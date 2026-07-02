@@ -1,0 +1,14 @@
+#vendor/
+#Dockerfile
+docker-compose.yml
+**.git
+.idea
+#**.gitignore
+#**.gitattributes
+#**.sass-cache
+certbot/
+var_log_letsencrypt/
+nginx/
+.gitignore
+.github/
+storage/

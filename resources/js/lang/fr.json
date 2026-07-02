@@ -1,0 +1,2370 @@
+{
+    "app_name": "Heroes CRM",
+
+    "add": "Ajouter",
+    "new": "Nouveau",
+    "new_order": "Nouveau devis",
+    "delete": "Supprimer",
+    "restore": "Restaurer",
+    "delete_confirm": "Voulez-vous vraiment effectuer cette suppression ?",
+    "update": "Modifier",
+    "edit": "Modifier",
+    "value": "Valeur",
+    "to_field": "Convertir en champ",
+    "to_field_confirm": "Voulez-vous vraiment transformer cette catégorie de filtres en champ classique ?",
+    "to_category": "Convertir en filtre",
+    "to_category_confirm": "Voulez-vous vraiment transformer ce champ en catégorie de filtres",
+
+    "cancel": "Annuler",
+    "ok": "OK",
+
+    "search": "Rechercher",
+    "all": "Tous",
+
+    "close": "Fermer",
+    "back": "Revenir",
+
+    "previous": "Précédent",
+    "next": "Suivant",
+
+    "enabled": "Activé",
+    "disabled": "Désactivé",
+
+    "none": "Aucun",
+    "show_more": "Afficher plus",
+    "show_less": "Afficher moins",
+    "required": "Obligatoire",
+
+    "name": "Nom",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "phone_number": "Numéro fixe",
+    "mobile_phone_number": "Numéro mobile",
+    "password": "Mot de passe",
+    "street": "Rue",
+    "street_bis": "Rue 2",
+    "postal_code": "Code postal",
+    "city": "Ville",
+    "country": "Pays",
+    "description": "Description",
+    "phone": "Téléphone",
+    "type": "Type",
+    "color": "Couleur de texte",
+    "bgcolor": "Couleur de fond",
+    "content": "Contenu",
+    "url": "URL",
+    "for": "Pour les",
+    "source": "Source",
+    "count": "Nombre",
+
+    "prospects": "Prospects",
+    "projects": "Projets",
+    "orders": "Devis",
+    "events": "RDVs",
+    "invoices": "Factures",
+    "users": "Utilisateurs",
+    "products": "Produits",
+
+    "copyright": "Heroes CRM since 2002 Reproduction interdite - Tous droits réservés / Reproduction forbidden - All rights reserved",
+    "request_error": "Erreur de requête.",
+
+    "auth": {
+        "email": "Email",
+        "password": "Mot de passe",
+        "confirm_password": "Confirmer le mot de passe",
+        "init_password": {
+            "title": "Réinitialiser le mot de passe",
+            "success": "Le lien de réinitialisation de mot de passe a été bien envoyé à l'adresse email <b>{email}</b>.",
+            "error": "Nous rencontrons pour l'instant une erreur lors de  l'envoi du lien de réinitialisation de mot de passe.<br><br>Vérifier bien que l'email saisi est correct.",
+            "send_verification_email": "Envoyer le lien de réinitialisation",
+            "sending_verification_email": "Envoi du lien de réinitialisation"
+        },
+        "register": {
+            "title": "S'inscrire",
+            "subscribe": "Inscription",
+            "already_have_an_account": "J'ai déjà un compte,"
+        },
+        "login": {
+            "title": "Connexion",
+            "authenticate": "Se connecter sur Heroes CRM",
+            "authenticating": "Connexion ...",
+            "forget_password": "J'ai oublié mon mot de passe",
+            "sign_up": "Je veux m'inscrire",
+            "google": "Se connecter via Google",
+            "error": "L'email ou le mot de passe est probablement erroné."
+        },
+        "google_authenticator": {
+            "open": "Ouvrez Google Authenticator,<br>Ou téléchargez l'application ici:<br><a href=\"https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr&gl=US\">Play Store</a> ou <a href=\"https://apps.apple.com/fr/app/google-authenticator/id388497605\">App Store</a>",
+            "scan_qrcode": "Et scannez le QR code suivant :",
+            "copy_following_key_configuration": "Ou copiez et saisissez la clé de configuration suivante :",
+            "check_type": "Ne demander que si vous changez d'IP.",
+            "key_security": "Clé de sécurité :",
+            "key_security_copied": "La clé de sécurité a été bien copiée",
+            "activate": "Activer Google Authenticator",
+            "activating": "Activation de Google Authenticator",
+            "login": "Connexion"
+        },
+        "impersonate": {
+            "back_to_my_account": "Retrouver mon compte"
+        },
+        "info_check": {
+            "1": "<b>RGPD / Sécurité SSL</b> renforcés.",
+            "2": "<b>Cryptage / Option</b> contrôlés.",
+            "3": "99,99% de <b>disponibilité des serveurs</b> + <b>Backup</b> en temps réel.",
+            "4": "Toute l’équipe du Heroes CRM est à votre service depuis 2002."
+        },
+        "partner": {
+            "title": "Plus de 200 partenaires et connecteurs inclus",
+            "call_sms_email": "Appel, SMS, mail",
+            "ads_systems": "Systèmes de Pubs",
+            "payment_systems": "Systèmes de paiement",
+            "accounting_systems": "Systèmes de comptabilité"
+        },
+        "session": {
+            "ban_device": "Bannir l'appareil",
+            "ban_code": "Code de bannissement",
+            "ban": "Bannir",
+            "connections": "Connexions"
+        }
+    },
+
+    "header": {
+        "close": "Fermer",
+        "home": "Accueil",
+        "prospects": "Prospects",
+        "appointments": "RDV",
+        "map": "MAP",
+        "mail": "Mails",
+        "order": "Devis",
+        "documents": "Documents",
+        "campaigns": "Campagnes",
+        "stat": "Statistiques",
+        "settings": "Paramètres"
+    },
+
+    "dashboard": {
+        "your_projects": "Vos tableaux",
+        "new_project": "Nouveau projet",
+        "new_user": "Nouvel utilisateur",
+        "stats": "Statistiques"
+    },
+
+    "prospect": {
+        "table": {
+            "footer": {
+                "deselect": "Déselectionner les prospects",
+                "init_filters": "Réinitialiser",
+                "toggle_menus": "Afficher/cacher les menus",
+                "toggle_prospect_menus": "Afficher/cacher les menus par prospect",
+                "add_prospect": "Nouveau prospect",
+                "import": "Importer des prospects",
+                "setting": "Paramètre des colonnes",
+                "previous": "Page précédente",
+                "next": "Page suivante",
+                "bulk_delete": "Supprimer définitivement",
+                "bulk_update": "Update",
+                "bulk_users": "Assigner ou rétirer des utilisateurs",
+                "bulk_groups": "Assigner ou rétirer des groupes",
+                "bulk_labels": "Assigner ou rétirer des filtres",
+                "bulk_project": "Copier les prospects vers un autre projet",
+                "bulk_sms": "SMS",
+                "bulk_messages": "Message",
+                "bulk_aircall_interactions": "Appeler sur Aircall",
+                "bulk_ringover_interactions": "Appeler sur Ringover",
+                "map": "MAP",
+                "export": "Exporter les prospects",
+                "find_duplicates": "Rechercher des duplications",
+                "bulk_archive": "Archiver",
+                "bulk_do_not_archive": "Re traiter",
+                "bulk_field": "Modifier un champ",
+                "search_and_replace": "Rechercher et remplacer",
+                "scan": "Scanner une carte de visite",
+                "page_prospects_count": "Nombre de prospects par page",
+                "prospects_count": "Nombre de prospects",
+                "row_max_lines": "Nombre de lignes max par prospects",
+                "current_page": "Page en cours"
+            },
+
+            "column": {
+                "manage": "Gérer les colonnes de {project}",
+                "delete_confirm": "Voulez-vous vraiment supprimer cette colonne ?",
+                "tab": {
+                    "fields": "Champs",
+                    "tags": "Filtres",
+                    "discussions": "Discussions",
+                    "forms": "Questionnaires",
+                    "others": "Autres"
+                },
+                "others": {
+                    "appointments": "RDV",
+                    "calls": "Appels",
+                    "sms": "SMS",
+                    "affected_users": "Utilisateurs affectés",
+                    "affected_groups": "Groupes affectés",
+                    "orders": "Devis",
+                    "import": "Import",
+                    "creator": "Créé par",
+                    "groups": "Groupes",
+                    "users": "Utilisateurs"
+                },
+                "import": {
+                    "use": "Utiliser les colonnes de l'import ...",
+                    "tooltip": {
+                        "name": "Tableau de prospects - Paramètre - Colonnes depuis un import",
+                        "body": "Utiliser les colonnes depuis un import ..."
+                    }
+                },
+                "event": {
+                    "fields": {
+                        "name": "Titre du RDV",
+                        "description": "Description du RDV",
+                        "location": "Adresse du RDV",
+                        "drop_off_location": "Adresse de destination du RDV",
+                        "started_hour": "Heure début RDV",
+                        "ended_hour": "Heure fin RDV",
+                        "started_date": "Date début RDV",
+                        "ended_date": "Date fin RDV",
+                        "calendar": "Type de RDV",
+                        "user": "RDV affecté à",
+                        "vehicle": "Véhicule RDV",
+                        "prospect": "Prospect RDV",
+                        "order": "Devis RDV"
+                    }
+                }
+            },
+
+            "cell": {
+                "event": {
+                    "add": "Ajouter un RDV"
+                },
+                "thread": {
+                    "enter_message": "Ecrire un message ...",
+                    "view_thread": "Voir la discussion ...",
+                    "send": "Envoyer ..."
+                }
+            },
+
+            "filters": {
+                "all": {
+                    "title": "Filtres"
+                },
+                "users": {
+                    "title": "Filtrer par utilisateurs affectés",
+                    "with": "Avec utilisateurs ...",
+                    "without": "Non affectés à un utilisateur",
+                    "without_user": "Non affectés à {user}"
+                },
+                "groups": {
+                    "title": "Filtrer par groupes affectés",
+                    "with": "Avec groupes ...",
+                    "without": "Non affectés à un groupe",
+                    "without_group": "Non affectés à {group}"
+                },
+                "imports": {
+                    "title": "Filtrer par imports",
+                    "with": "Avec imports ...",
+                    "without": "Non importés",
+                    "without_import": "Non associé à {import}"
+                },
+                "pipedrive_accounts": {
+                    "title": "Filtrer par ajouté depuis Pipedrive",
+                    "with": "Depuis Pipedrive ...",
+                    "without": "Non depuis Pipedrive ...",
+                    "without_pipedrive_account": "Non associé à {pipedriveAccount}"
+                },
+                "creators": {
+                    "title": "Filtrer par créateurs",
+                    "with": "Avec créateurs ...",
+                    "without": "Créateur inconnus",
+                    "without_creator": "Non associé à {creator}"
+                },
+                "appointments": {
+                    "title": "Filtrer par RDV",
+                    "with": "Avec RDV ...",
+                    "without": "Sans RDV",
+                    "calendars": "Calendriers ...",
+                    "no_selected_calendar": "Aucun calendrier sélectionné ...",
+                    "affected_to": "Affectés à ...",
+                    "no_selected_affected_to": "Aucun utilisateur sélectionné ...",
+                    "created_by": "Créés par ...",
+                    "no_selected_created_by": "Aucun utilisateur sélectionné ...",
+                    "after": "Après le",
+                    "before": "Avant le",
+                    "future": "A venir",
+                    "old": "Passé",
+                    "confirmed": "RDV confirmés",
+                    "not_confirmed": "RDV non confirmés",
+                    "done": "RDV faits",
+                    "not_done": "RDV non faits",
+                    "select_calendars": "Sélectionner des calendriers ..."
+                },
+                "field": {
+                    "title": "Filtrer par champ"
+                },
+                "file": {
+                    "title": "Filtrer par fichier",
+                    "with_files": "Avec fichiers",
+                    "without_file": "Sans fichier",
+                    "without_folder": "Sans fichier dans {folder}"
+                },
+                "interaction": {
+                    "title": "Filtrer par appel",
+                    "with_interactions": "Avec appels",
+                    "without_interaction": "Sans appel"
+                },
+                "message": {
+                    "title": "Filtrer par message",
+                    "with_messages": "Avec messages",
+                    "without_message": "Sans message",
+                    "without_thread": "Sans message dans {thread}"
+                },
+                "order": {
+                    "title": "Filtrer par devis",
+                    "with_orders": "Avec devis ...",
+                    "with_products": "Avec produits ...",
+                    "with_actions": "Avec actions ...",
+                    "with_steps": "Avec étapes ...",
+                    "with_statuses": "Avec états ...",
+                    "with_documents": "Avec documents ...",
+                    "created_by": "Créés par ...",
+                    "select_actions": "Sélectionner des actions ...",
+                    "select_products": "Sélectionner des produits ...",
+                    "select_steps": "Sélectionner des étapes ...",
+                    "select_statuses": "Sélectionner des états ...",
+                    "select_documents": "Sélectionner des documents ..."
+                },
+                "sms": {
+                    "title": "Filtrer par sms ...",
+                    "with_sms": "Avec SMS ...",
+                    "sources": "Sources ...",
+                    "created_by": "Créé par ...",
+                    "after": "Après le",
+                    "before": "Avant le",
+                    "sent": "SMS envoyé ...",
+                    "not_sent": "SMS non envoyé ...",
+                    "with_error": "Avec erreur ...",
+                    "without_error": "Sans erreur ...",
+                    "select_sources": "Sélectionner des sources ...",
+                    "without_source": "Aucun sms envoyé via {source}"
+                },
+                "threads": {
+                    "title": "Filtrer par messages"
+                },
+                "label": {
+                    "title": "Filtrer par filtre",
+                    "without_label": "Sans filtre {label}"
+                }
+            },
+
+            "bulk": {
+                "group": {
+                    "title": "Groupes affectés"
+                },
+                "label": {
+                    "title": "Filtres affectés",
+                    "selected": "{selected} filtre(s) sélectionné(s)",
+                    "new_category": "Nouvelle catégorie",
+                    "new_label": "Nouveau filtre dans {category}"
+                },
+                "user": {
+                    "title": "Utilisateurs affectés"
+                },
+                "field": {
+                    "title": "Modifier un champ"
+                },
+                "project": {
+                    "title": "Copier vers un autre project"
+                },
+                "add": "Assigner",
+                "remove": "Retirer"
+            }
+        },
+        "profile": {
+            "setting": {
+                "title": "Paramètre fiche de prospect",
+                "column_i": "Colonne {i}",
+                "new_bloc": "Nouveau bloc",
+                "fields": "Champs",
+                "messages": "Messages",
+                "files": "Dossiers",
+                "filters": "Filtres",
+                "orders": "Devis",
+                "pipelines": "Pipelines",
+                "labels": "Filtres actifs",
+                "external_links": "Liens externes",
+                "events": "RDVs",
+                "history": "Historiques",
+                "calls": "Appels",
+                "sms": "SMS",
+                "documents": "Documents",
+                "affected_users": "Utilisateurs affectés",
+                "affected_groups": "Groupes affectés",
+                "map": "MAP",
+                "edit_bloc": "Modifier le bloc"
+            },
+            "bloc": {
+                "messages": "Messages",
+                "files": "Fichiers",
+                "filters": "Filtres",
+                "orders": "Devis",
+                "labels": "Filtres actifs",
+                "external_links": "Liens externes",
+                "events": "RDVs",
+                "history": "Historiques",
+                "calls": "Appels",
+                "sms": "SMS",
+                "documents": "Documents",
+                "affected_users": "Utilisateurs affectés",
+                "affected_groups": "Groupes affectés",
+                "map": "MAP"
+            },
+            "menus": {
+                "sms": "SMS",
+                "call": "Appel",
+                "message": "Message",
+                "file": "Fichier",
+                "document": "Document",
+                "order": "Devis",
+                "event": "RDV",
+                "label": "Filtres",
+                "log": "Historique de consultations",
+                "questionnaire": "Questionnaire",
+                "revision": "Historique de modification",
+                "setting": "Paramètre des blocs de la fiche prospect",
+                "map": "MAP"
+            }
+        },
+        "document": {
+            "title": "Documents ({prospect})"
+        },
+        "interaction": {
+            "title": "Appels ({prospect})",
+            "add_history": "Ajouter un historique d'appel",
+            "edit_phone_number": "Modifier le numéro",
+            "edit_mobile_phone_number": "Modifier le numéro mobile",
+            "call_by_phone": "Appeler via Téléphone",
+            "call_by_aircall": "Appeler via Aircall",
+            "call_by_ringover": "Appeler via Ringover",
+            "history": "Historique"
+        },
+        "message": {
+            "title": "Message ({prospect})",
+            "email_setting": "Paramètre d'envoi d'email",
+            "templates": {
+                "title": "Templates de message",
+                "send": "Envoyer"
+            }
+        },
+        "order": {
+            "title": "Commandes ({prospect})",
+            "commission": {
+                "total": "Total",
+                "remain": "Reste",
+                "paid": "Payé",
+                "in_percent": "En pourcentage",
+                "tax_included": "TTC",
+                "tax_excluded": "HT",
+                "mark_as_paid": "Marquer comme payé",
+                "mark_as_unpaid": "Marquer comme non payé",
+                "select_user": "Choisir un utilisateur ..."
+            },
+            "product": {
+                "add_product_to_order": "Ajouter {product} dans le devis",
+                "add_to_order": "Ajouter dans le devis",
+                "quantity": "Quantité",
+                "price": "Prix",
+                "currency": "Devise",
+                "tax_in_percent": "Taxe en %",
+                "tax_included": "Taxe incluse"
+            },
+            "tabs": {
+                "products": {
+                    "title": "Produits"
+                },
+                "commissions": {
+                    "title": "Commissions",
+                    "manage": "Gérer les commissions",
+                    "not_defined": "Commission non définie"
+                },
+                "steps": {
+                    "title": "Etapes"
+                },
+                "documents": {
+                    "title": "Documents"
+                },
+                "fields": {
+                    "title": "Autre infos",
+                    "add": "Ajouter un autre champ",
+                    "remove_confirm": "Voulez-vous vraiment supprimer ce champ de votre projet ?"
+                },
+                "status": {
+                    "title": "Etat"
+                }
+            }
+        },
+        "sms": {
+            "title": "SMS ({prospect})",
+            "bulk_title": "SMS ({count} prospect(s))",
+            "via_your_phone": "SMS via votre téléphone",
+            "via_whatsapp": "SMS via Whatsapp",
+            "via_smsbox": "SMS via SMSBOX",
+            "via_mtarget": "SMS via MTarget",
+            "via_ringover": "SMS via Ringover",
+            "via_ultramsg": "SMS via UltraMsg",
+            "via_source": "SMS via {source}",
+            "templates": "Templates SMS",
+            "enter_text_message": "Saisir un SMS"
+        },
+        "file": {
+            "title": "Fichiers ({prospect})"
+        },
+        "group": {
+            "title": "Groupes ({prospect})"
+        },
+        "label": {
+            "title": "Filtres ({prospect})"
+        },
+        "form": {
+            "title": "Questionnaire",
+            "your_response": "Votre réponse ..."
+        },
+        "affected_user": {
+            "title": "Utilisateurs affectés ({prospect})"
+        },
+        "external_link": {
+            "title": "Liens externes ({prospect})",
+            "add": {
+                "title": "Nouveau lien externe ({prospect})"
+            }
+        },
+        "log_history": {
+            "title": "Historique de consultation ({prospect})"
+        },
+        "revision_history": {
+            "title": "Historique de modification ({prospect})"
+        },
+        "scan": {
+            "title": "Scanner une carte de visite",
+            "choose_file": "Choisir des fichiers",
+            "scan": "Scanner",
+            "import": "Importer",
+            "view_prospect": "Voir la fiche prospect",
+            "error": {
+                "camera_access": "Erreur d'accès à la camera: {error}",
+                "camera_stop": "Impossible de stopper la camera: {error}",
+                "camera_disabled": "Camera non active."
+            },
+            "success": {
+                "title": "Scan de carte de visite",
+                "message": "Vos fichiers importés seront prochainement scannés<br>et les prospects correspondant seront importés dans votre projet."
+            }
+        }
+    },
+
+    "import": {
+        "add": {
+            "title": "Importer des prospects",
+            "from": {
+                "label": "Depuis",
+                "local_file": "Fichier local",
+                "webservice": "Externe via URL"
+            },
+            "file": "Fichier",
+            "name": "Nom",
+            "field_delimiter": "Séparateur de champs",
+            "field_enclosure": "Délimiteur de texte",
+            "comma": "Virgule",
+            "semicolon": "Point virgule",
+            "tab": "(Tabulation)",
+            "space": "(Espace)"
+        },
+        "update": {
+            "name": "Nom"
+        },
+        "process": {
+            "title": "Import",
+            "tab": {
+                "mapping": {
+                    "title": "Mapping",
+                    "cancel": "Annuler le mapping",
+                    "event": "RDV",
+                    "order": "Devis",
+                    "sms": "SMS",
+                    "interaction": "Appel",
+                    "link": "Lien externe",
+                    "user": "Utilisateurs affectés",
+                    "plus_field": "+ Champ",
+                    "plus_category": "+ Filtre",
+                    "shortcut_new_field": "Nouveau champ",
+                    "shortcut_new_category": "Nouveau filtre",
+                    "shortcut_new_thread": "Nouveau canal de discussion",
+                    "new_field": "Nouveau champ de prospect",
+                    "new_category": "Nouvelle catégorie de filtres",
+                    "new_column": "Nouvelle colonne",
+                    "auto_field": "[Nouveau champ]",
+                    "auto_category": "[Nouveau filtre]",
+                    "auto_thread": "[Nouveau canal de discussion]"
+                },
+                "relations": {
+                    "title": "Relations",
+                    "affected_users": "Utilisateurs affectés",
+                    "affected_groups": "Groupes affectés"
+                },
+                "import": {
+                    "title": "Importer",
+                    "process": "Valider l'import",
+                    "re_process": "Re importer",
+                    "delete": {
+                        "import": "Supprimer l'import",
+                        "import_and_prospects": "Supprimer l'import et les prospects de l'import",
+                        "prospects": "Supprimer les prospects de l'import"
+                    },
+                    "download": "Télécharger le fichier de l'import",
+                    "stop": "Arrêter l'import",
+                    "view_prospects": "Voir les prospects importés",
+                    "prospects_table": {
+                        "title": "Tableau de prospects",
+                        "body": "Utiliser les colonnes dans cet import en tant que colonnes dans votre tableau de prospects"
+                    },
+                    "duplicate": {
+                        "title": "Vérifier les doublons",
+                        "fields": "Chercher par rapport aux champs ...",
+                        "choose_action": "Choisir une action à faire",
+                        "remove_duplicating": "Supprimer les anciens prospects dupliqués",
+                        "remove_duplicates": "Supprimer les duplications de prospects dans l'import",
+                        "replace_duplicating": "Ecraser les données modifiées des anciens prospects par celles des nouveaux"
+                    },
+                    "processing": "Nous vous enverrons un mail lorsque l'import sera terminé.",
+                    "webservice": {
+                        "step_1": "Pour associer votre zap avec cet import,<br />Connectez-vous sur Zapier, et créez-y votre zap:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Créer un Zap</a>",
+                        "step_2": "Choisissez <b>Google Sheet</b> comme <b>Trigger</b>,<br />Choisissez <b>New Spreadsheet Row [instant]</b> comme <b>Event</b>,<br />Cliquer sur <b>Continue</b>.",
+                        "step_3": "Choisissez votre compte Google contenant le fichier Google Sheet à importer dans <b>Choose account</b>,<br />Cliquer sur <b>Continue</b>.",
+                        "step_4": "Choisissez le fichier Google Sheet dans <b>Spreedsheet</b>,<br />Choisissez la feuille dans <b>Worksheet</b>,<br />Cliquer sur <b>Continue</b>.",
+                        "step_5": "Cliquer sur <b>Test Trigger</b> pour bien vérifier que Zapier a accès à votre fichier Google Sheet,<br />Cliquer sur <b>Continue</b>.",
+                        "step_6": "Choisissez <b>Webhooks by Zapier</b> comme <b>Action</b>,<br /> Choisissez <b>GET</b> comme <b>Event</b>,<br />Cliquer sur <b>Continue</b>.",
+                        "step_7": "Ajouter le lien suivant dans <b>URL</b>:",
+                        "step_8": "Vous pouvez utiliser les paramètres suivants comme<br /><b>Query String Params</b> à associer aux colonnes du fichier Google Sheet:",
+
+                        "webhook_url_copied": "URL Webhook copié",
+                        "query_string_copied": "Query String copié"
+                    }
+                },
+                "duplicate": {
+                    "title": "MAJ"
+                }
+            }
+        }
+    },
+
+    "user": {
+        "add": {
+            "title": "Nouvel utilisateur",
+            "email": "Saisir l'email de l'utilisateur",
+            "not_found": "Aucun utilisateur ayant ce mail n'a été trouvé dans notre base de données.",
+            "create": "Créer l'utilisateur",
+            "create_professional_project": "Créer un projet professionnel",
+            "create_personal_project": "Créer un projet personnel",
+            "create_demo_project": "Créer un projet démo"
+        },
+        "list": {
+            "title": "Utilisateurs"
+        },
+        "profile": {
+            "affected_projects": "Projets associés",
+            "setting": {
+                "title": "Paramètre de la fiche utilisateur",
+                "column_i": "Colonne {i}",
+                "new_bloc": "Nouveau bloc",
+                "fields": "Champs",
+                "files": "Fichiers"
+            },
+            "blocs": {
+                "calendars": "Calendriers affectés",
+                "categories": "Catégories de filtre affectées",
+                "documents": "Documents affectés",
+                "exports": "Exports",
+                "folders": "Dossiers affectés",
+                "geoips": "Locations",
+                "groups": "Groupes affectés",
+                "imports": "Imports",
+                "menus": "Menus affectés",
+                "order_actions": "Actions sur les devis affectées",
+                "order_status": "Etats de devis affectés",
+                "order_steps": "Etapes de devis affectées",
+                "projects": "Projets",
+                "questionnaires": "Questionnaires affectées",
+                "roles": "Rôles affectés",
+                "sessions": "Connexions",
+                "threads": "Canaux de discussion affectés",
+                "users": "Utilisateurs affectés"
+            },
+            "password_update": {
+                "confirm": "Etes-vous sûr de modifier le mot de passe ?",
+                "success": "Mot de passe modifié avec succès !",
+                "error": "Erreur lors de la modificaion de mot de passe!"
+            },
+            "menus": {
+                "files": "Fichiers",
+                "duplicate": "Dupliquer le profil pour d'autres utilisateurs",
+                "history": "Historique de connexion",
+                "actions": "Actions faites par l'utilisateur",
+                "permissions": "Permissions",
+                "vehicle": "Véhicules",
+                "prospect_profile_setting": "Paramètre de la fiche prospect",
+                "prospects_table_setting": "Paramètre du tableau de prospects",
+                "user_profile_setting": "Paramètre de la fiche utilisateur",
+                "use": "Se connecter avec ce compte"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "Déselectionner les prospects",
+                "init_filters": "Réinitialiser",
+                "toggle_menus": "Afficher/cacher les menus",
+                "toggle_user_menus": "Afficher/cacher les menus par utilisateur",
+                "add_user": "Ajouter un utilisateur",
+                "import": "Importer",
+                "add_column": "Nouvelle colonne",
+                "previous": "Page précédente",
+                "next": "Page suivante",
+                "bulk_delete": "Enlever du projet",
+                "bulk_calendars": "Assigner ou rétirer des types de RDV",
+                "bulk_categories": "Assigner ou rétirer des categories",
+                "bulk_documents": "Assigner ou rétirer des documents",
+                "bulk_folders": "Assigner ou rétirer des dossiers",
+                "bulk_groups": "Assigner ou rétirer des groupes",
+                "bulk_menus": "Assigner ou rétirer des menus",
+                "bulk_order_actions": "Assigner ou rétirer des actions sur les devis",
+                "bulk_order_steps": "Assigner ou rétirer des étapes de devis",
+                "bulk_roles": "Assigner ou rétirer des rôles",
+                "bulk_threads": "Assigner ou rétirer des canaux de discussion",
+                "bulk_users": "Assigner ou rétirer des utilisateurs"
+            },
+
+            "column": {
+                "manage": "Gérer les colonnes de {project}",
+                "new": "Nouvelle colonne",
+                "tab": {
+                    "fields": "Champs",
+                    "others": "Autres"
+                },
+                "others": {
+                    "calendars": "Types de RDV",
+                    "categories": "Categories",
+                    "documents": "Documents",
+                    "folders": "Dossiers",
+                    "groups": "Groupes",
+                    "menus": "Menus",
+                    "order_actions": "Actions sur les devis",
+                    "order_statuses": "Etats de devis",
+                    "order_steps": "Etapes de devis",
+                    "projects": "Projets",
+                    "last_project": "Connecté sur",
+                    "questionnaires": "Questionnaires",
+                    "roles": "Roles",
+                    "threads": "Canaux de discussion",
+                    "users": "Utilisateurs"
+                }
+            },
+
+            "filters": {
+                "calendars": {
+                    "title": "Filtrer par types de RDV affectés",
+                    "with": "Avec types de RDV ...",
+                    "without": "Non affectés à un type de RDV",
+                    "without_calendar": "Non affectés à {calendar}"
+                },
+                "categories": {
+                    "title": "Filtrer par categories de filtres affectées",
+                    "with": "Avec categories de filtres ...",
+                    "without": "Non affectés à une categorie de filtre",
+                    "without_category": "Non affectés à {category}"
+                },
+                "documents": {
+                    "title": "Filtrer par documents affectés",
+                    "with": "Avec documents ...",
+                    "without": "Non affectés à un document",
+                    "without_document": "Non affectés à {document}"
+                },
+                "folders": {
+                    "title": "Filtrer par dossiers affectés",
+                    "with": "Avec dossiers ...",
+                    "without": "Non affectés à un dossier",
+                    "without_folder": "Non affectés à {folder}"
+                },
+                "groups": {
+                    "title": "Filtrer par groupes affectés",
+                    "with": "Avec groupes ...",
+                    "without": "Non affectés à un groupe",
+                    "without_group": "Non affectés à {group}"
+                },
+                "menus": {
+                    "title": "Filtrer par menus affectés",
+                    "with": "Avec menus ...",
+                    "without": "Non affectés à un menu",
+                    "without_menu": "Non affectés à {menu}"
+                },
+                "order_actions": {
+                    "title": "Filtrer par actions sur les devis affectées",
+                    "with": "Avec actions sur les devis ...",
+                    "without": "Non affectés à une action sur les devis",
+                    "without_order_action": "Non affectés à {order_action}"
+                },
+                "order_steps": {
+                    "title": "Filtrer par étapes de devis affectées",
+                    "with": "Avec étapes de devis ...",
+                    "without": "Non affectés à une étape de devis",
+                    "without_order_step": "Non affectés à {order_step}"
+                },
+                "roles": {
+                    "title": "Filtrer par rôles affectés",
+                    "with": "Avec rôles ...",
+                    "without": "Non affectés à un rôle",
+                    "without_role": "Non affectés à {role}"
+                },
+                "threads": {
+                    "title": "Filtrer par canaux de discussion affectés",
+                    "with": "Avec canaux de discussion ...",
+                    "without": "Non affectés à un canal de discussion",
+                    "without_thread": "Non affectés à {thread}"
+                },
+                "users": {
+                    "title": "Filtrer par utilisateurs affectés",
+                    "with": "Avec utilisateurs ...",
+                    "without": "Non affectés à un utilisateur",
+                    "without_user": "Non affectés à {user}"
+                }
+            },
+            "bulk": {
+                "calendars": {
+                    "title": "Calendriers affectés"
+                },
+                "categories": {
+                    "title": "Categories de filtres affectés"
+                },
+                "documents": {
+                    "title": "Documents affectés"
+                },
+                "folders": {
+                    "title": "Dossiers affectés"
+                },
+                "groups": {
+                    "title": "Groupes affectés"
+                },
+                "menus": {
+                    "title": "Menus affectés"
+                },
+                "order_actions": {
+                    "title": "Actions sur les devis affectés"
+                },
+                "order_steps": {
+                    "title": "Etapes de devis affectés"
+                },
+                "roles": {
+                    "title": "Rôles affectés"
+                },
+                "threads": {
+                    "title": "Canaux de discussion affectés"
+                },
+                "users": {
+                    "title": "Utilisateurs affectés"
+                }
+            }
+        },
+        "duplicate": {
+            "title": "Duplication de profil",
+            "from": "Dupliquer pour",
+            "for": "Dupliquer depuis"
+        },
+        "calendars": {
+            "title": "Types de RDV affectés"
+        },
+        "categories": {
+            "title": "Catégories de filtres affectées"
+        },
+        "documents": {
+            "title": "Documents affectés"
+        },
+        "files": {
+            "title": "Fichiers de {user}"
+        },
+        "folders": {
+            "title": "Dossiers affectés"
+        },
+        "groups": {
+            "title": "Groupes affectés"
+        },
+        "menus": {
+            "title": "Menus affectés"
+        },
+        "order_actions": {
+            "title": "Actions sur les devis affectées"
+        },
+        "order_steps": {
+            "title": "Etapes de devis affectées"
+        },
+        "permissions": {
+            "title": "Permissions"
+        },
+        "project": {
+            "title": "Projets"
+        },
+        "questionnaires": {
+            "title": "Questionnaires affectés"
+        },
+        "roles": {
+            "title": "Rôles affectés"
+        },
+        "sessions": {
+            "title": "Appareils connectés"
+        },
+        "settings": {
+            "prospects_table": {
+                "title": "Paramètre - Tableau de prospects"
+            },
+            "prospects_table_menus": {
+                "title": "Paramètre - Menus tableau de prospects"
+            },
+            "prospect_profile": {
+                "title": "Paramètre - Fiche prospect"
+            }
+        },
+        "threads": {
+            "title": "Discussions affectées"
+        },
+        "users": {
+            "title": "Utilisateurs affectés"
+        },
+        "vehicles": {
+            "title": "Véhicules",
+            "add": {
+                "title": "Véhicule"
+            }
+        },
+        "log_chart": {
+            "title": "Logs Chart"
+        },
+        "actions": {
+            "title": "Actions faites par l'utilisateur"
+        }
+    },
+
+    "map": {
+        "prospect": {
+            "default_infos": "Informations par défaut",
+            "other_infos": "Autres informations",
+            "labels": "Filtres",
+            "appointments": "RDV",
+            "orders": "Devis",
+            "search": "Chercher à partir de ce prospect"
+        },
+        "prospect_without_lat_lng": {
+            "title": "Prospects sans lat/lng"
+        },
+        "vehicles": {
+            "title": "Véhicules"
+        },
+        "color": {
+            "title": "Colorer les marqueurs de la MAP avec ..."
+        }
+    },
+
+    "campaign": {
+        "mobile": "Veuillez utiliser un ordinateur pour utiliser cet outil.",
+        "campaign": {
+            "title": "Campagne",
+            "new": "Nouvelle campagne",
+            "enabled": "Activé",
+            "for": {
+                "prospect": "Pour les prospects",
+                "order": "Pour les devis",
+                "appointment": "Pour les RDVs"
+            },
+            "frequency": {
+                "once": "Une seule fois",
+                "every_fifteen_minutes": "Toutes les 15mn",
+                "every_thirty_minutes": "Toutes les 30mn",
+                "hourly": "Toutes les heures",
+                "daily": "Tous les jours",
+                "monthly": "Tous les mois"
+            },
+            "date": "Date",
+            "hour": "Heure",
+            "re_process_processed_prospects": "Retraiter les prospects déjà traités",
+            "check_rules": "Vérifier les règles",
+            "view_matching_prospects": "Voir les prospects concernés"
+        },
+        "operator": {
+            "title": "Opérateur",
+            "or": "OU",
+            "and": "ET"
+        },
+        "rule": {
+            "prospect": {
+                "title": "Prospect",
+                "tag": "Filtre",
+                "menu": "Menu",
+                "sms": {
+                    "title": "SMS",
+                    "source": "Source de SMS reçus",
+                    "count": "Nombre de SMS reçus"
+                },
+                "interaction": {
+                    "title": "Appel",
+                    "source": "Source d'appels reçus",
+                    "count": "Nombre d'appels reçus"
+                }
+            },
+            "order": {
+                "title": "Devis",
+                "action": "Avec actions",
+                "product": "Avec produits",
+                "status": "Avec états",
+                "step": "Avec étapes"
+            },
+            "appointment": {
+                "title": "RDV",
+                "date": {
+                    "title": "Date",
+                    "starts_in_more_than_mn": "Dans plus de {minute} mn",
+                    "starts_in_less_than_mn": "Dans moins de {minute} mn",
+                    "started_less_than_ago_mn": "Depuis moins de {minute} mn ago",
+                    "started_more_than_ago_mn": "Depuis plus de {minute} mn ago"
+                }
+            }
+        },
+        "action": {
+            "prospect": {
+                "archive": "Archiver",
+                "do_not_archive": "Ne pas archiver",
+                "remove": "Supprimer le prospect",
+                "message": {
+                    "title": "Envoyer un message / mail",
+                    "name": "Envoyer un message dans \"{thread}\": {content}",
+                    "thread": {
+                        "title": "Canal de discussion ...",
+                        "placeholder": "Choisir un canal de discussion ..."
+                    },
+                    "user": {
+                        "title": "Attendre retour de ...",
+                        "placeholder": "Choisir un utilisateur ..."
+                    },
+                    "template": {
+                        "title": "Choisir un template de message"
+                    },
+                    "enter_message": "Saisir un message"
+                },
+                "sms": {
+                    "title": "Envoyer un SMS",
+                    "name": "Envoyer un SMS",
+                    "source": "Source",
+                    "sms": "SMS"
+                },
+                "event": {
+                    "title": "Créer un RDV",
+                    "name": "Créer un {calendar} de {duration} mn pour {user} entre {min_days} et {max_days} jours",
+                    "duration": "Durée",
+                    "calendar": {
+                        "title": "Calendrier",
+                        "placeholder": "Choisir un calendrier ..."
+                    },
+                    "user": {
+                        "title": "Utilisateur",
+                        "placeholder": "Choisir un utilisateur ...",
+                        "random": "Utilisateur aléatoire",
+                        "prospect_creator": "Celui qui a créé le prospect",
+                        "prospect_affected_user": "Celui qui est affecté au prospect",
+                        "role": "Rôle {role}"
+                    },
+                    "date": {
+                        "title": "Dans X jours",
+                        "min": "Min...",
+                        "max": "Max..."
+                    }
+                },
+                "attach_group": {
+                    "title": "Affecter un groupe"
+                },
+                "attach_label": {
+                    "title": "Affecter un filtre"
+                },
+                "attach_user": {
+                    "title": "Affecter un utilisateur"
+                },
+                "detach_group": {
+                    "title": "Detacher un groupe"
+                },
+                "detach_label": {
+                    "title": "Detacher un filtre"
+                },
+                "detach_user": {
+                    "title": "Detacher un utilisateur"
+                },
+                "document_to_folder": {
+                    "title": "Générer un document PDF dans un dossier prospect",
+                    "name": "Générer le document \"{document}\" dans le dossier \"{folder}\"",
+                    "document": "Document à générer ...",
+                    "select_document": "Choisir un document ...",
+                    "folder": "Dossier de destination ...",
+                    "select_folder": "Choisir un dossier ..."
+                },
+                "document_to_thread": {
+                    "title": "Envoyer un document PDF dans un canal de discussion",
+                    "name": "Envoyer le document \"{document}\" dans la discussion \"{thread}\"",
+                    "document": "Document à générer ...",
+                    "select_document": "Choisir un document ...",
+                    "thread": "Discussion de destination ...",
+                    "select_thread": "Choisir une discussion ..."
+                },
+                "order": {
+                    "title": "Créer un devis",
+                    "name": "Créer un devis ({name})",
+                    "add": "Créer le devis"
+                }
+            },
+            "order": {
+                "generate_invoice": {
+                    "title": "Générer la facture du devis",
+                    "name": "Générer la facture \"{invoice}\""
+                },
+                "sign_invoice": {
+                    "title": "Signer la facture du devis",
+                    "name": "Signer la facture du devis \"{invoice}\""
+                },
+                "user_action": {
+                    "title": "Associer une action sur la devis à un utilisateur",
+                    "name": "Associer l'action \"{action}\" à {user}",
+                    "action": "Action sur le devis ...",
+                    "select_action": "Choisir une action ...",
+                    "user": "Utilisateur ...",
+                    "select_user": "Choisir un type d'utilisateur ...",
+                    "order_creator": "Celui qui a créé le devis",
+                    "prospect_creator": "Celui qui a créé le prospect",
+                    "prospect_affected_user": "Celui qui est affecté au prospect",
+                    "role": "Rôle {role}"
+                }
+            }
+        },
+        "matching_prospects": {
+            "title": "Prospects concernés"
+        }
+    },
+
+    "document": {
+        "update": {
+            "folder": "Générer dans le dossier {folder}"
+        },
+        "mobile": "Veuillez utiliser un ordinateur pour utiliser cet outil.",
+        "dashboard": {
+            "new_from_template": "Créer un document à partir d'un template",
+            "your_documents": "Vos templates de document"
+        },
+        "add": {
+            "title": "Nouveau template de document"
+        },
+        "list": {
+            "title": "Documents"
+        },
+        "pdf": {
+            "title": "PDF"
+        },
+        "font": {
+            "title": "Fonts",
+            "new": {
+                "title": "Nouvelle font",
+                "choose_file": "Choisir un fichier .ttf",
+                "type": {
+                    "title": "Type",
+                    "normal": "Normal",
+                    "bold": "Gras"
+                },
+                "style": {
+                    "title": "Style",
+                    "normal": "Normal",
+                    "italic": "Italic"
+                }
+            }
+        },
+        "page": {
+            "title": "Page",
+            "all": "Toutes les pages",
+            "add": {
+                "title": "Nouvelle page",
+                "choose_file": "Choisir un fichier",
+                "page": "Page",
+                "width": "Largeur en mm",
+                "height": "Hauteur en mm",
+                "empty": "Page blanche"
+            }
+        },
+        "zoom": {
+            "title": "Zoom"
+        },
+        "style": {
+            "frame": {
+                "title": "Frame",
+                "left": "Gauche",
+                "top": "Haut",
+                "width": "Largeur",
+                "height": "Hauteur",
+                "rotation": "Rotation",
+                "padding": {
+                    "title": "Marge interne",
+                    "top": "H",
+                    "right": "D",
+                    "bottom": "B",
+                    "left": "G"
+                },
+                "background_color": "Couleur de fond"
+            },
+            "format": {
+                "title": "Texte / Format",
+                "type": {
+                    "title": "Type",
+                    "text": "Texte",
+                    "html": "HTML",
+                    "qrcode": "QR Code"
+                },
+                "font_size": "Taille",
+                "line_height": "Hauteur des lignes",
+                "font": "Police",
+                "color": "Couleur de texte"
+            },
+            "border": {
+                "title": "Bordure",
+                "width": {
+                    "title": "Taille",
+                    "top": "H",
+                    "right": "D",
+                    "bottom": "B",
+                    "left": "G"
+                },
+                "style": {
+                    "title": "Style",
+                    "solid": "Solide",
+                    "dashed": "Tiret",
+                    "dotted": "Pointillé"
+                },
+                "color": "Couleur",
+                "radius": "Rondeur"
+            },
+            "content": {
+                "title": "Contenu"
+            },
+            "order_table": {
+                "table": {
+                    "header_style": "Style de l'entête",
+                    "content": "Contenu",
+                    "body_style": "Style de la colonne"
+                },
+                "summary": {
+                    "header_style": "Style de l'entête",
+                    "content": "Contenu",
+                    "body_style": "Style de la colonne"
+                },
+                "apply_to_all_cells": "Appliquer à toutes les cellules"
+            }
+        },
+        "map": {
+            "title": "MAP",
+            "satellite": "Satellite",
+            "roadmap": "Carte routère",
+            "hybrid": "Hybride",
+            "terrain": "Terrain",
+            "zoom": "Zoom"
+        },
+        "field": {
+            "page": {
+                "number": "Numéro de page"
+            },
+            "prospect": {
+                "title": "Prospect",
+                "default_fields": "Champs par défaut",
+                "other_fields": "Champs ajoutés"
+            },
+            "map": {
+                "title": "MAP"
+            },
+            "date": {
+                "title": "Date"
+            },
+            "order": {
+                "title": "Devis",
+                "table": {
+                    "title": "Tableau de devis",
+                    "columns": "Colonnes",
+                    "summaries": "Résumés",
+                    "edit": "Modifier le tableau de devis"
+                },
+                "number": "Numéro de facture",
+                "date": "Date de création",
+                "invoice_number": "Invoice N° {number}",
+                "invoice_date": "Date de création: {date}",
+                "product_i": "Produit {i}"
+            },
+            "tag": {
+                "title": "Filtre"
+            },
+            "questionnaire": {
+                "title": "Questionnaire"
+            },
+            "project": {
+                "thumbnail": "Logo"
+            },
+            "tabs": {
+                "prospects": {
+                    "title": "Prospects"
+                },
+                "map": {
+                    "title": "MAP"
+                },
+                "dates": {
+                    "title": "Dates"
+                },
+                "orders": {
+                    "title": "Devis"
+                },
+                "labels": {
+                    "title": "Filtres"
+                },
+                "forms": {
+                    "title": "Questionnaires"
+                },
+                "project": {
+                    "title": "Projet"
+                },
+                "pdfs": {
+                    "title": "Fichiers PDF"
+                },
+                "fonts": {
+                    "title": "Fonts"
+                },
+                "pages": {
+                    "title": "Pages",
+                    "number": "Numéro de page",
+                    "portrait": "Portrait",
+                    "landscape": "Paysage",
+                    "new_from": "Nouvelle page depuis"
+                }
+            }
+        }
+    },
+
+    "event": {
+        "title": "RDV",
+        "view_prospect": "Voir le prospect",
+        "view_and_edit": "Voir et modifier le RDV",
+        "new": "Nouveau RDV",
+        "move": "Déplacer le RDV",
+        "google_calendar_associated_account": "Compte Google Calendar associé",
+        "google_calendar_remove_account_confirm": "Voulez-vous vraiment ne plus associer votre compte Google Calendar avec le CRM ?",
+        "calendar": "Calendrier",
+        "user": "Utilisateur",
+        "vehicle": "Véhicule",
+        "prospect": "Prospect",
+        "order": "Devis",
+        "date_time": "Date et heure",
+        "started_at": "De...",
+        "ended_at": "A...",
+        "location": "Location",
+        "drop_off_location": "Adresse de destination",
+        "confirmed": "RDV confirmé",
+        "done": "RDV réalisé",
+        "labels": "Filtres",
+        "name": "Titre",
+        "add_title": "Ajouter un titre ...",
+        "description": "Description",
+        "add_description": "Ajouter une description ...",
+        "choose_calendar": "Choisir le calendrier",
+        "choose_user": "Choisir l'utilisateur",
+        "choose_vehicle": "Choisir le véhicule",
+        "choose_prospect": "Choisir le prospect",
+        "new_prospect": "Nouveau prospect",
+        "choose_order": "Choisir le devis",
+        "new_order": "Nouveau devis",
+        "choose_hour": "Choisir l'heure",
+        "email_to_prospect": "Envoyer une invitation au prospect",
+        "choose_event_description_template": "Templates de description",
+        "user_daily_directions": {
+            "title": "Directions",
+            "remove_from_map": "Enlever l'itinéraire de la carte",
+            "remove_marker": "Supprimer le marqueur",
+            "send_sms": "Envoyer un SMS",
+            "call": "Appeler",
+            "file": "Fichier",
+            "message": "Message",
+            "event": "RDV",
+            "find_prospect": "Chercher un prospect ...",
+            "find_address": "Chercher une adresse ..."
+        },
+        "agenda": {
+            "filters": {
+                "title": "Filtres",
+                "users": "Utilisateurs",
+                "calendars": "Types de RDV",
+                "show_we": "Afficher les week-end",
+                "show_other_projects": "RDV des autres projets",
+                "min_hour": "Horaire minimum",
+                "max_hour": "Horaire maximum",
+                "choose_role": "Choisir un rôle",
+                "labels": "Filtres"
+            }
+        }
+    },
+
+    "field": {
+        "add": {
+            "title": "Nouveau champ"
+        },
+        "update": {
+            "delete_confirm": "Ce champ contient <b>{count}</b> données liées aux prospects,<br>Voulez-vous vraimment effectuer cette suppression ?"
+        },
+        "types": {
+            "text": "Texte",
+            "long_text": "Long texte",
+            "number": "Nombre",
+            "email": "Email",
+            "date": "Date",
+            "datetime": "Date et heure",
+            "address": "Adresse",
+            "url": "URL",
+            "tel": "Numéro"
+        },
+        "add_to_global_search": "Ajouter dans la recherche globale",
+        "prospect": {
+            "phone_number": "Numéro de téléphone",
+            "mobile_phone_number": "Numéro mobile"
+        },
+        "default_value": "Valeur par défault",
+        "required": "Obligatoire",
+        "unique": "Vérifier doublon lors du saisi",
+        "format": "Format d'affichage"
+    },
+
+    "calendar": {
+        "types": {
+            "physical": "Physique",
+            "telephone": "Téléphonique",
+            "hangout": "GMeet",
+            "task": "Tâche",
+            "other": "Autre"
+        },
+        "add": {
+            "title": "Nouveau calendrier"
+        },
+        "update": {
+            "default_address": "Adresse par défaut pour vous"
+        },
+        "combine_with": "Combiner avec"
+    },
+
+    "interaction": {
+        "types": {
+            "telephone": "Téléphone"
+        }
+    },
+
+    "commission": {
+        "title": "Gérer les commissions",
+        "tab": {
+            "product": {
+                "title": "Sélectionner des produits"
+            },
+            "action": {
+                "title": "Sélectionner des actions"
+            },
+            "user": {
+                "title": "Sélectionner des utilisateurs"
+            },
+            "commission": {
+                "types": {
+                    "title": "Type",
+                    "percentage": "En pourcentage",
+                    "fix": "En Fixe"
+                },
+                "commission": {
+                    "title": "Commission"
+                },
+                "including_tax": {
+                    "title": "Calculer à partir du prix du produit en",
+                    "incl_tax": "TTC",
+                    "excl_tax": "HT"
+                },
+                "selected_products": "produits seléctionné(s)",
+                "selected_actions": "actions seléctionnée(s)",
+                "selected_users": "utilisateurs seléctionné(s)"
+            }
+        }
+    },
+
+    "setting": {
+        "title": "Paramètres",
+        "locale": {
+            "title": "Langue"
+        },
+        "project": {
+            "title": "Paramètre du project {project}",
+            "description": "Gérer votre projet"
+        },
+        "google_auth": {
+            "title": "Google Authenticator (2 facteurs)",
+            "confirm": {
+                "enable": "Voulez-vous vraiment activer l'authentification à double facteurs?",
+                "disable": "Voulez-vous vraiment désactiver l'authentification à double facteurs?"
+            }
+        },
+        "google_drive": {
+            "title": "Google Drive",
+            "description": "Associer un compte Google Drive pour les fichiers de vos prospects"
+        },
+        "google_calendar": {
+            "title": "Google Calendar",
+            "description": "Associer un compte Google Calendar à vos RDVs"
+        },
+        "google_contact": {
+            "title": "Google Contact",
+            "description": "Associer un compte Google Contact à vos prospects"
+        },
+        "pipedrive": {
+            "title": "Pipedrive",
+            "description": "Associer un compte Pipedrive à vos prospects"
+        },
+        "users": {
+            "title": "Liste des utilisateurs",
+            "description": "Gérer les accès des utilisateurs dans le projet {project}"
+        },
+        "devices": {
+            "title": "Appareils connectés",
+            "description": "Gérer vos appareils connectés"
+        },
+        "tutorials": {
+            "title": "Gérer les tutoriels",
+            "do_not_show_anymore": "Ne plus afficher des tutoriels"
+        },
+        "events_reminder": {
+            "title": "Notifier les RDVs proches"
+        },
+        "trash": {
+            "title": "Corbeille",
+            "description": "Prospects, filtres, ..."
+        },
+        "menu_icons": {
+            "title": "Modifier les icones des menus",
+            "description": "Prospects, Agendas, Map, ..."
+        },
+        "copyright": {
+            "title": "HeroesCRM.com depuis 2002 Reproduction interdite - Tous droits réservés.",
+            "technical_questions": "Questions techniques",
+            "commercial_questions": "Questions commerciales"
+        },
+        "confirm": {
+            "enable": "Voulez-vous vraiment activer Google Authenticator ?",
+            "enable": "Voulez-vous vraiment désactiver Google Authenticator ?"
+        }
+    },
+
+    "label": {
+        "add": {
+            "title": "Nouveau filtre"
+        },
+        "combine_with": "Combiner avec",
+        "affected_users": "Utilisateurs affectés",
+        "archive": "Archiver",
+        "archive_tooltip": "Ne plus afficher dans la liste des filtres"
+    },
+
+    "menu": {
+        "new": "Créer le menu",
+        "new_label": "Nouveau filtre",
+        "new_category": "Nouvelle catégorie",
+        "use_current_filters": "Utiliser les filtres actuels",
+        "select_filters": "Sélectionner des filtres",
+        "add": {
+            "title": "Nouveau menu"
+        }
+    },
+
+    "product": {
+        "price": "Prix",
+        "currency": "Devise",
+        "tax_in_percent": "Tax en pourcentage",
+        "included_tax": "Taxe incluse",
+        "image": "Image",
+        "manage_images": "Gérer les images du produit",
+        "archive": "Archiver",
+        "archive_tooltip": "Ne plus afficher dans la liste des produits",
+        "add_images": "Ajouter des photos",
+        "update": {
+            "choose_images": "Choisir des photos"
+        }
+    },
+
+    "role": {
+        "add": {
+            "title": "Nouveau rôle"
+        },
+        "list": {
+            "title": "Rôles"
+        },
+        "duplicate": {
+            "title": "Duplication de profil",
+            "from": "Dupliquer pour",
+            "for": "Dupliquer depuis"
+        }
+    },
+
+    "sms_template": {
+        "add": {
+            "title": "Nouveau modèle de SMS"
+        }
+    },
+
+    "stat": {
+        "country": {
+            "title": "Associer {country} à ..."
+        },
+        "metric": {
+            "title": "Suivre un filtre quotidiennement",
+            "label": "Filtre",
+            "menu": "Menu"
+        },
+        "blocs": {
+            "prospect": {
+                "title": "Prospect"
+            },
+            "sms": {
+                "title": "SMS",
+                "phone": "Téléphone"
+            },
+            "event": {
+                "title": "RDV"
+            },
+            "interaction": {
+                "title": "Appel",
+                "phone": "Phone"
+            },
+            "order": {
+                "title": "devs"
+            },
+            "file": {
+                "title": "Fichier"
+            },
+            "message": {
+                "title": "Message"
+            },
+            "total": {
+                "prospects": "Total des prospects",
+                "sms": "Total des SMS",
+                "event": "Total des RDVs",
+                "interaction": "Total des appels",
+                "order": "Total des devis",
+                "file": "Total des fichiers",
+                "message": "Total des message"
+            },
+            "new": {
+                "prospects": "Nouveaux prospects",
+                "sms": "Nouveaux SMS",
+                "event": "Nouveaux RDVs",
+                "interaction": "Nouveaux appels",
+                "order": "Nouveaux devis",
+                "file": "Nouveaux fichiers",
+                "message": "Nouveaux messages"
+            },
+            "follow_filter_daily": {
+                "title": "Suivre un filtre quotidiennement",
+                "distribution": "Repartition des filtres"
+            }
+        },
+        "user-connection-stat": {
+            "title": "Utilisateurs connectés par mois"
+        }
+    },
+
+    "thread": {
+        "add": {
+            "title": "Nouveau canal de discussion",
+            "send_email_to": "Envoyer un mail au ...",
+            "send_email_to_prospect": "Envoyer un mail au prospect",
+            "associate_to_the_user": "Associer à {user}"
+        }
+    },
+
+    "questionnaire": {
+        "questionnaire": {
+            "add": {
+                "title": "Nouveau questionaire"
+            },
+            "list": {
+                "title": "Questionnaires"
+            }
+        },
+        "question": {
+            "add": {
+                "title": "Nouvelle question"
+            },
+            "types": {
+                "radio": "Choix unique",
+                "checkbox": "Choix multiple",
+                "text": "Champ de texte",
+                "textarea": "Champ de texte multiligne",
+                "date": "Date",
+                "image": "Image",
+                "file": "Fichier"
+            }
+        },
+        "section": {
+            "add": {
+                "title": "Nouvelle section"
+            }
+        },
+        "option": {
+            "add": {
+                "title": "Nouvelle option",
+                "choose_section": "Choisir une section"
+            }
+        }
+    },
+
+    "permission": {
+        "all": "Toutes les permissions"
+    },
+
+    "category": {
+        "add": {
+            "title": "Nouvelle catégorie de filtre",
+            "unique": "Choix unique"
+        },
+        "list": {
+            "title": "Catégories de filtre"
+        },
+        "update": {
+            "unique": "Choix unique"
+        }
+    },
+
+    "folder": {
+        "add": {
+            "title": "Nouveau dossier"
+        }
+    },
+
+    "group": {
+        "add": {
+            "title": "Nouveau groupe"
+        }
+    },
+
+    "locale": {
+        "setting": {
+            "title": "Langue"
+        }
+    },
+
+    "message_template": {
+        "add": {
+            "title": "Nouveau template de message"
+        }
+    },
+
+    "event_description_template": {
+        "add": {
+            "title": "Nouveau template de description de RDV"
+        }
+    },
+
+    "order": {
+        "action": {
+            "add": {
+                "title": "Nouveau type d'acion sur les devis"
+            }
+        },
+        "status": {
+            "add": {
+                "title": "Nouvel état de devis"
+            }
+        },
+        "step": {
+            "add": {
+                "title": "Nouvelle étape de devis"
+            }
+        },
+        "product": {
+            "add": {
+                "title": "Nouveau produit"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "Déselectionner les devis",
+                "init_filters": "Réinitialiser",
+                "toggle_order_menus": "Afficher/cacher les menus par devis",
+                "add_order": "Nouveau devis",
+                "setting": "Paramètre des colonnes",
+                "previous": "Page précédente",
+                "next": "Page suivante",
+                "bulk_delete": "Supprimer définitivement",
+                "page_orders_count": "Nombre de devis par page",
+                "orders_count": "Nombre de devis",
+                "current_page": "Page en cours"
+            },
+
+            "column": {
+                "manage": "Gérer les colonnes de {project}",
+                "delete_confirm": "Voulez-vous vraiment supprimer cette colonne ?",
+                "others": {
+                    "total_commissions": "Tatal des commissions",
+                    "prospect": "Prospect",
+                    "products": "Produits",
+                    "status": "Etat",
+                    "steps": "Etapes",
+                    "commissions": "Commissions"
+                }
+            },
+
+            "setting": {
+                "decimal": "Nombre de chiffres après virgule:"
+            },
+
+            "filters": {
+                "all": {
+                    "title": "Filtres"
+                },
+                "actions": {
+                    "title": "Filtrer par actions",
+                    "with": "Avec actions ...",
+                    "without": "Sans action",
+                    "without_user": "Sans l'action {action}"
+                },
+                "products": {
+                    "title": "Filtrer par produits",
+                    "with": "Avec produits ...",
+                    "without": "Sans produit",
+                    "without_user": "Sans le produit {product}"
+                },
+                "statuses": {
+                    "title": "Filtrer par état",
+                    "with": "Avec états ...",
+                    "without": "Sans état",
+                    "without_user": "Sans l'état {status}"
+                },
+                "steps": {
+                    "title": "Filtrer par étapes",
+                    "with": "Avec étapes ...",
+                    "without": "Sans étape",
+                    "without_user": "Sans l'étape {step}"
+                }
+            }
+        }
+    },
+
+    "project": {
+        "add": {
+            "title": "Nouveau projet"
+        },
+        "profile": {
+            "blocs": {
+                "calendars": "Calendriers",
+                "categories": "Catégories de filtre",
+                "contacts": "Coordonnées",
+                "documents": "Documents",
+                "fields": "Champs",
+                "folders": "Dossiers",
+                "groups": "Groupes",
+                "imports": "Imports",
+                "menus": "Menus",
+                "order_actions": "Actions sur les devis",
+                "order_statuses": "Etats de devis",
+                "order_steps": "Etapes de devis",
+                "others": "Autres",
+                "products": "Produits",
+                "profile": "Profil",
+                "roles": "Rôles",
+                "threads": "Canaux de discussion",
+                "users": "Utilisateurs"
+            },
+            "logo": {
+                "change": "Changer votre logo ici."
+            },
+            "menus": {
+                "thread": "Canaux de discussion",
+                "folder": "Dossiers",
+                "category": "Catégories de filtres",
+                "field": "Champs de prospects",
+                "group": "Groupes",
+                "role": "Rôles",
+                "product": "Produits"
+            }
+        },
+        "table": {
+            "footer": {
+                "toggle_project_menus": "Afficher/cacher les menus",
+                "add_project": "Nouveau projet",
+                "deselect": "Déselectionner les projets sélectionnés",
+                "bulk_delete": "Supprimer les projets sélectionnés",
+                "previous": "Précédent",
+                "next": "Suivant",
+                "init_filters": "Réinitialiser"
+            },
+            "column": {
+                "others": {
+                    "active_users": "Utilisateurs connectés"
+                }
+            }
+        }
+    },
+
+    "global_search": {
+        "actions": {
+            "prospect": {
+                "create_event": {
+                    "name": "Saisir un RDV",
+                    "keywords": "nouveau saisir rdv rendez-vous google calendar",
+                    "description": "Créer un RDV physique, téléphonique, Google Meet, ..."
+                },
+                "create_order": {
+                    "name": "Saisir un devis",
+                    "keywords": "nouveau saisir devis commande produit",
+                    "description": "Créer un devis, gérer les actions sur les devis, gérer les commissions des utilisateurs, ..."
+                },
+                "create_sms": {
+                    "name": "SMS",
+                    "keywords": "nouveau saisir sms message smsbox ringover ultramsg  mtarget",
+                    "description": "Envoyer un message à un prospect via votre téléphone ou SMSBOX ou Ringover, ..."
+                },
+                "create_interaction": {
+                    "name": "Appel",
+                    "keywords": "appel appeler téléphone telephoner interaction ringover aircall",
+                    "description": "Appeler un prospect via votre téléphone ou Aircall ou Ringover, ..."
+                },
+                "create_file": {
+                    "name": "Fichier",
+                    "keywords": "dossier fichier google drive",
+                    "description": "Associer des fichiers aux prospects"
+                },
+                "create_message": {
+                    "name": "Messages",
+                    "keywords": "Canal discussion message email",
+                    "description": "Envoyer un message interne ou externe (email) à un prospect"
+                }
+            },
+            "project": {
+                "create_calendar": {
+                    "name": "Nouveau type de RDV",
+                    "keywords": "Nouveau type de RDV calendrier rendez-vous"
+                },
+                "create_category": {
+                    "name": "Nouvelle catégorie de filtres",
+                    "keywords": "Nouvelle catégorie de filtres"
+                },
+                "create_document": {
+                    "name": "Nouveau document",
+                    "keywords": "Nouveau document template pdf"
+                },
+                "create_folder": {
+                    "name": "Nouveau dossier",
+                    "keywords": "Nouveau dossier fichier"
+                },
+                "create_group": {
+                    "name": "Nouveau groupe",
+                    "keywords": "Nouveau groupe utilisateurs"
+                },
+                "create_menu": {
+                    "name": "Nouveau menu",
+                    "keywords": "Nouveau menu filtre"
+                },
+                "create_order_action": {
+                    "name": "Nouvelle action sur les commandes",
+                    "keywords": "Nouvelle action sur les commandes"
+                },
+                "create_order_step": {
+                    "name": "Nouvelle étape de commande",
+                    "keywords": "Nouvelle étape de commande"
+                },
+                "create_pipeline": {
+                    "name": "Nouveau pipeline",
+                    "keywords": "Nouveau pipeline étape pipedrive"
+                },
+                "create_product": {
+                    "name": "Nouveau produit",
+                    "keywords": "Nouveau produit commande devis"
+                },
+                "create_role": {
+                    "name": "Nouveau rôle",
+                    "keywords": "Nouveau rôle utilisateurs permissions"
+                },
+                "create_thread": {
+                    "name": "Nouveau canal de discussion",
+                    "keywords": "Nouveau canal de discussion message"
+                },
+                "add_user": {
+                    "name": "Ajouter un utilisateur",
+                    "keywords": "Ajouter un utilisateur"
+                },
+                "create_import": {
+                    "name": "Import",
+                    "keywords": "Importer un fichier prospects import xls xlsx",
+                    "description": "Importer des prospects depuis un fichier XLSX.<br>Ou depuis un lien externe comme Zapier."
+                },
+                "create_field": {
+                    "name": "Gérer les champs dans votre projet",
+                    "keywords": "Ajouter un champ"
+                }
+            },
+            "api": {
+                "smsbox": {
+                    "name": "Paramètre API SMSBOX",
+                    "keywords": "Paramètre API SMSBOX sms"
+                },
+                "email": {
+                    "name": "Paramètre envoi email",
+                    "keywords": "Paramètre API email message"
+                },
+                "ultramsg": {
+                    "name": "Paramètre API Ultramsg",
+                    "keywords": "Paramètre API Ultramsg sms"
+                },
+                "mtarget": {
+                    "name": "Paramètre API MTarget",
+                    "keywords": "Paramètre API MTarget sms"
+                },
+                "pipedrive": {
+                    "name": "Paramètre Pipedrive",
+                    "keywords": "Paramètre API Pipedrive prospect"
+                }
+            }
+        }
+    },
+
+    "duplicate": {
+        "title": "Recherche de doublons",
+        "fields": "Chercher par rapport aux champs ...",
+        "choose_action": "Choisir une action à faire",
+        "remove_duplicating": "Supprimer les anciens prospects dupliqués",
+        "remove_duplicates": "Supprimer les duplications de prospects dans l'import",
+        "replace_duplicating": "Ecraser les données modifiées des anciens prospects par celles des nouveaux"
+    },
+
+    "vehicle": {
+        "add": {
+            "title": "Nouveau véhicule"
+        },
+        "affected_user": "Utilisateur affecté {user}"
+    },
+
+    "tutorial": {
+        "tutorial": {
+            "name": "Tutoriel",
+            "body": "Supprimez des tutoriels pour les faire apparaître de nouveau."
+        },
+
+        "project_campaign_actions": {
+            "name": "Campagne - Actions",
+            "body": {
+                "0": "Définissez l'action qui sera effectuée par votre campagne.",
+                "1": "Vous pouvez glisser-déposer et associer plusieurs actions à une campagne."
+            }
+        },
+
+        "project_campaign_campaign_new": {
+            "name": "Campagne - nouveau",
+            "body": {
+                "0": "Glissez-deposez une nouvelle campagne dans la zone."
+            }
+        },
+
+        "project_campaign_operators": {
+            "name": "Campagne - Opérateurs",
+            "body": {
+                "0": "Combinez des règles pour votre campagne."
+            }
+        },
+
+        "project_campaign_rules": {
+            "name": "Campagne - Règle prospect",
+            "body": {
+                "0": "Définissez des règles pour filtrer les prospects qui seront affectés par votre campagne."
+            }
+        },
+
+        "project_category_to_field": {
+            "name": "Filtre - Transformer en champ",
+            "body": {
+                "0": "Transformez une catégorie de filtres en champ classique.",
+                "1": "Tous les filtres associés à un prospect appartenant à cette catégorie seront convertis en information dans un champ classique de même nom."
+            }
+        },
+
+        "dashboard_project": {
+            "name": "Liste des projects",
+            "body": "Gérez vos prospects dans divers projets"
+        },
+
+        "dashboard_project_new": {
+            "name": "Nouveaux projects",
+            "body": "Créez plusieurs projets dans lesquels vous pouvez gérer vos prospects"
+        },
+
+        "project_document_template_tab_file": {
+            "name": "Document - Fichiers",
+            "body": "Ajoutez des fichiers PDFs dans le template qui seront utilisés comme fond des pages générées dans les documents des prospects."
+        },
+
+        "project_document_template_tab_font": {
+            "name": "Document - Fonts",
+            "body": "Vous pouvez intégrer d'autres polices de texte pour formater les textes dans les champs que vous ajoutez dans le documents."
+        },
+
+        "project_document_template_tab_page": {
+            "name": "Document - Pages",
+            "body": "Ajoutez des nouvelles pages (vierges ou depuis un PDF) dans votre template."
+        },
+
+        "project_document_template_tab_prospect": {
+            "name": "Document - Templates - Prospect",
+            "body": {
+                "0": "Placez et formattez des champs de prospects dans votre template.",
+                "1": "Ces champs seront remplacés par les vraies infos des prospects lors de la génération de leur document."
+            }
+        },
+
+        "project_document_template_tab_project": {
+            "name": "Document - Template - Projet",
+            "body": "Placez y et formattez également des champs de projet qui seront remplacées par les infos de votre projet."
+        },
+
+        "project_document_template_tab_map": {
+            "name": "Document - Template - MAP",
+            "body": "Les champs de MAP vous permet d'ajouter une image de MAP qui representera l'emplacement du prospect rattaché au document généré."
+        },
+
+        "project_document_template_tab_date": {
+            "name": "Document - Template - Dates",
+            "body": "Ajoutez des champs de date qui seront remplacés par la date du jour à laquelle le document sera généré."
+        },
+
+        "project_document_template_tab_order": {
+            "name": "Document - Template - Devis",
+            "body": {
+                "0": "Trouvez ici des champs liés au devis (Tableau de devis, ...)."
+            }
+        },
+
+        "project_document_template_tab_label": {
+            "name": "Document - Template - Filtres",
+            "body": {
+                "0": "Vous pouvez également ajouter:",
+                "1": "soit des catégories de filtres dans le document, les filtres liés au prospect du document appartenant à la catégorie seront énumérés à la place du champ lors de la génération du document.",
+                "2": "soit des filtres qui seront remplacés par un icon check si le filtre est lié au prospect."
+            }
+        },
+
+        "project_field_to_category": {
+            "name": "Filtre - Transformer en champ",
+            "body": {
+                "0": "Champ - Transformer en filtre",
+                "1": "Transformez un champ en une catégorie de filtres."
+            }
+        },
+
+        "project_header_menu_prospects": {
+            "name": "Menu - Prospects",
+            "body": {
+                "0": "Accédez au tableau de prospects afin de gérer les informations, filtres relatifs aux prospects.<br>Ou pour gérer les SMS, messages, appels, devis, ..."
+            }
+        },
+
+        "project_header_menu_events": {
+            "name": "Menu - Agenda",
+            "body": {
+                "0": "Gérez votre agendas et les RDVs avec vos prospects."
+            }
+        },
+
+        "project_header_menu_map": {
+            "name": "Menu - MAP",
+            "body": {
+                "0": "Localisez vos prospects dans votre map."
+            }
+        },
+
+        "project_header_menu_orders": {
+            "name": "Menu - Devis",
+            "body": {
+                "0": "Voir la liste des devis"
+            }
+        },
+
+        "project_header_menu_stat": {
+            "name": "Menu - Stat",
+            "body": {
+                "0": "Voir diverses statistiques dans votre projet."
+            }
+        },
+
+        "project_header_menu_document": {
+            "name": "Menu - Document",
+            "body": {
+                "0": "Editez un template de document PDF.<br>Les templates pourront être ré-utilisés pour générer des documents PDF pour les prospects."
+            }
+        },
+
+        "project_header_menu_campaign": {
+            "name": "Menu - Campagne",
+            "body": {
+                "0": "Effectuez des actions automatiques sur vos prospects en fonction des filtres que vous appliquez sur vos prospects:",
+                "1": "Envoyer des emails",
+                "2": "Affecter des filtres",
+                "3": "Créer des devis"
+            }
+        },
+
+        "project_header_search": {
+            "name": "Recherche",
+            "body": {
+                "0": "Recherchez des prospects, utilisateurs, filtres, ...",
+                "1": "Vous pouvez également rechercher des fonctionnalités telles: \"Importer des prospects\", \"Paramètre envoi email&\", ..."
+            }
+        },
+
+        "project_map_header_filter": {
+            "name": "MAP - Filtre",
+            "body": {
+                "0": "Affinez vos recherches avec les divers filtres ici."
+            }
+        },
+
+        "project_map_header_color": {
+            "name": "MAP - Colorer les marqueurs",
+            "body": {
+                "0": "Vous pouvez utiliser une catégorie de filtre pour colorer les marqueurs dans la MAP."
+            }
+        },
+
+        "project_map_header_user_position": {
+            "name": "MAP - Localisation des utilisateurs",
+            "body": {
+                "0": "Localisez les positions des véhicules de vos utilisateurs ici."
+            }
+        },
+
+        "project_map_header_export": {
+            "name": "MAP - Export",
+            "body": {
+                "0": "Exporter les prospects sélectionnés dans votre tableau dans un fichier XLSX."
+            }
+        },
+
+        "project_map_header_prospect_without_lat_lng": {
+            "name": "MAP - Prospects sans lat/lng",
+            "body": {
+                "0": "Au cas où certains de vos prospects ne se trouvent pas dans la MAP, cet outil vous permettra de rechercher de nouveau leurs adresses."
+            }
+        },
+
+        "project_map": {
+            "name": "MAP",
+            "body": {
+                "0": "Vous pouvez maintenir CTRL<br>et <>appuyer-glisser",
+                "1": "et appuyer-glisser avec la souris pour tracer un cercle de recherche dans la MAP.",
+                "2": "Vous pouvez également maintenir SHIFT",
+                "3": "et cliquer sur plusieurs endroits pour trace un polygone de recherche."
+            }
+        }
+    },
+
+    "stat-chart": {
+        "add": {
+            "title": "Ajouter des statistiques dans le dashboard",
+            "blocs": {
+                "total-prospects-per-label": {
+                    "title": "Prospects par filtre",
+                    "description": "Choisissez plusieurs filtres ou sélection de filtres ou menu et voir la répartition actuelle des prospects dans ces filtres dans votre projet."
+                },
+                "total-prospects-per-country": {
+                    "title": "Prospects par pays",
+                    "description": "Afficher la quantité totale de vos prospects en fonction des pays dans lesquels il se trouve"
+                },
+                "new-prospects-per-label-per-day": {
+                    "title": "Nouveaux prospects",
+                    "description": "Suivez l’évolution du nombre de nouveaux prospects correspondant à une sélection de filtres à partir de cette date"
+                },
+                "total-prospects-per-label-per-day": {
+                    "title": "Total prospects",
+                    "description": "Suivez l’évolution du nombre total des prospects correspondant à une sélection de filtres à partir de cette date"
+                },
+                "new-orders-price-per-day": {
+                    "title": "Total nouveaux devis par jour",
+                    "description": "Afficher la quantité totale des sommes de vos nouveaux devis par jour"
+                },
+                "total-orders-price-per-day": {
+                    "title": "Total devis par jour",
+                    "description": "Afficher la quantité totale des sommes de vos devis par jour"
+                },
+                "new-commissions-per-user-per-day": {
+                    "title": "Total nouvelles commissions par utilisateur par jour",
+                    "description": "Afficher la quantité totale des sommes de vos nouvelles commissions par utilisateur par jour"
+                },
+                "total-commissions-per-user-per-day": {
+                    "title": "Total commissions par utilisateur par jour",
+                    "description": "Afficher la quantité totale des sommes de vos commissions par utilisateur par jour"
+                },
+                "events-list": {
+                    "title": "Liste des RDVs du jour",
+                    "description": "Liste des RDVs du jour"
+                },
+                "events-direction": {
+                    "title": "Itinéraire du jour",
+                    "description": "Afficher dans une MAP l'itinéraire du jour"
+                },
+                "new-sms-per-day": {
+                    "title": "Nouveaux sms",
+                    "description": "Suivez l’évolution du nombre de nouveaux SMS"
+                },
+                "total-sms-per-day": {
+                    "title": "Total sms",
+                    "description": "Suivez l’évolution du nombre total des SMS"
+                },
+                "new-event-per-day": {
+                    "title": "Nouveaux RDVs",
+                    "description": "Suivez l’évolution du nombre de nouveaux RDVs"
+                },
+                "total-event-per-day": {
+                    "title": "Total RDVs",
+                    "description": "Suivez l’évolution du nombre total des RDVs"
+                },
+                "new-message-per-day": {
+                    "title": "Nouveaux messages",
+                    "description": "Suivez l’évolution du nombre de nouveaux messages"
+                },
+                "total-message-per-day": {
+                    "title": "Total messages",
+                    "description": "Suivez l’évolution du nombre total des messages"
+                },
+                "new-order-per-day": {
+                    "title": "Nouveaux devis",
+                    "description": "Suivez l’évolution du nombre de nouveaux devis"
+                },
+                "total-order-per-day": {
+                    "title": "Total devis",
+                    "description": "Suivez l’évolution du nombre total des devis"
+                }
+            },
+            "chart-types": {
+                "pie": "Pie",
+                "hbar": "Bar horizontal",
+                "vbar": "Bar vertical",
+                "line": "Ligne",
+                "calendar": "Calendrier"
+            }
+        },
+        "dashboard": {
+            "between_dates": "Entre {start} et {end}"
+        }
+    },
+
+    "pipeline": {
+        "add": {
+            "title": "Nouveau pipeline"
+        }
+    }
+}

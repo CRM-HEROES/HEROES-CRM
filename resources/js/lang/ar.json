@@ -1,0 +1,1815 @@
+{
+    "app_name": "أبطال إدارة علاقات العملاء",
+    "add": "يضيف",
+    "new": "جديد",
+    "delete": "يمسح",
+    "restore": "يعيد",
+    "delete_confirm": "هل أنت متأكد أنك تريد حذف هذا؟",
+    "update": "تحديث",
+    "edit": "يحرر",
+    "to_field": "تحويل إلى حقل",
+    "to_field_confirm": "هل أنت متأكد أنك تريد تحويل هذا الفلتر إلى حقل؟",
+    "to_category": "تحويل إلى مرشح",
+    "to_category_confirm": "هل أنت متأكد أنك تريد تحويل هذا الحقل إلى مرشح؟",
+    "cancel": "يلغي",
+    "ok": "نعم",
+    "search": "يبحث",
+    "all": "الجميع",
+    "close": "يغلق",
+    "back": "خلف",
+    "previous": "سابق",
+    "next": "التالي",
+    "enabled": "ممكّن",
+    "disabled": "عاجز",
+    "none": "لا أحد",
+    "show_more": "أظهر المزيد",
+    "show_less": "عرض أقل",
+    "required": "مطلوب",
+    "name": "اسم",
+    "first_name": "الاسم الأول",
+    "last_name": "اسم العائلة",
+    "password": "كلمة المرور",
+    "street": "شارع",
+    "street_bis": "شارع 2",
+    "postal_code": "رمز بريدي",
+    "phone": "رقم التليفون",
+    "city": "مدينة",
+    "country": "دولة",
+    "description": "وصف",
+    "type": "يكتب",
+    "color": "لون الخط",
+    "bgcolor": "لون الخلفية",
+    "content": "محتوى",
+    "url": "عنوان URL",
+    "for": "ل",
+    "source": "مصدر",
+    "count": "عدد",
+    "prospects": "الآفاق",
+    "projects": "المشاريع",
+    "orders": "طلبات",
+    "invoices": "الفواتير",
+    "users": "المستخدمين",
+    "products": "منتجات",
+    "copyright": "Heroes CRM منذ عام 2002 ممنوع الاستنساخ - جميع الحقوق محفوظة / ممنوع الاستنساخ",
+    "request_error": "خطأ الطلب.",
+    "auth": {
+        "email": "بريد إلكتروني",
+        "password": "كلمة المرور",
+        "confirm_password": "تأكيد كلمة المرور",
+        "init_password": {
+            "title": "كلمة المرور الأولية",
+            "success": "تم إرسال رابط إعادة تعيين كلمة المرور بنجاح إلى عنوان البريد الإلكتروني<b>{بريد إلكتروني}</b>.",
+            "error": "نواجه حاليًا خطأً عند إرسال رابط إعادة تعيين كلمة المرور.<br><br>تأكد من صحة البريد الإلكتروني الذي تم إدخاله.",
+            "send_verification_email": "ارسل ايميل التفعيل",
+            "sending_verification_email": "إرسال البريد الإلكتروني التحقق"
+        },
+        "register": {
+            "title": "اشتراك",
+            "subscribe": "اشتراك",
+            "already_have_an_account": "هل لديك حساب ؟"
+        },
+        "login": {
+            "title": "تسجيل الدخول",
+            "authenticate": "قم بتسجيل الدخول إلى Heroes CRM",
+            "authenticating": "تسجيل الدخول ...",
+            "forget_password": "لقد نسيت كلمة المرور ...",
+            "sign_up": "اشتراك",
+            "google": "تسجيل الدخول عبر جوجل",
+            "error": "من المحتمل أن يكون البريد الإلكتروني أو كلمة المرور خاطئين."
+        },
+        "google_authenticator": {
+            "open": "افتح أداة مصادقة جوجل،<br>أو حمل التطبيق من هنا:<br><a href=\"https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr&gl=US\">متجر اللعب</a> أو <a href=\"https://apps.apple.com/fr/app/google-authenticator/id388497605\">متجر التطبيقات</a>",
+            "scan_qrcode": "وقم بمسح رمز الاستجابة السريعة التالي:",
+            "copy_following_key_configuration": "أو انسخ تكوين المفتاح التالي",
+            "check_type": "اسأل فقط إذا قمت بتغيير IP.",
+            "key_security": "الأمن الرئيسي:",
+            "key_security_copied": "تم نسخ مفتاح الأمان بنجاح",
+            "activate": "أداة مصادقة جوجل النشطة",
+            "activating": "تفعيل أداة مصادقة جوجل",
+            "login": "تسجيل الدخول"
+        },
+        "impersonate": {
+            "back_to_my_account": "العودة إلى حسابي"
+        },
+        "info_check": {
+            "1": "<b>اللائحة العامة لحماية البيانات / أمان SSL</b> عززت.",
+            "2": "<b>التشفير / الخيار</b> خاضع للسيطرة.",
+            "3": "99.99% <b>توافر الخادم</b> + <b>دعم</b> في الوقت الحقيقي.",
+            "4": "فريق Heroes CRM بأكمله في خدمتك منذ عام 2002."
+        },
+        "partner": {
+            "title": "تم تضمين أكثر من 200 شريك وموصل",
+            "call_sms_email": "الاتصال، والرسائل القصيرة، والبريد",
+            "ads_systems": "أنظمة الإعلانات",
+            "payment_systems": "أنظمة الدفع",
+            "accounting_systems": "نظم المحاسبة"
+        },
+        "session": {
+            "ban_device": "جهاز الحظر",
+            "ban_code": "رمز الحظر",
+            "ban": "المنع",
+            "connections": "روابط"
+        }
+    },
+    "header": {
+        "close": "يغلق",
+        "home": "بيت",
+        "prospects": "الآفاق",
+        "appointments": "تعيينات",
+        "map": "خريطة",
+        "mail": "رسائل",
+        "order": "طلبات",
+        "documents": "وثائق",
+        "campaigns": "الحملات",
+        "stat": "احصائيات",
+        "settings": "إعدادات"
+    },
+    "dashboard": {
+        "your_projects": "مشاريعك",
+        "new_project": "مشروع جديد",
+        "new_user": "مستخدم جديد",
+        "stats": "احصائيات"
+    },
+    "prospect": {
+        "table": {
+            "footer": {
+                "deselect": "قم بإلغاء تحديد التوقعات",
+                "init_filters": "المرشحات الأولية",
+                "toggle_menus": "تبديل القوائم",
+                "toggle_prospect_menus": "تبديل قوائم الاحتمالات",
+                "add_prospect": "احتمال جديد",
+                "import": "آفاق الاستيراد",
+                "setting": "إعداد الأعمدة",
+                "previous": "سابق",
+                "next": "التالي",
+                "bulk_delete": "احذف بالتأكيد",
+                "bulk_users": "إرفاق أو فصل المستخدمين",
+                "bulk_groups": "إرفاق أو فصل المجموعات",
+                "bulk_labels": "إرفاق أو فصل المرشحات",
+                "bulk_sms": "رسالة قصيرة",
+                "bulk_messages": "رسالة",
+                "map": "خريطة",
+                "export": "آفاق التصدير",
+                "find_duplicates": "البحث عن التكرارات",
+                "bulk_archive": "أرشيف",
+                "bulk_do_not_archive": "تراجع",
+                "search_and_replace": "بحث واستبدال",
+                "scan": "مسح بطاقة العمل",
+                "page_prospects_count": "عدد التوقعات لكل صفحة",
+                "prospects_count": "عدد الآفاق",
+                "row_max_lines": "الحد الأقصى لأسطر النص لكل صف",
+                "current_page": "الصفحه الحاليه"
+            },
+            "column": {
+                "manage": "إدارة أعمدة جدول العملاء المحتملين في {project}.",
+                "delete_confirm": "هل أنت متأكد أنك تريد إزالة هذا العمود؟",
+                "tab": {
+                    "fields": "مجالات",
+                    "tags": "العلامات",
+                    "discussions": "مناقشات",
+                    "forms": "نماذج",
+                    "others": "آحرون"
+                },
+                "others": {
+                    "appointments": "تعيينات",
+                    "calls": "المكالمات",
+                    "sms": "رسالة قصيرة",
+                    "affected_users": "المستخدمين المتأثرين",
+                    "affected_groups": "المجموعات المتضررة",
+                    "orders": "طلبات",
+                    "import": "يستورد",
+                    "groups": "مجموعات",
+                    "users": "المستخدمين"
+                }
+            },
+            "cell": {
+                "event": {
+                    "add": "أضف حدثًا"
+                },
+                "thread": {
+                    "enter_message": "أدخل رسالة ...",
+                    "view_thread": "عرض الموضوع...",
+                    "send": "يرسل ..."
+                }
+            },
+            "filters": {
+                "all": {
+                    "title": "المرشحات"
+                },
+                "users": {
+                    "title": "التصفية حسب المستخدمين المتأثرين",
+                    "with": "مع المستخدمين...",
+                    "without": "بدون مستخدمين",
+                    "without_user": "بدون المستخدم {user}"
+                },
+                "groups": {
+                    "title": "التصفية حسب المجموعات المتضررة",
+                    "with": "مع المجموعات...",
+                    "without": "بدون مجموعات",
+                    "without_group": "بدون المجموعة {group}"
+                },
+                "imports": {
+                    "title": "التصفية حسب الاستيراد المتأثر",
+                    "with": "مع الواردات...",
+                    "without": "بدون واردات",
+                    "without_import": "لم يتم الاستيراد من {import}"
+                },
+                "appointments": {
+                    "title": "تصفية حسب المواعيد",
+                    "with": "بالمواعيد...",
+                    "without": "بدون موعد",
+                    "calendars": "التقاويم",
+                    "no_selected_calendar": "لم يتم تحديد تقويم...",
+                    "affected_to": "تتأثر",
+                    "no_selected_affected_to": "لم يتم تحديد مستخدم...",
+                    "created_by": "انشأ من قبل",
+                    "no_selected_created_by": "لم يتم تحديد مستخدم...",
+                    "after": "بعد",
+                    "before": "قبل",
+                    "future": "مستقبل",
+                    "old": "قديم",
+                    "confirmed": "المواعيد المؤكدة",
+                    "not_confirmed": "مواعيد غير مؤكدة",
+                    "done": "تمت المواعيد",
+                    "not_done": "لم تتم المواعيد",
+                    "select_calendars": "تحديد التقويمات..."
+                },
+                "file": {
+                    "title": "تصفية حسب الملف",
+                    "with_files": "مع الملفات",
+                    "without_file": "بدون ملف",
+                    "without_folder": "بدون ملف من {folder}"
+                },
+                "interaction": {
+                    "title": "تصفية حسب المكالمة",
+                    "with_interactions": "مع المكالمات",
+                    "without_interaction": "بدون مكالمة"
+                },
+                "message": {
+                    "title": "تصفية حسب الرسالة",
+                    "with_messages": "مع الرسائل",
+                    "without_message": "بدون رسالة",
+                    "without_thread": "بدون رسالة من {thread}"
+                },
+                "order": {
+                    "title": "تصفية حسب الطلب",
+                    "with_orders": "مع أوامر...",
+                    "with_products": "مع المنتجات...",
+                    "with_actions": "بالأفعال...",
+                    "with_steps": "بخطوات...",
+                    "with_statuses": "مع الأوضاع...",
+                    "with_documents": "بالوثائق...",
+                    "created_by": "انشأ من قبل ...",
+                    "select_actions": "حدد الإجراءات...",
+                    "select_products": "حدد المنتجات...",
+                    "select_steps": "حدد الخطوات...",
+                    "select_statuses": "حدد الحالات...",
+                    "select_documents": "حدد المستندات..."
+                },
+                "sms": {
+                    "title": "تصفية عن طريق الرسائل القصيرة ...",
+                    "with_sms": "مع الرسائل القصيرة...",
+                    "sources": "مصادر ...",
+                    "created_by": "انشأ من قبل ...",
+                    "after": "بعد",
+                    "before": "قبل",
+                    "sent": "تم إرسال الرسائل القصيرة ...",
+                    "not_sent": "لم يتم إرسال الرسائل القصيرة ...",
+                    "with_error": "بالخطأ...",
+                    "without_error": "بدون أخطاء ...",
+                    "select_sources": "حدد المصادر...",
+                    "without_source": "بدون إرسال الرسائل القصيرة عبر {المصدر}"
+                },
+                "label": {
+                    "title": "تصفية حسب العلامة",
+                    "without_label": "بدون فلتر {label}"
+                }
+            },
+            "bulk": {
+                "group": {
+                    "title": "المجموعات المتضررة"
+                },
+                "label": {
+                    "title": "المرشحات المتضررة"
+                },
+                "user": {
+                    "title": "المستخدمين المتأثرين"
+                },
+                "add": "تعيين",
+                "remove": "يزيل"
+            }
+        },
+        "profile": {
+            "setting": {
+                "title": "إعداد الملف الشخصي المحتمل",
+                "column_i": "العمود {ط}",
+                "new_bloc": "كتلة جديدة",
+                "fields": "مجالات",
+                "messages": "رسائل",
+                "files": "ملفات",
+                "filters": "المرشحات",
+                "orders": "طلبات",
+                "labels": "مرشحات نشطة",
+                "external_links": "روابط خارجية",
+                "events": "الأحداث",
+                "calls": "المكالمات",
+                "sms": "رسالة قصيرة",
+                "documents": "وثائق",
+                "affected_users": "المستخدمين المتأثرين",
+                "affected_groups": "المجموعات المتضررة",
+                "map": "خريطة",
+                "edit_bloc": "تحرير الكتلة"
+            },
+            "bloc": {
+                "messages": "رسائل",
+                "files": "ملفات",
+                "filters": "المرشحات",
+                "orders": "طلبات",
+                "labels": "مرشحات نشطة",
+                "external_links": "روابط خارجية",
+                "events": "الأحداث",
+                "calls": "المكالمات",
+                "sms": "رسالة قصيرة",
+                "documents": "وثائق",
+                "affected_users": "المستخدمين المتأثرين",
+                "affected_groups": "المجموعات المتضررة",
+                "map": "خريطة"
+            }
+        },
+        "document": {
+            "title": "المستندات ({المحتمل})"
+        },
+        "interaction": {
+            "title": "المكالمات ({المحتمل})",
+            "edit_phone_number": "تعديل رقم الهاتف",
+            "edit_mobile_phone_number": "تعديل رقم الهاتف المحمول",
+            "add_history": "أضف التاريخ",
+            "call_by_phone": "اتصل عبر الهاتف",
+            "call_by_aircall": "الاتصال عن طريق Aircall",
+            "call_by_ringover": "الاتصال عن طريق Ringover",
+            "history": "تاريخ"
+        },
+        "message": {
+            "title": "الرسالة ({المحتمل})",
+            "email_setting": "إعداد البريد الإلكتروني",
+            "templates": "قالب الرسائل"
+        },
+        "order": {
+            "title": "الطلبات ({احتمال})",
+            "commission": {
+                "total": "المجموع",
+                "remain": "يبقى",
+                "paid": "مدفوع",
+                "in_percent": "في المئة",
+                "tax_included": "شامل الضريبة",
+                "tax_excluded": "غير شامل الضريبة.",
+                "mark_as_paid": "وضع علامة على أنه مدفوع",
+                "mark_as_unpaid": "وضع علامة على أنها غير مدفوعة الأجر",
+                "select_user": "اختر المستخدم ..."
+            },
+            "product": {
+                "add_product_to_order": "أضف {المنتج} إلى الطلب",
+                "add_to_order": "أضف إلى الطلب",
+                "quantity": "كمية",
+                "price": "سعر",
+                "currency": "عملة",
+                "tax_in_percent": "الضريبة %",
+                "tax_included": "شامل الضريبة"
+            },
+            "tabs": {
+                "products": {
+                    "title": "منتجات"
+                },
+                "commissions": {
+                    "title": "اللجان",
+                    "manage": "إدارة العمولات",
+                    "not_defined": "عمولة غير محددة"
+                },
+                "steps": {
+                    "title": "خطوات"
+                },
+                "documents": {
+                    "title": "وثائق"
+                },
+                "fields": {
+                    "title": "معلومات أخرى",
+                    "add": "إضافة حقل",
+                    "remove_confirm": "هل أنت متأكد أنك تريد إزالة هذا الحقل من مشروعك؟"
+                },
+                "status": {
+                    "title": "حالة"
+                }
+            }
+        },
+        "sms": {
+            "title": "الرسائل القصيرة ({احتمال})",
+            "bulk_title": "الرسائل القصيرة ({count} العملاء المحتملين))",
+            "via_your_phone": "الرسائل القصيرة عبر هاتفك",
+            "via_whatsapp": "الرسائل القصيرة عبر واتس اب",
+            "via_smsbox": "الرسائل القصيرة عبر SMSBOX",
+            "via_mtarget": "الرسائل القصيرة عبر MTarget",
+            "via_ringover": "الرسائل القصيرة عبر Ringover",
+            "via_ultramsg": "الرسائل القصيرة عبر UltraMsg",
+            "via_source": "الرسائل القصيرة عبر {المصدر}",
+            "templates": "قوالب الرسائل القصيرة",
+            "enter_text_message": "أدخل رسالة نصية"
+        },
+        "file": {
+            "title": "الملفات ({المحتمل})"
+        },
+        "group": {
+            "title": "المجموعات ({احتمال})"
+        },
+        "label": {
+            "title": "التصنيفات ({المحتمل})"
+        },
+        "form": {
+            "title": "استمارة",
+            "your_response": "ردك ..."
+        },
+        "affected_user": {
+            "title": "المستخدمون المتأثرون ({prospect})"
+        },
+        "external_link": {
+            "title": "روابط خارجية ({احتمال})",
+            "add": {
+                "title": "روابط خارجية جديدة ({prospect})"
+            }
+        },
+        "log_history": {
+            "title": "سجل السجل ({المحتمل})"
+        },
+        "revision_history": {
+            "title": "سجل المراجعة ({prospect})"
+        },
+        "scan": {
+            "title": "مسح بطاقة العمل",
+            "choose_file": "اختر ملف",
+            "scan": "مسح",
+            "import": "يستورد",
+            "view_prospect": "عرض احتمال",
+            "error": {
+                "camera_access": "خطأ في الوصول إلى الكاميرا: {خطأ}",
+                "camera_stop": "حدث خطأ أثناء إيقاف الكاميرا: {خطأ}",
+                "camera_disabled": "الكاميرا غير نشطة."
+            },
+            "success": {
+                "title": "مسح بطاقة العمل",
+                "message": "سيتم فحص ملفاتك المستوردة قريبًا<br>وسيتم استيراد التوقعات المقابلة إلى مشروعك."
+            }
+        }
+    },
+    "import": {
+        "add": {
+            "title": "آفاق الاستيراد",
+            "from": {
+                "label": "من",
+                "local_file": "ملف محلي",
+                "webservice": "خارجي عبر URL"
+            },
+            "file": "ملف",
+            "name": "اسم",
+            "field_delimiter": "محدد الحقل",
+            "field_enclosure": "الضميمة الميدانية",
+            "comma": "فاصلة",
+            "semicolon": "فاصلة منقوطة",
+            "tab": "(فاتورة غير مدفوعة)",
+            "space": "(فضاء)"
+        },
+        "update": {
+            "name": "اسم"
+        },
+        "process": {
+            "title": "يستورد",
+            "tab": {
+                "mapping": {
+                    "title": "رسم الخرائط",
+                    "cancel": "إلغاء التعيين",
+                    "event": "حدث",
+                    "order": "طلب",
+                    "sms": "رسالة قصيرة",
+                    "interaction": "يتصل",
+                    "link": "رابط خارجي",
+                    "user": "المستخدمين المتأثرين",
+                    "plus_field": "+ المجال",
+                    "plus_category": "+ الفئة",
+                    "shortcut_new_field": "حقل جديد",
+                    "shortcut_new_category": "مرشح جديد",
+                    "shortcut_new_thread": "موضوع جديد",
+                    "new_field": "مجال احتمال جديد",
+                    "new_category": "فئة جديدة",
+                    "new_column": "عمود جديد",
+                    "auto_field": "[حقل جديد]",
+                    "auto_category": "[فئة جديدة]",
+                    "auto_thread": "[موضوع جديد]"
+                },
+                "relations": {
+                    "title": "علاقات",
+                    "affected_users": "المستخدمين المتأثرين",
+                    "affected_groups": "المجموعات المتضررة"
+                },
+                "import": {
+                    "title": "يستورد",
+                    "process": "استيراد العملية",
+                    "re_process": "إعادة عملية الاستيراد",
+                    "delete": {
+                        "import": "حذف الاستيراد",
+                        "import_and_prospects": "حذف الاستيراد والتوقعات",
+                        "prospects": "حذف التوقعات فقط"
+                    },
+                    "download": "تحميل الاستيراد",
+                    "stop": "توقف عن الاستيراد",
+                    "view_prospects": "عرض التوقعات المستوردة",
+                    "prospects_table": {
+                        "title": "جدول الآفاق",
+                        "body": "استخدم الأعمدة الموجودة في عملية الاستيراد هذه كأعمدة في جدول العملاء المتوقعين"
+                    },
+                    "duplicate": {
+                        "title": "التحقق من التكرارات",
+                        "fields": "البحث حسب الحقول...",
+                        "choose_action": "اختر إجراءً للقيام به",
+                        "remove_duplicating": "حذف الخيوط المكررة القديمة",
+                        "remove_duplicates": "إزالة التكرارات الرصاص في الاستيراد",
+                        "replace_duplicating": "استبدل البيانات المعدلة للعملاء المحتملين القدامى ببيانات العملاء المحتملين الجدد"
+                    },
+                    "processing": "سنرسل إليك بريدًا إلكترونيًا عند اكتمال عملية الاستيراد.",
+                    "webservice": {
+                        "step_1": "لربط Zap الخاص بك بهذا الاستيراد،<br />اتصل بـ Zapier، وأنشئ برنامج Zapier الخاص بك هناك:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">إنشاء زاب</a>",
+                        "step_2": "يختار <b>ورقة جوجل</b> مثل <b>مشغل</b>,<br />يختار <b>صف جدول بيانات جديد [فوري]</b> مثل <b>حدث</b>,<br />انقر فوق <b>يكمل</b>.",
+                        "step_3": "اختر حساب Google الخاص بك الذي يحتوي على ملف Google Sheet للاستيراد إليه <b>اختر الحساب</b>,<br />انقر فوق <b>يكمل</b>.",
+                        "step_4": "اختر ملف Google Sheet في <b>ورقة النشر</b>,<br />اختر الورقة في <b>ورقة عمل</b>,<br />انقر فوق <b>يكمل</b>.",
+                        "step_5": "انقر فوق <b>اختبار الزناد</b> للتحقق من أن Zapier لديه حق الوصول إلى ملف Google Sheet الخاص بك،<br />انقر فوق <b>يكمل</b>.",
+                        "step_6": "يختار <b>خطافات الويب بواسطة Zapier</b> مثل <b>فعل</b>,<br /> يختار <b>يحصل</b> مثل <b>حدث</b>,<br />انقر فوق <b>يكمل</b>.",
+                        "step_7": "أضف الرابط التالي في <b>عنوان URL</b>:",
+                        "step_8": "يمكنك استخدام المعلمات التالية كما <br /><b>معلمات سلسلة الاستعلام</b> للربط بالأعمدة الموجودة في ملف ورقة Google:",
+                        "webhook_url_copied": "تم نسخ عنوان URL للرد التلقائي على الويب",
+                        "query_string_copied": "تم نسخ سلسلة الاستعلام"
+                    }
+                },
+                "duplicate": {
+                    "title": "التحديثات"
+                }
+            }
+        }
+    },
+    "user": {
+        "add": {
+            "title": "مستخدم جديد",
+            "email": "أدخل البريد الإلكتروني للمستخدم",
+            "not_found": "لم يتم العثور على مستخدم لديه هذا البريد الإلكتروني في قاعدة بياناتنا.",
+            "create": "قم بإنشاء هذا المستخدم",
+            "create_professional_project": "إنشاء مشروع احترافي",
+            "create_personal_project": "إنشاء مشروع شخصي",
+            "create_demo_project": "إنشاء مشروع تجريبي"
+        },
+        "profile": {
+            "affected_projects": "المشاريع المتضررة",
+            "blocs": {
+                "calendars": "التقويمات المتأثرة",
+                "categories": "الفئات المتضررة",
+                "documents": "المستندات المتأثرة",
+                "exports": "صادرات",
+                "folders": "المجلدات المتضررة",
+                "groups": "المجموعات المتضررة",
+                "menus": "القوائم المتأثرة",
+                "order_actions": "إجراءات الطلب المتأثرة",
+                "order_statuses": "حالات الطلب المتأثرة",
+                "order_steps": "خطوات الطلب المتأثرة",
+                "projects": "المشاريع المتضررة",
+                "questionnaires": "الأشكال المتضررة",
+                "roles": "الأدوار المتأثرة",
+                "threads": "المواضيع المتضررة",
+                "users": "المستخدمين المتأثرين"
+            },
+            "password_update": {
+                "confirm": "هل أنت متأكد من تغيير كلمة المرور؟",
+                "success": "تم تغيير الرقم السري بنجاح!",
+                "error": "خطأ في تغيير كلمة المرور!"
+            },
+            "menus": {
+                "duplicate": "ملف تعريف مكرر للمستخدمين الآخرين",
+                "history": "تاريخ الاتصال",
+                "actions": "الإجراءات التي يقوم بها المستخدم",
+                "permissions": "الأذونات",
+                "vehicle": "مركبات",
+                "prospect_profile_setting": "إعداد الملف الشخصي المحتمل",
+                "prospects_table_setting": "إعداد جدول التوقعات",
+                "user_profile_setting": "إعداد ملف تعريف المستخدم",
+                "use": "قم بتسجيل الدخول بهذا الحساب"
+            }
+        },
+        "list": {
+            "title": "المستخدمين"
+        },
+        "table": {
+            "footer": {
+                "deselect": "قم بإلغاء تحديد التوقعات",
+                "init_filters": "المرشحات الأولية",
+                "toggle_menus": "تبديل القوائم",
+                "toggle_user_menus": "تبديل قوائم المستخدم",
+                "add_user": "مستخدم جديد",
+                "import": "يستورد",
+                "add_column": "عمود جديد",
+                "previous": "سابق",
+                "next": "التالي",
+                "bulk_delete": "إزالة من المشروع",
+                "bulk_calendars": "إرفاق أو فصل التقويمات",
+                "bulk_categories": "إرفاق أو فصل الفئات",
+                "bulk_documents": "إرفاق أو فصل المستندات",
+                "bulk_folders": "إرفاق أو فصل المجلدات",
+                "bulk_groups": "إرفاق أو فصل المجموعات",
+                "bulk_menus": "إرفاق القوائم أو فصلها",
+                "bulk_order_actions": "إرفاق أو فصل إجراءات الطلب",
+                "bulk_order_steps": "إرفاق أو فصل خطوات الطلب",
+                "bulk_roles": "إرفاق الأدوار أو فصلها",
+                "bulk_threads": "إرفاق أو فصل المواضيع",
+                "bulk_users": "إرفاق أو فصل المستخدمين"
+            },
+            "column": {
+                "manage": "إدارة أعمدة جدول مستخدمي {project}.",
+                "new": "عمود جديد",
+                "tab": {
+                    "fields": "مجالات",
+                    "others": "آحرون"
+                },
+                "others": {
+                    "calendars": "التقاويم",
+                    "categories": "فئات",
+                    "documents": "وثائق",
+                    "folders": "المجلدات",
+                    "groups": "مجموعات",
+                    "menus": "القوائم",
+                    "order_actions": "إجراءات النظام",
+                    "order_statuses": "حالات الطلب",
+                    "order_steps": "خطوات الطلب",
+                    "projects": "المشاريع",
+                    "questionnaires": "الاستبيانات",
+                    "roles": "الأدوار",
+                    "threads": "الخيوط",
+                    "users": "المستخدمين"
+                }
+            },
+            "filters": {
+                "calendars": {
+                    "title": "التصفية حسب التقويمات المتأثرة",
+                    "with": "مع التقويمات...",
+                    "without": "بدون تقويمات",
+                    "without_calendar": "بدون {التقويم}"
+                },
+                "categories": {
+                    "title": "التصفية حسب الفئات المتضررة",
+                    "with": "مع الفئات...",
+                    "without": "بدون فئات",
+                    "without_category": "بدون {الفئة}"
+                },
+                "documents": {
+                    "title": "التصفية حسب المستندات المتأثرة",
+                    "with": "بالوثائق...",
+                    "without": "بدون وثائق",
+                    "without_document": "بدون {وثيقة}"
+                },
+                "folders": {
+                    "title": "التصفية حسب المجلدات المتأثرة",
+                    "with": "مع المجلدات...",
+                    "without": "بدون مجلدات",
+                    "without_folder": "بدون {مجلد}"
+                },
+                "groups": {
+                    "title": "التصفية حسب المجموعات المتضررة",
+                    "with": "مع المجموعات...",
+                    "without": "بدون مجموعات",
+                    "without_group": "بدون {مجموعة}"
+                },
+                "menus": {
+                    "title": "التصفية حسب القوائم المتأثرة",
+                    "with": "مع القوائم...",
+                    "without": "بدون قوائم",
+                    "without_menu": "بدون {القائمة}"
+                },
+                "order_actions": {
+                    "title": "التصفية حسب إجراءات الطلب المتأثرة",
+                    "with": "مع إجراءات النظام ...",
+                    "without": "بدون إجراءات النظام",
+                    "without_order_action": "بدون {order_action}"
+                },
+                "order_steps": {
+                    "title": "التصفية حسب خطوات الطلب المتأثرة",
+                    "with": "مع خطوات الطلب...",
+                    "without": "بدون خطوات النظام",
+                    "without_order_step": "بدون {order_step}"
+                },
+                "roles": {
+                    "title": "التصفية حسب الأدوار المتأثرة",
+                    "with": "مع الأدوار...",
+                    "without": "بدون أدوار",
+                    "without_role": "بدون {دور}"
+                },
+                "threads": {
+                    "title": "التصفية حسب المواضيع المتأثرة",
+                    "with": "مع الخيوط...",
+                    "without": "بدون خيوط",
+                    "without_thread": "بدون {موضوع}"
+                },
+                "users": {
+                    "title": "التصفية حسب المستخدمين المتأثرين",
+                    "with": "مع المستخدمين...",
+                    "without": "بدون مستخدمين",
+                    "without_user": "بدون {مستخدم}"
+                }
+            },
+            "bulk": {
+                "calendars": {
+                    "title": "التقويمات المتأثرة"
+                },
+                "categories": {
+                    "title": "الفئات المتضررة"
+                },
+                "documents": {
+                    "title": "المستندات المتأثرة"
+                },
+                "folders": {
+                    "title": "المجلدات المتضررة"
+                },
+                "groups": {
+                    "title": "المجموعات المتضررة"
+                },
+                "menus": {
+                    "title": "القوائم المتأثرة"
+                },
+                "order_actions": {
+                    "title": "إجراءات الطلب المتأثرة"
+                },
+                "order_steps": {
+                    "title": "خطوات الطلب المتأثرة"
+                },
+                "roles": {
+                    "title": "الأدوار المتأثرة"
+                },
+                "threads": {
+                    "title": "المواضيع المتضررة"
+                },
+                "users": {
+                    "title": "المستخدمين المتأثرين"
+                }
+            }
+        },
+        "duplicate": {
+            "title": "الملف الشخصي مكرر",
+            "from": "مكررة من",
+            "for": "مكررة ل"
+        },
+        "calendars": {
+            "title": "التقويمات المتأثرة"
+        },
+        "categories": {
+            "title": "فئات العلامات المتأثرة"
+        },
+        "documents": {
+            "title": "المستندات المتأثرة"
+        },
+        "folders": {
+            "title": "المجلدات المتضررة"
+        },
+        "groups": {
+            "title": "المجموعات المتضررة"
+        },
+        "menus": {
+            "title": "القوائم المتأثرة"
+        },
+        "order_actions": {
+            "title": "إجراءات الطلب المتأثرة"
+        },
+        "order_steps": {
+            "title": "خطوات الطلب المتأثرة"
+        },
+        "permissions": {
+            "title": "الأذونات"
+        },
+        "questionnaires": {
+            "title": "الأشكال المتضررة"
+        },
+        "roles": {
+            "title": "الأدوار المتأثرة"
+        },
+        "sessions": {
+            "title": "الأجهزة المتصلة"
+        },
+        "threads": {
+            "title": "المواضيع المتضررة"
+        },
+        "users": {
+            "title": "المستخدمين المتأثرين"
+        },
+        "vehicles": {
+            "title": "مركبات",
+            "add": {
+                "title": "عربة"
+            }
+        },
+        "log_chart": {
+            "title": "مخطط السجلات"
+        },
+        "actions": {
+            "title": "أجراءات"
+        }
+    },
+    "map": {
+        "prospect": {
+            "default_infos": "المعلومات الافتراضية",
+            "other_infos": "المعلومات الأخرى",
+            "labels": "العلامات",
+            "appointments": "تعيينات",
+            "orders": "طلبات",
+            "search": "البحث من هذا الاحتمال"
+        },
+        "prospect_without_lat_lng": {
+            "title": "آفاق دون خطوط العرض / الغاز الطبيعي المسال"
+        },
+        "vehicles": {
+            "title": "مركبات"
+        },
+        "color": {
+            "title": "علامات الخريطة الملونة بواسطة ..."
+        }
+    },
+    "campaign": {
+        "mobile": "يرجى استخدام جهاز كمبيوتر لاستخدام هذه الأداة.",
+        "campaign": {
+            "title": "حملة",
+            "new": "حملة جديدة",
+            "enabled": "ممكّن",
+            "for": {
+                "prospect": "للآفاق",
+                "order": "لأوامر",
+                "appointment": "للمواعيد"
+            },
+            "frequency": {
+                "once": "مرة واحدة",
+                "every_fifteen_minutes": "كل 15 دقيقة",
+                "every_thirty_minutes": "كل 30 دقيقة",
+                "hourly": "ساعيا",
+                "daily": "يوميًا",
+                "monthly": "شهريا"
+            },
+            "date": "تاريخ",
+            "hour": "ساعة",
+            "re_process_processed_prospects": "إعادة معالجة التوقعات المعالجة",
+            "check_rules": "تحقق من القواعد",
+            "view_matching_prospects": "عرض التوقعات المطابقة"
+        },
+        "operator": {
+            "title": "المشغل أو العامل",
+            "or": "أو",
+            "and": "و"
+        },
+        "rule": {
+            "prospect": {
+                "title": "احتمال",
+                "tag": "بطاقة شعار",
+                "menu": "قائمة طعام",
+                "sms": {
+                    "title": "رسالة قصيرة",
+                    "source": "مصدر الرسائل القصيرة المستلمة",
+                    "count": "عدد الرسائل القصيرة المستلمة"
+                },
+                "interaction": {
+                    "title": "نداء",
+                    "source": "مصدر المكالمات المستلمة",
+                    "count": "عدد المكالمات المستلمة"
+                }
+            },
+            "order": {
+                "title": "طلب",
+                "action": "مع الإجراءات",
+                "product": "مع المنتجات",
+                "status": "مع الحالات",
+                "step": "مع الخطوات"
+            },
+            "appointment": {
+                "title": "ميعاد",
+                "date": {
+                    "title": "تاريخ",
+                    "starts_in_more_than_mn": "يبدأ خلال أكثر من {دقيقة} دقيقة",
+                    "starts_in_less_than_mn": "يبدأ في أقل من {دقيقة} دقيقة",
+                    "started_less_than_ago_mn": "بدأت منذ أقل من {دقيقة} دقيقة",
+                    "started_more_than_ago_mn": "بدأت منذ أكثر من {دقيقة} دقيقة"
+                }
+            }
+        },
+        "action": {
+            "prospect": {
+                "archive": "أرشيف",
+                "do_not_archive": "لا تقم بالأرشفة",
+                "remove": "إزالة احتمال",
+                "message": {
+                    "title": "إرسال رسالة / بريد",
+                    "name": "أرسل رسالة في \"{الموضوع}\": {content}",
+                    "thread": {
+                        "title": "موضوع الرسالة...",
+                        "placeholder": "اختر موضوع الرسالة..."
+                    },
+                    "user": {
+                        "title": "انتظر ل ...",
+                        "placeholder": "اختر المستخدم..."
+                    },
+                    "template": {
+                        "title": "اختر نموذجًا للرسالة"
+                    },
+                    "enter_message": "أدخل رسالة"
+                },
+                "sms": {
+                    "title": "أرسل رسالة نصية قصيرة",
+                    "name": "أرسل رسالة نصية قصيرة",
+                    "source": "مصدر",
+                    "sms": "رسالة قصيرة"
+                },
+                "event": {
+                    "title": "إنشاء حدث",
+                    "name": "أنشئ {duration} دقيقة {calendar} لـ {user} خلال {min_days} إلى {max_days} يوم",
+                    "duration": "مدة",
+                    "calendar": {
+                        "title": "تقويم",
+                        "placeholder": "اختر التقويم..."
+                    },
+                    "user": {
+                        "title": "مستخدم",
+                        "placeholder": "اختر المستخدم...",
+                        "random": "مستخدم عشوائي",
+                        "prospect_creator": "من خلق الاحتمال",
+                        "prospect_affected_user": "من تم تعيينه في الاحتمال",
+                        "role": "دور {دور}"
+                    },
+                    "date": {
+                        "title": "في X أيام",
+                        "min": "مين...",
+                        "max": "الأعلى..."
+                    }
+                },
+                "attach_group": {
+                    "title": "تعيين مجموعة"
+                },
+                "attach_label": {
+                    "title": "تعيين علامة"
+                },
+                "attach_user": {
+                    "title": "تعيين مستخدم"
+                },
+                "detach_group": {
+                    "title": "فصل مجموعة"
+                },
+                "detach_label": {
+                    "title": "افصل علامة"
+                },
+                "detach_user": {
+                    "title": "فصل مستخدم"
+                },
+                "document_to_folder": {
+                    "title": "قم بإنشاء مستند PDF في مجلد محتمل",
+                    "name": "قم بإنشاء المستند \"{document}\" في \"{folder}\"",
+                    "document": "وثيقة لتوليد...",
+                    "select_document": "اختر وثيقة...",
+                    "folder": "مجلد الوجهة ...",
+                    "select_folder": "إختر ملفا أحمق ..."
+                },
+                "document_to_thread": {
+                    "title": "أرسل مستند PDF إلى سلسلة الرسائل",
+                    "name": "أرسل المستند \"{document}\" إلى سلسلة رسائل \"{thread}\".",
+                    "document": "وثيقة لتوليد...",
+                    "select_document": "اختر وثيقة...",
+                    "thread": "موضوع رسالة الوجهة ...",
+                    "select_thread": "اختر موضوع الرسالة..."
+                },
+                "order": {
+                    "title": "إنشاء النظام",
+                    "name": "إنشاء الطلب ({name})",
+                    "add": "إنشاء النظام"
+                }
+            },
+            "order": {
+                "generate_invoice": {
+                    "title": "إنشاء فاتورة الطلب",
+                    "name": "إنشاء الفاتورة \"{invoice}\""
+                },
+                "sign_invoice": {
+                    "title": "التوقيع على فاتورة الطلب",
+                    "name": "قم بالتوقيع على الفاتورة \"{invoice}\""
+                },
+                "user_action": {
+                    "title": "ربط إجراء على الأمر بمستخدم",
+                    "name": "ربط إجراء الطلب \"{action}\" بـ {user}",
+                    "action": "فعل ...",
+                    "select_action": "اختيار إجراء ...",
+                    "user": "مستخدم ...",
+                    "select_user": "اختيار مستخدم...",
+                    "order_creator": "من أنشأ الأمر",
+                    "prospect_creator": "من خلق الاحتمال",
+                    "prospect_affected_user": "من تم تعيينه في الاحتمال",
+                    "role": "دور {دور}"
+                }
+            }
+        },
+        "matching_prospects": {
+            "title": "مطابقة الآفاق"
+        }
+    },
+    "document": {
+        "mobile": "يرجى استخدام جهاز كمبيوتر لاستخدام هذه الأداة.",
+        "dashboard": {
+            "new_from_template": "مستند جديد من القالب",
+            "your_documents": "قوالب المستندات الخاصة بك"
+        },
+        "add": {
+            "title": "قالب مستند جديد"
+        },
+        "list": {
+            "title": "وثائق"
+        },
+        "pdf": {
+            "title": "بي دي إف"
+        },
+        "font": {
+            "title": "الخطوط",
+            "new": {
+                "title": "الخط الجديد",
+                "choose_file": "اختر ملف .ttf",
+                "type": {
+                    "title": "يكتب",
+                    "normal": "طبيعي",
+                    "bold": "عريض"
+                },
+                "style": {
+                    "title": "أسلوب",
+                    "normal": "طبيعي",
+                    "italic": "مائل"
+                }
+            }
+        },
+        "page": {
+            "title": "صفحة",
+            "all": "كل الصفحات",
+            "add": {
+                "title": "صفحة جديدة",
+                "choose_file": "اختر ملف",
+                "page": "صفحة",
+                "width": "العرض بالملم",
+                "height": "الارتفاع مم",
+                "empty": "فارغ"
+            }
+        },
+        "zoom": {
+            "title": "تكبير"
+        },
+        "style": {
+            "frame": {
+                "title": "إطار",
+                "left": "غادر",
+                "top": "قمة",
+                "width": "عرض",
+                "height": "ارتفاع",
+                "rotation": "دوران",
+                "padding": {
+                    "title": "حشوة",
+                    "top": "ت",
+                    "right": "ر",
+                    "bottom": "ب",
+                    "left": "ل"
+                },
+                "background_color": "لون الخلفية"
+            },
+            "format": {
+                "title": "تنسيق النص",
+                "type": {
+                    "title": "يكتب",
+                    "text": "نص",
+                    "html": "لغة البرمجة",
+                    "qrcode": "رمز الاستجابة السريعة"
+                },
+                "font_size": "حجم الخط",
+                "line_height": "ارتفاع خط",
+                "font": "الخط",
+                "color": "لون الخط"
+            },
+            "border": {
+                "title": "حدود",
+                "width": {
+                    "title": "عرض",
+                    "top": "ت",
+                    "right": "ر",
+                    "bottom": "ب",
+                    "left": "ل"
+                },
+                "style": {
+                    "title": "أسلوب",
+                    "solid": "صلب",
+                    "dashed": "متقطع",
+                    "dotted": "منقط"
+                },
+                "color": "لون",
+                "radius": "نصف القطر"
+            },
+            "content": {
+                "title": "محتوى"
+            },
+            "order_table": {
+                "table": {
+                    "header_style": "نمط الرأس",
+                    "content": "محتوى",
+                    "body_style": "نمط العمود"
+                },
+                "summary": {
+                    "header_style": "نمط الرأس",
+                    "content": "محتوى",
+                    "body_style": "نمط العمود"
+                },
+                "apply_to_all_cells": "تنطبق على جميع الخلايا الأخرى"
+            }
+        },
+        "map": {
+            "title": "خريطة",
+            "satellite": "الأقمار الصناعية",
+            "roadmap": "خريطة الطريق",
+            "hybrid": "هجين",
+            "terrain": "تضاريس",
+            "zoom": "تكبير"
+        },
+        "field": {
+            "page": {
+                "number": "رقم الصفحة"
+            },
+            "prospect": {
+                "title": "احتمال",
+                "default_fields": "الحقول الافتراضية",
+                "other_fields": "مجالات أخرى"
+            },
+            "map": {
+                "title": "خريطة"
+            },
+            "date": {
+                "title": "تاريخ"
+            },
+            "order": {
+                "title": "طلب",
+                "table": {
+                    "title": "جدول الطلبات",
+                    "columns": "أعمدة",
+                    "summaries": "ملخصات",
+                    "edit": "تعديل جدول الطلبات"
+                },
+                "number": "رقم الفاتوره",
+                "invoice_number": "رقم الفاتورة {number}",
+                "invoice_date": "تاريخ الإنشاء: {تاريخ}",
+                "product_i": "المنتج {i}"
+            },
+            "tag": {
+                "title": "بطاقة شعار"
+            },
+            "questionnaire": {
+                "title": "استمارة"
+            },
+            "project": {
+                "thumbnail": "شعار",
+                "date": "تاريخ الإنشاء"
+            },
+            "tabs": {
+                "prospects": {
+                    "title": "الآفاق"
+                },
+                "map": {
+                    "title": "خريطة"
+                },
+                "dates": {
+                    "title": "بلح"
+                },
+                "orders": {
+                    "title": "طلبات"
+                },
+                "labels": {
+                    "title": "المرشحات"
+                },
+                "forms": {
+                    "title": "نماذج"
+                },
+                "project": {
+                    "title": "مشروع"
+                },
+                "pdfs": {
+                    "title": "ملفات PDF"
+                },
+                "fonts": {
+                    "title": "الخطوط"
+                },
+                "pages": {
+                    "title": "الصفحات",
+                    "number": "رقم الصفحة",
+                    "portrait": "لَوحَة",
+                    "landscape": "منظر جمالي",
+                    "new_from": "صفحة جديدة من"
+                }
+            }
+        }
+    },
+    "event": {
+        "title": "حدث",
+        "view_prospect": "عرض احتمال",
+        "view_and_edit": "عرض وتحرير الحدث",
+        "move": "نقل الحدث",
+        "google_calendar_associated_account": "الحساب المرتبط بتقويم Google",
+        "google_calendar_remove_account_confirm": "هل تريد حقًا التوقف عن ربط حساب تقويم Google الخاص بك بـ Heroes CRM؟",
+        "calendar": "تقويم",
+        "user": "مستخدم",
+        "prospect": "احتمال",
+        "order": "طلب",
+        "date_time": "التاريخ و الوقت",
+        "started_at": "من...",
+        "ended_at": "ل...",
+        "location": "موقع",
+        "confirmed": "تم تأكيد الحدث",
+        "done": "تم الحدث",
+        "labels": "المرشحات",
+        "name": "عنوان",
+        "add_title": "أضف عنوانا ...",
+        "description": "وصف",
+        "add_description": "اضف وصفا ...",
+        "choose_calendar": "اختر التقويم",
+        "choose_user": "اختر المستخدم",
+        "choose_prospect": "اختر احتمال",
+        "new_prospect": "احتمال جديد",
+        "choose_order": "اختر الطلب",
+        "new_order": "طلب جديد",
+        "choose_hour": "اختر ساعة",
+        "email_to_prospect": "إرسال دعوة إلى احتمال",
+        "choose_event_description_template": "قوالب الوصف",
+        "user_daily_directions": {
+            "title": "الاتجاهات",
+            "remove_from_map": "إزالة الطريق من الخريطة",
+            "remove_marker": "إزالة العلامة",
+            "send_sms": "أرسل رسالة نصية قصيرة",
+            "call": "يتصل",
+            "file": "ملف",
+            "message": "رسالة",
+            "event": "حدث",
+            "find_prospect": "البحث عن احتمال...",
+            "find_address": "جد العنوان ..."
+        },
+        "agenda": {
+            "filters": {
+                "title": "المرشحات",
+                "users": "المستخدمين",
+                "calendars": "التقاويم",
+                "show_we": "عرض عطلات نهاية الأسبوع",
+                "min_hour": "الحد الأدنى للساعة",
+                "max_hour": "الحد الأقصى للساعة",
+                "choose_role": "اختر دورًا"
+            }
+        }
+    },
+    "field": {
+        "add": {
+            "title": "حقل جديد"
+        },
+        "update": {
+            "delete_confirm": "يحتوي هذا الحقل <b>{عدد}</b> البيانات المتعلقة بالتوقعات،<br>هل أنت متأكد أنك تريد حذف هذا؟"
+        },
+        "types": {
+            "text": "نص",
+            "long_text": "نص طويل",
+            "number": "رقم",
+            "email": "بريد إلكتروني",
+            "date": "تاريخ",
+            "datetime": "وقت التاريخ",
+            "address": "عنوان",
+            "url": "عنوان URL",
+            "tel": "رقم"
+        },
+        "add_to_global_search": "أضف إلى البحث العالمي",
+        "prospect": {
+            "phone_number": "رقم التليفون",
+            "mobile_phone_number": "رقم الهاتف الجوال"
+        }
+    },
+    "calendar": {
+        "types": {
+            "physical": "بدني",
+            "telephone": "هاتف",
+            "hangout": "لقاء",
+            "task": "مهمة",
+            "other": "آخر"
+        },
+        "add": {
+            "title": "تقويم جديد"
+        },
+        "update": {
+            "default_address": "عنوان الحدث الافتراضي الخاص بك"
+        },
+        "combine_with": "تتحد مع"
+    },
+    "interaction": {
+        "types": {
+            "telephone": "هاتف"
+        }
+    },
+    "commission": {
+        "title": "إدارة العمولات",
+        "tab": {
+            "product": {
+                "title": "حدد المنتجات"
+            },
+            "action": {
+                "title": "حدد الإجراءات"
+            },
+            "user": {
+                "title": "حدد المستخدمين"
+            },
+            "commission": {
+                "types": {
+                    "title": "يكتب",
+                    "percentage": "نسبة مئوية",
+                    "fix": "يصلح"
+                },
+                "commission": {
+                    "title": "عمولة"
+                },
+                "including_tax": {
+                    "title": "احسب من سعر المنتج",
+                    "incl_tax": "متضمن للضريبة",
+                    "excl_tax": "لا تشمل الضريبة"
+                },
+                "selected_products": "المنتجات المختارة",
+                "selected_actions": "الإجراءات المختارة",
+                "selected_users": "المستخدمين المختارين"
+            }
+        }
+    },
+    "setting": {
+        "title": "إعدادات",
+        "locale": {
+            "title": "لغة"
+        },
+        "project": {
+            "title": "إعدادات المشروع {project}.",
+            "description": "إدارة مشروعك"
+        },
+        "google_auth": {
+            "title": "أداة مصادقة Google (عاملان)"
+        },
+        "google_drive": {
+            "title": "جوجل درايف",
+            "description": "ربط حساب Google Drive لملفاتك المحتملة"
+        },
+        "google_calendar": {
+            "title": "تقويم جوجل",
+            "description": "قم بربط حساب تقويم Google بمواعيدك"
+        },
+        "users": {
+            "title": "قائمة المستخدمين",
+            "description": "إدارة وصول المستخدم في المشروع {project}"
+        },
+        "devices": {
+            "title": "الأجهزة المتصلة",
+            "description": "إدارة أجهزتك المتصلة"
+        },
+        "tutorials": {
+            "title": "إدارة الدروس",
+            "do_not_show_anymore": "لا تظهر الدروس بعد الآن"
+        },
+        "trash": {
+            "title": "نفاية",
+            "description": "مرشحات، مرشحات، ..."
+        },
+        "menu_icons": {
+            "title": "تغيير أيقونات القائمة",
+            "description": "آفاق، جداول الأعمال، خريطة، ..."
+        }
+    },
+    "label": {
+        "add": {
+            "title": "تسمية جديدة"
+        },
+        "combine_with": "تتحد مع",
+        "affected_users": "المستخدمين المتأثرين",
+        "archive": "أرشيف",
+        "archive_tooltip": "لا تظهر بعد الآن في قائمة التسميات"
+    },
+    "menu": {
+        "use_current_filters": "استخدم المرشحات الحالية",
+        "select_filters": "حدد المرشحات",
+        "add": {
+            "title": "قائمة جديدة"
+        }
+    },
+    "product": {
+        "price": "سعر",
+        "currency": "عملة",
+        "tax_in_percent": "الضريبة في المئة",
+        "included_tax": "شامل الضريبة",
+        "image": "صورة",
+        "manage_images": "إدارة الصور",
+        "archive": "أرشيف",
+        "archive_tooltip": "لا تظهر بعد الآن في قائمة المنتجات",
+        "add_images": "إضافة الصور",
+        "update": {
+            "choose_images": "اختر الصور"
+        }
+    },
+    "role": {
+        "add": {
+            "title": "دور جديد"
+        },
+        "list": {
+            "title": "الأدوار"
+        }
+    },
+    "sms_template": {
+        "add": {
+            "title": "قالب الرسائل القصيرة الجديد"
+        }
+    },
+    "stat": {
+        "country": {
+            "title": "ربط {country} بـ ..."
+        },
+        "metric": {
+            "title": "اتبع مرشح يوميا",
+            "label": "منقي",
+            "menu": "قائمة طعام"
+        },
+        "blocs": {
+            "prospect": {
+                "title": "احتمال"
+            },
+            "sms": {
+                "title": "رسالة قصيرة",
+                "phone": "هاتف"
+            },
+            "event": {
+                "title": "حدث"
+            },
+            "interaction": {
+                "title": "يتصل",
+                "phone": "هاتف"
+            },
+            "order": {
+                "title": "طلب"
+            },
+            "file": {
+                "title": "ملف"
+            },
+            "message": {
+                "title": "رسالة"
+            },
+            "total": {
+                "prospect": "عدد الآفاق",
+                "sms": "عدد الرسائل القصيرة",
+                "event": "عدد الأحداث",
+                "interaction": "عدد المكالمات",
+                "order": "عدد الطلبات",
+                "file": "عدد الملفات",
+                "message": "عدد الرسائل"
+            },
+            "new": {
+                "prospect": "آفاق جديدة",
+                "sms": "الرسائل القصيرة الجديدة",
+                "event": "أحداث جديدة",
+                "interaction": "مكالمات جديدة",
+                "order": "طلبات جديدة",
+                "file": "ملفات جديدة",
+                "message": "رسائل جديدة"
+            },
+            "follow_filter_daily": {
+                "title": "اتبع مرشح يوميا",
+                "distribution": "توزيع المرشحات"
+            }
+        },
+        "user-connection-stat": {
+            "title": "المستخدمين المتصلين شهريا"
+        }
+    },
+    "thread": {
+        "add": {
+            "title": "موضوع جديد",
+            "send_email_to": "إرسال البريد الإلكتروني إلى ...",
+            "send_email_to_prospect": "إرسال البريد الإلكتروني إلى احتمال",
+            "associate_to_the_user": "مرتبط بـ {user}"
+        }
+    },
+    "questionnaire": {
+        "questionnaire": {
+            "add": {
+                "title": "صيغة جديدة"
+            },
+            "list": {
+                "title": "نماذج"
+            }
+        },
+        "question": {
+            "add": {
+                "title": "سؤال جديد"
+            },
+            "types": {
+                "radio": "مذياع",
+                "checkbox": "خانة الاختيار",
+                "text": "نص",
+                "textarea": "نص متعدد الأسطر",
+                "date": "تاريخ",
+                "image": "صورة",
+                "file": "ملف"
+            }
+        },
+        "section": {
+            "add": {
+                "title": "قسم جديد"
+            }
+        },
+        "option": {
+            "add": {
+                "title": "خيار جديد",
+                "choose_section": "اختر قسما"
+            }
+        }
+    },
+    "permission": {
+        "all": "جميع الأذونات"
+    },
+    "category": {
+        "add": {
+            "title": "فئة التسمية الجديدة",
+            "unique": "اختيار واحد"
+        },
+        "list": {
+            "title": "فئات التسمية"
+        },
+        "update": {
+            "unique": "اختيار واحد"
+        }
+    },
+    "folder": {
+        "add": {
+            "title": "ملف جديد"
+        }
+    },
+    "group": {
+        "add": {
+            "title": "مجموعة جديدة"
+        }
+    },
+    "locale": {
+        "setting": {
+            "title": "لغة"
+        }
+    },
+    "message_template": {
+        "add": {
+            "title": "قالب رسالة جديد"
+        }
+    },
+    "event_description_template": {
+        "add": {
+            "title": "قالب وصف الحدث الجديد"
+        }
+    },
+    "order": {
+        "action": {
+            "add": {
+                "title": "نوع جديد من العمل على النظام"
+            }
+        },
+        "status": {
+            "add": {
+                "title": "حالة الطلب الجديد"
+            }
+        },
+        "step": {
+            "add": {
+                "title": "خطوة الطلب الجديد"
+            }
+        },
+        "product": {
+            "add": {
+                "title": "منتج جديد"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "إلغاء تحديد الطلبات",
+                "init_filters": "المرشحات الأولية",
+                "toggle_order_menus": "تبديل قوائم الطلب",
+                "add_order": "طلب جديد",
+                "setting": "إعداد الأعمدة",
+                "previous": "سابق",
+                "next": "التالي",
+                "bulk_delete": "احذف بالتأكيد",
+                "page_orders_count": "عدد الطلبات لكل صفحة",
+                "orders_count": "عدد الطلبات",
+                "current_page": "الصفحه الحاليه"
+            },
+            "column": {
+                "manage": "إدارة أعمدة جدول طلبات {project}.",
+                "delete_confirm": "هل أنت متأكد أنك تريد إزالة هذا العمود؟",
+                "others": {
+                    "total_commissions": "مجموع العمولات",
+                    "prospect": "احتمال",
+                    "products": "منتجات",
+                    "status": "حالة",
+                    "steps": "خطوات",
+                    "commissions": "اللجان"
+                }
+            },
+            "setting": {
+                "decimal": "الأرقام بعد عدد النقاط العشرية:"
+            },
+            "filters": {
+                "all": {
+                    "title": "المرشحات"
+                },
+                "actions": {
+                    "title": "التصفية حسب الإجراءات",
+                    "with": "بالأفعال...",
+                    "without": "بدون عمل",
+                    "without_user": "بدون إجراء {إجراء}"
+                },
+                "products": {
+                    "title": "تصفية حسب المنتجات",
+                    "with": "مع المنتجات...",
+                    "without": "بدون منتج",
+                    "without_user": "بدون المنتج {المنتج}"
+                },
+                "statuses": {
+                    "title": "التصفية حسب الحالة",
+                    "with": "مع الوضع...",
+                    "without": "بدون وضع",
+                    "without_user": "بدون الحالة {الحالة}"
+                },
+                "steps": {
+                    "title": "تصفية حسب الخطوات",
+                    "with": "بخطوات...",
+                    "without": "بدون خطوة",
+                    "without_user": "بدون خطوة {خطوة}"
+                }
+            }
+        }
+    },
+    "project": {
+        "add": {
+            "title": "مشروع جديد"
+        },
+        "profile": {
+            "blocs": {
+                "calendars": "التقاويم",
+                "categories": "فئات التسمية",
+                "contacts": "جهات الاتصال",
+                "documents": "وثائق",
+                "fields": "مجالات",
+                "folders": "المجلدات",
+                "groups": "مجموعات",
+                "imports": "الواردات",
+                "menus": "القوائم",
+                "order_actions": "إجراءات النظام",
+                "order_statuses": "حالات الطلب",
+                "order_steps": "خطوات الطلب",
+                "others": "آحرون",
+                "products": "منتجات",
+                "profile": "حساب تعريفي",
+                "roles": "الأدوار",
+                "threads": "الخيوط",
+                "users": "المستخدمين"
+            },
+            "logo": {
+                "change": "قم بتحديث شعار مشروعك هنا."
+            },
+            "menus": {
+                "thread": "الخيوط",
+                "folder": "المجلدات",
+                "category": "فئات",
+                "field": "مجالات",
+                "group": "مجموعات",
+                "role": "الأدوار",
+                "product": "منتجات"
+            }
+        },
+        "table": {
+            "footer": {
+                "toggle_project_menus": "تبديل قوائم المشروع",
+                "add_project": "مشروع جديد",
+                "deselect": "قم بإلغاء تحديد التوقعات",
+                "bulk_delete": "حذف المشاريع المحددة"
+            }
+        }
+    },
+    "global_search": {
+        "actions": {
+            "prospect": {
+                "create_event": {
+                    "name": "انشاء حدث",
+                    "keywords": "إنشاء موعد حدث جديد في تقويم جوجل",
+                    "description": "إنشاء حدث فعلي، Google Meet، ..."
+                },
+                "create_order": {
+                    "name": "إنشاء النظام",
+                    "keywords": "إنشاء منتج طلب جديد",
+                    "description": "إنشاء طلب لعميل محتمل، وإدارة إجراءات المستخدمين بناءً على الطلب، وإدارة عمولة المستخدم، ..."
+                },
+                "create_sms": {
+                    "name": "رسالة قصيرة",
+                    "keywords": "إنشاء رسالة sms جديدة smsbox Ringover Ultramsg mtarget",
+                    "description": "اتصل بالمحتمل عبر هاتفك أو SMSBOX أو Ringover، ..."
+                },
+                "create_interaction": {
+                    "name": "يتصل",
+                    "keywords": "مكالمة هاتفية تفاعل هاتفي رنين عبر aircall",
+                    "description": "اتصل بالمحتمل عبر هاتفك أو Aircall أو Ringover، ..."
+                },
+                "create_file": {
+                    "name": "ملفات",
+                    "keywords": "ملف مجلد جوجل درايف",
+                    "description": "إقران ملف إلى احتمال"
+                },
+                "create_message": {
+                    "name": "رسائل",
+                    "keywords": "البريد الإلكتروني لرسالة الموضوع",
+                    "description": "إرسال رسالة داخلية أو خارجية (البريد الإلكتروني) إلى عميل محتمل"
+                }
+            },
+            "project": {
+                "create_calendar": {
+                    "name": "تقويم جديد",
+                    "keywords": "حدث تقويم جديد"
+                },
+                "create_category": {
+                    "name": "فئة التسميات الجديدة",
+                    "keywords": "فئة التسميات الجديدة"
+                },
+                "create_document": {
+                    "name": "مستند جديد",
+                    "keywords": "نموذج مستند جديد pdf"
+                },
+                "create_folder": {
+                    "name": "ملف جديد",
+                    "keywords": "ملف مجلد جديد"
+                },
+                "create_group": {
+                    "name": "مجموعة جديدة",
+                    "keywords": "مستخدمو المجموعة الجدد"
+                },
+                "create_menu": {
+                    "name": "قائمة جديدة",
+                    "keywords": "قائمة جديدة"
+                },
+                "create_order_action": {
+                    "name": "إجراء أمر جديد",
+                    "keywords": "إجراء أمر جديد"
+                },
+                "create_order_step": {
+                    "name": "خطوة الطلب الجديد",
+                    "keywords": "خطوة الطلب الجديد"
+                },
+                "create_role": {
+                    "name": "دور جديد",
+                    "keywords": "أذونات مستخدمي الدور الجديد"
+                },
+                "create_thread": {
+                    "name": "موضوع الرسالة الجديدة",
+                    "keywords": "موضوع الرسالة الجديدة"
+                },
+                "add_user": {
+                    "name": "إضافة مستخدم",
+                    "keywords": "إضافة مستخدم"
+                },
+                "create_import": {
+                    "name": "يستورد",
+                    "keywords": "استيراد ملف التوقعات XLS XLSX",
+                    "description": "استيراد التوقعات من ملف XLSX.<br>أو من خدمة ويب خارجية مثل Zapier."
+                },
+                "create_field": {
+                    "name": "إدارة الحقول في مشروعك",
+                    "keywords": "إضافة حقل"
+                }
+            },
+            "api": {
+                "smsbox": {
+                    "name": "إعداد واجهة برمجة تطبيقات SMSBOX",
+                    "keywords": "إعداد واجهة برمجة تطبيقات SMSBOX"
+                },
+                "email": {
+                    "name": "إعداد البريد الإلكتروني",
+                    "keywords": "إعداد البريد الإلكتروني"
+                },
+                "ultramsg": {
+                    "name": "إعداد واجهة برمجة التطبيقات Ultramsg",
+                    "keywords": "إعداد واجهة برمجة التطبيقات Ultramsg"
+                },
+                "mtarget": {
+                    "name": "إعداد واجهة برمجة تطبيقات MTarget",
+                    "keywords": "إعداد واجهة برمجة تطبيقات MTarget"
+                }
+            }
+        }
+    },
+    "duplicate": {
+        "title": "التحقق من التكرارات",
+        "fields": "البحث حسب الحقول...",
+        "choose_action": "اختر إجراءً للقيام به",
+        "remove_duplicating": "حذف الخيوط المكررة القديمة",
+        "remove_duplicates": "إزالة التكرارات الرصاص في الاستيراد",
+        "replace_duplicating": "استبدل البيانات المعدلة للعملاء المحتملين القدامى ببيانات العملاء المحتملين الجدد"
+    }
+}

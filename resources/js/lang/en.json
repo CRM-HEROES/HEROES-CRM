@@ -1,0 +1,2330 @@
+{
+    "app_name": "Heroes CRM",
+
+    "add": "Add",
+    "new": "New",
+    "new_order": "New order",
+    "delete": "Delete",
+    "restore": "Restore",
+    "delete_confirm": "Are you sure you want to delete this?",
+    "update": "Update",
+    "edit": "Edit",
+    "value": "Value",
+    "to_field": "Convert to field",
+    "to_field_confirm": "Are you sure you want to turn this filter into field?",
+    "to_category": "Convert to filter",
+    "to_category_confirm": "Are you sure you want to turn this field into filter?",
+
+    "cancel": "Cancel",
+    "ok": "OK",
+
+    "search": "Search",
+    "all": "All",
+
+    "close": "Close",
+    "back": "Back",
+
+    "previous": "Previous",
+    "next": "Next",
+
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+
+    "none": "None",
+    "show_more": "Show more",
+    "show_less": "Show less",
+    "required": "Required",
+
+    "name": "Name",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "phone_number": "Phone number",
+    "mobile_phone_number": "Mobile phone number",
+    "password": "Password",
+    "street": "Street",
+    "street_bis": "Street 2",
+    "postal_code": "Postal code",
+    "phone": "Phone number",
+    "city": "City",
+    "country": "Country",
+    "description": "Description",
+    "type": "Type",
+    "color": "Text color",
+    "bgcolor": "Background color",
+    "content": "Content",
+    "url": "URL",
+    "for": "For",
+    "source": "Source",
+    "count": "Count",
+
+    "prospects": "Prospects",
+    "projects": "Projects",
+    "orders": "Orders",
+    "events": "Events",
+    "invoices": "Invoices",
+    "users": "Users",
+    "products": "Products",
+
+    "copyright": "Heroes CRM since 2002 Reproduction prohibited - All rights reserved / Reproduction forbidden",
+    "request_error": "Request error.",
+
+    "auth": {
+        "email": "Email",
+        "password": "Password",
+        "confirm_password": "Confirm password",
+        "init_password": {
+            "title": "Init password",
+            "success": "The password reset link was successfully sent to the email address<b>{email}</b>.",
+            "error": "We are currently encountering an error when sending the password reset link.<br><br>Check that the email entered is correct.",
+            "send_verification_email": "Send verification email",
+            "sending_verification_email": "Sending verification email"
+        },
+        "register": {
+            "title": "Sign up",
+            "subscribe": "Sign up",
+            "already_have_an_account": "Already have an account ?"
+        },
+        "login": {
+            "title": "Sign in",
+            "authenticate": "Log in to Heroes CRM",
+            "authenticating": "Log in ...",
+            "forget_password": "I forgot my password ...",
+            "sign_up": "Sign up",
+            "google": "Log in via Google",
+            "error": "The email or password is probably wrong."
+        },
+        "google_authenticator": {
+            "open": "Open Google Authenticator,<br>Or download the app here:<br><a href=\"https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr&gl=US\">Play Store</a> or <a href=\"https://apps.apple.com/fr/app/google-authenticator/id388497605\">App Store</a>",
+            "scan_qrcode": "And scan the following Qr code :",
+            "copy_following_key_configuration": "Or copy the following key configuration",
+            "check_type": "Only ask if you change IP.",
+            "key_security": "Key security :",
+            "key_security_copied": "Key security copied successfully",
+            "activate": "Active Google Authenticator",
+            "activating": "Activating Google Authenticator",
+            "login": "login"
+        },
+        "impersonate": {
+            "back_to_my_account": "Back to my account"
+        },
+        "info_check": {
+            "1": "<b>GDPR / SSL Security</b> reinforced.",
+            "2": "<b>Encryption / Option</b> controlled.",
+            "3": "99.99% <b>server availability</b> + <b>Backup</b> in real time.",
+            "4": "The entire Heroes CRM team has been at your service since 2002."
+        },
+        "partner": {
+            "title": "More than 200 partners and connectors included",
+            "call_sms_email": "Call, SMS, mail",
+            "ads_systems": "Ads systems",
+            "payment_systems": "Payment systems",
+            "accounting_systems": "Accounting systems"
+        },
+        "session": {
+            "ban_device": "Ban device",
+            "ban_code": "Ban code",
+            "ban": "Ban",
+            "connections": "Connections"
+        }
+    },
+
+    "header": {
+        "close": "Close",
+        "home": "Home",
+        "prospects": "Prospects",
+        "appointments": "Appointments",
+        "map": "MAP",
+        "mail": "Mails",
+        "order": "Orders",
+        "documents": "Documents",
+        "campaigns": "Campaigns",
+        "stat": "Stats",
+        "settings": "Settings"
+    },
+
+    "dashboard": {
+        "your_projects": "Your projects",
+        "new_project": "New project",
+        "new_user": "New user",
+        "stats": "Stats"
+    },
+
+    "prospect": {
+        "table": {
+            "footer": {
+                "deselect": "De-select prospects",
+                "init_filters": "Init filters",
+                "toggle_menus": "Toggle menus",
+                "toggle_prospect_menus": "Toggle prospect menus",
+                "add_prospect": "New prospect",
+                "import": "Import prospects",
+                "setting": "Columns setting",
+                "previous": "Previous",
+                "next": "Next",
+                "bulk_delete": "Delete definitely",
+                "bulk_update": "Update",
+                "bulk_users": "Attach or detach users",
+                "bulk_groups": "Attach or detach groups",
+                "bulk_labels": "Attach or detach filters",
+                "bulk_project": "Copy prospects to another project",
+                "bulk_sms": "SMS",
+                "bulk_messages": "Message",
+                "bulk_aircall_interactions": "Call with Aircall",
+                "bulk_ringover_interactions": "Call with Ringover",
+                "map": "MAP",
+                "export": "Export prospects",
+                "find_duplicates": "Find duplicates",
+                "bulk_archive": "Archive",
+                "bulk_do_not_archive": "Re treat",
+                "bulk_field": "Update field value",
+                "search_and_replace": "Search and replace",
+                "scan": "Scan a business card",
+                "page_prospects_count": "Prospects count per page",
+                "prospects_count": "Prospects count",
+                "row_max_lines": "Max text lines per row",
+                "current_page": "Current page"
+            },
+
+            "column": {
+                "manage": "Manage your {project} prospects table columns",
+                "delete_confirm": "Are you sure you want to remove this column ?",
+                "tab": {
+                    "fields": "Fields",
+                    "tags": "Tags",
+                    "discussions": "Discussions",
+                    "forms": "Forms",
+                    "others": "Others"
+                },
+                "others": {
+                    "appointments": "Appointments",
+                    "calls": "Calls",
+                    "sms": "SMS",
+                    "affected_users": "Affected users",
+                    "affected_groups": "Affected groups",
+                    "orders": "Orders",
+                    "import": "Import",
+                    "creator": "Created by",
+                    "groups": "Groups",
+                    "users": "Users"
+                },
+                "import": {
+                    "use": "Use import columns...",
+                    "tooltip": {
+                        "name": "Prospect table - Parameter - Columns from an import",
+                        "body": "Using columns from an import..."
+                    }
+                },
+                "event": {
+                    "fields": {
+                        "name": "Event title",
+                        "description": "Description of the Event",
+                        "location": "Event address",
+                        "drop_off_location": "Event drop off location",
+                        "started_hour": "Event start time",
+                        "ended_hour": "Event end time",
+                        "started_date": "Event start date",
+                        "ended_date": "Event end date",
+                        "calendar": "Event type",
+                        "user": "Event assigned to",
+                        "vehicle": "Event vehicle",
+                        "prospect": "Prospect Event",
+                        "order": "Event order"
+                    }
+                }
+            },
+
+            "cell": {
+                "event": {
+                    "add": "Add event"
+                },
+                "thread": {
+                    "enter_message": "Enter message ...",
+                    "view_thread": "View thread ...",
+                    "send": "Send ..."
+                }
+            },
+
+            "filters": {
+                "all": {
+                    "title": "Filters"
+                },
+                "users": {
+                    "title": "Filter by affected users",
+                    "with": "With users ...",
+                    "without": "Without users",
+                    "without_user": "Without user {user}"
+                },
+                "groups": {
+                    "title": "Filter by affected groups",
+                    "with": "With groups ...",
+                    "without": "Without groups",
+                    "without_group": "Without group {group}"
+                },
+                "imports": {
+                    "title": "Filter by affected import",
+                    "with": "With imports ...",
+                    "without": "Without imports",
+                    "without_import": "Not imported from {import}"
+                },
+                "pipedrive_accounts": {
+                    "title": "Filter by added from Pipedrive",
+                    "with": "From Pipedrive...",
+                    "without": "No from Pipedrive...",
+                    "without_pipedrive_account": "Not associated with {pipedriveAccount}"
+                },
+                "creators": {
+                    "title": "Filter by creator",
+                    "with": "With creators ...",
+                    "without": "Unknown creator",
+                    "without_creator": "Not created by {creator}"
+                },
+                "appointments": {
+                    "title": "Filter by appointments",
+                    "with": "With appointments ...",
+                    "without": "Without appointment",
+                    "calendars": "Calendars",
+                    "no_selected_calendar": "No selected calendar ...",
+                    "affected_to": "Affected to",
+                    "no_selected_affected_to": "No selected user ...",
+                    "created_by": "Created by",
+                    "no_selected_created_by": "No selected user ...",
+                    "after": "After",
+                    "before": "Before",
+                    "future": "Future",
+                    "old": "Old",
+                    "confirmed": "Confirmed appointments",
+                    "not_confirmed": "Not confirmed appointments",
+                    "done": "Done appointments",
+                    "not_done": "Not done appointments",
+                    "select_calendars": "Select calendars ..."
+                },
+                "field": {
+                    "title": "Filter by field"
+                },
+                "file": {
+                    "title": "Filter by file",
+                    "with_files": "With files",
+                    "without_file": "Without file",
+                    "without_folder": "Without file from {folder}"
+                },
+                "interaction": {
+                    "title": "Filter by call",
+                    "with_interactions": "With calls",
+                    "without_interaction": "Without call"
+                },
+                "message": {
+                    "title": "Filter by message",
+                    "with_messages": "With messages",
+                    "without_message": "Without message",
+                    "without_thread": "Without message from {thread}"
+                },
+                "order": {
+                    "title": "Filter by order",
+                    "with_orders": "With orders ...",
+                    "with_products": "With products ...",
+                    "with_actions": "With actions ...",
+                    "with_steps": "With steps ...",
+                    "with_statuses": "With statuses ...",
+                    "with_documents": "With documents ...",
+                    "created_by": "Created by ...",
+                    "select_actions": "Select actions ...",
+                    "select_products": "Select products ...",
+                    "select_steps": "Select steps ...",
+                    "select_statuses": "Select statuses ...",
+                    "select_documents": "Select documents ..."
+                },
+                "sms": {
+                    "title": "Filter by SMS ...",
+                    "with_sms": "With SMS ...",
+                    "sources": "Sources ...",
+                    "created_by": "Created by ...",
+                    "after": "After",
+                    "before": "Before",
+                    "sent": "SMS sent ...",
+                    "not_sent": "SMS not sent ...",
+                    "with_error": "With error ...",
+                    "without_error": "Without error ...",
+                    "select_sources": "Select sources ...",
+                    "without_source": "Without sms sent via {source}"
+                },
+                "threads": {
+                    "title": "Filter by messages"
+                },
+                "label": {
+                    "title": "Filter by tag",
+                    "without_label": "Without filter {label}"
+                }
+            },
+
+            "bulk": {
+                "group": {
+                    "title": "Affected groups"
+                },
+                "label": {
+                    "title": "Affected filters",
+                    "selected": "{selected} selected label(s)",
+                    "new_category": "New category",
+                    "new_label": "New label in {category}"
+                },
+                "user": {
+                    "title": "Affected users"
+                },
+                "field": {
+                    "title": "Update field value"
+                },
+                "project": {
+                    "title": "Copy to another project"
+                },
+                "add": "Assign",
+                "remove": "Remove"
+            }
+        },
+        "profile": {
+            "setting": {
+                "title": "Prospect profile setting",
+                "column_i": "Column {i}",
+                "new_bloc": "New bloc",
+                "fields": "Fields",
+                "messages": "Messages",
+                "files": "Files",
+                "filters": "Filters",
+                "orders": "Orders",
+                "pipelines": "Pipelines",
+                "labels": "Active filters",
+                "external_links": "External links",
+                "events": "Events",
+                "history": "History",
+                "calls": "Calls",
+                "sms": "SMS",
+                "documents": "Documents",
+                "affected_users": "Affected users",
+                "affected_groups": "Affected groups",
+                "map": "MAP",
+                "edit_bloc": "Edit bloc"
+            },
+            "bloc": {
+                "messages": "Messages",
+                "files": "Files",
+                "filters": "Filters",
+                "orders": "Orders",
+                "labels": "Active filters",
+                "external_links": "External links",
+                "events": "Events",
+                "history": "History",
+                "calls": "Calls",
+                "sms": "SMS",
+                "documents": "Documents",
+                "affected_users": "Affected users",
+                "affected_groups": "Affected groups",
+                "map": "MAP"
+            },
+            "menus": {
+                "sms": "SMS",
+                "call": "Call",
+                "message": "Message",
+                "file": "File",
+                "document": "Document",
+                "order": "Order",
+                "event": "Appointment",
+                "label": "Filters",
+                "log": "History of consultations",
+                "questionnaire": "Forms",
+                "revision": "Change history",
+                "setting": "Prospect profile blocs settings",
+                "map": "MAP"
+            }
+        },
+        "document": {
+            "title": "Documents ({prospect})"
+        },
+        "interaction": {
+            "title": "Calls ({prospect})",
+            "edit_phone_number": "Edit phone number",
+            "edit_mobile_phone_number": "Edit mobile phone number",
+            "add_history": "Add history",
+            "call_by_phone": "Call by phone",
+            "call_by_aircall": "Call by Aircall",
+            "call_by_ringover": "Call by Ringover",
+            "history": "History"
+        },
+        "message": {
+            "title": "Message ({prospect})",
+            "email_setting": "Email setting",
+            "templates": {
+                "title": "Messages template",
+                "send": "Envoyer"
+            }
+        },
+        "order": {
+            "title": "Orders ({prospect})",
+            "commission": {
+                "total": "Total",
+                "remain": "Remain",
+                "paid": "Paid",
+                "in_percent": "In percent",
+                "tax_included": "Tax incl.",
+                "tax_excluded": "Tax excl.",
+                "mark_as_paid": "Mark as paid",
+                "mark_as_unpaid": "Mark as unpaid",
+                "select_user": "Select user ..."
+            },
+            "product": {
+                "add_product_to_order": "Add {product} to the order",
+                "add_to_order": "Add to the order",
+                "quantity": "Quantity",
+                "price": "Price",
+                "currency": "Currency",
+                "tax_in_percent": "Tax in %",
+                "tax_included": "Tax included"
+            },
+            "tabs": {
+                "products": {
+                    "title": "Products"
+                },
+                "commissions": {
+                    "title": "Commissions",
+                    "manage": "Manage commissions",
+                    "not_defined": "Not defined commission"
+                },
+                "steps": {
+                    "title": "Steps"
+                },
+                "documents": {
+                    "title": "Documents"
+                },
+                "fields": {
+                    "title": "Other infos",
+                    "add": "Add field",
+                    "remove_confirm": "Are you sure you want to remove this field from your project?"
+                },
+                "status": {
+                    "title": "Status"
+                }
+            }
+        },
+        "sms": {
+            "title": "SMS ({prospect})",
+            "bulk_title": "SMS ({count} prospect(s))",
+            "via_your_phone": "SMS via your phone",
+            "via_whatsapp": "SMS via Whatsapp",
+            "via_smsbox": "SMS via SMSBOX",
+            "via_mtarget": "SMS via MTarget",
+            "via_ringover": "SMS via Ringover",
+            "via_ultramsg": "SMS via UltraMsg",
+            "via_source": "SMS via {source}",
+            "templates": "SMS templates",
+            "enter_text_message": "Enter a text message"
+        },
+        "file": {
+            "title": "Files ({prospect})"
+        },
+        "group": {
+            "title": "Groups ({prospect})"
+        },
+        "label": {
+            "title": "Labels ({prospect})"
+        },
+        "form": {
+            "title": "Form",
+            "your_response": "Your response ..."
+        },
+        "affected_user": {
+            "title": "Affected users ({prospect})"
+        },
+        "external_link": {
+            "title": "External links ({prospect})",
+            "add": {
+                "title": "New external links ({prospect})"
+            }
+        },
+        "log_history": {
+            "title": "Log history ({prospect})"
+        },
+        "revision_history": {
+            "title": "Revision history ({prospect})"
+        },
+        "scan": {
+            "title": "Scan a business card",
+            "choose_file": "Choose file",
+            "scan": "Scan",
+            "import": "Import",
+            "view_prospect": "View prospect",
+            "error": {
+                "camera_access": "Error accessing the camera: {error}",
+                "camera_stop": "Error stopping the camera: {error}",
+                "camera_disabled": "Camera is not active."
+            },
+            "success": {
+                "title": "Business card scan",
+                "message": "Your imported files will soon be scanned<br>and the corresponding prospects will be imported into your project."
+            }
+        }
+    },
+
+    "import": {
+        "add": {
+            "title": "Import prospects",
+            "from": {
+                "label": "From",
+                "local_file": "Local file",
+                "webservice": "External via URL"
+            },
+            "file": "File",
+            "name": "Name",
+            "field_delimiter": "Field delimiter",
+            "field_enclosure": "Field enclosure",
+            "comma": "Comma",
+            "semicolon": "Semicolon",
+            "tab": "(Tab)",
+            "space": "(Space)"
+        },
+        "update": {
+            "name": "name"
+        },
+        "process": {
+            "title": "Import",
+            "tab": {
+                "mapping": {
+                    "title": "Mapping",
+                    "cancel": "Cancel mapping",
+                    "event": "Event",
+                    "order": "Order",
+                    "sms": "SMS",
+                    "interaction": "Call",
+                    "link": "External link",
+                    "user": "Affected users",
+                    "plus_field": "+ Field",
+                    "plus_category": "+ Category",
+                    "shortcut_new_field": "New field",
+                    "shortcut_new_category": "New filter",
+                    "shortcut_new_thread": "New thread",
+                    "new_field": "New prospect field",
+                    "new_category": "New category",
+                    "new_column": "New column",
+                    "auto_field": "[New field]",
+                    "auto_category": "[New category]",
+                    "auto_thread": "[New thread]"
+                },
+                "relations": {
+                    "title": "Relations",
+                    "affected_users": "Affected users",
+                    "affected_groups": "Affected groups"
+                },
+                "import": {
+                    "title": "Import",
+                    "process": "Process import",
+                    "re_process": "Re process import",
+                    "delete": {
+                        "import": "Delete import",
+                        "import_and_prospects": "Delete import and prospects",
+                        "prospects": "Delete only prospects"
+                    },
+                    "download": "Download import",
+                    "stop": "Stop import",
+                    "view_prospects": "View imported prospects",
+                    "prospects_table": {
+                        "title": "Prospects table",
+                        "body": "Use the columns in this import as columns in your prospects table"
+                    },
+                    "duplicate": {
+                        "title": "Check duplicates",
+                        "fields": "Search by fields ...",
+                        "choose_action": "Choose an action to do",
+                        "remove_duplicating": "Delete old duplicate leads",
+                        "remove_duplicates": "Remove lead duplications in import",
+                        "replace_duplicating": "Overwrite the modified data of old prospects with those of new ones"
+                    },
+                    "processing": "We will send you an email when the import is complete.",
+                    "webservice": {
+                        "step_1": "To associate your zap with this import,<br />Connect to Zapier, and create your zap there:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Create a Zap</a>",
+                        "step_2": "Choose <b>Google Sheet</b> as <b>Trigger</b>,<br />Choose <b>New Spreadsheet Row [instant]</b> as <b>Event</b>,<br />Click on <b>Continue</b>.",
+                        "step_3": "Choose your Google account containing the Google Sheet file to import into <b>Choose account</b>,<br />Click on <b>Continue</b>.",
+                        "step_4": "Choose the Google Sheet file in <b>Spreedsheet</b>,<br />Choose the sheet in <b>Worksheet</b>,<br />Click on <b>Continue</b>.",
+                        "step_5": "Click on <b>Test Trigger</b> to verify that Zapier has access to your Google Sheet file,<br />Click on <b>Continue</b>.",
+                        "step_6": "Choose <b>Webhooks by Zapier</b> as <b>Action</b>,<br /> Choose <b>GET</b> as <b>Event</b>,<br />Click on <b>Continue</b>.",
+                        "step_7": "Add the following link in <b>URL</b>:",
+                        "step_8": "You can use the following parameters as <br /><b>Query String Params</b> to associate with the columns in the Google Sheet file:",
+
+                        "webhook_url_copied": "Webhook URL copied",
+                        "query_string_copied": "Query String copied"
+                    }
+                },
+                "duplicate": {
+                    "title": "Updates"
+                }
+            }
+        }
+    },
+
+    "user": {
+        "add": {
+            "title": "New user",
+            "email": "Enter user email",
+            "not_found": "No user with this email was found in our database.",
+            "create": "Create this user",
+            "create_professional_project": "Create a professional project",
+            "create_personal_project": "Create a personal project",
+            "create_demo_project": "Create a demo project"
+        },
+        "profile": {
+            "affected_projects": "Affected projects",
+            "setting": {
+                "title": "User file parameter",
+                "column_i": "Column {i}",
+                "new_bloc": "New block",
+                "fields": "Fields",
+                "files": "Files"
+            },
+            "blocs": {
+                "calendars": "Affected calendars",
+                "categories": "Affected categories",
+                "documents": "Affected documents",
+                "exports": "Exports",
+                "folders": "Affected folders",
+                "geoips": "Locations",
+                "groups": "Affected groups",
+                "menus": "Affected menus",
+                "order_actions": "Affected order actions",
+                "order_statuses": "Affected order statuses",
+                "order_steps": "Affected order steps",
+                "projects": "Affected projects",
+                "questionnaires": "Affected forms",
+                "roles": "Affected roles",
+                "sessions": "Connections",
+                "threads": "Affected threads",
+                "users": "Affected users"
+            },
+            "password_update": {
+                "confirm": "Are you sure to change the password?",
+                "success": "Password changed successfully!",
+                "error": "Error changing password!"
+            },
+            "menus": {
+                "files": "Files",
+                "duplicate": "Duplicate profile for other users",
+                "history": "Connection history",
+                "actions": "Actions made by the user",
+                "permissions": "Permissions",
+                "vehicle": "Vehicles",
+                "prospect_profile_setting": "Prospect profile setting",
+                "prospects_table_setting": "Prospects table setting",
+                "user_profile_setting": "User profile setting",
+                "use": "Log in with this account"
+            }
+        },
+        "list": {
+            "title": "Users"
+        },
+        "table": {
+            "footer": {
+                "deselect": "De-select prospects",
+                "init_filters": "Init filters",
+                "toggle_menus": "Toggle menus",
+                "toggle_user_menus": "Toggle user menus",
+                "add_user": "New user",
+                "import": "Import",
+                "add_column": "New column",
+                "previous": "Previous",
+                "next": "Next",
+                "bulk_delete": "Remove from the project",
+                "bulk_calendars": "Attach or detach calendars",
+                "bulk_categories": "Attach or detach categories",
+                "bulk_documents": "Attach or detach documents",
+                "bulk_folders": "Attach or detach folders",
+                "bulk_groups": "Attach or detach groups",
+                "bulk_menus": "Attach or detach menus",
+                "bulk_order_actions": "Attach or detach order actions",
+                "bulk_order_steps": "Attach or detach order steps",
+                "bulk_roles": "Attach or detach roles",
+                "bulk_threads": "Attach or detach threads",
+                "bulk_users": "Attach or detach users"
+            },
+
+            "column": {
+                "manage": "Manage your {project} users table columns",
+                "new": "New column",
+                "tab": {
+                    "fields": "Fields",
+                    "others": "Others"
+                },
+                "others": {
+                    "calendars": "Calendars",
+                    "categories": "Categories",
+                    "documents": "Documents",
+                    "folders": "Folders",
+                    "groups": "Groups",
+                    "menus": "Menus",
+                    "order_actions": "Order actions",
+                    "order_statuses": "Order statuses",
+                    "order_steps": "Order steps",
+                    "projects": "Projects",
+                    "last_project": "Connected to",
+                    "questionnaires": "Questionnaires",
+                    "roles": "Roles",
+                    "threads": "Threads",
+                    "users": "Users"
+                }
+            },
+
+            "filters": {
+                "calendars": {
+                    "title": "Filter by affected calendars",
+                    "with": "With calendars ...",
+                    "without": "Without calendars",
+                    "without_calendar": "Without {calendar}"
+                },
+                "categories": {
+                    "title": "Filter by affected categories",
+                    "with": "With categories ...",
+                    "without": "Without categories",
+                    "without_category": "Without {category}"
+                },
+                "documents": {
+                    "title": "Filter by affected documents",
+                    "with": "With documents ...",
+                    "without": "Without documents",
+                    "without_document": "Without {document}"
+                },
+                "folders": {
+                    "title": "Filter by affected folders",
+                    "with": "With folders ...",
+                    "without": "Without folders",
+                    "without_folder": "Without {folder}"
+                },
+                "groups": {
+                    "title": "Filter by affected groups",
+                    "with": "With groups ...",
+                    "without": "Without groups",
+                    "without_group": "Without {group}"
+                },
+                "menus": {
+                    "title": "Filter by affected menus",
+                    "with": "With menus ...",
+                    "without": "Without menus",
+                    "without_menu": "Without {menu}"
+                },
+                "order_actions": {
+                    "title": "Filter by affected order actions",
+                    "with": "With order actions ...",
+                    "without": "Without order actions",
+                    "without_order_action": "Without {order_action}"
+                },
+                "order_steps": {
+                    "title": "Filter by affected order steps",
+                    "with": "With order steps ...",
+                    "without": "Without order steps",
+                    "without_order_step": "Without {order_step}"
+                },
+                "roles": {
+                    "title": "Filter by affected roles",
+                    "with": "With roles ...",
+                    "without": "Without roles",
+                    "without_role": "Without {role}"
+                },
+                "threads": {
+                    "title": "Filter by affected threads",
+                    "with": "With threads ...",
+                    "without": "Without threads",
+                    "without_thread": "Without {thread}"
+                },
+                "users": {
+                    "title": "Filter by affected users",
+                    "with": "With users ...",
+                    "without": "Without users",
+                    "without_user": "Without {user}"
+                }
+            },
+            "bulk": {
+                "calendars": {
+                    "title": "Affected calendars"
+                },
+                "categories": {
+                    "title": "Affected categories"
+                },
+                "documents": {
+                    "title": "Affected documents"
+                },
+                "folders": {
+                    "title": "Affected folders"
+                },
+                "groups": {
+                    "title": "Affected groups"
+                },
+                "menus": {
+                    "title": "Affected menus"
+                },
+                "order_actions": {
+                    "title": "Affected order actions"
+                },
+                "order_steps": {
+                    "title": "Affected order steps"
+                },
+                "roles": {
+                    "title": "Affected roles"
+                },
+                "threads": {
+                    "title": "Affected threads"
+                },
+                "users": {
+                    "title": "Affected users"
+                }
+            }
+        },
+        "duplicate": {
+            "title": "Profile duplicate",
+            "from": "Duplicate from",
+            "for": "Duplicate for"
+        },
+        "calendars": {
+            "title": "Affected calendars"
+        },
+        "categories": {
+            "title": "Affected tags categories"
+        },
+        "documents": {
+            "title": "Affected documents"
+        },
+        "files": {
+            "title": "{user} files"
+        },
+        "folders": {
+            "title": "Affected folders"
+        },
+        "groups": {
+            "title": "Affected groups"
+        },
+        "menus": {
+            "title": "Affected menus"
+        },
+        "order_actions": {
+            "title": "Affected order actions"
+        },
+        "order_steps": {
+            "title": "Affected order steps"
+        },
+        "permissions": {
+            "title": "Permissions"
+        },
+        "project": {
+            "title": "Projets"
+        },
+        "questionnaires": {
+            "title": "Affected forms"
+        },
+        "roles": {
+            "title": "Affected roles"
+        },
+        "sessions": {
+            "title": "Connected devices"
+        },
+        "settings": {
+            "prospects_table": {
+                "title": "Setting - Prospects table"
+            },
+            "prospects_table_menus": {
+                "title": "Paramètre - Menus tableau de prospects"
+            },
+            "prospect_profile": {
+                "title": "Setting - Prospect profile"
+            }
+        },
+        "threads": {
+            "title": "Affected threads"
+        },
+        "users": {
+            "title": "Affected users"
+        },
+        "vehicles": {
+            "title": "Vehicles",
+            "add": {
+                "title": "Vehicle"
+            }
+        },
+        "log_chart": {
+            "title": "Logs Chart"
+        },
+        "actions": {
+            "title": "Actions"
+        }
+    },
+
+    "map": {
+        "prospect": {
+            "default_infos": "Default informations",
+            "other_infos": "Other informations",
+            "labels": "Tags",
+            "appointments": "Appointments",
+            "orders": "Orders",
+            "search": "Search from this prospect"
+        },
+        "prospect_without_lat_lng": {
+            "title": "Prospects without lat/lng"
+        },
+        "vehicles": {
+            "title": "Vehicles"
+        },
+        "color": {
+            "title": "Color map markers by ..."
+        }
+    },
+
+    "campaign": {
+        "mobile": "Please use a computer to use this tool.",
+        "campaign": {
+            "title": "Campaign",
+            "new": "New campaign",
+            "enabled": "Enabled",
+            "for": {
+                "prospect": "For prospects",
+                "order": "For orders",
+                "appointment": "For appointments"
+            },
+            "frequency": {
+                "once": "Once",
+                "every_fifteen_minutes": "Every 15mn",
+                "every_thirty_minutes": "Every 30mn",
+                "hourly": "Hourly",
+                "daily": "Daily",
+                "monthly": "Monthly"
+            },
+            "date": "Date",
+            "hour": "Hour",
+            "re_process_processed_prospects": "Re-process processed prospects",
+            "check_rules": "Check rules",
+            "view_matching_prospects": "View matching prospects"
+        },
+        "operator": {
+            "title": "Operator",
+            "or": "OR",
+            "and": "AND"
+        },
+        "rule": {
+            "prospect": {
+                "title": "Prospect",
+                "tag": "Tag",
+                "menu": "Menu",
+                "sms": {
+                    "title": "SMS",
+                    "source": "Received SMS source",
+                    "count": "Received SMS count"
+                },
+                "interaction": {
+                    "title": "Appel",
+                    "source": "Received calls source",
+                    "count": "Received calls count"
+                }
+            },
+            "order": {
+                "title": "Order",
+                "action": "With actions",
+                "product": "With products",
+                "status": "With statuses",
+                "step": "With steps"
+            },
+            "appointment": {
+                "title": "Appointment",
+                "date": {
+                    "title": "Date",
+                    "starts_in_more_than_mn": "Starts in more than {minute} mn",
+                    "starts_in_less_than_mn": "Starts in less than {minute} mn",
+                    "started_less_than_ago_mn": "Started less than {minute} mn ago",
+                    "started_more_than_ago_mn": "Started more than {minute} mn ago"
+                }
+            }
+        },
+        "action": {
+            "prospect": {
+                "archive": "Archive",
+                "do_not_archive": "Do not archive",
+                "remove": "Remove prospect",
+                "message": {
+                    "title": "Send message / mail",
+                    "name": "Send message in \"{thread}\": {content}",
+                    "thread": {
+                        "title": "Message thread ...",
+                        "placeholder": "Choose message thread ..."
+                    },
+                    "user": {
+                        "title": "Waiting for ...",
+                        "placeholder": "Choose user ..."
+                    },
+                    "template": {
+                        "title": "Choisir un template de message"
+                    },
+                    "enter_message": "Enter message"
+                },
+                "sms": {
+                    "title": "Send SMS",
+                    "name": "Send SMS",
+                    "source": "Source",
+                    "sms": "SMS"
+                },
+                "event": {
+                    "title": "Create an event",
+                    "name": "Create a {duration} mn {calendar} for {user} in {min_days} to {max_days} days",
+                    "duration": "Duration",
+                    "calendar": {
+                        "title": "Calendar",
+                        "placeholder": "Choose a calendar ..."
+                    },
+                    "user": {
+                        "title": "User",
+                        "placeholder": "Choose user ...",
+                        "random": "Random user",
+                        "prospect_creator": "Whoever created the prospect",
+                        "prospect_affected_user": "Whoever who is assigned to the prospect",
+                        "role": "Role {role}"
+                    },
+                    "date": {
+                        "title": "In X days",
+                        "min": "Min...",
+                        "max": "Max..."
+                    }
+                },
+                "attach_group": {
+                    "title": "Assign a group"
+                },
+                "attach_label": {
+                    "title": "Assign a tag"
+                },
+                "attach_user": {
+                    "title": "Assign an user"
+                },
+                "detach_group": {
+                    "title": "Detach a group"
+                },
+                "detach_label": {
+                    "title": "Detach a tag"
+                },
+                "detach_user": {
+                    "title": "Detach an user"
+                },
+                "document_to_folder": {
+                    "title": "Generate a PDF document into a prospect folder",
+                    "name": "Generate document \"{document}\" into \"{folder}\"",
+                    "document": "Document to generate ...",
+                    "select_document": "Choose a document ...",
+                    "folder": "Destination folder ...",
+                    "select_folder": "Choose folder ..."
+                },
+                "document_to_thread": {
+                    "title": "Send a PDF document into a message thread",
+                    "name": "Send document \"{document}\" into \"{thread}\" message thread",
+                    "document": "Document to generate ...",
+                    "select_document": "Choose a document ...",
+                    "thread": "Destination message thread ...",
+                    "select_thread": "Choose message thread ..."
+                },
+                "order": {
+                    "title": "Create order",
+                    "name": "Create order ({name})",
+                    "add": "Create order"
+                }
+            },
+            "order": {
+                "generate_invoice": {
+                    "title": "Generate order invoice",
+                    "name": "Generate the invoice \"{invoice}\""
+                },
+                "sign_invoice": {
+                    "title": "Sign order invoice",
+                    "name": "Sign the invoice \"{invoice}\""
+                },
+                "user_action": {
+                    "title": "Associate an action on the order to a user",
+                    "name": "Associate the order action \"{action}\" to {user}",
+                    "action": "Action ...",
+                    "select_action": "Choose an action ...",
+                    "user": "User ...",
+                    "select_user": "Choose an user ...",
+                    "order_creator": "Whoever created the order",
+                    "prospect_creator": "Whoever created the prospect",
+                    "prospect_affected_user": "Whoever who is assigned to the prospect",
+                    "role": "Role {role}"
+                }
+            }
+        },
+        "matching_prospects": {
+            "title": "Matching prospects"
+        }
+    },
+
+    "document": {
+        "update": {
+            "folder": "Generate in folder {folder}"
+        },
+        "mobile": "Please use a computer to use this tool.",
+        "dashboard": {
+            "new_from_template": "New document from template",
+            "your_documents": "Your document templates"
+        },
+        "add": {
+            "title": "New document template"
+        },
+        "list": {
+            "title": "Documents"
+        },
+        "pdf": {
+            "title": "PDF"
+        },
+        "font": {
+            "title": "Fonts",
+            "new": {
+                "title": "New font",
+                "choose_file": "Choose .ttf file",
+                "type": {
+                    "title": "Type",
+                    "normal": "Normal",
+                    "bold": "Bold"
+                },
+                "style": {
+                    "title": "Style",
+                    "normal": "Normal",
+                    "italic": "Italic"
+                }
+            }
+        },
+        "page": {
+            "title": "Page",
+            "all": "All pages",
+            "add": {
+                "title": "New page",
+                "choose_file": "Choose file",
+                "page": "Page",
+                "width": "Width in mm",
+                "height": "Height in mm",
+                "empty": "Empty"
+            }
+        },
+        "zoom": {
+            "title": "Zoom"
+        },
+        "style": {
+            "frame": {
+                "title": "Frame",
+                "left": "Left",
+                "top": "Top",
+                "width": "Width",
+                "height": "Height",
+                "rotation": "Rotation",
+                "padding": {
+                    "title": "Padding",
+                    "top": "T",
+                    "right": "R",
+                    "bottom": "B",
+                    "left": "L"
+                },
+                "background_color": "Background color"
+            },
+            "format": {
+                "title": "Text / Format",
+                "type": {
+                    "title": "Type",
+                    "text": "Text",
+                    "html": "HTML",
+                    "qrcode": "QR Code"
+                },
+                "font_size": "Font size",
+                "line_height": "Line height",
+                "font": "Font",
+                "color": "Text color"
+            },
+            "border": {
+                "title": "Border",
+                "width": {
+                    "title": "Width",
+                    "top": "T",
+                    "right": "R",
+                    "bottom": "B",
+                    "left": "L"
+                },
+                "style": {
+                    "title": "Style",
+                    "solid": "Solid",
+                    "dashed": "Dashed",
+                    "dotted": "Dotted"
+                },
+                "color": "Color",
+                "radius": "Radius"
+            },
+            "content": {
+                "title": "Content"
+            },
+            "order_table": {
+                "table": {
+                    "header_style": "Header style",
+                    "content": "Content",
+                    "body_style": "Column style"
+                },
+                "summary": {
+                    "header_style": "Header style",
+                    "content": "Content",
+                    "body_style": "Column style"
+                },
+                "apply_to_all_cells": "Apply to all other cell"
+            }
+        },
+        "map": {
+            "title": "MAP",
+            "satellite": "Satellite",
+            "roadmap": "Roadmap",
+            "hybrid": "Hybrid",
+            "terrain": "Terrain",
+            "zoom": "Zoom"
+        },
+        "field": {
+            "page": {
+                "number": "Page number"
+            },
+            "prospect": {
+                "title": "Prospect",
+                "default_fields": "Default fields",
+                "other_fields": "Other fields"
+            },
+            "map": {
+                "title": "MAP"
+            },
+            "date": {
+                "title": "Date"
+            },
+            "order": {
+                "title": "Order",
+                "table": {
+                    "title": "Order table",
+                    "columns": "Columns",
+                    "summaries": "Summaries",
+                    "edit": "Edit order table"
+                },
+                "number": "Bill number",
+                "invoice_number": "Invoice N° {number}",
+                "invoice_date": "Creation date: {date}",
+                "product_i": "Product {i}"
+            },
+            "tag": {
+                "title": "Tag"
+            },
+            "questionnaire": {
+                "title": "Form"
+            },
+            "project": {
+                "thumbnail": "Logo",
+                "date": "Creation date"
+            },
+            "tabs": {
+                "prospects": {
+                    "title": "Prospects"
+                },
+                "map": {
+                    "title": "MAP"
+                },
+                "dates": {
+                    "title": "Dates"
+                },
+                "orders": {
+                    "title": "Orders"
+                },
+                "labels": {
+                    "title": "Filters"
+                },
+                "forms": {
+                    "title": "Forms"
+                },
+                "project": {
+                    "title": "Project"
+                },
+                "pdfs": {
+                    "title": "PDF files"
+                },
+                "fonts": {
+                    "title": "Fonts"
+                },
+                "pages": {
+                    "title": "Pages",
+                    "number": "Page number",
+                    "portrait": "Portrait",
+                    "landscape": "Landscape",
+                    "new_from": "New page from"
+                }
+            }
+        }
+    },
+
+    "event": {
+        "title": "Event",
+        "view_prospect": "View prospect",
+        "view_and_edit": "View and edit event",
+        "new": "New event",
+        "move": "Move event",
+        "google_calendar_associated_account": "Google calendar associated account",
+        "google_calendar_remove_account_confirm": "Do you really want to no longer associate your Google Calendar account with Heroes CRM ?",
+        "calendar": "Calendar",
+        "user": "User",
+        "vehicle": "Vehicle",
+        "prospect": "Prospect",
+        "order": "Order",
+        "date_time": "Date and time",
+        "started_at": "From...",
+        "ended_at": "To...",
+        "location": "Location",
+        "drop_off_location": "Drop off address",
+        "confirmed": "Event confirmed",
+        "done": "Event done",
+        "labels": "Filters",
+        "name": "Title",
+        "add_title": "Add title ...",
+        "description": "Description",
+        "add_description": "Add description ...",
+        "choose_calendar": "Choose calendar",
+        "choose_user": "Choose user",
+        "choose_vehicle": "Choose vehicle",
+        "choose_prospect": "Choose prospect",
+        "new_prospect": "New prospect",
+        "choose_order": "Choose order",
+        "new_order": "New order",
+        "choose_hour": "Choose hour",
+        "email_to_prospect": "Send invitation to prospect",
+        "choose_event_description_template": "Description templates",
+        "user_daily_directions": {
+            "title": "Directions",
+            "remove_from_map": "Remove route from map",
+            "remove_marker": "Remove marker",
+            "send_sms": "Send SMS",
+            "call": "Call",
+            "file": "File",
+            "message": "Message",
+            "event": "Event",
+            "find_prospect": "Find prospect ...",
+            "find_address": "Find address ..."
+        },
+        "agenda": {
+            "filters": {
+                "title": "Filters",
+                "users": "Users",
+                "calendars": "Calendars",
+                "show_we": "Show weekends",
+                "show_other_projects": "Other projects events",
+                "min_hour": "Minimum hour",
+                "max_hour": "Maximum hour",
+                "choose_role": "Choose a role",
+                "labels": "Filters"
+            }
+        }
+    },
+
+    "field": {
+        "add": {
+            "title": "New field"
+        },
+        "update": {
+            "delete_confirm": "This field contains <b>{count}</b> prospect-related data,<br>Are you sure you want to delete this?"
+        },
+        "types": {
+            "text": "Text",
+            "long_text": "Long text",
+            "number": "Number",
+            "email": "Email",
+            "date": "Date",
+            "datetime": "Date time",
+            "address": "Address",
+            "url": "URL",
+            "tel": "Number"
+        },
+        "add_to_global_search": "Add to global search",
+        "prospect": {
+            "phone_number": "Phone number",
+            "mobile_phone_number": "Mobile phone number"
+        },
+        "default_value": "Default value",
+        "required": "Required",
+        "unique": "Check duplicate when entering",
+        "format": "Display format"
+    },
+
+    "calendar": {
+        "types": {
+            "physical": "Physical",
+            "telephone": "Telephone",
+            "hangout": "GMeet",
+            "task": "Task",
+            "other": "Other"
+        },
+        "add": {
+            "title": "New calendar"
+        },
+        "update": {
+            "default_address": "Your default event address"
+        },
+        "combine_with": "Combine with"
+    },
+
+    "interaction": {
+        "types": {
+            "telephone": "Telephone"
+        }
+    },
+
+    "commission": {
+        "title": "Manage commissions",
+        "tab": {
+            "product": {
+                "title": "Select products"
+            },
+            "action": {
+                "title": "Select actions"
+            },
+            "user": {
+                "title": "Select users"
+            },
+            "commission": {
+                "types": {
+                    "title": "Type",
+                    "percentage": "Percentage",
+                    "fix": "Fix"
+                },
+                "commission": {
+                    "title": "Commission"
+                },
+                "including_tax": {
+                    "title": "Calculate from the product price",
+                    "incl_tax": "Including tax",
+                    "excl_tax": "Excluding tax"
+                },
+                "selected_products": "selected products",
+                "selected_actions": "selected actions",
+                "selected_users": "selected users"
+            }
+        }
+    },
+
+    "setting": {
+        "title": "Settings",
+        "locale": {
+            "title": "Locale"
+        },
+        "project": {
+            "title": "Project {project} settings",
+            "description": "Manage your project"
+        },
+        "google_auth": {
+            "title": "Google Authenticator (2 factors)",
+            "confirm": {
+                "enable": "Are you sure you want to enable two-factor authentication?",
+                "disable": "Are you sure you want to disable two-factor authentication?"
+            }
+        },
+        "google_drive": {
+            "title": "Google Drive",
+            "description": "Link a Google Drive account for your prospects files"
+        },
+        "google_calendar": {
+            "title": "Google Calendar",
+            "description": "Associate a Google Calendar account with your appointments"
+        },
+        "pipedrive": {
+            "title": "Pipedrive",
+            "description": "Associate a Pipedrive account with your prospects list"
+        },
+        "users": {
+            "title": "Users list",
+            "description": "Manage user access in the project {project}"
+        },
+        "devices": {
+            "title": "Connected devices",
+            "description": "Manage your connected devices"
+        },
+        "tutorials": {
+            "title": "Manage tutorials",
+            "do_not_show_anymore": "Do not show tutorials anymore"
+        },
+        "events_reminder": {
+            "title": "Notify nearby appointments"
+        },
+        "trash": {
+            "title": "Trash",
+            "description": "Leads, filters,..."
+        },
+        "menu_icons": {
+            "title": "Change menu icons",
+            "description": "Prospects, Agendas, Map, ..."
+        },
+        "copyright": {
+            "title": "HeroesCRM.com since 2002 Reproduction forbidden - All rights reserved.",
+            "technical_questions": "Technical questions",
+            "commercial_questions": "Commercial questions"
+        },
+        "confirm": {
+            "enable": "Are you sure you want to enable Google Authenticator?",
+            "diable": "Are you sure you want to disable Google Authenticator?"
+        }
+    },
+
+    "label": {
+        "add": {
+            "title": "New label"
+        },
+        "combine_with": "Combine with",
+        "affected_users": "Affected users",
+        "archive": "Archive",
+        "archive_tooltip": "Do not show anymore in labels list"
+    },
+
+    "menu": {
+        "new": "Create menu",
+        "new_label": "New label",
+        "new_category": "New category",
+        "use_current_filters": "Use current filters",
+        "select_filters": "Select filters",
+        "add": {
+            "title": "New menu"
+        }
+    },
+
+    "product": {
+        "price": "Price",
+        "currency": "Currency",
+        "tax_in_percent": "Tax in percent",
+        "included_tax": "Included tax",
+        "image": "Image",
+        "manage_images": "Manage images",
+        "archive": "Archive",
+        "archive_tooltip": "Do not show anymore in products list",
+        "add_images": "Add images",
+        "update": {
+            "choose_images": "Choose images"
+        }
+    },
+
+    "role": {
+        "add": {
+            "title": "New role"
+        },
+        "list": {
+            "title": "Roles"
+        },
+        "duplicate": {
+            "title": "Profile duplicate",
+            "from": "Duplicate from",
+            "for": "Duplicate for"
+        }
+    },
+
+    "sms_template": {
+        "add": {
+            "title": "New SMS template"
+        }
+    },
+
+    "stat": {
+        "country": {
+            "title": "Associate {country} to ..."
+        },
+        "metric": {
+            "title": "Follow a filter daily",
+            "label": "Filter",
+            "menu": "Menu"
+        },
+        "blocs": {
+            "prospect": {
+                "title": "Prospect"
+            },
+            "sms": {
+                "title": "SMS",
+                "phone": "Phone"
+            },
+            "event": {
+                "title": "Event"
+            },
+            "interaction": {
+                "title": "Call",
+                "phone": "Phone"
+            },
+            "order": {
+                "title": "Order"
+            },
+            "file": {
+                "title": "File"
+            },
+            "message": {
+                "title": "Message"
+            },
+            "total": {
+                "prospect": "Prospects count",
+                "sms": "SMS count",
+                "event": "Events count",
+                "interaction": "Calls count",
+                "order": "Orders count",
+                "file": "Files count",
+                "message": "Messages count"
+            },
+            "new": {
+                "prospect": "New prospects",
+                "sms": "New SMS",
+                "event": "New events",
+                "interaction": "New calls",
+                "order": "New orders",
+                "file": "New files",
+                "message": "New messages"
+            },
+            "follow_filter_daily": {
+                "title": "Follow a filter daily",
+                "distribution": "Distribution of filters"
+            }
+        },
+        "user-connection-stat": {
+            "title": "Connected users per month"
+        }
+    },
+
+    "thread": {
+        "add": {
+            "title": "New thread",
+            "send_email_to": "Send email to ...",
+            "send_email_to_prospect": "Send email to the prospect",
+            "associate_to_the_user": "Associate to {user}"
+        }
+    },
+
+    "questionnaire": {
+        "questionnaire": {
+            "add": {
+                "title": "New form"
+            },
+            "list": {
+                "title": "Forms"
+            }
+        },
+        "question": {
+            "add": {
+                "title": "New question"
+            },
+            "types": {
+                "radio": "Radio",
+                "checkbox": "Checkbox",
+                "text": "Text",
+                "textarea": "Text multiline",
+                "date": "Date",
+                "image": "Image",
+                "file": "File"
+            }
+        },
+        "section": {
+            "add": {
+                "title": "New section"
+            }
+        },
+        "option": {
+            "add": {
+                "title": "Nouvelle option",
+                "choose_section": "Choose a section"
+            }
+        }
+    },
+
+    "permission": {
+        "all": "Toutes les permissions"
+    },
+
+    "category": {
+        "add": {
+            "title": "New label category",
+            "unique": "Single choice"
+        },
+        "list": {
+            "title": "Label categories"
+        },
+        "update": {
+            "unique": "Single choice"
+        }
+    },
+
+    "folder": {
+        "add": {
+            "title": "New folder"
+        }
+    },
+
+    "group": {
+        "add": {
+            "title": "New group"
+        }
+    },
+
+    "locale": {
+        "setting": {
+            "title": "Locale"
+        }
+    },
+
+    "message_template": {
+        "add": {
+            "title": "New message template"
+        }
+    },
+
+    "event_description_template": {
+        "add": {
+            "title": "New event description template"
+        }
+    },
+
+    "order": {
+        "action": {
+            "add": {
+                "title": "New type of action on order"
+            }
+        },
+        "status": {
+            "add": {
+                "title": "New order status"
+            }
+        },
+        "step": {
+            "add": {
+                "title": "New order step"
+            }
+        },
+        "product": {
+            "add": {
+                "title": "New product"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "De-select orders",
+                "init_filters": "Init filters",
+                "toggle_order_menus": "Toggle order menus",
+                "add_order": "New order",
+                "setting": "Columns setting",
+                "previous": "Previous",
+                "next": "Next",
+                "bulk_delete": "Delete definitely",
+                "page_orders_count": "Orders count per page",
+                "orders_count": "Orders count",
+                "current_page": "Current page"
+            },
+
+            "column": {
+                "manage": "Manage your {project} orders table columns",
+                "delete_confirm": "Are you sure you want to remove this column ?",
+                "others": {
+                    "total_commissions": "Commissions total",
+                    "prospect": "Prospect",
+                    "products": "Products",
+                    "status": "Status",
+                    "steps": "Steps",
+                    "commissions": "Commissions"
+                }
+            },
+
+            "setting": {
+                "decimal": "Digits after decimal point count:"
+            },
+
+            "filters": {
+                "all": {
+                    "title": "Filters"
+                },
+                "actions": {
+                    "title": "Filter by actions",
+                    "with": "With actions ...",
+                    "without": "Without action",
+                    "without_user": "Without action {action}"
+                },
+                "products": {
+                    "title": "Filter by products",
+                    "with": "With products ...",
+                    "without": "Without product",
+                    "without_user": "Without product {product}"
+                },
+                "statuses": {
+                    "title": "Filter by status",
+                    "with": "With status ...",
+                    "without": "Without status",
+                    "without_user": "Without status {status}"
+                },
+                "steps": {
+                    "title": "Filter by steps",
+                    "with": "With steps ...",
+                    "without": "Without step",
+                    "without_user": "Without step {step}"
+                }
+            }
+        }
+    },
+
+    "project": {
+        "add": {
+            "title": "New project"
+        },
+        "profile": {
+            "blocs": {
+                "calendars": "Calendars",
+                "categories": "Label categories",
+                "contacts": "Contacts",
+                "documents": "Documents",
+                "fields": "Fields",
+                "folders": "Folders",
+                "groups": "Groups",
+                "imports": "Imports",
+                "menus": "Menus",
+                "order_actions": "Order actions",
+                "order_statuses": "Order statuses",
+                "order_steps": "Order steps",
+                "others": "Others",
+                "products": "Products",
+                "profile": "Profile",
+                "roles": "Roles",
+                "threads": "Threads",
+                "users": "Users"
+            },
+            "logo": {
+                "change": "Update your project logo here."
+            },
+            "menus": {
+                "thread": "Threads",
+                "folder": "Folders",
+                "category": "Categories",
+                "field": "Fields",
+                "group": "Groups",
+                "role": "Roles",
+                "product": "Products"
+            }
+        },
+        "table": {
+            "footer": {
+                "toggle_project_menus": "Toggle project menus",
+                "add_project": "New project",
+                "deselect": "De-select prospects",
+                "bulk_delete": "Delete selected projects",
+                "previous": "Previous",
+                "next": "Next",
+                "init_filters": "Init filters"
+            },
+            "column": {
+                "others": {
+                    "active_users": "Active users"
+                }
+            }
+        }
+    },
+
+    "global_search": {
+        "actions": {
+            "prospect": {
+                "create_event": {
+                    "name": "Create event",
+                    "keywords": "create new event appointment google calendar",
+                    "description": "Create physical, Google meet, ... event"
+                },
+                "create_order": {
+                    "name": "Create order",
+                    "keywords": "create new order product",
+                    "description": "Create order for a given prospect, manage users actions on order, manage user commission, ..."
+                },
+                "create_sms": {
+                    "name": "SMS",
+                    "keywords": "create new sms message smsbox ringover ultramsg mtarget",
+                    "description": "Call prospect via your phone or SMSBOX or Ringover, ..."
+                },
+                "create_interaction": {
+                    "name": "Call",
+                    "keywords": "call telephone phone interaction ringover aircall",
+                    "description": "Call prospect via your phone or Aircall or Ringover, ..."
+                },
+                "create_file": {
+                    "name": "Files",
+                    "keywords": "folder file google drive",
+                    "description": "Associate a file to a prospect"
+                },
+                "create_message": {
+                    "name": "Messages",
+                    "keywords": "Thread message email",
+                    "description": "Send internal or external message (email) to a prospect"
+                }
+            },
+            "project": {
+                "create_calendar": {
+                    "name": "New calendar",
+                    "keywords": "New calendar event"
+                },
+                "create_category": {
+                    "name": "New labels category",
+                    "keywords": "New labels category"
+                },
+                "create_document": {
+                    "name": "New document",
+                    "keywords": "New document template pdf"
+                },
+                "create_folder": {
+                    "name": "New folder",
+                    "keywords": "New folder file"
+                },
+                "create_group": {
+                    "name": "New group",
+                    "keywords": "New group users"
+                },
+                "create_menu": {
+                    "name": "New menu",
+                    "keywords": "New menu"
+                },
+                "create_order_action": {
+                    "name": "New order action",
+                    "keywords": "New order action"
+                },
+                "create_order_step": {
+                    "name": "New order step",
+                    "keywords": "New order step"
+                },
+                "create_pipeline": {
+                    "name": "New pipeline",
+                    "keywords": "New pipeline step pipedrive"
+                },
+                "create_product": {
+                    "name": "New product",
+                    "keywords": "New product order"
+                },
+                "create_role": {
+                    "name": "New role",
+                    "keywords": "New role users permissions"
+                },
+                "create_thread": {
+                    "name": "New message thread",
+                    "keywords": "New message thread"
+                },
+                "add_user": {
+                    "name": "Add user",
+                    "keywords": "Add user"
+                },
+                "create_import": {
+                    "name": "Import",
+                    "keywords": "Import prospects file xls xlsx",
+                    "description": "Import prospects from XLSX file.<br>Or from external webservice like Zapier."
+                },
+                "create_field": {
+                    "name": "Manage fields in your project",
+                    "keywords": "Add field"
+                }
+            },
+            "api": {
+                "smsbox": {
+                    "name": "SMSBOX API Setting",
+                    "keywords": "SMSBOX API Setting"
+                },
+                "email": {
+                    "name": "Email setting",
+                    "keywords": "Email setting"
+                },
+                "ultramsg": {
+                    "name": "Ultramsg API Setting",
+                    "keywords": "Ultramsg API Setting"
+                },
+                "mtarget": {
+                    "name": "MTarget API Setting",
+                    "keywords": "MTarget API Setting"
+                }
+            }
+        }
+    },
+
+    "duplicate": {
+        "title": "Check duplicates",
+        "fields": "Search by fields ...",
+        "choose_action": "Choose an action to do",
+        "remove_duplicating": "Delete old duplicate leads",
+        "remove_duplicates": "Remove lead duplications in import",
+        "replace_duplicating": "Overwrite the modified data of old prospects with those of new ones"
+    },
+
+    "vehicle": {
+        "add": {
+            "title": "New vehicle"
+        },
+        "affected_user": "Affected user {user}"
+    },
+
+    "tutorial": {
+        "tutorial": {
+            "name": "Tutorial",
+            "body": "Delete tutorials to make them appear again."
+        },
+        "project_campaign_actions": {
+            "name": "Campaign - Actions",
+            "body": {
+                "0": "Define the action that your campaign will perform.",
+                "1": "You can drag and drop and associate multiple actions with a campaign."
+            }
+        },
+        "project_campaign_campaign_new": {
+            "name": "Campaign - new",
+            "body": {
+                "0": "Drag and drop a new campaign into the area."
+            }
+        },
+        "project_campaign_operators": {
+            "name": "Campaign - Operators",
+            "body": {
+                "0": "Combine rules for your campaign."
+            }
+        },
+        "project_campaign_rules": {
+            "name": "Campaign - Prospect rule",
+            "body": {
+                "0": "Set rules to filter leads that will be affected by your campaign."
+            }
+        },
+        "project_category_to_field": {
+            "name": "Filter - Transform to Field",
+            "body": {
+                "0": "Transform a filter category into a classic field.",
+                "1": "All filters associated with a prospect belonging to this category will be converted into information in a classic field of the same name."
+            }
+        },
+        "dashboard_project": {
+            "name": "List of projects",
+            "body": "Manage your leads in various projects"
+        },
+        "dashboard_project_new": {
+            "name": "New projects",
+            "body": "Create multiple projects where you can manage your leads"
+        },
+        "project_document_template_tab_file": {
+            "name": "Document - Files",
+            "body": "Add PDF files to the template which will be used as backgrounds for pages generated in prospect documents."
+        },
+        "project_document_template_tab_font": {
+            "name": "Document - Fonts",
+            "body": "You can integrate other text fonts to format the texts in the fields you add in the documents."
+        },
+        "project_document_template_tab_page": {
+            "name": "Document - Pages",
+            "body": "Add new pages (blank or from a PDF) to your template."
+        },
+        "project_document_template_tab_prospect": {
+            "name": "Document - Templates - Prospect",
+            "body": {
+                "0": "Place and format lead fields in your template.",
+                "1": "These fields will be replaced by the prospects' real information when generating their document."
+            }
+        },
+        "project_document_template_tab_project": {
+            "name": "Document - Template - Project",
+            "body": "Place y and also format project fields which will be replaced by your project info."
+        },
+        "project_document_template_tab_map": {
+            "name": "Document - Template - MAP",
+            "body": "The MAP fields allow you to add a MAP image which will represent the location of the prospect attached to the generated document."
+        },
+        "project_document_template_tab_date": {
+            "name": "Document - Template - Dates",
+            "body": "Add date fields that will be replaced with today's date the document will be generated."
+        },
+        "project_document_template_tab_order": {
+            "name": "Document - Template - Quote",
+            "body": {
+                "0": "Find fields linked to the quote here (quote table, etc.)."
+            }
+        },
+        "project_document_template_tab_label": {
+            "name": "Document - Template - Filters",
+            "body": {
+                "0": "You can also add:",
+                "1": "or filter categories in the document, the filters linked to the prospect of the document belonging to the category will be listed in place of the field when generating the document.",
+                "2": "or filters which will be replaced by an icon check if the filter is linked to the prospect."
+            }
+        },
+        "project_field_to_category": {
+            "name": "Filter - Transform to Field",
+            "body": {
+                "0": "Field - Transform into filter",
+                "1": "Transform a field into a filter category."
+            }
+        },
+        "project_header_menu_prospects": {
+            "name": "Menu - Prospects",
+            "body": {
+                "0": "Access the prospects table to manage information and filters relating to prospects.<br>Or to manage SMS, messages, calls, quotes, etc."
+            }
+        },
+        "project_header_menu_events": {
+            "name": "Menu - Calendar",
+            "body": {
+                "0": "Manage your calendars and appointments with your prospects."
+            }
+        },
+        "project_header_menu_map": {
+            "name": "Menu - MAP",
+            "body": {
+                "0": "Locate your prospects in your map."
+            }
+        },
+        "project_header_menu_orders": {
+            "name": "Menu - Quote",
+            "body": {
+                "0": "See the list of quotes"
+            }
+        },
+        "project_header_menu_stat": {
+            "name": "Menu - Stat",
+            "body": {
+                "0": "View various statistics in your project."
+            }
+        },
+        "project_header_menu_document": {
+            "name": "Menu - Document",
+            "body": {
+                "0": "Edit a PDF document template.<br>The templates can be re-used to generate PDF documents for prospects."
+            }
+        },
+        "project_header_menu_campaign": {
+            "name": "Menu - Countryside",
+            "body": {
+                "0": "Perform automatic actions on your prospects based on the filters you apply on your prospects:",
+                "1": "Send e-mails",
+                "2": "Assign filters",
+                "3": "Create quotes"
+            }
+        },
+        "project_header_search": {
+            "name": "Research",
+            "body": {
+                "0": "Search for prospects, users, filters, ...",
+                "1": "You can also search for features such as: \"Import leads\", \"Email sending settings\", ..."
+            }
+        },
+        "project_map_header_filter": {
+            "name": "MAP - Filter",
+            "body": {
+                "0": "Refine your searches with the various filters here."
+            }
+        },
+        "project_map_header_color": {
+            "name": "MAP - Color markers",
+            "body": {
+                "0": "You can use a filter category to color markers in the MAP."
+            }
+        },
+        "project_map_header_user_position": {
+            "name": "MAP - User Location",
+            "body": {
+                "0": "Locate your users' vehicle locations here."
+            }
+        },
+        "project_map_header_export": {
+            "name": "MAP - Export",
+            "body": {
+                "0": "Export the prospects selected in your table to an XLSX file."
+            }
+        },
+        "project_map_header_prospect_without_lat_lng": {
+            "name": "MAP - Prospects without lat/lng",
+            "body": {
+                "0": "In case some of your prospects are not in the MAP, this tool will allow you to search for their addresses again."
+            }
+        },
+        "project_map": {
+            "name": "MAP",
+            "body": {
+                "0": "You can hold CTRL<br>and <>tap-drag",
+                "1": "and press-drag with the mouse to draw a search circle in the MAP.",
+                "2": "You can also hold SHIFT",
+                "3": "and click on several locations to draw a search polygon."
+            }
+        }
+    },
+
+    "stat-chart": {
+        "add": {
+            "title": "Add statistics to the dashboard",
+            "blocs": {
+                "total-prospects-per-label": {
+                    "title": "Prospects by filter",
+                    "description": "Choose multiple filters or selection of filters or menu and see the current distribution of prospects in these filters in your project."
+                },
+                "total-prospects-per-country": {
+                    "title": "Prospects by country",
+                    "description": "Show the total quantity of your leads based on the countries they are located in"
+                },
+                "new-prospects-per-label-per-day": {
+                    "title": "New prospects",
+                    "description": "Track the number of new prospects matching a selection of filters from this date"
+                },
+                "total-prospects-per-label-per-day": {
+                    "title": "Total prospects",
+                    "description": "Follow the evolution of the total number of prospects matching a selection of filters from this date"
+                },
+                "new-orders-price-per-day": {
+                    "title": "Total new quotes per day",
+                    "description": "Show the total amount of your new quotes per day"
+                },
+                "total-orders-price-per-day": {
+                    "title": "Total quote per day",
+                    "description": "Show the total quantity of your quote sums per day"
+                },
+                "new-commissions-per-user-per-day": {
+                    "title": "Total new commissions per user per day",
+                    "description": "Show the total amount of your new commission amounts per user per day"
+                },
+                "total-commissions-per-user-per-day": {
+                    "title": "Total commissions per user per day",
+                    "description": "Show the total amount of your commission amounts per user per day"
+                },
+                "events-list": {
+                    "title": "List of today's appointments",
+                    "description": "List of today's appointments"
+                },
+                "events-direction": {
+                    "title": "Today's itinerary",
+                    "description": "Display today's route in a MAP"
+                },
+                "new-sms-per-day": {
+                    "title": "New SMS",
+                    "description": "Follow the evolution of the number of new SMS"
+                },
+                "total-sms-per-day": {
+                    "title": "Total SMS",
+                    "description": "Follow the evolution of the total number of SMS"
+                },
+                "new-event-per-day": {
+                    "title": "New appointments",
+                    "description": "Follow the evolution of the number of new appointments"
+                },
+                "total-event-per-day": {
+                    "title": "Total appointments",
+                    "description": "Follow the evolution of the total number of appointments"
+                },
+                "new-message-per-day": {
+                    "title": "New messages",
+                    "description": "Track the number of new messages"
+                },
+                "total-message-per-day": {
+                    "title": "Total messages",
+                    "description": "Follow the evolution of the total number of messages"
+                },
+                "new-order-per-day": {
+                    "title": "New quotes",
+                    "description": "Follow the evolution of the number of new quotes"
+                },
+                "total-order-per-day": {
+                    "title": "Total quote",
+                    "description": "Follow the evolution of the total number of quotes"
+                }
+            },
+            "chart-types": {
+                "pie": "Mapie",
+                "hbar": "Horizontal bar",
+                "vbar": "Vertical bar",
+                "line": "Line",
+                "calendar": "Calendar"
+            }
+        },
+        "dashboard": {
+            "between_dates": "Between {start} and {end}"
+        }
+    },
+
+    "pipeline": {
+        "add": {
+            "title": "New pipeline"
+        }
+    }
+}

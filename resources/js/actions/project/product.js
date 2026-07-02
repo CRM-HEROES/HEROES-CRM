@@ -1,0 +1,10 @@
+export const FETCH_PRODUCTS = "fetchProducts";
+export const SET_PRODUCTS = "setProducts";
+export const SET_PRODUCT = "setProduct";
+export const ADD_PRODUCT = "addProduct";
+export const SHOW_PRODUCT = "showProduct";
+export const UPDATE_PRODUCT = "updateProduct";
+export const REMOVE_PRODUCT = "removeProduct";
+export const ADD_PRODUCT_IMAGE = "addProductImage";
+export const UPDATE_PRODUCT_IMAGE = "updateProductImage";
+export const REMOVE_PRODUCT_IMAGE = "removeProductImage";

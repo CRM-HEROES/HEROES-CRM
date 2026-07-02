@@ -1,0 +1,9 @@
+export const FETCH_CATEGORIES = "fetchCategories";
+export const SET_CATEGORIES = "setCategories";
+export const SET_CATEGORY = "setCategory";
+export const ADD_CATEGORY = "addCategory";
+export const SHOW_CATEGORY = "showCategory";
+export const UPDATE_CATEGORY = "updateCategory";
+export const REMOVE_CATEGORY = "removeCategory";
+export const CATEGORY_TO_FIELD = "categoryToField";
+export const CATEGORY_COMBINE_WITH = "categoryCombineWith";

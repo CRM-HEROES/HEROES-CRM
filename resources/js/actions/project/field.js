@@ -1,0 +1,9 @@
+export const FETCH_FIELDS = "fetchFields";
+export const SET_FIELDS = "setFields";
+export const SET_FIELD = "setField";
+export const ADD_FIELD = "addField";
+export const SHOW_FIELD = "showField";
+export const UPDATE_FIELD = "updateField";
+export const REMOVE_FIELD = "removeField";
+export const SET_NEW_FIELD_FOR = "setNewFieldFor";
+export const FIELD_TO_CATEGORY = "fieldToCategory";

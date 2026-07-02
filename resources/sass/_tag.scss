@@ -1,0 +1,20 @@
+.hc-tag {
+    font-size: 10px;
+    height: 21px;
+    line-height: 21px;
+    padding: 0 5px;
+    border-radius: 2px;
+    display: inline-block;
+    margin: 0 1px 0 0;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+    .hc-tag {
+        font-size: 11px;
+        height: 27px;
+        line-height: 27px;
+        padding: 0 7px;
+    }
+}

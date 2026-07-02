@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Notifications;
+
+use App\Models\Prospect;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Notification;
+
+class GoogleContactNewProspect extends Notification implements ShouldQueue
+{
+    use Queueable;
+
+    protected $prospect;
+
+    /**
+     * Create a new notification instance.
+     */
+    public function __construct(Prospect $prospect)
+    {
+        $this->prospect = $prospect;
+    }
+
+    /**
+     * Get the notification's delivery channels.
+     *
+     * @return array<int, string>
+     */
+    public function via(object $notifiable): array
+    {
+        return [\App\Channels\GoogleContactNewProspectChannel::class];
+    }
+
+    /**
+     * 
+     */
+    public function getProspect()
+    {
+        return $this->prospect;
+    }
+    
+}

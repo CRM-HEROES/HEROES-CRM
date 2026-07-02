@@ -1,0 +1,2168 @@
+{
+    "app_name": "Heróis CRM",
+    "add": "Adicionar",
+    "new": "Novo",
+    "new_order": "Nova ordem",
+    "delete": "Excluir",
+    "restore": "Restaurar",
+    "delete_confirm": "Tem certeza de que deseja excluir isto?",
+    "update": "Atualizar",
+    "edit": "Editar",
+    "value": "Valor",
+    "to_field": "Converter em campo",
+    "to_field_confirm": "Tem certeza de que deseja transformar este filtro em campo?",
+    "to_category": "Converter para filtrar",
+    "to_category_confirm": "Tem certeza de que deseja transformar este campo em filtro?",
+    "cancel": "Cancelar",
+    "ok": "OK",
+    "search": "Procurar",
+    "all": "Todos",
+    "close": "Fechar",
+    "back": "Voltar",
+    "previous": "Anterior",
+    "next": "Próximo",
+    "enabled": "Habilitado",
+    "disabled": "Desabilitado",
+    "none": "Nenhum",
+    "show_more": "Mostre mais",
+    "show_less": "Mostre menos",
+    "required": "Obrigatório",
+    "name": "Nome",
+    "first_name": "Primeiro nome",
+    "last_name": "Sobrenome",
+    "phone_number": "Número de telefone",
+    "mobile_phone_number": "número de celular",
+    "password": "Senha",
+    "street": "Rua",
+    "street_bis": "Rua # 2",
+    "postal_code": "Código postal",
+    "phone": "Número de telefone",
+    "city": "Cidade",
+    "country": "País",
+    "description": "Descrição",
+    "type": "Tipo",
+    "color": "Cor do texto",
+    "bgcolor": "Cor de fundo",
+    "content": "Contente",
+    "url": "URL",
+    "for": "Para",
+    "source": "Fonte",
+    "count": "Contar",
+    "prospects": "Perspectivas",
+    "projects": "Projetos",
+    "orders": "Pedidos",
+    "invoices": "Faturas",
+    "users": "Usuários",
+    "products": "Produtos",
+    "copyright": "Heroes CRM desde 2002 Reprodução proibida - Todos os direitos reservados / Reprodução proibida",
+    "request_error": "Erro de solicitação.",
+    "auth": {
+        "email": "E-mail",
+        "password": "Senha",
+        "confirm_password": "Confirme sua senha",
+        "init_password": {
+            "title": "Senha de inicialização",
+            "success": "O link de redefinição de senha foi enviado com sucesso para o endereço de e-mail<b>{e-mail}</b>.",
+            "error": "No momento, estamos encontrando um erro ao enviar o link de redefinição de senha.<br><br>Verifique se o e-mail digitado está correto.",
+            "send_verification_email": "Enviar e-mail de verificação",
+            "sending_verification_email": "Enviando e-mail de verificação"
+        },
+        "register": {
+            "title": "Inscrever-se",
+            "subscribe": "Inscrever-se",
+            "already_have_an_account": "Já tem uma conta ?"
+        },
+        "login": {
+            "title": "Entrar",
+            "authenticate": "Faça login no Heroes CRM",
+            "authenticating": "Conecte-se ...",
+            "forget_password": "Esqueci a minha senha ...",
+            "sign_up": "Inscrever-se",
+            "google": "Faça login através do Google",
+            "error": "O e-mail ou senha provavelmente está errado."
+        },
+        "google_authenticator": {
+            "open": "Abra o Google Autenticador,<br>Ou baixe o aplicativo aqui:<br><a href=\"https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr&gl=US\">Loja de jogos</a> ou <a href=\"https://apps.apple.com/fr/app/google-authenticator/id388497605\">Loja de aplicativos</a>",
+            "scan_qrcode": "E escaneie o seguinte código Qr:",
+            "copy_following_key_configuration": "Ou copie a seguinte configuração de chave",
+            "check_type": "Pergunte apenas se você mudar de IP.",
+            "key_security": "Segurança chave:",
+            "key_security_copied": "Chave de segurança copiada com sucesso",
+            "activate": "Autenticador Google ativo",
+            "activating": "Ativando o Google Autenticador",
+            "login": "Conecte-se"
+        },
+        "impersonate": {
+            "back_to_my_account": "Voltar para minha conta"
+        },
+        "info_check": {
+            "1": "<b>Segurança GDPR/SSL</b> reforçado.",
+            "2": "<b>Criptografia/Opção</b> controlada.",
+            "3": "99,99% <b>disponibilidade do servidor</b> + <b>Cópia de segurança</b> em tempo real.",
+            "4": "Toda a equipe do Heroes CRM está ao seu serviço desde 2002."
+        },
+        "partner": {
+            "title": "Mais de 200 parceiros e conectores incluídos",
+            "call_sms_email": "Chamada, SMS, correio",
+            "ads_systems": "Sistemas de anúncios",
+            "payment_systems": "Sistemas de pagamento",
+            "accounting_systems": "Sistemas de contabilidade"
+        },
+        "session": {
+            "ban_device": "Banir dispositivo",
+            "ban_code": "Código de proibição",
+            "ban": "Banimento",
+            "connections": "Conexões"
+        }
+    },
+    "header": {
+        "close": "Fechar",
+        "home": "Lar",
+        "prospects": "Perspectivas",
+        "appointments": "Compromissos",
+        "map": "MAPA",
+        "mail": "Correios",
+        "order": "Pedidos",
+        "documents": "Documentos",
+        "campaigns": "Campanhas",
+        "stat": "Estatísticas",
+        "settings": "Configurações"
+    },
+    "dashboard": {
+        "your_projects": "Seus projetos",
+        "new_project": "Novo projeto",
+        "new_user": "Novo usuário",
+        "stats": "Estatísticas"
+    },
+    "prospect": {
+        "table": {
+            "footer": {
+                "deselect": "Desselecionar clientes potenciais",
+                "init_filters": "Filtros de inicialização",
+                "toggle_menus": "Alternar menus",
+                "toggle_prospect_menus": "Alternar menus de clientes potenciais",
+                "add_prospect": "Novo cliente potencial",
+                "import": "Importar clientes em potencial",
+                "setting": "Configuração de colunas",
+                "previous": "Anterior",
+                "next": "Próximo",
+                "bulk_delete": "Excluir definitivamente",
+                "bulk_users": "Anexar ou desanexar usuários",
+                "bulk_groups": "Anexar ou desanexar grupos",
+                "bulk_labels": "Anexe ou desanexe filtros",
+                "bulk_sms": "SMS",
+                "bulk_messages": "Mensagem",
+                "map": "MAPA",
+                "export": "Perspectivas de exportação",
+                "find_duplicates": "Encontre duplicatas",
+                "bulk_archive": "Arquivo",
+                "bulk_do_not_archive": "Retratar",
+                "bulk_field": "Atualizar valor do campo",
+                "search_and_replace": "Pesquisar e substituir",
+                "scan": "Digitalize um cartão de visita",
+                "page_prospects_count": "Contagem de clientes potenciais por página",
+                "prospects_count": "Contagem de clientes potenciais",
+                "row_max_lines": "Máximo de linhas de texto por linha",
+                "current_page": "Pagina atual"
+            },
+            "column": {
+                "manage": "Gerencie as colunas da tabela de clientes potenciais do {projeto}",
+                "delete_confirm": "Tem certeza de que deseja remover esta coluna?",
+                "tab": {
+                    "fields": "Campos",
+                    "tags": "Tag",
+                    "discussions": "Discussões",
+                    "forms": "Formulários",
+                    "others": "Outros"
+                },
+                "others": {
+                    "appointments": "Compromissos",
+                    "calls": "Chamadas",
+                    "sms": "SMS",
+                    "affected_users": "Usuários afetados",
+                    "affected_groups": "Grupos afetados",
+                    "orders": "Pedidos",
+                    "import": "importar",
+                    "creator": "Criado por",
+                    "groups": "Grupos",
+                    "users": "Usuários"
+                }
+            },
+            "cell": {
+                "event": {
+                    "add": "Adicionar Evento"
+                },
+                "thread": {
+                    "enter_message": "Digite a mensagem...",
+                    "view_thread": "Ver tópico...",
+                    "send": "Enviar ..."
+                }
+            },
+            "filters": {
+                "all": {
+                    "title": "Filtros"
+                },
+                "users": {
+                    "title": "Filtrar por usuários afetados",
+                    "with": "Com usuários ...",
+                    "without": "Sem usuários",
+                    "without_user": "Sem usuário {usuário}"
+                },
+                "groups": {
+                    "title": "Filtrar por grupos afetados",
+                    "with": "Com grupos...",
+                    "without": "Sem grupos",
+                    "without_group": "Sem grupo {grupo}"
+                },
+                "imports": {
+                    "title": "Filtrar por importação afetada",
+                    "with": "Com importações...",
+                    "without": "Sem importações",
+                    "without_import": "Não importado de {import}"
+                },
+                "creators": {
+                    "title": "Filtrar por criador",
+                    "with": "Com criadores ...",
+                    "without": "Criador desconhecido",
+                    "without_creator": "Não criado por {creator}"
+                },
+                "appointments": {
+                    "title": "Filtrar por compromissos",
+                    "with": "Com compromissos...",
+                    "without": "Sem hora marcada",
+                    "calendars": "Calendários",
+                    "no_selected_calendar": "Nenhum calendário selecionado...",
+                    "affected_to": "Afetado para",
+                    "no_selected_affected_to": "Nenhum usuário selecionado...",
+                    "created_by": "Criado por",
+                    "no_selected_created_by": "Nenhum usuário selecionado...",
+                    "after": "Depois",
+                    "before": "Antes",
+                    "future": "Futuro",
+                    "old": "Velho",
+                    "confirmed": "Compromissos confirmados",
+                    "not_confirmed": "Agendamentos não confirmados",
+                    "done": "Compromissos concluídos",
+                    "not_done": "Agendamentos não realizados",
+                    "select_calendars": "Selecione calendários..."
+                },
+                "file": {
+                    "title": "Filtrar por arquivo",
+                    "with_files": "Com arquivos",
+                    "without_file": "Sem arquivo",
+                    "without_folder": "Sem arquivo de {folder}"
+                },
+                "interaction": {
+                    "title": "Filtrar por chamada",
+                    "with_interactions": "Com chamadas",
+                    "without_interaction": "Sem chamada"
+                },
+                "message": {
+                    "title": "Filtrar por mensagem",
+                    "with_messages": "Com mensagens",
+                    "without_message": "Sem mensagem",
+                    "without_thread": "Sem mensagem de {thread}"
+                },
+                "order": {
+                    "title": "Filtrar por pedido",
+                    "with_orders": "Com encomendas...",
+                    "with_products": "Com produtos...",
+                    "with_actions": "Com ações...",
+                    "with_steps": "Com passos ...",
+                    "with_statuses": "Com status ...",
+                    "with_documents": "Com documentos...",
+                    "created_by": "Criado por ...",
+                    "select_actions": "Selecione ações...",
+                    "select_products": "Selecione produtos...",
+                    "select_steps": "Selecione as etapas...",
+                    "select_statuses": "Selecione status...",
+                    "select_documents": "Selecione documentos..."
+                },
+                "sms": {
+                    "title": "Filtrar por SMS...",
+                    "with_sms": "Com SMS...",
+                    "sources": "Fontes ...",
+                    "created_by": "Criado por ...",
+                    "after": "Depois",
+                    "before": "Antes",
+                    "sent": "SMS enviado...",
+                    "not_sent": "SMS não enviado...",
+                    "with_error": "Com erro...",
+                    "without_error": "Sem erro ...",
+                    "select_sources": "Selecione fontes...",
+                    "without_source": "Sem SMS enviado via {fonte}"
+                },
+                "label": {
+                    "title": "Filtrar por tag",
+                    "without_label": "Sem filtro {label}"
+                }
+            },
+            "bulk": {
+                "group": {
+                    "title": "Grupos afetados"
+                },
+                "label": {
+                    "title": "Filtros afetados"
+                },
+                "user": {
+                    "title": "Usuários afetados"
+                },
+                "field": {
+                    "title": "Atualizar valor do campo"
+                },
+                "add": "Atribuir",
+                "remove": "Remover"
+            }
+        },
+        "profile": {
+            "setting": {
+                "title": "Configuração do perfil do cliente potencial",
+                "column_i": "Coluna {eu}",
+                "new_bloc": "Novo bloco",
+                "fields": "Campos",
+                "messages": "Mensagens",
+                "files": "arquivos",
+                "filters": "Filtros",
+                "orders": "Pedidos",
+                "labels": "Filtros ativos",
+                "external_links": "links externos",
+                "events": "Eventos",
+                "calls": "Chamadas",
+                "sms": "SMS",
+                "documents": "Documentos",
+                "affected_users": "Usuários afetados",
+                "affected_groups": "Grupos afetados",
+                "map": "MAPA",
+                "edit_bloc": "Editar bloco"
+            },
+            "bloc": {
+                "messages": "Mensagens",
+                "files": "arquivos",
+                "filters": "Filtros",
+                "orders": "Pedidos",
+                "labels": "Filtros ativos",
+                "external_links": "links externos",
+                "events": "Eventos",
+                "calls": "Chamadas",
+                "sms": "SMS",
+                "documents": "Documentos",
+                "affected_users": "Usuários afetados",
+                "affected_groups": "Grupos afetados",
+                "map": "MAPA"
+            },
+            "menus": {
+                "sms": "SMS",
+                "call": "Chamar",
+                "message": "Mensagem",
+                "file": "Arquivo",
+                "document": "Documento",
+                "order": "Ordem",
+                "event": "Encontro",
+                "label": "Filtros",
+                "revision": "Histórico de alterações",
+                "log": "Histórico de consultas",
+                "setting": "Configurações de blocos de perfil de cliente potencial",
+                "map": "MAPA"
+            }
+        },
+        "document": {
+            "title": "Documentos ({cliente potencial})"
+        },
+        "interaction": {
+            "title": "Chamadas ({cliente potencial})",
+            "edit_phone_number": "Editar número de telefone",
+            "edit_mobile_phone_number": "Editar número de celular",
+            "add_history": "Adicionar histórico",
+            "call_by_phone": "Ligue por telefone",
+            "call_by_aircall": "Chamada por Aircall",
+            "call_by_ringover": "Chamada por Ringover",
+            "history": "História"
+        },
+        "message": {
+            "title": "Mensagem ({cliente potencial})",
+            "email_setting": "Configuração de e-mail",
+            "templates": {
+                "title": "Modelo de mensagens",
+                "send": "Enviado"
+            }
+        },
+        "order": {
+            "title": "Pedidos ({cliente potencial})",
+            "commission": {
+                "total": "Total",
+                "remain": "Permanecer",
+                "paid": "Pago",
+                "in_percent": "Em porcentagem",
+                "tax_included": "Imposto incluído.",
+                "tax_excluded": "Sem impostos.",
+                "mark_as_paid": "Marcar como pago",
+                "mark_as_unpaid": "Marcar como não pago",
+                "select_user": "Selecione o usuário..."
+            },
+            "product": {
+                "add_product_to_order": "Adicione {produto} ao pedido",
+                "add_to_order": "Adicionar ao pedido",
+                "quantity": "Quantidade",
+                "price": "Preço",
+                "currency": "Moeda",
+                "tax_in_percent": "Imposto em %",
+                "tax_included": "Taxas incluídas"
+            },
+            "tabs": {
+                "products": {
+                    "title": "Produtos"
+                },
+                "commissions": {
+                    "title": "Comissões",
+                    "manage": "Gerenciar comissões",
+                    "not_defined": "Comissão não definida"
+                },
+                "steps": {
+                    "title": "Passos"
+                },
+                "documents": {
+                    "title": "Documentos"
+                },
+                "fields": {
+                    "title": "Outras informações",
+                    "add": "Adicionar campo",
+                    "remove_confirm": "Tem certeza de que deseja remover este campo do seu projeto?"
+                },
+                "status": {
+                    "title": "Status"
+                }
+            }
+        },
+        "sms": {
+            "title": "SMS ({cliente potencial})",
+            "bulk_title": "SMS ({count} clientes potenciais)",
+            "via_your_phone": "SMS através do seu telefone",
+            "via_whatsapp": "SMS via Whatsapp",
+            "via_smsbox": "SMS via SMSBOX",
+            "via_mtarget": "SMS via MTarget",
+            "via_ringover": "SMS via Ringover",
+            "via_ultramsg": "SMS via UltraMsg",
+            "via_source": "SMS via {fonte}",
+            "templates": "Modelos de SMS",
+            "enter_text_message": "Digite uma mensagem de texto"
+        },
+        "file": {
+            "title": "Arquivos ({prospecto})"
+        },
+        "group": {
+            "title": "Grupos ({cliente potencial})"
+        },
+        "label": {
+            "title": "Rótulos ({cliente potencial})"
+        },
+        "form": {
+            "title": "Forma",
+            "your_response": "Sua responsabilidade ..."
+        },
+        "affected_user": {
+            "title": "Usuários afetados ({prospect})"
+        },
+        "external_link": {
+            "title": "Links externos ({prospecto})",
+            "add": {
+                "title": "Novos links externos ({prospect})"
+            }
+        },
+        "log_history": {
+            "title": "Histórico de registro ({prospecto})"
+        },
+        "revision_history": {
+            "title": "Histórico de revisões ({prospecto})"
+        },
+        "scan": {
+            "title": "Digitalize um cartão de visita",
+            "choose_file": "Escolher arquivo",
+            "scan": "Varredura",
+            "import": "Importar",
+            "view_prospect": "Ver cliente potencial",
+            "error": {
+                "camera_access": "Erro ao acessar a câmera: {error}",
+                "camera_stop": "Erro ao parar a câmera: {error}",
+                "camera_disabled": "A câmera não está ativa."
+            },
+            "success": {
+                "title": "Digitalização de cartão de visita",
+                "message": "Seus arquivos importados serão verificados em breve<br>e os clientes potenciais correspondentes serão importados para o seu projeto."
+            }
+        }
+    },
+    "import": {
+        "add": {
+            "title": "Importar clientes em potencial",
+            "from": {
+                "label": "De",
+                "local_file": "Arquivo local",
+                "webservice": "Externo via URL"
+            },
+            "file": "Arquivo",
+            "name": "Nome",
+            "field_delimiter": "Delimitador de campo",
+            "field_enclosure": "Invólucro de campo",
+            "comma": "Vírgula",
+            "semicolon": "Ponto e vírgula",
+            "tab": "(Aba)",
+            "space": "(Espaço)"
+        },
+        "update": {
+            "name": "nome"
+        },
+        "process": {
+            "title": "Importar",
+            "tab": {
+                "mapping": {
+                    "title": "Mapeamento",
+                    "cancel": "Cancelar mapeamento",
+                    "event": "Evento",
+                    "order": "Ordem",
+                    "sms": "SMS",
+                    "interaction": "Chamar",
+                    "link": "Link externo",
+                    "user": "Usuários afetados",
+                    "plus_field": "+ Campo",
+                    "plus_category": "+ Categoria",
+                    "shortcut_new_field": "Novo campo",
+                    "shortcut_new_category": "Novo filtro",
+                    "shortcut_new_thread": "Novo tópico",
+                    "new_field": "Novo campo de cliente potencial",
+                    "new_category": "Nova categoria",
+                    "new_column": "Nova coluna",
+                    "auto_field": "[Novo campo]",
+                    "auto_category": "[Nova categoria]",
+                    "auto_thread": "[Novo tópico]"
+                },
+                "relations": {
+                    "title": "Relações",
+                    "affected_users": "Usuários afetados",
+                    "affected_groups": "Grupos afetados"
+                },
+                "import": {
+                    "title": "Importar",
+                    "process": "Importação de processos",
+                    "re_process": "Reprocessar importação",
+                    "delete": {
+                        "import": "Excluir importação",
+                        "import_and_prospects": "Excluir importação e clientes potenciais",
+                        "prospects": "Excluir apenas clientes potenciais"
+                    },
+                    "download": "Baixar importação",
+                    "stop": "Parar importação",
+                    "view_prospects": "Ver clientes potenciais importados",
+                    "prospects_table": {
+                        "title": "Tabela de clientes potenciais",
+                        "body": "Use as colunas nesta importação como colunas em sua tabela de clientes potenciais"
+                    },
+                    "duplicate": {
+                        "title": "Verifique duplicatas",
+                        "fields": "Pesquise por campos...",
+                        "choose_action": "Escolha uma ação para fazer",
+                        "remove_duplicating": "Exclua leads duplicados antigos",
+                        "remove_duplicates": "Remover duplicações de leads na importação",
+                        "replace_duplicating": "Substitua os dados modificados de clientes potenciais antigos pelos de novos"
+                    },
+                    "processing": "Enviaremos um e-mail para você quando a importação for concluída.",
+                    "webservice": {
+                        "step_1": "Para associar seu zap a esta importação,<br />Conecte-se ao Zapier e crie seu zap lá:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Crie um Zap</a>",
+                        "step_2": "Escolher <b>Planilha Google</b> como <b>Acionar</b>,<br />Escolher <b>Nova linha da planilha [instantâneo]</b> como <b>Evento</b>,<br />Clique em <b>Continuar</b>.",
+                        "step_3": "Escolha sua conta do Google que contém o arquivo da Planilha Google para importar <b>Escolha a conta</b>,<br />Clique em <b>Continuar</b>.",
+                        "step_4": "Escolha o arquivo da Planilha Google em <b>Planilha</b>,<br />Escolha a planilha em <b>Planilha</b>,<br />Clique em <b>Continuar</b>.",
+                        "step_5": "Clique em <b>Gatilho de teste</b> para verificar se Zapier tem acesso ao seu arquivo da Planilha Google,<br />Clique em <b>Continuar</b>.",
+                        "step_6": "Escolher <b>Webhooks de Zapier</b> como <b>Ação</b>,<br /> Escolher <b>PEGAR</b> como <b>Evento</b>,<br />Clique em <b>Continuar</b>.",
+                        "step_7": "Adicione o seguinte link em <b>URL</b>:",
+                        "step_8": "Você pode usar os seguintes parâmetros como <br /><b>Parâmetros de string de consulta</b> para associar às colunas no arquivo da Planilha Google:",
+                        "webhook_url_copied": "URL do webhook copiado",
+                        "query_string_copied": "String de consulta copiada"
+                    }
+                },
+                "duplicate": {
+                    "title": "Atualizações"
+                }
+            }
+        }
+    },
+    "user": {
+        "add": {
+            "title": "Novo usuário",
+            "email": "Insira o e-mail do usuário",
+            "not_found": "Nenhum usuário com este e-mail foi encontrado em nosso banco de dados.",
+            "create": "Crie este usuário",
+            "create_professional_project": "Crie um projeto profissional",
+            "create_personal_project": "Crie um projeto pessoal",
+            "create_demo_project": "Crie um projeto de demonstração"
+        },
+        "profile": {
+            "affected_projects": "Projetos afetados",
+            "blocs": {
+                "calendars": "Calendários afetados",
+                "categories": "Categorias afetadas",
+                "documents": "Documentos afetados",
+                "exports": "Exportações",
+                "folders": "Pastas afetadas",
+                "groups": "Grupos afetados",
+                "menus": "Menus afetados",
+                "order_actions": "Ações de pedido afetadas",
+                "order_statuses": "Status de pedidos afetados",
+                "order_steps": "Etapas do pedido afetadas",
+                "projects": "Projetos afetados",
+                "questionnaires": "Formulários afetados",
+                "roles": "Funções afetadas",
+                "threads": "Tópicos afetados",
+                "users": "Usuários afetados"
+            },
+            "password_update": {
+                "confirm": "Tem certeza de que deseja alterar a senha?",
+                "success": "Senha alterada com sucesso!",
+                "error": "Erro ao alterar a senha!"
+            },
+            "menus": {
+                "duplicate": "Perfil duplicado para outros usuários",
+                "history": "Histórico de conexão",
+                "actions": "Ações realizadas pelo usuário",
+                "permissions": "Permissões",
+                "vehicle": "Veículos",
+                "prospect_profile_setting": "Configuração do perfil do cliente potencial",
+                "prospects_table_setting": "Configuração da tabela de clientes potenciais",
+                "user_profile_setting": "Configuração de perfil de usuário",
+                "use": "Faça login com esta conta"
+            }
+        },
+        "list": {
+            "title": "Usuários"
+        },
+        "table": {
+            "footer": {
+                "deselect": "Desselecionar clientes potenciais",
+                "init_filters": "Filtros de inicialização",
+                "toggle_menus": "Alternar menus",
+                "toggle_user_menus": "Alternar menus do usuário",
+                "add_user": "Novo usuário",
+                "import": "Importar",
+                "add_column": "Nova coluna",
+                "previous": "Anterior",
+                "next": "Próximo",
+                "bulk_delete": "Remover do projeto",
+                "bulk_calendars": "Anexar ou desanexar calendários",
+                "bulk_categories": "Anexar ou desanexar categorias",
+                "bulk_documents": "Anexar ou desanexar documentos",
+                "bulk_folders": "Anexar ou desanexar pastas",
+                "bulk_groups": "Anexar ou desanexar grupos",
+                "bulk_menus": "Anexar ou desanexar menus",
+                "bulk_order_actions": "Anexar ou desanexar ações de pedido",
+                "bulk_order_steps": "Anexar ou desanexar etapas do pedido",
+                "bulk_roles": "Anexar ou desanexar funções",
+                "bulk_threads": "Anexar ou desconectar tópicos",
+                "bulk_users": "Anexar ou desanexar usuários"
+            },
+            "column": {
+                "manage": "Gerenciar as colunas da tabela de usuários do {project}",
+                "new": "Nova coluna",
+                "tab": {
+                    "fields": "Campos",
+                    "others": "Outros"
+                },
+                "others": {
+                    "calendars": "Calendários",
+                    "categories": "Categorias",
+                    "documents": "Documentos",
+                    "folders": "Pastas",
+                    "groups": "Grupos",
+                    "menus": "Cardápios",
+                    "order_actions": "Ordenar ações",
+                    "order_statuses": "Status do pedido",
+                    "order_steps": "Etapas do pedido",
+                    "projects": "Projetos",
+                    "questionnaires": "Questionários",
+                    "roles": "Funções",
+                    "threads": "Tópicos",
+                    "users": "Usuários"
+                }
+            },
+            "filters": {
+                "calendars": {
+                    "title": "Filtrar por calendários afetados",
+                    "with": "Com calendários...",
+                    "without": "Sem calendários",
+                    "without_calendar": "Sem {calendário}"
+                },
+                "categories": {
+                    "title": "Filtrar por categorias afetadas",
+                    "with": "Com categorias ...",
+                    "without": "Sem categorias",
+                    "without_category": "Sem {categoria}"
+                },
+                "documents": {
+                    "title": "Filtrar por documentos afetados",
+                    "with": "Com documentos...",
+                    "without": "Sem documentos",
+                    "without_document": "Sem {documento}"
+                },
+                "folders": {
+                    "title": "Filtrar por pastas afetadas",
+                    "with": "Com pastas...",
+                    "without": "Sem pastas",
+                    "without_folder": "Sem {pasta}"
+                },
+                "groups": {
+                    "title": "Filtrar por grupos afetados",
+                    "with": "Com grupos...",
+                    "without": "Sem grupos",
+                    "without_group": "Sem {grupo}"
+                },
+                "menus": {
+                    "title": "Filtrar por menus afetados",
+                    "with": "Com cardápios...",
+                    "without": "Sem menus",
+                    "without_menu": "Sem {menu}"
+                },
+                "order_actions": {
+                    "title": "Filtrar por ações de pedido afetadas",
+                    "with": "Com ações de ordem...",
+                    "without": "Sem ações de ordem",
+                    "without_order_action": "Sem {order_action}"
+                },
+                "order_steps": {
+                    "title": "Filtrar por etapas do pedido afetadas",
+                    "with": "Com etapas de pedido ...",
+                    "without": "Sem etapas de pedido",
+                    "without_order_step": "Sem {order_step}"
+                },
+                "roles": {
+                    "title": "Filtrar por funções afetadas",
+                    "with": "Com papéis ...",
+                    "without": "Sem papéis",
+                    "without_role": "Sem {papel}"
+                },
+                "threads": {
+                    "title": "Filtrar por tópicos afetados",
+                    "with": "Com fios ...",
+                    "without": "Sem tópicos",
+                    "without_thread": "Sem {thread}"
+                },
+                "users": {
+                    "title": "Filtrar por usuários afetados",
+                    "with": "Com usuários ...",
+                    "without": "Sem usuários",
+                    "without_user": "Sem {usuário}"
+                }
+            },
+            "bulk": {
+                "calendars": {
+                    "title": "Calendários afetados"
+                },
+                "categories": {
+                    "title": "Categorias afetadas"
+                },
+                "documents": {
+                    "title": "Documentos afetados"
+                },
+                "folders": {
+                    "title": "Pastas afetadas"
+                },
+                "groups": {
+                    "title": "Grupos afetados"
+                },
+                "menus": {
+                    "title": "Menus afetados"
+                },
+                "order_actions": {
+                    "title": "Ações de pedido afetadas"
+                },
+                "order_steps": {
+                    "title": "Etapas do pedido afetadas"
+                },
+                "roles": {
+                    "title": "Funções afetadas"
+                },
+                "threads": {
+                    "title": "Tópicos afetados"
+                },
+                "users": {
+                    "title": "Usuários afetados"
+                }
+            }
+        },
+        "duplicate": {
+            "title": "Perfil duplicado",
+            "from": "Duplicar de",
+            "for": "Duplicar para"
+        },
+        "calendars": {
+            "title": "Calendários afetados"
+        },
+        "categories": {
+            "title": "Categorias de tags afetadas"
+        },
+        "documents": {
+            "title": "Documentos afetados"
+        },
+        "folders": {
+            "title": "Pastas afetadas"
+        },
+        "groups": {
+            "title": "Grupos afetados"
+        },
+        "menus": {
+            "title": "Menus afetados"
+        },
+        "order_actions": {
+            "title": "Ações de pedido afetadas"
+        },
+        "order_steps": {
+            "title": "Etapas do pedido afetadas"
+        },
+        "permissions": {
+            "title": "Permissões"
+        },
+        "questionnaires": {
+            "title": "Formulários afetados"
+        },
+        "roles": {
+            "title": "Funções afetadas"
+        },
+        "sessions": {
+            "title": "Dispositivos conectados"
+        },
+        "settings": {
+            "prospects_table": {
+                "title": "Configuração - Tabela de clientes potenciais"
+            },
+            "prospect_profile": {
+                "title": "Configuração - Perfil do cliente potencial"
+            }
+        },
+        "threads": {
+            "title": "Tópicos afetados"
+        },
+        "users": {
+            "title": "Usuários afetados"
+        },
+        "vehicles": {
+            "title": "Veículos",
+            "add": {
+                "title": "Veículo"
+            }
+        },
+        "log_chart": {
+            "title": "Gráfico de registros"
+        },
+        "actions": {
+            "title": "Ações"
+        }
+    },
+    "map": {
+        "prospect": {
+            "default_infos": "Informações padrão",
+            "other_infos": "Outras informações",
+            "labels": "Tag",
+            "appointments": "Compromissos",
+            "orders": "Pedidos",
+            "search": "Pesquisar neste cliente potencial"
+        },
+        "prospect_without_lat_lng": {
+            "title": "Perspectivas sem lat/lng"
+        },
+        "vehicles": {
+            "title": "Veículos"
+        },
+        "color": {
+            "title": "Marcadores de mapa de cores por ..."
+        }
+    },
+    "campaign": {
+        "mobile": "Por favor, use um computador para usar esta ferramenta.",
+        "campaign": {
+            "title": "Campanha",
+            "new": "Nova campanha",
+            "enabled": "Habilitado",
+            "for": {
+                "prospect": "Para clientes em potencial",
+                "order": "Para pedidos",
+                "appointment": "Para compromissos"
+            },
+            "frequency": {
+                "once": "Uma vez",
+                "every_fifteen_minutes": "A cada 15 minutos",
+                "every_thirty_minutes": "A cada 30 minutos",
+                "hourly": "De hora em hora",
+                "daily": "Diário",
+                "monthly": "Por mês"
+            },
+            "date": "Data",
+            "hour": "Hora",
+            "re_process_processed_prospects": "Reprocessar clientes potenciais processados",
+            "check_rules": "Verifique as regras",
+            "view_matching_prospects": "Ver clientes potenciais correspondentes"
+        },
+        "operator": {
+            "title": "Operador",
+            "or": "OU",
+            "and": "E"
+        },
+        "rule": {
+            "prospect": {
+                "title": "Cliente em potencial",
+                "tag": "Marcação",
+                "menu": "Cardápio",
+                "sms": {
+                    "title": "SMS",
+                    "source": "Fonte de SMS recebida",
+                    "count": "Contagem de SMS recebidos"
+                },
+                "interaction": {
+                    "title": "Apelo",
+                    "source": "Fonte de chamadas recebidas",
+                    "count": "Contagem de chamadas recebidas"
+                }
+            },
+            "order": {
+                "title": "Ordem",
+                "action": "Com ações",
+                "product": "Com produtos",
+                "status": "Com status",
+                "step": "Com etapas"
+            },
+            "appointment": {
+                "title": "Encontro",
+                "date": {
+                    "title": "Data",
+                    "starts_in_more_than_mn": "Começa em mais de {minuto} minutos",
+                    "starts_in_less_than_mn": "Começa em menos de {minuto} minutos",
+                    "started_less_than_ago_mn": "Começou há menos de {minuto} minutos",
+                    "started_more_than_ago_mn": "Começou há mais de {minuto} minutos"
+                }
+            }
+        },
+        "action": {
+            "prospect": {
+                "archive": "Arquivo",
+                "do_not_archive": "Não arquive",
+                "remove": "Remover cliente potencial",
+                "message": {
+                    "title": "Enviar mensagem / e-mail",
+                    "name": "Enviar mensagem em \"{thread}\": {content}",
+                    "thread": {
+                        "title": "Tópico de mensagens...",
+                        "placeholder": "Escolha o tópico da mensagem..."
+                    },
+                    "user": {
+                        "title": "Esperando por ...",
+                        "placeholder": "Escolha o usuário..."
+                    },
+                    "template": {
+                        "title": "Escolha um modelo de mensagem"
+                    },
+                    "enter_message": "Digite a mensagem"
+                },
+                "sms": {
+                    "title": "Enviar SMS",
+                    "name": "Enviar SMS",
+                    "source": "Fonte",
+                    "sms": "SMS"
+                },
+                "event": {
+                    "title": "Crie um evento",
+                    "name": "Crie um {duration} mn {calendar} para {user} em {min_days} a {max_days} dias",
+                    "duration": "Duração",
+                    "calendar": {
+                        "title": "Calendário",
+                        "placeholder": "Escolha um calendário..."
+                    },
+                    "user": {
+                        "title": "Do utilizador",
+                        "placeholder": "Escolha o usuário...",
+                        "random": "Usuário aleatório",
+                        "prospect_creator": "Quem criou o cliente potencial",
+                        "prospect_affected_user": "Quem quer que seja atribuído ao cliente potencial",
+                        "role": "Função {função}"
+                    },
+                    "date": {
+                        "title": "Em X dias",
+                        "min": "Min...",
+                        "max": "Máximo..."
+                    }
+                },
+                "attach_group": {
+                    "title": "Atribuir um grupo"
+                },
+                "attach_label": {
+                    "title": "Atribuir uma etiqueta"
+                },
+                "attach_user": {
+                    "title": "Atribuir um usuário"
+                },
+                "detach_group": {
+                    "title": "Desanexar um grupo"
+                },
+                "detach_label": {
+                    "title": "Desanexar uma tag"
+                },
+                "detach_user": {
+                    "title": "Desanexar um usuário"
+                },
+                "document_to_folder": {
+                    "title": "Gere um documento PDF em uma pasta de cliente potencial",
+                    "name": "Gere o documento \"{document}\" em \"{folder}\"",
+                    "document": "Documento para gerar ...",
+                    "select_document": "Escolha um documento...",
+                    "folder": "Pasta de destino ...",
+                    "select_folder": "Escolher pasta ..."
+                },
+                "document_to_thread": {
+                    "title": "Envie um documento PDF para um tópico de mensagens",
+                    "name": "Envie o documento \"{document}\" para o tópico de mensagens \"{thread}\"",
+                    "document": "Documento para gerar ...",
+                    "select_document": "Escolha um documento...",
+                    "thread": "Tópico de mensagem de destino...",
+                    "select_thread": "Escolha o tópico da mensagem..."
+                },
+                "order": {
+                    "title": "Criar pedido",
+                    "name": "Criar pedido ({name})",
+                    "add": "Criar pedido"
+                }
+            },
+            "order": {
+                "generate_invoice": {
+                    "title": "Gerar fatura do pedido",
+                    "name": "Gere a fatura \"{invoice}\""
+                },
+                "sign_invoice": {
+                    "title": "Assinar fatura do pedido",
+                    "name": "Assine a fatura \"{invoice}\""
+                },
+                "user_action": {
+                    "title": "Associar uma ação no pedido a um usuário",
+                    "name": "Associe a ação do pedido \"{action}\" a {user}",
+                    "action": "Ação ...",
+                    "select_action": "Escolha uma ação...",
+                    "user": "Do utilizador ...",
+                    "select_user": "Escolha um usuário...",
+                    "order_creator": "Quem criou o pedido",
+                    "prospect_creator": "Quem criou o cliente potencial",
+                    "prospect_affected_user": "Quem quer que seja atribuído ao cliente potencial",
+                    "role": "Função {função}"
+                }
+            }
+        },
+        "matching_prospects": {
+            "title": "Perspectivas correspondentes"
+        }
+    },
+    "document": {
+        "update": {
+            "folder": "Gerar na pasta {pasta}"
+        },
+        "mobile": "Por favor, use um computador para usar esta ferramenta.",
+        "dashboard": {
+            "new_from_template": "Novo documento do modelo",
+            "your_documents": "Seus modelos de documentos"
+        },
+        "add": {
+            "title": "Novo modelo de documento"
+        },
+        "list": {
+            "title": "Documentos"
+        },
+        "pdf": {
+            "title": "PDF"
+        },
+        "font": {
+            "title": "Fontes",
+            "new": {
+                "title": "Nova fonte",
+                "choose_file": "Escolha o arquivo .ttf",
+                "type": {
+                    "title": "Tipo",
+                    "normal": "Normal",
+                    "bold": "Audacioso"
+                },
+                "style": {
+                    "title": "Estilo",
+                    "normal": "Normal",
+                    "italic": "itálico"
+                }
+            }
+        },
+        "page": {
+            "title": "Página",
+            "all": "Todas as páginas",
+            "add": {
+                "title": "Nova página",
+                "choose_file": "Escolher arquivo",
+                "page": "Página",
+                "width": "Largura em mm",
+                "height": "Altura em mm",
+                "empty": "Vazio"
+            }
+        },
+        "zoom": {
+            "title": "Ampliação"
+        },
+        "style": {
+            "frame": {
+                "title": "Quadro",
+                "left": "Esquerda",
+                "top": "Principal",
+                "width": "Largura",
+                "height": "Altura",
+                "rotation": "Rotação",
+                "padding": {
+                    "title": "Preenchimento",
+                    "top": "T",
+                    "right": "R",
+                    "bottom": "B",
+                    "left": "eu"
+                },
+                "background_color": "Cor de fundo"
+            },
+            "format": {
+                "title": "Texto/Formato",
+                "type": {
+                    "title": "Tipo",
+                    "text": "Texto",
+                    "html": "HTML",
+                    "qrcode": "Código QR"
+                },
+                "font_size": "Tamanho da fonte",
+                "line_height": "Altura da linha",
+                "font": "Fonte",
+                "color": "Cor do texto"
+            },
+            "border": {
+                "title": "Fronteira",
+                "width": {
+                    "title": "Largura",
+                    "top": "T",
+                    "right": "R",
+                    "bottom": "B",
+                    "left": "eu"
+                },
+                "style": {
+                    "title": "Estilo",
+                    "solid": "Sólido",
+                    "dashed": "Tracejadas",
+                    "dotted": "Pontilhado"
+                },
+                "color": "Cor",
+                "radius": "Raio"
+            },
+            "content": {
+                "title": "Contente"
+            },
+            "order_table": {
+                "table": {
+                    "header_style": "Estilo de cabeçalho",
+                    "content": "Contente",
+                    "body_style": "Estilo de coluna"
+                },
+                "summary": {
+                    "header_style": "Estilo de cabeçalho",
+                    "content": "Contente",
+                    "body_style": "Estilo de coluna"
+                },
+                "apply_to_all_cells": "Aplicar a todas as outras células"
+            }
+        },
+        "map": {
+            "title": "MAPA",
+            "satellite": "Satélite",
+            "roadmap": "Roteiro",
+            "hybrid": "Híbrido",
+            "terrain": "Terreno",
+            "zoom": "Ampliação"
+        },
+        "field": {
+            "page": {
+                "number": "Número de página"
+            },
+            "prospect": {
+                "title": "Cliente em potencial",
+                "default_fields": "Campos padrão",
+                "other_fields": "Outros campos"
+            },
+            "map": {
+                "title": "MAPA"
+            },
+            "date": {
+                "title": "Data"
+            },
+            "order": {
+                "title": "Ordem",
+                "table": {
+                    "title": "Tabela de pedidos",
+                    "columns": "Colunas",
+                    "summaries": "Resumos",
+                    "edit": "Editar tabela de pedidos"
+                },
+                "number": "Número da conta",
+                "invoice_number": "Nº da fatura {número}",
+                "invoice_date": "Data de criação: {data}",
+                "product_i": "Produto {eu}"
+            },
+            "tag": {
+                "title": "Marcação"
+            },
+            "questionnaire": {
+                "title": "Forma"
+            },
+            "project": {
+                "thumbnail": "Logotipo",
+                "date": "Data de criação"
+            },
+            "tabs": {
+                "prospects": {
+                    "title": "Perspectivas"
+                },
+                "map": {
+                    "title": "MAPA"
+                },
+                "dates": {
+                    "title": "datas"
+                },
+                "orders": {
+                    "title": "Pedidos"
+                },
+                "labels": {
+                    "title": "Filtros"
+                },
+                "forms": {
+                    "title": "Formulários"
+                },
+                "project": {
+                    "title": "Projeto"
+                },
+                "pdfs": {
+                    "title": "Arquivos PDF"
+                },
+                "fonts": {
+                    "title": "Fontes"
+                },
+                "pages": {
+                    "title": "Páginas",
+                    "number": "Número de página",
+                    "portrait": "Retrato",
+                    "landscape": "Paisagem",
+                    "new_from": "Nova página de"
+                }
+            }
+        }
+    },
+    "event": {
+        "title": "Evento",
+        "view_prospect": "Ver cliente potencial",
+        "view_and_edit": "Ver e editar evento",
+        "new": "Novo evento",
+        "move": "Mover evento",
+        "google_calendar_associated_account": "Conta associada ao calendário do Google",
+        "google_calendar_remove_account_confirm": "Você realmente deseja não associar mais sua conta do Google Agenda ao Heroes CRM?",
+        "calendar": "Calendário",
+        "user": "Do utilizador",
+        "vehicle": "Veículo",
+        "prospect": "Cliente em potencial",
+        "order": "Ordem",
+        "date_time": "Data e hora",
+        "started_at": "De...",
+        "ended_at": "Para...",
+        "location": "Localização",
+        "confirmed": "Evento confirmado",
+        "done": "Evento concluído",
+        "labels": "Filtros",
+        "name": "Título",
+        "add_title": "Adicionar título...",
+        "description": "Descrição",
+        "add_description": "Adicionar descrição ...",
+        "choose_calendar": "Escolha o calendário",
+        "choose_user": "Escolha o usuário",
+        "choose_vehicle": "Escolha o veículo",
+        "choose_prospect": "Escolha o cliente potencial",
+        "new_prospect": "Novo cliente potencial",
+        "choose_order": "Escolha o pedido",
+        "new_order": "Nova ordem",
+        "choose_hour": "Escolha a hora",
+        "email_to_prospect": "Enviar convite para prospect",
+        "choose_event_description_template": "Modelos de descrição",
+        "user_daily_directions": {
+            "title": "instruções",
+            "remove_from_map": "Remover rota do mapa",
+            "remove_marker": "Remover marcador",
+            "send_sms": "Enviar SMS",
+            "call": "Chamar",
+            "file": "Arquivo",
+            "message": "Mensagem",
+            "event": "Evento",
+            "find_prospect": "Encontre cliente potencial...",
+            "find_address": "Encontrar endereço ..."
+        },
+        "agenda": {
+            "filters": {
+                "title": "Filtros",
+                "users": "Usuários",
+                "calendars": "Calendários",
+                "show_we": "Mostrar fins de semana",
+                "show_other_projects": "Outros eventos de projetos",
+                "min_hour": "Hora mínima",
+                "max_hour": "Hora máxima",
+                "choose_role": "Escolha uma função",
+                "labels": "Filtros"
+            }
+        }
+    },
+    "field": {
+        "add": {
+            "title": "Novo campo"
+        },
+        "update": {
+            "delete_confirm": "Este campo contém <b>{contar}</b> dados relacionados ao cliente potencial,<br>Tem certeza de que deseja excluir isto?"
+        },
+        "types": {
+            "text": "Texto",
+            "long_text": "Texto longo",
+            "number": "Número",
+            "email": "E-mail",
+            "date": "Data",
+            "datetime": "Data hora",
+            "address": "Endereço",
+            "url": "URL",
+            "tel": "Número"
+        },
+        "add_to_global_search": "Adicionar à pesquisa global",
+        "prospect": {
+            "phone_number": "Número de telefone",
+            "mobile_phone_number": "número de celular"
+        },
+        "default_value": "Valor padrão",
+        "required": "Obrigatório",
+        "unique": "Verifique duplicado ao entrar",
+        "format": "Formato de apresentação"
+    },
+    "calendar": {
+        "types": {
+            "physical": "Físico",
+            "telephone": "Telefone",
+            "hangout": "Encontro",
+            "task": "Tarefa",
+            "other": "Outro"
+        },
+        "add": {
+            "title": "Novo calendário"
+        },
+        "update": {
+            "default_address": "Seu endereço de evento padrão"
+        },
+        "combine_with": "Combina com"
+    },
+    "interaction": {
+        "types": {
+            "telephone": "Telefone"
+        }
+    },
+    "commission": {
+        "title": "Gerenciar comissões",
+        "tab": {
+            "product": {
+                "title": "Selecione produtos"
+            },
+            "action": {
+                "title": "Selecione ações"
+            },
+            "user": {
+                "title": "Selecione usuários"
+            },
+            "commission": {
+                "types": {
+                    "title": "Tipo",
+                    "percentage": "Percentagem",
+                    "fix": "Consertar"
+                },
+                "commission": {
+                    "title": "Comissão"
+                },
+                "including_tax": {
+                    "title": "Calcule a partir do preço do produto",
+                    "incl_tax": "Incluindo taxas",
+                    "excl_tax": "Excluindo impostos"
+                },
+                "selected_products": "produtos selecionados",
+                "selected_actions": "ações selecionadas",
+                "selected_users": "usuários selecionados"
+            }
+        }
+    },
+    "setting": {
+        "title": "Configurações",
+        "locale": {
+            "title": "Localidade"
+        },
+        "project": {
+            "title": "Configurações do projeto {project}",
+            "description": "Gerencie seu projeto"
+        },
+        "google_auth": {
+            "title": "Autenticador Google (2 fatores)",
+            "confirm": {
+                "enable": "Tem certeza de que deseja ativar a autenticação de dois fatores?",
+                "disable": "Tem certeza de que deseja desativar a autenticação de dois fatores?"
+            }
+        },
+        "google_drive": {
+            "title": "Google Drive",
+            "description": "Vincule uma conta do Google Drive aos arquivos de seus clientes potenciais"
+        },
+        "google_calendar": {
+            "title": "calendário do Google",
+            "description": "Associe uma conta do Google Agenda aos seus compromissos"
+        },
+        "users": {
+            "title": "Lista de usuários",
+            "description": "Gerenciar o acesso do usuário no projeto {project}"
+        },
+        "devices": {
+            "title": "Dispositivos conectados",
+            "description": "Gerencie seus dispositivos conectados"
+        },
+        "tutorials": {
+            "title": "Gerenciar tutoriais",
+            "do_not_show_anymore": "Não mostrar mais tutoriais"
+        },
+        "events_reminder": {
+            "title": "Notificar compromissos próximos"
+        },
+        "trash": {
+            "title": "Lixo",
+            "description": "Leads, filtros,..."
+        },
+        "menu_icons": {
+            "title": "Alterar ícones do menu",
+            "description": "Perspectivas, Agendas, Mapa, ..."
+        },
+        "copyright": {
+            "title": "HeroesCRM.com desde 2002 Reprodução proibida - Todos os direitos reservados.",
+            "technical_questions": "Perguntas técnicas",
+            "commercial_questions": "Questões comerciais"
+        }
+    },
+    "label": {
+        "add": {
+            "title": "Novo rótulo"
+        },
+        "combine_with": "Combina com",
+        "affected_users": "Usuários afetados",
+        "archive": "Arquivo",
+        "archive_tooltip": "Não mostrar mais na lista de marcadores"
+    },
+    "menu": {
+        "use_current_filters": "Usar filtros atuais",
+        "select_filters": "Selecione filtros",
+        "add": {
+            "title": "Novo cardápio"
+        }
+    },
+    "product": {
+        "price": "Preço",
+        "currency": "Moeda",
+        "tax_in_percent": "Imposto em porcentagem",
+        "included_tax": "Imposto incluído",
+        "image": "Imagem",
+        "manage_images": "Gerenciar imagens",
+        "archive": "Arquivo",
+        "archive_tooltip": "Não aparece mais na lista de produtos",
+        "add_images": "Adicionar imagens",
+        "update": {
+            "choose_images": "Escolha imagens"
+        }
+    },
+    "role": {
+        "add": {
+            "title": "Novo papel"
+        },
+        "list": {
+            "title": "Funções"
+        },
+        "duplicate": {
+            "title": "Perfil duplicado",
+            "from": "Duplicar de",
+            "for": "Duplicar para"
+        }
+    },
+    "sms_template": {
+        "add": {
+            "title": "Novo modelo de SMS"
+        }
+    },
+    "stat": {
+        "country": {
+            "title": "Associar {país} a ..."
+        },
+        "metric": {
+            "title": "Siga um filtro diariamente",
+            "label": "Filtro",
+            "menu": "Cardápio"
+        },
+        "blocs": {
+            "prospect": {
+                "title": "Cliente em potencial"
+            },
+            "sms": {
+                "title": "SMS",
+                "phone": "Telefone"
+            },
+            "event": {
+                "title": "Evento"
+            },
+            "interaction": {
+                "title": "Chamar",
+                "phone": "Telefone"
+            },
+            "order": {
+                "title": "Ordem"
+            },
+            "file": {
+                "title": "Arquivo"
+            },
+            "message": {
+                "title": "Mensagem"
+            },
+            "total": {
+                "prospect": "Contagem de clientes potenciais",
+                "sms": "Contagem de SMS",
+                "event": "Contagem de eventos",
+                "interaction": "Contagem de chamadas",
+                "order": "Contagem de pedidos",
+                "file": "Contagem de arquivos",
+                "message": "Contagem de mensagens"
+            },
+            "new": {
+                "prospect": "Novos clientes potenciais",
+                "sms": "Novo SMS",
+                "event": "Novos eventos",
+                "interaction": "Novas chamadas",
+                "order": "Novas ordens",
+                "file": "Novos arquivos",
+                "message": "Novas mensagens"
+            },
+            "follow_filter_daily": {
+                "title": "Siga um filtro diariamente",
+                "distribution": "Distribuição de filtros"
+            }
+        },
+        "user-connection-stat": {
+            "title": "Usuários conectados por mês"
+        }
+    },
+    "thread": {
+        "add": {
+            "title": "Novo tópico",
+            "send_email_to": "Enviar um email a ...",
+            "send_email_to_prospect": "Envie e-mail para o cliente em potencial",
+            "associate_to_the_user": "Associar a {usuário}"
+        }
+    },
+    "questionnaire": {
+        "questionnaire": {
+            "add": {
+                "title": "Nova forma"
+            },
+            "list": {
+                "title": "Formulários"
+            }
+        },
+        "question": {
+            "add": {
+                "title": "Nova pergunta"
+            },
+            "types": {
+                "radio": "Rádio",
+                "checkbox": "Caixa de seleção",
+                "text": "Texto",
+                "textarea": "Texto multilinha",
+                "date": "Data",
+                "image": "Imagem",
+                "file": "Arquivo"
+            }
+        },
+        "section": {
+            "add": {
+                "title": "Nova seção"
+            }
+        },
+        "option": {
+            "add": {
+                "title": "Opção nova",
+                "choose_section": "Escolha uma seção"
+            }
+        }
+    },
+    "permission": {
+        "all": "Todas as permissões"
+    },
+    "category": {
+        "add": {
+            "title": "Nova categoria de rótulo",
+            "unique": "Escolha única"
+        },
+        "list": {
+            "title": "Categorias de rótulos"
+        },
+        "update": {
+            "unique": "Escolha única"
+        }
+    },
+    "folder": {
+        "add": {
+            "title": "Nova pasta"
+        }
+    },
+    "group": {
+        "add": {
+            "title": "Novo grupo"
+        }
+    },
+    "locale": {
+        "setting": {
+            "title": "Localidade"
+        }
+    },
+    "message_template": {
+        "add": {
+            "title": "Novo modelo de mensagem"
+        }
+    },
+    "event_description_template": {
+        "add": {
+            "title": "Novo modelo de descrição de evento"
+        }
+    },
+    "order": {
+        "action": {
+            "add": {
+                "title": "Novo tipo de ação sob encomenda"
+            }
+        },
+        "status": {
+            "add": {
+                "title": "Status do novo pedido"
+            }
+        },
+        "step": {
+            "add": {
+                "title": "Nova etapa do pedido"
+            }
+        },
+        "product": {
+            "add": {
+                "title": "Novo produto"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "Desselecionar pedidos",
+                "init_filters": "Filtros de inicialização",
+                "toggle_order_menus": "Alternar menus de pedidos",
+                "add_order": "Nova ordem",
+                "setting": "Configuração de colunas",
+                "previous": "Anterior",
+                "next": "Próximo",
+                "bulk_delete": "Excluir definitivamente",
+                "page_orders_count": "Contagem de pedidos por página",
+                "orders_count": "Contagem de pedidos",
+                "current_page": "Pagina atual"
+            },
+            "column": {
+                "manage": "Gerencie as colunas da tabela de pedidos do {project}",
+                "delete_confirm": "Tem certeza de que deseja remover esta coluna?",
+                "others": {
+                    "total_commissions": "Total de comissões",
+                    "prospect": "Cliente em potencial",
+                    "products": "Produtos",
+                    "status": "Status",
+                    "steps": "Passos",
+                    "commissions": "Comissões"
+                }
+            },
+            "setting": {
+                "decimal": "Dígitos após a contagem da vírgula decimal:"
+            },
+            "filters": {
+                "all": {
+                    "title": "Filtros"
+                },
+                "actions": {
+                    "title": "Filtrar por ações",
+                    "with": "Com ações...",
+                    "without": "Sem ação",
+                    "without_user": "Sem ação {ação}"
+                },
+                "products": {
+                    "title": "Filtrar por produtos",
+                    "with": "Com produtos...",
+                    "without": "Sem produto",
+                    "without_user": "Sem produto {produto}"
+                },
+                "statuses": {
+                    "title": "Filtrar por status",
+                    "with": "Com estatuto...",
+                    "without": "Sem status",
+                    "without_user": "Sem status {status}"
+                },
+                "steps": {
+                    "title": "Filtrar por etapas",
+                    "with": "Com passos ...",
+                    "without": "Sem passo",
+                    "without_user": "Sem passo {passo}"
+                }
+            }
+        }
+    },
+    "project": {
+        "add": {
+            "title": "Novo projeto"
+        },
+        "profile": {
+            "blocs": {
+                "calendars": "Calendários",
+                "categories": "Categorias de rótulos",
+                "contacts": "Contatos",
+                "documents": "Documentos",
+                "fields": "Campos",
+                "folders": "Pastas",
+                "groups": "Grupos",
+                "imports": "Importações",
+                "menus": "Cardápios",
+                "order_actions": "Ordenar ações",
+                "order_statuses": "Status do pedido",
+                "order_steps": "Etapas do pedido",
+                "others": "Outros",
+                "products": "Produtos",
+                "profile": "Perfil",
+                "roles": "Funções",
+                "threads": "Tópicos",
+                "users": "Usuários"
+            },
+            "logo": {
+                "change": "Atualize o logotipo do seu projeto aqui."
+            },
+            "menus": {
+                "thread": "Tópicos",
+                "folder": "Pastas",
+                "category": "Categorias",
+                "field": "Campos",
+                "group": "Grupos",
+                "role": "Funções",
+                "product": "Produtos"
+            }
+        },
+        "table": {
+            "footer": {
+                "toggle_project_menus": "Alternar menus do projeto",
+                "add_project": "Novo projeto",
+                "deselect": "Desselecionar clientes potenciais",
+                "bulk_delete": "Excluir projetos selecionados"
+            }
+        }
+    },
+    "global_search": {
+        "actions": {
+            "prospect": {
+                "create_event": {
+                    "name": "Criar Evento",
+                    "keywords": "criar novo compromisso de evento Google Agenda",
+                    "description": "Crie um evento físico, Google Meet, ..."
+                },
+                "create_order": {
+                    "name": "Criar pedido",
+                    "keywords": "criar novo produto pedido",
+                    "description": "Crie um pedido para um determinado cliente potencial, gerencie as ações dos usuários no pedido, gerencie a comissão do usuário, ..."
+                },
+                "create_sms": {
+                    "name": "SMS",
+                    "keywords": "criar nova mensagem sms smsbox ringover ultramsg mtarget",
+                    "description": "Ligue para o cliente potencial através do seu telefone ou SMSBOX ou Ringover, ..."
+                },
+                "create_interaction": {
+                    "name": "Chamar",
+                    "keywords": "ligar telefone interação telefônica toque chamada aérea",
+                    "description": "Ligue para o cliente potencial por meio de seu telefone ou Aircall ou Ringover, ..."
+                },
+                "create_file": {
+                    "name": "arquivos",
+                    "keywords": "pasta arquivo google drive",
+                    "description": "Associar um arquivo a um cliente potencial"
+                },
+                "create_message": {
+                    "name": "Mensagens",
+                    "keywords": "E-mail de mensagem de tópico",
+                    "description": "Envie mensagem interna ou externa (e-mail) para um cliente potencial"
+                }
+            },
+            "project": {
+                "create_calendar": {
+                    "name": "Novo calendário",
+                    "keywords": "Novo evento de calendário"
+                },
+                "create_category": {
+                    "name": "Nova categoria de rótulos",
+                    "keywords": "Nova categoria de rótulos"
+                },
+                "create_document": {
+                    "name": "Novo Documento",
+                    "keywords": "Novo modelo de documento pdf"
+                },
+                "create_folder": {
+                    "name": "Nova pasta",
+                    "keywords": "Novo arquivo de pasta"
+                },
+                "create_group": {
+                    "name": "Novo grupo",
+                    "keywords": "Novos usuários do grupo"
+                },
+                "create_menu": {
+                    "name": "Novo cardápio",
+                    "keywords": "Novo cardápio"
+                },
+                "create_order_action": {
+                    "name": "Ação de novo pedido",
+                    "keywords": "Ação de novo pedido"
+                },
+                "create_order_step": {
+                    "name": "Nova etapa do pedido",
+                    "keywords": "Nova etapa do pedido"
+                },
+                "create_role": {
+                    "name": "Novo papel",
+                    "keywords": "Novas permissões de usuários de função"
+                },
+                "create_thread": {
+                    "name": "Novo tópico de mensagens",
+                    "keywords": "Novo tópico de mensagens"
+                },
+                "add_user": {
+                    "name": "Adicionar usuário",
+                    "keywords": "Adicionar usuário"
+                },
+                "create_import": {
+                    "name": "Importar",
+                    "keywords": "Importar arquivo de clientes potenciais xls xlsx",
+                    "description": "Importe clientes potenciais do arquivo XLSX.<br>Ou de um webservice externo como o Zapier."
+                },
+                "create_field": {
+                    "name": "Gerenciar campos em seu projeto",
+                    "keywords": "Adicionar campo"
+                }
+            },
+            "api": {
+                "smsbox": {
+                    "name": "Configuração da API SMSBOX",
+                    "keywords": "Configuração da API SMSBOX"
+                },
+                "email": {
+                    "name": "Configuração de e-mail",
+                    "keywords": "Configuração de e-mail"
+                },
+                "ultramsg": {
+                    "name": "Configuração da API Ultramsg",
+                    "keywords": "Configuração da API Ultramsg"
+                },
+                "mtarget": {
+                    "name": "Configuração da API MTarget",
+                    "keywords": "Configuração da API MTarget"
+                }
+            }
+        }
+    },
+    "duplicate": {
+        "title": "Verifique duplicatas",
+        "fields": "Pesquise por campos...",
+        "choose_action": "Escolha uma ação para fazer",
+        "remove_duplicating": "Exclua leads duplicados antigos",
+        "remove_duplicates": "Remover duplicações de leads na importação",
+        "replace_duplicating": "Substitua os dados modificados de clientes potenciais antigos pelos de novos"
+    },
+    "vehicle": {
+        "add": {
+            "title": "Veículo novo"
+        },
+        "affected_user": "Usuário afetado {usuário}"
+    },
+    "tutorial": {
+        "tutorial": {
+            "name": "Tutorial",
+            "body": "Exclua os tutoriais para que eles apareçam novamente."
+        },
+        "project_campaign_actions": {
+            "name": "Campanha - Ações",
+            "body": {
+                "0": "Defina a ação que sua campanha irá realizar.",
+                "1": "Você pode arrastar e soltar e associar diversas ações a uma campanha."
+            }
+        },
+        "project_campaign_campaign_new": {
+            "name": "Campanha - nova",
+            "body": {
+                "0": "Arraste e solte uma nova campanha na área."
+            }
+        },
+        "project_campaign_operators": {
+            "name": "Campanha - Operadores",
+            "body": {
+                "0": "Combine regras para sua campanha."
+            }
+        },
+        "project_campaign_rules": {
+            "name": "Campanha - Regra do cliente potencial",
+            "body": {
+                "0": "Defina regras para filtrar leads que serão afetados pela sua campanha."
+            }
+        },
+        "project_category_to_field": {
+            "name": "Filtro - Transformar em Campo",
+            "body": {
+                "0": "Transforme uma categoria de filtro em um campo clássico.",
+                "1": "Todos os filtros associados a um prospect pertencente a esta categoria serão convertidos em informações em um campo clássico de mesmo nome."
+            }
+        },
+        "dashboard_project": {
+            "name": "Lista de projetos",
+            "body": "Gerencie seus leads em vários projetos"
+        },
+        "dashboard_project_new": {
+            "name": "Novos projetos",
+            "body": "Crie vários projetos onde você pode gerenciar seus leads"
+        },
+        "project_document_template_tab_file": {
+            "name": "Documento - Arquivos",
+            "body": "Adicione arquivos PDF ao modelo que serão usados ​​como plano de fundo para páginas geradas em documentos prospectivos."
+        },
+        "project_document_template_tab_font": {
+            "name": "Documento - Fontes",
+            "body": "Você pode integrar outras fontes de texto para formatar os textos nos campos adicionados aos documentos."
+        },
+        "project_document_template_tab_page": {
+            "name": "Documento - Páginas",
+            "body": "Adicione novas páginas (em branco ou de PDF) ao seu modelo."
+        },
+        "project_document_template_tab_prospect": {
+            "name": "Documento - Modelos - Cliente potencial",
+            "body": {
+                "0": "Coloque e formate campos de lead em seu modelo.",
+                "1": "Esses campos serão substituídos pelas informações reais do prospect no momento da geração do seu documento."
+            }
+        },
+        "project_document_template_tab_project": {
+            "name": "Documento - Modelo - Projeto",
+            "body": "Coloque y e também formate os campos do projeto que serão substituídos pelas informações do seu projeto."
+        },
+        "project_document_template_tab_map": {
+            "name": "Documento - Modelo - MAPA",
+            "body": "Os campos MAP permitem adicionar uma imagem MAP que representará a localização do cliente potencial anexada ao documento gerado."
+        },
+        "project_document_template_tab_date": {
+            "name": "Documento - Modelo - Datas",
+            "body": "Adicione campos de data que serão substituídos pela data de hoje em que o documento será gerado."
+        },
+        "project_document_template_tab_order": {
+            "name": "Documento - Modelo - Cotação",
+            "body": {
+                "0": "Encontre aqui os campos vinculados à cotação (tabela de cotações, etc.)."
+            }
+        },
+        "project_document_template_tab_label": {
+            "name": "Documento - Modelo - Filtros",
+            "body": {
+                "0": "Você também pode adicionar:",
+                "1": "ou filtrar categorias no documento, os filtros vinculados ao prospecto do documento pertencente à categoria serão listados no lugar do campo no momento da geração do documento.",
+                "2": "ou filtros que serão substituídos por um ícone para verificar se o filtro está vinculado ao cliente potencial."
+            }
+        },
+        "project_field_to_category": {
+            "name": "Filtro - Transformar em Campo",
+            "body": {
+                "0": "Campo - Transformar em filtro",
+                "1": "Transforme um campo em uma categoria de filtro."
+            }
+        },
+        "project_header_menu_prospects": {
+            "name": "Menu - Perspectivas",
+            "body": {
+                "0": "Acesse a tabela de prospects para gerenciar informações e filtros relacionados aos prospects.<br>Ou para gerenciar SMS, mensagens, chamadas, orçamentos, etc."
+            }
+        },
+        "project_header_menu_events": {
+            "name": "Menu - Calendário",
+            "body": {
+                "0": "Gerencie seus calendários e compromissos com seus clientes potenciais."
+            }
+        },
+        "project_header_menu_map": {
+            "name": "Cardápio - MAPA",
+            "body": {
+                "0": "Localize seus clientes potenciais em seu mapa."
+            }
+        },
+        "project_header_menu_orders": {
+            "name": "Cardápio - Cotação",
+            "body": {
+                "0": "Veja a lista de citações"
+            }
+        },
+        "project_header_menu_stat": {
+            "name": "Menu - Estatística",
+            "body": {
+                "0": "Visualize várias estatísticas em seu projeto."
+            }
+        },
+        "project_header_menu_document": {
+            "name": "Menu - Documento",
+            "body": {
+                "0": "Edite um modelo de documento PDF.<br>Os modelos podem ser reutilizados para gerar documentos PDF para clientes potenciais."
+            }
+        },
+        "project_header_menu_campaign": {
+            "name": "Menu - Campo",
+            "body": {
+                "0": "Execute ações automáticas em seus clientes potenciais com base nos filtros que você aplica a eles:",
+                "1": "Mande emails",
+                "2": "Atribuir filtros",
+                "3": "Criar cotações"
+            }
+        },
+        "project_header_search": {
+            "name": "Pesquisar",
+            "body": {
+                "0": "Pesquise clientes potenciais, usuários, filtros, ...",
+                "1": "Você também pode pesquisar recursos como: \"Importar leads\", \"Configurações de envio de e-mail\", ..."
+            }
+        },
+        "project_map_header_filter": {
+            "name": "MAPA - Filtro",
+            "body": {
+                "0": "Refine suas pesquisas com os vários filtros aqui."
+            }
+        },
+        "project_map_header_color": {
+            "name": "MAPA - Marcadores de cores",
+            "body": {
+                "0": "Você pode usar uma categoria de filtro para colorir marcadores no MAPA."
+            }
+        },
+        "project_map_header_user_position": {
+            "name": "MAPA - Localização do usuário",
+            "body": {
+                "0": "Localize aqui a localização dos veículos dos seus usuários."
+            }
+        },
+        "project_map_header_export": {
+            "name": "MAPA - Exportar",
+            "body": {
+                "0": "Exporte os clientes potenciais selecionados em sua tabela para um arquivo XLSX."
+            }
+        },
+        "project_map_header_prospect_without_lat_lng": {
+            "name": "MAP - Perspectivas sem lat/lng",
+            "body": {
+                "0": "Caso alguns de seus prospects não estejam no MAP, esta ferramenta permitirá que você pesquise novamente seus endereços."
+            }
+        },
+        "project_map": {
+            "name": "MAPA",
+            "body": {
+                "0": "Você pode segurar CTRL<br>e <>toque e arraste",
+                "1": "e pressione e arraste com o mouse para desenhar um círculo de pesquisa no MAPA.",
+                "2": "Você também pode segurar SHIFT",
+                "3": "e clique em vários locais para desenhar um polígono de pesquisa."
+            }
+        }
+    },
+    "stat-chart": {
+        "add": {
+            "title": "Adicione estatísticas ao painel",
+            "blocs": {
+                "total-prospects-per-label": {
+                    "title": "Clientes potenciais por filtro",
+                    "description": "Escolha vários filtros ou seleção de filtros ou menu e veja a distribuição atual dos clientes potenciais nesses filtros em seu projeto."
+                },
+                "total-leads-per-country": {
+                    "title": "Perspectivas por país",
+                    "description": "Mostre a quantidade total de seus leads com base nos países em que estão localizados"
+                },
+                "new-prospects-per-label-per-day": {
+                    "title": "Novos clientes potenciais",
+                    "description": "Acompanhe o número de novos clientes potenciais que correspondem a uma seleção de filtros a partir desta data"
+                },
+                "total-prospects-per-label-per-day": {
+                    "title": "Perspectivas totais",
+                    "description": "Acompanhe a evolução do número total de prospects que correspondem a uma seleção de filtros a partir desta data"
+                },
+                "new-orders-price-per-day": {
+                    "title": "Total de novas cotações por dia",
+                    "description": "Mostre o valor total de suas novas cotações por dia"
+                },
+                "total-orders-price-per-day": {
+                    "title": "Cotação total por dia",
+                    "description": "Mostre a quantidade total de suas cotações por dia"
+                },
+                "new-commissions-per-user-per-day": {
+                    "title": "Total de novas comissões por usuário por dia",
+                    "description": "Mostre o valor total de seus novos valores de comissão por usuário por dia"
+                },
+                "total-commissions-per-user-per-day": {
+                    "title": "Comissões totais por usuário por dia",
+                    "description": "Mostre o valor total de suas comissões por usuário por dia"
+                },
+                "events-list": {
+                    "title": "Lista dos compromissos de hoje",
+                    "description": "Lista dos compromissos de hoje"
+                },
+                "events-direction": {
+                    "title": "Roteiro de hoje",
+                    "description": "Exibir a rota de hoje em um MAPA"
+                },
+                "new-sms-per-day": {
+                    "title": "Novo SMS",
+                    "description": "Acompanhe a evolução do número de novos SMS"
+                },
+                "total-sms-per-day": {
+                    "title": "SMS totais",
+                    "description": "Acompanhe a evolução do número total de SMS"
+                },
+                "new-event-per-day": {
+                    "title": "Novos compromissos",
+                    "description": "Acompanhe a evolução do número de novas nomeações"
+                },
+                "total-event-per-day": {
+                    "title": "Total de compromissos",
+                    "description": "Acompanhe a evolução do número total de agendamentos"
+                },
+                "new-message-per-day": {
+                    "title": "Novas mensagens",
+                    "description": "Acompanhe o número de novas mensagens"
+                },
+                "total-message-per-day": {
+                    "title": "Total de mensagens",
+                    "description": "Acompanhe a evolução do número total de mensagens"
+                },
+                "new-order-per-day": {
+                    "title": "Novas cotações",
+                    "description": "Acompanhe a evolução do número de novas cotações"
+                },
+                "total-order-per-day": {
+                    "title": "Cotação total",
+                    "description": "Acompanhe a evolução do número total de cotações"
+                }
+            },
+            "chart-types": {
+                "pie": "Mapa",
+                "hbar": "Barra horizontal",
+                "vbar": "Barra vertical",
+                "line": "Linha",
+                "calendar": "Calendário"
+            }
+        },
+        "dashboard": {
+            "between_dates": "Entre {início} e {fim}"
+        }
+    }
+}

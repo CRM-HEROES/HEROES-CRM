@@ -1,0 +1,10 @@
+export const FETCH_PROSPECT_FILES = "fetchProspectFiles";
+export const FETCH_PROSPECT_FOLDERS = "fetchProspectFolders";
+export const SET_PROSPECT_FILES = "setProspectFiles";
+export const SET_PROSPECT_FILE = "setFile";
+export const SET_PROSPECT_FOLDERS = "setProspectFolders";
+export const ADD_PROSPECT_FILE = "addProspectFile";
+export const REMOVE_PROSPECT_FILE = "removeProspectFile";
+export const SET_PROSPECT_FILE_FOLDER = "setProspectFileFolder";
+export const BULK_ADD_USER_FILE = "bulkAddUserFile";
+export const BULK_REMOVE_USER_FILE = "bulkRemoveUserFile";

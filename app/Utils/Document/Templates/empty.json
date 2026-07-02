@@ -1,0 +1,15 @@
+{
+    "name": "Vide",
+    "description": "Fichier A4",
+    "for": "order",
+    "thumbnail": "/images/document/templates/empty.jpg",
+    "pages": [
+        {
+            "id": 210,
+            "width": "209.90277777778mm",
+            "height": "297.03888888889mm",
+            "orientation": "P",
+            "fields": []
+        }
+    ]
+}

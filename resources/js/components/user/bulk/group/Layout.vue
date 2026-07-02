@@ -1,0 +1,171 @@
+<template>
+    <div class="hc-flex-column" style="height: 100%">
+        <search v-model="groupKeyword" />
+        <item-list class="hc-flex-1" padding="5px">
+            <item tag="label">
+                <icon class="fa fa-check-square" />
+                <div class="hc-item-main-content" v-text="$t('all')"></div>
+                <checkbox v-model="all" />
+            </item>
+            <group-row
+                v-for="group in filteredGroups"
+                :key="group.id"
+                :group="group"
+            />
+        </item-list>
+        <buttons>
+            <button @click.prevent="attach" :disabled="disabled">
+                Assigner
+            </button>
+            <button
+                @click.prevent="detach"
+                :disabled="disabled"
+                class="hc-button-danger"
+            >
+                Retirer
+            </button>
+            <a
+                v-if="can('all.project.group.add')"
+                @click.prevent="addGroup"
+                v-text="$t('add')"
+            ></a>
+        </buttons>
+        <loading :loading="bulking" />
+    </div>
+</template>
+
+<script>
+import { mapGetters } from "vuex";
+import store from "@/store";
+
+// Actions
+import {
+    BULK_ADD_USER_GROUP,
+    BULK_REMOVE_USER_GROUP,
+} from "@/actions/project/user/group";
+import {
+    FETCH_USERS,
+    UPDATE_SELECTED_USERS,
+    UPDATE_USER_BULK_GROUPS,
+} from "@/actions/project/user";
+import { OPEN_MODAL } from "@/actions/modal";
+import { CLOSE_SLIDE } from "@/actions/slide";
+
+// Components
+import GroupRow from "./GroupRow.vue";
+
+export default {
+    components: {
+        GroupRow,
+    },
+
+    data() {
+        return {
+            bulking: false,
+            groupKeyword: "",
+        };
+    },
+
+    methods: {
+        /**
+         *
+         */
+        addGroup() {
+            store.commit(OPEN_MODAL, "group-add");
+        },
+
+        /**
+         *
+         */
+        async attach() {
+            this.bulking = true;
+            const usersSelected = this.usersSelected;
+            store.commit(UPDATE_SELECTED_USERS, []);
+
+            try {
+                await store.dispatch(BULK_ADD_USER_GROUP, {
+                    users: usersSelected,
+                    groups: this.userBulkGroups,
+                });
+                store.dispatch(FETCH_USERS);
+            } finally {
+                this.bulking = false;
+                store.commit(UPDATE_USER_BULK_GROUPS, []);
+                store.commit(CLOSE_SLIDE, "user-bulk-manage-groups");
+            }
+        },
+
+        /**
+         *
+         */
+        async detach() {
+            this.bulking = true;
+            const usersSelected = this.usersSelected;
+            store.commit(UPDATE_SELECTED_USERS, []);
+
+            try {
+                await store.dispatch(BULK_REMOVE_USER_GROUP, {
+                    users: usersSelected,
+                    groups: this.userBulkGroups,
+                });
+                store.dispatch(FETCH_USERS);
+            } finally {
+                this.bulking = false;
+                store.commit(UPDATE_USER_BULK_GROUPS, []);
+                store.commit(CLOSE_SLIDE, "user-bulk-manage-groups");
+            }
+        },
+    },
+
+    computed: {
+        ...mapGetters(["groups", "usersSelected", "userBulkGroups", "can"]),
+
+        /**
+         *
+         */
+        disabled() {
+            return this.userBulkGroups.length == 0;
+        },
+
+        /**
+         *
+         */
+        filteredGroups() {
+            const keyword = removeStringAccent(this.groupKeyword);
+
+            return this.groups.filter(
+                (group) => removeStringAccent(group.name).indexOf(keyword) >= 0
+            );
+        },
+
+        /**
+         *
+         */
+        all: {
+            get: function () {
+                for (let i in this.filteredGroups) {
+                    if (
+                        !this.userBulkGroups.find(
+                            (group) => group == this.filteredGroups[i].id
+                        )
+                    ) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+            set: async function (value) {
+                if (value) {
+                    store.commit(
+                        UPDATE_USER_BULK_GROUPS,
+                        this.filteredGroups.map((group) => group.id)
+                    );
+                } else {
+                    store.commit(UPDATE_USER_BULK_GROUPS, []);
+                }
+            },
+        },
+    },
+};
+</script>

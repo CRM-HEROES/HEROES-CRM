@@ -1,0 +1,188 @@
+{
+    "name": "Facture",
+    "description": "Facture de commande",
+    "pages": [
+        {
+            "width": "209.90277777778mm",
+            "height": "297.03888888889mm",
+            "orientation": "P",
+
+            "fields": [
+                {
+                    "type": "order-table",
+                    "content": "{\"columns\":[{\"header\":{\"content\":\"N\u00b0\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.index}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\",\"text-align\":\"right\"}}},{\"header\":{\"content\":\"Nom du produit\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"<b>{product.name}</b><br />{product.description}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Prix\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.price_value}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Taxe\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.tax_percent} %\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Qt\u00e9\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.quantity}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Taxe total\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.total_tax_value} {product.pivot.currency}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Sous total HT\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.total_price_excluding_tax} {product.pivot.currency}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}},{\"header\":{\"content\":\"Sous total TTC\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#0096ff\",\"font-weight\":\"normal\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#ffffff\",\"border-color\":\"#0096ff\"}},\"body\":{\"content\":\"{product.pivot.total_price_including_tax} {product.pivot.currency}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"border-color\":\"#0096ff\"}}}],\"summaries\":[{\"header\":{\"content\":\"Total HT\",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"text-align\":\"right\"}},\"body\":{\"content\":\"{order.total_excluding_tax} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"left\"}}},{\"header\":{\"content\":\"TVA\",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"text-align\":\"right\"}},\"body\":{\"content\":\"{order.tax_value} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"left\"}}},{\"header\":{\"content\":\"Total TTC\",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"color\":\"#0096ff\"}},\"body\":{\"content\":\"{order.total_including_tax} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"left\",\"color\":\"#000000\"}}}]}",
+                    "style": {
+                        "top": "367px",
+                        "left": "100px",
+                        "width": "600px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.logo}",
+                    "style": {
+                        "top": "43px",
+                        "left": "103.171875px",
+                        "width": "150px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Vendeur",
+                    "style": {
+                        "top": "190px",
+                        "left": "100px",
+                        "color": "#0096ff",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Facture N\u00b0 {invoice.id}",
+                    "style": {
+                        "top": "44px",
+                        "left": "478.171875px",
+                        "color": "#0096ff",
+                        "width": "224px",
+                        "font-size": "15px",
+                        "text-align": "right",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Date de cr\u00e9ation: {invoice.date}",
+                    "style": {
+                        "top": "78px",
+                        "left": "525.171875px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Acheteur",
+                    "style": {
+                        "top": "190px",
+                        "left": "450px",
+                        "color": "#0096ff",
+                        "height": "15px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.last_name} {prospect.first_name}",
+                    "style": {
+                        "top": "215px",
+                        "left": "450px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.name}",
+                    "style": {
+                        "top": "215px",
+                        "left": "100px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.street} {prospect.street_bis}",
+                    "style": {
+                        "top": "240px",
+                        "left": "450px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.email}",
+                    "style": {
+                        "top": "290px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.postal_code} {prospect.city} {prospect.country}",
+                    "style": {
+                        "top": "265px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.phone_number}, {prospect.mobile_phone_number}",
+                    "style": {
+                        "top": "315px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.street}",
+                    "style": {
+                        "top": "240px",
+                        "left": "100px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.postal_code} {project.city} {project.country}",
+                    "style": {
+                        "top": "267px",
+                        "left": "100px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.email}",
+                    "style": {
+                        "top": "290px",
+                        "left": "100px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.mobile_phone_number}, {project.phone_number}",
+                    "style": {
+                        "top": "315px",
+                        "left": "100px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "A payer: {order.total_including_tax} {order.currency}",
+                    "style": {
+                        "top": "762px",
+                        "left": "100.171875px",
+                        "color": "#0096ff",
+                        "font-size": "18px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Date et signature du client pr\u00e9c\u00e9d\u00e9 de la mention 'Bon pour accord'",
+                    "style": {
+                        "top": "947px",
+                        "left": "407.171875px",
+                        "color": "#0096ff",
+                        "width": "295px",
+                        "text-align": "center"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Bon pour accord: {invoice.date}",
+                    "style": {
+                        "top": "983px",
+                        "left": "463.171875px"
+                    }
+                }
+            ]
+        }
+    ]
+}

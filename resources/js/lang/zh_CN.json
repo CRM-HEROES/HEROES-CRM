@@ -1,0 +1,1815 @@
+{
+    "app_name": "英雄CRM",
+    "add": "添加",
+    "new": "新的",
+    "delete": "删除",
+    "restore": "恢复",
+    "delete_confirm": "你确定要删除这个吗？",
+    "update": "更新",
+    "edit": "编辑",
+    "to_field": "转换为字段",
+    "to_field_confirm": "您确定要将此过滤器转换为字段吗？",
+    "to_category": "转换为过滤器",
+    "to_category_confirm": "您确定要将此字段变成过滤器吗？",
+    "cancel": "取消",
+    "ok": "好的",
+    "search": "搜索",
+    "all": "全部",
+    "close": "关闭",
+    "back": "后退",
+    "previous": "以前的",
+    "next": "下一个",
+    "enabled": "启用",
+    "disabled": "残疾人",
+    "none": "没有任何",
+    "show_more": "展示更多",
+    "show_less": "显示较少",
+    "required": "必需的",
+    "name": "姓名",
+    "first_name": "名",
+    "last_name": "姓",
+    "password": "密码",
+    "street": "街道",
+    "street_bis": "2号街",
+    "postal_code": "邮政编码",
+    "phone": "电话号码",
+    "city": "城市",
+    "country": "国家",
+    "description": "描述",
+    "type": "类型",
+    "color": "文字颜色",
+    "bgcolor": "背景颜色",
+    "content": "内容",
+    "url": "网址",
+    "for": "为了",
+    "source": "来源",
+    "count": "数数",
+    "prospects": "前景",
+    "projects": "项目",
+    "orders": "命令",
+    "invoices": "发票",
+    "users": "用户",
+    "products": "产品",
+    "copyright": "Heroes CRM 自 2002 年起禁止复制 - 保留所有权利/禁止复制",
+    "request_error": "请求错误。",
+    "auth": {
+        "email": "电子邮件",
+        "password": "密码",
+        "confirm_password": "确认密码",
+        "init_password": {
+            "title": "初始化密码",
+            "success": "密码重置链接已成功发送至电子邮件地址<b>{电子邮件}</b>。",
+            "error": "目前，我们在发送密码重置链接时遇到错误。<br><br>检查输入的电子邮件是否正确。",
+            "send_verification_email": "发送验证邮件",
+            "sending_verification_email": "发送验证邮件"
+        },
+        "register": {
+            "title": "报名",
+            "subscribe": "报名",
+            "already_have_an_account": "已有帐户？"
+        },
+        "login": {
+            "title": "登入",
+            "authenticate": "登录英雄 CRM",
+            "authenticating": "登录 ...",
+            "forget_password": "我忘记了我的密码 ...",
+            "sign_up": "报名",
+            "google": "通过谷歌登录",
+            "error": "电子邮件或密码可能有误。"
+        },
+        "google_authenticator": {
+            "open": "打开谷歌身份验证器，<br>或者在这里下载应用程序：<br><a href=\"https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=fr&gl=US\">应用商店</a> 或者 <a href=\"https://apps.apple.com/fr/app/google-authenticator/id388497605\">应用商店</a>",
+            "scan_qrcode": "并扫描以下二维码：",
+            "copy_following_key_configuration": "或者复制以下关键配置",
+            "check_type": "只询问是否更改IP。",
+            "key_security": "关键安全性：",
+            "key_security_copied": "密钥安全复制成功",
+            "activate": "有效的谷歌身份验证器",
+            "activating": "激活谷歌身份验证器",
+            "login": "登录"
+        },
+        "impersonate": {
+            "back_to_my_account": "返回我的帐户"
+        },
+        "info_check": {
+            "1": "<b>GDPR / SSL 安全</b> 加强。",
+            "2": "<b>加密/选项</b> 受控。",
+            "3": "99.99% <b>服务器可用性</b> + <b>备份</b> 实时。",
+            "4": "自 2002 年以来，整个 Heroes CRM 团队一直为您服务。"
+        },
+        "partner": {
+            "title": "包括 200 多个合作伙伴和连接者",
+            "call_sms_email": "通话、短信、邮件",
+            "ads_systems": "广告系统",
+            "payment_systems": "支付系统",
+            "accounting_systems": "会计系统"
+        },
+        "session": {
+            "ban_device": "禁止装置",
+            "ban_code": "禁令代码",
+            "ban": "禁止",
+            "connections": "连接"
+        }
+    },
+    "header": {
+        "close": "关闭",
+        "home": "家",
+        "prospects": "前景",
+        "appointments": "预约",
+        "map": "地图",
+        "mail": "邮件",
+        "order": "命令",
+        "documents": "文件",
+        "campaigns": "活动",
+        "stat": "统计数据",
+        "settings": "设置"
+    },
+    "dashboard": {
+        "your_projects": "您的项目",
+        "new_project": "新项目",
+        "new_user": "新用户",
+        "stats": "统计数据"
+    },
+    "prospect": {
+        "table": {
+            "footer": {
+                "deselect": "取消选择潜在客户",
+                "init_filters": "初始化过滤器",
+                "toggle_menus": "切换菜单",
+                "toggle_prospect_menus": "切换潜在客户菜单",
+                "add_prospect": "新前景",
+                "import": "进口前景",
+                "setting": "栏目设置",
+                "previous": "以前的",
+                "next": "下一个",
+                "bulk_delete": "坚决删除",
+                "bulk_users": "附加或分离用户",
+                "bulk_groups": "附加或分离组",
+                "bulk_labels": "安装或拆卸过滤器",
+                "bulk_sms": "短信",
+                "bulk_messages": "信息",
+                "map": "地图",
+                "export": "出口前景",
+                "find_duplicates": "查找重复项",
+                "bulk_archive": "档案",
+                "bulk_do_not_archive": "重新治疗",
+                "search_and_replace": "搜索和替换",
+                "scan": "扫描名片",
+                "page_prospects_count": "每页的潜在客户数",
+                "prospects_count": "前景很重要",
+                "row_max_lines": "每行最大文本行数",
+                "current_page": "当前页面"
+            },
+            "column": {
+                "manage": "管理您的 {project} 前景表列",
+                "delete_confirm": "您确定要删除此列吗？",
+                "tab": {
+                    "fields": "领域",
+                    "tags": "标签",
+                    "discussions": "讨论",
+                    "forms": "形式",
+                    "others": "其他的"
+                },
+                "others": {
+                    "appointments": "预约",
+                    "calls": "通话",
+                    "sms": "短信",
+                    "affected_users": "受影响的用户",
+                    "affected_groups": "受影响群体",
+                    "orders": "命令",
+                    "import": "进口",
+                    "groups": "团体",
+                    "users": "用户"
+                }
+            },
+            "cell": {
+                "event": {
+                    "add": "添加事件"
+                },
+                "thread": {
+                    "enter_message": "输入留言...",
+                    "view_thread": "查看线程...",
+                    "send": "发送 ..."
+                }
+            },
+            "filters": {
+                "all": {
+                    "title": "过滤器"
+                },
+                "users": {
+                    "title": "按受影响的用户过滤",
+                    "with": "与用户...",
+                    "without": "没有用户",
+                    "without_user": "没有用户 {user}"
+                },
+                "groups": {
+                    "title": "按受影响群体过滤",
+                    "with": "与团体...",
+                    "without": "无团体",
+                    "without_group": "没有组 {group}"
+                },
+                "imports": {
+                    "title": "按受影响的导入过滤",
+                    "with": "与进口...",
+                    "without": "无进口",
+                    "without_import": "未从 {import} 导入"
+                },
+                "appointments": {
+                    "title": "按约会过滤",
+                    "with": "与约会...",
+                    "without": "无需预约",
+                    "calendars": "日历",
+                    "no_selected_calendar": "没有选择的日历...",
+                    "affected_to": "受影响于",
+                    "no_selected_affected_to": "没有选定的用户...",
+                    "created_by": "由...制作",
+                    "no_selected_created_by": "没有选定的用户...",
+                    "after": "后",
+                    "before": "前",
+                    "future": "未来",
+                    "old": "老的",
+                    "confirmed": "已确认的预约",
+                    "not_confirmed": "未确认预约",
+                    "done": "已完成预约",
+                    "not_done": "未完成预约",
+                    "select_calendars": "选择日历..."
+                },
+                "file": {
+                    "title": "按文件过滤",
+                    "with_files": "有文件",
+                    "without_file": "无文件",
+                    "without_folder": "没有来自{文件夹}的文件"
+                },
+                "interaction": {
+                    "title": "按通话过滤",
+                    "with_interactions": "有通话",
+                    "without_interaction": "无需通话"
+                },
+                "message": {
+                    "title": "按消息过滤",
+                    "with_messages": "有消息",
+                    "without_message": "没有留言",
+                    "without_thread": "没有来自 {thread} 的消息"
+                },
+                "order": {
+                    "title": "按顺序过滤",
+                    "with_orders": "随着订单...",
+                    "with_products": "随着产品...",
+                    "with_actions": "用行动...",
+                    "with_steps": "随着步骤...",
+                    "with_statuses": "与状态...",
+                    "with_documents": "有文件...",
+                    "created_by": "由...制作 ...",
+                    "select_actions": "选择操作...",
+                    "select_products": "选择产品...",
+                    "select_steps": "选择步骤...",
+                    "select_statuses": "选择状态...",
+                    "select_documents": "选择文档..."
+                },
+                "sms": {
+                    "title": "通过短信过滤...",
+                    "with_sms": "通过短信...",
+                    "sources": "来源...",
+                    "created_by": "由...制作 ...",
+                    "after": "后",
+                    "before": "前",
+                    "sent": "短信已发送...",
+                    "not_sent": "短信未发送...",
+                    "with_error": "有错误...",
+                    "without_error": "没有错误...",
+                    "select_sources": "选择来源...",
+                    "without_source": "没有通过{source}发送短信"
+                },
+                "label": {
+                    "title": "按标签过滤",
+                    "without_label": "没有过滤器{标签}"
+                }
+            },
+            "bulk": {
+                "group": {
+                    "title": "受影响群体"
+                },
+                "label": {
+                    "title": "受影响的过滤器"
+                },
+                "user": {
+                    "title": "受影响的用户"
+                },
+                "add": "分配",
+                "remove": "消除"
+            }
+        },
+        "profile": {
+            "setting": {
+                "title": "前景概况设置",
+                "column_i": "第 {i} 列",
+                "new_bloc": "新集团",
+                "fields": "领域",
+                "messages": "留言",
+                "files": "文件",
+                "filters": "过滤器",
+                "orders": "命令",
+                "labels": "有源滤波器",
+                "external_links": "外部链接",
+                "events": "活动",
+                "calls": "通话",
+                "sms": "短信",
+                "documents": "文件",
+                "affected_users": "受影响的用户",
+                "affected_groups": "受影响群体",
+                "map": "地图",
+                "edit_bloc": "编辑区块"
+            },
+            "bloc": {
+                "messages": "留言",
+                "files": "文件",
+                "filters": "过滤器",
+                "orders": "命令",
+                "labels": "有源滤波器",
+                "external_links": "外部链接",
+                "events": "活动",
+                "calls": "通话",
+                "sms": "短信",
+                "documents": "文件",
+                "affected_users": "受影响的用户",
+                "affected_groups": "受影响群体",
+                "map": "地图"
+            }
+        },
+        "document": {
+            "title": "文件（{前景}）"
+        },
+        "interaction": {
+            "title": "来电（{潜在客户}）",
+            "edit_phone_number": "编辑电话号码",
+            "edit_mobile_phone_number": "编辑手机号码",
+            "add_history": "添加历史记录",
+            "call_by_phone": "通过电话拨打",
+            "call_by_aircall": "通过空中电话拨打",
+            "call_by_ringover": "通过振铃呼叫",
+            "history": "历史"
+        },
+        "message": {
+            "title": "消息（{潜在客户}）",
+            "email_setting": "邮箱设置",
+            "templates": "消息模板"
+        },
+        "order": {
+            "title": "订单（{潜在客户}）",
+            "commission": {
+                "total": "全部的",
+                "remain": "保持",
+                "paid": "有薪酬的",
+                "in_percent": "以百分比表示",
+                "tax_included": "含税",
+                "tax_excluded": "不含税。",
+                "mark_as_paid": "标记为已付款",
+                "mark_as_unpaid": "标记为未付款",
+                "select_user": "选择用户..."
+            },
+            "product": {
+                "add_product_to_order": "将 {product} 添加到订单中",
+                "add_to_order": "添加到订单",
+                "quantity": "数量",
+                "price": "价格",
+                "currency": "货币",
+                "tax_in_percent": "税费百分比",
+                "tax_included": "含税"
+            },
+            "tabs": {
+                "products": {
+                    "title": "产品"
+                },
+                "commissions": {
+                    "title": "佣金",
+                    "manage": "管理佣金",
+                    "not_defined": "未定义佣金"
+                },
+                "steps": {
+                    "title": "脚步"
+                },
+                "documents": {
+                    "title": "文件"
+                },
+                "fields": {
+                    "title": "其他信息",
+                    "add": "添加字段",
+                    "remove_confirm": "您确定要从项目中删除该字段吗？"
+                },
+                "status": {
+                    "title": "地位"
+                }
+            }
+        },
+        "sms": {
+            "title": "短信（{潜在客户}）",
+            "bulk_title": "短信（{count} 个潜在客户）",
+            "via_your_phone": "通过您的手机发送短信",
+            "via_whatsapp": "通过 Whatsapp 发送短信",
+            "via_smsbox": "通过 SMSBOX 发送短信",
+            "via_mtarget": "通过 MTarget 发送短信",
+            "via_ringover": "通过振铃发送短信",
+            "via_ultramsg": "通过 UltraMsg 发送短信",
+            "via_source": "通过{source}发送短信",
+            "templates": "短信模板",
+            "enter_text_message": "输入短信"
+        },
+        "file": {
+            "title": "文件（{前景}）"
+        },
+        "group": {
+            "title": "团体（{前景}）"
+        },
+        "label": {
+            "title": "标签（{前景}）"
+        },
+        "form": {
+            "title": "形式",
+            "your_response": "你的回应 ..."
+        },
+        "affected_user": {
+            "title": "受影响的用户 ({prospect})"
+        },
+        "external_link": {
+            "title": "外部链接 ({prospect})",
+            "add": {
+                "title": "新的外部链接 ({prospect})"
+            }
+        },
+        "log_history": {
+            "title": "日志历史记录 ({prospect})"
+        },
+        "revision_history": {
+            "title": "修订历史记录 ({prospect})"
+        },
+        "scan": {
+            "title": "扫描名片",
+            "choose_file": "选择文件",
+            "scan": "扫描",
+            "import": "进口",
+            "view_prospect": "查看前景",
+            "error": {
+                "camera_access": "访问相机时出错：{error}",
+                "camera_stop": "停止相机时出错：{error}",
+                "camera_disabled": "相机未激活。"
+            },
+            "success": {
+                "title": "名片扫描件",
+                "message": "您导入的文件很快就会被扫描<br>并且相应的潜在客户将被导入到您的项目中。"
+            }
+        }
+    },
+    "import": {
+        "add": {
+            "title": "进口前景",
+            "from": {
+                "label": "从",
+                "local_file": "本地文件",
+                "webservice": "通过 URL 外部"
+            },
+            "file": "文件",
+            "name": "姓名",
+            "field_delimiter": "字段分隔符",
+            "field_enclosure": "现场围栏",
+            "comma": "逗号",
+            "semicolon": "分号",
+            "tab": "（标签）",
+            "space": "（空间）"
+        },
+        "update": {
+            "name": "姓名"
+        },
+        "process": {
+            "title": "进口",
+            "tab": {
+                "mapping": {
+                    "title": "测绘",
+                    "cancel": "取消映射",
+                    "event": "事件",
+                    "order": "命令",
+                    "sms": "短信",
+                    "interaction": "称呼",
+                    "link": "外部链接",
+                    "user": "受影响的用户",
+                    "plus_field": "+ 领域",
+                    "plus_category": "+ 类别",
+                    "shortcut_new_field": "新领域",
+                    "shortcut_new_category": "新过滤器",
+                    "shortcut_new_thread": "新线程",
+                    "new_field": "新前景领域",
+                    "new_category": "新类别",
+                    "new_column": "新专栏",
+                    "auto_field": "[新领域]",
+                    "auto_category": "[新类别]",
+                    "auto_thread": "[新线程]"
+                },
+                "relations": {
+                    "title": "关系",
+                    "affected_users": "受影响的用户",
+                    "affected_groups": "受影响群体"
+                },
+                "import": {
+                    "title": "进口",
+                    "process": "流程导入",
+                    "re_process": "重新处理导入",
+                    "delete": {
+                        "import": "删除导入",
+                        "import_and_prospects": "删除导入和前景",
+                        "prospects": "仅删除潜在客户"
+                    },
+                    "download": "下载导入",
+                    "stop": "停止导入",
+                    "view_prospects": "查看导入的潜在客户",
+                    "prospects_table": {
+                        "title": "前景表",
+                        "body": "使用此导入中的列作为前景表中的列"
+                    },
+                    "duplicate": {
+                        "title": "检查重复项",
+                        "fields": "按字段搜索...",
+                        "choose_action": "选择要执行的操作",
+                        "remove_duplicating": "删除旧的重复潜在客户",
+                        "remove_duplicates": "删除导入中的重复线索",
+                        "replace_duplicating": "用新潜在客户的数据覆盖旧潜在客户的修改数据"
+                    },
+                    "processing": "导入完成后，我们会向您发送一封电子邮件。",
+                    "webservice": {
+                        "step_1": "要将您的 zap 与此导入相关联，<br />连接到 Zapier，并在那里创建您的 zap：<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">创建 Zap</a>",
+                        "step_2": "选择 <b>谷歌表格</b> 作为 <b>扳机</b>,<br />选择 <b>新电子表格行[即时]</b> 作为 <b>事件</b>,<br />点击 <b>继续</b>。",
+                        "step_3": "选择包含要导入的 Google 表格文件的 Google 帐户 <b>选择账户</b>,<br />点击 <b>继续</b>。",
+                        "step_4": "选择 Google Sheet 文件 <b>电子表格</b>,<br />选择其中的工作表 <b>工作表</b>,<br />点击 <b>继续</b>。",
+                        "step_5": "点击 <b>测试触发</b> 验证 Zapier 是否有权访问您的 Google 表格文件，<br />点击 <b>继续</b>。",
+                        "step_6": "选择 <b>Zapier 的 Webhooks</b> 作为 <b>行动</b>,<br /> 选择 <b>得到</b> 作为 <b>事件</b>,<br />点击 <b>继续</b>。",
+                        "step_7": "添加以下链接 <b>网址</b>:",
+                        "step_8": "您可以使用以下参数作为 <br /><b>查询字符串参数</b> 与 Google Sheet 文件中的列关联：",
+                        "webhook_url_copied": "已复制 Webhook URL",
+                        "query_string_copied": "查询字符串已复制"
+                    }
+                },
+                "duplicate": {
+                    "title": "更新"
+                }
+            }
+        }
+    },
+    "user": {
+        "add": {
+            "title": "新用户",
+            "email": "输入用户电子邮件",
+            "not_found": "在我们的数据库中找不到使用此电子邮件的用户。",
+            "create": "创建该用户",
+            "create_professional_project": "创建专业项目",
+            "create_personal_project": "创建个人项目",
+            "create_demo_project": "创建一个演示项目"
+        },
+        "profile": {
+            "affected_projects": "受影响的项目",
+            "blocs": {
+                "calendars": "受影响的日历",
+                "categories": "受影响的类别",
+                "documents": "受影响的文件",
+                "exports": "出口",
+                "folders": "受影响的文件夹",
+                "groups": "受影响群体",
+                "menus": "受影响的菜单",
+                "order_actions": "受影响的订单操作",
+                "order_statuses": "受影响的订单状态",
+                "order_steps": "受影响的订单步骤",
+                "projects": "受影响的项目",
+                "questionnaires": "受影响的表格",
+                "roles": "受影响的角色",
+                "threads": "受影响的线程",
+                "users": "受影响的用户"
+            },
+            "password_update": {
+                "confirm": "您确定要更改密码吗？",
+                "success": "密码修改成功！",
+                "error": "更改密码时出错！"
+            },
+            "menus": {
+                "duplicate": "其他用户的重复个人资料",
+                "history": "连接历史记录",
+                "actions": "用户所做的操作",
+                "permissions": "权限",
+                "vehicle": "汽车",
+                "prospect_profile_setting": "前景概况设置",
+                "prospects_table_setting": "前景表设置",
+                "user_profile_setting": "用户个人资料设置",
+                "use": "使用此帐户登录"
+            }
+        },
+        "list": {
+            "title": "用户"
+        },
+        "table": {
+            "footer": {
+                "deselect": "取消选择潜在客户",
+                "init_filters": "初始化过滤器",
+                "toggle_menus": "切换菜单",
+                "toggle_user_menus": "切换用户菜单",
+                "add_user": "新用户",
+                "import": "进口",
+                "add_column": "新专栏",
+                "previous": "以前的",
+                "next": "下一个",
+                "bulk_delete": "从项目中删除",
+                "bulk_calendars": "连接或分离日历",
+                "bulk_categories": "附加或分离类别",
+                "bulk_documents": "附加或分离文档",
+                "bulk_folders": "附加或分离文件夹",
+                "bulk_groups": "附加或分离组",
+                "bulk_menus": "附加或分离菜单",
+                "bulk_order_actions": "附加或分离订单操作",
+                "bulk_order_steps": "附加或分离订单步骤",
+                "bulk_roles": "附加或分离角色",
+                "bulk_threads": "连接或分离螺纹",
+                "bulk_users": "附加或分离用户"
+            },
+            "column": {
+                "manage": "管理您的 {project} 用户表列",
+                "new": "新专栏",
+                "tab": {
+                    "fields": "领域",
+                    "others": "其他的"
+                },
+                "others": {
+                    "calendars": "日历",
+                    "categories": "类别",
+                    "documents": "文件",
+                    "folders": "文件夹",
+                    "groups": "团体",
+                    "menus": "菜单",
+                    "order_actions": "订购行动",
+                    "order_statuses": "订单状态",
+                    "order_steps": "订购步骤",
+                    "projects": "项目",
+                    "questionnaires": "问卷调查",
+                    "roles": "角色",
+                    "threads": "线程数",
+                    "users": "用户"
+                }
+            },
+            "filters": {
+                "calendars": {
+                    "title": "按受影响的日历过滤",
+                    "with": "与日历...",
+                    "without": "没有日历",
+                    "without_calendar": "没有{日历}"
+                },
+                "categories": {
+                    "title": "按受影响类别过滤",
+                    "with": "与类别...",
+                    "without": "没有类别",
+                    "without_category": "没有{类别}"
+                },
+                "documents": {
+                    "title": "按受影响的文档过滤",
+                    "with": "有文件...",
+                    "without": "无证件",
+                    "without_document": "没有{文档}"
+                },
+                "folders": {
+                    "title": "按受影响的文件夹过滤",
+                    "with": "与文件夹...",
+                    "without": "不带文件夹",
+                    "without_folder": "没有{文件夹}"
+                },
+                "groups": {
+                    "title": "按受影响群体过滤",
+                    "with": "与团体...",
+                    "without": "无团体",
+                    "without_group": "没有{组}"
+                },
+                "menus": {
+                    "title": "按受影响的菜单过滤",
+                    "with": "有菜单...",
+                    "without": "无菜单",
+                    "without_menu": "没有{菜单}"
+                },
+                "order_actions": {
+                    "title": "按受影响的订单操作进行过滤",
+                    "with": "通过命令操作...",
+                    "without": "无命令动作",
+                    "without_order_action": "没有 {order_action}"
+                },
+                "order_steps": {
+                    "title": "按受影响的订单步骤进行过滤",
+                    "with": "通过订购步骤...",
+                    "without": "无订购步骤",
+                    "without_order_step": "没有 {order_step}"
+                },
+                "roles": {
+                    "title": "按受影响的角色过滤",
+                    "with": "与角色...",
+                    "without": "没有角色",
+                    "without_role": "没有{角色}"
+                },
+                "threads": {
+                    "title": "按受影响的线程过滤",
+                    "with": "用线程...",
+                    "without": "无螺纹",
+                    "without_thread": "没有{线程}"
+                },
+                "users": {
+                    "title": "按受影响的用户过滤",
+                    "with": "与用户...",
+                    "without": "没有用户",
+                    "without_user": "没有{用户}"
+                }
+            },
+            "bulk": {
+                "calendars": {
+                    "title": "受影响的日历"
+                },
+                "categories": {
+                    "title": "受影响的类别"
+                },
+                "documents": {
+                    "title": "受影响的文件"
+                },
+                "folders": {
+                    "title": "受影响的文件夹"
+                },
+                "groups": {
+                    "title": "受影响群体"
+                },
+                "menus": {
+                    "title": "受影响的菜单"
+                },
+                "order_actions": {
+                    "title": "受影响的订单操作"
+                },
+                "order_steps": {
+                    "title": "受影响的订单步骤"
+                },
+                "roles": {
+                    "title": "受影响的角色"
+                },
+                "threads": {
+                    "title": "受影响的线程"
+                },
+                "users": {
+                    "title": "受影响的用户"
+                }
+            }
+        },
+        "duplicate": {
+            "title": "个人资料重复",
+            "from": "复制自",
+            "for": "重复为"
+        },
+        "calendars": {
+            "title": "受影响的日历"
+        },
+        "categories": {
+            "title": "受影响的标签类别"
+        },
+        "documents": {
+            "title": "受影响的文件"
+        },
+        "folders": {
+            "title": "受影响的文件夹"
+        },
+        "groups": {
+            "title": "受影响群体"
+        },
+        "menus": {
+            "title": "受影响的菜单"
+        },
+        "order_actions": {
+            "title": "受影响的订单操作"
+        },
+        "order_steps": {
+            "title": "受影响的订单步骤"
+        },
+        "permissions": {
+            "title": "权限"
+        },
+        "questionnaires": {
+            "title": "受影响的表格"
+        },
+        "roles": {
+            "title": "受影响的角色"
+        },
+        "sessions": {
+            "title": "连接设备"
+        },
+        "threads": {
+            "title": "受影响的线程"
+        },
+        "users": {
+            "title": "受影响的用户"
+        },
+        "vehicles": {
+            "title": "汽车",
+            "add": {
+                "title": "车辆"
+            }
+        },
+        "log_chart": {
+            "title": "日志图表"
+        },
+        "actions": {
+            "title": "行动"
+        }
+    },
+    "map": {
+        "prospect": {
+            "default_infos": "默认信息",
+            "other_infos": "其他信息",
+            "labels": "标签",
+            "appointments": "预约",
+            "orders": "命令",
+            "search": "从此前景搜索"
+        },
+        "prospect_without_lat_lng": {
+            "title": "没有纬度/经度的前景"
+        },
+        "vehicles": {
+            "title": "汽车"
+        },
+        "color": {
+            "title": "彩色地图标记..."
+        }
+    },
+    "campaign": {
+        "mobile": "请使用计算机来使用此工具。",
+        "campaign": {
+            "title": "活动",
+            "new": "新活动",
+            "enabled": "启用",
+            "for": {
+                "prospect": "对于前景",
+                "order": "对于订单",
+                "appointment": "预约"
+            },
+            "frequency": {
+                "once": "一次",
+                "every_fifteen_minutes": "每15百万",
+                "every_thirty_minutes": "每3000万",
+                "hourly": "每小时",
+                "daily": "日常的",
+                "monthly": "每月"
+            },
+            "date": "日期",
+            "hour": "小时",
+            "re_process_processed_prospects": "重新处理已处理的前景",
+            "check_rules": "检查规则",
+            "view_matching_prospects": "查看匹配的潜在客户"
+        },
+        "operator": {
+            "title": "操作员",
+            "or": "或者",
+            "and": "和"
+        },
+        "rule": {
+            "prospect": {
+                "title": "前景",
+                "tag": "标签",
+                "menu": "菜单",
+                "sms": {
+                    "title": "短信",
+                    "source": "收到短信来源",
+                    "count": "收到短信数"
+                },
+                "interaction": {
+                    "title": "阿佩尔",
+                    "source": "接听电话来源",
+                    "count": "已接来电计数"
+                }
+            },
+            "order": {
+                "title": "命令",
+                "action": "用行动",
+                "product": "拥有产品",
+                "status": "有状态",
+                "step": "有步骤"
+            },
+            "appointment": {
+                "title": "预约",
+                "date": {
+                    "title": "日期",
+                    "starts_in_more_than_mn": "超过 { 分钟} 分钟后开始",
+                    "starts_in_less_than_mn": "不到 { 分钟} 分钟后开始",
+                    "started_less_than_ago_mn": "不到 { 分钟} 分钟前开始",
+                    "started_more_than_ago_mn": "超过 { 分钟} 分钟前开始"
+                }
+            }
+        },
+        "action": {
+            "prospect": {
+                "archive": "档案",
+                "do_not_archive": "不存档",
+                "remove": "删除潜在客户",
+                "message": {
+                    "title": "发送消息/邮件",
+                    "name": "在“{thread}”中发送消息：{content}",
+                    "thread": {
+                        "title": "消息线索...",
+                        "placeholder": "选择消息主题..."
+                    },
+                    "user": {
+                        "title": "等待...",
+                        "placeholder": "选择用户..."
+                    },
+                    "template": {
+                        "title": "选择消息模板"
+                    },
+                    "enter_message": "输入留言"
+                },
+                "sms": {
+                    "title": "发简讯",
+                    "name": "发简讯",
+                    "source": "来源",
+                    "sms": "短信"
+                },
+                "event": {
+                    "title": "创建活动",
+                    "name": "为 {user} 创建 {min_days} 到 {max_days} 天的 {duration} mn {calendar}",
+                    "duration": "期间",
+                    "calendar": {
+                        "title": "日历",
+                        "placeholder": "选择日历..."
+                    },
+                    "user": {
+                        "title": "用户",
+                        "placeholder": "选择用户...",
+                        "random": "随机用户",
+                        "prospect_creator": "谁创造了前景",
+                        "prospect_affected_user": "无论谁被分配给潜在客户",
+                        "role": "角色{角色}"
+                    },
+                    "date": {
+                        "title": "X天内",
+                        "min": "敏...",
+                        "max": "最大限度..."
+                    }
+                },
+                "attach_group": {
+                    "title": "分配一个组"
+                },
+                "attach_label": {
+                    "title": "分配标签"
+                },
+                "attach_user": {
+                    "title": "分配用户"
+                },
+                "detach_group": {
+                    "title": "分离一个组"
+                },
+                "detach_label": {
+                    "title": "分离标签"
+                },
+                "detach_user": {
+                    "title": "分离用户"
+                },
+                "document_to_folder": {
+                    "title": "生成 PDF 文档到潜在客户文件夹中",
+                    "name": "将文档“{document}”生成到“{folder}”中",
+                    "document": "要生成的文档...",
+                    "select_document": "选择一个文档...",
+                    "folder": "目标文件夹...",
+                    "select_folder": "选择文件夹..."
+                },
+                "document_to_thread": {
+                    "title": "将 PDF 文档发送到消息线程中",
+                    "name": "将文档“{document}”发送到“{thread}”消息线程",
+                    "document": "要生成的文档...",
+                    "select_document": "选择一个文档...",
+                    "thread": "目的地消息线程...",
+                    "select_thread": "选择消息主题..."
+                },
+                "order": {
+                    "title": "创建订单",
+                    "name": "创建订单（{name}）",
+                    "add": "创建订单"
+                }
+            },
+            "order": {
+                "generate_invoice": {
+                    "title": "生成订单发票",
+                    "name": "生成发票“{invoice}”"
+                },
+                "sign_invoice": {
+                    "title": "签署订单发票",
+                    "name": "签署发票“{invoice}”"
+                },
+                "user_action": {
+                    "title": "将订单上的操作关联到用户",
+                    "name": "将订单操作“{action}”关联到 {user}",
+                    "action": "行动 ...",
+                    "select_action": "选择一个动作...",
+                    "user": "用户...",
+                    "select_user": "选择一个用户...",
+                    "order_creator": "无论谁创建了订单",
+                    "prospect_creator": "谁创造了前景",
+                    "prospect_affected_user": "无论谁被分配给潜在客户",
+                    "role": "角色{角色}"
+                }
+            }
+        },
+        "matching_prospects": {
+            "title": "匹配的前景"
+        }
+    },
+    "document": {
+        "mobile": "请使用计算机来使用此工具。",
+        "dashboard": {
+            "new_from_template": "来自模板的新文档",
+            "your_documents": "您的文档模板"
+        },
+        "add": {
+            "title": "新文档模板"
+        },
+        "list": {
+            "title": "文件"
+        },
+        "pdf": {
+            "title": "PDF"
+        },
+        "font": {
+            "title": "字体",
+            "new": {
+                "title": "新字体",
+                "choose_file": "选择.ttf文件",
+                "type": {
+                    "title": "类型",
+                    "normal": "普通的",
+                    "bold": "大胆的"
+                },
+                "style": {
+                    "title": "风格",
+                    "normal": "普通的",
+                    "italic": "斜体"
+                }
+            }
+        },
+        "page": {
+            "title": "页",
+            "all": "所有页面",
+            "add": {
+                "title": "新一页",
+                "choose_file": "选择文件",
+                "page": "页",
+                "width": "宽度（毫米）",
+                "height": "高度（毫米）",
+                "empty": "空的"
+            }
+        },
+        "zoom": {
+            "title": "飞涨"
+        },
+        "style": {
+            "frame": {
+                "title": "框架",
+                "left": "左边",
+                "top": "顶部",
+                "width": "宽度",
+                "height": "高度",
+                "rotation": "回转",
+                "padding": {
+                    "title": "填充",
+                    "top": "时间",
+                    "right": "右",
+                    "bottom": "乙",
+                    "left": "L"
+                },
+                "background_color": "背景颜色"
+            },
+            "format": {
+                "title": "文本/格式",
+                "type": {
+                    "title": "类型",
+                    "text": "文本",
+                    "html": "超文本标记语言",
+                    "qrcode": "二维码"
+                },
+                "font_size": "字体大小",
+                "line_height": "线高",
+                "font": "字体",
+                "color": "文字颜色"
+            },
+            "border": {
+                "title": "边界",
+                "width": {
+                    "title": "宽度",
+                    "top": "时间",
+                    "right": "右",
+                    "bottom": "乙",
+                    "left": "L"
+                },
+                "style": {
+                    "title": "风格",
+                    "solid": "坚硬的",
+                    "dashed": "虚线",
+                    "dotted": "点状"
+                },
+                "color": "颜色",
+                "radius": "半径"
+            },
+            "content": {
+                "title": "内容"
+            },
+            "order_table": {
+                "table": {
+                    "header_style": "标题样式",
+                    "content": "内容",
+                    "body_style": "栏目样式"
+                },
+                "summary": {
+                    "header_style": "标题样式",
+                    "content": "内容",
+                    "body_style": "栏目样式"
+                },
+                "apply_to_all_cells": "适用于所有其他单元格"
+            }
+        },
+        "map": {
+            "title": "地图",
+            "satellite": "卫星",
+            "roadmap": "路线图",
+            "hybrid": "杂交种",
+            "terrain": "地形",
+            "zoom": "飞涨"
+        },
+        "field": {
+            "page": {
+                "number": "页码"
+            },
+            "prospect": {
+                "title": "前景",
+                "default_fields": "默认字段",
+                "other_fields": "其他领域"
+            },
+            "map": {
+                "title": "地图"
+            },
+            "date": {
+                "title": "日期"
+            },
+            "order": {
+                "title": "命令",
+                "table": {
+                    "title": "订单表",
+                    "columns": "列",
+                    "summaries": "摘要",
+                    "edit": "编辑订单表"
+                },
+                "number": "帐单号码",
+                "invoice_number": "发票编号 {number}",
+                "invoice_date": "创建日期：{日期}",
+                "product_i": "产品{i}"
+            },
+            "tag": {
+                "title": "标签"
+            },
+            "questionnaire": {
+                "title": "形式"
+            },
+            "project": {
+                "thumbnail": "标识",
+                "date": "创建日期"
+            },
+            "tabs": {
+                "prospects": {
+                    "title": "前景"
+                },
+                "map": {
+                    "title": "地图"
+                },
+                "dates": {
+                    "title": "日期"
+                },
+                "orders": {
+                    "title": "命令"
+                },
+                "labels": {
+                    "title": "过滤器"
+                },
+                "forms": {
+                    "title": "形式"
+                },
+                "project": {
+                    "title": "项目"
+                },
+                "pdfs": {
+                    "title": "PDF 文件"
+                },
+                "fonts": {
+                    "title": "字体"
+                },
+                "pages": {
+                    "title": "页数",
+                    "number": "页码",
+                    "portrait": "肖像",
+                    "landscape": "景观",
+                    "new_from": "新页面来自"
+                }
+            }
+        }
+    },
+    "event": {
+        "title": "事件",
+        "view_prospect": "查看前景",
+        "view_and_edit": "查看和编辑事件",
+        "move": "移动事件",
+        "google_calendar_associated_account": "Google 日历关联帐户",
+        "google_calendar_remove_account_confirm": "您真的不想再将您的 Google 日历帐户与 Heroes CRM 关联吗？",
+        "calendar": "日历",
+        "user": "用户",
+        "prospect": "前景",
+        "order": "命令",
+        "date_time": "日期和时间",
+        "started_at": "从...",
+        "ended_at": "到...",
+        "location": "地点",
+        "confirmed": "活动已确认",
+        "done": "活动完成",
+        "labels": "过滤器",
+        "name": "标题",
+        "add_title": "添加标题 ...",
+        "description": "描述",
+        "add_description": "添加描述...",
+        "choose_calendar": "选择日历",
+        "choose_user": "选择用户",
+        "choose_prospect": "选择潜在客户",
+        "new_prospect": "新前景",
+        "choose_order": "选择订单",
+        "new_order": "新命令",
+        "choose_hour": "选择时间",
+        "email_to_prospect": "向潜在客户发送邀请",
+        "choose_event_description_template": "描述模板",
+        "user_daily_directions": {
+            "title": "路线",
+            "remove_from_map": "从地图中删除路线",
+            "remove_marker": "删除标记",
+            "send_sms": "发简讯",
+            "call": "称呼",
+            "file": "文件",
+            "message": "信息",
+            "event": "事件",
+            "find_prospect": "寻找潜在客户...",
+            "find_address": "查找地址..."
+        },
+        "agenda": {
+            "filters": {
+                "title": "过滤器",
+                "users": "用户",
+                "calendars": "日历",
+                "show_we": "显示周末",
+                "min_hour": "最短时间",
+                "max_hour": "最长小时数",
+                "choose_role": "选择角色"
+            }
+        }
+    },
+    "field": {
+        "add": {
+            "title": "新领域"
+        },
+        "update": {
+            "delete_confirm": "该字段包含 <b>{数数}</b> 前景相关数据，<br>你确定要删除这个吗？"
+        },
+        "types": {
+            "text": "文本",
+            "long_text": "长文本",
+            "number": "数字",
+            "email": "电子邮件",
+            "date": "日期",
+            "datetime": "约会时间",
+            "address": "地址",
+            "url": "网址",
+            "tel": "数字"
+        },
+        "add_to_global_search": "添加到全局搜索",
+        "prospect": {
+            "phone_number": "电话号码",
+            "mobile_phone_number": "手机号码"
+        }
+    },
+    "calendar": {
+        "types": {
+            "physical": "身体的",
+            "telephone": "电话",
+            "hangout": "环球会议",
+            "task": "任务",
+            "other": "其他"
+        },
+        "add": {
+            "title": "新日历"
+        },
+        "update": {
+            "default_address": "您的默认活动地址"
+        },
+        "combine_with": "结合"
+    },
+    "interaction": {
+        "types": {
+            "telephone": "电话"
+        }
+    },
+    "commission": {
+        "title": "管理佣金",
+        "tab": {
+            "product": {
+                "title": "选择产品"
+            },
+            "action": {
+                "title": "选择操作"
+            },
+            "user": {
+                "title": "选择用户"
+            },
+            "commission": {
+                "types": {
+                    "title": "类型",
+                    "percentage": "百分比",
+                    "fix": "使固定"
+                },
+                "commission": {
+                    "title": "委员会"
+                },
+                "including_tax": {
+                    "title": "从产品价格计算",
+                    "incl_tax": "含税",
+                    "excl_tax": "不含税"
+                },
+                "selected_products": "精选产品",
+                "selected_actions": "选定的行动",
+                "selected_users": "选定的用户"
+            }
+        }
+    },
+    "setting": {
+        "title": "设置",
+        "locale": {
+            "title": "语言环境"
+        },
+        "project": {
+            "title": "项目 {project} 设置",
+            "description": "管理您的项目"
+        },
+        "google_auth": {
+            "title": "Google 身份验证器（2 个因素）"
+        },
+        "google_drive": {
+            "title": "谷歌云端硬盘",
+            "description": "为您的潜在客户文件关联 Google 云端硬盘帐户"
+        },
+        "google_calendar": {
+            "title": "谷歌日历",
+            "description": "将 Google 日历帐户与您的约会关联"
+        },
+        "users": {
+            "title": "用户列表",
+            "description": "管理项目 {project} 中的用户访问权限"
+        },
+        "devices": {
+            "title": "连接设备",
+            "description": "管理您的连接设备"
+        },
+        "tutorials": {
+            "title": "管理教程",
+            "do_not_show_anymore": "不再显示教程"
+        },
+        "trash": {
+            "title": "垃圾",
+            "description": "引线、过滤器、..."
+        },
+        "menu_icons": {
+            "title": "更改菜单图标",
+            "description": "前景、议程、地图..."
+        }
+    },
+    "label": {
+        "add": {
+            "title": "新标签"
+        },
+        "combine_with": "结合",
+        "affected_users": "受影响的用户",
+        "archive": "档案",
+        "archive_tooltip": "不再显示在标签列表中"
+    },
+    "menu": {
+        "use_current_filters": "使用当前过滤器",
+        "select_filters": "选择过滤器",
+        "add": {
+            "title": "新菜单"
+        }
+    },
+    "product": {
+        "price": "价格",
+        "currency": "货币",
+        "tax_in_percent": "税费百分比",
+        "included_tax": "含税",
+        "image": "图像",
+        "manage_images": "管理图像",
+        "archive": "档案",
+        "archive_tooltip": "不再显示在产品列表中",
+        "add_images": "添加图片",
+        "update": {
+            "choose_images": "选择图像"
+        }
+    },
+    "role": {
+        "add": {
+            "title": "新角色"
+        },
+        "list": {
+            "title": "角色"
+        }
+    },
+    "sms_template": {
+        "add": {
+            "title": "新短信模板"
+        }
+    },
+    "stat": {
+        "country": {
+            "title": "将 {country} 关联到..."
+        },
+        "metric": {
+            "title": "每天遵循过滤器",
+            "label": "筛选",
+            "menu": "菜单"
+        },
+        "blocs": {
+            "prospect": {
+                "title": "前景"
+            },
+            "sms": {
+                "title": "短信",
+                "phone": "电话"
+            },
+            "event": {
+                "title": "事件"
+            },
+            "interaction": {
+                "title": "称呼",
+                "phone": "电话"
+            },
+            "order": {
+                "title": "命令"
+            },
+            "file": {
+                "title": "文件"
+            },
+            "message": {
+                "title": "信息"
+            },
+            "total": {
+                "prospect": "前景很重要",
+                "sms": "短信数量",
+                "event": "事件计数",
+                "interaction": "通话次数",
+                "order": "订单数",
+                "file": "文件数",
+                "message": "消息数"
+            },
+            "new": {
+                "prospect": "新前景",
+                "sms": "新短信",
+                "event": "新活动",
+                "interaction": "新来电",
+                "order": "新订单",
+                "file": "新文件",
+                "message": "新消息"
+            },
+            "follow_filter_daily": {
+                "title": "每天遵循过滤器",
+                "distribution": "过滤器分布"
+            }
+        },
+        "user-connection-stat": {
+            "title": "每月连接用户数"
+        }
+    },
+    "thread": {
+        "add": {
+            "title": "新线程",
+            "send_email_to": "发送电子邮件至...",
+            "send_email_to_prospect": "向潜在客户发送电子邮件",
+            "associate_to_the_user": "关联到{用户}"
+        }
+    },
+    "questionnaire": {
+        "questionnaire": {
+            "add": {
+                "title": "新形式"
+            },
+            "list": {
+                "title": "形式"
+            }
+        },
+        "question": {
+            "add": {
+                "title": "新问题"
+            },
+            "types": {
+                "radio": "收音机",
+                "checkbox": "复选框",
+                "text": "文本",
+                "textarea": "文本多行",
+                "date": "日期",
+                "image": "图像",
+                "file": "文件"
+            }
+        },
+        "section": {
+            "add": {
+                "title": "新版块"
+            }
+        },
+        "option": {
+            "add": {
+                "title": "新选项",
+                "choose_section": "选择一个部分"
+            }
+        }
+    },
+    "permission": {
+        "all": "所有文件权限"
+    },
+    "category": {
+        "add": {
+            "title": "新标签类别",
+            "unique": "单项选择"
+        },
+        "list": {
+            "title": "标签类别"
+        },
+        "update": {
+            "unique": "单项选择"
+        }
+    },
+    "folder": {
+        "add": {
+            "title": "新建文件夹"
+        }
+    },
+    "group": {
+        "add": {
+            "title": "新组"
+        }
+    },
+    "locale": {
+        "setting": {
+            "title": "语言环境"
+        }
+    },
+    "message_template": {
+        "add": {
+            "title": "新消息模板"
+        }
+    },
+    "event_description_template": {
+        "add": {
+            "title": "新的事件描述模板"
+        }
+    },
+    "order": {
+        "action": {
+            "add": {
+                "title": "新型订单操作"
+            }
+        },
+        "status": {
+            "add": {
+                "title": "新订单状态"
+            }
+        },
+        "step": {
+            "add": {
+                "title": "新订单步骤"
+            }
+        },
+        "product": {
+            "add": {
+                "title": "新产品"
+            }
+        },
+        "table": {
+            "footer": {
+                "deselect": "取消选择订单",
+                "init_filters": "初始化过滤器",
+                "toggle_order_menus": "切换订单菜单",
+                "add_order": "新命令",
+                "setting": "栏目设置",
+                "previous": "以前的",
+                "next": "下一个",
+                "bulk_delete": "坚决删除",
+                "page_orders_count": "每页订单数",
+                "orders_count": "订单数",
+                "current_page": "当前页面"
+            },
+            "column": {
+                "manage": "管理您的 {project} 订单表列",
+                "delete_confirm": "您确定要删除此列吗？",
+                "others": {
+                    "total_commissions": "佣金总额",
+                    "prospect": "前景",
+                    "products": "产品",
+                    "status": "地位",
+                    "steps": "脚步",
+                    "commissions": "佣金"
+                }
+            },
+            "setting": {
+                "decimal": "小数点后位数计算："
+            },
+            "filters": {
+                "all": {
+                    "title": "过滤器"
+                },
+                "actions": {
+                    "title": "按操作过滤",
+                    "with": "用行动...",
+                    "without": "没有行动",
+                    "without_user": "没有动作{action}"
+                },
+                "products": {
+                    "title": "按产品过滤",
+                    "with": "随着产品...",
+                    "without": "无产品",
+                    "without_user": "没有产品{产品}"
+                },
+                "statuses": {
+                    "title": "按状态过滤",
+                    "with": "有状态...",
+                    "without": "无身份",
+                    "without_user": "没有状态 {status}"
+                },
+                "steps": {
+                    "title": "按步骤过滤",
+                    "with": "随着步骤...",
+                    "without": "无台阶",
+                    "without_user": "没有步骤{step}"
+                }
+            }
+        }
+    },
+    "project": {
+        "add": {
+            "title": "新项目"
+        },
+        "profile": {
+            "blocs": {
+                "calendars": "日历",
+                "categories": "标签类别",
+                "contacts": "联系方式",
+                "documents": "文件",
+                "fields": "领域",
+                "folders": "文件夹",
+                "groups": "团体",
+                "imports": "进口",
+                "menus": "菜单",
+                "order_actions": "订购行动",
+                "order_statuses": "订单状态",
+                "order_steps": "订购步骤",
+                "others": "其他的",
+                "products": "产品",
+                "profile": "轮廓",
+                "roles": "角色",
+                "threads": "线程数",
+                "users": "用户"
+            },
+            "logo": {
+                "change": "在此更新您的项目徽标。"
+            },
+            "menus": {
+                "thread": "线程数",
+                "folder": "文件夹",
+                "category": "类别",
+                "field": "领域",
+                "group": "团体",
+                "role": "角色",
+                "product": "产品"
+            }
+        },
+        "table": {
+            "footer": {
+                "toggle_project_menus": "切换项目菜单",
+                "add_project": "新项目",
+                "deselect": "取消选择潜在客户",
+                "bulk_delete": "删除选定的项目"
+            }
+        }
+    },
+    "global_search": {
+        "actions": {
+            "prospect": {
+                "create_event": {
+                    "name": "创建活动",
+                    "keywords": "创建新的活动约会谷歌日历",
+                    "description": "创建实体、Google meet 等活动"
+                },
+                "create_order": {
+                    "name": "创建订单",
+                    "keywords": "创建新订单产品",
+                    "description": "为给定的潜在客户创建订单，管理用户对订单的操作，管理用户佣金，..."
+                },
+                "create_sms": {
+                    "name": "短信",
+                    "keywords": "创建新短信 smsbox Ringover ultramsg mtarget",
+                    "description": "通过您的电话、SMSBOX 或 Ringover 呼叫潜在客户，..."
+                },
+                "create_interaction": {
+                    "name": "称呼",
+                    "keywords": "拨打电话 电话互动 响铃 空中通话",
+                    "description": "通过电话、Aircall 或 Ringover 呼叫潜在客户，..."
+                },
+                "create_file": {
+                    "name": "文件",
+                    "keywords": "文件夹 文件 谷歌驱动器",
+                    "description": "将文件与潜在客户关联"
+                },
+                "create_message": {
+                    "name": "留言",
+                    "keywords": "话题 消息 电子邮件",
+                    "description": "向潜在客户发送内部或外部消息（电子邮件）"
+                }
+            },
+            "project": {
+                "create_calendar": {
+                    "name": "新日历",
+                    "keywords": "新日历事件"
+                },
+                "create_category": {
+                    "name": "新标签类别",
+                    "keywords": "新标签类别"
+                },
+                "create_document": {
+                    "name": "新文件",
+                    "keywords": "新文档模板 pdf"
+                },
+                "create_folder": {
+                    "name": "新建文件夹",
+                    "keywords": "新建文件夹文件"
+                },
+                "create_group": {
+                    "name": "新组",
+                    "keywords": "新群组用户"
+                },
+                "create_menu": {
+                    "name": "新菜单",
+                    "keywords": "新菜单"
+                },
+                "create_order_action": {
+                    "name": "新订单行动",
+                    "keywords": "新订单行动"
+                },
+                "create_order_step": {
+                    "name": "新订单步骤",
+                    "keywords": "新订单步骤"
+                },
+                "create_role": {
+                    "name": "新角色",
+                    "keywords": "新角色用户权限"
+                },
+                "create_thread": {
+                    "name": "新消息线程",
+                    "keywords": "新消息线程"
+                },
+                "add_user": {
+                    "name": "添加用户",
+                    "keywords": "添加用户"
+                },
+                "create_import": {
+                    "name": "进口",
+                    "keywords": "导入前景文件 xls xlsx",
+                    "description": "从 XLSX 文件导入潜在客户。<br>或者来自 Zapier 等外部网络服务。"
+                },
+                "create_field": {
+                    "name": "管理项目中的字段",
+                    "keywords": "添加字段"
+                }
+            },
+            "api": {
+                "smsbox": {
+                    "name": "短信框API设置",
+                    "keywords": "短信框API设置"
+                },
+                "email": {
+                    "name": "邮箱设置",
+                    "keywords": "邮箱设置"
+                },
+                "ultramsg": {
+                    "name": "Ultramsg API 设置",
+                    "keywords": "Ultramsg API 设置"
+                },
+                "mtarget": {
+                    "name": "MTarget API 设置",
+                    "keywords": "MTarget API 设置"
+                }
+            }
+        }
+    },
+    "duplicate": {
+        "title": "检查重复项",
+        "fields": "按字段搜索...",
+        "choose_action": "选择要执行的操作",
+        "remove_duplicating": "删除旧的重复潜在客户",
+        "remove_duplicates": "删除导入中的重复线索",
+        "replace_duplicating": "用新潜在客户的数据覆盖旧潜在客户的修改数据"
+    }
+}

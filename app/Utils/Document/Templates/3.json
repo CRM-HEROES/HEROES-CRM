@@ -1,0 +1,84 @@
+{
+    "name": "Facture 3",
+    "description": null,
+    "for": "order",
+    "pages": [
+        {
+            "width": "209.90277777778mm",
+            "height": "297.03888888889mm",
+            "orientation": "P",
+
+            "fields": [
+                {
+                    "type": "html",
+                    "content": "{project.logo}",
+                    "style": {
+                        "top": "46px",
+                        "left": "341.171875px",
+                        "width": "107px",
+                        "height": "91px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Facture<div>N\u00b0: <b style=\"font-size: 16px\">{order.number}</b><br><br>Date du:&nbsp;</div><div>{date.DD/MM/YYYY}</div>",
+                    "style": {
+                        "top": "200px",
+                        "left": "50px",
+                        "width": "150px",
+                        "height": "230px",
+                        "padding": "20px",
+                        "line-height": "20px",
+                        "border-width": "0px",
+                        "border-radius": "20px",
+                        "background-color": "#f3f0e5"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Vendeur<br><b style=\"font-size: 16px\">{project.name}</b><br><br>{project.street}<br>{project.postal_code} {project.city} {project.country}<br>{project.email}<br>{project.mobile_phone_number}, {project.phone_number}<br>",
+                    "style": {
+                        "top": "200px",
+                        "left": "200px",
+                        "width": "270px",
+                        "height": "230px",
+                        "padding": "20px",
+                        "line-height": "20px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Acheteur<br><b style=\"font-size: 16px\">{prospect.first_name} {prospect.last_name}</b><br><div><br></div><div><div>{prospect.street}</div><div>{prospect.postal_code} {prospect.city} {prospect.country}</div><div>{prospect.email}</div><div>{prospect.mobile_phone_number}, {prospect.phone_number}&nbsp;</div></div>",
+                    "style": {
+                        "top": "200px",
+                        "left": "470px",
+                        "width": "270px",
+                        "height": "230px",
+                        "padding": "20px",
+                        "line-height": "20px"
+                    }
+                },
+                {
+                    "type": "order-table",
+                    "content": "{\"columns\":[{\"header\":{\"content\":\"Nom du produit\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"<b>{product.name}</b><br />{product.description}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Prix\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.price_value}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Taxe\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.tax_percent} %\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Qt\u00e9\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.quantity}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Taxe total\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.total_tax_value} {product.pivot.currency}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Sous total HT\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.total_price_excluding_tax} {product.pivot.currency}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"left\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\"}}},{\"header\":{\"content\":\"Sous total TTC\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"left\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"padding\":\"0px 10px 0px 10px\",\"border-width\":\"1px\",\"border-style\":\"dotted\",\"border-color\":\"#a3976c\",\"color\":\"#000000\"}},\"body\":{\"content\":\"{product.pivot.total_price_including_tax} {product.pivot.currency}\",\"style\":{\"background-color\":\"#ffffff\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"3px 5px\",\"text-align\":\"right\",\"font-size\":\"13px\",\"border-width\":\"1px\",\"border-style\":\"dashed\",\"border-color\":\"#a3976c\",\"font-weight\":\"bold\"}}}],\"summaries\":[{\"header\":{\"content\":\"Total HT : \",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"line-height\":\"20px\"}},\"body\":{\"content\":\"{order.total_excluding_tax} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"right\"}}},{\"header\":{\"content\":\"TVA : \",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"line-height\":\"20px\"}},\"body\":{\"content\":\"{order.tax_value} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"right\",\"color\":\"#bc1515\",\"font-weight\":\"bold\"}}},{\"header\":{\"content\":\"Total TTC : \",\"style\":{\"padding\":\"2px 5px\",\"font-weight\":\"bold\",\"line-height\":\"20px\"}},\"body\":{\"content\":\"{order.total_including_tax} {order.currency}\",\"style\":{\"padding\":\"2px 5px\",\"text-align\":\"right\",\"font-weight\":\"bold\",\"font-size\":\"15px\"}}}]}",
+                    "style": {
+                        "top": "489px",
+                        "left": "50px",
+                        "width": "690px",
+                        "height": "443px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "<span style=\"white-space-collapse: preserve;\">Date et signature du client</span><br style=\"white-space-collapse: preserve;\"><span style=\"white-space-collapse: preserve;\">pr\u00e9c\u00e9d\u00e9 de la mention 'Bon pour accord</span><div><span style=\"white-space-collapse: preserve;\">\n</span><span style=\"white-space-collapse: preserve;\">Bon pour accord: </span>{date.DD/MM/YYYY}<span style=\"white-space-collapse: preserve;\">\n</span></div>",
+                    "style": {
+                        "top": "960px",
+                        "left": "50px",
+                        "width": "690px",
+                        "text-align": "center"
+                    }
+                }
+            ]
+        }
+    ]
+}

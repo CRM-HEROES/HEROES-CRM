@@ -1,0 +1,324 @@
+{
+    "name": "Facture",
+    "description": "Facture de commande",
+    "pages": [
+        {
+            "width": "209.90277777778mm",
+            "height": "297.03888888889mm",
+            "orientation": "P",
+
+            "fields": [
+                {
+                    "type": "html",
+                    "content": "{project.logo}",
+                    "style": {
+                        "top": "26px",
+                        "left": "609.171875px",
+                        "width": "82px",
+                        "height": "82px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Acheteur",
+                    "style": {
+                        "top": "190px",
+                        "left": "450px",
+                        "color": "#000000",
+                        "height": "15px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.last_name} {prospect.first_name}",
+                    "style": {
+                        "top": "215px",
+                        "left": "450px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.name}",
+                    "style": {
+                        "top": "187px",
+                        "left": "100px",
+                        "font-size": "14px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.street} {prospect.street_bis}",
+                    "style": {
+                        "top": "240px",
+                        "left": "450px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.email}",
+                    "style": {
+                        "top": "290px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.postal_code} {prospect.city} {prospect.country}",
+                    "style": {
+                        "top": "265px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.phone_number}, {prospect.mobile_phone_number}",
+                    "style": {
+                        "top": "315px",
+                        "left": "450px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{project.street}<br>{project.postal_code} {project.city} {project.country}<br>{project.email}<br>{project.mobile_phone_number}, {project.phone_number}<br>",
+                    "style": {
+                        "top": "215px",
+                        "left": "100px",
+                        "color": "#555555",
+                        "width": "324px",
+                        "height": "111px",
+                        "line-height": "24px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Date :",
+                    "style": {
+                        "top": "386px",
+                        "left": "116px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "",
+                    "style": {
+                        "top": "369px",
+                        "left": "100px",
+                        "color": "#555555",
+                        "width": "324px",
+                        "height": "127px",
+                        "padding": "10px",
+                        "background-color": "#f5f5f5"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Total: {order.total_including_tax} {order.currency}",
+                    "style": {
+                        "top": "693px",
+                        "left": "100px",
+                        "color": "#00b4c2",
+                        "font-size": "18px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "text",
+                    "content": "Si\u00e8ge social",
+                    "style": {
+                        "top": "986px",
+                        "left": "100px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "",
+                    "style": {
+                        "top": "967px",
+                        "left": "100.171875px",
+                        "width": "600px",
+                        "height": "139px",
+                        "border-color": "#e3e3e3",
+                        "border-style": "solid",
+                        "border-width": "1px 0px 0px 0px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Bon de livraison&nbsp;",
+                    "style": {
+                        "top": "55px",
+                        "left": "101px",
+                        "color": "#00b5c2",
+                        "width": "590px",
+                        "height": "85px",
+                        "font-size": "30px",
+                        "font-weight": "bold",
+                        "border-color": "#00b4c2",
+                        "border-style": "solid",
+                        "border-width": "0px 0px 3px 0px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Lieu:",
+                    "style": {
+                        "top": "412px",
+                        "left": "116px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Num\u00e9ro de commande:",
+                    "style": {
+                        "top": "436px",
+                        "left": "116px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Contact client:",
+                    "style": {
+                        "top": "462px",
+                        "left": "116px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{invoice.date}",
+                    "style": {
+                        "top": "386px",
+                        "left": "271px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.city}",
+                    "style": {
+                        "top": "412px",
+                        "left": "271px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{invoice.id}",
+                    "style": {
+                        "top": "436px",
+                        "left": "271px",
+                        "height": "15px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "{prospect.mobile_phone_number}",
+                    "style": {
+                        "top": "462px",
+                        "left": "271px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "<div>{project.street}</div><div>{project.postal_code} {project.city}</div><div>{project.country}&nbsp;</div>",
+                    "style": {
+                        "top": "1015px",
+                        "left": "100px",
+                        "color": "#888888"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Coordonn\u00e9es",
+                    "style": {
+                        "top": "986px",
+                        "left": "357px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "<div>{project.name}</div><div>{project.mobile_phone_number}, {project.phone_number}</div><div>{project.email}</div><div>{project.website}</div>",
+                    "style": {
+                        "top": "1015px",
+                        "left": "357px",
+                        "color": "#888888"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Visa du client",
+                    "style": {
+                        "top": "848px",
+                        "left": "100px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Re\u00e7u le :&nbsp;",
+                    "style": {
+                        "top": "881px",
+                        "left": "100px",
+                        "color": "#888888"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Signature:&nbsp; <u>&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;</u>",
+                    "style": {
+                        "top": "913px",
+                        "left": "100px",
+                        "color": "#888888"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Visa du fournisseur",
+                    "style": {
+                        "top": "844px",
+                        "left": "435px",
+                        "font-weight": "bold"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "Livr\u00e9 le :",
+                    "style": {
+                        "top": "876px",
+                        "left": "435px",
+                        "color": "#888888"
+                    }
+                },
+                {
+                    "type": "order-table",
+                    "content": "{\"columns\":[{\"header\":{\"content\":\"N\u00b0\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#000000\",\"border-color\":\"#bababa\",\"border-width\":\"0px 0px 1px 0px\"}},\"body\":{\"content\":\"{product.index}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"7px 5px 7px 5px\",\"border-color\":\"#e3e3e3\",\"text-align\":\"right\",\"border-width\":\"0px 0px 1px 0px\",\"color\":\"#828282\"}}},{\"header\":{\"content\":\"Nom du produit\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#000000\",\"border-color\":\"#bababa\",\"border-width\":\"0px 0px 1px 0px\"}},\"body\":{\"content\":\"{product.name}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"7px 5px 7px 5px\",\"border-color\":\"#e3e3e3\",\"text-align\":\"left\",\"border-width\":\"0px 0px 1px 0px\",\"color\":\"#828282\"}}},{\"header\":{\"content\":\"Description\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#000000\",\"border-color\":\"#bababa\",\"border-width\":\"0px 0px 1px 0px\"}},\"body\":{\"content\":\"{product.description}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"7px 5px 7px 5px\",\"border-color\":\"#e3e3e3\",\"text-align\":\"left\",\"border-width\":\"0px 0px 1px 0px\",\"color\":\"#828282\"}}},{\"header\":{\"content\":\"Quantit\u00e9\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#000000\",\"border-color\":\"#bababa\",\"border-width\":\"0px 0px 1px 0px\"}},\"body\":{\"content\":\"{product.pivot.quantity}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"7px 5px 7px 5px\",\"border-color\":\"#e3e3e3\",\"text-align\":\"right\",\"border-width\":\"0px 0px 1px 0px\",\"color\":\"#828282\"}}},{\"header\":{\"content\":\"Sous total TTC\",\"style\":{\"border\":\"1px solid #ccc\",\"font-size\":\"12px\",\"vertical-align\":\"middle\",\"text-align\":\"center\",\"background-color\":\"#ffffff\",\"font-weight\":\"bold\",\"white-space\":\"nowrap\",\"height\":\"36px\",\"color\":\"#000000\",\"border-color\":\"#bababa\",\"border-width\":\"0px 0px 1px 0px\"}},\"body\":{\"content\":\"{product.pivot.total_price_including_tax} {product.pivot.currency}\",\"style\":{\"background-color\":\"white\",\"border\":\"1px solid #DDDDDD\",\"padding\":\"7px 5px 7px 5px\",\"border-color\":\"#e3e3e3\",\"text-align\":\"right\",\"border-width\":\"0px 0px 1px 0px\",\"color\":\"#828282\"}}}],\"summaries\":[]}",
+                    "style": {
+                        "top": "547px",
+                        "left": "100px",
+                        "width": "600px",
+                        "border-color": "#00b5c2",
+                        "border-style": "solid",
+                        "border-width": "02px 0px 0px 0px"
+                    }
+                },
+                {
+                    "type": "html",
+                    "content": "",
+                    "style": {
+                        "top": "966px",
+                        "left": "100px",
+                        "width": "600px",
+                        "border-color": "#969696",
+                        "border-style": "solid",
+                        "border-width": "0px 0px 1px 0px"
+                    }
+                }
+            ]
+        }
+    ]
+}
