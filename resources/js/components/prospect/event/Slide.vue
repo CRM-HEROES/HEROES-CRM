@@ -5,7 +5,7 @@
             eventProspect
                 ? [
                       prospectEvent.prospect.first_name,
-                      prospectEvent.prospect.last_name,
+                      prospectEvent."",
                   ]
                       .filter((n) => n)
                       .join(' ')
@@ -1657,7 +1657,7 @@ export default {
                 // by the prospect full name
                 this.prospectEvent.name = [
                     this.prospectEvent.prospect.first_name,
-                    this.prospectEvent.prospect.last_name,
+                    this.prospectEvent."",
                 ]
                     .filter((c) => c)
                     .join(" ");
@@ -1678,7 +1678,7 @@ export default {
                     '">' +
                     [
                         this.prospectEvent.prospect.first_name,
-                        this.prospectEvent.prospect.last_name,
+                        this.prospectEvent."",
                     ]
                         .filter((c) => c)
                         .join(" ") +

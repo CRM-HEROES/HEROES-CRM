@@ -5,7 +5,7 @@
         :title="
             $t('prospect.interaction.title', {
                 prospect: interactionProspect
-                    ? interactionProspect.last_name
+                    ? interactionProspect.first_name
                     : '',
             })
         "

@@ -21,8 +21,8 @@ return [
     'fields' => [
         'email' => "Email",
         'title' => "Titre",
-        'last_name' => "Nom",
         'first_name' => "Prénom",
+    'last_name' => "Nom",
         'company_name' => "Société",
         'job_title' => "Fonction",
         'website_url' => "Site web",

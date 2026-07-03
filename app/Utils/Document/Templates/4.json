@@ -30,7 +30,7 @@
                 },
                 {
                     "type": "html",
-                    "content": "{prospect.first_name} {prospect.last_name}",
+                    "content": "{prospect.first_name} {prospect.last_name} ",
                     "style": {
                         "top": "230px",
                         "left": "450px",

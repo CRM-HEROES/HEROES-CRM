@@ -48,6 +48,6 @@ class ProspectController extends Controller
             ->filter($prospectFilters)
             ->skip($count * $page)
             ->limit($count)
-            ->get(['id', 'first_name', 'last_name']);
+            ->get(['id', 'full_name']);
     }
 }

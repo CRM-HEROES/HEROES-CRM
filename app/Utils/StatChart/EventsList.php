@@ -35,7 +35,7 @@ class EventsList implements StatChartStatChart
             ->with('calendar:id,name,color,bgcolor,type')
             ->with('confirmedBy:id,name')
             ->with('doneBy:id,name')
-            ->with('prospect:id,first_name,last_name,phone_number,mobile_phone_number,latitude,longitude,street,street_bis,postal_code,city,state,county,country')
+            ->with('prospect:id,full_name,phone_number,mobile_phone_number,latitude,longitude,street,street_bis,postal_code,city,state,county,country')
             ->where(function($query) {
                 $query->where('user_id', auth()->id())
                     ->orWhereHas('users', function($query) {

@@ -57,7 +57,7 @@ export default {
 
             return [
                 this.order.prospect.first_name,
-                this.order.prospect.last_name,
+                this.order."",
             ]
                 .filter((n) => n)
                 .join(" ");

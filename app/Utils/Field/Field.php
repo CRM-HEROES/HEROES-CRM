@@ -10,8 +10,8 @@ class Field
             // Prospect
 
             ['slug' => 'title',               'name' => trans('prospect.fields.title'),               'for' => "prospect"],
-            ['slug' => 'last_name',           'name' => trans('prospect.fields.last_name'),           'for' => "prospect"],
-            ['slug' => 'first_name',          'name' => trans('prospect.fields.first_name'),          'for' => "prospect"],
+            ['slug' => 'full_name',           'name' => trans('prospect.fields.full_name'),           'for' => "prospect"],
+
             ['slug' => 'phone_number',        'name' => trans('prospect.fields.phone_number'),        'for' => "prospect"],
             ['slug' => 'mobile_phone_number', 'name' => trans('prospect.fields.mobile_phone_number'), 'for' => "prospect"],
             ['slug' => 'email',               'name' => trans('prospect.fields.email'),               'for' => "prospect"],

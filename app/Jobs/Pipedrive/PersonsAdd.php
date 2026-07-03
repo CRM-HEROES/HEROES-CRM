@@ -77,7 +77,7 @@ class PersonsAdd implements ShouldQueue
                 'prospects.id',
 
                 'prospects.first_name', 
-                'prospects.last_name', 
+                '""', 
                 
                 'prospects.latitude', 
                 'prospects.longitude', 

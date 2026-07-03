@@ -37,10 +37,9 @@ class Prospect extends Authenticatable
         'date_of_birth',
         'email',
         'fax_number',
-        'first_name',
+        'full_name',
         'ip_address',
         'job_title',
-        'last_name',
         'latitude',
         'longitude',
         'meta',
@@ -113,8 +112,7 @@ class Prospect extends Authenticatable
     public function getFullNameAttribute()
     {
         $items = [
-            $this->first_name,
-            $this->last_name,
+            $this->full_name,
         ];
         
         // Remove unused space

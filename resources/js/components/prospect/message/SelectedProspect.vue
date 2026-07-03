@@ -3,7 +3,7 @@
         <div
             class="hc-prospect-message-selected-prospect-name"
             v-text="
-                prospect.first_name ? prospect.first_name : prospect.last_name
+                prospect.first_name ? prospect.first_name : ""
             "
         ></div>
         <icon

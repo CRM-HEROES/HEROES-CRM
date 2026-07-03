@@ -70,7 +70,7 @@
                 },
                 {
                     "type": "html",
-                    "content": "{prospect.last_name} {prospect.first_name}",
+                    "content": " {prospect.first_name} {prospect.last_name}",
                     "style": {
                         "top": "215px",
                         "left": "450px",

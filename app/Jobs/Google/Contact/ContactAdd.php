@@ -48,7 +48,7 @@ class ContactAdd implements ShouldQueue
                 'names' => [
                     [
                         'givenName' => $this->prospect->first_name,
-                        'familyName' => $this->prospect->last_name
+                        'familyName' => ""
                     ]
                 ],
                 'emailAddresses' => [

@@ -89,7 +89,7 @@ class EventController extends Controller
         $event->load('confirmedBy:id,name');
         $event->load('creator:id,name');
         $event->load('doneBy:id,name');
-        $event->load('prospect:id,first_name,last_name');
+        $event->load('prospect:id,full_name');
         $event->load('order');
         $event->load('user:id,name');
         $event->load('users:id,name');
@@ -122,7 +122,7 @@ class EventController extends Controller
         $event->load('confirmedBy:id,name');
         $event->load('creator:id,name');
         $event->load('doneBy:id,name');
-        $event->load('prospect:id,first_name,last_name');
+        $event->load('prospect:id,full_name');
         $event->load('order');
         $event->load('user:id,name');
         $event->load('users:id,name');

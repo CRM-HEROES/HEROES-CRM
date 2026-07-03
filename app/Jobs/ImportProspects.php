@@ -68,6 +68,7 @@ class ImportProspects implements ShouldQueue
     protected $prospectRelationsHandlers;
     protected $mapping;
     protected $emptyProspect;
+    protected $seenDuplicates = ['email' => [], 'phone' => [], 'mobile' => []];
 
     /**
      * Create a new job instance.
@@ -154,6 +155,11 @@ class ImportProspects implements ShouldQueue
 
                 // Convert import row to prospect data
                 $prospect = $this->importRowToProspect($row, $rowsCount);
+
+                // Skip if prospect is a duplicate (by email or phone)
+                if ($this->isDuplicateProspect($prospect)) {
+                    continue;
+                }
 
                 // Add prospect to the array of prospects to create
                 $prospects[] = $prospect;
@@ -486,6 +492,42 @@ class ImportProspects implements ShouldQueue
 
         // XLSX
         return ReaderEntityFactory::createXLSXReader();
+    }
+
+    /**
+     * Check if prospect is a duplicate by email or phone number
+     * Tracks seen values to prevent duplicates within the import
+     */
+    protected function isDuplicateProspect($prospect)
+    {
+        // Check email
+        if (!empty($prospect['email'])) {
+            $email = strtolower(trim($prospect['email']));
+            if (in_array($email, $this->seenDuplicates['email'])) {
+                return true; // Duplicate found
+            }
+            $this->seenDuplicates['email'][] = $email;
+        }
+
+        // Check phone_number
+        if (!empty($prospect['phone_number'])) {
+            $phone = trim($prospect['phone_number']);
+            if (in_array($phone, $this->seenDuplicates['phone'])) {
+                return true; // Duplicate found
+            }
+            $this->seenDuplicates['phone'][] = $phone;
+        }
+
+        // Check mobile_phone_number
+        if (!empty($prospect['mobile_phone_number'])) {
+            $mobile = trim($prospect['mobile_phone_number']);
+            if (in_array($mobile, $this->seenDuplicates['mobile'])) {
+                return true; // Duplicate found
+            }
+            $this->seenDuplicates['mobile'][] = $mobile;
+        }
+
+        return false; // Not a duplicate
     }
 
     /**

@@ -106,7 +106,7 @@ class ProspectObserver
             $d = Prospect::
                 where('id', '!=', $prospect->id)
                 ->where($field->slug, $prospect->{$field->slug})
-                ->first(['id', 'first_name', 'last_name']);
+                ->first(['id', 'full_name']);
 
             if ($d) {
                 abort(400, 'Valeur dupliquée pour la colonne: ' . $field->name . ', Prospect: ' . $d->full_name);

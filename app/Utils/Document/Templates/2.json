@@ -126,7 +126,7 @@
                 },
                 {
                     "type": "html",
-                    "content": "{prospect.first_name}",
+                    "content": "{prospect.first_name} {prospect.last_name}",
                     "style": {
                         "top": "173px",
                         "left": "400px",

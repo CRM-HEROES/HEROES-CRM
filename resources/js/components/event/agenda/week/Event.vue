@@ -797,7 +797,7 @@ export default {
                         ? "<b>Prospect</b>: " +
                           [
                               this.event.prospect.first_name,
-                              this.event.prospect.last_name,
+                              "",
                           ].join(" ") +
                           "<br>"
                         : "") +

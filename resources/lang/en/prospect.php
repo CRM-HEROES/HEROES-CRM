@@ -19,8 +19,8 @@ return [
     'fields' => [
         'email' => "Email",
         'title' => "Title",
-        'last_name' => "Last name",
         'first_name' => "First name",
+    'last_name' => "Last name",
         'company_name' => "Company name",
         'job_title' => "Job title",
         'website_url' => "Website URL",

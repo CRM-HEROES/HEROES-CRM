@@ -20,7 +20,7 @@ class TrashController extends Controller
     {
         return $project
             ->prospects()
-            ->select('id', 'first_name', 'last_name', 'deleted_at')
+            ->select('id', 'full_name', 'deleted_at')
             ->onlyTrashed()
             ->orderBy('deleted_at', 'desc')
             ->paginate(100);

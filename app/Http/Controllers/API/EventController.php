@@ -71,7 +71,7 @@ class EventController extends Controller
                 $query->with('doneBy:id,name');
             })
             ->when(in_array('prospect', $fields), function($query) {
-                $query->with('prospect:id,first_name,last_name,phone_number,mobile_phone_number,latitude,longitude,street,street_bis,postal_code,city,state,county,country,project_id')
+                $query->with('prospect:id,full_name,phone_number,mobile_phone_number,latitude,longitude,street,street_bis,postal_code,city,state,county,country,project_id')
                     ->with('prospect.project:id,name,slug');
             })
             ->when(in_array('user', $fields), function($query) {
