@@ -8,7 +8,8 @@ return [
                 "name" => "Profil",
                 "type" => "field",
                 "items" => [
-                    "full_name",
+                    "last_name",
+                    "first_name",
                     "company_name",
                     "title"
                 ]
@@ -80,7 +81,8 @@ return [
     ],
 
     'prospects-table' => [
-        ['key' => "full_name"],
+        ['key' => "last_name"],
+        ['key' => "first_name"],
         ['key' => "email"],
         ['key' => "street"],
         ['key' => "street_bis"],

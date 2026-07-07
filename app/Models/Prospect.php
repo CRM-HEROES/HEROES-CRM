@@ -37,7 +37,8 @@ class Prospect extends Authenticatable
         'date_of_birth',
         'email',
         'fax_number',
-        'full_name',
+        'first_name',
+        'last_name',
         'ip_address',
         'job_title',
         'latitude',
@@ -70,6 +71,15 @@ class Prospect extends Authenticatable
         'processed_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+    ];
+
+    /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = [
+        'full_name',
     ];
 
 
@@ -112,7 +122,8 @@ class Prospect extends Authenticatable
     public function getFullNameAttribute()
     {
         $items = [
-            $this->full_name,
+            $this->first_name,
+            $this->last_name,
         ];
         
         // Remove unused space

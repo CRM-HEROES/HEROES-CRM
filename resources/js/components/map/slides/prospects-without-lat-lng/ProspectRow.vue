@@ -100,7 +100,7 @@ export default {
          *
          */
         fullName() {
-            const fullName = [this.prospect.full_name]
+            const fullName = [this.prospect.first_name, this.prospect.last_name]
                 .filter((n) => n)
                 .join(" ");
 

@@ -55,7 +55,7 @@ class OrderController extends Controller
             ->when(in_array('prospect', $fields), function($query) {
                 $query->with([
                     'prospect' => function($query) {
-                        $query->select('id', 'full_name');
+                        $query->select('id', 'first_name', 'last_name');
                     },
                 ]);
             })

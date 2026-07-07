@@ -37,9 +37,9 @@ class DuplicateController extends Controller
         
         return $project
             ->prospects()
-            ->with('duplicate:id,full_name')
+            ->with('duplicate:id,first_name,last_name')
             ->whereNotNull('duplicate_id')
-            ->select('id', 'duplicate_id', 'full_name')
+            ->select('id', 'duplicate_id', 'first_name', 'last_name')
             ->get();
     }
     
