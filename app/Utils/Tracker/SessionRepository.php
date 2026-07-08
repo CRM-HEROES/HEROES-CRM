@@ -180,6 +180,13 @@ class SessionRepository
                     $model = $this->find($this->sessionInfo['id']);
                 }
 
+                // La session de tracking peut ne plus exister en base
+                // (ex: base réinitialisée) : on la recrée pour éviter le crash.
+                if (! $model) {
+                    $model = $this->firstOrCreate(['uuid' => $this->sessionInfo['uuid']]);
+                    $this->sessionInfo['id'] = $model->id;
+                }
+
                 $model->{$key} = $value;
                 $model->save();
 

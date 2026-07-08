@@ -31,6 +31,7 @@
                 v-slot="{ label }"
                 ><input
                     required
+                    ref="fileInput"
                     type="file"
                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     @change="setFile"
@@ -131,7 +132,15 @@ export default {
                 store.commit(SET_IMPORT, prospectImport);
             } finally {
                 this.addingImport = false;
+                // Réinitialise complètement le formulaire (modal)
                 this.prospectImport = this.newImport();
+                // Vide aussi l'input fichier natif (le nom du fichier reste
+                // affiché sinon, car un input type=file ne se réinitialise pas
+                // en changeant la variable liée)
+                if (this.$refs.fileInput) {
+                    this.$refs.fileInput.value = "";
+                }
+                // Ferme le modal
                 store.commit(CLOSE_MODAL);
             }
         },
