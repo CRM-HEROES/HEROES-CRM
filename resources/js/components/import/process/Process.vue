@@ -201,6 +201,7 @@ import { API_URL } from "@/apis/common";
 import { GET_PROJECT_USER_SETTING } from "@/actions/project/user/setting";
 
 import {
+    FETCH_IMPORTS,
     UPDATE_IMPORT,
     REMOVE_IMPORT,
     SET_IMPORT,
@@ -246,19 +247,24 @@ export default {
         async processImport() {
             this.processingImport = true;
 
+            // Référence à l'import courant : reste valide même après avoir
+            // réinitialisé le panneau (SET_IMPORT null vide juste la sélection,
+            // pas l'objet lui-même).
+            const currentImport = this.prospectImport;
+
             try {
                 // Launch import
                 await store.dispatch(UPDATE_IMPORT, {
-                    id: this.prospectImport.id,
+                    id: currentImport.id,
                     is_processing: true,
                 });
-                this.prospectImport.is_processing = true;
+                currentImport.is_processing = true;
 
                 // If prospects table setting is not configured for the current user
                 // use the import columns as the default columns for the prospects table
-                this.getColumns();
+                this.getColumns(currentImport);
                 // Update prospects table
-                this.refreshProspectsList();
+                this.refreshProspectsList(currentImport);
 
                 // Flash: "Import is processing"
                 flashInfo({
@@ -266,6 +272,11 @@ export default {
                     body: this.$t("import.process.tab.import.processing"),
                     duration: 5000,
                 });
+
+                // Réinitialise le panneau : revient à la liste des imports
+                store.commit(SET_IMPORT, null);
+                // Rafraîchit la liste des imports (statut à jour)
+                store.dispatch(FETCH_IMPORTS);
             } finally {
                 this.processingImport = false;
             }
@@ -380,13 +391,26 @@ export default {
          * Define the import columns
          * as the prospects table columns
          */
-        async setProspectsTableSetting() {
+        async setProspectsTableSetting(currentImport) {
+            // Appelé aussi depuis un clic (template) où l'argument est un
+            // événement : dans ce cas on retombe sur l'import courant du store.
+            if (!currentImport || !currentImport.id) {
+                currentImport = this.prospectImport;
+            }
+
             this.settingProspectsTable = true;
 
             try {
-                // Get import mapping
-                await store.dispatch(SHOW_IMPORT, this.prospectImport.id);
-                const settings = this.prospectImport.mapping
+                // Get import mapping (données fraîches du serveur)
+                const freshImport = await store.dispatch(
+                    SHOW_IMPORT,
+                    currentImport.id
+                );
+                const mapping =
+                    (freshImport && freshImport.mapping) ||
+                    currentImport.mapping ||
+                    [];
+                const settings = mapping
                     .filter((s) => s)
                     .map((s) => ({
                         key: s,
@@ -411,16 +435,20 @@ export default {
          * Refresh the prospects table
          * every 5s
          */
-        refreshProspectsList() {
+        refreshProspectsList(currentImport = this.prospectImport) {
             const intervalTime = 5000;
+            // On capture l'id : l'intervalle continue même après avoir
+            // réinitialisé le panneau (import désélectionné).
+            const importId = currentImport.id;
+            const projectSlug = this.project.slug;
             let interval;
 
             interval = setInterval(async () => {
                 try {
                     // Check if import has been finished
                     const { data } = await ImportService.show(
-                        this.project.slug,
-                        this.prospectImport.id
+                        projectSlug,
+                        importId
                     );
 
                     store.dispatch(FETCH_PROSPECTS);
@@ -442,7 +470,7 @@ export default {
          * Get prospects table columns setting
          * For the current user
          */
-        async getColumns() {
+        async getColumns(currentImport = this.prospectImport) {
             try {
                 await store.dispatch(GET_PROJECT_USER_SETTING, {
                     key: "prospects-table",
@@ -453,7 +481,7 @@ export default {
                 // as the default prospects table columns
                 // for the current user
                 if (this.projectUserSettingsProspectsTable.length == 0) {
-                    this.setProspectsTableSetting();
+                    this.setProspectsTableSetting(currentImport);
                 }
             } finally {
             }
@@ -559,6 +587,11 @@ export default {
         process() {
             if (this.process) {
                 this.processImport();
+                // Réinitialise le flag côté parent pour que le prochain
+                // "Suivant" / OK relance bien l'import (sinon "process" reste
+                // à true et le watch ne se redéclenche plus → il fallait
+                // actualiser la page).
+                this.$emit("processed");
             }
         },
     },

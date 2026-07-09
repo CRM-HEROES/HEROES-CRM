@@ -2021,7 +2021,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (!this.editable) {
         return;
       }
-      hcConfirm("Voulez-vous vraiment supprimer ce RDV ?<br>" + "<br>" + (this.event.prospect ? "<b>Prospect</b>: " + [this.event.prospect.first_name, this.event.prospect.last_name].join(" ") + "<br>" : "") + "<b>Date</b>: " + dayjs(this.event.started_at).format("ddd, DD MMM YYYY") + "<br>" + "<b>Calendrier</b>: " + this.calendar.name, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      hcConfirm("Voulez-vous vraiment supprimer ce RDV ?<br>" + "<br>" + (this.event.prospect ? "<b>Prospect</b>: " + [this.event.prospect.first_name, ""].join(" ") + "<br>" : "") + "<b>Date</b>: " + dayjs(this.event.started_at).format("ddd, DD MMM YYYY") + "<br>" + "<b>Calendrier</b>: " + this.calendar.name, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:

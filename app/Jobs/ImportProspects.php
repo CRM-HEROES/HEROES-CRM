@@ -69,6 +69,8 @@ class ImportProspects implements ShouldQueue
     protected $mapping;
     protected $emptyProspect;
     protected $seenDuplicates = ['email' => [], 'phone' => [], 'mobile' => []];
+    protected $existingEmails = [];
+    protected $existingMobiles = [];
 
     /**
      * Create a new job instance.
@@ -78,7 +80,7 @@ class ImportProspects implements ShouldQueue
     public function __construct($import)
     {
         $this->import = $import;
-        $this->date = Carbon::now()->format('Y-m-d h:i:s');
+        $this->date = Carbon::now()->format('Y-m-d H:i:s');
         $this->categories = $this->getCategories();
         $this->threads = $this->getThreads();
         $this->calendars = $this->getCalendars();
@@ -87,8 +89,12 @@ class ImportProspects implements ShouldQueue
         $this->prospectRelationsHandlers = $this->getProspectRelationsHandlers();
 
         $this->mapping = $this->getImportMappingFields();
-        
+
         $this->emptyProspect = $this->newProspect();
+
+        // Emails / mobiles déjà présents en base (pour éviter les répétitions)
+        $this->existingEmails = $this->getExistingEmails();
+        $this->existingMobiles = $this->getExistingMobiles();
     }
 
     /**
@@ -495,11 +501,87 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
+     * Précharge les emails des prospects déjà présents en base
+     * (même projet) afin de ne pas ré-importer une personne existante.
+     */
+    protected function getExistingEmails()
+    {
+        $emails = [];
+
+        DB::table('prospects')
+            ->where('project_id', $this->import->project_id)
+            ->whereNull('deleted_at')
+            ->where('import_id', '<>', $this->import->id)
+            ->whereNotNull('email')
+            ->where('email', '<>', '')
+            ->select('email')
+            ->orderBy('id')
+            ->chunk(5000, function ($rows) use (&$emails) {
+                foreach ($rows as $p) {
+                    $emails[strtolower(trim($p->email))] = true;
+                }
+            });
+
+        return $emails;
+    }
+
+    /**
+     * Précharge les numéros mobiles des prospects déjà présents en base
+     * (même projet) afin de ne pas ré-importer une personne existante.
+     */
+    protected function getExistingMobiles()
+    {
+        $mobiles = [];
+
+        DB::table('prospects')
+            ->where('project_id', $this->import->project_id)
+            ->whereNull('deleted_at')
+            ->where('import_id', '<>', $this->import->id)
+            ->whereNotNull('mobile_phone_number')
+            ->where('mobile_phone_number', '<>', '')
+            ->select('mobile_phone_number')
+            ->orderBy('id')
+            ->chunk(5000, function ($rows) use (&$mobiles) {
+                foreach ($rows as $p) {
+                    $key = $this->normalizePhone($p->mobile_phone_number);
+                    if ($key !== '') {
+                        $mobiles[$key] = true;
+                    }
+                }
+            });
+
+        return $mobiles;
+    }
+
+    /**
+     * Normalise un numéro de téléphone : ne garde que les chiffres
+     * (ex: "06 18 41 66 33" et "0618416633" deviennent identiques).
+     */
+    protected function normalizePhone($value)
+    {
+        return preg_replace('/\D+/', '', (string) $value);
+    }
+
+    /**
      * Check if prospect is a duplicate by email or phone number
      * Tracks seen values to prevent duplicates within the import
      */
     protected function isDuplicateProspect($prospect)
     {
+        // Email déjà présent en base → on ignore la ligne
+        if (!empty($prospect['email'])
+            && isset($this->existingEmails[strtolower(trim($prospect['email']))])) {
+            return true;
+        }
+
+        // Mobile déjà présent en base → on ignore la ligne
+        if (!empty($prospect['mobile_phone_number'])) {
+            $mobile = $this->normalizePhone($prospect['mobile_phone_number']);
+            if ($mobile !== '' && isset($this->existingMobiles[$mobile])) {
+                return true;
+            }
+        }
+
         // Check email
         if (!empty($prospect['email'])) {
             $email = strtolower(trim($prospect['email']));

@@ -65,7 +65,10 @@
                         <duplicate />
                     </template>
                     <template #4>
-                        <process :process="process" />
+                        <process
+                            :process="process"
+                            @processed="process = false"
+                        />
                     </template>
                 </tab-layout>
 
