@@ -596,6 +596,15 @@ export default {
         },
     },
 
+    mounted() {
+        // If the import was already processing
+        // (eg. the page was refreshed mid-import)
+        // resume polling the prospects table
+        if (this.prospectImport && this.prospectImport.is_processing) {
+            this.refreshProspectsList();
+        }
+    },
+
     computed: {
         ...mapGetters([
             "projectUserSettingsProspectsTable",

@@ -8,6 +8,7 @@ use App\Notifications\GoogleContactDeletedProspect;
 use App\Notifications\GoogleContactNewProspect;
 use App\Notifications\PipedrivePersonNewProspect;
 use App\Notifications\PipedrivePersonUpdatedProspect;
+use App\Services\ProspectAutoAssignment;
 use Illuminate\Support\Facades\DB;
 use Venturecraft\Revisionable\Revision;
 
@@ -36,6 +37,10 @@ class ProspectObserver
         $this->getLatLng($prospect);
         $this->storeGoogleContact($prospect);
         $this->storePipedrivePerson($prospect);
+
+        if (!$prospect->users()->exists()) {
+            app(ProspectAutoAssignment::class)->assignProspect($prospect);
+        }
     }
 
     /**

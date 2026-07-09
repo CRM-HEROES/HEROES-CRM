@@ -42,6 +42,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:campaign --frequency=monthly')->monthlyOn(1);
         
         $schedule->command('app:campaign --frequency=once')->daily();
+
+        // Automatic assignment of unassigned prospects
+        $schedule->command('app:assign-prospects')->everyFiveMinutes()->withoutOverlapping();
     }
 
     /**
