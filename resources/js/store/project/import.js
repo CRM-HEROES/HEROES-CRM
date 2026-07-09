@@ -70,7 +70,7 @@ const actions = {
             context.state.project.slug,
             slug
         );
-        // context.commit(SET_IMPORT, data);
+        context.commit(SET_IMPORT, data);
         return data;
     },
 

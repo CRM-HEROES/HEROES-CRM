@@ -25,10 +25,12 @@ use App\Jobs\Import\ProspectItemsHandler\MessagesHandler;
 use App\Jobs\Import\ProspectItemsHandler\OrdersHandler;
 use App\Jobs\Import\ProspectItemsHandler\SmsHandler;
 use App\Jobs\Import\ProspectItemsHandler\UsersHandler;
+use App\Events\ImportFinished;
 use App\Models\Import;
-// use App\Events\ImportFinished;
+use App\Services\ProspectAutoAssignment;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Illuminate\Support\Facades\Log;
 
 use Carbon\Carbon;
 
@@ -98,21 +100,27 @@ class ImportProspects implements ShouldQueue
      */
     public function handle()
     {
-        // check if we should stop the import
-        if ($this->checkImportStopped()) {
-            return;
-        }
+        Log::info('ImportProspects: starting import', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+        ]);
 
-        $this->import->update(['processing_at' => Carbon::now()]);
+        try {
+            // check if we should stop the import
+            if ($this->checkImportStopped()) {
+                return;
+            }
 
-        // Remove previous imported prospects
-        $this->removePreviousImportProspects();
+            $this->import->update(['processing_at' => Carbon::now()]);
+
+            // Remove previous imported prospects
+            $this->removePreviousImportProspects();
 
 
-        // Total count of imported prospects
-        $rowsCount = 0;
-        // Temporary prospects array
-        $prospects = [];
+            // Total count of imported prospects
+            $rowsCount = 0;
+            // Temporary prospects array
+            $prospects = [];
 
 
         // WE USE "BOX SPOUT" FOR THE FILE READING
@@ -191,6 +199,15 @@ class ImportProspects implements ShouldQueue
             $this->handleProspects($prospects);
         }
 
+        // Assign automatically any imported prospects
+        // that were not assigned during import relation handling.
+        $automaticAssignments = app(ProspectAutoAssignment::class)
+            ->assignUnassignedProspects(null, $this->import->id);
+
+        Log::info('ImportProspects: automatic assignment after import', [
+            'import_id' => $this->import->id,
+            'assigned_count' => $automaticAssignments,
+        ]);
 
         // Close the reader
         $reader->close();
@@ -212,9 +229,40 @@ class ImportProspects implements ShouldQueue
             'processed_at' => Carbon::now(),
         ]);
 
+        ImportFinished::dispatch($this->import->refresh());
+
+        Log::info('ImportProspects: finished import', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'rows_count' => $rowsCount,
+        ]);
+
         // Send notification to the import's creator
         // that import has been finished
         $this->notifyImportFinished();
+    } catch (\Throwable $exception) {
+        Log::error('ImportProspects: import failed during handle', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'message' => $exception->getMessage(),
+        ]);
+
+        throw $exception;
+    }
+}
+
+    public function failed(\Throwable $exception)
+    {
+        Log::error('ImportProspects: import failed', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'message' => $exception->getMessage(),
+        ]);
+
+        $this->import->update([
+            'is_processing' => 0,
+            'processed_at' => Carbon::now(),
+        ]);
     }
 
     /**

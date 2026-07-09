@@ -27,4 +27,5 @@ supervisord.pid
 supervisord.log.*
 nginx/certbot
 mysql-data/
+mysql/
 backup/

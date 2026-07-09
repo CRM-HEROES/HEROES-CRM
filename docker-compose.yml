@@ -2,6 +2,9 @@ version: '3'
 services:
   #PHP Service
   heroescrm:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: heroescrm:latest
     container_name: heroescrm
     restart: always
@@ -34,6 +37,33 @@ services:
     env_file:
       - .env
       
+  # MySQL Service
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-heroes
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: heroes
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - heroes-network
+
+  # Adminer service
+  adminer:
+    image: adminer:latest
+    container_name: adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    networks:
+      - heroes-network
+
   #Nginx Service
   webserver:
     image: nginx:latest
