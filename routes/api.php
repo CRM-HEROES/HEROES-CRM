@@ -43,6 +43,7 @@ use App\Http\Controllers\API\Project\DocumentTemplateController as ProjectDocume
 
 use App\Http\Controllers\API\Project\EventController as ProjectEventController;
 use App\Http\Controllers\API\Project\EventDescriptionTemplateController as ProjectEventDescriptionTemplateController;
+use App\Http\Controllers\API\Project\AttendanceController as ProjectAttendanceController;
 use App\Http\Controllers\API\Project\ExportController as ProjectExportController;
 use App\Http\Controllers\API\Project\FolderController as ProjectFolderController;
 use App\Http\Controllers\API\Project\FieldController as ProjectFieldController;
@@ -380,6 +381,13 @@ Route::group([
         Route::apiResource('folder', ProjectFolderController::class);
         // Group
         Route::apiResource('group', ProjectGroupController::class);
+
+        // Attendance (gestion de planning : pointage + retards)
+        Route::get('attendance/users', [ProjectAttendanceController::class, 'users']);
+        Route::post('attendance/leave', [ProjectAttendanceController::class, 'leave']);
+        Route::post('attendance/leave/remove', [ProjectAttendanceController::class, 'removeLeave']);
+        Route::apiResource('attendance', ProjectAttendanceController::class)
+            ->only('index', 'store', 'update', 'destroy');
 
         // Google Drive
         Route::get('google/drive', [ProjectGoogleDriveController::class, 'index']);

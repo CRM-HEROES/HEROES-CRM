@@ -52,6 +52,8 @@ const Stat = () => import("@/components/stat/Stat.vue");
 const Stat2 = () => import("@/components/stat2/Stat.vue");
 // Order
 const Order = () => import("@/components/order/Table/Layout.vue");
+// Planning (gestion de planning - RH)
+const Planning = () => import("@/components/planning/Planning.vue");
 
 // Error
 // 404
@@ -189,6 +191,15 @@ const routes = [
                 component: Order,
                 meta: {
                     title: `Devis`,
+                },
+            },
+            {
+                name: "planning",
+                path: "planning",
+                component: Planning,
+                meta: {
+                    title: `Gestion de planning`,
+                    page: "planning.index",
                 },
             },
             {
