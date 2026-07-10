@@ -108,18 +108,29 @@ class ProspectAutoAssignment
     protected function getProjectUsers(Project $project)
     {
         $allowedRoles = ['agent commercial', 'assistant commercial'];
+        $today = date('Y-m-d');
+
+        // Get user IDs that are on leave today or in the future
+        $onLeaveUserIds = DB::table('attendances')
+            ->where('project_id', $project->id)
+            ->whereDate('date', '>=', $today)
+            ->whereIn('status', ['absence', 'vacation', 'leave', 'congé'])
+            ->distinct('user_id')
+            ->pluck('user_id')
+            ->toArray();
 
         return $project->users()
             ->whereNull('banned_at')
             ->get(['id', 'name', 'role'])
-            ->filter(function (User $user) use ($allowedRoles) {
+            ->filter(function (User $user) use ($allowedRoles, $onLeaveUserIds) {
                 $role = trim(strtolower((string) $user->role));
 
                 return $user->is_assignable_for_prospect
                     && (
                         $role === ''
                         || in_array($role, $allowedRoles, true)
-                    );
+                    )
+                    && !in_array($user->id, $onLeaveUserIds, true);
             })
             ->values();
     }
