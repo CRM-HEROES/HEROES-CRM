@@ -19,6 +19,7 @@
                 <span><i class="dot present"></i> Présent</span>
                 <span><i class="dot retard"></i> Retard</span>
                 <span><i class="dot conge"></i> Congé</span>
+                <span><i class="dot pause"></i> Pause</span>
                 <span><i class="dot absent"></i> Absent</span>
             </div>
         </div>
@@ -90,6 +91,7 @@
                     <select v-model="form.status">
                         <option value="present">Présent</option>
                         <option value="leave">Congé</option>
+                        <option value="pause">Pause</option>
                         <option value="absent">Absent</option>
                     </select>
                 </div>
@@ -345,6 +347,7 @@ export default {
             if (!a) return null;
 
             if (a.status == "leave") return { label: "Congé", cls: "conge" };
+            if (a.status == "pause") return { label: "Pause", cls: "pause" };
             if (a.status == "absent") return { label: "Absent", cls: "absent" };
 
             if (a.arrival_at) {
@@ -533,8 +536,11 @@ export default {
                         });
                     }
                 } else {
+                    payload.expected_arrival = null;
+                    payload.expected_departure = null;
                     payload.arrival_at = null;
                     payload.departure_at = null;
+                    payload.break_minutes = 0;
                 }
 
                 const { data } = await attendanceService.store(
@@ -706,6 +712,7 @@ export default {
 .dot.present { background-color: #2abb47; }
 .dot.retard { background-color: #ef9f27; }
 .dot.conge { background-color: #1a73e8; }
+.dot.pause { background-color: #9a70ff; }
 .dot.absent { background-color: #e24b4a; }
 
 .hc-planning-table-wrapper {
@@ -779,6 +786,7 @@ export default {
 .hc-planning-pill.present { background-color: #e1f5e6; color: #1a7a33; }
 .hc-planning-pill.retard { background-color: #faeeda; color: #8a5a0b; }
 .hc-planning-pill.conge { background-color: #e6f1fb; color: #12508a; }
+.hc-planning-pill.pause { background-color: #f0e8ff; color: #5d3abe; }
 .hc-planning-pill.absent { background-color: #fcebeb; color: #a32d2d; }
 
 .hc-planning-empty {

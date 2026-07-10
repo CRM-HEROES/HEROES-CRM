@@ -559,7 +559,6 @@ class ImportProspects implements ShouldQueue
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
             ->whereNull('deleted_at')
-            ->where('import_id', '<>', $this->import->id)
             ->whereNotNull('email')
             ->where('email', '<>', '')
             ->select('email')
@@ -584,7 +583,6 @@ class ImportProspects implements ShouldQueue
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
             ->whereNull('deleted_at')
-            ->where('import_id', '<>', $this->import->id)
             ->whereNotNull('mobile_phone_number')
             ->where('mobile_phone_number', '<>', '')
             ->select('mobile_phone_number')
@@ -867,6 +865,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Associate the import users to each prospect in the import
+     * Only assign to prospects that don't already have users assigned.
      * 
      * @param  {array}  $prospectsIds list of prospects ids
      */
@@ -876,10 +875,26 @@ class ImportProspects implements ShouldQueue
             return;
         }
 
+        // Get prospects that already have users assigned
+        $assignedProspectIds = DB::table('prospect_user')
+            ->whereIn('prospect_id', $prospectsIds)
+            ->distinct('prospect_id')
+            ->pluck('prospect_id')
+            ->toArray();
+
+        // Filter out prospects that already have users
+        $unassignedProspectIds = array_filter($prospectsIds, function($id) use ($assignedProspectIds) {
+            return !in_array($id, $assignedProspectIds);
+        });
+
+        if (empty($unassignedProspectIds)) {
+            return; // All prospects already have users assigned
+        }
+
         $data = [];
 
         foreach ($this->import->users as $userId) {
-            foreach ($prospectsIds as $prospectId) {
+            foreach ($unassignedProspectIds as $prospectId) {
                 $data[] = [
                     'prospect_id' => $prospectId,
                     'user_id'     => $userId,
@@ -890,7 +905,9 @@ class ImportProspects implements ShouldQueue
             }
         }
 
-        DB::table('prospect_user')->insert($data);
+        if (!empty($data)) {
+            DB::table('prospect_user')->insert($data);
+        }
     }
 
     /**
