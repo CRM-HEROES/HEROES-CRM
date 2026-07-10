@@ -45,6 +45,11 @@ class Kernel extends ConsoleKernel
 
         // Automatic assignment of unassigned prospects
         $schedule->command('app:assign-prospects')->everyFiveMinutes()->withoutOverlapping();
+
+        // Attendance automation
+        $schedule->command('app:attendance-auto --mode=presence')->dailyAt('06:00');
+        $schedule->command('app:attendance-auto --mode=absent')->dailyAt('23:45');
+        $schedule->command('app:reassign-unavailable-prospects')->dailyAt('00:10');
     }
 
     /**

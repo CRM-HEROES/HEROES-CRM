@@ -105,9 +105,10 @@ class ProspectAutoAssignment
         return true;
     }
 
-    protected function getProjectUsers(Project $project)
+    protected function getProjectUsers(Project $project, array $excludeUserIds = [])
     {
         $allowedRoles = ['agent commercial', 'assistant commercial'];
+        $allowedRoleNames = array_map('strtolower', $allowedRoles);
         $today = date('Y-m-d');
 
         // Get user IDs that are on leave today or in the future
@@ -119,20 +120,113 @@ class ProspectAutoAssignment
             ->pluck('user_id')
             ->toArray();
 
+        $roleTable = config('permission.table_names.roles', 'roles');
+        $modelHasRolesTable = config('permission.table_names.model_has_roles', 'model_has_roles');
+
+        $roleUserIds = DB::table($modelHasRolesTable)
+            ->join($roleTable, $roleTable . '.id', '=', $modelHasRolesTable . '.role_id')
+            ->where($modelHasRolesTable . '.model_type', User::class)
+            ->where($modelHasRolesTable . '.project_id', $project->id)
+            ->whereIn(DB::raw('LOWER(' . $roleTable . '.name)'), $allowedRoleNames)
+            ->pluck($modelHasRolesTable . '.model_id')
+            ->toArray();
+
         return $project->users()
             ->whereNull('banned_at')
             ->get(['id', 'name', 'role'])
-            ->filter(function (User $user) use ($allowedRoles, $onLeaveUserIds) {
-                $role = trim(strtolower((string) $user->role));
+            ->filter(function (User $user) use ($allowedRoleNames, $roleUserIds, $onLeaveUserIds, $excludeUserIds) {
+                $roleField = trim(strtolower((string) $user->role));
 
                 return $user->is_assignable_for_prospect
                     && (
-                        $role === ''
-                        || in_array($role, $allowedRoles, true)
+                        in_array($roleField, $allowedRoleNames, true)
+                        || in_array($user->id, $roleUserIds, true)
                     )
-                    && !in_array($user->id, $onLeaveUserIds, true);
+                    && !in_array($user->id, $onLeaveUserIds, true)
+                    && !in_array($user->id, $excludeUserIds, true);
             })
             ->values();
+    }
+
+    public function reassignUnavailableProspects(?Project $project = null): int
+    {
+        $query = DB::table('attendances')
+            ->whereDate('date', date('Y-m-d'))
+            ->whereIn('status', ['leave', 'congé', 'absence', 'vacation']);
+
+        if ($project) {
+            $query->where('project_id', $project->id);
+        }
+
+        $unavailableUserIds = $query->distinct('user_id')->pluck('user_id')->toArray();
+        if (empty($unavailableUserIds)) {
+            return 0;
+        }
+
+        $prospectIds = DB::table('prospect_user')
+            ->join('prospects', 'prospect_user.prospect_id', '=', 'prospects.id')
+            ->whereIn('prospect_user.user_id', $unavailableUserIds)
+            ->when($project, fn ($q) => $q->where('prospects.project_id', $project->id))
+            ->distinct('prospect_user.prospect_id')
+            ->pluck('prospect_user.prospect_id')
+            ->toArray();
+
+        $reassigned = 0;
+
+        foreach ($prospectIds as $prospectId) {
+            $prospect = Prospect::with('users')->find($prospectId);
+            if (!$prospect) {
+                continue;
+            }
+
+            $project = $prospect->project;
+            if (!$project) {
+                continue;
+            }
+
+            $assignedUserIds = $prospect->users->pluck('id')->toArray();
+            $availableAssigned = array_filter($assignedUserIds, fn ($userId) => !in_array($userId, $unavailableUserIds, true));
+            if (!empty($availableAssigned)) {
+                continue;
+            }
+
+            $availableUsers = $this->getProjectUsers($project, $assignedUserIds);
+            if ($availableUsers->isEmpty()) {
+                continue;
+            }
+
+            $candidate = $this->chooseUser($prospect, $availableUsers, $this->getProjectUserCounts($project));
+            if (!$candidate) {
+                continue;
+            }
+
+            $now = Carbon::now();
+            $creatorId = auth()->id() ?: $prospect->creator_id ?: null;
+
+            DB::table('prospect_user')
+                ->where('prospect_id', $prospect->id)
+                ->whereIn('user_id', $unavailableUserIds)
+                ->delete();
+
+            $prospect->users()->syncWithoutDetaching([
+                $candidate->id => [
+                    'creator_id' => $creatorId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ],
+            ]);
+
+            Log::info('ProspectAutoAssignment: prospect reassigned from unavailable user', [
+                'prospect_id' => $prospect->id,
+                'new_user_id' => $candidate->id,
+                'project_id' => $project->id,
+            ]);
+
+            ProspectUserAttached::dispatch($prospect, $candidate);
+            $reassigned++;
+        }
+
+        return $reassigned;
     }
 
     protected function getProjectUserCounts(Project $project): array
