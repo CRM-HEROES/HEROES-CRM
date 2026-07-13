@@ -154,8 +154,56 @@ class AttendanceAuto extends Command
             ->whereNull('banned_at')
             ->get()
             ->filter(function (User $user) use ($allowedRoles) {
-                $role = trim(mb_strtolower((string) $user->role));
-                return in_array($role, $allowedRoles, true);
+                return $this->isAttendanceEligibleUser($user, $allowedRoles);
             });
+    }
+
+    protected function isAttendanceEligibleUser(User $user, array $allowedRoles): bool
+    {
+        if ($user->banned_at) {
+            return false;
+        }
+
+        $normalizedAllowedRoles = array_map(function (string $role): string {
+            return trim(mb_strtolower(str_replace(['_', '-'], ' ', $role)));
+        }, $allowedRoles);
+
+        $candidateRoleNames = collect();
+
+        $roles = $user->roles()->pluck('name')->all();
+        if (!empty($roles)) {
+            $candidateRoleNames = collect($roles)->map(function ($roleName) {
+                return trim(mb_strtolower(str_replace(['_', '-'], ' ', (string) $roleName)));
+            })->filter()->values();
+        }
+
+        if ($candidateRoleNames->isEmpty()) {
+            $directRoleNames = DB::table('model_has_roles')
+                ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+                ->where('model_has_roles.model_type', User::class)
+                ->where('model_has_roles.model_id', $user->getKey())
+                ->pluck('roles.name')
+                ->map(function ($roleName) {
+                    return trim(mb_strtolower(str_replace(['_', '-'], ' ', (string) $roleName)));
+                })
+                ->filter()
+                ->values();
+
+            if ($directRoleNames->isNotEmpty()) {
+                $candidateRoleNames = $directRoleNames;
+            }
+        }
+
+        if ($candidateRoleNames->isEmpty()) {
+            $candidateRoleNames = collect([$user->role ?? '']);
+        }
+
+        $candidateRoleNames = $candidateRoleNames->map(function ($roleName) {
+            return trim(mb_strtolower(str_replace(['_', '-'], ' ', (string) $roleName)));
+        })->filter()->values();
+
+        return $candidateRoleNames->contains(function ($roleName) use ($normalizedAllowedRoles) {
+            return in_array($roleName, $normalizedAllowedRoles, true);
+        });
     }
 }
