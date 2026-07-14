@@ -2238,6 +2238,12 @@ export default {
                 return true;
             }
 
+            // Computed server-side: takes into account whether the user
+            // is affected to the event itself or to its related prospect
+            if (this.prospectEvent.editable !== undefined) {
+                return this.prospectEvent.editable;
+            }
+
             if (this.prospectEvent.user_id == this.user.id) {
                 return true;
             }
