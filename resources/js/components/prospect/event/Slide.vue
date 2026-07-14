@@ -1374,10 +1374,10 @@ export default {
             this.addingEvent = true;
 
             try {
-                const d = await store.dispatch(
-                    /*this.prospect && this.prospect.id
+                await store.dispatch(
+                    this.prospect && this.prospect.id == data.prospect_id
                         ? ADD_PROSPECT_EVENT
-                        : */ ADD_EVENT,
+                        : ADD_EVENT,
                     data
                 );
 
@@ -1385,13 +1385,6 @@ export default {
                     store.commit(UPDATE_PROSPECT, {
                         id: this.prospect.id,
                         street: this.prospectEvent.location,
-                    });
-                }
-
-                if (this.prospect && this.prospect.id == data.prospect_id) {
-                    store.commit(ADD_PROSPECT_EVENT, {
-                        ...this.prospectEvent,
-                        id: d.id,
                     });
                 }
             } finally {
@@ -1436,18 +1429,14 @@ export default {
             this.updatingEvent = true;
 
             try {
-                await store.dispatch(
-                    /*this.prospect ? UPDATE_PROSPECT_EVENT : */ UPDATE_EVENT,
-                    data
-                );
-
-                if (this.prospect && this.prospect.id != data.prospect_id) {
-                    store.commit(REMOVE_PROSPECT_EVENT, this.prospectEvent.id);
+                if (this.prospect && this.prospect.id == data.prospect_id) {
+                    await store.dispatch(UPDATE_PROSPECT_EVENT, data);
                 } else {
-                    store.commit(
-                        this.prospect ? UPDATE_PROSPECT_EVENT : UPDATE_EVENT,
-                        this.prospectEvent
-                    );
+                    await store.dispatch(UPDATE_EVENT, data);
+
+                    if (this.prospect) {
+                        store.commit(REMOVE_PROSPECT_EVENT, this.prospectEvent.id);
+                    }
                 }
             } finally {
                 this.updatingEvent = false;
