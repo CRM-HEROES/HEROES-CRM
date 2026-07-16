@@ -120,6 +120,8 @@ class ProspectAutoAssignment
             ->pluck('user_id')
             ->toArray();
 
+        $busyUserIds = $this->getUsersInOngoingEvent();
+
         $roleTable = config('permission.table_names.roles', 'roles');
         $modelHasRolesTable = config('permission.table_names.model_has_roles', 'model_has_roles');
 
@@ -134,18 +136,46 @@ class ProspectAutoAssignment
         return $project->users()
             ->whereNull('banned_at')
             ->get(['id', 'name', 'role'])
-            ->filter(function (User $user) use ($allowedRoleNames, $roleUserIds, $onLeaveUserIds, $excludeUserIds) {
+            ->filter(function (User $user) use ($allowedRoleNames, $roleUserIds, $onLeaveUserIds, $busyUserIds, $excludeUserIds) {
                 $roleField = trim(strtolower((string) $user->role));
 
-                return $user->is_assignable_for_prospect
-                    && (
+                return (
                         in_array($roleField, $allowedRoleNames, true)
                         || in_array($user->id, $roleUserIds, true)
                     )
                     && !in_array($user->id, $onLeaveUserIds, true)
+                    && !in_array($user->id, $busyUserIds, true)
                     && !in_array($user->id, $excludeUserIds, true);
             })
             ->values();
+    }
+
+    /**
+     * IDs of users currently in an RDV (events.started_at <= now <= events.ended_at).
+     */
+    protected function getUsersInOngoingEvent(): array
+    {
+        $now = Carbon::now();
+
+        $directUserIds = DB::table('events')
+            ->whereNull('deleted_at')
+            ->whereNotNull('user_id')
+            ->where('started_at', '<=', $now)
+            ->where('ended_at', '>=', $now)
+            ->pluck('user_id');
+
+        $pivotUserIds = DB::table('user_event')
+            ->join('events', 'events.id', '=', 'user_event.event_id')
+            ->whereNull('events.deleted_at')
+            ->where('events.started_at', '<=', $now)
+            ->where('events.ended_at', '>=', $now)
+            ->pluck('user_event.user_id');
+
+        return $directUserIds->merge($pivotUserIds)
+            ->filter()
+            ->unique()
+            ->values()
+            ->toArray();
     }
 
     public function reassignUnavailableProspects(?Project $project = null): int

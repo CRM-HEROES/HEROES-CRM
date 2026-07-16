@@ -189,21 +189,6 @@
                     </svg>
                 </header-menu>
 
-                <!-- Planning -->
-
-                <header-menu
-                    v-if="can('all.planning')"
-                    icon="fa fa-calendar-week"
-                    color="#7939b8"
-                    :label="'Gestion de planning'"
-                    :to="{
-                        name: 'planning',
-                        params: {
-                            project: project.slug,
-                        },
-                    }"
-                />
-
                 <!-- MAP -->
 
                 <header-menu
