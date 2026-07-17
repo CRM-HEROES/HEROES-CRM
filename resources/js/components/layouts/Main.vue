@@ -602,10 +602,7 @@ export default {
             signOut: "auth/logout",
         }),
         async logout() {
-            await axios.post("/logout").then((response) => {
-                this.signOut();
-                this.$router.push({ name: "login" });
-            });
+            await this.signOut();
         },
         keydown(e) {
             if (e.ctrlKey) {

@@ -607,15 +607,7 @@ export default {
         },
 
         async logout() {
-            await axios
-                .post("/logout")
-                .then(({ data }) => {
-                    this.signOut();
-                })
-                .catch(({ response: { data } }) => {
-                    alert(data.message);
-                })
-                .finally(() => {});
+            await this.signOut();
         },
 
         /**
