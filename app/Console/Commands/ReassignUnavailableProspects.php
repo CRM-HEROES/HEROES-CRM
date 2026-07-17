@@ -9,7 +9,7 @@ use Illuminate\Console\Command;
 class ReassignUnavailableProspects extends Command
 {
     protected $signature = 'app:reassign-unavailable-prospects {project?}';
-    protected $description = 'Reassign prospects assigned to unavailable users (on leave, absent, vacation) to available commercial agents.';
+    protected $description = 'Reassign prospects assigned to users currently in an ongoing event (RDV) to available commercial agents.';
 
     public function handle(ProspectAutoAssignment $assignmentService)
     {
