@@ -18,8 +18,8 @@
                         v-text="$t('import.add.from.local_file')"
                     ></option>
                     <option
-                        value="webservice"
-                        v-text="$t('import.add.from.webservice')"
+                        value="google_sheets"
+                        v-text="$t('import.add.from.google_sheets')"
                     ></option>
                 </select>
             </v-field>
@@ -35,6 +35,18 @@
                     type="file"
                     accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     @change="setFile"
+            /></v-field>
+
+            <v-field
+                v-if="prospectImport.source == 'google_sheets'"
+                :label="$t('import.add.google_sheets.url')"
+                required
+                v-slot="{ label }"
+                ><input
+                    required
+                    type="url"
+                    :placeholder="label + ' ...'"
+                    v-model="prospectImport.url"
             /></v-field>
 
             <v-field :label="$t('import.add.name')" required v-slot="{ label }"
@@ -109,6 +121,7 @@ export default {
                 description: "",
                 source: "file",
                 file: null,
+                url: "",
                 field_delimiter: ",",
                 field_enclosure: "",
             };
@@ -125,23 +138,43 @@ export default {
                 formData.append(i, this.prospectImport[i]);
             }
 
+            let succeeded = false;
+
             try {
                 const pi = await store.dispatch(ADD_IMPORT, formData);
                 const prospectImport = await store.dispatch(SHOW_IMPORT, pi.id);
                 store.commit(OPEN_SLIDE, "import");
                 store.commit(SET_IMPORT, prospectImport);
+                succeeded = true;
+            } catch (e) {
+                const errors = e.response && e.response.data && e.response.data.errors;
+                const message =
+                    (errors && Object.values(errors)[0] && Object.values(errors)[0][0]) ||
+                    (e.response && e.response.data && e.response.data.message) ||
+                    e.message;
+
+                flashError({
+                    title: this.$t("import.add.title"),
+                    body: message,
+                });
             } finally {
                 this.addingImport = false;
-                // Réinitialise complètement le formulaire (modal)
-                this.prospectImport = this.newImport();
-                // Vide aussi l'input fichier natif (le nom du fichier reste
-                // affiché sinon, car un input type=file ne se réinitialise pas
-                // en changeant la variable liée)
-                if (this.$refs.fileInput) {
-                    this.$refs.fileInput.value = "";
+
+                // En cas d'erreur, on laisse le formulaire tel quel
+                // (modal ouvert, valeurs conservées) pour que l'utilisateur
+                // puisse corriger l'URL/le nom et réessayer.
+                if (succeeded) {
+                    // Réinitialise complètement le formulaire (modal)
+                    this.prospectImport = this.newImport();
+                    // Vide aussi l'input fichier natif (le nom du fichier reste
+                    // affiché sinon, car un input type=file ne se réinitialise pas
+                    // en changeant la variable liée)
+                    if (this.$refs.fileInput) {
+                        this.$refs.fileInput.value = "";
+                    }
+                    // Ferme le modal
+                    store.commit(CLOSE_MODAL);
                 }
-                // Ferme le modal
-                store.commit(CLOSE_MODAL);
             }
         },
 

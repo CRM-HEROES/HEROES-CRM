@@ -567,9 +567,15 @@
             "from": {
                 "label": "From",
                 "local_file": "Local file",
+                "google_sheets": "Google Sheets (link)",
                 "webservice": "External via URL"
             },
             "file": "File",
+            "google_sheets": {
+                "url": "Google Sheets link",
+                "invalid_url": "This Google Sheets link is not valid.",
+                "unreachable": "Unable to fetch this Google Sheets file. Make sure the share link allows \"Anyone with the link\" to view the document."
+            },
             "name": "Name",
             "field_delimiter": "Field delimiter",
             "field_enclosure": "Field enclosure",

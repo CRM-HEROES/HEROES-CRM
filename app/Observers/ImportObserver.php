@@ -24,19 +24,19 @@ class ImportObserver
      */
     public function created(Import $import): void
     {
-        if ($import->source == 'file') {
+        if (in_array($import->source, ['file', 'google_sheets'], true)) {
             ImportGetSummary::dispatchSync($import);
             $import->refresh();
             $this->autoMapping($import);
         }
     }
-    
+
     /**
      * Handle the Import "created" event.
      */
     public function updated(Import $import): void
     {
-        if ($import->source == 'file') {
+        if (in_array($import->source, ['file', 'google_sheets'], true)) {
             $this->launchOrStop($import);
         }
     }
@@ -61,7 +61,7 @@ class ImportObserver
     protected function launchOrStop(Import $import)
     {
         if (
-            $import->source != 'file' ||
+            !in_array($import->source, ['file', 'google_sheets'], true) ||
             !$import->isDirty('is_processing') ||
             !$import->is_processing
         ) {

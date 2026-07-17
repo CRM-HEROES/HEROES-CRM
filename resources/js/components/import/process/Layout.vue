@@ -46,9 +46,11 @@
                     <template #2>{{
                         $t("import.process.tab.relations.title")
                     }}</template>
-                    <template #3 v-if="prospectImport.source == 'file'">{{
-                        $t("import.process.tab.duplicate.title")
-                    }}</template>
+                    <template
+                        #3
+                        v-if="['file', 'google_sheets'].includes(prospectImport.source)"
+                        >{{ $t("import.process.tab.duplicate.title") }}</template
+                    >
                     <template #4>{{
                         $t("import.process.tab.import.title")
                     }}</template>
@@ -61,7 +63,10 @@
                     <template #2>
                         <relation />
                     </template>
-                    <template #3 v-if="prospectImport.source == 'file'">
+                    <template
+                        #3
+                        v-if="['file', 'google_sheets'].includes(prospectImport.source)"
+                    >
                         <duplicate />
                     </template>
                     <template #4>

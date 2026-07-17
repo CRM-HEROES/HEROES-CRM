@@ -567,9 +567,15 @@
             "from": {
                 "label": "Depuis",
                 "local_file": "Fichier local",
+                "google_sheets": "Google Sheets (lien)",
                 "webservice": "Externe via URL"
             },
             "file": "Fichier",
+            "google_sheets": {
+                "url": "Lien Google Sheets",
+                "invalid_url": "Ce lien Google Sheets n'est pas valide.",
+                "unreachable": "Impossible de récupérer ce fichier Google Sheets. Vérifiez que le lien de partage autorise \"Tous les utilisateurs disposant du lien\" à voir le document."
+            },
             "name": "Nom",
             "field_delimiter": "Séparateur de champs",
             "field_enclosure": "Délimiteur de texte",
