@@ -32,7 +32,7 @@ class ImportController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'url' => 'required_if:source,google_sheets|url',
+            'url' => 'required_if:source,google_sheets',
         ]);
 
         $import = $project
