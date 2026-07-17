@@ -683,15 +683,7 @@ export default {
             store.commit(OPEN_SLIDE, "manage-users");
         },
         async logout() {
-            await axios
-                .post("/logout")
-                .then(({ data }) => {
-                    this.signOut();
-                })
-                .catch(({ response: { data } }) => {
-                    alert(data.message);
-                })
-                .finally(() => {});
+            await this.signOut();
         },
         setting() {
             store.commit(OPEN_SLIDE, "settings");

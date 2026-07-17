@@ -90,9 +90,21 @@ export default {
             }
         },
         logout({ commit }) {
-            commit("SET_USER", {});
-            commit("SET_AUTHENTICATED", false);
-            router.push({ name: "login" });
+            return axios
+                .post("/logout")
+                .catch(() => {
+                    // Même si l'appel échoue (session déjà expirée, CSRF
+                    // périmé, coupure réseau...), l'utilisateur doit quand
+                    // même être déconnecté côté client : ne jamais le
+                    // laisser bloqué sur une session obsolète.
+                })
+                .finally(() => {
+                    commit("SET_USER", {});
+                    commit("SET_AUTHENTICATED", false);
+                    commit("SET_IMPERSONATING", false);
+                    commit("SET_IMPERSONATE_PROJECT", null);
+                    router.push({ name: "login" });
+                });
         },
     },
 };
