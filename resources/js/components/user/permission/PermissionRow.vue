@@ -4,7 +4,7 @@
         <div class="hc-item-main-content" v-text="permission.name"></div>
         <div v-if="count" class="hc-item-count" v-text="count"></div>
         <checkbox
-            v-if="!permission.action"
+            v-if="!permission.sub && !permission.action"
             :model-value="value"
             :disabled="disabled"
             @change="change"
