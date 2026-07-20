@@ -99,11 +99,12 @@ export default {
                 // même être déconnecté côté client : ne jamais le
                 // laisser bloqué sur une session obsolète.
             } finally {
+                router.push({ name: "login" });
                 commit("SET_USER", {});
                 commit("SET_AUTHENTICATED", false);
                 commit("SET_IMPERSONATING", false);
                 commit("SET_IMPERSONATE_PROJECT", null);
-                router.push({ name: "login" });
+                // router.push({ name: "login" });
             }
         },
     },
