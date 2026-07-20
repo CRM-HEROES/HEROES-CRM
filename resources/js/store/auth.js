@@ -89,10 +89,23 @@ export default {
                 commit("SET_AUTHENTICATED", false);
             }
         },
-        logout({ commit }) {
-            commit("SET_USER", {});
-            commit("SET_AUTHENTICATED", false);
-            router.push({ name: "login" });
+        async logout({ commit }) {
+            try {
+                await axios.get("/sanctum/csrf-cookie");
+                await axios.post("/logout");
+            } catch (e) {
+                // Même si l'appel échoue (session déjà expirée, CSRF
+                // périmé, coupure réseau...), l'utilisateur doit quand
+                // même être déconnecté côté client : ne jamais le
+                // laisser bloqué sur une session obsolète.
+            } finally {
+                router.push({ name: "login" });
+                commit("SET_USER", {});
+                commit("SET_AUTHENTICATED", false);
+                commit("SET_IMPERSONATING", false);
+                commit("SET_IMPERSONATE_PROJECT", null);
+                // router.push({ name: "login" });
+            }
         },
     },
 };
