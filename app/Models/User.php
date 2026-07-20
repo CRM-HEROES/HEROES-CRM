@@ -117,6 +117,22 @@ class User extends Authenticatable // implements MustVerifyEmail
         return request()->project && (request()->project->creator_id == $this->id || $this->can('', request()->project));
     }
 
+    /**
+     * Determine whether the user can be assigned a prospect.
+     *
+     * @return bool
+     */
+    public function getIsAssignableForProspectAttribute(): bool
+    {
+        if (empty($this->role)) {
+            return true;
+        }
+
+        $role = strtolower(trim($this->role));
+        $excludedRoles = ['super_admin', 'administrateur', 'superviseur', 'administrator', 'supervisor'];
+
+        return !in_array($role, $excludedRoles, true);
+    }
 
     /**
      * Get is super admin

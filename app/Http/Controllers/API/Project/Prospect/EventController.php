@@ -108,13 +108,9 @@ class EventController extends Controller
         // Authenticated user has access to view the event
         abort_unless(
             // Project or Super admin
-            auth()->user()->can('', $project) || 
-            // Affected user
-            $event->user_id == auth()->id() || 
-            // Creator user
-            $event->creator_id == auth()->id() || 
-            // Associated users
-            $event->users()->where('id', auth()->id())->first(), 
+            auth()->user()->can('', $project) ||
+            // Affected user (event or its prospect)
+            $event->isAffectedTo(auth()->user()),
             404
         );
 
@@ -127,6 +123,12 @@ class EventController extends Controller
         $event->load('user:id,name');
         $event->load('users:id,name');
         $event->load('vehicle:id,name');
+
+        // Whether the current user can edit/delete this event
+        $event->setAttribute(
+            'editable',
+            auth()->user()->can('', $project) || $event->isAffectedTo(auth()->user())
+        );
 
         return $event;
     }
@@ -156,11 +158,9 @@ class EventController extends Controller
         // Authenticated user can edit the event
         abort_unless(
             // Project or Super admin
-            auth()->user()->can('', $project) || 
-            // Affected user
-            $event->user_id == auth()->id() || 
-            // Creator user
-            $event->creator_id == auth()->id(), 
+            auth()->user()->can('', $project) ||
+            // Affected user (event or its prospect)
+            $event->isAffectedTo(auth()->user()),
             404
         );
 
@@ -193,11 +193,9 @@ class EventController extends Controller
         // Authenticated user can edit the event
         abort_unless(
             // Project or Super admin
-            auth()->user()->can('', $project) || 
-            // Affected user
-            $event->user_id == auth()->id() || 
-            // Creator user
-            $event->creator_id == auth()->id(), 
+            auth()->user()->can('', $project) ||
+            // Affected user (event or its prospect)
+            $event->isAffectedTo(auth()->user()),
             404
         );
 

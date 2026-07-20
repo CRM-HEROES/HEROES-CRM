@@ -25,10 +25,12 @@ use App\Jobs\Import\ProspectItemsHandler\MessagesHandler;
 use App\Jobs\Import\ProspectItemsHandler\OrdersHandler;
 use App\Jobs\Import\ProspectItemsHandler\SmsHandler;
 use App\Jobs\Import\ProspectItemsHandler\UsersHandler;
+use App\Events\ImportFinished;
 use App\Models\Import;
-// use App\Events\ImportFinished;
+use App\Services\ProspectAutoAssignment;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use Illuminate\Support\Facades\Log;
 
 use Carbon\Carbon;
 
@@ -104,21 +106,27 @@ class ImportProspects implements ShouldQueue
      */
     public function handle()
     {
-        // check if we should stop the import
-        if ($this->checkImportStopped()) {
-            return;
-        }
+        Log::info('ImportProspects: starting import', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+        ]);
 
-        $this->import->update(['processing_at' => Carbon::now()]);
+        try {
+            // check if we should stop the import
+            if ($this->checkImportStopped()) {
+                return;
+            }
 
-        // Remove previous imported prospects
-        $this->removePreviousImportProspects();
+            $this->import->update(['processing_at' => Carbon::now()]);
+
+            // Remove previous imported prospects
+            $this->removePreviousImportProspects();
 
 
-        // Total count of imported prospects
-        $rowsCount = 0;
-        // Temporary prospects array
-        $prospects = [];
+            // Total count of imported prospects
+            $rowsCount = 0;
+            // Temporary prospects array
+            $prospects = [];
 
 
         // WE USE "BOX SPOUT" FOR THE FILE READING
@@ -197,6 +205,15 @@ class ImportProspects implements ShouldQueue
             $this->handleProspects($prospects);
         }
 
+        // Assign automatically any imported prospects
+        // that were not assigned during import relation handling.
+        $automaticAssignments = app(ProspectAutoAssignment::class)
+            ->assignUnassignedProspects(null, $this->import->id);
+
+        Log::info('ImportProspects: automatic assignment after import', [
+            'import_id' => $this->import->id,
+            'assigned_count' => $automaticAssignments,
+        ]);
 
         // Close the reader
         $reader->close();
@@ -218,9 +235,40 @@ class ImportProspects implements ShouldQueue
             'processed_at' => Carbon::now(),
         ]);
 
+        ImportFinished::dispatch($this->import->refresh());
+
+        Log::info('ImportProspects: finished import', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'rows_count' => $rowsCount,
+        ]);
+
         // Send notification to the import's creator
         // that import has been finished
         $this->notifyImportFinished();
+    } catch (\Throwable $exception) {
+        Log::error('ImportProspects: import failed during handle', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'message' => $exception->getMessage(),
+        ]);
+
+        throw $exception;
+    }
+}
+
+    public function failed(\Throwable $exception)
+    {
+        Log::error('ImportProspects: import failed', [
+            'import_id' => $this->import->id,
+            'project_id' => $this->import->project_id,
+            'message' => $exception->getMessage(),
+        ]);
+
+        $this->import->update([
+            'is_processing' => 0,
+            'processed_at' => Carbon::now(),
+        ]);
     }
 
     /**
@@ -511,7 +559,6 @@ class ImportProspects implements ShouldQueue
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
             ->whereNull('deleted_at')
-            ->where('import_id', '<>', $this->import->id)
             ->whereNotNull('email')
             ->where('email', '<>', '')
             ->select('email')
@@ -536,7 +583,6 @@ class ImportProspects implements ShouldQueue
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
             ->whereNull('deleted_at')
-            ->where('import_id', '<>', $this->import->id)
             ->whereNotNull('mobile_phone_number')
             ->where('mobile_phone_number', '<>', '')
             ->select('mobile_phone_number')
@@ -819,6 +865,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Associate the import users to each prospect in the import
+     * Only assign to prospects that don't already have users assigned.
      * 
      * @param  {array}  $prospectsIds list of prospects ids
      */
@@ -828,10 +875,26 @@ class ImportProspects implements ShouldQueue
             return;
         }
 
+        // Get prospects that already have users assigned
+        $assignedProspectIds = DB::table('prospect_user')
+            ->whereIn('prospect_id', $prospectsIds)
+            ->distinct('prospect_id')
+            ->pluck('prospect_id')
+            ->toArray();
+
+        // Filter out prospects that already have users
+        $unassignedProspectIds = array_filter($prospectsIds, function($id) use ($assignedProspectIds) {
+            return !in_array($id, $assignedProspectIds);
+        });
+
+        if (empty($unassignedProspectIds)) {
+            return; // All prospects already have users assigned
+        }
+
         $data = [];
 
         foreach ($this->import->users as $userId) {
-            foreach ($prospectsIds as $prospectId) {
+            foreach ($unassignedProspectIds as $prospectId) {
                 $data[] = [
                     'prospect_id' => $prospectId,
                     'user_id'     => $userId,
@@ -842,7 +905,9 @@ class ImportProspects implements ShouldQueue
             }
         }
 
-        DB::table('prospect_user')->insert($data);
+        if (!empty($data)) {
+            DB::table('prospect_user')->insert($data);
+        }
     }
 
     /**

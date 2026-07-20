@@ -195,6 +195,10 @@ var DEFAULT_SCHEDULE = {
         label: "Congé",
         cls: "conge"
       };
+      if (a.status == "pause") return {
+        label: "Pause",
+        cls: "pause"
+      };
       if (a.status == "absent") return {
         label: "Absent",
         cls: "absent"
@@ -384,8 +388,11 @@ var DEFAULT_SCHEDULE = {
                   });
                 }
               } else {
+                payload.expected_arrival = null;
+                payload.expected_departure = null;
                 payload.arrival_at = null;
                 payload.departure_at = null;
+                payload.break_minutes = 0;
               }
               _context3.next = 19;
               return _apis_project_attendance__WEBPACK_IMPORTED_MODULE_0__["default"].store(_this6.project.slug, payload);
@@ -546,7 +553,7 @@ var _hoisted_3 = {
   "class": "hc-planning-week"
 };
 var _hoisted_4 = ["textContent"];
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"hc-planning-legend\" data-v-1e69abb4><span data-v-1e69abb4><i class=\"dot present\" data-v-1e69abb4></i> Présent</span><span data-v-1e69abb4><i class=\"dot retard\" data-v-1e69abb4></i> Retard</span><span data-v-1e69abb4><i class=\"dot conge\" data-v-1e69abb4></i> Congé</span><span data-v-1e69abb4><i class=\"dot absent\" data-v-1e69abb4></i> Absent</span></div>", 1);
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<div class=\"hc-planning-legend\" data-v-1e69abb4><span data-v-1e69abb4><i class=\"dot present\" data-v-1e69abb4></i> Présent</span><span data-v-1e69abb4><i class=\"dot retard\" data-v-1e69abb4></i> Retard</span><span data-v-1e69abb4><i class=\"dot conge\" data-v-1e69abb4></i> Congé</span><span data-v-1e69abb4><i class=\"dot pause\" data-v-1e69abb4></i> Pause</span><span data-v-1e69abb4><i class=\"dot absent\" data-v-1e69abb4></i> Absent</span></div>", 1);
 var _hoisted_6 = {
   "class": "hc-planning-table-wrapper"
 };
@@ -605,67 +612,72 @@ var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
 });
 var _hoisted_29 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "pause"
+  }, "Pause", -1 /* HOISTED */);
+});
+var _hoisted_30 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "absent"
   }, "Absent", -1 /* HOISTED */);
 });
-var _hoisted_30 = [_hoisted_27, _hoisted_28, _hoisted_29];
-var _hoisted_31 = {
+var _hoisted_31 = [_hoisted_27, _hoisted_28, _hoisted_29, _hoisted_30];
+var _hoisted_32 = {
   "class": "hc-planning-field-row"
 };
-var _hoisted_32 = {
+var _hoisted_33 = {
   "class": "hc-planning-field"
 };
-var _hoisted_33 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_34 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Du", -1 /* HOISTED */);
 });
-var _hoisted_34 = {
+var _hoisted_35 = {
   "class": "hc-planning-field"
 };
-var _hoisted_35 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Au", -1 /* HOISTED */);
 });
-var _hoisted_36 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_37 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-planning-preview"
   }, " Le congé sera appliqué à tous les jours de la période. ", -1 /* HOISTED */);
 });
-var _hoisted_37 = {
+var _hoisted_38 = {
   "class": "hc-planning-field-row"
 };
-var _hoisted_38 = {
+var _hoisted_39 = {
   "class": "hc-planning-field"
 };
-var _hoisted_39 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_40 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Arrivée prévue", -1 /* HOISTED */);
 });
-var _hoisted_40 = {
+var _hoisted_41 = {
   "class": "hc-planning-field"
 };
-var _hoisted_41 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_42 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Départ prévu", -1 /* HOISTED */);
 });
-var _hoisted_42 = {
+var _hoisted_43 = {
   "class": "hc-planning-field-row"
 };
-var _hoisted_43 = {
+var _hoisted_44 = {
   "class": "hc-planning-field"
 };
-var _hoisted_44 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_45 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Arrivée réelle", -1 /* HOISTED */);
 });
-var _hoisted_45 = {
+var _hoisted_46 = {
   "class": "hc-planning-field"
 };
-var _hoisted_46 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_47 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Départ réel", -1 /* HOISTED */);
 });
-var _hoisted_47 = {
+var _hoisted_48 = {
   "class": "hc-planning-field"
 };
-var _hoisted_48 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_49 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Pause (h:min)", -1 /* HOISTED */);
 });
-var _hoisted_49 = {
+var _hoisted_50 = {
   style: {
     "display": "flex",
     "align-items": "center",
@@ -676,17 +688,17 @@ var _hoisted_49 = {
     "cursor": "pointer"
   }
 };
-var _hoisted_50 = ["innerHTML"];
-var _hoisted_51 = {
+var _hoisted_51 = ["innerHTML"];
+var _hoisted_52 = {
   "class": "hc-planning-field"
 };
-var _hoisted_52 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_53 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Note", -1 /* HOISTED */);
 });
-var _hoisted_53 = {
+var _hoisted_54 = {
   "class": "hc-planning-editor-buttons"
 };
-var _hoisted_54 = ["textContent"];
+var _hoisted_55 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Toolbar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
@@ -764,46 +776,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $data.form.status = $event;
     })
-  }, _hoisted_30, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.status]])]), $data.form.status == 'leave' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, _hoisted_31, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.status]])]), $data.form.status == 'leave' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return $data.form.leave_from = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.leave_from]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.leave_from]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [_hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "date",
     "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $data.form.leave_to = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.leave_to]])])]), _hoisted_36], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.form.status == 'present' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.leave_to]])])]), _hoisted_37], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.form.status == 'present' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "time",
     "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
       return $data.form.expected_arrival = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.expected_arrival]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.expected_arrival]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "time",
     "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
       return $data.form.expected_departure = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.expected_departure]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.expected_departure]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [_hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "time",
     "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
       return $data.form.arrival = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.arrival]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [_hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.arrival]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "time",
     "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
       return $data.form.departure = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.departure]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.departure]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [_hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "time",
     "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
       return $options.breakTime = $event;
     })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.breakTime]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.breakTime]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
       return $data.form.save_as_default = $event;
@@ -815,20 +827,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "hc-planning-preview",
     innerHTML: $options.livePreview
-  }, null, 8 /* PROPS */, _hoisted_50)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [_hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  }, null, 8 /* PROPS */, _hoisted_51)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [_hoisted_53, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
       return $data.form.note = $event;
     }),
     rows: "2",
     placeholder: "Note ..."
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.note]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [$data.editing.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.note]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [$data.editing.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     "class": "hc-planning-btn danger",
     onClick: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.remove && $options.remove.apply($options, arguments);
     }, ["prevent"])),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.status == 'leave' ? 'Annuler le congé' : 'Supprimer')
-  }, null, 8 /* PROPS */, _hoisted_54)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     "class": "hc-planning-btn primary",
     onClick: _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.save && $options.save.apply($options, arguments);
@@ -899,7 +911,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-planning[data-v-1e69abb4] {\n    padding: 12px;\n    width: 100%;\n    height: 100%;\n    overflow: auto;\n}\n.hc-planning-toolbar[data-v-1e69abb4] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    flex-wrap: wrap;\n    gap: 10px;\n    margin-bottom: 12px;\n}\n.hc-planning-week[data-v-1e69abb4] {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 14px;\n    font-weight: 500;\n}\n.hc-planning-nav[data-v-1e69abb4] {\n    cursor: pointer;\n    color: #555;\n    padding: 4px 8px;\n    border-radius: 6px;\n    text-decoration: none;\n}\n.hc-planning-nav[data-v-1e69abb4]:hover {\n    background-color: #f0f0f0;\n}\n.hc-planning-legend[data-v-1e69abb4] {\n    display: flex;\n    gap: 14px;\n    font-size: 12px;\n    color: #666;\n}\n.hc-planning-legend .dot[data-v-1e69abb4] {\n    display: inline-block;\n    width: 9px;\n    height: 9px;\n    border-radius: 50%;\n    margin-right: 3px;\n}\n.dot.present[data-v-1e69abb4] { background-color: #2abb47;\n}\n.dot.retard[data-v-1e69abb4] { background-color: #ef9f27;\n}\n.dot.conge[data-v-1e69abb4] { background-color: #1a73e8;\n}\n.dot.absent[data-v-1e69abb4] { background-color: #e24b4a;\n}\n.hc-planning-table-wrapper[data-v-1e69abb4] {\n    position: relative;\n    border: 1px solid #e6e6e6;\n    border-radius: 10px;\n    overflow: hidden;\n}\n.hc-planning-table[data-v-1e69abb4] {\n    width: 100%;\n    border-collapse: collapse;\n    table-layout: fixed;\n}\n.hc-planning-table th[data-v-1e69abb4] {\n    background-color: #f7f7f7;\n    font-size: 12px;\n    font-weight: 500;\n    color: #666;\n    padding: 8px 4px;\n    text-align: center;\n    border-bottom: 1px solid #e6e6e6;\n}\n.hc-planning-table th.hc-planning-emp[data-v-1e69abb4],\n.hc-planning-table td.hc-planning-emp[data-v-1e69abb4] {\n    width: 20%;\n    text-align: left;\n    padding-left: 10px;\n}\n.hc-planning-emp-name[data-v-1e69abb4] {\n    font-size: 13px;\n    font-weight: 500;\n    color: #222;\n}\n.hc-planning-emp-sub[data-v-1e69abb4] {\n    font-size: 11px;\n    color: #888;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n.hc-planning-cell[data-v-1e69abb4] {\n    text-align: center;\n    padding: 7px 3px;\n    border-bottom: 1px solid #eee;\n    border-left: 1px solid #f2f2f2;\n    cursor: pointer;\n    vertical-align: top;\n}\n.hc-planning-cell[data-v-1e69abb4]:hover {\n    background-color: #f6faff;\n}\n.hc-planning-times[data-v-1e69abb4] {\n    font-family: monospace;\n    font-size: 11px;\n    color: #333;\n    margin-bottom: 3px;\n}\n.hc-planning-pill[data-v-1e69abb4] {\n    display: inline-block;\n    padding: 1px 6px;\n    border-radius: 6px;\n    font-size: 11px;\n}\n.hc-planning-pill.present[data-v-1e69abb4] { background-color: #e1f5e6; color: #1a7a33;\n}\n.hc-planning-pill.retard[data-v-1e69abb4] { background-color: #faeeda; color: #8a5a0b;\n}\n.hc-planning-pill.conge[data-v-1e69abb4] { background-color: #e6f1fb; color: #12508a;\n}\n.hc-planning-pill.absent[data-v-1e69abb4] { background-color: #fcebeb; color: #a32d2d;\n}\n.hc-planning-empty[data-v-1e69abb4] {\n    color: #ccc;\n    font-size: 14px;\n}\n.hc-planning-total[data-v-1e69abb4] {\n    text-align: center;\n    font-size: 11px;\n    color: #666;\n    border-bottom: 1px solid #eee;\n    border-left: 1px solid #f2f2f2;\n    vertical-align: top;\n    padding: 8px 4px;\n}\n.hc-planning-none[data-v-1e69abb4] {\n    text-align: center;\n    color: #999;\n    padding: 20px;\n    font-size: 13px;\n}\n.hc-planning-overlay[data-v-1e69abb4] {\n    position: fixed;\n    inset: 0;\n    background-color: rgba(0, 0, 0, 0.35);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    z-index: 2000;\n}\n.hc-planning-editor[data-v-1e69abb4] {\n    background-color: white;\n    width: 360px;\n    max-width: 92vw;\n    border-radius: 12px;\n    padding: 16px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);\n}\n.hc-planning-editor-header[data-v-1e69abb4] {\n    display: flex;\n    align-items: start;\n    justify-content: space-between;\n    margin-bottom: 12px;\n}\n.hc-planning-editor-title[data-v-1e69abb4] {\n    font-size: 15px;\n    font-weight: 500;\n}\n.hc-planning-field[data-v-1e69abb4] {\n    margin-bottom: 10px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    flex: 1;\n}\n.hc-planning-field label[data-v-1e69abb4] {\n    font-size: 12px;\n    color: #666;\n}\n.hc-planning-field input[data-v-1e69abb4],\n.hc-planning-field select[data-v-1e69abb4],\n.hc-planning-field textarea[data-v-1e69abb4] {\n    border: 1px solid #ddd;\n    border-radius: 6px;\n    padding: 6px 8px;\n    font-size: 13px;\n    width: 100%;\n}\n.hc-planning-field-row[data-v-1e69abb4] {\n    display: flex;\n    gap: 10px;\n}\n.hc-planning-preview[data-v-1e69abb4] {\n    font-size: 12px;\n    color: #8a5a0b;\n    background-color: #faeeda;\n    padding: 6px 8px;\n    border-radius: 6px;\n    margin-bottom: 10px;\n}\n.hc-planning-editor-buttons[data-v-1e69abb4] {\n    display: flex;\n    justify-content: flex-end;\n    gap: 8px;\n    margin-top: 8px;\n    position: relative;\n}\n.hc-planning-btn[data-v-1e69abb4] {\n    border: none;\n    border-radius: 7px;\n    padding: 8px 14px;\n    font-size: 13px;\n    cursor: pointer;\n}\n.hc-planning-btn.primary[data-v-1e69abb4] {\n    background-color: #12a0f3;\n    color: white;\n}\n.hc-planning-btn.danger[data-v-1e69abb4] {\n    background-color: #fcebeb;\n    color: #a32d2d;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-planning[data-v-1e69abb4] {\n    padding: 12px;\n    width: 100%;\n    height: 100%;\n    overflow: auto;\n}\n.hc-planning-toolbar[data-v-1e69abb4] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    flex-wrap: wrap;\n    gap: 10px;\n    margin-bottom: 12px;\n}\n.hc-planning-week[data-v-1e69abb4] {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    font-size: 14px;\n    font-weight: 500;\n}\n.hc-planning-nav[data-v-1e69abb4] {\n    cursor: pointer;\n    color: #555;\n    padding: 4px 8px;\n    border-radius: 6px;\n    text-decoration: none;\n}\n.hc-planning-nav[data-v-1e69abb4]:hover {\n    background-color: #f0f0f0;\n}\n.hc-planning-legend[data-v-1e69abb4] {\n    display: flex;\n    gap: 14px;\n    font-size: 12px;\n    color: #666;\n}\n.hc-planning-legend .dot[data-v-1e69abb4] {\n    display: inline-block;\n    width: 9px;\n    height: 9px;\n    border-radius: 50%;\n    margin-right: 3px;\n}\n.dot.present[data-v-1e69abb4] { background-color: #2abb47;\n}\n.dot.retard[data-v-1e69abb4] { background-color: #ef9f27;\n}\n.dot.conge[data-v-1e69abb4] { background-color: #1a73e8;\n}\n.dot.pause[data-v-1e69abb4] { background-color: #9a70ff;\n}\n.dot.absent[data-v-1e69abb4] { background-color: #e24b4a;\n}\n.hc-planning-table-wrapper[data-v-1e69abb4] {\n    position: relative;\n    border: 1px solid #e6e6e6;\n    border-radius: 10px;\n    overflow: hidden;\n}\n.hc-planning-table[data-v-1e69abb4] {\n    width: 100%;\n    border-collapse: collapse;\n    table-layout: fixed;\n}\n.hc-planning-table th[data-v-1e69abb4] {\n    background-color: #f7f7f7;\n    font-size: 12px;\n    font-weight: 500;\n    color: #666;\n    padding: 8px 4px;\n    text-align: center;\n    border-bottom: 1px solid #e6e6e6;\n}\n.hc-planning-table th.hc-planning-emp[data-v-1e69abb4],\n.hc-planning-table td.hc-planning-emp[data-v-1e69abb4] {\n    width: 20%;\n    text-align: left;\n    padding-left: 10px;\n}\n.hc-planning-emp-name[data-v-1e69abb4] {\n    font-size: 13px;\n    font-weight: 500;\n    color: #222;\n}\n.hc-planning-emp-sub[data-v-1e69abb4] {\n    font-size: 11px;\n    color: #888;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n.hc-planning-cell[data-v-1e69abb4] {\n    text-align: center;\n    padding: 7px 3px;\n    border-bottom: 1px solid #eee;\n    border-left: 1px solid #f2f2f2;\n    cursor: pointer;\n    vertical-align: top;\n}\n.hc-planning-cell[data-v-1e69abb4]:hover {\n    background-color: #f6faff;\n}\n.hc-planning-times[data-v-1e69abb4] {\n    font-family: monospace;\n    font-size: 11px;\n    color: #333;\n    margin-bottom: 3px;\n}\n.hc-planning-pill[data-v-1e69abb4] {\n    display: inline-block;\n    padding: 1px 6px;\n    border-radius: 6px;\n    font-size: 11px;\n}\n.hc-planning-pill.present[data-v-1e69abb4] { background-color: #e1f5e6; color: #1a7a33;\n}\n.hc-planning-pill.retard[data-v-1e69abb4] { background-color: #faeeda; color: #8a5a0b;\n}\n.hc-planning-pill.conge[data-v-1e69abb4] { background-color: #e6f1fb; color: #12508a;\n}\n.hc-planning-pill.pause[data-v-1e69abb4] { background-color: #f0e8ff; color: #5d3abe;\n}\n.hc-planning-pill.absent[data-v-1e69abb4] { background-color: #fcebeb; color: #a32d2d;\n}\n.hc-planning-empty[data-v-1e69abb4] {\n    color: #ccc;\n    font-size: 14px;\n}\n.hc-planning-total[data-v-1e69abb4] {\n    text-align: center;\n    font-size: 11px;\n    color: #666;\n    border-bottom: 1px solid #eee;\n    border-left: 1px solid #f2f2f2;\n    vertical-align: top;\n    padding: 8px 4px;\n}\n.hc-planning-none[data-v-1e69abb4] {\n    text-align: center;\n    color: #999;\n    padding: 20px;\n    font-size: 13px;\n}\n.hc-planning-overlay[data-v-1e69abb4] {\n    position: fixed;\n    inset: 0;\n    background-color: rgba(0, 0, 0, 0.35);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    z-index: 2000;\n}\n.hc-planning-editor[data-v-1e69abb4] {\n    background-color: white;\n    width: 360px;\n    max-width: 92vw;\n    border-radius: 12px;\n    padding: 16px;\n    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);\n}\n.hc-planning-editor-header[data-v-1e69abb4] {\n    display: flex;\n    align-items: start;\n    justify-content: space-between;\n    margin-bottom: 12px;\n}\n.hc-planning-editor-title[data-v-1e69abb4] {\n    font-size: 15px;\n    font-weight: 500;\n}\n.hc-planning-field[data-v-1e69abb4] {\n    margin-bottom: 10px;\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    flex: 1;\n}\n.hc-planning-field label[data-v-1e69abb4] {\n    font-size: 12px;\n    color: #666;\n}\n.hc-planning-field input[data-v-1e69abb4],\n.hc-planning-field select[data-v-1e69abb4],\n.hc-planning-field textarea[data-v-1e69abb4] {\n    border: 1px solid #ddd;\n    border-radius: 6px;\n    padding: 6px 8px;\n    font-size: 13px;\n    width: 100%;\n}\n.hc-planning-field-row[data-v-1e69abb4] {\n    display: flex;\n    gap: 10px;\n}\n.hc-planning-preview[data-v-1e69abb4] {\n    font-size: 12px;\n    color: #8a5a0b;\n    background-color: #faeeda;\n    padding: 6px 8px;\n    border-radius: 6px;\n    margin-bottom: 10px;\n}\n.hc-planning-editor-buttons[data-v-1e69abb4] {\n    display: flex;\n    justify-content: flex-end;\n    gap: 8px;\n    margin-top: 8px;\n    position: relative;\n}\n.hc-planning-btn[data-v-1e69abb4] {\n    border: none;\n    border-radius: 7px;\n    padding: 8px 14px;\n    font-size: 13px;\n    cursor: pointer;\n}\n.hc-planning-btn.primary[data-v-1e69abb4] {\n    background-color: #12a0f3;\n    color: white;\n}\n.hc-planning-btn.danger[data-v-1e69abb4] {\n    background-color: #fcebeb;\n    color: #a32d2d;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

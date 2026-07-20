@@ -1,0 +1,5 @@
+version: '3'
+services:
+  webserver:
+    volumes:
+      - ./nginx/conf.d/app.local.conf:/etc/nginx/conf.d/app.conf

@@ -572,7 +572,17 @@ export default {
             await axios
                 .post("/login", this.auth)
                 .then(({ data }) => {
-                    this.signIn();
+                    // Une session déjà authentifiée fait rediriger le
+                    // middleware "guest" vers "/" (200, mais sans ce
+                    // message) : ne pas considérer ça comme un login réussi.
+                    if (data && data.message === "Login successful") {
+                        this.signIn();
+                    } else {
+                        flashError({
+                            title: "Authentification",
+                            body: this.$t("auth.login.error"),
+                        });
+                    }
                 })
                 .catch((error) => {
                     if (

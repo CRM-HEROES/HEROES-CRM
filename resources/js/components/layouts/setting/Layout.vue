@@ -50,6 +50,7 @@
                 class="fa fa-sign-out"
                 @click.prevent.stop="logout"
             />
+            <loading v-if="!impersonating" :loading="loggingOut" />
         </item>
 
         <!-- Locale -->
@@ -533,6 +534,7 @@ export default {
     data() {
         return {
             leavingImpersonation: false,
+            loggingOut: false,
 
             googleCalendar: undefined,
             removingGoogleCalendar: false,
@@ -607,15 +609,12 @@ export default {
         },
 
         async logout() {
-            await axios
-                .post("/logout")
-                .then(({ data }) => {
-                    this.signOut();
-                })
-                .catch(({ response: { data } }) => {
-                    alert(data.message);
-                })
-                .finally(() => {});
+            this.loggingOut = true;
+            try {
+                await this.signOut();
+            } finally {
+                this.loggingOut = false;
+            }
         },
 
         /**

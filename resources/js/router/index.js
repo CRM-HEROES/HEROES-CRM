@@ -52,8 +52,6 @@ const Stat = () => import("@/components/stat/Stat.vue");
 const Stat2 = () => import("@/components/stat2/Stat.vue");
 // Order
 const Order = () => import("@/components/order/Table/Layout.vue");
-// Planning (gestion de planning - RH)
-const Planning = () => import("@/components/planning/Planning.vue");
 
 // Error
 // 404
@@ -196,10 +194,21 @@ const routes = [
             {
                 name: "planning",
                 path: "planning",
-                component: Planning,
-                meta: {
-                    title: `Gestion de planning`,
-                    page: "planning.index",
+                redirect: (to) => {
+                    const query = { ...(to.query || {}) };
+                    if (!query.filters && store.state.auth?.user?.id) {
+                        query.filters = JSON.stringify({
+                            withUsers: [store.state.auth.user.id],
+                        });
+                    }
+
+                    return {
+                        name: "event",
+                        params: {
+                            project: to.params.project,
+                        },
+                        query,
+                    };
                 },
             },
             {

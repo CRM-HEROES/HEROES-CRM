@@ -189,21 +189,6 @@
                     </svg>
                 </header-menu>
 
-                <!-- Planning -->
-
-                <header-menu
-                    v-if="can('all.planning')"
-                    icon="fa fa-calendar-week"
-                    color="#7939b8"
-                    :label="'Gestion de planning'"
-                    :to="{
-                        name: 'planning',
-                        params: {
-                            project: project.slug,
-                        },
-                    }"
-                />
-
                 <!-- MAP -->
 
                 <header-menu
@@ -698,15 +683,7 @@ export default {
             store.commit(OPEN_SLIDE, "manage-users");
         },
         async logout() {
-            await axios
-                .post("/logout")
-                .then(({ data }) => {
-                    this.signOut();
-                })
-                .catch(({ response: { data } }) => {
-                    alert(data.message);
-                })
-                .finally(() => {});
+            await this.signOut();
         },
         setting() {
             store.commit(OPEN_SLIDE, "settings");

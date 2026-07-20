@@ -60,7 +60,10 @@
             <loading :loading="deletingImportProspects" />
         </item>
 
-        <item v-if="prospectImport.source == 'file'" @click="download">
+        <item
+            v-if="['file', 'google_sheets'].includes(prospectImport.source)"
+            @click="download"
+        >
             <icon class="fa fa-file-download" />
             <div
                 class="hc-item-main-content"
@@ -594,6 +597,15 @@ export default {
                 this.$emit("processed");
             }
         },
+    },
+
+    mounted() {
+        // If the import was already processing
+        // (eg. the page was refreshed mid-import)
+        // resume polling the prospects table
+        if (this.prospectImport && this.prospectImport.is_processing) {
+            this.refreshProspectsList();
+        }
     },
 
     computed: {

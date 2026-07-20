@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Filters\Filters;
 use App\Models\Scopes\EventScope;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -155,6 +156,36 @@ class Event extends Model
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class);
+    }
+
+
+    // Permissions
+
+    /**
+     * Whether the given user is affected to this event, either directly
+     * (creator, affected user, invited user) or through the prospect
+     * this event is attached to (prospect creator, prospect assigned user
+     * or a group shared with the prospect).
+     */
+    public function isAffectedTo(User $user): bool
+    {
+        if (
+            $this->creator_id == $user->id ||
+            $this->user_id == $user->id ||
+            $this->users()->where('id', $user->id)->exists()
+        ) {
+            return true;
+        }
+
+        if ($this->prospect && (
+            $this->prospect->creator_id == $user->id ||
+            $this->prospect->users()->where('id', $user->id)->exists() ||
+            $this->prospect->groups()->whereIn('id', $user->groups->pluck('id'))->exists()
+        )) {
+            return true;
+        }
+
+        return false;
     }
 
 }
