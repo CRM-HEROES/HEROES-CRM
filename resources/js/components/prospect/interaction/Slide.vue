@@ -448,6 +448,10 @@
                                         )
                                     "
                                 ></div>
+                                <icon
+                                    class="fa fa-cog"
+                                    @click.stop="kavkomSetting"
+                                />
                             </item>
                             <div
                                 style="
@@ -710,6 +714,11 @@ export default {
             this.interaction.number = number;
             this.addInteraction();
         },
+
+        kavkomSetting() {
+            store.commit(OPEN_MODAL, "setting-kavkom");
+        },
+
 
         /**
          *

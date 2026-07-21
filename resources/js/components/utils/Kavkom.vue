@@ -138,8 +138,26 @@ export default {
 
             url.searchParams.set("language", "french");
 
+            // Attach Kavkom settings if available (api_key, api_secret)
+            try {
+                const kavkomSetting = this.$store && this.$store.getters && this.$store.getters.settingsGet
+                    ? this.$store.getters.settingsGet("kavkom")
+                    : null;
+
+                if (kavkomSetting && kavkomSetting.api_key) {
+                    url.searchParams.set("api_key", kavkomSetting.api_key);
+                }
+
+                if (kavkomSetting && kavkomSetting.api_secret) {
+                    url.searchParams.set("api_secret", kavkomSetting.api_secret);
+                }
+            } catch (e) {
+                // ignore
+            }
+
             return url.toString();
         },
+
 
         openInNewTab() {
             if (this.kavkomUrl) {
