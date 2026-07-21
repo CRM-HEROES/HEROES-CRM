@@ -444,6 +444,10 @@ class StatController extends Controller
                 'name' => "MTarget",
                 'color' => "rgb(0, 180, 160)"
             ],
+            'brevo' => [
+                'name' => "Brevo",
+                'color' => "rgb(11, 153, 108)"
+            ],
             'telephone' => [
                 'name' => "Téléphone",
                 'color' => "rgb(255, 79, 55)"

@@ -203,6 +203,7 @@
                 <setting-m-target-modal />
                 <setting-pipedrive-modal />
                 <setting-ringover-modal />
+                <setting-brevo-modal />
                 <setting-kavkom-modal />
             </protected-content>
 
@@ -407,6 +408,7 @@ import SettingRingoverModal from "@/components/settings/Ringover.vue";
 import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
 import SettingMTargetModal from "@/components/settings/MTarget.vue";
 import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
+import SettingBrevoModal from "@/components/settings/Brevo.vue";
 import SettingKavkomModal from "@/components/settings/Kavkom.vue";
 
 import MenuIconSlide from "@/components/menu-icon/Slide.vue";
@@ -579,6 +581,7 @@ export default {
         SettingUltramsgModal,
         SettingMTargetModal,
         SettingPipedriveModal,
+        SettingBrevoModal,
 
         MenuIconSlide,
         TrashSlide,
