@@ -376,6 +376,7 @@
             "call_by_phone": "llamar por telefono",
             "call_by_aircall": "Llamar por Aircall",
             "call_by_ringover": "Llamar por Ringover",
+            "call_by_kavkom": "Llamar por Kavkom",
             "history": "Historia"
         },
         "message": {

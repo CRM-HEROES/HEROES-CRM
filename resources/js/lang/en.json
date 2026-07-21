@@ -445,6 +445,7 @@
             "call_by_phone": "Call by phone",
             "call_by_aircall": "Call by Aircall",
             "call_by_ringover": "Call by Ringover",
+            "call_by_kavkom": "Call by Kavkom",
             "history": "History"
         },
         "message": {

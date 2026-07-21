@@ -31,6 +31,10 @@ class InteractionsCount implements StatChart
                     'telephone' => [
                         'name' => "Téléphone",
                         'bgcolor' => "rgb(255, 79, 55)"
+                    ],
+                    'kavkom' => [
+                        'name' => "Kavkom",
+                        'bgcolor' => "rgb(142, 36, 170)"
                     ]
                 ];
 

@@ -347,6 +347,7 @@
             "call_by_phone": "फ़ोन से कॉल करें",
             "call_by_aircall": "एयरकॉल द्वारा कॉल करें",
             "call_by_ringover": "रिंगओवर द्वारा कॉल करें",
+            "call_by_kavkom": "Kavkom के माध्यम से कॉल करें",
             "history": "इतिहास"
         },
         "message": {
