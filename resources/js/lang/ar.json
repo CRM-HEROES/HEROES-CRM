@@ -411,6 +411,7 @@
             "via_mtarget": "الرسائل القصيرة عبر MTarget",
             "via_ringover": "الرسائل القصيرة عبر Ringover",
             "via_ultramsg": "الرسائل القصيرة عبر UltraMsg",
+            "via_brevo": "الرسائل القصيرة عبر Brevo",
             "via_source": "الرسائل القصيرة عبر {المصدر}",
             "templates": "قوالب الرسائل القصيرة",
             "enter_text_message": "أدخل رسالة نصية"

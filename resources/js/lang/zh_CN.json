@@ -411,6 +411,7 @@
             "via_mtarget": "通过 MTarget 发送短信",
             "via_ringover": "通过振铃发送短信",
             "via_ultramsg": "通过 UltraMsg 发送短信",
+            "via_brevo": "通过 Brevo 发送短信",
             "via_source": "通过{source}发送短信",
             "templates": "短信模板",
             "enter_text_message": "输入短信"

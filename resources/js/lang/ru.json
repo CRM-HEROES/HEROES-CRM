@@ -411,6 +411,7 @@
             "via_mtarget": "СМС через MTarget",
             "via_ringover": "СМС через Ringover",
             "via_ultramsg": "СМС через UltraMsg",
+            "via_brevo": "СМС через Brevo",
             "via_source": "SMS через {источник}",
             "templates": "Шаблоны СМС",
             "enter_text_message": "Введите текстовое сообщение"
