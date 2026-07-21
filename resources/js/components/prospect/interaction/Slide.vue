@@ -37,7 +37,7 @@
                     <template v-if="can('all.prospect.interaction.add')">
                         <item
                             v-if="interactionProspect.phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 3)"
+                            @click.prevent="(tab = 1), (frameTab = 4)"
                         >
                             <icon class="fa fa-phone" />
                             <div
@@ -50,7 +50,7 @@
                         </item>
                         <item
                             v-if="interactionProspect.mobile_phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 4)"
+                            @click.prevent="(tab = 1), (frameTab = 5)"
                         >
                             <icon class="fa fa-mobile" />
                             <div
@@ -160,6 +160,30 @@
                                 </div>
                                 <icon class="fa fa-caret-right" />
                             </item>
+
+                            <!-- Kavkom -->
+                            <item
+                                class="hc-prospect-interaction-item"
+                                @click="interactionViaKavkom(number)"
+                            >
+                                <icon class="fa fa-phone" color="#8e24aa" />
+                                <div
+                                    class="hc-item-main-content hc-flex-column"
+                                >
+                                    <span
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_kavkom'
+                                            )
+                                        "
+                                    ></span>
+                                    <span
+                                        class="hc-prospect-interaction-item-number"
+                                        v-text="number"
+                                    ></span>
+                                </div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -201,7 +225,7 @@
 
             <!-- List of interaction -->
             <template #2>
-                <frame-layout :count="5" :tab="frameTab" class="hc-flex-1">
+                <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
                     <template #1 v-if="interactionProspect">
                         <tab-layout
                             :count="2"
@@ -376,6 +400,7 @@
                                     width: 100%;
                                     height: 100%;
                                     overflow: auto;
+                                    padding: 16px;
                                 "
                             >
                                 <ringover
@@ -411,14 +436,69 @@
                         </div>
                     </template>
 
-                    <template #3>
+                    <template #3 v-if="interactionProspect">
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item @click="tab = 0" class="bordered">
+                                <icon class="fa fa-caret-left" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'prospect.interaction.call_by_kavkom'
+                                        )
+                                    "
+                                ></div>
+                            </item>
+                            <div
+                                style="
+                                    flex: 1;
+                                    width: 100%;
+                                    height: 100%;
+                                    overflow: auto;
+                                    padding: 16px;
+                                "
+                            >
+                                <kavkom
+                                    id="kavkom-phone"
+                                    :number="interaction.number"
+                                    tab="phone"
+                                    style="flex: 1; width: 100%; height: 100%"
+                                    @ringing-call="
+                                        (callInfo) => {
+                                            interaction.from_number =
+                                                callInfo.data.from;
+                                            interaction.status = 'ringing';
+                                            interaction.data.id =
+                                                callInfo.data.call_id;
+                                            updateInteraction();
+                                        }
+                                    "
+                                    @hangup-call="
+                                        (callInfo) => {
+                                            interaction.status = 'hangup';
+                                            interaction.data.id =
+                                                callInfo.data.call_id;
+                                            updateInteraction();
+                                            nextInteraction();
+                                        }
+                                    "
+                                    @answered-call="
+                                        (interaction.status = 'answered'),
+                                            updateInteraction()
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </template>
+
+                    <template #4>
                         <select-prospect
                             @back="tab = 0"
                             @prospect-selected="setInteractionProspect"
                         />
                     </template>
 
-                    <template #4>
+                    <template #5>
                         <form
                             class="hc-flex-column"
                             style="height: 100%"
@@ -450,7 +530,7 @@
                         </form>
                     </template>
 
-                    <template #5>
+                    <template #6>
                         <form
                             class="hc-flex-column"
                             style="height: 100%; position"
@@ -516,6 +596,7 @@ import {
 
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
+import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
@@ -523,6 +604,7 @@ import SelectProspect from "../select/Select.vue";
 export default {
     components: {
         Ringover,
+        Kavkom,
         Aircall,
         InteractionRow,
         SelectProspect,
@@ -576,7 +658,7 @@ export default {
                 }
             } else if (this.prospectsSelected.length == 0) {
                 this.tab = 1;
-                this.frameTab = 2;
+                this.frameTab = 3;
             }
         },
 
@@ -616,6 +698,15 @@ export default {
             this.frameTab = 1;
             this.interaction = this.newInteraction();
             this.interaction.source = "ringover";
+            this.interaction.number = number;
+            this.addInteraction();
+        },
+
+        interactionViaKavkom(number) {
+            this.tab = 1;
+            this.frameTab = 2;
+            this.interaction = this.newInteraction();
+            this.interaction.source = "kavkom";
             this.interaction.number = number;
             this.addInteraction();
         },

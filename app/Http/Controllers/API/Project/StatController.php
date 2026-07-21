@@ -455,6 +455,10 @@ class StatController extends Controller
             'ringover' => [
                 'name' => "Ringover",
                 'color' => "rgb(0, 201, 76)"
+            ],
+            'kavkom' => [
+                'name' => "Kavkom",
+                'color' => "rgb(142, 36, 170)"
             ]
         ] as $source => $value) {
             $keys[$key . ".source." . $source] = array_merge($value, [

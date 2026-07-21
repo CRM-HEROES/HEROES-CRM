@@ -347,6 +347,7 @@
             "call_by_phone": "Chiama per telefono",
             "call_by_aircall": "Chiama tramite Aircall",
             "call_by_ringover": "Chiama tramite Ringover",
+            "call_by_kavkom": "Chiama tramite Kavkom",
             "history": "Storia"
         },
         "message": {
