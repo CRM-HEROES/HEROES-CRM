@@ -347,6 +347,7 @@
             "call_by_phone": "Позвонить по телефону",
             "call_by_aircall": "Звонок по воздуху",
             "call_by_ringover": "Звонок через Ringover",
+            "call_by_kavkom": "Позвонить через Kavkom",
             "history": "История"
         },
         "message": {

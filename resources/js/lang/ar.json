@@ -347,6 +347,7 @@
             "call_by_phone": "اتصل عبر الهاتف",
             "call_by_aircall": "الاتصال عن طريق Aircall",
             "call_by_ringover": "الاتصال عن طريق Ringover",
+            "call_by_kavkom": "الاتصال عبر Kavkom",
             "history": "تاريخ"
         },
         "message": {
