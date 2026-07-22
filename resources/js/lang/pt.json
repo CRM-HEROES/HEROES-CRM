@@ -443,6 +443,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {fonte}",
             "templates": "Modelos de SMS",
             "enter_text_message": "Digite uma mensagem de texto"

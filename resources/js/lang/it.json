@@ -411,6 +411,7 @@
             "via_mtarget": "SMS tramite MTarget",
             "via_ringover": "SMS tramite Ringover",
             "via_ultramsg": "SMS tramite UltraMsg",
+            "via_brevo": "SMS tramite Brevo",
             "via_source": "SMS tramite {fonte}",
             "templates": "Modelli SMS",
             "enter_text_message": "Inserisci un messaggio di testo"
