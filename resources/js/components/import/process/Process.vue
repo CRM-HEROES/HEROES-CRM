@@ -16,7 +16,7 @@
                 class="hc-item-main-content"
                 v-text="$t('import.process.tab.import.notify_welcome_sms')"
             ></div>
-            <loading :loading="checkingBrevoSetting" />
+            <loading :loading="checkingSmsSourceSetting" />
         </item>
 
         <item-list
@@ -24,6 +24,18 @@
             padding="0 12px 10px 12px"
             gap="5px"
         >
+            <v-field
+                :label="$t('import.process.tab.import.welcome_sms_source')"
+                v-slot="{ label }"
+            >
+                <select v-model="welcomeSmsSource" @change="onChangeWelcomeSmsSource">
+                    <option value="brevo">{{ $t("prospect.sms.via_brevo") }}</option>
+                    <option value="smsbox">{{ $t("prospect.sms.via_smsbox") }}</option>
+                    <option value="ultramsg">{{ $t("prospect.sms.via_ultramsg") }}</option>
+                    <option value="mtarget">{{ $t("prospect.sms.via_mtarget") }}</option>
+                </select>
+            </v-field>
+
             <v-field
                 :label="$t('import.process.tab.import.welcome_sms_message')"
                 required
@@ -280,8 +292,27 @@ export default {
             deletingProspects: false,
             settingProspectsTable: false,
             notifyWelcomeSms: false,
-            welcomeSmsMessage: "",
-            checkingBrevoSetting: false,
+            welcomeSmsMessage: this.$t(
+                "import.process.tab.import.welcome_sms_message_default"
+            ),
+            welcomeSmsSource: "brevo",
+            checkingSmsSourceSetting: false,
+            // Mapping between an SMS source and:
+            // - the modal to open when it isn't configured
+            // - the field(s) that must be present for the
+            //   source to be considered "configured"
+            smsSourcesSettings: {
+                brevo: { modal: "setting-brevo", requiredFields: ["api_key"] },
+                smsbox: { modal: "setting-smsbox", requiredFields: ["api_key"] },
+                ultramsg: {
+                    modal: "setting-ultramsg",
+                    requiredFields: ["instance", "token"],
+                },
+                mtarget: {
+                    modal: "setting-mtarget",
+                    requiredFields: ["username", "password"],
+                },
+            },
         };
     },
 
@@ -291,28 +322,19 @@ export default {
         /**
          * Called when the user (de)activates the
          * "Notifier SMS de bienvenue" checkbox.
-         * When activating it, make sure a Brevo API key
-         * is configured. If not, open the Brevo setting modal
-         * and revert the checkbox.
+         * When activating it, make sure the selected
+         * SMS source is configured. If not, open its
+         * setting modal and revert the checkbox.
          */
         async onToggleNotifyWelcomeSms() {
             if (this.notifyWelcomeSms) {
-                this.checkingBrevoSetting = true;
+                const configured = await this.checkSmsSourceSetting(
+                    this.welcomeSmsSource
+                );
 
-                try {
-                    const brevoSetting = await store.dispatch(
-                        GET_SETTING,
-                        "brevo"
-                    );
-
-                    if (!brevoSetting || !brevoSetting.api_key) {
-                        // No Brevo API key configured
-                        this.notifyWelcomeSms = false;
-                        store.commit(OPEN_MODAL, "setting-brevo");
-                        return;
-                    }
-                } finally {
-                    this.checkingBrevoSetting = false;
+                if (!configured) {
+                    this.notifyWelcomeSms = false;
+                    return;
                 }
             }
 
@@ -320,8 +342,68 @@ export default {
         },
 
         /**
+         * Called when the user changes the SMS source
+         * used to send the welcome message. Re-checks that
+         * the newly selected source is properly configured.
+         */
+        async onChangeWelcomeSmsSource() {
+            if (!this.notifyWelcomeSms) {
+                return;
+            }
+
+            const configured = await this.checkSmsSourceSetting(
+                this.welcomeSmsSource
+            );
+
+            if (!configured) {
+                // Revert to the default source rather than
+                // leaving an unconfigured one selected
+                this.welcomeSmsSource = "brevo";
+                return;
+            }
+
+            await this.saveWelcomeSmsSettings();
+        },
+
+        /**
+         * Verify that the given SMS source has its
+         * settings configured for this project. If not,
+         * open the corresponding setting modal.
+         *
+         * @return {boolean} whether the source is configured
+         */
+        async checkSmsSourceSetting(source) {
+            const sourceConfig = this.smsSourcesSettings[source];
+
+            if (!sourceConfig) {
+                return false;
+            }
+
+            this.checkingSmsSourceSetting = true;
+
+            try {
+                const setting = await store.dispatch(GET_SETTING, source);
+
+                const isConfigured =
+                    setting &&
+                    sourceConfig.requiredFields.every(
+                        (field) => !!setting[field]
+                    );
+
+                if (!isConfigured) {
+                    store.commit(OPEN_MODAL, sourceConfig.modal);
+                    return false;
+                }
+
+                return true;
+            } finally {
+                this.checkingSmsSourceSetting = false;
+            }
+        },
+
+        /**
          * Persist the welcome SMS notification setting
-         * (activated + message) on the current import
+         * (activated + message + source) on the current import
          */
         async saveWelcomeSmsSettings() {
             if (!this.prospectImport || !this.prospectImport.id) {
@@ -332,6 +414,7 @@ export default {
                 id: this.prospectImport.id,
                 notify_welcome_sms: this.notifyWelcomeSms,
                 welcome_sms_message: this.welcomeSmsMessage,
+                welcome_sms_source: this.welcomeSmsSource,
             });
         },
 
@@ -358,10 +441,12 @@ export default {
                     is_processing: true,
                     notify_welcome_sms: this.notifyWelcomeSms,
                     welcome_sms_message: this.welcomeSmsMessage,
+                    welcome_sms_source: this.welcomeSmsSource,
                 });
                 currentImport.is_processing = true;
                 currentImport.notify_welcome_sms = this.notifyWelcomeSms;
                 currentImport.welcome_sms_message = this.welcomeSmsMessage;
+                currentImport.welcome_sms_source = this.welcomeSmsSource;
 
                 // If prospects table setting is not configured for the current user
                 // use the import columns as the default columns for the prospects table
@@ -727,7 +812,12 @@ export default {
                 if (newValue) {
                     this.notifyWelcomeSms = !!newValue.notify_welcome_sms;
                     this.welcomeSmsMessage =
-                        newValue.welcome_sms_message || "";
+                        newValue.welcome_sms_message ||
+                        this.$t(
+                            "import.process.tab.import.welcome_sms_message_default"
+                        );
+                    this.welcomeSmsSource =
+                        newValue.welcome_sms_source || "brevo";
                 }
             },
         },

@@ -41,6 +41,7 @@ class Import extends Model
         'name',
         'notify_welcome_sms',
         'welcome_sms_message',
+        'welcome_sms_source',
         'welcome_sms_sent_at',
         'path',
         'projects',

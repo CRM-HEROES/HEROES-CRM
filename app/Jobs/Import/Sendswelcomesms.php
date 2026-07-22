@@ -49,7 +49,7 @@ trait SendsWelcomeSms
                 // envoyé").
                 $prospect->sms()->create([
                     'message' => $import->welcome_sms_message,
-                    'source' => 'brevo',
+                    'source' => $import->welcome_sms_source ?: 'brevo',
                     'from_user' => 1,
                     'creator_id' => $import->creator_id,
                 ]);

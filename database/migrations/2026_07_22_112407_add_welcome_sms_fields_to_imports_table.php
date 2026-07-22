@@ -15,6 +15,7 @@ return new class extends Migration
             $table->boolean('notify_welcome_sms')->default(false)->after('token')->comment('Active ou non l\'envoi du SMS de bienvenue via Brevo');
             $table->text('welcome_sms_message')->nullable()->after('notify_welcome_sms');
             $table->timestamp('welcome_sms_sent_at')->nullable()->after('welcome_sms_message');
+            $table->string('welcome_sms_source')->nullable()->after('welcome_sms_sent_at');
         });
     }
 
@@ -28,6 +29,7 @@ return new class extends Migration
                 'notify_welcome_sms',
                 'welcome_sms_message',
                 'welcome_sms_sent_at',
+                'welcome_sms_source',
             ]);
         });
     }
