@@ -292,9 +292,7 @@ export default {
             deletingProspects: false,
             settingProspectsTable: false,
             notifyWelcomeSms: false,
-            welcomeSmsMessage: this.$t(
-                "import.process.tab.import.welcome_sms_message_default"
-            ),
+            welcomeSmsMessageRaw: "",
             welcomeSmsSource: "brevo",
             checkingSmsSourceSetting: false,
             // Mapping between an SMS source and:
@@ -811,11 +809,8 @@ export default {
             handler(newValue) {
                 if (newValue) {
                     this.notifyWelcomeSms = !!newValue.notify_welcome_sms;
-                    this.welcomeSmsMessage =
-                        newValue.welcome_sms_message ||
-                        this.$t(
-                            "import.process.tab.import.welcome_sms_message_default"
-                        );
+                    this.welcomeSmsMessageRaw =
+                        newValue.welcome_sms_message || "";
                     this.welcomeSmsSource =
                         newValue.welcome_sms_source || "brevo";
                 }
@@ -843,6 +838,26 @@ export default {
             "threads",
             "fields",
         ]),
+
+        /**
+         * Welcome SMS message, falling back to the
+         * translated default text when empty.
+         * (getter/setter so the textarea's v-model
+         * keeps working as before)
+         */
+        welcomeSmsMessage: {
+            get() {
+                return (
+                    this.welcomeSmsMessageRaw ||
+                    this.$t(
+                        "import.process.tab.import.welcome_sms_message_default"
+                    )
+                );
+            },
+            set(value) {
+                this.welcomeSmsMessageRaw = value;
+            },
+        },
 
         /**
          * List of import columns
