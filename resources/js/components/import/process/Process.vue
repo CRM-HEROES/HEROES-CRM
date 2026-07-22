@@ -1,5 +1,44 @@
 <template>
     <item-list style="height: 100%; overflow: auto" padding="12px" gap="2px">
+        <!-- Notifier SMS de bienvenue -->
+        <item
+            v-if="!prospectImport.is_processing"
+            tag="label"
+            class="hc-import-notify-welcome-sms"
+            style="cursor: pointer"
+        >
+            <input
+                type="checkbox"
+                v-model="notifyWelcomeSms"
+                @change="onToggleNotifyWelcomeSms"
+            />
+            <div
+                class="hc-item-main-content"
+                v-text="$t('import.process.tab.import.notify_welcome_sms')"
+            ></div>
+            <loading :loading="checkingBrevoSetting" />
+        </item>
+
+        <item-list
+            v-if="notifyWelcomeSms && !prospectImport.is_processing"
+            padding="0 12px 10px 12px"
+            gap="5px"
+        >
+            <v-field
+                :label="$t('import.process.tab.import.welcome_sms_message')"
+                required
+                v-slot="{ label }"
+            >
+                <textarea
+                    :placeholder="label + ' ...'"
+                    v-model="welcomeSmsMessage"
+                    @change="saveWelcomeSmsSettings"
+                    required
+                    rows="3"
+                ></textarea>
+            </v-field>
+        </item-list>
+
         <item
             id="hc-import-process-process"
             v-if="!prospectImport.is_processing"
@@ -212,6 +251,8 @@ import {
 } from "@/actions/project/import";
 import { FETCH_PROSPECTS } from "@/actions/project/prospect";
 import { UPDATE_PROJECT_USER_SETTING } from "@/actions/project/user/setting";
+import { GET_SETTING } from "@/actions/project/setting";
+import { OPEN_MODAL } from "@/actions/modal";
 
 import { SHOW_PROJECT } from "@/actions/project";
 import MappingColumnFieldCopyRow from "./process/MappingColumnFieldCopyRow.vue";
@@ -238,10 +279,62 @@ export default {
             deletingImportProspects: false,
             deletingProspects: false,
             settingProspectsTable: false,
+            notifyWelcomeSms: false,
+            welcomeSmsMessage: "",
+            checkingBrevoSetting: false,
         };
     },
 
     methods: {
+        // NOTIFY WELCOME SMS
+
+        /**
+         * Called when the user (de)activates the
+         * "Notifier SMS de bienvenue" checkbox.
+         * When activating it, make sure a Brevo API key
+         * is configured. If not, open the Brevo setting modal
+         * and revert the checkbox.
+         */
+        async onToggleNotifyWelcomeSms() {
+            if (this.notifyWelcomeSms) {
+                this.checkingBrevoSetting = true;
+
+                try {
+                    const brevoSetting = await store.dispatch(
+                        GET_SETTING,
+                        "brevo"
+                    );
+
+                    if (!brevoSetting || !brevoSetting.api_key) {
+                        // No Brevo API key configured
+                        this.notifyWelcomeSms = false;
+                        store.commit(OPEN_MODAL, "setting-brevo");
+                        return;
+                    }
+                } finally {
+                    this.checkingBrevoSetting = false;
+                }
+            }
+
+            await this.saveWelcomeSmsSettings();
+        },
+
+        /**
+         * Persist the welcome SMS notification setting
+         * (activated + message) on the current import
+         */
+        async saveWelcomeSmsSettings() {
+            if (!this.prospectImport || !this.prospectImport.id) {
+                return;
+            }
+
+            await store.dispatch(UPDATE_IMPORT, {
+                id: this.prospectImport.id,
+                notify_welcome_sms: this.notifyWelcomeSms,
+                welcome_sms_message: this.welcomeSmsMessage,
+            });
+        },
+
         // LAUNCH AND STOP IMPORT
 
         /**
@@ -257,11 +350,18 @@ export default {
 
             try {
                 // Launch import
+                // (also persists the welcome SMS notification setting,
+                // in case it was toggled without triggering the
+                // textarea's @change event)
                 await store.dispatch(UPDATE_IMPORT, {
                     id: currentImport.id,
                     is_processing: true,
+                    notify_welcome_sms: this.notifyWelcomeSms,
+                    welcome_sms_message: this.welcomeSmsMessage,
                 });
                 currentImport.is_processing = true;
+                currentImport.notify_welcome_sms = this.notifyWelcomeSms;
+                currentImport.welcome_sms_message = this.welcomeSmsMessage;
 
                 // If prospects table setting is not configured for the current user
                 // use the import columns as the default columns for the prospects table
@@ -460,6 +560,25 @@ export default {
                     // stop refreshing the prospects table
                     if (!data.is_processing) {
                         clearInterval(interval);
+
+                        // Welcome SMS notification:
+                        // once the import (dedup + welcome SMS sending)
+                        // is done server-side, let the user know.
+                        // NOTE: the actual sending of the welcome SMS
+                        // (after duplicate check) and the creation of the
+                        // "Message bienvenue envoyé" tracking entry on each
+                        // newly imported prospect must happen server-side,
+                        // as part of the import job, using
+                        // `notify_welcome_sms` / `welcome_sms_message`.
+                        if (currentImport.notify_welcome_sms) {
+                            flashInfo({
+                                title: "Import",
+                                body: this.$t(
+                                    "import.process.tab.import.welcome_sms_sent"
+                                ),
+                                duration: 5000,
+                            });
+                        }
                     }
                 } catch (e) {
                     clearInterval(interval);
@@ -597,6 +716,21 @@ export default {
                 this.$emit("processed");
             }
         },
+
+        /**
+         * Sync local welcome SMS state when
+         * the selected import changes
+         */
+        prospectImport: {
+            immediate: true,
+            handler(newValue) {
+                if (newValue) {
+                    this.notifyWelcomeSms = !!newValue.notify_welcome_sms;
+                    this.welcomeSmsMessage =
+                        newValue.welcome_sms_message || "";
+                }
+            },
+        },
     },
 
     mounted() {
@@ -606,6 +740,8 @@ export default {
         if (this.prospectImport && this.prospectImport.is_processing) {
             this.refreshProspectsList();
         }
+        // Note: the welcome SMS state (notifyWelcomeSms / welcomeSmsMessage)
+        // is restored by the immediate "prospectImport" watcher below.
     },
 
     computed: {
