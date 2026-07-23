@@ -1,6 +1,17 @@
 <template>
     <item-list style="height: 100%; overflow: auto" padding="12px" gap="2px">
         <item
+            v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0)"
+            style="color: #92400e !important; background-color: #fef3c7"
+        >
+            <icon class="fa fa-exclamation-triangle" style="color: #92400e" />
+            <div
+                class="hc-item-main-content"
+                style="white-space: normal"
+                v-text="'Aucun rôle sélectionné dans l\'étape Relations — les prospects importés ne seront assignés à personne automatiquement.'"
+            ></div>
+        </item>
+        <item
             id="hc-import-process-process"
             v-if="!prospectImport.is_processing"
             @click="processImport"
