@@ -104,6 +104,8 @@ class KavkomService
             return [
                 'success' => true,
                 'extension' => (string) data_get($extension, 'extension'),
+                'password' => (string) data_get($extension, 'password'),
+                'user_context' => (string) data_get($extension, 'user_context'),
             ];
         } catch (\Throwable $exception) {
             return [

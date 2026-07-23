@@ -454,13 +454,22 @@
                                 />
                             </item>
                             <div class="hc-kavkom-call-panel">
-                                <div class="hc-kavkom-call-help">
-                                    L'extension Kavkom de votre domaine (le
-                                    poste/softphone déjà configuré dans
-                                    Kavkom) va sonner en premier, puis Kavkom
-                                    la reliera automatiquement au numéro du
-                                    lead ci-dessous.
-                                </div>
+                                <kavkom
+                                    id="kavkom-webphone"
+                                    @ringing-call="
+                                        (interaction.status = 'ringing'),
+                                            updateInteraction()
+                                    "
+                                    @answered-call="
+                                        (interaction.status = 'answered'),
+                                            updateInteraction()
+                                    "
+                                    @hangup-call="
+                                        (interaction.status = 'hangup'),
+                                            updateInteraction(),
+                                            nextInteraction()
+                                    "
+                                />
 
                                 <div class="hc-kavkom-call-number">
                                     {{ interaction.number }}
@@ -638,6 +647,7 @@ import {
 
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
+import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
@@ -648,6 +658,7 @@ import ApiService from "@/apis/api.service";
 export default {
     components: {
         Ringover,
+        Kavkom,
         Aircall,
         InteractionRow,
         SelectProspect,

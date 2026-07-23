@@ -27,15 +27,9 @@ class KavkomController extends Controller
             'destination' => ['required', 'string'],
         ]);
 
-        $setting = UserSetting::query()
-            ->whereNull('project_id')
-            ->where('user_id', $request->user()->id)
-            ->where('key', 'kavkom')
-            ->first();
+        $config = $this->getUserKavkomConfig($request);
 
-        $config = $setting ? (array) $setting->value : [];
-
-        if (empty($config['api_token']) || empty($config['domain_uuid'])) {
+        if (!$config) {
             return response()->json([
                 'success' => false,
                 'message' => 'Configuration Kavkom manquante : renseignez le jeton API et le domain_uuid dans les paramètres.',
@@ -56,5 +50,44 @@ class KavkomController extends Controller
         );
 
         return response()->json($result, 200);
+    }
+
+    /**
+     * SIP credentials (extension, password, user_context) needed by the
+     * browser to register a WebRTC softphone. The API token itself is
+     * never sent to the browser, only these derived, extension-scoped
+     * credentials.
+     */
+    public function credentials(Request $request, KavkomService $service)
+    {
+        $config = $this->getUserKavkomConfig($request);
+
+        if (!$config) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Configuration Kavkom manquante : renseignez le jeton API et le domain_uuid dans les paramètres.',
+            ], 200);
+        }
+
+        $result = $service->resolveExtension($config['api_token'], $config['domain_uuid']);
+
+        return response()->json($result, 200);
+    }
+
+    protected function getUserKavkomConfig(Request $request): ?array
+    {
+        $setting = UserSetting::query()
+            ->whereNull('project_id')
+            ->where('user_id', $request->user()->id)
+            ->where('key', 'kavkom')
+            ->first();
+
+        $config = $setting ? (array) $setting->value : [];
+
+        if (empty($config['api_token']) || empty($config['domain_uuid'])) {
+            return null;
+        }
+
+        return $config;
     }
 }

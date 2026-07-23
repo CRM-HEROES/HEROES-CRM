@@ -59,7 +59,7 @@ class KavkomServiceTest extends TestCase
                 'success' => true,
                 'data' => [
                     ['extension' => '900', 'enabled' => 'false'],
-                    ['extension' => '901', 'enabled' => 'true'],
+                    ['extension' => '901', 'enabled' => 'true', 'password' => 'sip-secret', 'user_context' => 'client.kavkom.com'],
                 ],
             ], 200),
         ]);
@@ -70,6 +70,8 @@ class KavkomServiceTest extends TestCase
 
         $this->assertTrue($result['success']);
         $this->assertSame('901', $result['extension']);
+        $this->assertSame('sip-secret', $result['password']);
+        $this->assertSame('client.kavkom.com', $result['user_context']);
     }
 
     public function test_it_fails_to_resolve_extension_when_domain_has_none(): void
