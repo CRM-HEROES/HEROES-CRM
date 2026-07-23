@@ -347,6 +347,7 @@
             "call_by_phone": "फ़ोन से कॉल करें",
             "call_by_aircall": "एयरकॉल द्वारा कॉल करें",
             "call_by_ringover": "रिंगओवर द्वारा कॉल करें",
+            "call_by_kavkom": "Kavkom के माध्यम से कॉल करें",
             "history": "इतिहास"
         },
         "message": {
@@ -410,6 +411,7 @@
             "via_mtarget": "एमटार्गेट के माध्यम से एसएमएस करें",
             "via_ringover": "रिंगओवर के माध्यम से एसएमएस",
             "via_ultramsg": "UltraMsg के माध्यम से एसएमएस करें",
+            "via_brevo": "Brevo के माध्यम से एसएमएस करें",
             "via_source": "{स्रोत} के माध्यम से एसएमएस",
             "templates": "एसएमएस टेम्प्लेट",
             "enter_text_message": "एक टेक्स्ट संदेश दर्ज करें"
@@ -456,6 +458,35 @@
             "success": {
                 "title": "बिजनेस कार्ड स्कैन",
                 "message": "आपकी आयातित फ़ाइलें शीघ्र ही स्कैन की जाएंगी<br>और संबंधित संभावनाएं आपके प्रोजेक्ट में आयात की जाएंगी।"
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "अज्ञात SMS स्रोत: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "इस प्रोजेक्ट के लिए SMSBOX सेटिंग्स कॉन्फ़िगर नहीं की गई हैं।"
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "इस प्रोजेक्ट के लिए Ultramsg सेटिंग्स कॉन्फ़िगर नहीं की गई हैं।"
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "इस प्रोजेक्ट के लिए MTarget सेटिंग्स कॉन्फ़िगर नहीं की गई हैं।"
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "अमान्य SMS प्रकार।",
+                "empty_setting": "इस प्रोजेक्ट के लिए Brevo सेटिंग्स कॉन्फ़िगर नहीं की गई हैं।",
+                "empty_message": "SMS संदेश खाली है।",
+                "empty_number": "प्राप्तकर्ता का नंबर खाली है।",
+                "other": "Brevo त्रुटि"
             }
         }
     },
@@ -533,6 +564,11 @@
                         "replace_duplicating": "पुरानी संभावनाओं के संशोधित डेटा को नई संभावनाओं के साथ अधिलेखित करें"
                     },
                     "processing": "आयात पूरा होने पर हम आपको एक ईमेल भेजेंगे।",
+                    "notify_welcome_sms": "स्वागत SMS द्वारा सूचित करें",
+                    "welcome_sms_source": "स्वागत SMS का स्रोत",
+                    "welcome_sms_message": "स्वागत SMS संदेश",
+                    "welcome_sms_message_default": "स्वागत है! हमसे जुड़ने के लिए धन्यवाद।",
+                    "welcome_sms_sent": "स्वागत SMS भेजा गया",
                     "webservice": {
                         "step_1": "अपने ज़ैप को इस आयात के साथ जोड़ने के लिए,<br />जैपियर से कनेक्ट करें, और वहां अपना जैप बनाएं:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">एक जैप बनाएं</a>",
                         "step_2": "चुनना <b>गूगल शीट</b> जैसा <b>चालू कर देना</b>,<br />चुनना <b>नई स्प्रेडशीट पंक्ति [तत्काल]</b> जैसा <b>आयोजन</b>,<br />पर क्लिक करें <b>जारी रखना</b>.",

@@ -28,6 +28,7 @@ use App\Jobs\Import\ProspectItemsHandler\UsersHandler;
 use App\Events\ImportFinished;
 use App\Models\Import;
 use App\Services\ProspectAutoAssignment;
+use App\Jobs\Import\SendsWelcomeSms;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;
@@ -44,7 +45,7 @@ use Illuminate\Support\Str;
 
 class ImportProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, SendsWelcomeSms;
 
     const MAPPING_FIELD_DEFAULT = 0;
     const MAPPING_FIELD_META = 1;
@@ -234,6 +235,11 @@ class ImportProspects implements ShouldQueue
             'is_processing' => 0,
             'processed_at' => Carbon::now(),
         ]);
+
+        // Notifier SMS de bienvenue :
+        // envoyé une fois l'import terminé et les doublons
+        // écartés (cf. isDuplicateProspect ci-dessus).
+        $this->sendWelcomeSms($this->import);
 
         ImportFinished::dispatch($this->import->refresh());
 

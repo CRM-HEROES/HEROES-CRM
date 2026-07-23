@@ -347,6 +347,7 @@
             "call_by_phone": "通过电话拨打",
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
+            "call_by_kavkom": "通过 Kavkom 拨打",
             "history": "历史"
         },
         "message": {
@@ -410,6 +411,7 @@
             "via_mtarget": "通过 MTarget 发送短信",
             "via_ringover": "通过振铃发送短信",
             "via_ultramsg": "通过 UltraMsg 发送短信",
+            "via_brevo": "通过 Brevo 发送短信",
             "via_source": "通过{source}发送短信",
             "templates": "短信模板",
             "enter_text_message": "输入短信"
@@ -456,6 +458,35 @@
             "success": {
                 "title": "名片扫描件",
                 "message": "您导入的文件很快就会被扫描<br>并且相应的潜在客户将被导入到您的项目中。"
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "未知的短信来源：{source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "该项目尚未配置 SMSBOX 设置。"
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "该项目尚未配置 Ultramsg 设置。"
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "该项目尚未配置 MTarget 设置。"
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "无效的短信类型。",
+                "empty_setting": "该项目尚未配置 Brevo 设置。",
+                "empty_message": "短信内容为空。",
+                "empty_number": "收件人号码为空。",
+                "other": "Brevo 错误"
             }
         }
     },
@@ -533,6 +564,11 @@
                         "replace_duplicating": "用新潜在客户的数据覆盖旧潜在客户的修改数据"
                     },
                     "processing": "导入完成后，我们会向您发送一封电子邮件。",
+                    "notify_welcome_sms": "通过欢迎短信通知",
+                    "welcome_sms_source": "欢迎短信来源",
+                    "welcome_sms_message": "欢迎短信内容",
+                    "welcome_sms_message_default": "欢迎！感谢您的加入。",
+                    "welcome_sms_sent": "欢迎短信已发送",
                     "webservice": {
                         "step_1": "要将您的 zap 与此导入相关联，<br />连接到 Zapier，并在那里创建您的 zap：<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">创建 Zap</a>",
                         "step_2": "选择 <b>谷歌表格</b> 作为 <b>扳机</b>,<br />选择 <b>新电子表格行[即时]</b> 作为 <b>事件</b>,<br />点击 <b>继续</b>。",

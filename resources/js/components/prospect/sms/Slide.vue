@@ -221,6 +221,42 @@
                         </div>
                         <icon class="fa fa-caret-right" />
                     </item>
+
+                    <!-- Brevo -->
+                    <item
+                        v-if="can('all.prospect.sms.add')"
+                        class="hc-prospect-sms-item"
+                        @click="
+                            (tab = 1), (frameTab = 0), (sms.source = 'brevo')
+                        "
+                    >
+                        <icon>
+                            <svg viewBox="0 0 50 50">
+                                <rect
+                                    x="2"
+                                    y="2"
+                                    width="46"
+                                    height="46"
+                                    rx="10"
+                                    style="fill: #0b996c"
+                                />
+                                <path
+                                    style="fill: #ffffff"
+                                    d="M14,32V18c0-2.2,1.8-4,4-4h4c2.2,0,4,1.8,4,4s-1.8,4-4,4h-4v10H14z"
+                                />
+                                <circle cx="32" cy="26" r="7" style="fill: #ffffff" />
+                            </svg>
+                        </icon>
+                        <div class="hc-item-main-content hc-flex-column">
+                            <span v-text="$t('prospect.sms.via_brevo')"></span>
+                            <span
+                                v-if="prospect"
+                                class="hc-prospect-sms-item-number"
+                                v-text="prospect.mobile_phone_number"
+                            ></span>
+                        </div>
+                        <icon class="fa fa-caret-right" />
+                    </item>
                 </item-list>
             </template>
 
@@ -272,6 +308,14 @@
                                             class="fa fa-cog"
                                             @click.prevent.stop="
                                                 configureMTarget
+                                            "
+                                        />
+                                        <icon
+                                            v-else-if="sms.source == 'brevo'"
+                                            tag="a"
+                                            class="fa fa-cog"
+                                            @click.prevent.stop="
+                                                configureBrevo
                                             "
                                         />
                                     </item>
@@ -720,6 +764,10 @@ export default {
 
         configureMTarget() {
             store.commit(OPEN_MODAL, "setting-mtarget");
+        },
+
+        configureBrevo() {
+            store.commit(OPEN_MODAL, "setting-brevo");
         },
 
         /**

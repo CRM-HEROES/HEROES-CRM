@@ -445,6 +445,7 @@
             "call_by_phone": "Call by phone",
             "call_by_aircall": "Call by Aircall",
             "call_by_ringover": "Call by Ringover",
+            "call_by_kavkom": "Call by Kavkom",
             "history": "History"
         },
         "message": {
@@ -511,6 +512,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {source}",
             "templates": "SMS templates",
             "enter_text_message": "Enter a text message"
@@ -560,7 +562,35 @@
             }
         }
     },
-
+    "sms": {
+        "error": {
+            "unknown_source": "Unknown SMS source: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "SMSBOX settings are not configured for this project."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "Ultramsg settings are not configured for this project."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "MTarget settings are not configured for this project."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "invalid SMS type.",
+                "empty_setting": "Brevo settings are not configured for this project.",
+                "empty_message": "the SMS message is empty.",
+                "empty_number": "the recipient's number is empty.",
+                "other": "Brevo error"
+            }
+        }
+    },
     "import": {
         "add": {
             "title": "Import prospects",
@@ -641,6 +671,11 @@
                         "replace_duplicating": "Overwrite the modified data of old prospects with those of new ones"
                     },
                     "processing": "We will send you an email when the import is complete.",
+                    "notify_welcome_sms": "Notify with welcome SMS",
+                    "welcome_sms_source": "Welcome SMS source",
+                    "welcome_sms_message": "Welcome SMS message",
+                    "welcome_sms_message_default": "Welcome! Thank you for joining us.",
+                    "welcome_sms_sent": "Welcome SMS sent",
                     "webservice": {
                         "step_1": "To associate your zap with this import,<br />Connect to Zapier, and create your zap there:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Create a Zap</a>",
                         "step_2": "Choose <b>Google Sheet</b> as <b>Trigger</b>,<br />Choose <b>New Spreadsheet Row [instant]</b> as <b>Event</b>,<br />Click on <b>Continue</b>.",

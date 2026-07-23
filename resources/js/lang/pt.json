@@ -376,6 +376,7 @@
             "call_by_phone": "Ligue por telefone",
             "call_by_aircall": "Chamada por Aircall",
             "call_by_ringover": "Chamada por Ringover",
+            "call_by_kavkom": "Chamada por Kavkom",
             "history": "História"
         },
         "message": {
@@ -442,6 +443,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {fonte}",
             "templates": "Modelos de SMS",
             "enter_text_message": "Digite uma mensagem de texto"
@@ -488,6 +490,35 @@
             "success": {
                 "title": "Digitalização de cartão de visita",
                 "message": "Seus arquivos importados serão verificados em breve<br>e os clientes potenciais correspondentes serão importados para o seu projeto."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "Fonte de SMS desconhecida: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "as configurações do SMSBOX não estão definidas para este projeto."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "as configurações do Ultramsg não estão definidas para este projeto."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "as configurações do MTarget não estão definidas para este projeto."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "tipo de SMS inválido.",
+                "empty_setting": "as configurações do Brevo não estão definidas para este projeto.",
+                "empty_message": "a mensagem do SMS está vazia.",
+                "empty_number": "o número do destinatário está vazio.",
+                "other": "erro do Brevo"
             }
         }
     },
@@ -565,6 +596,11 @@
                         "replace_duplicating": "Substitua os dados modificados de clientes potenciais antigos pelos de novos"
                     },
                     "processing": "Enviaremos um e-mail para você quando a importação for concluída.",
+                    "notify_welcome_sms": "Notificar por SMS de boas-vindas",
+                    "welcome_sms_source": "Origem do SMS de boas-vindas",
+                    "welcome_sms_message": "Mensagem do SMS de boas-vindas",
+                    "welcome_sms_message_default": "Bem-vindo(a)! Obrigado por se juntar a nós.",
+                    "welcome_sms_sent": "SMS de boas-vindas enviado",
                     "webservice": {
                         "step_1": "Para associar seu zap a esta importação,<br />Conecte-se ao Zapier e crie seu zap lá:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Crie um Zap</a>",
                         "step_2": "Escolher <b>Planilha Google</b> como <b>Acionar</b>,<br />Escolher <b>Nova linha da planilha [instantâneo]</b> como <b>Evento</b>,<br />Clique em <b>Continuar</b>.",
