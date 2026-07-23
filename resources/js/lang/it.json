@@ -411,6 +411,7 @@
             "via_mtarget": "SMS tramite MTarget",
             "via_ringover": "SMS tramite Ringover",
             "via_ultramsg": "SMS tramite UltraMsg",
+            "via_brevo": "SMS tramite Brevo",
             "via_source": "SMS tramite {fonte}",
             "templates": "Modelli SMS",
             "enter_text_message": "Inserisci un messaggio di testo"
@@ -457,6 +458,35 @@
             "success": {
                 "title": "Scansione di biglietti da visita",
                 "message": "I tuoi file importati verranno presto scansionati<br>e i potenziali clienti corrispondenti verranno importati nel tuo progetto."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "Fonte SMS sconosciuta: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "le impostazioni SMSBOX non sono configurate per questo progetto."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "le impostazioni Ultramsg non sono configurate per questo progetto."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "le impostazioni MTarget non sono configurate per questo progetto."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "tipo di SMS non valido.",
+                "empty_setting": "le impostazioni Brevo non sono configurate per questo progetto.",
+                "empty_message": "il messaggio SMS è vuoto.",
+                "empty_number": "il numero del destinatario è vuoto.",
+                "other": "errore Brevo"
             }
         }
     },
@@ -534,6 +564,11 @@
                         "replace_duplicating": "Sovrascrivi i dati modificati dei vecchi prospect con quelli dei nuovi"
                     },
                     "processing": "Ti invieremo un'e-mail al termine dell'importazione.",
+                    "notify_welcome_sms": "Notifica con SMS di benvenuto",
+                    "welcome_sms_source": "Origine dell'SMS di benvenuto",
+                    "welcome_sms_message": "Messaggio dell'SMS di benvenuto",
+                    "welcome_sms_message_default": "Benvenuto/a! Grazie per esserti unito a noi.",
+                    "welcome_sms_sent": "SMS di benvenuto inviato",
                     "webservice": {
                         "step_1": "Per associare il tuo zap a questa importazione,<br />Connettiti a Zapier e crea lì il tuo zap:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Crea uno zap</a>",
                         "step_2": "Scegliere <b>Foglio Google</b> COME <b>Grilletto</b>,<br />Scegliere <b>Nuova riga del foglio di calcolo [istantaneo]</b> COME <b>Evento</b>,<br />Clicca su <b>Continua</b>.",

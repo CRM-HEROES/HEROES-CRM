@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Import;
+use App\Jobs\Import\SendsWelcomeSms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,7 +14,7 @@ use Illuminate\Support\Str;
 
 class ImportHandleDuplicatedProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, SendsWelcomeSms;
 
     const MAPPING_FIELD_CLASSIC = 0;
     const MAPPING_FIELD_META = 1;
@@ -55,6 +56,8 @@ class ImportHandleDuplicatedProspects implements ShouldQueue
                 $this->replaceDuplicating($duplicates);
                 break;
         }
+
+        $this->sendWelcomeSms($this->import);
     }
     
     /**

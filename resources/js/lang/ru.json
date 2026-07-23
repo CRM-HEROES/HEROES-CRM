@@ -411,6 +411,7 @@
             "via_mtarget": "СМС через MTarget",
             "via_ringover": "СМС через Ringover",
             "via_ultramsg": "СМС через UltraMsg",
+            "via_brevo": "СМС через Brevo",
             "via_source": "SMS через {источник}",
             "templates": "Шаблоны СМС",
             "enter_text_message": "Введите текстовое сообщение"
@@ -457,6 +458,35 @@
             "success": {
                 "title": "Сканирование визитной карточки",
                 "message": "Импортированные файлы скоро будут отсканированы.<br>и соответствующие потенциальные клиенты будут импортированы в ваш проект."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "Неизвестный источник SMS: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "настройки SMSBOX не заданы для этого проекта."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "настройки Ultramsg не заданы для этого проекта."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "настройки MTarget не заданы для этого проекта."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "недопустимый тип SMS.",
+                "empty_setting": "настройки Brevo не заданы для этого проекта.",
+                "empty_message": "текст SMS пуст.",
+                "empty_number": "номер получателя пуст.",
+                "other": "ошибка Brevo"
             }
         }
     },
@@ -534,6 +564,11 @@
                         "replace_duplicating": "Перезапишите измененные данные старых потенциальных клиентов данными новых."
                     },
                     "processing": "Мы отправим вам электронное письмо, когда импорт будет завершен.",
+                    "notify_welcome_sms": "Уведомлять приветственным SMS",
+                    "welcome_sms_source": "Источник приветственного SMS",
+                    "welcome_sms_message": "Текст приветственного SMS",
+                    "welcome_sms_message_default": "Добро пожаловать! Спасибо, что присоединились к нам.",
+                    "welcome_sms_sent": "Приветственное SMS отправлено",
                     "webservice": {
                         "step_1": "Чтобы связать ваш zap с этим импортом,<br />Подключитесь к Zapier и создайте там свой zap:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Создать Зап</a>",
                         "step_2": "Выбирать <b>Google Таблицы</b> как <b>Курок</b>,<br />Выбирать <b>Новая строка таблицы [мгновенно]</b> как <b>Событие</b>,<br />Нажмите на <b>Продолжать</b>.",

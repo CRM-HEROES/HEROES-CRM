@@ -3,6 +3,7 @@ import importGroupService from "@/apis/project/import/group";
 import importLabelService from "@/apis/project/import/label";
 import importUserService from "@/apis/project/import/user";
 import importMappingService from "@/apis/project/import/mapping";
+import importRoleService from "@/apis/project/import/role";
 
 import {
     FETCH_IMPORTS,
@@ -29,6 +30,8 @@ import {
     ADD_IMPORT_MAPPING_LINK,
     ADD_IMPORT_MAPPING_USER,
     REMOVE_IMPORT_MAPPING,
+    ADD_IMPORT_ROLE,
+    REMOVE_IMPORT_ROLE,
 } from "@/actions/project/import";
 
 /**
@@ -207,6 +210,23 @@ const actions = {
     async [REMOVE_IMPORT_USER](context, slug) {
         context.commit(REMOVE_IMPORT_USER, slug);
         await importUserService.destroy(
+            context.state.project.slug,
+            context.state.project.import.id,
+            slug
+        );
+    },
+    async [ADD_IMPORT_ROLE](context, slug) {
+        context.commit(ADD_IMPORT_ROLE, slug);
+        await importRoleService.update(
+            context.state.project.slug,
+            context.state.project.import.id,
+            slug
+        );
+    },
+
+    async [REMOVE_IMPORT_ROLE](context, slug) {
+        context.commit(REMOVE_IMPORT_ROLE, slug);
+        await importRoleService.destroy(
             context.state.project.slug,
             context.state.project.import.id,
             slug
@@ -538,6 +558,18 @@ const mutations = {
      */
     [REMOVE_IMPORT_USER](state, slug) {
         state.project.import.users = state.project.import.users.filter(
+            (o) => o != slug
+        );
+    },
+    [ADD_IMPORT_ROLE](state, slug) {
+        state.project.import.roles = [
+            ...(state.project.import.roles ?? []),
+            slug,
+        ];
+    },
+
+    [REMOVE_IMPORT_ROLE](state, slug) {
+        state.project.import.roles = state.project.import.roles.filter(
             (o) => o != slug
         );
     },

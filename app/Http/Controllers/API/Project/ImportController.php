@@ -90,6 +90,9 @@ class ImportController extends Controller
         $this->validate(request(), [
             'mapping' => 'sometimes|array',
             'duplicates_fields' => 'sometimes|array',
+            'notify_welcome_sms' => 'sometimes|boolean',
+            'welcome_sms_message' => 'sometimes|nullable|string|required_if:notify_welcome_sms,true',
+            'welcome_sms_source' => 'sometimes|nullable|in:brevo,smsbox,ultramsg,mtarget',
         ]);
 
         $import->update($request->only(
@@ -97,7 +100,10 @@ class ImportController extends Controller
             'headers',
             'mapping',
             'duplicates_fields',
-            'is_processing'
+            'is_processing',
+            'notify_welcome_sms',
+            'welcome_sms_message',
+            'welcome_sms_source'
         ));
 
         return ['message' => trans('common.success.updated_resource')];

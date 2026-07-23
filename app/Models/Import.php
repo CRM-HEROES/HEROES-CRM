@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Model;
 class Import extends Model
 {
     use HasFactory;
-    
-    
+
+
     /**
      * The "booted" method of the model.
      */
@@ -20,8 +20,8 @@ class Import extends Model
     {
         static::addGlobalScope(new ImportScope());
     }
-    
-    
+
+
     /**
      * The attributes that are mass assignable.
      *
@@ -39,17 +39,22 @@ class Import extends Model
         'labels',
         'mapping',
         'name',
+        'notify_welcome_sms',
+        'welcome_sms_message',
+        'welcome_sms_source',
+        'welcome_sms_sent_at',
         'path',
         'projects',
         'processing_at',
         'processed_at',
         'rows_count',
+        'roles',
         'source',
         'token',
         'users',
         'values',
     ];
-    
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -62,7 +67,7 @@ class Import extends Model
 
 
     /**
-     * 
+     *
      */
     protected $appends = [
         'url',
@@ -80,7 +85,10 @@ class Import extends Model
         'headers'   => 'json',
         'labels'    => 'json',
         'mapping'   => 'json',
+        'notify_welcome_sms' => 'boolean',
+        'welcome_sms_sent_at' => 'datetime',
         'projects'  => 'json',
+        'roles'     => 'json',
         'prospects' => 'json',
         'users'     => 'json',
         'values'    => 'json',
@@ -112,7 +120,7 @@ class Import extends Model
     public function getUrlAttribute()
     {
         return $this->project ? route('api.project.import.download', [
-            'project' => $this->project->slug, 
+            'project' => $this->project->slug,
             'import' => $this->id
         ]) : null;
     }
@@ -127,7 +135,7 @@ class Import extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * Project
      */
@@ -135,7 +143,7 @@ class Import extends Model
     {
         return $this->belongsTo(Project::class);
     }
-    
+
     /**
      * Prospects
      */

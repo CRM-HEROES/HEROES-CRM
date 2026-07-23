@@ -411,6 +411,7 @@
             "via_mtarget": "الرسائل القصيرة عبر MTarget",
             "via_ringover": "الرسائل القصيرة عبر Ringover",
             "via_ultramsg": "الرسائل القصيرة عبر UltraMsg",
+            "via_brevo": "الرسائل القصيرة عبر Brevo",
             "via_source": "الرسائل القصيرة عبر {المصدر}",
             "templates": "قوالب الرسائل القصيرة",
             "enter_text_message": "أدخل رسالة نصية"
@@ -457,6 +458,35 @@
             "success": {
                 "title": "مسح بطاقة العمل",
                 "message": "سيتم فحص ملفاتك المستوردة قريبًا<br>وسيتم استيراد التوقعات المقابلة إلى مشروعك."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "مصدر SMS غير معروف: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "لم يتم تكوين إعدادات SMSBOX لهذا المشروع."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "لم يتم تكوين إعدادات Ultramsg لهذا المشروع."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "لم يتم تكوين إعدادات MTarget لهذا المشروع."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "نوع SMS غير صالح.",
+                "empty_setting": "لم يتم تكوين إعدادات Brevo لهذا المشروع.",
+                "empty_message": "نص الرسالة فارغ.",
+                "empty_number": "رقم المستلم فارغ.",
+                "other": "خطأ في Brevo"
             }
         }
     },
@@ -534,6 +564,11 @@
                         "replace_duplicating": "استبدل البيانات المعدلة للعملاء المحتملين القدامى ببيانات العملاء المحتملين الجدد"
                     },
                     "processing": "سنرسل إليك بريدًا إلكترونيًا عند اكتمال عملية الاستيراد.",
+                    "notify_welcome_sms": "إشعار عبر رسالة SMS ترحيبية",
+                    "welcome_sms_source": "مصدر رسالة SMS الترحيبية",
+                    "welcome_sms_message": "نص رسالة SMS الترحيبية",
+                    "welcome_sms_message_default": "مرحبًا بك! شكرًا لانضمامك إلينا.",
+                    "welcome_sms_sent": "تم إرسال رسالة SMS الترحيبية",
                     "webservice": {
                         "step_1": "لربط Zap الخاص بك بهذا الاستيراد،<br />اتصل بـ Zapier، وأنشئ برنامج Zapier الخاص بك هناك:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">إنشاء زاب</a>",
                         "step_2": "يختار <b>ورقة جوجل</b> مثل <b>مشغل</b>,<br />يختار <b>صف جدول بيانات جديد [فوري]</b> مثل <b>حدث</b>,<br />انقر فوق <b>يكمل</b>.",

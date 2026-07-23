@@ -512,6 +512,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {source}",
             "templates": "Templates SMS",
             "enter_text_message": "Saisir un SMS"
@@ -561,7 +562,35 @@
             }
         }
     },
-
+    "sms": {
+        "error": {
+            "unknown_source": "Source de SMS inconnue : {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "la configuration SMSBOX n'est pas renseignée pour ce projet."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "la configuration Ultramsg n'est pas renseignée pour ce projet."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "la configuration MTarget n'est pas renseignée pour ce projet."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "type de SMS invalide.",
+                "empty_setting": "la configuration Brevo n'est pas renseignée pour ce projet.",
+                "empty_message": "le message du SMS est vide.",
+                "empty_number": "le numéro du destinataire est vide.",
+                "other": "erreur Brevo"
+            }
+        }
+    },
     "import": {
         "add": {
             "title": "Importer des prospects",
@@ -642,6 +671,11 @@
                         "replace_duplicating": "Ecraser les données modifiées des anciens prospects par celles des nouveaux"
                     },
                     "processing": "Nous vous enverrons un mail lorsque l'import sera terminé.",
+                    "notify_welcome_sms": "Notifier par SMS de bienvenue",
+                    "welcome_sms_source": "Origine du SMS de bienvenue",
+                    "welcome_sms_message": "Message du SMS de bienvenue",
+                    "welcome_sms_message_default": "Bienvenue ! Merci de nous avoir rejoint.",
+                    "welcome_sms_sent": "SMS de bienvenue envoyé",
                     "webservice": {
                         "step_1": "Pour associer votre zap avec cet import,<br />Connectez-vous sur Zapier, et créez-y votre zap:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Créer un Zap</a>",
                         "step_2": "Choisissez <b>Google Sheet</b> comme <b>Trigger</b>,<br />Choisissez <b>New Spreadsheet Row [instant]</b> comme <b>Event</b>,<br />Cliquer sur <b>Continue</b>.",
