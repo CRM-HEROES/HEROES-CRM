@@ -26,3 +26,5 @@ export const ADD_IMPORT_MAPPING_INTERACTION = "addImportMappingInteraction";
 export const ADD_IMPORT_MAPPING_LINK = "addImportMappingLink";
 export const ADD_IMPORT_MAPPING_USER = "addImportMappingUser";
 export const REMOVE_IMPORT_MAPPING = "removeImportMapping";
+export const ADD_IMPORT_ROLE = "addImportRole";
+export const REMOVE_IMPORT_ROLE = "removeImportRole";

@@ -393,6 +393,7 @@ Route::group([
         Route::delete('/import/{import}/duplicate', [ProjectImportDuplicateController::class, 'destroy']);
         // Import Relation Group
         Route::apiResource('import.group', ProjectImportGroupController::class)->only('index', 'update', 'destroy');
+        Route::apiResource('import.role', \App\Http\Controllers\API\Project\Import\RoleController::class)->only('index', 'update', 'destroy');
         // Import Relation Label
         Route::apiResource('import.label', ProjectImportLabelController::class)->only('index', 'update', 'destroy');
         // Import Relation User

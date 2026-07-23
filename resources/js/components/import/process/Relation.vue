@@ -45,6 +45,23 @@
                                 <icon class="fa fa-caret-right" />
                             </item>
 
+                            <!-- Roles -->
+                            <item
+                                @click="(tab = 1), (itemsTab = 3)"
+                                v-if="filteredRelationRoles.length > 0"
+                            >
+                                <icon class="fa fa-id-badge" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'Rôles effectués'
+                                        )
+                                    "
+                                ></div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
+
                             <!-- Categories -->
                             <relation-category-row
                                 v-for="c in filteredRelationCategories"
@@ -63,7 +80,7 @@
                 <template #2>
                     <div class="hc-flex-column" style="height: 100%">
                         <frame-layout
-                            :count="3"
+                            :count="4"
                             :tab="itemsTab"
                             class="hc-flex-1 hc-flex-column"
                             style="height: 100%"
@@ -144,6 +161,33 @@
                                     />
                                 </item-list>
                             </template>
+
+                            <!-- Roles -->
+                            <template #4>
+                                <!-- Title -->
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'Rôles effectués'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+
+                                <item-list padding="12px" class="hc-flex-1">
+                                    <relation-role-row
+                                        v-for="role in filteredRelationRoles"
+                                        :key="role.id"
+                                        :role="role"
+                                        :is-checked="
+                                            isRelationRoleChecked(role)
+                                        "
+                                    />
+                                </item-list>
+                            </template>
                         </frame-layout>
                     </div>
                 </template>
@@ -159,6 +203,7 @@ import RelationCategoryRow from "./relation/RelationCategoryRow.vue";
 import RelationLabelRow from "./relation/RelationLabelRow.vue";
 import RelationGroupRow from "./relation/RelationGroupRow.vue";
 import RelationUserRow from "./relation/RelationUserRow.vue";
+import RelationRoleRow from "./relation/RelationRoleRow.vue";
 
 export default {
     components: {
@@ -167,6 +212,7 @@ export default {
         RelationLabelRow,
         RelationGroupRow,
         RelationUserRow,
+        RelationRoleRow,
     },
 
     data() {
@@ -214,10 +260,22 @@ export default {
                 this.prospectImport.users.indexOf(user.id) >= 0
             );
         },
+
+        /**
+         * Role checked
+         * @param {*} role
+         */
+        isRelationRoleChecked(role) {
+            return (
+                this.prospectImport &&
+                this.prospectImport.roles &&
+                this.prospectImport.roles.indexOf(role.id) >= 0
+            );
+        },
     },
 
     computed: {
-        ...mapGetters(["categories", "groups", "users", "prospectImport"]),
+        ...mapGetters(["categories", "groups", "users", "roles", "prospectImport"]),
 
         /**
          *
@@ -287,6 +345,17 @@ export default {
                         ? -1
                         : 1
                 );
+        },
+
+        /**
+         *
+         */
+        filteredRelationRoles() {
+            const keyword = removeStringAccent(this.relationKeyword);
+
+            return (this.roles || []).filter(
+                (role) => removeStringAccent(role.name).indexOf(keyword) >= 0
+            );
         },
     },
 };
