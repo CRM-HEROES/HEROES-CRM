@@ -1,183 +1,171 @@
 <template>
-    <div :id="id" class="hc-kavkom-shell">
+    <div :id="id" class="hc-kavkom-webphone">
+        <audio ref="remoteAudio" autoplay style="display: none"></audio>
 
-        <iframe
-            v-if="kavkomUrl"
-            :key="kavkomUrl"
-            class="hc-kavkom-iframe"
-            :src="kavkomUrl"
-            title="Kavkom"
-            loading="eager"
-            referrerpolicy="strict-origin-when-cross-origin"
-            allow="microphone; camera; autoplay"
-            @load="onIframeLoaded"
-            @error="onIframeError"
-        ></iframe>
-
-        <div v-else class="hc-kavkom-fallback">
-            Chargement de l’interface Kavkom…
+        <div class="hc-kavkom-webphone-status">
+            <span v-if="status === 'not-configured'">
+                Configurez le jeton Kavkom et le domain UUID dans les
+                paramètres pour activer le softphone.
+            </span>
+            <span v-else-if="status === 'error'">
+                {{ errorMessage || "Erreur de connexion au softphone Kavkom." }}
+            </span>
+            <span v-else-if="status === 'connecting'">
+                Connexion du softphone à l’extension Kavkom…
+            </span>
+            <span v-else-if="status === 'registered'">
+                Softphone Kavkom prêt (extension {{ extension }}).
+            </span>
+            <span v-else-if="status === 'ringing'">Appel entrant…</span>
+            <span v-else-if="status === 'in-call'">Appel en cours.</span>
         </div>
 
-        <div v-if="iframeError" class="hc-kavkom-fallback-message">
-            L’interface Kavkom n’a pas pu être chargée directement ici. Vous pouvez utiliser le bouton ci-dessus pour l’ouvrir dans un onglet.
+        <div
+            class="hc-kavkom-webphone-controls"
+            v-if="['ringing', 'in-call'].includes(status)"
+        >
+            <button
+                v-if="status === 'ringing'"
+                type="button"
+                class="hc-button-success"
+                @click="answer"
+            >
+                Répondre
+            </button>
+            <button type="button" class="hc-button-danger" @click="hangup">
+                Raccrocher
+            </button>
         </div>
     </div>
 </template>
 
-<style>
-.hc-kavkom-shell {
+<style scoped>
+.hc-kavkom-webphone {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    height: 100%;
-    min-height: 480px;
 }
-.hc-kavkom-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-}
-.hc-kavkom-title {
-    font-weight: 600;
-    color: #343a40;
-}
-.hc-kavkom-subtitle {
-    font-size: 12px;
+.hc-kavkom-webphone-status {
+    font-size: 13px;
     color: #6c757d;
 }
-.hc-kavkom-open-btn {
-    border: 0;
-    border-radius: 6px;
-    background: #8e24aa;
-    color: #fff;
-    padding: 8px 12px;
-    cursor: pointer;
-    font-size: 13px;
-}
-.hc-kavkom-iframe {
-    flex: 1;
-    width: 100%;
-    min-height: 420px;
-    border: 0;
-    border-radius: 6px;
-    background: #fff;
-}
-.hc-kavkom-fallback,
-.hc-kavkom-fallback-message {
+.hc-kavkom-webphone-controls {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 120px;
-    padding: 16px;
-    border: 1px dashed #d0d7de;
-    border-radius: 8px;
-    background: #f8f9fa;
-    color: #6c757d;
-    font-size: 13px;
-    text-align: center;
+    gap: 8px;
 }
 </style>
 
 <script>
+import { SimpleUser } from "sip.js/lib/platform/web";
+import ApiService from "@/apis/api.service";
+
 export default {
     props: {
         id: {
             type: String,
         },
-
-        number: {
-            type: String,
-            default: null,
-        },
-
-        tab: {
-            type: String,
-            default: "phone",
-        },
-
-        options: {
-            type: Object,
-            default: {
-                animation: false,
-                size: "auto",
-                type: "relative",
-            },
-        },
     },
 
     data() {
         return {
-            kavkomUrl: null,
-            iframeError: false,
+            simpleUser: null,
+            status: "connecting",
+            errorMessage: "",
+            extension: "",
         };
     },
 
-    mounted() {
-        this.kavkomUrl = this.buildKavkomUrl();
+    async mounted() {
+        await this.registerWebphone();
+    },
+
+    beforeUnmount() {
+        this.teardown();
     },
 
     methods: {
-        normalizeNumber(value) {
-            if (!value) {
-                return "";
-            }
+        async registerWebphone() {
+            this.status = "connecting";
+            this.errorMessage = "";
 
-            return String(value).replace(/[^\d+]/g, "");
-        },
-
-        buildKavkomUrl() {
-            const baseUrl = "https://app.kavkom.com/";
-            const url = new URL(baseUrl);
-            const normalizedNumber = this.normalizeNumber(this.number);
-
-            if (normalizedNumber) {
-                url.searchParams.set("phone", normalizedNumber);
-                url.searchParams.set("number", normalizedNumber);
-            }
-
-            url.searchParams.set("language", "french");
-
-            // Attach Kavkom settings if available (api_key, api_secret)
             try {
-                const kavkomSetting = this.$store && this.$store.getters && this.$store.getters.settingsGet
-                    ? this.$store.getters.settingsGet("kavkom")
-                    : null;
+                const { data } = await ApiService.get(
+                    "settings/kavkom/credentials"
+                );
 
-                if (kavkomSetting && kavkomSetting.api_key) {
-                    url.searchParams.set("api_key", kavkomSetting.api_key);
+                if (!data.success) {
+                    this.status = "not-configured";
+                    this.errorMessage = data.message;
+                    return;
                 }
 
-                if (kavkomSetting && kavkomSetting.api_secret) {
-                    url.searchParams.set("api_secret", kavkomSetting.api_secret);
-                }
-            } catch (e) {
-                // ignore
-            }
-
-            return url.toString();
-        },
-
-
-        openInNewTab() {
-            if (this.kavkomUrl) {
-                window.open(this.kavkomUrl, "_blank", "noopener,noreferrer");
+                this.extension = data.extension;
+                this.connectSip(data);
+            } catch (error) {
+                this.status = "error";
+                this.errorMessage =
+                    error.response?.data?.message ||
+                    "Erreur inattendue lors de la connexion à Kavkom.";
             }
         },
 
-        onIframeLoaded() {
-            this.iframeError = false;
+        connectSip({ extension, password, user_context }) {
+            const server = `wss://${user_context}`;
+            const aor = `sip:${extension}@${user_context}`;
+
+            this.simpleUser = new SimpleUser(server, {
+                aor,
+                userAgentOptions: {
+                    authorizationUsername: extension,
+                    authorizationPassword: password,
+                },
+                media: {
+                    constraints: { audio: true, video: false },
+                    remote: { audio: this.$refs.remoteAudio },
+                },
+            });
+
+            this.simpleUser.delegate = {
+                onCallReceived: async () => {
+                    this.status = "ringing";
+                    this.$emit("ringing-call");
+                },
+                onCallAnswered: () => {
+                    this.status = "in-call";
+                    this.$emit("answered-call");
+                },
+                onCallHangup: () => {
+                    this.status = "registered";
+                    this.$emit("hangup-call");
+                },
+            };
+
+            this.simpleUser
+                .connect()
+                .then(() => this.simpleUser.register())
+                .then(() => {
+                    this.status = "registered";
+                })
+                .catch(() => {
+                    this.status = "error";
+                    this.errorMessage =
+                        "Impossible de connecter le softphone à l’extension Kavkom.";
+                });
         },
 
-        onIframeError() {
-            this.iframeError = true;
+        answer() {
+            this.simpleUser?.answer().catch(() => {});
         },
-    },
 
-    watch: {
-        number() {
-            this.iframeError = false;
-            this.kavkomUrl = this.buildKavkomUrl();
+        hangup() {
+            this.simpleUser?.hangup().catch(() => {});
+        },
+
+        teardown() {
+            if (this.simpleUser) {
+                this.simpleUser.disconnect().catch(() => {});
+                this.simpleUser = null;
+            }
         },
     },
 };
