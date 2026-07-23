@@ -42,12 +42,16 @@ class KavkomController extends Controller
             ], 200);
         }
 
-        $src = $request->user()->mobile_phone_number ?: $request->user()->phone_number;
+        $extension = $service->resolveExtension($config['api_token'], $config['domain_uuid']);
+
+        if (!$extension['success']) {
+            return response()->json($extension, 200);
+        }
 
         $result = $service->originateCall(
             $config['api_token'],
             $config['domain_uuid'],
-            (string) $src,
+            $extension['extension'],
             $data['destination']
         );
 

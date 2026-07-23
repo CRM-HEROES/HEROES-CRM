@@ -51,4 +51,40 @@ class KavkomServiceTest extends TestCase
 
         $this->assertFalse($result['success']);
     }
+
+    public function test_it_resolves_the_first_enabled_extension_of_the_domain(): void
+    {
+        Http::fake([
+            'https://api.kavkom.com/api/pbx/v1/extension/list*' => Http::response([
+                'success' => true,
+                'data' => [
+                    ['extension' => '900', 'enabled' => 'false'],
+                    ['extension' => '901', 'enabled' => 'true'],
+                ],
+            ], 200),
+        ]);
+
+        $service = new KavkomService();
+
+        $result = $service->resolveExtension('test-token', 'domain-uuid');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('901', $result['extension']);
+    }
+
+    public function test_it_fails_to_resolve_extension_when_domain_has_none(): void
+    {
+        Http::fake([
+            'https://api.kavkom.com/api/pbx/v1/extension/list*' => Http::response([
+                'success' => true,
+                'data' => [],
+            ], 200),
+        ]);
+
+        $service = new KavkomService();
+
+        $result = $service->resolveExtension('test-token', 'domain-uuid');
+
+        $this->assertFalse($result['success']);
+    }
 }

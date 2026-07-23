@@ -55,6 +55,64 @@ class KavkomService
         }
     }
 
+    /**
+     * Kavkom requires the "src" of a call to be an extension already
+     * registered on the domain (a phone/softphone already logged into
+     * that extension) — an arbitrary external phone number is rejected.
+     * We auto-detect the first enabled extension of the domain.
+     */
+    public function resolveExtension(string $apiToken, string $domainUuid): array
+    {
+        if (empty($apiToken) || empty($domainUuid)) {
+            return [
+                'success' => false,
+                'message' => 'Le jeton API Kavkom et le domain_uuid sont requis.',
+            ];
+        }
+
+        try {
+            $response = Http::withHeaders([
+                'X-API-TOKEN' => $apiToken,
+                'Accept' => 'application/json',
+            ])->timeout(10)->get(self::BASE_URL . '/api/pbx/v1/extension/list', [
+                'domain_uuid' => $domainUuid,
+                'limit' => 50,
+            ]);
+
+            if (!$response->successful() || data_get($response->json(), 'success') !== true) {
+                return [
+                    'success' => false,
+                    'message' => data_get($response->json(), 'message') ?: 'Impossible de récupérer les extensions Kavkom.',
+                ];
+            }
+
+            $extensions = (array) data_get($response->json(), 'data', []);
+
+            $enabled = collect($extensions)->first(
+                fn ($item) => filter_var(data_get($item, 'enabled'), FILTER_VALIDATE_BOOLEAN)
+            );
+
+            $extension = $enabled ?: ($extensions[0] ?? null);
+
+            if (!$extension || empty(data_get($extension, 'extension'))) {
+                return [
+                    'success' => false,
+                    'message' => "Aucune extension Kavkom trouvée sur ce domaine. Créez une extension dans Kavkom pour pouvoir passer des appels.",
+                ];
+            }
+
+            return [
+                'success' => true,
+                'extension' => (string) data_get($extension, 'extension'),
+            ];
+        } catch (\Throwable $exception) {
+            return [
+                'success' => false,
+                'message' => $this->buildErrorMessage($exception),
+            ];
+        }
+    }
+
     public function originateCall(string $apiToken, string $domainUuid, string $src, string $destination): array
     {
         if (empty($apiToken) || empty($domainUuid)) {
@@ -67,7 +125,7 @@ class KavkomService
         if (empty($src)) {
             return [
                 'success' => false,
-                'message' => "Aucun numéro de téléphone n'est renseigné sur votre profil pour recevoir l'appel.",
+                'message' => "Aucune extension Kavkom n'a pu être déterminée pour lancer l'appel.",
             ];
         }
 
@@ -91,7 +149,7 @@ class KavkomService
             if ($response->successful() && data_get($response->json(), 'success') === true) {
                 return [
                     'success' => true,
-                    'message' => "Votre téléphone ({$src}) va sonner, il sera ensuite relié au {$destination}.",
+                    'message' => "L'extension Kavkom {$src} va sonner, elle sera ensuite reliée au {$destination}.",
                     'call_uuid' => data_get($response->json(), 'call_uuid'),
                 ];
             }

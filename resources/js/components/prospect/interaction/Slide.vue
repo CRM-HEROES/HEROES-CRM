@@ -184,27 +184,6 @@
                                 </div>
                                 <icon class="fa fa-caret-right" />
                             </item>
-
-                            <!-- Kavkom click-to-call -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaKavkomCall(number)"
-                            >
-                                <icon
-                                    class="fa fa-phone-volume"
-                                    color="#8e24aa"
-                                />
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span>Rappel automatique Kavkom</span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <loading :loading="callingViaKavkom" />
-                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -474,44 +453,48 @@
                                     @click.stop="kavkomSetting"
                                 />
                             </item>
-                            <div
-                                style="
-                                    flex: 1;
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: auto;
-                                    padding: 16px;
-                                "
-                            >
-                                <kavkom
-                                    id="kavkom-phone"
-                                    :number="interaction.number"
-                                    tab="phone"
-                                    style="flex: 1; width: 100%; height: 100%"
-                                    @ringing-call="
-                                        (callInfo) => {
-                                            interaction.from_number =
-                                                callInfo.data.from;
-                                            interaction.status = 'ringing';
-                                            interaction.data.id =
-                                                callInfo.data.call_id;
-                                            updateInteraction();
-                                        }
-                                    "
-                                    @hangup-call="
-                                        (callInfo) => {
-                                            interaction.status = 'hangup';
-                                            interaction.data.id =
-                                                callInfo.data.call_id;
-                                            updateInteraction();
-                                            nextInteraction();
-                                        }
-                                    "
-                                    @answered-call="
-                                        (interaction.status = 'answered'),
-                                            updateInteraction()
-                                    "
-                                />
+                            <div class="hc-kavkom-call-panel">
+                                <div class="hc-kavkom-call-help">
+                                    L'extension Kavkom de votre domaine (le
+                                    poste/softphone déjà configuré dans
+                                    Kavkom) va sonner en premier, puis Kavkom
+                                    la reliera automatiquement au numéro du
+                                    lead ci-dessous.
+                                </div>
+
+                                <div class="hc-kavkom-call-number">
+                                    {{ interaction.number }}
+                                </div>
+
+                                <div
+                                    v-if="callingViaKavkom"
+                                    class="hc-kavkom-call-status"
+                                >
+                                    <loading :loading="true" />
+                                    Déclenchement de l’appel…
+                                </div>
+                                <div
+                                    v-else-if="kavkomCallMessage"
+                                    :class="[
+                                        'hc-kavkom-call-status',
+                                        kavkomCallSuccess ? 'success' : 'error',
+                                    ]"
+                                >
+                                    {{ kavkomCallMessage }}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="hc-button-secondary"
+                                    :disabled="callingViaKavkom"
+                                    @click="triggerKavkomCall(interaction.number)"
+                                >
+                                    {{
+                                        callingViaKavkom
+                                            ? "Appel en cours..."
+                                            : "Rappeler"
+                                    }}
+                                </button>
                             </div>
                         </div>
                     </template>
@@ -601,6 +584,40 @@
     font-size: 11px;
     color: #999999;
 }
+.hc-kavkom-call-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 24px;
+    text-align: center;
+}
+.hc-kavkom-call-help {
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.5;
+    max-width: 320px;
+}
+.hc-kavkom-call-number {
+    font-size: 18px;
+    font-weight: 600;
+    color: #343a40;
+}
+.hc-kavkom-call-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #6c757d;
+}
+.hc-kavkom-call-status.success {
+    color: #2e7d32;
+}
+.hc-kavkom-call-status.error {
+    color: #c62828;
+}
 </style>
 
 <script>
@@ -621,7 +638,6 @@ import {
 
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
-import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
@@ -632,7 +648,6 @@ import ApiService from "@/apis/api.service";
 export default {
     components: {
         Ringover,
-        Kavkom,
         Aircall,
         InteractionRow,
         SelectProspect,
@@ -654,6 +669,8 @@ export default {
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
             callingViaKavkom: false,
+            kavkomCallMessage: "",
+            kavkomCallSuccess: false,
         };
     },
 
@@ -746,6 +763,7 @@ export default {
             this.interaction.source = "kavkom";
             this.interaction.number = number;
             this.addInteraction();
+            this.triggerKavkomCall(number);
         },
 
         kavkomSetting() {
@@ -753,38 +771,30 @@ export default {
         },
 
         /**
-         * Trigger a Kavkom click-to-call: the agent's own phone rings
-         * first, then Kavkom connects it to the lead's number.
+         * Trigger a Kavkom click-to-call: the agent's own phone (from
+         * their CRM profile) rings first, then Kavkom connects it to
+         * the lead's number, using the stored Token + Domain UUID.
          */
-        async interactionViaKavkomCall(number) {
+        async triggerKavkomCall(number) {
+            if (!number) {
+                return;
+            }
+
             this.callingViaKavkom = true;
+            this.kavkomCallMessage = "";
 
             try {
                 const { data } = await ApiService.post("settings/kavkom/call", {
                     destination: number,
                 });
 
-                if (data.success) {
-                    flashInfo({
-                        title: "Kavkom",
-                        body: data.message,
-                        duration: 8000,
-                    });
-
-                    this.interaction = this.newInteraction();
-                    this.interaction.source = "kavkom";
-                    this.interaction.number = number;
-                    this.addInteraction();
-                } else {
-                    flashError({ title: "Kavkom", body: data.message });
-                }
+                this.kavkomCallMessage = data.message;
+                this.kavkomCallSuccess = data.success;
             } catch (error) {
-                flashError({
-                    title: "Kavkom",
-                    body:
-                        error.response?.data?.message ||
-                        "Erreur inattendue lors de l’appel Kavkom.",
-                });
+                this.kavkomCallMessage =
+                    error.response?.data?.message ||
+                    "Erreur inattendue lors de l’appel Kavkom.";
+                this.kavkomCallSuccess = false;
             } finally {
                 this.callingViaKavkom = false;
             }
@@ -793,6 +803,10 @@ export default {
         openKavkomAfterSave() {
             this.tab = 1;
             this.frameTab = 2;
+
+            if (this.interaction && this.interaction.number) {
+                this.triggerKavkomCall(this.interaction.number);
+            }
         },
 
         /**
