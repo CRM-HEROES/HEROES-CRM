@@ -11,7 +11,7 @@ import {
  * Setting Store state
  */
 export const state = {
-    userSettings: [],
+    userSettings: {},
 };
 
 /**
@@ -26,10 +26,13 @@ const actions = {
      * @returns setting
      */
     async [GET_USER_SETTING](context, key) {
-        const { data } = await SettingService.show(
-            context.rootState.auth.user.id,
-            key
-        );
+        const userId = context.rootState?.auth?.user?.id;
+
+        if (!userId) {
+            return null;
+        }
+
+        const { data } = await SettingService.show(userId, key);
         const value = data;
         context.commit(ADD_USER_SETTING, { key, value });
         return data;
@@ -42,8 +45,14 @@ const actions = {
      * @param {Object} params new setting field values
      */
     async [UPDATE_USER_SETTING](context, { key, value }) {
-        context.commit(UPDATE_USER_SETTING, { key, value });
-        await SettingService.update(context.rootState.auth.user.id, key, value);
+        const userId = context.rootState?.auth?.user?.id;
+
+        if (!userId) {
+            return null;
+        }
+
+        await SettingService.update(userId, key, value);
+        context.commit(ADD_USER_SETTING, { key, value });
     },
 
     /**
@@ -54,7 +63,13 @@ const actions = {
      * @returns setting
      */
     async [REMOVE_USER_SETTING](context, key) {
-        await SettingService.destroy(context.rootState.auth.user.id, key);
+        const userId = context.rootState?.auth?.user?.id;
+
+        if (!userId) {
+            return null;
+        }
+
+        await SettingService.destroy(userId, key);
         context.commit(REMOVE_USER_SETTING, key);
     },
 };
@@ -81,12 +96,10 @@ const mutations = {
      * @param {*} state
      */
     [UPDATE_USER_SETTING](state, { key, value }) {
-        state.userSettings = Object.fromEntries(
-            Object.entries(state.userSettings).map(([k, v]) => [
-                k,
-                k == key ? value : v,
-            ])
-        );
+        state.userSettings = {
+            ...state.userSettings,
+            [key]: value,
+        };
     },
 
     /**
@@ -113,7 +126,7 @@ const getters = {
      * @returns
      */
     userSettings(state) {
-        return state.userSettings ? state.userSettings : [];
+        return state.userSettings ? state.userSettings : {};
     },
 
     /**

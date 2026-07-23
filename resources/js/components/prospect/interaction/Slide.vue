@@ -184,6 +184,27 @@
                                 </div>
                                 <icon class="fa fa-caret-right" />
                             </item>
+
+                            <!-- Kavkom click-to-call -->
+                            <item
+                                class="hc-prospect-interaction-item"
+                                @click="interactionViaKavkomCall(number)"
+                            >
+                                <icon
+                                    class="fa fa-phone-volume"
+                                    color="#8e24aa"
+                                />
+                                <div
+                                    class="hc-item-main-content hc-flex-column"
+                                >
+                                    <span>Rappel automatique Kavkom</span>
+                                    <span
+                                        class="hc-prospect-interaction-item-number"
+                                        v-text="number"
+                                    ></span>
+                                </div>
+                                <loading :loading="callingViaKavkom" />
+                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -605,6 +626,9 @@ import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
 
+// Apis
+import ApiService from "@/apis/api.service";
+
 export default {
     components: {
         Ringover,
@@ -629,12 +653,21 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
+            callingViaKavkom: false,
         };
     },
 
     created() {
         store.commit(SET_PROSPECT_INTERACTION_TAB, 0);
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+    },
+
+    mounted() {
+        window.addEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
+    },
+
+    beforeDestroy() {
+        window.removeEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
     },
 
     methods: {
@@ -719,6 +752,48 @@ export default {
             store.commit(OPEN_MODAL, "setting-kavkom");
         },
 
+        /**
+         * Trigger a Kavkom click-to-call: the agent's own phone rings
+         * first, then Kavkom connects it to the lead's number.
+         */
+        async interactionViaKavkomCall(number) {
+            this.callingViaKavkom = true;
+
+            try {
+                const { data } = await ApiService.post("settings/kavkom/call", {
+                    destination: number,
+                });
+
+                if (data.success) {
+                    flashInfo({
+                        title: "Kavkom",
+                        body: data.message,
+                        duration: 8000,
+                    });
+
+                    this.interaction = this.newInteraction();
+                    this.interaction.source = "kavkom";
+                    this.interaction.number = number;
+                    this.addInteraction();
+                } else {
+                    flashError({ title: "Kavkom", body: data.message });
+                }
+            } catch (error) {
+                flashError({
+                    title: "Kavkom",
+                    body:
+                        error.response?.data?.message ||
+                        "Erreur inattendue lors de l’appel Kavkom.",
+                });
+            } finally {
+                this.callingViaKavkom = false;
+            }
+        },
+
+        openKavkomAfterSave() {
+            this.tab = 1;
+            this.frameTab = 2;
+        },
 
         /**
          *

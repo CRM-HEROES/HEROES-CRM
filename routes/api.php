@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\KavkomController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
@@ -257,6 +258,10 @@ Route::group([
 
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // Kavkom
+    Route::post('/settings/kavkom/test', [KavkomController::class, 'test'])->name('settings.kavkom.test');
+    Route::post('/settings/kavkom/call', [KavkomController::class, 'call'])->name('settings.kavkom.call');
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
 
     // Default field
