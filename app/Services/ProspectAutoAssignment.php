@@ -282,7 +282,7 @@ class ProspectAutoAssignment
         return $project->users()
             ->whereNull('banned_at')
             ->whereIn('id', $roleUserIds)
-            ->get(['id', 'name', 'role', 'last_activity'])
+            ->get(['users.id', 'users.name', 'users.role', 'users.last_activity'])
             ->filter(function (User $user) use ($busyUserIds, $excludeUserIds, $today) {
                 return !in_array($user->id, $busyUserIds, true)
                     && !in_array($user->id, $excludeUserIds, true)

@@ -151,7 +151,7 @@ class ImportProspects implements ShouldQueue
         // Loop through the spreadsheet sheets
         foreach ($reader->getSheetIterator() as $sheet) {
 
-            // Indicate the first row 
+            // Indicate the first row
             // as the header of the file
             $isHeaderRow = true;
 
@@ -224,7 +224,7 @@ class ImportProspects implements ShouldQueue
         // values are given
         $this->checkValidAddress();
 
-        // Ensure that the first leads added 
+        // Ensure that the first leads added
         // are the ones that were created last
         // $this->reverseCreatedAt();
 
@@ -323,7 +323,7 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
-     * 
+     *
      */
     protected function getColumnToFieldHandlers()
     {
@@ -346,7 +346,7 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
-     * 
+     *
      */
     protected function getProspectRelationsHandlers()
     {
@@ -519,7 +519,7 @@ class ImportProspects implements ShouldQueue
 
         return $mapping;
     }
-    
+
     /**
      * Choose reader type
      * depending on the type of file to import
@@ -537,7 +537,7 @@ class ImportProspects implements ShouldQueue
             if ($this->import->field_delimiter) {
                 $reader->setFieldDelimiter($this->import->field_delimiter);
             }
-            
+
             if ($this->import->field_enclosure) {
                 $reader->setFieldEnclosure($this->import->field_enclosure);
             }
@@ -666,7 +666,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Check if import has been stopped
-     * 
+     *
      * @return import stopped
      */
     protected function checkImportStopped()
@@ -680,7 +680,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Create new field
-     * 
+     *
      * @param  {string}  $name name of the new field
      */
     protected function createNewField($index)
@@ -702,7 +702,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Create new category
-     * 
+     *
      * @param  {string}  $name name of the new category
      */
     protected function createNewCategory($index)
@@ -725,7 +725,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Create new thread
-     * 
+     *
      * @param  {string}  $name name of the new thread
      */
     protected function createNewThread($index)
@@ -747,7 +747,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Get values from row cells
-     * 
+     *
      * @param  $r
      */
     protected function getCellsValues(&$r)
@@ -781,12 +781,12 @@ class ImportProspects implements ShouldQueue
 
         return $prospect;
     }
-    
+
     /**
      * Map import row with prospect
-     * 
+     *
      * @param  {array}  $row import row
-     * 
+     *
      * @return  {array}  row converted to prospect
      */
     protected function importRowToProspect(&$row, $rowsCount)
@@ -799,11 +799,11 @@ class ImportProspects implements ShouldQueue
         // Loop through the import mapping
         foreach ($this->mapping as $index => $mapping) {
             $this->columnToFieldHandlers[$mapping['type']]->handle(
-                $prospect, 
-                $mapping['field'], 
+                $prospect,
+                $mapping['field'],
                 // cell value
-                isset($row[$index]) && $row[$index] != 'null' ? 
-                    $row[$index] : 
+                isset($row[$index]) && $row[$index] != 'null' ?
+                    $row[$index] :
                     null
             );
         }
@@ -814,7 +814,7 @@ class ImportProspects implements ShouldQueue
     /**
      * Create many prospects
      * in the given array
-     * 
+     *
      * @param  {array}  $prospects list of prospects to create
      */
     protected function createProspects(&$prospects)
@@ -843,7 +843,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Associate the import labels to each prospect in the import
-     * 
+     *
      * @param  {array}  $prospectsIds list of prospects ids
      */
     protected function handleProspectsImportLabels(&$prospectsIds)
@@ -872,7 +872,7 @@ class ImportProspects implements ShouldQueue
     /**
      * Associate the import users to each prospect in the import
      * Only assign to prospects that don't already have users assigned.
-     * 
+     *
      * @param  {array}  $prospectsIds list of prospects ids
      */
     protected function handleProspectsImportUsers(&$prospectsIds)
@@ -918,7 +918,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Associate the import groups to each prospect in the import
-     * 
+     *
      * @param  {array}  $prospectsIds list of prospects ids
      */
     protected function handleProspectsImportGroups(&$prospectsIds)
@@ -944,7 +944,7 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
-     * 
+     *
      */
     protected function handleProspects(&$prospects)
     {
@@ -978,7 +978,7 @@ class ImportProspects implements ShouldQueue
 
         // Import relations
         $this->handleProspectsImportLabels($prospectsIds);
-        $this->handleProspectsImportUsers($prospectsIds);
+//        $this->handleProspectsImportUsers($prospectsIds);
         $this->handleProspectsImportGroups($prospectsIds);
     }
 
