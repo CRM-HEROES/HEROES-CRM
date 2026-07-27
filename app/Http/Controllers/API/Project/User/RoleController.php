@@ -53,6 +53,12 @@ class RoleController extends Controller
             ->syncWithoutDetaching([$role->id => [
                 'project_id' => $project->id
             ]]);
+        DB::table('role_assignable_user')->insertOrIgnore([
+            'role_id' => $role->id,
+            'assignable_user_id' => $user->id,
+            'project_id' => $project->id,
+            'creator_id' => auth()->id(),
+        ]);
 
         return ['message' => trans('common.success.attached_resource')];
     }
@@ -66,7 +72,11 @@ class RoleController extends Controller
         abort_unless($project->id == $role->project_id, 404);
 
         $user->roles()->detach($role->id);
-
+        DB::table('role_assignable_user')
+            ->where('role_id', $role->id)
+            ->where('assignable_user_id', $user->id)
+            ->where('project_id', $project->id)
+            ->delete();
         return ['message' => trans('common.success.detached_resource')];
     }
 
@@ -76,7 +86,7 @@ class RoleController extends Controller
     public function bulk(Request $request, Project $project)
     {
         abort_unless(auth()->user()->can('userRole', $project), 404);
-        
+
         $this->validate($request, [
             'roles' => 'required',
             'users' => 'required',
@@ -93,7 +103,7 @@ class RoleController extends Controller
                 return $role->id;
             })
             ->toArray();
-            
+
         // Only users
         // associated to the current project
         $users = $project
@@ -104,11 +114,11 @@ class RoleController extends Controller
                 return $user->id;
             })
             ->toArray();
-            
+
         switch ($request->input('action')) {
             case "attach":
                 $this->bulkActionAttach($users, $roles);
-                return ['message' => trans('common.success.updated_resource')];            
+                return ['message' => trans('common.success.updated_resource')];
 
             case "detach":
                 $this->bulkActionDetach($users, $roles);
@@ -122,7 +132,7 @@ class RoleController extends Controller
     /**
      * Bulk attach roles
      */
-    protected function bulkActionAttach(&$users, &$roles) {
+    protected function bulkActionAttach(&$users, &$roles, Project $project = null) {
         // Remove previous data
         $this->bulkActionDetach($users, $roles);
 
@@ -141,16 +151,41 @@ class RoleController extends Controller
         }, []);
 
         DB::table(config('permission.table_names')['model_has_roles'])->insert($data);
+
+        if ($project) {
+            $roleAssignableData = array_map(function($role) use($users, $project) {
+                return array_map(function($user) use($role, $project) {
+                    return [
+                        'role_id' => $role,
+                        'assignable_user_id' => $user,
+                        'project_id' => $project->id,
+                        'creator_id' => auth()->id(),
+                    ];
+                }, $users);
+            }, $roles);
+            $roleAssignableData = array_reduce($roleAssignableData, function($carry, $data) {
+                return array_merge($carry, $data);
+            }, []);
+
+            DB::table('role_assignable_user')->insertOrIgnore($roleAssignableData);
+        }
     }
 
     /**
      * Bulk detach roles
      */
-    protected function bulkActionDetach(&$users, &$roles) {
+    protected function bulkActionDetach(&$users, &$roles, Project $project = null) {
         DB::table(config('permission.table_names')['model_has_roles'])
             ->whereIn('role_id', $roles)
             ->where('model_type', "App\User")
             ->whereIn('model_id', $users)
             ->delete();
+        if ($project) {
+            DB::table('role_assignable_user')
+                ->whereIn('role_id', $roles)
+                ->whereIn('assignable_user_id', $users)
+                ->where('project_id', $project->id)
+                ->delete();
+        }
     }
 }
