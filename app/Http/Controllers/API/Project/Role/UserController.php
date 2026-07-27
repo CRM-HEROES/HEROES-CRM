@@ -52,6 +52,12 @@ class UserController extends Controller
                 'created_at' => \Carbon\Carbon::now(),
                 'updated_at' => \Carbon\Carbon::now()
             ]);
+        DB::table('model_has_roles')->insertOrIgnore([
+            'role_id' => $role->id,
+            'model_type' => 'App\\Models\\User',
+            'model_id' => $assignableUser->id,
+            'project_id' => $project->id,
+        ]);
 
         return ['message' => trans('common.success.attached_resource')];
     }
@@ -70,6 +76,14 @@ class UserController extends Controller
                 'project_id' => $project->id,
             ])
             ->delete();
+        DB::table('model_has_roles')
+        ->where([
+            'role_id' => $role->id,
+            'model_type' => 'App\\Models\\User',
+            'model_id' => $assignableUser->id,
+            'project_id' => $project->id,
+        ])
+        ->delete();
 
         return ['message' => trans('common.success.detached_resource')];
     }
@@ -95,7 +109,7 @@ class UserController extends Controller
                 return $thread->id;
             })
             ->toArray();
-            
+
         // Only roles
         // associated to the current project
         $roles = $project
@@ -106,11 +120,11 @@ class UserController extends Controller
                 return $role->id;
             })
             ->toArray();
-            
+
         switch ($request->input('action')) {
             case "attach":
                 $this->bulkActionAttach($project, $roles, $assignableUsers);
-                return ['message' => trans('common.success.updated_resource')];            
+                return ['message' => trans('common.success.updated_resource')];
 
             case "detach":
                 $this->bulkActionDetach($project, $roles, $assignableUsers);
@@ -147,6 +161,24 @@ class UserController extends Controller
         }, []);
 
         DB::table('role_assignable_user')->insert($data);
+
+        $modelHasRolesData = array_map(function ($assignableUser) use ($project, $roles) {
+            return array_map(function ($role) use ($project, $assignableUser) {
+                return [
+                    'role_id' => $role,
+                    'model_type' => 'App\\Models\\User',
+                    'model_id' => $assignableUser,
+                    'project_id' => $project->id,
+                ];
+            }, $roles);
+        }, $assignableUsers);
+        $modelHasRolesData = array_reduce($modelHasRolesData, function ($carry, $data) {
+            return array_merge($carry, $data);
+        }, []);
+
+        if (!empty($modelHasRolesData)) {
+            DB::table('model_has_roles')->insertOrIgnore($modelHasRolesData);
+        }
     }
 
     /**
@@ -158,5 +190,11 @@ class UserController extends Controller
             ->whereIn('role_id', $roles)
             ->where('project_id', $project->id)
             ->delete();
+        DB::table('model_has_roles')
+        ->whereIn('model_id', $assignableUsers)
+        ->where('model_type', 'App\\Models\\User')
+        ->whereIn('role_id', $roles)
+        ->where('project_id', $project->id)
+        ->delete();
     }
 }
