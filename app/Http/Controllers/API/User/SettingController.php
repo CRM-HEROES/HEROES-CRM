@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class SettingController extends Controller
 {
@@ -39,16 +40,31 @@ class SettingController extends Controller
 
         $this->validate($request, [
             'value' => 'required',
+            'value.phone_number' => $setting === 'kavkom'
+                ? ['required', 'string', 'max:255']
+                : ['nullable'],
         ]);
 
-        UserSetting::updateOrCreate([
-            'project_id' => null,
-            'user_id' => $user->id,
-            'key' => $setting,
-        ], [
-            'value' => $request->input('value'),
-            'creator_id' => auth()->id(),
-        ]);
+        DB::transaction(function () use ($request, $user, $setting) {
+            UserSetting::updateOrCreate([
+                'project_id' => null,
+                'user_id' => $user->id,
+                'key' => $setting,
+            ], [
+                'value' => $request->input('value'),
+                'creator_id' => auth()->id(),
+            ]);
+
+            if ($setting === 'kavkom') {
+                $phoneNumber = trim($request->input('value.phone_number'));
+
+                // Kavkom uses one caller number; keep the two CRM fields in sync.
+                $user->update([
+                    'phone_number' => $phoneNumber,
+                    'mobile_phone_number' => $phoneNumber,
+                ]);
+            }
+        });
 
         return ['message' => trans('common.success.attached_resource')];
     }

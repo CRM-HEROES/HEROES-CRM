@@ -454,25 +454,35 @@
                                 />
                             </item>
                             <div class="hc-kavkom-call-panel">
-                                <kavkom
-                                    id="kavkom-webphone"
-                                    @ringing-call="
-                                        (interaction.status = 'ringing'),
-                                            updateInteraction()
-                                    "
-                                    @answered-call="
-                                        (interaction.status = 'answered'),
-                                            updateInteraction()
-                                    "
-                                    @hangup-call="
-                                        (interaction.status = 'hangup'),
-                                            updateInteraction(),
-                                            nextInteraction()
-                                    "
-                                />
+                                <div class="hc-kavkom-call-card">
+                                    <div class="hc-kavkom-call-card-header">
+                                        <span class="hc-kavkom-call-icon">
+                                            <icon class="fa fa-phone" />
+                                        </span>
+                                        <div>
+                                            <div class="hc-kavkom-call-label">Appel Kavkom</div>
+                                            <div class="hc-kavkom-call-number">
+                                                {{ interaction.number }}
+                                            </div>
+                                        </div>
+                                    </div>
 
-                                <div class="hc-kavkom-call-number">
-                                    {{ interaction.number }}
+                                    <kavkom
+                                        id="kavkom-webphone"
+                                        @ringing-call="
+                                            (interaction.status = 'ringing'),
+                                                updateInteraction()
+                                        "
+                                        @answered-call="
+                                            (interaction.status = 'answered'),
+                                                updateInteraction()
+                                        "
+                                        @hangup-call="
+                                            (interaction.status = 'hangup'),
+                                                updateInteraction(),
+                                                nextInteraction()
+                                        "
+                                    />
                                 </div>
 
                                 <div
@@ -599,9 +609,40 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 24px;
+    gap: 14px;
+    padding: 18px;
     text-align: center;
+    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);
+}
+.hc-kavkom-call-card {
+    width: 100%;
+    padding: 16px;
+    text-align: left;
+    background: #fff;
+    border: 1px solid #eadcf7;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);
+}
+.hc-kavkom-call-card-header {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 14px;
+}
+.hc-kavkom-call-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    background: #8e24aa;
+    border-radius: 10px;
+}
+.hc-kavkom-call-label {
+    color: #7b7284;
+    font-size: 12px;
+    font-weight: 600;
 }
 .hc-kavkom-call-help {
     font-size: 12px;
@@ -610,6 +651,7 @@
     max-width: 320px;
 }
 .hc-kavkom-call-number {
+    margin-top: 2px;
     font-size: 18px;
     font-weight: 600;
     color: #343a40;
@@ -626,6 +668,13 @@
 }
 .hc-kavkom-call-status.error {
     color: #c62828;
+}
+.hc-kavkom-call-panel > .hc-button-secondary {
+    width: 100%;
+    min-height: 40px;
+    color: #fff;
+    background: #8e24aa;
+    border-color: #8e24aa;
 }
 </style>
 
