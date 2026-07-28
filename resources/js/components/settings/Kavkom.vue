@@ -26,6 +26,21 @@
                     />
                 </v-field>
 
+                <v-field label="Numéro Kavkom" required v-slot="{ label }">
+                    <input
+                        :placeholder="label + ' ...'"
+                        v-model.trim="setting.phone_number"
+                        type="tel"
+                        autocomplete="tel"
+                        required
+                    />
+                </v-field>
+
+                <div class="hc-kavkom-number-help">
+                    Ce numéro est utilisé pour vos appels Kavkom et enregistré
+                    dans les champs téléphone fixe et mobile de votre profil.
+                </div>
+
                 <div class="hc-kavkom-help">
                     Créez un token dans l’interface Kavkom : réglages avancés → Paramètres API → Ajouter un Token.
                     Le domain_uuid correspond au domaine associé à ce token. Le test est réalisé côté serveur,
@@ -96,6 +111,13 @@
     font-size: 12px;
     color: #6c757d;
     line-height: 1.5;
+}
+
+.hc-kavkom-number-help {
+    margin-top: -2px;
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.45;
 }
 
 .hc-kavkom-test-message {
@@ -281,6 +303,7 @@ export default {
             setting: {
                 api_token: "",
                 domain_uuid: "",
+                phone_number: "",
             },
         };
     },
@@ -337,6 +360,7 @@ export default {
                     key: this.key,
                     value: this.setting,
                 });
+                await store.dispatch("auth/user");
                 this.testMessage = "Paramètres enregistrés. L’interface Kavkom s’ouvre maintenant.";
                 this.testMessageType = "success";
                 window.dispatchEvent(new CustomEvent("hc:kavkom-settings-saved"));
@@ -358,12 +382,21 @@ export default {
                     this.setting = {
                         api_token: data.api_token || data.api_key || "",
                         domain_uuid: data.domain_uuid || "",
+                        phone_number:
+                            data.phone_number ||
+                            this.user.mobile_phone_number ||
+                            this.user.phone_number ||
+                            "",
                         id: data.id,
                     };
                 } else {
                     this.setting = {
                         api_token: "",
                         domain_uuid: "",
+                        phone_number:
+                            this.user.mobile_phone_number ||
+                            this.user.phone_number ||
+                            "",
                     };
                 }
             } finally {
@@ -384,6 +417,7 @@ export default {
     },
 
     computed: {
+        ...mapGetters("auth", ["user"]),
         ...mapGetters(["project"]),
     },
 };
