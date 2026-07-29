@@ -962,19 +962,37 @@ export default {
          *
          */
         async updateInteraction() {
-            if (!this.interaction) {
+            if (!this.interaction || !this.interactionProspect?.id) {
                 return;
             }
 
-            if (!this.interaction.id) {
-                this.interaction = await store.dispatch(
-                    ADD_PROSPECT_INTERACTION,
-                    this.interaction
+            // Ne rien tenter si aucun prospect n'est rattaché à l'interaction
+            // en cours (ex: le leg agent Kavkom peut arriver avant que le
+            // contexte prospect ne soit chargé).
+            if (!this.interactionProspect) {
+                this.logKavkomWarn?.(
+                    "updateInteraction ignoré : aucun prospect actif"
                 );
                 return;
             }
 
-            store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
+            if (!this.interaction.id) {
+                try {
+                    this.interaction = await store.dispatch(
+                        ADD_PROSPECT_INTERACTION,
+                        this.interaction
+                    );
+                } catch (error) {
+                    console.error("Échec création interaction", error);
+                }
+                return;
+            }
+
+            try {
+                await store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
+            } catch (error) {
+                console.error("Échec mise à jour interaction", error);
+            }
         },
 
         /**
