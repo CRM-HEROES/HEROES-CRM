@@ -14,27 +14,22 @@
                 </div>
             </span>
             <span v-else-if="status === 'connecting'">
-                Connexion du softphone à l’extension Kavkom…
+                Connexion du softphone à l'extension Kavkom…
             </span>
             <span v-else-if="status === 'registered'">
                 Softphone Kavkom prêt (extension {{ extension }}).
             </span>
-            <span v-else-if="status === 'ringing'">Appel entrant…</span>
+            <span v-else-if="status === 'calling'">Appel en cours de connexion…</span>
+            <span v-else-if="status === 'ringing'">
+                Votre poste sonne (mise en relation Kavkom)…
+            </span>
             <span v-else-if="status === 'in-call'">Appel en cours.</span>
         </div>
 
         <div
             class="hc-kavkom-webphone-controls"
-            v-if="['ringing', 'in-call'].includes(status)"
+            v-if="status === 'in-call'"
         >
-            <button
-                v-if="status === 'ringing'"
-                type="button"
-                class="hc-button-success"
-                @click="answer"
-            >
-                Répondre
-            </button>
             <button type="button" class="hc-button-danger" @click="hangup">
                 Raccrocher
             </button>
@@ -75,9 +70,12 @@ export default {
             status: "connecting",
             errorMessage: "",
             extension: "",
+            userContext: "",
+            isRegistered: false,
             sipErrorDetails: "",
             connectionAttempts: 0,
             maxConnectionAttempts: 2,
+            pcDiagnosticInterval: null,
         };
     },
 
@@ -91,94 +89,43 @@ export default {
 
     methods: {
         async registerWebphone() {
-    this.status = "connecting";
-    this.errorMessage = "";
-    this.sipErrorDetails = "";
+            this.status = "connecting";
+            this.isRegistered = false;
+            this.errorMessage = "";
+            this.sipErrorDetails = "";
 
-    try {
-        const { data } = await ApiService.get(
-            "settings/kavkom/credentials"
-        );
+            try {
+                const { data } = await ApiService.get(
+                    "settings/kavkom/credentials"
+                );
 
-        if (!data.success) {
-            this.status = "not-configured";
-            this.errorMessage = data.message;
-            this.logError("Credentials fetch failed", { response: data });
-            return;
-        }
+                if (!data.success) {
+                    this.status = "not-configured";
+                    this.errorMessage = data.message;
+                    this.logError("Credentials fetch failed", { response: data });
+                    return;
+                }
 
-        this.extension = data.extension;
-        this.logInfo("Credentials received", {
-            extension: this.extension,
-            userContext: data.user_context,
-        });
+                this.extension = data.extension;
+                this.userContext = data.user_context;
+                this.logInfo("Credentials received", {
+                    extension: this.extension,
+                    userContext: data.user_context,
+                });
 
-        // Suppression du pré-test WSS : il donnait un faux négatif car
-        // il n'envoyait pas le sous-protocole "sip" exigé par le serveur.
-        // SimpleUser.connect() gère ça correctement en interne.
-        this.connectSip(data);
-    } catch (error) {
-        this.status = "error";
-        this.errorMessage =
-            error.response?.data?.message ||
-            error.message ||
-            "Erreur inattendue lors de la connexion à Kavkom.";
-        this.logError("Credentials fetch error", { error });
-    }
-},
-
-        /**
-         * Test WSS (WebSocket Secure) connectivity to the Kavkom server
-         * before attempting SIP registration. This helps diagnose network issues.
-         */
-        async testWssConnectivity(userContext) {
-            return new Promise((resolve) => {
-                const wssUrl = `wss://${userContext}`;
-                this.logInfo("Testing WSS connectivity", { url: wssUrl });
-
-                const websocket = new WebSocket(wssUrl);
-                let isResolved = false;
-                const timeout = setTimeout(() => {
-                    isResolved = true;
-                    websocket.close();
-                    this.logWarn("WSS connectivity test timed out", {
-                        url: wssUrl,
-                    });
-                    resolve(false);
-                }, 5000);
-
-                websocket.onopen = () => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        clearTimeout(timeout);
-                        websocket.close();
-                        this.logInfo("WSS connectivity test succeeded", {
-                            url: wssUrl,
-                        });
-                        resolve(true);
-                    }
-                };
-
-                websocket.onerror = (event) => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        clearTimeout(timeout);
-                        this.logError("WSS connectivity test failed", {
-                            url: wssUrl,
-                            error: event.message || "Unknown error",
-                        });
-                        resolve(false);
-                    }
-                };
-
-                websocket.onclose = () => {
-                    clearTimeout(timeout);
-                };
-            });
+                this.connectSip(data);
+            } catch (error) {
+                this.status = "error";
+                this.errorMessage =
+                    error.response?.data?.message ||
+                    error.message ||
+                    "Erreur inattendue lors de la connexion à Kavkom.";
+                this.logError("Credentials fetch error", { error });
+            }
         },
 
         connectSip({ extension, password, user_context }) {
-            const server = `wss://${user_context}`;
+            const server = `wss://${user_context}/`;
             const aor = `sip:${extension}@${user_context}`;
 
             this.logInfo("Connecting to SIP", {
@@ -192,7 +139,8 @@ export default {
                 userAgentOptions: {
                     authorizationUsername: extension,
                     authorizationPassword: password,
-                    logBuiltinEnabled: false,
+                    logBuiltinEnabled: true,
+                    logLevel: "debug",
                     logConnector: this.createSipLogger(),
                 },
                 media: {
@@ -202,19 +150,64 @@ export default {
             });
 
             this.simpleUser.delegate = {
+                onRegistered: () => {
+                    this.isRegistered = true;
+                    this.status = "registered";
+                    this.logInfo("SIP registration succeeded", {
+                        extension: this.extension,
+                    });
+                    this.$emit("ready");
+                },
+                onUnregistered: () => {
+                    this.isRegistered = false;
+                },
+                onServerDisconnect: (error) => {
+                    this.isRegistered = false;
+
+                    if (error) {
+                        this.status = "error";
+                        this.errorMessage = "La connexion au softphone Kavkom a été interrompue.";
+                        this.$emit("connection-error", this.errorMessage);
+                    }
+                },
+
+                /**
+                 * ARCHITECTURE CLICK-TO-CALL KAVKOM (recommandée par leur doc) :
+                 * On ne compose plus le numéro de destination directement depuis
+                 * le navigateur. C'est le PBX Kavkom qui appelle CETTE extension
+                 * (le "leg agent") après un déclenchement via l'API REST
+                 * POST /api/pbx/v1/active_call/call côté backend. On doit donc
+                 * auto-répondre à cet appel entrant : le PBX se charge ensuite,
+                 * de son côté, de mettre en relation avec le numéro externe
+                 * (le "leg destination"), sans jamais exposer cette négociation
+                 * média PSTN à notre navigateur.
+                 */
                 onCallReceived: async () => {
                     this.status = "ringing";
-                    this.logInfo("Incoming call received");
+                    this.logInfo("Appel entrant du PBX Kavkom (leg agent)");
                     this.$emit("ringing-call");
+
+                    try {
+                        await this.simpleUser.answer();
+                        this.logInfo("Auto-réponse au leg agent réussie");
+                    } catch (error) {
+                        this.logError("Échec de l'auto-réponse au leg agent", { error });
+                        this.$emit(
+                            "call-failed",
+                            "Impossible de décrocher automatiquement l'appel entrant du PBX Kavkom."
+                        );
+                    }
                 },
+
                 onCallAnswered: () => {
                     this.status = "in-call";
-                    this.logInfo("Call answered");
+                    this.logInfo("Appel établi (leg agent connecté)");
                     this.$emit("answered-call");
                 },
+
                 onCallHangup: () => {
                     this.status = "registered";
-                    this.logInfo("Call hung up");
+                    this.logInfo("Appel terminé");
                     this.$emit("hangup-call");
                 },
             };
@@ -225,13 +218,8 @@ export default {
                     this.logInfo("SIP connection established");
                     return this.simpleUser.register();
                 })
-                .then(() => {
-                    this.status = "registered";
-                    this.logInfo("SIP registration succeeded", {
-                        extension: this.extension,
-                    });
-                })
                 .catch((error) => {
+                    this.isRegistered = false;
                     this.status = "error";
                     const errorMsg = this.extractSipErrorMessage(error);
                     this.errorMessage = errorMsg;
@@ -241,8 +229,8 @@ export default {
                         details: this.sipErrorDetails,
                         originalError: error,
                     });
+                    this.$emit("connection-error", this.errorMessage);
 
-                    // Try to reconnect if this was the first attempt
                     if (this.connectionAttempts < this.maxConnectionAttempts) {
                         this.connectionAttempts++;
                         this.logWarn("Retrying SIP connection", {
@@ -253,14 +241,6 @@ export default {
                             this.registerWebphone();
                         }, 2000);
                     }
-                });
-        },
-
-        answer() {
-            this.simpleUser
-                ?.answer()
-                .catch((error) => {
-                    this.logError("Failed to answer call", { error });
                 });
         },
 
@@ -279,6 +259,7 @@ export default {
                     .catch(() => {})
                     .finally(() => {
                         this.simpleUser = null;
+                        this.isRegistered = false;
                     });
             }
         },
@@ -287,7 +268,6 @@ export default {
          * Extract a user-friendly error message from SIP errors
          */
         extractSipErrorMessage(error) {
-            // Handle different error scenarios
             if (error instanceof TypeError) {
                 if (error.message.includes("WebSocket")) {
                     return "Impossible de se connecter au serveur SIP WebSocket (problème de certificat SSL, DNS, ou firewall).";
@@ -296,7 +276,6 @@ export default {
             }
 
             if (error && typeof error === "object") {
-                // Check for specific SIP error codes
                 if (error.statusCode === 401 || error.statusCode === 407) {
                     return "Erreur d'authentification SIP (identifiants incorrects ou extension désactivée dans Kavkom).";
                 }
@@ -306,8 +285,6 @@ export default {
                 if (error.reasonPhrase && error.reasonPhrase.includes("NOT_REGISTERED")) {
                     return "L'extension n'a pas pu s'enregistrer auprès du serveur SIP. Le serveur WebSocket n'est peut-être pas joignable.";
                 }
-
-                // Try to extract message from error object
                 if (error.message) {
                     return "Erreur SIP : " + error.message;
                 }
@@ -343,16 +320,12 @@ export default {
             return details.join(" | ");
         },
 
-        /**
-         * Create a logger function for SIP.js
-         */
         createSipLogger() {
             return (message) => {
                 this.logDebug("SIP.js", { message });
             };
         },
 
-        // Logging utilities
         logInfo(message, data = {}) {
             console.log(
                 `[Kavkom] ${message}`,
