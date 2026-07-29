@@ -490,9 +490,7 @@
                                                 updateInteraction()
                                         "
                                         @hangup-call="
-                                            (interaction.status = 'hangup'),
-                                                updateInteraction(),
-                                                nextInteraction()
+                                            onKavkomCallHangup
                                         "
                                     />
                                 </div>
@@ -931,6 +929,14 @@ export default {
             this.callingViaKavkom = false;
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;
+        },
+
+        onKavkomCallHangup() {
+            this.interaction.status = "hangup";
+            this.updateInteraction();
+            this.callingViaKavkom = false;
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Appel terminé.";
         },
 
         openKavkomAfterSave() {

@@ -76,6 +76,9 @@ export default {
             connectionAttempts: 0,
             maxConnectionAttempts: 2,
             pcDiagnosticInterval: null,
+            ringtoneContext: null,
+            ringtoneTimer: null,
+            ringtoneOscillators: [],
         };
     },
 
@@ -84,6 +87,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.stopRingtone();
         this.teardown();
     },
 
@@ -185,12 +189,14 @@ export default {
                 onCallReceived: async () => {
                     this.status = "ringing";
                     this.logInfo("Appel entrant du PBX Kavkom (leg agent)");
+                    this.playRingtone();
                     this.$emit("ringing-call");
 
                     try {
                         await this.simpleUser.answer();
                         this.logInfo("Auto-réponse au leg agent réussie");
                     } catch (error) {
+                        this.stopRingtone();
                         this.logError("Échec de l'auto-réponse au leg agent", { error });
                         this.$emit(
                             "call-failed",
@@ -200,12 +206,14 @@ export default {
                 },
 
                 onCallAnswered: () => {
+                    this.stopRingtone();
                     this.status = "in-call";
                     this.logInfo("Appel établi (leg agent connecté)");
                     this.$emit("answered-call");
                 },
 
                 onCallHangup: () => {
+                    this.stopRingtone();
                     this.status = "registered";
                     this.logInfo("Appel terminé");
                     this.$emit("hangup-call");
@@ -250,6 +258,74 @@ export default {
                 .catch((error) => {
                     this.logError("Failed to hang up call", { error });
                 });
+        },
+
+        /**
+         * Sonnerie locale pour signaler le leg entrant envoyé par Kavkom.
+         * Elle est synthétisée afin de ne pas dépendre d'un fichier audio et
+         * est arrêtée dès que le softphone répond ou que l'appel se termine.
+         */
+        playRingtone() {
+            this.stopRingtone();
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) {
+                return;
+            }
+
+            try {
+                this.ringtoneContext = new AudioContext();
+                this.ringtoneContext.resume?.();
+
+                const ring = () => {
+                    if (!this.ringtoneContext || this.status !== "ringing") {
+                        return;
+                    }
+
+                    const now = this.ringtoneContext.currentTime;
+                    const gain = this.ringtoneContext.createGain();
+                    gain.gain.setValueAtTime(0.0001, now);
+                    gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
+                    gain.connect(this.ringtoneContext.destination);
+
+                    [440, 480].forEach((frequency) => {
+                        const oscillator = this.ringtoneContext.createOscillator();
+                        oscillator.frequency.value = frequency;
+                        oscillator.connect(gain);
+                        oscillator.start(now);
+                        oscillator.stop(now + 0.7);
+                        this.ringtoneOscillators.push(oscillator);
+                    });
+                };
+
+                ring();
+                this.ringtoneTimer = window.setInterval(ring, 2000);
+            } catch (error) {
+                this.logWarn("Impossible de jouer la sonnerie locale", { error });
+                this.stopRingtone();
+            }
+        },
+
+        stopRingtone() {
+            if (this.ringtoneTimer) {
+                window.clearInterval(this.ringtoneTimer);
+                this.ringtoneTimer = null;
+            }
+
+            this.ringtoneOscillators.forEach((oscillator) => {
+                try {
+                    oscillator.stop();
+                } catch (_) {
+                    // L'oscillateur a déjà été arrêté.
+                }
+            });
+            this.ringtoneOscillators = [];
+
+            if (this.ringtoneContext) {
+                this.ringtoneContext.close().catch(() => {});
+                this.ringtoneContext = null;
+            }
         },
 
         teardown() {
