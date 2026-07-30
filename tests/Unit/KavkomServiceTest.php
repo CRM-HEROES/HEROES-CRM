@@ -98,6 +98,27 @@ class KavkomServiceTest extends TestCase
         $this->assertSame('client.kavkom.com', $result['user_context']);
     }
 
+    public function test_it_resolves_the_extension_selected_in_the_crm_configuration(): void
+    {
+        Http::fake([
+            'https://api.kavkom.com/api/pbx/v1/extension/list*' => Http::response([
+                'success' => true,
+                'data' => [
+                    ['extension' => '901', 'enabled' => 'true'],
+                    ['extension' => '902', 'enabled' => 'true', 'password' => 'sip-secret', 'user_context' => 'client.kavkom.com'],
+                ],
+            ], 200),
+        ]);
+
+        $service = new KavkomService();
+
+        $result = $service->resolveExtension('test-token', 'domain-uuid', '902');
+
+        $this->assertTrue($result['success']);
+        $this->assertSame('902', $result['extension']);
+        $this->assertSame('sip-secret', $result['password']);
+    }
+
     public function test_it_fails_to_resolve_extension_when_domain_has_none(): void
     {
         Http::fake([

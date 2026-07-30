@@ -204,9 +204,11 @@ class KavkomService
      * Kavkom requires the "src" of a call to be an extension already
      * registered on the domain (a phone/softphone already logged into
      * that extension) — an arbitrary external phone number is rejected.
-     * We auto-detect the first enabled extension of the domain.
+     * The CRM can target a specific extension configured by the user. This
+     * prevents a click-to-call from being handled by another user's Kavkom
+     * tab when several extensions are enabled on the same domain.
      */
-    public function resolveExtension(string $apiToken, string $domainUuid): array
+    public function resolveExtension(string $apiToken, string $domainUuid, ?string $requestedExtension = null): array
     {
         if (empty($apiToken) || empty($domainUuid)) {
             return [
@@ -230,16 +232,30 @@ class KavkomService
 
             $extensions = (array) data_get($response->json(), 'data', []);
 
-            $enabled = collect($extensions)->first(
-                fn ($item) => filter_var(data_get($item, 'enabled'), FILTER_VALIDATE_BOOLEAN)
-            );
+            $requestedExtension = trim((string) $requestedExtension);
+            $extension = $requestedExtension !== ''
+                ? collect($extensions)->first(
+                    fn ($item) => (string) data_get($item, 'extension') === $requestedExtension
+                )
+                : collect($extensions)->first(
+                    fn ($item) => filter_var(data_get($item, 'enabled'), FILTER_VALIDATE_BOOLEAN)
+                );
 
-            $extension = $enabled ?: ($extensions[0] ?? null);
+            $extension = $extension ?: ($requestedExtension === '' ? ($extensions[0] ?? null) : null);
 
             if (!$extension || empty(data_get($extension, 'extension'))) {
                 return [
                     'success' => false,
-                    'message' => "Aucune extension Kavkom trouvée sur ce domaine. Créez une extension dans Kavkom pour pouvoir passer des appels.",
+                    'message' => $requestedExtension !== ''
+                        ? "L'extension Kavkom {$requestedExtension} est introuvable sur ce domaine."
+                        : "Aucune extension Kavkom trouvée sur ce domaine. Créez une extension dans Kavkom pour pouvoir passer des appels.",
+                ];
+            }
+
+            if (!filter_var(data_get($extension, 'enabled'), FILTER_VALIDATE_BOOLEAN)) {
+                return [
+                    'success' => false,
+                    'message' => "L'extension Kavkom {$extension['extension']} est désactivée.",
                 ];
             }
 

@@ -38,7 +38,11 @@ class KavkomController extends Controller
             ], 200);
         }
 
-        $extension = $service->resolveExtension($config['api_token'], $config['domain_uuid']);
+        $extension = $service->resolveExtension(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $config['extension'] ?? null
+        );
 
         if (!$extension['success']) {
             return response()->json($extension, 200);
@@ -72,7 +76,11 @@ class KavkomController extends Controller
             ], 200);
         }
 
-        $result = $service->resolveExtension($config['api_token'], $config['domain_uuid']);
+        $result = $service->resolveExtension(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $config['extension'] ?? null
+        );
 
         return response()->json($result, 200);
     }
@@ -135,7 +143,11 @@ class KavkomController extends Controller
         }
 
         // Test 2: Extension Resolution
-        $extensionTest = $service->resolveExtension($config['api_token'], $config['domain_uuid']);
+        $extensionTest = $service->resolveExtension(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $config['extension'] ?? null
+        );
         $results['tests'][] = [
             'name' => 'Extension Resolution',
             'status' => $extensionTest['success'] ? 'ok' : 'error',
