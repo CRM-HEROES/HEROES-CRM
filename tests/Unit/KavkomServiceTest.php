@@ -41,6 +41,12 @@ class KavkomServiceTest extends TestCase
 
         $this->assertTrue($result['success']);
         $this->assertSame('a1b2c3d4', $result['call_uuid']);
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://api.kavkom.com/api/pbx/v1/active_call/call'
+                && $request['src'] === '0611223344'
+                && $request['destination'] === '0699887766'
+                && $request['src_cid_number'] === '0699887766';
+        });
     }
 
     public function test_it_fails_to_originate_a_call_without_source_number(): void
@@ -50,6 +56,24 @@ class KavkomServiceTest extends TestCase
         $result = $service->originateCall('test-token', 'domain-uuid', '', '0699887766');
 
         $this->assertFalse($result['success']);
+    }
+
+    public function test_it_normalizes_html_encoded_non_breaking_spaces_in_phone_numbers(): void
+    {
+        Http::fake([
+            'https://api.kavkom.com/api/pbx/v1/active_call/call*' => Http::response([
+                'success' => true,
+            ], 200),
+        ]);
+
+        $service = new KavkomService();
+
+        $service->originateCall('test-token', 'domain-uuid', '901', '06&#xA0;18&#xA0;41&#xA0;66&#xA0;33');
+
+        Http::assertSent(function ($request) {
+            return $request['destination'] === '0618416633'
+                && $request['src_cid_number'] === '0618416633';
+        });
     }
 
     public function test_it_resolves_the_first_enabled_extension_of_the_domain(): void

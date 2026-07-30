@@ -285,6 +285,15 @@ class KavkomService
         // si le numéro contient des espaces/points/tirets, ex: "06 18 41 66 33".
         $destination = $this->normalizePhoneNumber($destination);
 
+        // Kavkom affiche le caller ID du leg source dans son historique de
+        // click-to-call. Sans cette valeur, le PBX utilise le caller ID de
+        // l'extension (ici configuré à 0000000000), ce qui masque le lead.
+        // L'extension reste bien la source technique ; seul l'affichage de
+        // l'appel dans Kavkom reprend le numéro du lead appelé.
+        $options = array_merge([
+            'src_cid_number' => $destination,
+        ], $options);
+
         $payload = array_merge([
             'domain_uuid' => $domainUuid,
             'src' => $src,
@@ -321,13 +330,19 @@ class KavkomService
     }
 
     /**
-     * Retire espaces, points, tirets et parenthèses. Ne fait PAS de
-     * conversion E.164 complète (pas d'indicatif pays deviné) pour rester
-     * sûr avec des numéros déjà internationaux (+33...) ou courts (901).
+     * Décode les entités HTML (notamment &#xA0;, espace insécable) puis
+     * conserve uniquement les chiffres et un "+" éventuel en première
+     * position. Ne fait PAS de conversion E.164 complète : aucun indicatif
+     * pays n'est deviné.
      */
     protected function normalizePhoneNumber(string $number): string
     {
-        return preg_replace('/[\s.\-()]/', '', trim($number));
+        $number = html_entity_decode($number, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $number = trim($number);
+        $hasLeadingPlus = str_starts_with($number, '+');
+        $digits = preg_replace('/\D+/', '', $number);
+
+        return $hasLeadingPlus ? '+' . $digits : $digits;
     }
 
     protected function buildErrorMessage(\Throwable $exception): string
