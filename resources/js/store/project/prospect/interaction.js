@@ -30,6 +30,7 @@ export const actions = {
      * @param {*} context
      * @returns
      */
+
     async [FETCH_PROSPECT_INTERACTIONS](context, params) {
         const { data } = await ProspectInteractionService.get(
             context.state.project.slug,
@@ -65,13 +66,20 @@ export const actions = {
      * @returns prospectInteraction
      */
     async [UPDATE_PROSPECT_INTERACTION](context, params) {
+        const prospectId = context.state.project?.interactionProspect?.id;
+
+        if (!prospectId) {
+            return params;
+        }
+
         const { data } = await ProspectInteractionService.update(
             context.state.project.slug,
-            context.state.project.interactionProspect.id,
+            prospectId,
             params.id,
             params
         );
-        context.commit(UPDATE_PROSPECT_INTERACTION, data);
+
+        context.commit(UPDATE_PROSPECT_INTERACTION, { data, prospectId });
         return data;
     },
 
@@ -83,12 +91,18 @@ export const actions = {
      * @returns prospectInteraction
      */
     async [REMOVE_PROSPECT_INTERACTION](context, slug) {
+        const prospectId = context.state.project?.interactionProspect?.id;
+
+        if (!prospectId) {
+            return;
+        }
+
         await ProspectInteractionService.destroy(
             context.state.project.slug,
-            context.state.project.interactionProspect.id,
+            prospectId,
             slug
         );
-        context.commit(REMOVE_PROSPECT_INTERACTION, slug);
+        context.commit(REMOVE_PROSPECT_INTERACTION, { slug, prospectId });
     },
 };
 
@@ -103,6 +117,9 @@ export const mutations = {
      * @returns
      */
     [SET_PROSPECT_INTERACTIONS](state, interactions) {
+        if (!state.project?.interactionProspect) {
+            return;
+        }
         state.project.interactionProspect.interactions = interactions;
     },
 
@@ -113,6 +130,9 @@ export const mutations = {
      * @param {Number} interaction to append to prospect interactions list
      */
     [ADD_PROSPECT_INTERACTION](state, interaction) {
+        if (!state.project?.interactionProspect) {
+            return;
+        }
         state.project.interactionProspect.interactions = [
             interaction,
             ...(state.project.interactionProspect.interactions
@@ -132,17 +152,19 @@ export const mutations = {
      * @param {*} state
      * @param {Number} interaction to append to prospect interactions list
      */
-    [UPDATE_PROSPECT_INTERACTION](state, params) {
-        state.project.interactionProspect.interactions = (
-            state.project.interactionProspect.interactions
-                ? state.project.interactionProspect.interactions
-                : []
-        ).map((o) => (o.id == params.id ? { ...o, ...params } : o));
+    [UPDATE_PROSPECT_INTERACTION](state, { data: params, prospectId }) {
+        const current = state.project?.interactionProspect;
+
+        if (!current || current.id !== prospectId) {
+            return;
+        }
+
+        current.interactions = (current.interactions ? current.interactions : []).map(
+            (o) => (o.id == params.id ? { ...o, ...params } : o)
+        );
 
         state.project.prospects = state.project.prospects.map((o) =>
-            o.id == state.project.interactionProspect.id
-                ? { ...o, ...state.project.interactionProspect }
-                : o
+            o.id == current.id ? { ...o, ...current } : o
         );
     },
 
@@ -152,16 +174,18 @@ export const mutations = {
      * @param {*} context
      * @param {Number} params prospect interaction id
      */
-    [REMOVE_PROSPECT_INTERACTION](state, slug) {
-        state.project.interactionProspect.interactions = (
-            state.project.interactionProspect.interactions
-                ? state.project.interactionProspect.interactions
-                : []
-        ).filter((o) => o.id != slug);
+    [REMOVE_PROSPECT_INTERACTION](state, { slug, prospectId }) {
+        const current = state.project?.interactionProspect;
+
+        if (!current || current.id !== prospectId) {
+            return;
+        }
+
+        current.interactions = (current.interactions ? current.interactions : []).filter(
+            (o) => o.id != slug
+        );
         state.project.prospects = state.project.prospects.map((o) =>
-            o.id == state.project.interactionProspect.id
-                ? { ...o, ...state.project.interactionProspect }
-                : o
+            o.id == current.id ? { ...o, ...current } : o
         );
     },
 

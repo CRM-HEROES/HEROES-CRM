@@ -48,7 +48,8 @@ class KavkomController extends Controller
             $config['api_token'],
             $config['domain_uuid'],
             $extension['extension'],
-            $data['destination']
+            $data['destination'],
+            ['auto_answer' => 'true']
         );
 
         return response()->json($result, 200);

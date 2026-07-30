@@ -43,7 +43,6 @@ class KavkomService
                 $lastException = $exception;
                 $attempt++;
 
-                // Only retry on transient errors (timeouts, 5xx, 429)
                 $shouldRetry = $this->isTransientError($exception);
 
                 Log::channel('kavkom')->warning('Kavkom API GET request failed', [
@@ -58,8 +57,8 @@ class KavkomService
                     throw $exception;
                 }
 
-                // Exponential backoff: 100ms, 300ms
-                usleep(pow(2, $attempt - 1) * 100000);
+                // Backoff exponentiel : 200ms, 400ms
+                usleep(pow(2, $attempt) * 100000);
             }
         }
 
@@ -98,7 +97,6 @@ class KavkomService
                 $lastException = $exception;
                 $attempt++;
 
-                // Only retry on transient errors
                 $shouldRetry = $this->isTransientError($exception);
 
                 Log::channel('kavkom')->warning('Kavkom API POST request failed', [
@@ -113,8 +111,7 @@ class KavkomService
                     throw $exception;
                 }
 
-                // Exponential backoff: 100ms, 300ms
-                usleep(pow(2, $attempt - 1) * 100000);
+                usleep(pow(2, $attempt) * 100000);
             }
         }
 
@@ -123,24 +120,36 @@ class KavkomService
 
     /**
      * Determine if an error is transient (worth retrying).
+     *
+     * FIX : strpos() est sensible à la casse. Le vrai message cURL est
+     * "Connection timed out after 10000 milliseconds" (minuscules), donc
+     * l'ancien test sur "Operation timed out" / "Timeout" ne matchait
+     * jamais et désactivait le retry sur TOUS les timeouts.
      */
     protected function isTransientError(\Throwable $exception): bool
     {
         $message = $exception->getMessage();
 
-        // cURL timeout errors
-        if (strpos($message, 'Operation timed out') !== false || strpos($message, 'Timeout') !== false) {
+        // cURL error 28 / timeouts réseau (insensible à la casse)
+        if (stripos($message, 'timed out') !== false || stripos($message, 'timeout') !== false) {
             return true;
         }
 
-        // HTTP 5xx errors (server errors)
-        if (strpos($message, '500') !== false || strpos($message, '502') !== false || 
-            strpos($message, '503') !== false || strpos($message, '504') !== false) {
+        // Erreurs cURL de connexion (DNS, connexion refusée, etc.)
+        if (stripos($message, 'cURL error 6') !== false   // Couldn't resolve host
+            || stripos($message, 'cURL error 7') !== false  // Failed to connect
+        ) {
+            return true;
+        }
+
+        // HTTP 5xx (bornes de mots pour éviter les faux positifs, ex: un
+        // request_uuid qui contiendrait "500")
+        if (preg_match('/\b(500|502|503|504)\b/', $message)) {
             return true;
         }
 
         // Rate limiting
-        if (strpos($message, '429') !== false) {
+        if (preg_match('/\b429\b/', $message)) {
             return true;
         }
 
@@ -248,7 +257,7 @@ class KavkomService
         }
     }
 
-    public function originateCall(string $apiToken, string $domainUuid, string $src, string $destination): array
+    public function originateCall(string $apiToken, string $domainUuid, string $src, string $destination, array $options = []): array
     {
         if (empty($apiToken) || empty($domainUuid)) {
             return [
@@ -271,11 +280,33 @@ class KavkomService
             ];
         }
 
+        // FIX : normalisation du numéro de destination. Kavkom peut échouer
+        // silencieusement (ou raccrocher immédiatement le leg destination)
+        // si le numéro contient des espaces/points/tirets, ex: "06 18 41 66 33".
+        $destination = $this->normalizePhoneNumber($destination);
+
+        // Kavkom affiche le caller ID du leg source dans son historique de
+        // click-to-call. Sans cette valeur, le PBX utilise le caller ID de
+        // l'extension (ici configuré à 0000000000), ce qui masque le lead.
+        // L'extension reste bien la source technique ; seul l'affichage de
+        // l'appel dans Kavkom reprend le numéro du lead appelé.
+        $options = array_merge([
+            'src_cid_number' => $destination,
+        ], $options);
+
+        $payload = array_merge([
+            'domain_uuid' => $domainUuid,
+            'src' => $src,
+            'destination' => $destination,
+        ], $options);
+
+        Log::channel('kavkom')->info('Kavkom originateCall payload envoyé', $payload);
+
         try {
-            $response = $this->makePostRequest($apiToken, '/api/pbx/v1/active_call/call', [
-                'domain_uuid' => $domainUuid,
-                'src' => $src,
-                'destination' => $destination,
+            $response = $this->makePostRequest($apiToken, '/api/pbx/v1/active_call/call', $payload);
+
+            Log::channel('kavkom')->info('Kavkom originateCall réponse complète', [
+                'body' => $response->json(),
             ]);
 
             if ($response->successful() && data_get($response->json(), 'success') === true) {
@@ -298,6 +329,22 @@ class KavkomService
         }
     }
 
+    /**
+     * Décode les entités HTML (notamment &#xA0;, espace insécable) puis
+     * conserve uniquement les chiffres et un "+" éventuel en première
+     * position. Ne fait PAS de conversion E.164 complète : aucun indicatif
+     * pays n'est deviné.
+     */
+    protected function normalizePhoneNumber(string $number): string
+    {
+        $number = html_entity_decode($number, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $number = trim($number);
+        $hasLeadingPlus = str_starts_with($number, '+');
+        $digits = preg_replace('/\D+/', '', $number);
+
+        return $hasLeadingPlus ? '+' . $digits : $digits;
+    }
+
     protected function buildErrorMessage(\Throwable $exception): string
     {
         if (!method_exists($exception, 'getResponse')) {
@@ -311,7 +358,6 @@ class KavkomService
             $body = (string) $response->getBody();
             $data = json_decode($body, true) ?: [];
 
-            // Extract more details from the error response
             $details = [];
 
             if (!empty($data['message'])) {

@@ -449,8 +449,9 @@
                                     "
                                 ></div>
                                 <icon
-                                    class="fa fa-cog"
-                                    @click.stop="kavkomSetting"
+                                    class="fa fa-cog hc-kavkom-settings-btn"
+                                    @click.stop.prevent="kavkomSetting"
+                                    title="Paramètres Kavkom"
                                 />
                             </item>
                             <div class="hc-kavkom-call-panel">
@@ -467,8 +468,19 @@
                                         </div>
                                     </div>
 
+                                    <!--
+                                        Le softphone ne compose plus le numéro de
+                                        destination lui-même : il ne fait qu'auto-
+                                        répondre au leg agent renvoyé par le PBX
+                                        Kavkom une fois l'appel déclenché via
+                                        l'API REST (triggerKavkomCall ci-dessous).
+                                    -->
                                     <kavkom
+                                        ref="kavkomWebphone"
                                         id="kavkom-webphone"
+                                        @ready="onKavkomReady"
+                                        @connection-error="onKavkomConnectionError"
+                                        @call-failed="onKavkomCallFailed"
                                         @ringing-call="
                                             (interaction.status = 'ringing'),
                                                 updateInteraction()
@@ -478,9 +490,7 @@
                                                 updateInteraction()
                                         "
                                         @hangup-call="
-                                            (interaction.status = 'hangup'),
-                                                updateInteraction(),
-                                                nextInteraction()
+                                            onKavkomCallHangup
                                         "
                                     />
                                 </div>
@@ -490,7 +500,7 @@
                                     class="hc-kavkom-call-status"
                                 >
                                     <loading :loading="true" />
-                                    Déclenchement de l’appel…
+                                    Déclenchement de l'appel…
                                 </div>
                                 <div
                                     v-else-if="kavkomCallMessage"
@@ -505,13 +515,13 @@
                                 <button
                                     type="button"
                                     class="hc-button-secondary"
-                                    :disabled="callingViaKavkom"
+                                    :disabled="callingViaKavkom || !kavkomReady"
                                     @click="triggerKavkomCall(interaction.number)"
                                 >
                                     {{
                                         callingViaKavkom
                                             ? "Appel en cours..."
-                                            : "Rappeler"
+                                            : "Appeler"
                                     }}
                                 </button>
                             </div>
@@ -662,6 +672,7 @@
     gap: 8px;
     font-size: 13px;
     color: #6c757d;
+    pointer-events: none;
 }
 .hc-kavkom-call-status.success {
     color: #2e7d32;
@@ -676,12 +687,23 @@
     background: #8e24aa;
     border-color: #8e24aa;
 }
+.hc-kavkom-call-panel > .hc-button-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+.hc-kavkom-settings-btn {
+    position: relative;
+    z-index: 20;
+    cursor: pointer;
+    pointer-events: auto !important;
+}
 </style>
 
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
+import ApiService from "@/apis/api.service";
 
 import { OPEN_MODAL } from "@/actions/modal";
 import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
@@ -700,9 +722,6 @@ import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
-
-// Apis
-import ApiService from "@/apis/api.service";
 
 export default {
     components: {
@@ -731,6 +750,13 @@ export default {
             callingViaKavkom: false,
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
+            // Softphone prêt = enregistré en SIP côté navigateur, capable
+            // de recevoir/auto-répondre au leg agent envoyé par le PBX.
+            kavkomReady: false,
+            // Si l'utilisateur clique "Appeler" avant que le softphone ne
+            // soit encore enregistré, on mémorise le numéro pour le lancer
+            // dès que le softphone devient prêt (onKavkomReady).
+            pendingKavkomNumber: "",
         };
     },
 
@@ -831,12 +857,26 @@ export default {
         },
 
         /**
-         * Trigger a Kavkom click-to-call: the agent's own phone (from
-         * their CRM profile) rings first, then Kavkom connects it to
-         * the lead's number, using the stored Token + Domain UUID.
+         * Déclenche l'appel via l'API REST Kavkom (click-to-call officiel) :
+         * POST /api/pbx/v1/active_call/call, relayé par le backend Laravel
+         * (KavkomController::call). Le PBX Kavkom appelle d'abord notre
+         * softphone (le "leg agent", extension 901), auto-répondu par
+         * Kavkom.vue, puis met en relation avec le numéro de destination
+         * de son côté — toute la négociation média PSTN reste côté Kavkom.
          */
         async triggerKavkomCall(number) {
             if (!number) {
+                return;
+            }
+
+            // Le softphone doit être enregistré en SIP avant de pouvoir
+            // recevoir/auto-répondre au leg agent. S'il ne l'est pas encore,
+            // on mémorise le numéro et onKavkomReady relancera l'appel dès
+            // que le softphone sera prêt.
+            if (!this.kavkomReady) {
+                this.pendingKavkomNumber = number;
+                this.kavkomCallMessage = "Connexion du softphone Kavkom…";
+                this.kavkomCallSuccess = false;
                 return;
             }
 
@@ -848,16 +888,55 @@ export default {
                     destination: number,
                 });
 
-                this.kavkomCallMessage = data.message;
-                this.kavkomCallSuccess = data.success;
+                if (!data.success) {
+                    this.kavkomCallMessage =
+                        data.message || "Impossible de lancer l'appel Kavkom.";
+                    this.kavkomCallSuccess = false;
+                    return;
+                }
+
+                this.kavkomCallMessage =
+                    "Votre poste va sonner, décrochez pour être mis en relation avec le prospect.";
+                this.kavkomCallSuccess = true;
             } catch (error) {
                 this.kavkomCallMessage =
                     error.response?.data?.message ||
-                    "Erreur inattendue lors de l’appel Kavkom.";
+                    "Erreur inattendue lors de l'appel Kavkom.";
                 this.kavkomCallSuccess = false;
             } finally {
                 this.callingViaKavkom = false;
             }
+        },
+
+        onKavkomReady() {
+            this.kavkomReady = true;
+
+            if (this.pendingKavkomNumber) {
+                const number = this.pendingKavkomNumber;
+                this.pendingKavkomNumber = "";
+                this.triggerKavkomCall(number);
+            }
+        },
+
+        onKavkomConnectionError(message) {
+            this.kavkomReady = false;
+            this.callingViaKavkom = false;
+            this.kavkomCallSuccess = false;
+            this.kavkomCallMessage = message;
+        },
+
+        onKavkomCallFailed(message) {
+            this.callingViaKavkom = false;
+            this.kavkomCallSuccess = false;
+            this.kavkomCallMessage = message;
+        },
+
+        onKavkomCallHangup() {
+            this.interaction.status = "hangup";
+            this.updateInteraction();
+            this.callingViaKavkom = false;
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Appel terminé.";
         },
 
         openKavkomAfterSave() {
@@ -889,19 +968,37 @@ export default {
          *
          */
         async updateInteraction() {
-            if (!this.interaction) {
+            if (!this.interaction || !this.interactionProspect?.id) {
                 return;
             }
 
-            if (!this.interaction.id) {
-                this.interaction = await store.dispatch(
-                    ADD_PROSPECT_INTERACTION,
-                    this.interaction
+            // Ne rien tenter si aucun prospect n'est rattaché à l'interaction
+            // en cours (ex: le leg agent Kavkom peut arriver avant que le
+            // contexte prospect ne soit chargé).
+            if (!this.interactionProspect) {
+                this.logKavkomWarn?.(
+                    "updateInteraction ignoré : aucun prospect actif"
                 );
                 return;
             }
 
-            store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
+            if (!this.interaction.id) {
+                try {
+                    this.interaction = await store.dispatch(
+                        ADD_PROSPECT_INTERACTION,
+                        this.interaction
+                    );
+                } catch (error) {
+                    console.error("Échec création interaction", error);
+                }
+                return;
+            }
+
+            try {
+                await store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
+            } catch (error) {
+                console.error("Échec mise à jour interaction", error);
+            }
         },
 
         /**
@@ -910,7 +1007,7 @@ export default {
         nextInteraction() {
             if (
                 this.selectedProspects.length - 1 >
-                this.this.currentProspectIndex
+                this.currentProspectIndex
             ) {
                 this.currentProspectIndex++;
             } else {
