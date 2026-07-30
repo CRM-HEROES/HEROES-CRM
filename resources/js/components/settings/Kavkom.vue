@@ -36,9 +36,21 @@
                     />
                 </v-field>
 
+                <v-field label="Extension Kavkom" required v-slot="{ label }">
+                    <input
+                        :placeholder="label + ' (ex. 901)'"
+                        v-model.trim="setting.extension"
+                        type="text"
+                        inputmode="numeric"
+                        autocomplete="off"
+                        required
+                    />
+                </v-field>
+
                 <div class="hc-kavkom-number-help">
-                    Ce numéro est utilisé pour vos appels Kavkom et enregistré
-                    dans les champs téléphone fixe et mobile de votre profil.
+                    Indiquez votre extension Kavkom personnelle (par exemple
+                    901). Le CRM s'y connecte directement : aucun autre onglet
+                    Kavkom ne doit rester ouvert pour recevoir les appels.
                 </div>
 
                 <div class="hc-kavkom-help">
@@ -304,6 +316,7 @@ export default {
                 api_token: "",
                 domain_uuid: "",
                 phone_number: "",
+                extension: "",
             },
         };
     },
@@ -387,6 +400,7 @@ export default {
                             this.user.mobile_phone_number ||
                             this.user.phone_number ||
                             "",
+                        extension: data.extension || "",
                         id: data.id,
                     };
                 } else {
@@ -397,6 +411,7 @@ export default {
                             this.user.mobile_phone_number ||
                             this.user.phone_number ||
                             "",
+                        extension: "",
                     };
                 }
             } finally {
