@@ -53,7 +53,8 @@ class ProspectAutoAssignment
             // d'une liste de rôles unique codée en dur pour tout le monde.
             foreach ($projectProspects->groupBy('import_id') as $groupImportId => $importProspects) {
                 $roleIds = $this->getImportRoleIds($groupImportId ?: $importId);
-                $assigned += $this->assignBatch($projectModel, $importProspects, $roleIds);
+                $userIds = $this->getImportUserIds($groupImportId ?: $importId);
+                $assigned += $this->assignBatch($projectModel, $importProspects, $roleIds, $userIds);
             }
         }
 
@@ -81,9 +82,9 @@ class ProspectAutoAssignment
     // protected function assignBatch(Project $project, $prospects): int
     // {
     //     $users = $this->getProjectUsers($project);
-    protected function assignBatch(Project $project, $prospects, array $roleIds = []): int
+    protected function assignBatch(Project $project, $prospects, array $roleIds = [], array $userIds = []): int
     {
-        $users = $this->getProjectUsers($project, [], $roleIds);
+        $users = $this->getProjectUsers($project, [], $roleIds, $userIds);
         if ($users->isEmpty()) {
             return 0;
         }
@@ -133,8 +134,9 @@ class ProspectAutoAssignment
         // NOUVEAU: récupère les rôles éligibles configurés sur l'import
         // du prospect, au lieu de la liste codée en dur.
         $roleIds = $this->getImportRoleIds($prospect->import_id);
+        $userIds = $this->getImportUserIds($prospect->import_id);
 
-        $users = $this->getProjectUsers($project, [], $roleIds);
+        $users = $this->getProjectUsers($project, [], $roleIds, $userIds);
         if ($users->isEmpty()) {
             return false;
         }
@@ -251,10 +253,10 @@ class ProspectAutoAssignment
     //         })
     //         ->values();
     // }
-    protected function getProjectUsers(Project $project, array $excludeUserIds = [], array $roleIds = [])
+    protected function getProjectUsers(Project $project, array $excludeUserIds = [], array $roleIds = [], array $userIds = [])
     {
-        // Aucun rôle configuré pour cet import → personne n'est éligible.
-        if (empty($roleIds)) {
+        // Neither a role nor an explicit user was selected for this import.
+        if (empty($roleIds) && empty($userIds)) {
             return collect();
         }
 
@@ -263,7 +265,7 @@ class ProspectAutoAssignment
         $roleTable = config('permission.table_names.roles', 'roles');
         $modelHasRolesTable = config('permission.table_names.model_has_roles', 'model_has_roles');
 
-        $roleUserIds = DB::table($modelHasRolesTable)
+        $roleUserIds = empty($roleIds) ? [] : DB::table($modelHasRolesTable)
             ->join($roleTable, $roleTable . '.id', '=', $modelHasRolesTable . '.role_id')
             ->where($modelHasRolesTable . '.model_type', User::class)
             ->where($modelHasRolesTable . '.project_id', $project->id)
@@ -271,7 +273,10 @@ class ProspectAutoAssignment
             ->pluck($modelHasRolesTable . '.model_id')
             ->toArray();
 
-        if (empty($roleUserIds)) {
+        // A person selected directly and through a role must occur only once
+        // in the allocation pool. One prospect is therefore assigned once.
+        $candidateUserIds = array_values(array_unique(array_merge($roleUserIds, $userIds)));
+        if (empty($candidateUserIds)) {
             return collect();
         }
 
@@ -281,7 +286,7 @@ class ProspectAutoAssignment
 
         return $project->users()
             ->whereNull('banned_at')
-            ->whereIn('id', $roleUserIds)
+            ->whereIn('users.id', $candidateUserIds)
             ->get(['users.id', 'users.name', 'users.role', 'users.last_activity'])
             ->filter(function (User $user) use ($busyUserIds, $excludeUserIds, $today) {
                 return !in_array($user->id, $busyUserIds, true)
@@ -364,7 +369,8 @@ class ProspectAutoAssignment
             // NOUVEAU: récupère les rôles éligibles configurés sur l'import
             // du prospect, au lieu de la liste codée en dur.
             $roleIds = $this->getImportRoleIds($prospect->import_id);
-            $availableUsers = $this->getProjectUsers($project, $assignedUserIds, $roleIds);
+            $userIds = $this->getImportUserIds($prospect->import_id);
+            $availableUsers = $this->getProjectUsers($project, $assignedUserIds, $roleIds, $userIds);
             if ($availableUsers->isEmpty()) {
                 continue;
             }
@@ -423,5 +429,26 @@ class ProspectAutoAssignment
         $import = Import::find($importId);
 
         return $import && is_array($import->roles) ? $import->roles : [];
+    }
+
+    /**
+     * Explicit users selected in the import's Relations step. They are part of
+     * the same allocation pool as users supplied by the selected roles.
+     */
+    protected function getImportUserIds(?int $importId): array
+    {
+        if (!$importId) {
+            return [];
+        }
+
+        $import = Import::find($importId);
+        if (!$import || !is_array($import->users)) {
+            return [];
+        }
+
+        return array_values(array_unique(array_filter(
+            array_map('intval', $import->users),
+            fn ($userId) => $userId > 0
+        )));
     }
 }
