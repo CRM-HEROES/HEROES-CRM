@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\UserSetting;
+use App\Models\KavkomCall;
 use App\Services\KavkomService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -27,6 +28,7 @@ class KavkomController extends Controller
     {
         $data = $request->validate([
             'destination' => ['required', 'string'],
+            'prospect_id' => ['nullable', 'integer', 'exists:prospects,id'],
         ]);
 
         $config = $this->getUserKavkomConfig($request);
@@ -55,6 +57,28 @@ class KavkomController extends Controller
             $data['destination'],
             ['auto_answer' => 'true']
         );
+
+        if ($result['success'] && !empty($result['call_uuid'])) {
+            KavkomCall::firstOrCreate(['call_uuid' => $result['call_uuid']], [
+                'call_uuid' => $result['call_uuid'],
+                'prospect_id' => $data['prospect_id'] ?? null,
+                'user_id' => $request->user()->id,
+                'domain_uuid' => $config['domain_uuid'],
+                'destination' => $data['destination'],
+                'status' => 'initiated',
+            ]);
+
+            Log::channel('kavkom')->info('Kavkom call linked to CRM prospect.', [
+                'call_uuid' => $result['call_uuid'],
+                'prospect_id' => $data['prospect_id'] ?? null,
+                'user_id' => $request->user()->id,
+            ]);
+        } elseif ($result['success']) {
+            Log::channel('kavkom')->warning('Kavkom call started without call_uuid; automatic transcription will not be linked.', [
+                'prospect_id' => $data['prospect_id'] ?? null,
+                'user_id' => $request->user()->id,
+            ]);
+        }
 
         return response()->json($result, 200);
     }

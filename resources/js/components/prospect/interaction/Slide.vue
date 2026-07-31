@@ -866,14 +866,21 @@ export default {
          */
         async triggerKavkomCall(number) {
             if (!number) {
+                console.warn("[Kavkom] Appel ignoré : aucun numéro fourni.");
                 return;
             }
+
+            console.log("[Kavkom] Préparation de l'appel.", {
+                prospectId: this.interactionProspect?.id,
+                numberSuffix: String(number).replace(/\D/g, "").slice(-4),
+            });
 
             // Le softphone doit être enregistré en SIP avant de pouvoir
             // recevoir/auto-répondre au leg agent. S'il ne l'est pas encore,
             // on mémorise le numéro et onKavkomReady relancera l'appel dès
             // que le softphone sera prêt.
             if (!this.kavkomReady) {
+                console.log("[Kavkom] Appel en attente : softphone non prêt.");
                 this.pendingKavkomNumber = number;
                 this.kavkomCallMessage = "Connexion du softphone Kavkom…";
                 this.kavkomCallSuccess = false;
@@ -886,9 +893,11 @@ export default {
             try {
                 const { data } = await ApiService.post("settings/kavkom/call", {
                     destination: number,
+                    prospect_id: this.interactionProspect?.id,
                 });
 
                 if (!data.success) {
+                    console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", { message: data.message });
                     this.kavkomCallMessage =
                         data.message || "Impossible de lancer l'appel Kavkom.";
                     this.kavkomCallSuccess = false;
@@ -898,7 +907,12 @@ export default {
                 this.kavkomCallMessage =
                     "Votre poste va sonner, décrochez pour être mis en relation avec le prospect.";
                 this.kavkomCallSuccess = true;
+                console.log("[Kavkom] Appel lancé.", { callUuid: data.call_uuid || null });
             } catch (error) {
+                console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
+                    status: error.response?.status,
+                    message: error.response?.data?.message || error.message,
+                });
                 this.kavkomCallMessage =
                     error.response?.data?.message ||
                     "Erreur inattendue lors de l'appel Kavkom.";

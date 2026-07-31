@@ -225,7 +225,7 @@ export default {
          */
         getCSVDelimiterEnclosure(line) {
             // Detect the delimiter by counting occurrences of common delimiter characters
-            const delimiterCounts = [",", ";", "\t"];
+            const delimiterCounts = { ",": 0, ";": 0, "\t": 0 };
             for (let i = 0; i < line.length; i++) {
                 if (line[i] === ",") delimiterCounts[","]++;
                 else if (line[i] === ";") delimiterCounts[";"]++;

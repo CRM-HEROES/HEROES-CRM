@@ -6622,7 +6622,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      */
     getCSVDelimiterEnclosure: function getCSVDelimiterEnclosure(line) {
       // Detect the delimiter by counting occurrences of common delimiter characters
-      var delimiterCounts = [",", ";", "\t"];
+      var delimiterCounts = {
+        ",": 0,
+        ";": 0,
+        "\t": 0
+      };
       for (var i = 0; i < line.length; i++) {
         if (line[i] === ",") delimiterCounts[","]++;else if (line[i] === ";") delimiterCounts[";"]++;else if (line[i] === "\t") delimiterCounts["\t"]++;
       }
@@ -29159,61 +29163,84 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     triggerKavkomCall: function triggerKavkomCall(number) {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _yield$ApiService$pos, data, _error$response;
+        var _this3$interactionPro;
+        var _this3$interactionPro2, _yield$ApiService$pos, data, _error$response, _error$response2, _error$response3;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               if (number) {
-                _context2.next = 2;
+                _context2.next = 3;
                 break;
               }
+              console.warn("[Kavkom] Appel ignoré : aucun numéro fourni.");
               return _context2.abrupt("return");
-            case 2:
+            case 3:
+              console.log("[Kavkom] Préparation de l'appel.", {
+                prospectId: (_this3$interactionPro = _this3.interactionProspect) === null || _this3$interactionPro === void 0 ? void 0 : _this3$interactionPro.id,
+                numberSuffix: String(number).replace(/\D/g, "").slice(-4)
+              });
+
+              // Le softphone doit être enregistré en SIP avant de pouvoir
+              // recevoir/auto-répondre au leg agent. S'il ne l'est pas encore,
+              // on mémorise le numéro et onKavkomReady relancera l'appel dès
+              // que le softphone sera prêt.
               if (_this3.kavkomReady) {
-                _context2.next = 7;
+                _context2.next = 10;
                 break;
               }
+              console.log("[Kavkom] Appel en attente : softphone non prêt.");
               _this3.pendingKavkomNumber = number;
               _this3.kavkomCallMessage = "Connexion du softphone Kavkom…";
               _this3.kavkomCallSuccess = false;
               return _context2.abrupt("return");
-            case 7:
+            case 10:
               _this3.callingViaKavkom = true;
               _this3.kavkomCallMessage = "";
-              _context2.prev = 9;
-              _context2.next = 12;
+              _context2.prev = 12;
+              _context2.next = 15;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/kavkom/call", {
-                destination: number
+                destination: number,
+                prospect_id: (_this3$interactionPro2 = _this3.interactionProspect) === null || _this3$interactionPro2 === void 0 ? void 0 : _this3$interactionPro2.id
               });
-            case 12:
+            case 15:
               _yield$ApiService$pos = _context2.sent;
               data = _yield$ApiService$pos.data;
               if (data.success) {
-                _context2.next = 18;
+                _context2.next = 22;
                 break;
               }
+              console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", {
+                message: data.message
+              });
               _this3.kavkomCallMessage = data.message || "Impossible de lancer l'appel Kavkom.";
               _this3.kavkomCallSuccess = false;
               return _context2.abrupt("return");
-            case 18:
+            case 22:
               _this3.kavkomCallMessage = "Votre poste va sonner, décrochez pour être mis en relation avec le prospect.";
               _this3.kavkomCallSuccess = true;
-              _context2.next = 26;
+              console.log("[Kavkom] Appel lancé.", {
+                callUuid: data.call_uuid || null
+              });
+              _context2.next = 32;
               break;
-            case 22:
-              _context2.prev = 22;
-              _context2.t0 = _context2["catch"](9);
-              _this3.kavkomCallMessage = ((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Erreur inattendue lors de l'appel Kavkom.";
+            case 27:
+              _context2.prev = 27;
+              _context2.t0 = _context2["catch"](12);
+              console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
+                status: (_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
+                message: ((_error$response2 = _context2.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _context2.t0.message
+              });
+              _this3.kavkomCallMessage = ((_error$response3 = _context2.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.message) || "Erreur inattendue lors de l'appel Kavkom.";
               _this3.kavkomCallSuccess = false;
-            case 26:
-              _context2.prev = 26;
+            case 32:
+              _context2.prev = 32;
               _this3.callingViaKavkom = false;
-              return _context2.finish(26);
-            case 29:
+              return _context2.finish(32);
+            case 35:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[9, 22, 26, 29]]);
+        }, _callee2, null, [[12, 27, 32, 35]]);
       }))();
     },
     onKavkomReady: function onKavkomReady() {

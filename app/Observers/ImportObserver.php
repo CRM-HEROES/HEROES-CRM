@@ -119,6 +119,12 @@ class ImportObserver
         $mapping = $import->mapping ?: array_fill(0, count($import->headers), null);
 
         foreach ($import->headers as $i => $header) {
+            // Meta Lead Ads uses human-readable headers rather than CRM slugs.
+            $defaultField = $this->getKnownImportField($header);
+            if ($defaultField) {
+                $mapping[$i] = $defaultField;
+                continue;
+            }
 
             // Find if a field has a slug or name
             // same as the header
@@ -165,9 +171,64 @@ class ImportObserver
                 $mapping[$i] = $previousImport->mapping[$index];
                 break;
             }
+
+            // Preserve campaign/ad data and evolving form questions.  The custom
+            // field is created once per project and reused by future imports.
+            if (empty($mapping[$i])) {
+                $field = $fields->first(function ($item) use ($header) {
+                    return $this->normalizeImportHeader($item['name']) === $this->normalizeImportHeader($header);
+                });
+
+                if (!$field) {
+                    $field = $import->project->fields()->create([
+                        'name' => trim((string) $header) ?: ('Colonne ' . ($i + 1)),
+                        'for' => 'prospect',
+                        'meta' => true,
+                    ]);
+                    $fields->push($field);
+                }
+
+                $mapping[$i] = 'meta->' . $field->slug;
+            }
         }
 
         $import->update(['mapping' => $mapping]);
+    }
+
+    /** Return the CRM field corresponding to a known CSV/Sheets header. */
+    protected function getKnownImportField($header): ?string
+    {
+        $header = $this->normalizeImportHeader($header);
+
+        $aliases = [
+            'email' => 'email',
+            'e mail' => 'email',
+            'mail' => 'email',
+            'nom complet' => 'full_name',
+            'full name' => 'full_name',
+            'name' => 'full_name',
+            'numero de telephone' => 'mobile_phone_number',
+            'telephone' => 'mobile_phone_number',
+            'telephone portable' => 'mobile_phone_number',
+            'mobile' => 'mobile_phone_number',
+            'phone' => 'mobile_phone_number',
+            'phone number' => 'mobile_phone_number',
+            'created time' => 'created_at',
+            'created at' => 'created_at',
+            'date de creation' => 'created_at',
+        ];
+
+        return $aliases[$header] ?? null;
+    }
+
+    /** Normalize headers from CSV files and Google Sheets consistently. */
+    protected function normalizeImportHeader($header): string
+    {
+        $header = str_replace(['\\_', '_'], ' ', (string) $header);
+        $header = Str::ascii($header);
+        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
+
+        return strtolower(trim(preg_replace('/\s+/', ' ', $header)));
     }
     
 }

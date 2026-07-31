@@ -37,4 +37,9 @@ return [
         'version' => env('ANTHROPIC_VERSION', '2023-06-01'),
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'transcription_model' => env('OPENAI_TRANSCRIPTION_MODEL', 'whisper-1'),
+    ],
+
 ];

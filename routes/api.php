@@ -4,6 +4,7 @@ use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
 use App\Http\Controllers\API\KavkomController;
+use App\Http\Controllers\API\KavkomWebhookController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
@@ -201,6 +202,10 @@ Route::post('/google/auth/login', [App\Http\Controllers\API\Google\AuthControlle
 
 // Two factors
 Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class, 'login']);
+
+// Kavkom sends CDRs without a CRM session. The controller validates the
+// domain and API token already configured in the user's Kavkom modal.
+Route::post('/webhooks/kavkom/cdr', [KavkomWebhookController::class, 'cdr'])->name('webhooks.kavkom.cdr');
 
 // User Permission
 Route::get('permission', [PermissionController::class, 'index'])->name("permission");
