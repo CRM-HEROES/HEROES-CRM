@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App\Models\Import;
-use App\Jobs\Import\SendsWelcomeSms;
+// The trait file is named Sendswelcomesms.php. Keep the import spelling in
+// sync with the file for case-sensitive production filesystems.
+use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;

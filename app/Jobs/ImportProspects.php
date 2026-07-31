@@ -28,7 +28,9 @@ use App\Jobs\Import\ProspectItemsHandler\UsersHandler;
 use App\Events\ImportFinished;
 use App\Models\Import;
 use App\Services\ProspectAutoAssignment;
-use App\Jobs\Import\SendsWelcomeSms;
+// The trait file is named Sendswelcomesms.php. Keep the import spelling in
+// sync with the file for case-sensitive production filesystems.
+use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;

@@ -32,9 +32,9 @@ class ProspectAutoAssignment
             'unassigned_prospects' => $total,
         ]);
 
-        $prospects = $query->get();
         $assigned = 0;
 
+        $query->orderBy('id')->chunkById(500, function ($prospects) use ($project, $importId, &$assigned) {
         foreach ($prospects->groupBy('project_id') as $projectId => $projectProspects) {
             $projectModel = ($project && (int)$project->id === (int)$projectId)
                 ? $project
@@ -57,6 +57,7 @@ class ProspectAutoAssignment
                 $assigned += $this->assignBatch($projectModel, $importProspects, $roleIds, $userIds);
             }
         }
+        });
 
         if ($assigned !== 0 || $total !== 0) {
             Log::info('ProspectAutoAssignment: completed auto-assignment', [
