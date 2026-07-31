@@ -52,7 +52,7 @@
         </item-list>
 
         <item
-            v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0)"
+            v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0) && (!prospectImport.users || prospectImport.users.length === 0)"
             style="color: #92400e !important; background-color: #fef3c7"
         >
             <icon class="fa fa-exclamation-triangle" style="color: #92400e" />
