@@ -132,7 +132,18 @@ class DefaultField implements ImportColumnToFieldInterface
                 return;
             }
 
-            $value = $this->formatDateValue($value);
+            $formatted = $this->formatDateValue($value);
+
+            try {
+                Carbon::parse($formatted);
+            } catch (\Exception $e) {
+                // Malformed value (e.g. a stray duplicated header row) — keep
+                // the already computed fallback date instead of crashing the
+                // insert with an invalid datetime.
+                return;
+            }
+
+            $value = $formatted;
         }
 
         if ($field == 'mobile_phone_number' || $field == 'phone_number') {

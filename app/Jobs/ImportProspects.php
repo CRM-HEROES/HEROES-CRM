@@ -156,6 +156,7 @@ class ImportProspects implements ShouldQueue
             // Indicate the first row
             // as the header of the file
             $isHeaderRow = true;
+            $headerRow = null;
 
             // ROW LOOP
             // Loop through the sheet rows
@@ -164,11 +165,21 @@ class ImportProspects implements ShouldQueue
                 // Skip the header row
                 if ($isHeaderRow) {
                     $isHeaderRow = false;
+                    $headerRow = $this->getCellsValues($r);
                     continue;
                 }
 
                 // Get cells values in current row
                 $row = $this->getCellsValues($r);
+
+                // Skip rows that repeat the header (common when several
+                // exports have been pasted one after another in the same
+                // spreadsheet) — otherwise the header values leak into the
+                // data (e.g. the literal text "created_time" ends up in the
+                // created_at column) and crash the whole insert batch.
+                if ($row === $headerRow) {
+                    continue;
+                }
 
                 // Convert import row to prospect data
                 $prospect = $this->importRowToProspect($row, $rowsCount);

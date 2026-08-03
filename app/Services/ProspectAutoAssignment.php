@@ -106,7 +106,9 @@ class ProspectAutoAssignment
                 continue;
             }
 
-            $this->attachProspectToUser($prospect, $candidate);
+            if (!$this->attachProspectToUser($prospect, $candidate)) {
+                continue;
+            }
             $loads[$candidate->id]++;
             $assigned++;
         }
@@ -151,9 +153,7 @@ class ProspectAutoAssignment
             return false;
         }
 
-        $this->attachProspectToUser($prospect, $candidate);
-
-        return true;
+        return $this->attachProspectToUser($prospect, $candidate);
     }
 
     /**
@@ -177,18 +177,33 @@ class ProspectAutoAssignment
         return $candidate;
     }
 
-    protected function attachProspectToUser(Prospect $prospect, User $candidate): void
+    protected function attachProspectToUser(Prospect $prospect, User $candidate): bool
     {
         $now = Carbon::now();
         $creatorId = auth()->id() ?: $prospect->creator_id ?: null;
 
-        $prospect->users()->syncWithoutDetaching([
-            $candidate->id => [
-                'creator_id' => $creatorId,
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-        ]);
+        try {
+            $prospect->users()->syncWithoutDetaching([
+                $candidate->id => [
+                    'creator_id' => $creatorId,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ],
+            ]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            // The prospect (or the user) may have been deleted concurrently
+            // (e.g. by a manual cleanup) between the moment it was selected
+            // for assignment and this attach. Skip it instead of aborting
+            // the whole batch — this would otherwise crash the import job
+            // that triggered this assignment.
+            Log::warning('ProspectAutoAssignment: skipping assignment, prospect or user no longer exists', [
+                'prospect_id' => $prospect->id,
+                'candidate_id' => $candidate->id,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return false;
+        }
 
         Log::info('ProspectAutoAssignment: prospect assigned', [
             'prospect_id' => $prospect->id,
@@ -199,6 +214,8 @@ class ProspectAutoAssignment
         ]);
 
         ProspectUserAttached::dispatch($prospect, $candidate);
+
+        return true;
     }
 
     /**
