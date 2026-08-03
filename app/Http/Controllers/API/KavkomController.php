@@ -54,19 +54,20 @@ class KavkomController extends Controller
             $config['api_token'],
             $config['domain_uuid'],
             $extension['extension'],
-            $data['destination'],
-            ['auto_answer' => 'true']
+            $data['destination']
         );
 
         if ($result['success'] && !empty($result['call_uuid'])) {
-            KavkomCall::firstOrCreate(['call_uuid' => $result['call_uuid']], [
-                'call_uuid' => $result['call_uuid'],
-                'prospect_id' => $data['prospect_id'] ?? null,
-                'user_id' => $request->user()->id,
-                'domain_uuid' => $config['domain_uuid'],
-                'destination' => $data['destination'],
-                'status' => 'initiated',
-            ]);
+            // The CDR webhook may arrive before this API response. Complete
+            // that record so its recording can still be transcribed.
+            $call = KavkomCall::firstOrNew(['call_uuid' => $result['call_uuid']]);
+            $call->fill([
+                'prospect_id' => $call->prospect_id ?: ($data['prospect_id'] ?? null),
+                'user_id' => $call->user_id ?: $request->user()->id,
+                'domain_uuid' => $call->domain_uuid ?: $config['domain_uuid'],
+                'destination' => $call->destination ?: $data['destination'],
+                'status' => $call->status ?: 'initiated',
+            ])->save();
 
             Log::channel('kavkom')->info('Kavkom call linked to CRM prospect.', [
                 'call_uuid' => $result['call_uuid'],

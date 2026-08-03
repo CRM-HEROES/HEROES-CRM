@@ -26,10 +26,16 @@
             <span v-else-if="status === 'in-call'">Appel en cours.</span>
         </div>
 
-        <div
-            class="hc-kavkom-webphone-controls"
-            v-if="status === 'in-call'"
-        >
+        <div class="hc-kavkom-webphone-controls" v-if="status === 'ringing'">
+            <button type="button" class="hc-button-secondary" @click="answer">
+                Accepter l'appel
+            </button>
+            <button type="button" class="hc-button-danger" @click="decline">
+                Refuser
+            </button>
+        </div>
+
+        <div class="hc-kavkom-webphone-controls" v-else-if="status === 'in-call'">
             <button type="button" class="hc-button-danger" @click="hangup">
                 Raccrocher
             </button>
@@ -79,6 +85,7 @@ export default {
             ringtoneContext: null,
             ringtoneTimer: null,
             ringtoneOscillators: [],
+            callEstablishedAt: null,
         };
     },
 
@@ -175,48 +182,33 @@ export default {
                     }
                 },
 
-                /**
-                 * ARCHITECTURE CLICK-TO-CALL KAVKOM (recommandée par leur doc) :
-                 * On ne compose plus le numéro de destination directement depuis
-                 * le navigateur. C'est le PBX Kavkom qui appelle CETTE extension
-                 * (le "leg agent") après un déclenchement via l'API REST
-                 * POST /api/pbx/v1/active_call/call côté backend. On doit donc
-                 * auto-répondre à cet appel entrant : le PBX se charge ensuite,
-                 * de son côté, de mettre en relation avec le numéro externe
-                 * (le "leg destination"), sans jamais exposer cette négociation
-                 * média PSTN à notre navigateur.
-                 */
-                onCallReceived: async () => {
+                /** The PBX calls the WebRTC extension after the REST request.
+                 * The user explicitly accepts this agent leg before Kavkom
+                 * connects the prospect. */
+                onCallReceived: () => {
                     this.status = "ringing";
                     this.logInfo("Appel entrant du PBX Kavkom (leg agent)");
                     this.playRingtone();
                     this.$emit("ringing-call");
-
-                    try {
-                        await this.simpleUser.answer();
-                        this.logInfo("Auto-réponse au leg agent réussie");
-                    } catch (error) {
-                        this.stopRingtone();
-                        this.logError("Échec de l'auto-réponse au leg agent", { error });
-                        this.$emit(
-                            "call-failed",
-                            "Impossible de décrocher automatiquement l'appel entrant du PBX Kavkom."
-                        );
-                    }
                 },
 
                 onCallAnswered: () => {
                     this.stopRingtone();
                     this.status = "in-call";
+                    this.callEstablishedAt = Date.now();
                     this.logInfo("Appel établi (leg agent connecté)");
                     this.$emit("answered-call");
                 },
 
                 onCallHangup: () => {
+                    const durationMs = this.callEstablishedAt
+                        ? Date.now() - this.callEstablishedAt
+                        : null;
+                    this.callEstablishedAt = null;
                     this.stopRingtone();
                     this.status = "registered";
                     this.logInfo("Appel terminé");
-                    this.$emit("hangup-call");
+                    this.$emit("hangup-call", { durationMs });
                 },
             };
 
@@ -258,6 +250,31 @@ export default {
                 .catch((error) => {
                     this.logError("Failed to hang up call", { error });
                 });
+        },
+
+        async answer() {
+            try {
+                await this.simpleUser?.answer();
+                this.logInfo("Leg agent accepté par l'utilisateur");
+            } catch (error) {
+                this.stopRingtone();
+                this.status = "registered";
+                this.logError("Échec de l'acceptation de l'appel Kavkom", { error });
+                this.$emit("call-failed", "Impossible d'accepter l'appel Kavkom.");
+            }
+        },
+
+        async decline() {
+            try {
+                await this.simpleUser?.decline();
+                this.logInfo("Leg agent refusé par l'utilisateur");
+            } catch (error) {
+                this.logError("Échec du refus de l'appel Kavkom", { error });
+            } finally {
+                this.stopRingtone();
+                this.status = "registered";
+                this.$emit("call-failed", "Appel Kavkom refusé.");
+            }
         },
 
         /**

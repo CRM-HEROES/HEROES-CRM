@@ -481,14 +481,8 @@
                                         @ready="onKavkomReady"
                                         @connection-error="onKavkomConnectionError"
                                         @call-failed="onKavkomCallFailed"
-                                        @ringing-call="
-                                            (interaction.status = 'ringing'),
-                                                updateInteraction()
-                                        "
-                                        @answered-call="
-                                            (interaction.status = 'answered'),
-                                                updateInteraction()
-                                        "
+                                        @ringing-call="onKavkomCallRinging"
+                                        @answered-call="onKavkomCallAnswered"
                                         @hangup-call="
                                             onKavkomCallHangup
                                         "
@@ -496,14 +490,7 @@
                                 </div>
 
                                 <div
-                                    v-if="callingViaKavkom"
-                                    class="hc-kavkom-call-status"
-                                >
-                                    <loading :loading="true" />
-                                    Déclenchement de l'appel…
-                                </div>
-                                <div
-                                    v-else-if="kavkomCallMessage"
+                                    v-if="kavkomCallMessage"
                                     :class="[
                                         'hc-kavkom-call-status',
                                         kavkomCallSuccess ? 'success' : 'error',
@@ -750,6 +737,7 @@ export default {
             callingViaKavkom: false,
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
+            kavkomCallState: "idle",
             // Softphone prêt = enregistré en SIP côté navigateur, capable
             // de recevoir/auto-répondre au leg agent envoyé par le PBX.
             kavkomReady: false,
@@ -889,6 +877,7 @@ export default {
 
             this.callingViaKavkom = true;
             this.kavkomCallMessage = "";
+            this.kavkomCallState = "requesting";
 
             try {
                 const { data } = await ApiService.post("settings/kavkom/call", {
@@ -904,9 +893,15 @@ export default {
                     return;
                 }
 
-                this.kavkomCallMessage =
-                    "Votre poste va sonner, décrochez pour être mis en relation avec le prospect.";
-                this.kavkomCallSuccess = true;
+                // Kavkom may complete the agent leg before its REST response
+                // returns. Never overwrite a newer SIP result with this
+                // asynchronous acknowledgement.
+                if (this.kavkomCallState === "requesting") {
+                    this.kavkomCallMessage =
+                        "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
+                    this.kavkomCallSuccess = true;
+                    this.kavkomCallState = "requested";
+                }
                 console.log("[Kavkom] Appel lancé.", { callUuid: data.call_uuid || null });
             } catch (error) {
                 console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
@@ -932,25 +927,46 @@ export default {
             }
         },
 
+        onKavkomCallRinging() {
+            this.interaction.status = "ringing";
+            this.updateInteraction();
+            this.kavkomCallState = "ringing";
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Votre poste sonne. Acceptez l'appel pour joindre le prospect.";
+        },
+
+        onKavkomCallAnswered() {
+            this.interaction.status = "answered";
+            this.updateInteraction();
+            this.kavkomCallState = "active";
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Appel Kavkom en cours.";
+        },
+
         onKavkomConnectionError(message) {
             this.kavkomReady = false;
             this.callingViaKavkom = false;
+            this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;
         },
 
         onKavkomCallFailed(message) {
             this.callingViaKavkom = false;
+            this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;
         },
 
-        onKavkomCallHangup() {
+        onKavkomCallHangup({ durationMs = null } = {}) {
             this.interaction.status = "hangup";
             this.updateInteraction();
             this.callingViaKavkom = false;
-            this.kavkomCallSuccess = true;
-            this.kavkomCallMessage = "Appel terminé.";
+            this.kavkomCallSuccess = !(durationMs !== null && durationMs < 5000);
+            this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
+            this.kavkomCallMessage = this.kavkomCallSuccess
+                ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom."
+                : "Kavkom a fermé l'appel immédiatement, avant la mise en relation avec le prospect. Vérifiez le numéro sortant de l'extension et le format du numéro appelé.";
         },
 
         openKavkomAfterSave() {
