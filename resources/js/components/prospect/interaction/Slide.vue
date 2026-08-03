@@ -908,10 +908,16 @@ export default {
                     status: error.response?.status,
                     message: error.response?.data?.message || error.message,
                 });
-                this.kavkomCallMessage =
-                    error.response?.data?.message ||
-                    "Erreur inattendue lors de l'appel Kavkom.";
-                this.kavkomCallSuccess = false;
+                // Kavkom can time out its HTTP response after it has already
+                // sent the SIP INVITE. Preserve the newer SIP state instead
+                // of hiding the Accept button behind a stale API error.
+                if (this.kavkomCallState === "requesting") {
+                    this.kavkomCallMessage =
+                        error.response?.data?.message ||
+                        "Kavkom n'a pas confirmé la demande. Si votre poste sonne, acceptez l'appel et ne relancez pas le bouton.";
+                    this.kavkomCallSuccess = false;
+                    this.kavkomCallState = "failed";
+                }
             } finally {
                 this.callingViaKavkom = false;
             }
@@ -966,7 +972,7 @@ export default {
             this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
             this.kavkomCallMessage = this.kavkomCallSuccess
                 ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom."
-                : "Kavkom a fermé l'appel immédiatement, avant la mise en relation avec le prospect. Vérifiez le numéro sortant de l'extension et le format du numéro appelé.";
+                : "Kavkom a fermé le leg agent avant le pont vers le prospect. Le DID sortant a été accepté ; consultez le CDR Kavkom pour la cause du leg destination.";
         },
 
         openKavkomAfterSave() {

@@ -40,6 +40,14 @@ class KavkomController extends Controller
             ], 200);
         }
 
+        $callerId = preg_replace('/\D+/', '', (string) ($config['phone_number'] ?? ''));
+        if (strlen($callerId) < 8 || preg_match('/^0+$/', $callerId)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Configurez un numéro sortant Kavkom (DID autorisé) dans les paramètres avant de lancer un appel. Le PBX utilise actuellement 0000000000, ce qui bloque les appels sortants.',
+            ], 200);
+        }
+
         $extension = $service->resolveExtension(
             $config['api_token'],
             $config['domain_uuid'],
@@ -54,7 +62,8 @@ class KavkomController extends Controller
             $config['api_token'],
             $config['domain_uuid'],
             $extension['extension'],
-            $data['destination']
+            $data['destination'],
+            ['src_cid_number' => $callerId]
         );
 
         if ($result['success'] && !empty($result['call_uuid'])) {

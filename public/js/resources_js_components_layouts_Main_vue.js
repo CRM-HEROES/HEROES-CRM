@@ -29044,6 +29044,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       callingViaKavkom: false,
       kavkomCallMessage: "",
       kavkomCallSuccess: false,
+      kavkomCallState: "idle",
       // Softphone prêt = enregistré en SIP côté navigateur, capable
       // de recevoir/auto-répondre au leg agent envoyé par le PBX.
       kavkomReady: false,
@@ -29196,17 +29197,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 10:
               _this3.callingViaKavkom = true;
               _this3.kavkomCallMessage = "";
-              _context2.prev = 12;
-              _context2.next = 15;
+              _this3.kavkomCallState = "requesting";
+              _context2.prev = 13;
+              _context2.next = 16;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/kavkom/call", {
                 destination: number,
                 prospect_id: (_this3$interactionPro2 = _this3.interactionProspect) === null || _this3$interactionPro2 === void 0 ? void 0 : _this3$interactionPro2.id
               });
-            case 15:
+            case 16:
               _yield$ApiService$pos = _context2.sent;
               data = _yield$ApiService$pos.data;
               if (data.success) {
-                _context2.next = 22;
+                _context2.next = 23;
                 break;
               }
               console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", {
@@ -29215,32 +29217,44 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this3.kavkomCallMessage = data.message || "Impossible de lancer l'appel Kavkom.";
               _this3.kavkomCallSuccess = false;
               return _context2.abrupt("return");
-            case 22:
-              _this3.kavkomCallMessage = "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
-              _this3.kavkomCallSuccess = true;
+            case 23:
+              // Kavkom may complete the agent leg before its REST response
+              // returns. Never overwrite a newer SIP result with this
+              // asynchronous acknowledgement.
+              if (_this3.kavkomCallState === "requesting") {
+                _this3.kavkomCallMessage = "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
+                _this3.kavkomCallSuccess = true;
+                _this3.kavkomCallState = "requested";
+              }
               console.log("[Kavkom] Appel lancé.", {
                 callUuid: data.call_uuid || null
               });
-              _context2.next = 32;
+              _context2.next = 31;
               break;
             case 27:
               _context2.prev = 27;
-              _context2.t0 = _context2["catch"](12);
+              _context2.t0 = _context2["catch"](13);
               console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
                 status: (_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
                 message: ((_error$response2 = _context2.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _context2.t0.message
               });
-              _this3.kavkomCallMessage = ((_error$response3 = _context2.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.message) || "Erreur inattendue lors de l'appel Kavkom.";
-              _this3.kavkomCallSuccess = false;
-            case 32:
-              _context2.prev = 32;
+              // Kavkom can time out its HTTP response after it has already
+              // sent the SIP INVITE. Preserve the newer SIP state instead
+              // of hiding the Accept button behind a stale API error.
+              if (_this3.kavkomCallState === "requesting") {
+                _this3.kavkomCallMessage = ((_error$response3 = _context2.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.message) || "Kavkom n'a pas confirmé la demande. Si votre poste sonne, acceptez l'appel et ne relancez pas le bouton.";
+                _this3.kavkomCallSuccess = false;
+                _this3.kavkomCallState = "failed";
+              }
+            case 31:
+              _context2.prev = 31;
               _this3.callingViaKavkom = false;
-              return _context2.finish(32);
-            case 35:
+              return _context2.finish(31);
+            case 34:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[12, 27, 32, 35]]);
+        }, _callee2, null, [[13, 27, 31, 34]]);
       }))();
     },
     onKavkomReady: function onKavkomReady() {
@@ -29251,14 +29265,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.triggerKavkomCall(number);
       }
     },
+    onKavkomCallRinging: function onKavkomCallRinging() {
+      this.interaction.status = "ringing";
+      this.updateInteraction();
+      this.kavkomCallState = "ringing";
+      this.kavkomCallSuccess = true;
+      this.kavkomCallMessage = "Votre poste sonne. Acceptez l'appel pour joindre le prospect.";
+    },
+    onKavkomCallAnswered: function onKavkomCallAnswered() {
+      this.interaction.status = "answered";
+      this.updateInteraction();
+      this.kavkomCallState = "active";
+      this.kavkomCallSuccess = true;
+      this.kavkomCallMessage = "Appel Kavkom en cours.";
+    },
     onKavkomConnectionError: function onKavkomConnectionError(message) {
       this.kavkomReady = false;
       this.callingViaKavkom = false;
+      this.kavkomCallState = "failed";
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
     },
     onKavkomCallFailed: function onKavkomCallFailed(message) {
       this.callingViaKavkom = false;
+      this.kavkomCallState = "failed";
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
     },
@@ -29270,7 +29300,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.updateInteraction();
       this.callingViaKavkom = false;
       this.kavkomCallSuccess = !(durationMs !== null && durationMs < 5000);
-      this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé l'appel immédiatement, avant la mise en relation avec le prospect. Vérifiez le numéro sortant de l'extension et le format du numéro appelé.";
+      this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
+      this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé le leg agent avant le pont vers le prospect. Le DID sortant a été accepté ; consultez le CDR Kavkom pour la cause du leg destination.";
     },
     openKavkomAfterSave: function openKavkomAfterSave() {
       this.tab = 1;
@@ -77338,7 +77369,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("slide", true);
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[24] || (_cache[24] = function ($event) {
+    onOpen: _cache[22] || (_cache[22] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects();
     }),
     title: _ctx.$t('prospect.interaction.title', {
@@ -77371,7 +77402,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "4": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[17] || (_cache[17] = function ($event) {
+                onBack: _cache[15] || (_cache[15] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setInteractionProspect
@@ -77383,11 +77414,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 style: {
                   "height": "100%"
                 },
-                onSubmit: _cache[20] || (_cache[20] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onSubmit: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.updateProspectPhoneNumber && $options.updateProspectPhoneNumber.apply($options, arguments);
                 }, ["prevent"]))
               }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[18] || (_cache[18] = function ($event) {
+                onClick: _cache[16] || (_cache[16] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -77414,7 +77445,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "tel",
-                        "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
+                        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
                           return $data.phoneNumber = $event;
                         })
                       }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.phoneNumber, void 0, {
@@ -77442,11 +77473,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 style: {
                   "height": "100%"
                 },
-                onSubmit: _cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onSubmit: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.updateProspectMobilePhoneNumber && $options.updateProspectMobilePhoneNumber.apply($options, arguments);
                 }, ["prevent"]))
               }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[21] || (_cache[21] = function ($event) {
+                onClick: _cache[19] || (_cache[19] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -77473,7 +77504,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "tel",
-                        "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
+                        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
                           return $data.mobilePhoneNumber = $event;
                         })
                       }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.mobilePhoneNumber, void 0, {
@@ -77706,21 +77737,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 onReady: $options.onKavkomReady,
                 onConnectionError: $options.onKavkomConnectionError,
                 onCallFailed: $options.onKavkomCallFailed,
-                onRingingCall: _cache[14] || (_cache[14] = function ($event) {
-                  return $data.interaction.status = 'ringing', $options.updateInteraction();
-                }),
-                onAnsweredCall: _cache[15] || (_cache[15] = function ($event) {
-                  return $data.interaction.status = 'answered', $options.updateInteraction();
-                }),
+                onRingingCall: $options.onKavkomCallRinging,
+                onAnsweredCall: $options.onKavkomCallAnswered,
                 onHangupCall: $options.onKavkomCallHangup
-              }, null, 8 /* PROPS */, ["onReady", "onConnectionError", "onCallFailed", "onHangupCall"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+              }, null, 8 /* PROPS */, ["onReady", "onConnectionError", "onCallFailed", "onRingingCall", "onAnsweredCall", "onHangupCall"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
                 key: 0,
                 "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.kavkomCallSuccess ? 'success' : 'error'])
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                 type: "button",
                 "class": "hc-button-secondary",
                 disabled: $data.callingViaKavkom || !$data.kavkomReady,
-                onClick: _cache[16] || (_cache[16] = function ($event) {
+                onClick: _cache[14] || (_cache[14] = function ($event) {
                   return $options.triggerKavkomCall($data.interaction.number);
                 })
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 9 /* TEXT, PROPS */, _hoisted_39)])])];
@@ -88459,7 +88486,7 @@ var _hoisted_4 = ["placeholder"];
 var _hoisted_5 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-kavkom-number-help"
-  }, " Indiquez votre extension Kavkom personnelle (par exemple 901). Le CRM s'y connecte directement : aucun autre onglet Kavkom ne doit rester ouvert pour recevoir les appels. ", -1 /* HOISTED */);
+  }, " Indiquez le numéro sortant réellement attribué et autorisé par Kavkom (par exemple 33178902698), pas le numéro du prospect. Il sera présenté au PBX comme caller ID. ", -1 /* HOISTED */);
 });
 var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -88572,7 +88599,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-            label: "Numéro Kavkom",
+            label: "Numéro sortant Kavkom (DID autorisé)",
             required: ""
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref3) {

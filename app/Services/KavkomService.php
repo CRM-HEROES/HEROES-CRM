@@ -66,56 +66,34 @@ class KavkomService
     }
 
     /**
-     * Make a POST request to Kavkom API with automatic retry on transient errors.
+     * Start calls without retrying. An HTTP timeout can happen after Kavkom has
+     * accepted the request, so repeating this POST would originate a second call.
      */
     protected function makePostRequest(string $apiToken, string $endpoint, array $data): \Illuminate\Http\Client\Response
     {
-        $attempt = 0;
-        $lastException = null;
+        $startTime = microtime(true);
 
-        while ($attempt <= self::MAX_RETRIES) {
-            try {
-                $startTime = microtime(true);
+        try {
+            $response = Http::withHeaders([
+                'X-API-TOKEN' => $apiToken,
+                'Accept' => 'application/json',
+            ])->timeout(self::TIMEOUT_SECONDS)->post(self::BASE_URL . $endpoint, $data);
 
-                $response = Http::withHeaders([
-                    'X-API-TOKEN' => $apiToken,
-                    'Accept' => 'application/json',
-                ])->timeout(self::TIMEOUT_SECONDS)->post(self::BASE_URL . $endpoint, $data);
+            Log::channel('kavkom')->info('Kavkom API POST request completed', [
+                'endpoint' => $endpoint,
+                'status' => $response->status(),
+                'duration_ms' => round((microtime(true) - $startTime) * 1000),
+            ]);
 
-                $duration = round((microtime(true) - $startTime) * 1000);
-                $statusCode = $response->status();
+            return $response;
+        } catch (\Throwable $exception) {
+            Log::channel('kavkom')->warning('Kavkom call request timed out or failed; not retrying to avoid a duplicate call.', [
+                'endpoint' => $endpoint,
+                'error' => $exception->getMessage(),
+            ]);
 
-                Log::channel('kavkom')->info('Kavkom API POST request succeeded', [
-                    'endpoint' => $endpoint,
-                    'status' => $statusCode,
-                    'duration_ms' => $duration,
-                    'attempt' => $attempt + 1,
-                ]);
-
-                return $response;
-            } catch (\Throwable $exception) {
-                $lastException = $exception;
-                $attempt++;
-
-                $shouldRetry = $this->isTransientError($exception);
-
-                Log::channel('kavkom')->warning('Kavkom API POST request failed', [
-                    'endpoint' => $endpoint,
-                    'attempt' => $attempt,
-                    'max_retries' => self::MAX_RETRIES,
-                    'error' => $exception->getMessage(),
-                    'will_retry' => $shouldRetry && $attempt <= self::MAX_RETRIES,
-                ]);
-
-                if (!$shouldRetry || $attempt > self::MAX_RETRIES) {
-                    throw $exception;
-                }
-
-                usleep(pow(2, $attempt) * 100000);
-            }
+            throw $exception;
         }
-
-        throw $lastException;
     }
 
     /**
@@ -296,13 +274,27 @@ class KavkomService
             ];
         }
 
-        // FIX : normalisation du numéro de destination. Kavkom peut échouer
-        // silencieusement (ou raccrocher immédiatement le leg destination)
-        // si le numéro contient des espaces/points/tirets, ex: "06 18 41 66 33".
-        $destination = $this->normalizePhoneNumber($destination);
+        // Use the user's Kavkom number as the caller ID. When it is omitted,
+        // this PBX falls back to 0000000000, which is rejected by outbound
+        // carriers and clears the call before the destination leg is bridged.
+        if (!empty($options['src_cid_number'])) {
+            $options['src_cid_number'] = $this->normalizePhoneNumber(
+                (string) $options['src_cid_number']
+            );
+        } else {
+            unset($options['src_cid_number']);
+        }
 
-        // Keep Kavkom's configured extension caller ID. Spoofing it with the
-        // destination can make the PBX create and immediately clear the agent leg.
+        // Kavkom expects an international destination without a leading "+".
+        // For this French Kavkom tenant, convert a local 10-digit number such
+        // as 0688753390 to 33688753390 before originating the destination leg.
+        $destination = $this->normalizePhoneNumber($destination);
+        if (!empty($options['src_cid_number'])
+            && str_starts_with($options['src_cid_number'], '33')
+            && preg_match('/^0\d{9}$/', $destination)) {
+            $destination = '33' . substr($destination, 1);
+        }
+
         $payload = array_merge([
             'domain_uuid' => $domainUuid,
             'src' => $src,
@@ -340,9 +332,8 @@ class KavkomService
 
     /**
      * Décode les entités HTML (notamment &#xA0;, espace insécable) puis
-     * conserve uniquement les chiffres. L'endpoint click-to-call Kavkom
-     * documente les destinations internationales au format 33612345678,
-     * sans préfixe "+". Aucun indicatif pays n'est deviné.
+     * conserve uniquement les chiffres. Les numéros locaux sont convertis
+     * séparément seulement lorsque le DID source permet d'identifier le pays.
      */
     protected function normalizePhoneNumber(string $number): string
     {

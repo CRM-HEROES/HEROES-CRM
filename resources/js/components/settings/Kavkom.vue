@@ -26,7 +26,7 @@
                     />
                 </v-field>
 
-                <v-field label="Numéro Kavkom" required v-slot="{ label }">
+                <v-field label="Numéro sortant Kavkom (DID autorisé)" required v-slot="{ label }">
                     <input
                         :placeholder="label + ' ...'"
                         v-model.trim="setting.phone_number"
@@ -48,9 +48,9 @@
                 </v-field>
 
                 <div class="hc-kavkom-number-help">
-                    Indiquez votre extension Kavkom personnelle (par exemple
-                    901). Le CRM s'y connecte directement : aucun autre onglet
-                    Kavkom ne doit rester ouvert pour recevoir les appels.
+                    Indiquez le numéro sortant réellement attribué et autorisé
+                    par Kavkom (par exemple 33178902698), pas le numéro du
+                    prospect. Il sera présenté au PBX comme caller ID.
                 </div>
 
                 <div class="hc-kavkom-help">
