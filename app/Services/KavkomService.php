@@ -8,7 +8,10 @@ use Illuminate\Support\Facades\Log;
 class KavkomService
 {
     protected const BASE_URL = 'https://api.kavkom.com';
-    protected const TIMEOUT_SECONDS = 20;
+    // Kavkom can send the SIP INVITE before its REST endpoint returns. Give
+    // it enough time to acknowledge the request, but never retry this POST:
+    // a timeout can still mean that the PBX has originated the call.
+    protected const TIMEOUT_SECONDS = 35;
     protected const MAX_RETRIES = 2;
 
     /**
@@ -239,9 +242,13 @@ class KavkomService
 
             return [
                 'success' => true,
+                'message' => "Extension Kavkom {$extension['extension']} trouvée et activée.",
                 'extension' => (string) data_get($extension, 'extension'),
                 'password' => (string) data_get($extension, 'password'),
                 'user_context' => (string) data_get($extension, 'user_context'),
+                // This is the DID Kavkom presents to the external contact.
+                // `src_cid_number` only identifies the PBX-to-agent leg.
+                'effective_caller_id_number' => (string) data_get($extension, 'effective_caller_id_number'),
             ];
         } catch (\Throwable $exception) {
             return [
@@ -301,7 +308,12 @@ class KavkomService
             'destination' => $destination,
         ], $options);
 
-        Log::channel('kavkom')->info('Kavkom originateCall payload envoyé', $payload);
+        Log::channel('kavkom')->info('Kavkom call requested', [
+            'domain_uuid' => $domainUuid,
+            'src_extension' => $src,
+            'destination_suffix' => substr($destination, -4),
+            'has_caller_id' => !empty($options['src_cid_number']),
+        ]);
 
         try {
             $response = $this->makePostRequest($apiToken, '/api/pbx/v1/active_call/call', $payload);

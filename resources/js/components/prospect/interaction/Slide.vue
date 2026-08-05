@@ -478,6 +478,7 @@
                                     <kavkom
                                         ref="kavkomWebphone"
                                         id="kavkom-webphone"
+                                        :auto-answer="true"
                                         @ready="onKavkomReady"
                                         @connection-error="onKavkomConnectionError"
                                         @call-failed="onKavkomCallFailed"
@@ -830,13 +831,23 @@ export default {
             this.addInteraction();
         },
 
-        interactionViaKavkom(number) {
+        async interactionViaKavkom(number) {
             this.tab = 1;
             this.frameTab = 2;
             this.interaction = this.newInteraction();
             this.interaction.source = "kavkom";
             this.interaction.number = number;
-            this.addInteraction();
+            // SIP events can arrive within milliseconds. Persist the
+            // interaction first so they never update a stale record.
+            try {
+                await this.addInteraction();
+            } catch (error) {
+                console.error("Échec création interaction Kavkom", error);
+                this.kavkomCallMessage =
+                    "Impossible de créer l'interaction CRM avant l'appel.";
+                this.kavkomCallSuccess = false;
+                return;
+            }
             this.triggerKavkomCall(number);
         },
 
@@ -848,7 +859,8 @@ export default {
          * Déclenche l'appel via l'API REST Kavkom (click-to-call officiel) :
          * POST /api/pbx/v1/active_call/call, relayé par le backend Laravel
          * (KavkomController::call). Le PBX Kavkom appelle d'abord notre
-         * softphone (le "leg agent", extension 901), auto-répondu par
+         * softphone (le "leg agent", extension sélectionnée), auquel le CRM répond
+         * automatiquement pour éviter l'expiration du leg agent, puis
          * Kavkom.vue, puis met en relation avec le numéro de destination
          * de son côté — toute la négociation média PSTN reste côté Kavkom.
          */
@@ -902,7 +914,10 @@ export default {
                     this.kavkomCallSuccess = true;
                     this.kavkomCallState = "requested";
                 }
-                console.log("[Kavkom] Appel lancé.", { callUuid: data.call_uuid || null });
+                console.log("[Kavkom] Appel lancé.", {
+                    callUuid: data.call_uuid || null,
+                    apiConfirmation: true,
+                });
             } catch (error) {
                 console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
                     status: error.response?.status,
@@ -914,7 +929,7 @@ export default {
                 if (this.kavkomCallState === "requesting") {
                     this.kavkomCallMessage =
                         error.response?.data?.message ||
-                        "Kavkom n'a pas confirmé la demande. Si votre poste sonne, acceptez l'appel et ne relancez pas le bouton.";
+                        "Kavkom n'a pas confirmé la demande à temps. Si l'appel démarre dans le CRM, ne relancez pas le bouton.";
                     this.kavkomCallSuccess = false;
                     this.kavkomCallState = "failed";
                 }
@@ -938,7 +953,7 @@ export default {
             this.updateInteraction();
             this.kavkomCallState = "ringing";
             this.kavkomCallSuccess = true;
-            this.kavkomCallMessage = "Votre poste sonne. Acceptez l'appel pour joindre le prospect.";
+            this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
         },
 
         onKavkomCallAnswered() {
@@ -972,16 +987,24 @@ export default {
             this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
             this.kavkomCallMessage = this.kavkomCallSuccess
                 ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom."
-                : "Kavkom a fermé le leg agent avant le pont vers le prospect. Le DID sortant a été accepté ; consultez le CDR Kavkom pour la cause du leg destination.";
+                : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
         },
 
         openKavkomAfterSave() {
             this.tab = 1;
             this.frameTab = 2;
 
+            // The diagnostic can test unsaved fields. After saving, replace
+            // the old SIP registration with the extension just persisted.
+            this.kavkomReady = false;
+
             if (this.interaction && this.interaction.number) {
                 this.triggerKavkomCall(this.interaction.number);
             }
+
+            this.$nextTick(() => {
+                this.$refs.kavkomWebphone?.refreshWebphone();
+            });
         },
 
         /**

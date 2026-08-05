@@ -58,6 +58,22 @@ class KavkomController extends Controller
             return response()->json($extension, 200);
         }
 
+        $effectiveCallerId = preg_replace(
+            '/\D+/',
+            '',
+            (string) ($extension['effective_caller_id_number'] ?? '')
+        );
+
+        // Kavkom's originate endpoint uses src_cid_number only for the leg
+        // that rings the agent. The caller ID presented to the prospect is
+        // bound to the extension in Kavkom (effective_caller_id_number).
+        if ($effectiveCallerId !== '' && $effectiveCallerId !== $callerId) {
+            return response()->json([
+                'success' => false,
+                'message' => "Le DID sortant de l'extension Kavkom {$extension['extension']} est {$effectiveCallerId}, alors que le CRM est configuré avec {$callerId}. Dans Kavkom, attribuez {$callerId} comme numéro sortant à l'extension {$extension['extension']}, puis réessayez.",
+            ], 200);
+        }
+
         $result = $service->originateCall(
             $config['api_token'],
             $config['domain_uuid'],
@@ -128,9 +144,22 @@ class KavkomController extends Controller
      */
     public function testFull(Request $request, KavkomService $service)
     {
-        $config = $this->getUserKavkomConfig($request);
+        // Test the values currently visible in the modal. Previously this
+        // endpoint silently ignored them and diagnosed an older saved setup,
+        // which could report a different extension and SIP domain.
+        $input = $request->validate([
+            'api_token' => ['nullable', 'string'],
+            'domain_uuid' => ['nullable', 'string'],
+            'extension' => ['nullable', 'string'],
+            'phone_number' => ['nullable', 'string'],
+        ]);
 
-        if (!$config) {
+        $config = array_merge(
+            $this->getUserKavkomConfig($request) ?: [],
+            array_filter($input, fn ($value) => $value !== null && $value !== '')
+        );
+
+        if (empty($config['api_token']) || empty($config['domain_uuid'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'Configuration Kavkom manquante : renseignez le jeton API et le domain_uuid dans les paramètres.',
@@ -185,9 +214,32 @@ class KavkomController extends Controller
         $results['tests'][] = [
             'name' => 'Extension Resolution',
             'status' => $extensionTest['success'] ? 'ok' : 'error',
-            'message' => data_get($extensionTest, 'message', 'Impossible de récupérer les extensions Kavkom.'),
+            'message' => data_get(
+                $extensionTest,
+                'message',
+                $extensionTest['success']
+                    ? "Extension Kavkom {$extensionTest['extension']} trouvée et activée."
+                    : 'Impossible de récupérer les extensions Kavkom.'
+            ),
             'extension' => $extensionTest['extension'] ?? null,
+            'effective_caller_id_number' => $extensionTest['effective_caller_id_number'] ?? null,
         ];
+
+        $configuredCallerId = preg_replace('/\D+/', '', (string) ($config['phone_number'] ?? ''));
+        $effectiveCallerId = preg_replace('/\D+/', '', (string) ($extensionTest['effective_caller_id_number'] ?? ''));
+
+        if ($configuredCallerId !== '' && $effectiveCallerId !== '' && $configuredCallerId !== $effectiveCallerId) {
+            $results['success'] = false;
+            $results['recommendations'][] = [
+                'severity' => 'critical',
+                'title' => 'DID sortant différent de celui de l’extension',
+                'steps' => [
+                    "Le CRM demande {$configuredCallerId}, mais l’extension {$extensionTest['extension']} présente {$effectiveCallerId} aux contacts.",
+                    "Dans Kavkom, attribuez {$configuredCallerId} comme DID sortant à l’extension {$extensionTest['extension']}.",
+                    'Enregistrez la modification dans Kavkom, puis relancez ce diagnostic.',
+                ],
+            ];
+        }
 
         if (!$extensionTest['success']) {
             $results['success'] = false;

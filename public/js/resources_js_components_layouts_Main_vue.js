@@ -29142,13 +29142,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.addInteraction();
     },
     interactionViaKavkom: function interactionViaKavkom(number) {
-      this.tab = 1;
-      this.frameTab = 2;
-      this.interaction = this.newInteraction();
-      this.interaction.source = "kavkom";
-      this.interaction.number = number;
-      this.addInteraction();
-      this.triggerKavkomCall(number);
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _this3.tab = 1;
+              _this3.frameTab = 2;
+              _this3.interaction = _this3.newInteraction();
+              _this3.interaction.source = "kavkom";
+              _this3.interaction.number = number;
+              // SIP events can arrive within milliseconds. Persist the
+              // interaction first so they never update a stale record.
+              _context2.prev = 5;
+              _context2.next = 8;
+              return _this3.addInteraction();
+            case 8:
+              _context2.next = 16;
+              break;
+            case 10:
+              _context2.prev = 10;
+              _context2.t0 = _context2["catch"](5);
+              console.error("Échec création interaction Kavkom", _context2.t0);
+              _this3.kavkomCallMessage = "Impossible de créer l'interaction CRM avant l'appel.";
+              _this3.kavkomCallSuccess = false;
+              return _context2.abrupt("return");
+            case 16:
+              _this3.triggerKavkomCall(number);
+            case 17:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[5, 10]]);
+      }))();
     },
     kavkomSetting: function kavkomSetting() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.OPEN_MODAL, "setting-kavkom");
@@ -29157,27 +29183,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Déclenche l'appel via l'API REST Kavkom (click-to-call officiel) :
      * POST /api/pbx/v1/active_call/call, relayé par le backend Laravel
      * (KavkomController::call). Le PBX Kavkom appelle d'abord notre
-     * softphone (le "leg agent", extension 901), auto-répondu par
+     * softphone (le "leg agent", extension sélectionnée), auquel le CRM répond
+     * automatiquement pour éviter l'expiration du leg agent, puis
      * Kavkom.vue, puis met en relation avec le numéro de destination
      * de son côté — toute la négociation média PSTN reste côté Kavkom.
      */
     triggerKavkomCall: function triggerKavkomCall(number) {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _this3$interactionPro;
-        var _this3$interactionPro2, _yield$ApiService$pos, data, _error$response, _error$response2, _error$response3;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _this4$interactionPro;
+        var _this4$interactionPro2, _yield$ApiService$pos, data, _error$response, _error$response2, _error$response3;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
               if (number) {
-                _context2.next = 3;
+                _context3.next = 3;
                 break;
               }
               console.warn("[Kavkom] Appel ignoré : aucun numéro fourni.");
-              return _context2.abrupt("return");
+              return _context3.abrupt("return");
             case 3:
               console.log("[Kavkom] Préparation de l'appel.", {
-                prospectId: (_this3$interactionPro = _this3.interactionProspect) === null || _this3$interactionPro === void 0 ? void 0 : _this3$interactionPro.id,
+                prospectId: (_this4$interactionPro = _this4.interactionProspect) === null || _this4$interactionPro === void 0 ? void 0 : _this4$interactionPro.id,
                 numberSuffix: String(number).replace(/\D/g, "").slice(-4)
               });
 
@@ -29185,76 +29212,77 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               // recevoir/auto-répondre au leg agent. S'il ne l'est pas encore,
               // on mémorise le numéro et onKavkomReady relancera l'appel dès
               // que le softphone sera prêt.
-              if (_this3.kavkomReady) {
-                _context2.next = 10;
+              if (_this4.kavkomReady) {
+                _context3.next = 10;
                 break;
               }
               console.log("[Kavkom] Appel en attente : softphone non prêt.");
-              _this3.pendingKavkomNumber = number;
-              _this3.kavkomCallMessage = "Connexion du softphone Kavkom…";
-              _this3.kavkomCallSuccess = false;
-              return _context2.abrupt("return");
+              _this4.pendingKavkomNumber = number;
+              _this4.kavkomCallMessage = "Connexion du softphone Kavkom…";
+              _this4.kavkomCallSuccess = false;
+              return _context3.abrupt("return");
             case 10:
-              _this3.callingViaKavkom = true;
-              _this3.kavkomCallMessage = "";
-              _this3.kavkomCallState = "requesting";
-              _context2.prev = 13;
-              _context2.next = 16;
+              _this4.callingViaKavkom = true;
+              _this4.kavkomCallMessage = "";
+              _this4.kavkomCallState = "requesting";
+              _context3.prev = 13;
+              _context3.next = 16;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/kavkom/call", {
                 destination: number,
-                prospect_id: (_this3$interactionPro2 = _this3.interactionProspect) === null || _this3$interactionPro2 === void 0 ? void 0 : _this3$interactionPro2.id
+                prospect_id: (_this4$interactionPro2 = _this4.interactionProspect) === null || _this4$interactionPro2 === void 0 ? void 0 : _this4$interactionPro2.id
               });
             case 16:
-              _yield$ApiService$pos = _context2.sent;
+              _yield$ApiService$pos = _context3.sent;
               data = _yield$ApiService$pos.data;
               if (data.success) {
-                _context2.next = 23;
+                _context3.next = 23;
                 break;
               }
               console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", {
                 message: data.message
               });
-              _this3.kavkomCallMessage = data.message || "Impossible de lancer l'appel Kavkom.";
-              _this3.kavkomCallSuccess = false;
-              return _context2.abrupt("return");
+              _this4.kavkomCallMessage = data.message || "Impossible de lancer l'appel Kavkom.";
+              _this4.kavkomCallSuccess = false;
+              return _context3.abrupt("return");
             case 23:
               // Kavkom may complete the agent leg before its REST response
               // returns. Never overwrite a newer SIP result with this
               // asynchronous acknowledgement.
-              if (_this3.kavkomCallState === "requesting") {
-                _this3.kavkomCallMessage = "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
-                _this3.kavkomCallSuccess = true;
-                _this3.kavkomCallState = "requested";
+              if (_this4.kavkomCallState === "requesting") {
+                _this4.kavkomCallMessage = "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
+                _this4.kavkomCallSuccess = true;
+                _this4.kavkomCallState = "requested";
               }
               console.log("[Kavkom] Appel lancé.", {
-                callUuid: data.call_uuid || null
+                callUuid: data.call_uuid || null,
+                apiConfirmation: true
               });
-              _context2.next = 31;
+              _context3.next = 31;
               break;
             case 27:
-              _context2.prev = 27;
-              _context2.t0 = _context2["catch"](13);
+              _context3.prev = 27;
+              _context3.t0 = _context3["catch"](13);
               console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
-                status: (_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
-                message: ((_error$response2 = _context2.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _context2.t0.message
+                status: (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
+                message: ((_error$response2 = _context3.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _context3.t0.message
               });
               // Kavkom can time out its HTTP response after it has already
               // sent the SIP INVITE. Preserve the newer SIP state instead
               // of hiding the Accept button behind a stale API error.
-              if (_this3.kavkomCallState === "requesting") {
-                _this3.kavkomCallMessage = ((_error$response3 = _context2.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.message) || "Kavkom n'a pas confirmé la demande. Si votre poste sonne, acceptez l'appel et ne relancez pas le bouton.";
-                _this3.kavkomCallSuccess = false;
-                _this3.kavkomCallState = "failed";
+              if (_this4.kavkomCallState === "requesting") {
+                _this4.kavkomCallMessage = ((_error$response3 = _context3.t0.response) === null || _error$response3 === void 0 || (_error$response3 = _error$response3.data) === null || _error$response3 === void 0 ? void 0 : _error$response3.message) || "Kavkom n'a pas confirmé la demande à temps. Si l'appel démarre dans le CRM, ne relancez pas le bouton.";
+                _this4.kavkomCallSuccess = false;
+                _this4.kavkomCallState = "failed";
               }
             case 31:
-              _context2.prev = 31;
-              _this3.callingViaKavkom = false;
-              return _context2.finish(31);
+              _context3.prev = 31;
+              _this4.callingViaKavkom = false;
+              return _context3.finish(31);
             case 34:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[13, 27, 31, 34]]);
+        }, _callee3, null, [[13, 27, 31, 34]]);
       }))();
     },
     onKavkomReady: function onKavkomReady() {
@@ -29270,7 +29298,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.updateInteraction();
       this.kavkomCallState = "ringing";
       this.kavkomCallSuccess = true;
-      this.kavkomCallMessage = "Votre poste sonne. Acceptez l'appel pour joindre le prospect.";
+      this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
     },
     onKavkomCallAnswered: function onKavkomCallAnswered() {
       this.interaction.status = "answered";
@@ -29301,98 +29329,107 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.callingViaKavkom = false;
       this.kavkomCallSuccess = !(durationMs !== null && durationMs < 5000);
       this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
-      this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé le leg agent avant le pont vers le prospect. Le DID sortant a été accepté ; consultez le CDR Kavkom pour la cause du leg destination.";
+      this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
     },
     openKavkomAfterSave: function openKavkomAfterSave() {
+      var _this5 = this;
       this.tab = 1;
       this.frameTab = 2;
+
+      // The diagnostic can test unsaved fields. After saving, replace
+      // the old SIP registration with the extension just persisted.
+      this.kavkomReady = false;
       if (this.interaction && this.interaction.number) {
         this.triggerKavkomCall(this.interaction.number);
       }
+      this.$nextTick(function () {
+        var _this5$$refs$kavkomWe;
+        (_this5$$refs$kavkomWe = _this5.$refs.kavkomWebphone) === null || _this5$$refs$kavkomWe === void 0 ? void 0 : _this5$$refs$kavkomWe.refreshWebphone();
+      });
     },
     /**
      *
      */
     addInteraction: function addInteraction() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              _this4.addingInteraction = true;
-              _context3.prev = 1;
-              _context3.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this4.interaction);
+              _this6.addingInteraction = true;
+              _context4.prev = 1;
+              _context4.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this6.interaction);
             case 4:
-              _this4.interaction = _context3.sent;
+              _this6.interaction = _context4.sent;
             case 5:
-              _context3.prev = 5;
-              _this4.addingInteraction = false;
-              return _context3.finish(5);
+              _context4.prev = 5;
+              _this6.addingInteraction = false;
+              return _context4.finish(5);
             case 8:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3, null, [[1,, 5, 8]]);
+        }, _callee4, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _this5$interactionPro;
-        var _this5$logKavkomWarn;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var _this7$interactionPro;
+        var _this7$logKavkomWarn;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              if (!(!_this5.interaction || !((_this5$interactionPro = _this5.interactionProspect) !== null && _this5$interactionPro !== void 0 && _this5$interactionPro.id))) {
-                _context4.next = 2;
+              if (!(!_this7.interaction || !((_this7$interactionPro = _this7.interactionProspect) !== null && _this7$interactionPro !== void 0 && _this7$interactionPro.id))) {
+                _context5.next = 2;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 2:
-              if (_this5.interactionProspect) {
-                _context4.next = 5;
+              if (_this7.interactionProspect) {
+                _context5.next = 5;
                 break;
               }
-              (_this5$logKavkomWarn = _this5.logKavkomWarn) === null || _this5$logKavkomWarn === void 0 ? void 0 : _this5$logKavkomWarn.call(_this5, "updateInteraction ignoré : aucun prospect actif");
-              return _context4.abrupt("return");
+              (_this7$logKavkomWarn = _this7.logKavkomWarn) === null || _this7$logKavkomWarn === void 0 ? void 0 : _this7$logKavkomWarn.call(_this7, "updateInteraction ignoré : aucun prospect actif");
+              return _context5.abrupt("return");
             case 5:
-              if (_this5.interaction.id) {
-                _context4.next = 16;
+              if (_this7.interaction.id) {
+                _context5.next = 16;
                 break;
               }
-              _context4.prev = 6;
-              _context4.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this5.interaction);
+              _context5.prev = 6;
+              _context5.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this7.interaction);
             case 9:
-              _this5.interaction = _context4.sent;
-              _context4.next = 15;
+              _this7.interaction = _context5.sent;
+              _context5.next = 15;
               break;
             case 12:
-              _context4.prev = 12;
-              _context4.t0 = _context4["catch"](6);
-              console.error("Échec création interaction", _context4.t0);
+              _context5.prev = 12;
+              _context5.t0 = _context5["catch"](6);
+              console.error("Échec création interaction", _context5.t0);
             case 15:
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 16:
-              _context4.prev = 16;
-              _context4.next = 19;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this5.interaction);
+              _context5.prev = 16;
+              _context5.next = 19;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this7.interaction);
             case 19:
-              _context4.next = 24;
+              _context5.next = 24;
               break;
             case 21:
-              _context4.prev = 21;
-              _context4.t1 = _context4["catch"](16);
-              console.error("Échec mise à jour interaction", _context4.t1);
+              _context5.prev = 21;
+              _context5.t1 = _context5["catch"](16);
+              console.error("Échec mise à jour interaction", _context5.t1);
             case 24:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[6, 12], [16, 21]]);
+        }, _callee5, null, [[6, 12], [16, 21]]);
       }))();
     },
     /**
@@ -29413,47 +29450,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              _this6.updatingPhoneNumber = true;
-              _context5.prev = 1;
-              _context5.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
-                id: _this6.interactionProspect.id,
-                phone_number: _this6.phoneNumber
-              });
-            case 4:
-              _context5.prev = 4;
-              _this6.updatingPhoneNumber = false;
-              _this6.tab = 0;
-              return _context5.finish(4);
-            case 8:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
-      var _this7 = this;
+      var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _this7.updatingMobilePhoneNumber = true;
+              _this8.updatingPhoneNumber = true;
               _context6.prev = 1;
               _context6.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
-                id: _this7.interactionProspect.id,
-                mobile_phone_number: _this7.mobilePhoneNumber
+                id: _this8.interactionProspect.id,
+                phone_number: _this8.phoneNumber
               });
             case 4:
               _context6.prev = 4;
-              _this7.updatingMobilePhoneNumber = false;
-              _this7.tab = 0;
+              _this8.updatingPhoneNumber = false;
+              _this8.tab = 0;
               return _context6.finish(4);
             case 8:
             case "end":
@@ -29462,45 +29474,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee6, null, [[1,, 4, 8]]);
       }))();
     },
-    fetchSelectedProspects: function fetchSelectedProspects() {
-      var _this8 = this;
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
+      var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (!(_this8.prospectsSelected.length == 0)) {
-                _context7.next = 3;
+              _this9.updatingMobilePhoneNumber = true;
+              _context7.prev = 1;
+              _context7.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
+                id: _this9.interactionProspect.id,
+                mobile_phone_number: _this9.mobilePhoneNumber
+              });
+            case 4:
+              _context7.prev = 4;
+              _this9.updatingMobilePhoneNumber = false;
+              _this9.tab = 0;
+              return _context7.finish(4);
+            case 8:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
+            case 0:
+              if (!(_this10.prospectsSelected.length == 0)) {
+                _context8.next = 3;
                 break;
               }
-              _this8.selectedProspects = [];
-              return _context7.abrupt("return");
+              _this10.selectedProspects = [];
+              return _context8.abrupt("return");
             case 3:
-              _context7.prev = 3;
-              _context7.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this8.project.slug, {
+              _context8.prev = 3;
+              _context8.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this10.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this8.prospectsSelected
+                    ids: _this10.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context7.sent;
+              _yield$ProspectServic = _context8.sent;
               data = _yield$ProspectServic.data;
-              _this8.selectedProspects = data.data.filter(function (prospect) {
+              _this10.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context7.prev = 9;
-              _this8.fetchingProspect = false;
-              return _context7.finish(9);
+              _context8.prev = 9;
+              _this10.fetchingProspect = false;
+              return _context8.finish(9);
             case 12:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
-        }, _callee7, null, [[3,, 9, 12]]);
+        }, _callee8, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -29520,24 +29557,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) switch (_context8.prev = _context8.next) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              if (newValue && _this9.leftSlideOpen(_this9.name)) {
-                _this9.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this9.interaction.number)) {
-                  _this9.interaction.number = newValue.phone_number;
+              if (newValue && _this11.leftSlideOpen(_this11.name)) {
+                _this11.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this11.interaction.number)) {
+                  _this11.interaction.number = newValue.phone_number;
                 } else {
-                  _this9.interaction.number = newValue.mobile_phone_number;
+                  _this11.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
-        }, _callee8);
+        }, _callee9);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -41532,13 +41569,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context.next = 14;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_1__["default"].post("settings/kavkom/test-full", {
                 api_token: _this.setting.api_token,
-                domain_uuid: _this.setting.domain_uuid
+                domain_uuid: _this.setting.domain_uuid,
+                extension: _this.setting.extension,
+                phone_number: _this.setting.phone_number
               });
             case 14:
               _yield$ApiService$pos = _context.sent;
               data = _yield$ApiService$pos.data;
               if (data.success) {
-                _this.testMessage = "Diagnostic réussi! Tous les tests sont passés. Vous pouvez maintenant utiliser le softphone.";
+                _this.testMessage = "Diagnostic réussi. Cliquez maintenant sur Enregistrer pour appliquer cette extension au softphone.";
                 _this.testMessageType = "success";
               } else {
                 _this.testMessage = data.message || "Le diagnostic a détecté des problèmes. Consultez les recommandations ci-dessous.";
@@ -41569,6 +41608,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     update: function update() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var _error$response2;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -41586,16 +41626,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this2.testMessage = "Paramètres enregistrés. L’interface Kavkom s’ouvre maintenant.";
               _this2.testMessageType = "success";
               window.dispatchEvent(new CustomEvent("hc:kavkom-settings-saved"));
-            case 9:
-              _context2.prev = 9;
-              _this2.updatingSetting = false;
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              return _context2.finish(9);
-            case 13:
+              _context2.next = 16;
+              break;
+            case 12:
+              _context2.prev = 12;
+              _context2.t0 = _context2["catch"](1);
+              _this2.testMessage = ((_error$response2 = _context2.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || "Impossible d'enregistrer les paramètres Kavkom.";
+              _this2.testMessageType = "error";
+            case 16:
+              _context2.prev = 16;
+              _this2.updatingSetting = false;
+              return _context2.finish(16);
+            case 19:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[1,, 9, 13]]);
+        }, _callee2, null, [[1, 12, 16, 19]]);
       }))();
     },
     showSetting: function showSetting() {
@@ -51660,6 +51707,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   props: {
     id: {
       type: String
+    },
+    // This component is only mounted from the CRM click-to-call screen.
+    // Answer the agent leg immediately so the PBX does not time it out
+    // while the user is looking for an "Accept" button.
+    autoAnswer: {
+      type: Boolean,
+      "default": true
     }
   },
   data: function data() {
@@ -51700,60 +51754,79 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.teardown();
   },
   methods: {
-    registerWebphone: function registerWebphone() {
+    /** Reconnect with the credentials saved after the component mounted. */refreshWebphone: function refreshWebphone() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _yield$ApiService$get, data, _error$response;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this2.status = "connecting";
-              _this2.isRegistered = false;
-              _this2.errorMessage = "";
-              _this2.sipErrorDetails = "";
-              _context2.prev = 4;
-              _context2.next = 7;
-              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("settings/kavkom/credentials");
-            case 7:
-              _yield$ApiService$get = _context2.sent;
-              data = _yield$ApiService$get.data;
-              if (data.success) {
-                _context2.next = 14;
-                break;
-              }
-              _this2.status = "not-configured";
-              _this2.errorMessage = data.message;
-              _this2.logError("Credentials fetch failed", {
-                response: data
-              });
-              return _context2.abrupt("return");
-            case 14:
-              _this2.extension = data.extension;
-              _this2.userContext = data.user_context;
-              _this2.logInfo("Credentials received", {
-                extension: _this2.extension,
-                userContext: data.user_context
-              });
-              _this2.connectSip(data);
-              _context2.next = 25;
-              break;
-            case 20:
-              _context2.prev = 20;
-              _context2.t0 = _context2["catch"](4);
-              _this2.status = "error";
-              _this2.errorMessage = ((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context2.t0.message || "Erreur inattendue lors de la connexion à Kavkom.";
-              _this2.logError("Credentials fetch error", {
-                error: _context2.t0
-              });
-            case 25:
+              _this2.connectionAttempts = 0;
+              _context2.next = 3;
+              return _this2.teardown();
+            case 3:
+              _context2.next = 5;
+              return _this2.registerWebphone();
+            case 5:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[4, 20]]);
+        }, _callee2);
+      }))();
+    },
+    registerWebphone: function registerWebphone() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _yield$ApiService$get, data, _error$response;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _this3.status = "connecting";
+              _this3.isRegistered = false;
+              _this3.errorMessage = "";
+              _this3.sipErrorDetails = "";
+              _context3.prev = 4;
+              _context3.next = 7;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("settings/kavkom/credentials");
+            case 7:
+              _yield$ApiService$get = _context3.sent;
+              data = _yield$ApiService$get.data;
+              if (data.success) {
+                _context3.next = 14;
+                break;
+              }
+              _this3.status = "not-configured";
+              _this3.errorMessage = data.message;
+              _this3.logError("Credentials fetch failed", {
+                response: data
+              });
+              return _context3.abrupt("return");
+            case 14:
+              _this3.extension = data.extension;
+              _this3.userContext = data.user_context;
+              _this3.logInfo("Credentials received", {
+                extension: _this3.extension,
+                userContext: data.user_context
+              });
+              _this3.connectSip(data);
+              _context3.next = 25;
+              break;
+            case 20:
+              _context3.prev = 20;
+              _context3.t0 = _context3["catch"](4);
+              _this3.status = "error";
+              _this3.errorMessage = ((_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context3.t0.message || "Erreur inattendue lors de la connexion à Kavkom.";
+              _this3.logError("Credentials fetch error", {
+                error: _context3.t0
+              });
+            case 25:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[4, 20]]);
       }))();
     },
     connectSip: function connectSip(_ref) {
-      var _this3 = this;
+      var _this4 = this;
       var extension = _ref.extension,
         password = _ref.password,
         user_context = _ref.user_context;
@@ -51771,7 +51844,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           authorizationPassword: password,
           logBuiltinEnabled: true,
           logLevel: "debug",
-          logConnector: this.createSipLogger()
+          logConnector: this.createSipLogger(),
+          transportOptions: {
+            // SimpleUser ne renseigne `server` dans
+            // transportOptions que si on ne fournit pas nous-
+            // mêmes cet objet ; on doit donc le redéfinir ici.
+            server: server,
+            // Sans ping périodique, le proxy WSS de Kavkom coupe
+            // la connexion pour inactivité (fermeture code 1006
+            // observée toutes les ~2 minutes), désenregistrant
+            // l'extension entre deux appels.
+            keepAliveInterval: 30
+          }
         },
         media: {
           constraints: {
@@ -51785,148 +51869,207 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
       this.simpleUser.delegate = {
         onRegistered: function onRegistered() {
-          _this3.isRegistered = true;
-          _this3.status = "registered";
-          _this3.logInfo("SIP registration succeeded", {
-            extension: _this3.extension
+          _this4.isRegistered = true;
+          _this4.status = "registered";
+          _this4.logInfo("SIP registration succeeded", {
+            extension: _this4.extension
           });
-          _this3.$emit("ready");
+          _this4.$emit("ready");
         },
         onUnregistered: function onUnregistered() {
-          _this3.isRegistered = false;
+          _this4.isRegistered = false;
         },
         onServerDisconnect: function onServerDisconnect(error) {
-          _this3.isRegistered = false;
+          _this4.isRegistered = false;
           if (error) {
-            _this3.status = "error";
-            _this3.errorMessage = "La connexion au softphone Kavkom a été interrompue.";
-            _this3.$emit("connection-error", _this3.errorMessage);
+            _this4.status = "error";
+            _this4.errorMessage = "La connexion au softphone Kavkom a été interrompue.";
+            _this4.$emit("connection-error", _this4.errorMessage);
           }
         },
         /** The PBX calls the WebRTC extension after the REST request.
          * The user explicitly accepts this agent leg before Kavkom
          * connects the prospect. */
         onCallReceived: function onCallReceived() {
-          _this3.status = "ringing";
-          _this3.logInfo("Appel entrant du PBX Kavkom (leg agent)");
-          _this3.playRingtone();
-          _this3.$emit("ringing-call");
+          _this4.status = "ringing";
+          _this4.logInfo("Appel entrant du PBX Kavkom (leg agent)", {
+            autoAnswer: _this4.autoAnswer
+          });
+          _this4.$emit("ringing-call");
+          if (_this4.autoAnswer) {
+            // The former local ringtone was the repeated "beep"
+            // heard while waiting for a manual response. It also
+            // made it easy to exceed the PBX agent-leg timeout.
+            _this4.stopRingtone();
+            void _this4.answer(true);
+          } else {
+            _this4.playRingtone();
+          }
         },
         onCallAnswered: function onCallAnswered() {
-          _this3.stopRingtone();
-          _this3.status = "in-call";
-          _this3.callEstablishedAt = Date.now();
-          _this3.logInfo("Appel établi (leg agent connecté)");
-          _this3.$emit("answered-call");
+          var _this4$$refs$remoteAu, _this4$$refs$remoteAu2;
+          _this4.stopRingtone();
+          _this4.status = "in-call";
+          _this4.callEstablishedAt = Date.now();
+          _this4.playRemoteAudio();
+          _this4.logInfo("Appel établi (leg agent connecté)", {
+            remoteAudioPaused: (_this4$$refs$remoteAu = _this4.$refs.remoteAudio) === null || _this4$$refs$remoteAu === void 0 ? void 0 : _this4$$refs$remoteAu.paused,
+            remoteAudioMuted: (_this4$$refs$remoteAu2 = _this4.$refs.remoteAudio) === null || _this4$$refs$remoteAu2 === void 0 ? void 0 : _this4$$refs$remoteAu2.muted
+          });
+          _this4.$emit("answered-call");
         },
         onCallHangup: function onCallHangup() {
-          var durationMs = _this3.callEstablishedAt ? Date.now() - _this3.callEstablishedAt : null;
-          _this3.callEstablishedAt = null;
-          _this3.stopRingtone();
-          _this3.status = "registered";
-          _this3.logInfo("Appel terminé");
-          _this3.$emit("hangup-call", {
+          var durationMs = _this4.callEstablishedAt ? Date.now() - _this4.callEstablishedAt : null;
+          _this4.callEstablishedAt = null;
+          _this4.stopRingtone();
+          _this4.status = "registered";
+          _this4.logInfo("Appel terminé");
+          _this4.$emit("hangup-call", {
             durationMs: durationMs
           });
         }
       };
       this.simpleUser.connect().then(function () {
-        _this3.logInfo("SIP connection established");
-        return _this3.simpleUser.register();
+        _this4.logInfo("SIP connection established");
+        return _this4.simpleUser.register();
       })["catch"](function (error) {
-        _this3.isRegistered = false;
-        _this3.status = "error";
-        var errorMsg = _this3.extractSipErrorMessage(error);
-        _this3.errorMessage = errorMsg;
-        _this3.sipErrorDetails = _this3.extractSipErrorDetails(error);
-        _this3.logError("SIP connection or registration failed", {
+        _this4.isRegistered = false;
+        _this4.status = "error";
+        var errorMsg = _this4.extractSipErrorMessage(error);
+        _this4.errorMessage = errorMsg;
+        _this4.sipErrorDetails = _this4.extractSipErrorDetails(error);
+        _this4.logError("SIP connection or registration failed", {
           error: errorMsg,
-          details: _this3.sipErrorDetails,
+          details: _this4.sipErrorDetails,
           originalError: error
         });
-        _this3.$emit("connection-error", _this3.errorMessage);
-        if (_this3.connectionAttempts < _this3.maxConnectionAttempts) {
-          _this3.connectionAttempts++;
-          _this3.logWarn("Retrying SIP connection", {
-            attempt: _this3.connectionAttempts,
-            maxAttempts: _this3.maxConnectionAttempts
+        _this4.$emit("connection-error", _this4.errorMessage);
+        if (_this4.connectionAttempts < _this4.maxConnectionAttempts) {
+          _this4.connectionAttempts++;
+          _this4.logWarn("Retrying SIP connection", {
+            attempt: _this4.connectionAttempts,
+            maxAttempts: _this4.maxConnectionAttempts
           });
           setTimeout(function () {
-            _this3.registerWebphone();
+            _this4.registerWebphone();
           }, 2000);
         }
       });
     },
     hangup: function hangup() {
       var _this$simpleUser,
-        _this4 = this;
+        _this5 = this;
       (_this$simpleUser = this.simpleUser) === null || _this$simpleUser === void 0 ? void 0 : _this$simpleUser.hangup()["catch"](function (error) {
-        _this4.logError("Failed to hang up call", {
+        _this5.logError("Failed to hang up call", {
           error: error
         });
       });
     },
     answer: function answer() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var _this5$simpleUser;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              _context3.prev = 0;
-              _context3.next = 3;
-              return (_this5$simpleUser = _this5.simpleUser) === null || _this5$simpleUser === void 0 ? void 0 : _this5$simpleUser.answer();
-            case 3:
-              _this5.logInfo("Leg agent accepté par l'utilisateur");
-              _context3.next = 12;
-              break;
-            case 6:
-              _context3.prev = 6;
-              _context3.t0 = _context3["catch"](0);
-              _this5.stopRingtone();
-              _this5.status = "registered";
-              _this5.logError("Échec de l'acceptation de l'appel Kavkom", {
-                error: _context3.t0
-              });
-              _this5.$emit("call-failed", "Impossible d'accepter l'appel Kavkom.");
-            case 12:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3, null, [[0, 6]]);
-      }))();
-    },
-    decline: function decline() {
-      var _this6 = this;
+      var _arguments = arguments,
+        _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _this6$simpleUser;
+        var automatic, _this6$simpleUser;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              _context4.prev = 0;
-              _context4.next = 3;
-              return (_this6$simpleUser = _this6.simpleUser) === null || _this6$simpleUser === void 0 ? void 0 : _this6$simpleUser.decline();
-            case 3:
-              _this6.logInfo("Leg agent refusé par l'utilisateur");
-              _context4.next = 9;
-              break;
-            case 6:
-              _context4.prev = 6;
-              _context4.t0 = _context4["catch"](0);
-              _this6.logError("Échec du refus de l'appel Kavkom", {
-                error: _context4.t0
+              automatic = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : false;
+              _context4.prev = 1;
+              _context4.next = 4;
+              return (_this6$simpleUser = _this6.simpleUser) === null || _this6$simpleUser === void 0 ? void 0 : _this6$simpleUser.answer();
+            case 4:
+              _this6.logInfo("Leg agent accepté", {
+                automatic: automatic
               });
-            case 9:
-              _context4.prev = 9;
+              _context4.next = 13;
+              break;
+            case 7:
+              _context4.prev = 7;
+              _context4.t0 = _context4["catch"](1);
               _this6.stopRingtone();
               _this6.status = "registered";
-              _this6.$emit("call-failed", "Appel Kavkom refusé.");
-              return _context4.finish(9);
-            case 14:
+              _this6.logError("Échec de l'acceptation de l'appel Kavkom", {
+                error: _context4.t0
+              });
+              _this6.$emit("call-failed", "Impossible d'accepter l'appel Kavkom.");
+            case 13:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[0, 6, 9, 14]]);
+        }, _callee4, null, [[1, 7]]);
+      }))();
+    },
+    playRemoteAudio: function playRemoteAudio() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var audio, _stream$getAudioTrack, stream;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              audio = _this7.$refs.remoteAudio;
+              if (audio) {
+                _context5.next = 4;
+                break;
+              }
+              _this7.logWarn("Élément audio distant introuvable.");
+              return _context5.abrupt("return");
+            case 4:
+              _context5.prev = 4;
+              _context5.next = 7;
+              return audio.play();
+            case 7:
+              stream = audio.srcObject;
+              _this7.logInfo("Lecture audio distante démarrée", {
+                hasStream: !!stream,
+                audioTracks: (stream === null || stream === void 0 || (_stream$getAudioTrack = stream.getAudioTracks) === null || _stream$getAudioTrack === void 0 ? void 0 : _stream$getAudioTrack.call(stream).length) || 0
+              });
+              _context5.next = 15;
+              break;
+            case 11:
+              _context5.prev = 11;
+              _context5.t0 = _context5["catch"](4);
+              _this7.logError("Lecture audio distante bloquée par le navigateur", {
+                error: _context5.t0
+              });
+              _this7.$emit("connection-error", "Le navigateur a bloqué le son de l'appel. Autorisez l'audio et le microphone pour ce site.");
+            case 15:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[4, 11]]);
+      }))();
+    },
+    decline: function decline() {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var _this8$simpleUser;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.prev = 0;
+              _context6.next = 3;
+              return (_this8$simpleUser = _this8.simpleUser) === null || _this8$simpleUser === void 0 ? void 0 : _this8$simpleUser.decline();
+            case 3:
+              _this8.logInfo("Leg agent refusé par l'utilisateur");
+              _context6.next = 9;
+              break;
+            case 6:
+              _context6.prev = 6;
+              _context6.t0 = _context6["catch"](0);
+              _this8.logError("Échec du refus de l'appel Kavkom", {
+                error: _context6.t0
+              });
+            case 9:
+              _context6.prev = 9;
+              _this8.stopRingtone();
+              _this8.status = "registered";
+              _this8.$emit("call-failed", "Appel Kavkom refusé.");
+              return _context6.finish(9);
+            case 14:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6, null, [[0, 6, 9, 14]]);
       }))();
     },
     /**
@@ -51935,7 +52078,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * est arrêtée dès que le softphone répond ou que l'appel se termine.
      */
     playRingtone: function playRingtone() {
-      var _this7 = this;
+      var _this9 = this;
       this.stopRingtone();
       var AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) {
@@ -51946,22 +52089,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.ringtoneContext = new AudioContext();
         (_this$ringtoneContext = (_this$ringtoneContext2 = this.ringtoneContext).resume) === null || _this$ringtoneContext === void 0 ? void 0 : _this$ringtoneContext.call(_this$ringtoneContext2);
         var ring = function ring() {
-          if (!_this7.ringtoneContext || _this7.status !== "ringing") {
+          if (!_this9.ringtoneContext || _this9.status !== "ringing") {
             return;
           }
-          var now = _this7.ringtoneContext.currentTime;
-          var gain = _this7.ringtoneContext.createGain();
+          var now = _this9.ringtoneContext.currentTime;
+          var gain = _this9.ringtoneContext.createGain();
           gain.gain.setValueAtTime(0.0001, now);
           gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
-          gain.connect(_this7.ringtoneContext.destination);
+          gain.connect(_this9.ringtoneContext.destination);
           [440, 480].forEach(function (frequency) {
-            var oscillator = _this7.ringtoneContext.createOscillator();
+            var oscillator = _this9.ringtoneContext.createOscillator();
             oscillator.frequency.value = frequency;
             oscillator.connect(gain);
             oscillator.start(now);
             oscillator.stop(now + 0.7);
-            _this7.ringtoneOscillators.push(oscillator);
+            _this9.ringtoneOscillators.push(oscillator);
           });
         };
         ring();
@@ -51992,13 +52135,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     teardown: function teardown() {
-      var _this8 = this;
-      if (this.simpleUser) {
-        this.simpleUser.disconnect()["catch"](function () {})["finally"](function () {
-          _this8.simpleUser = null;
-          _this8.isRegistered = false;
-        });
-      }
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var simpleUser;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
+            case 0:
+              simpleUser = _this10.simpleUser;
+              _this10.simpleUser = null;
+              _this10.isRegistered = false;
+              if (!simpleUser) {
+                _context7.next = 11;
+                break;
+              }
+              _context7.prev = 4;
+              _context7.next = 7;
+              return simpleUser.disconnect();
+            case 7:
+              _context7.next = 11;
+              break;
+            case 9:
+              _context7.prev = 9;
+              _context7.t0 = _context7["catch"](4);
+            case 11:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7, null, [[4, 9]]);
+      }))();
     },
     /**
      * Extract a user-friendly error message from SIP errors
@@ -52051,28 +52215,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return details.join(" | ");
     },
     createSipLogger: function createSipLogger() {
-      var _this9 = this;
+      var _this11 = this;
       return function (message) {
-        _this9.logDebug("SIP.js", {
+        _this11.logDebug("SIP.js", {
           message: message
         });
       };
     },
     logInfo: function logInfo(message) {
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.log("[Kavkom] ".concat(message), Object.keys(data).length > 0 ? data : "");
+      console.log("[Kavkom ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
     },
     logDebug: function logDebug(message) {
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.debug("[Kavkom DEBUG] ".concat(message), Object.keys(data).length > 0 ? data : "");
+      console.debug("[Kavkom DEBUG ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
     },
     logWarn: function logWarn(message) {
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.warn("[Kavkom WARNING] ".concat(message), Object.keys(data).length > 0 ? data : "");
+      console.warn("[Kavkom WARNING ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
     },
     logError: function logError(message) {
       var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.error("[Kavkom ERROR] ".concat(message), Object.keys(data).length > 0 ? data : "");
+      console.error("[Kavkom ERROR ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
     }
   }
 });
@@ -77734,6 +77898,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Le softphone ne compose plus le numéro de\n                                        destination lui-même : il ne fait qu'auto-\n                                        répondre au leg agent renvoyé par le PBX\n                                        Kavkom une fois l'appel déclenché via\n                                        l'API REST (triggerKavkomCall ci-dessous).\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
                 ref: "kavkomWebphone",
                 id: "kavkom-webphone",
+                "auto-answer": true,
                 onReady: $options.onKavkomReady,
                 onConnectionError: $options.onKavkomConnectionError,
                 onCallFailed: $options.onKavkomCallFailed,
@@ -88521,23 +88686,27 @@ var _hoisted_13 = {
   "class": "hc-kavkom-result-detail"
 };
 var _hoisted_14 = {
+  key: 3,
+  "class": "hc-kavkom-result-detail"
+};
+var _hoisted_15 = {
   key: 2,
   "class": "hc-kavkom-recommendations"
 };
-var _hoisted_15 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-kavkom-recommendations-header"
   }, "Recommandations:", -1 /* HOISTED */);
 });
-var _hoisted_16 = {
+var _hoisted_17 = {
   "class": "hc-kavkom-rec-title"
 };
-var _hoisted_17 = {
+var _hoisted_18 = {
   "class": "hc-kavkom-rec-steps"
 };
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["disabled"];
-var _hoisted_20 = ["textContent"];
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = ["disabled"];
+var _hoisted_21 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
@@ -88646,12 +88815,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               "class": "hc-kavkom-result-item"
             }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
               "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-result-status', test.status])
-            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.name) + " - ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.status === 'ok' ? '✓ OK' : test.status === 'error' ? '✗ ERREUR' : '⚠ ALERTE'), 1 /* TEXT */)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.message), 1 /* TEXT */), test.extension ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, " Extension: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.extension), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), test.wss_url ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" WebSocket URL: "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.wss_url), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), test.details ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.details.extensionsCount) + " extension(s) trouvée(s) ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.testRecommendations ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, [_hoisted_15, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.testRecommendations, function (rec, idx) {
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.name) + " - ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.status === 'ok' ? '✓ OK' : test.status === 'error' ? '✗ ERREUR' : '⚠ ALERTE'), 1 /* TEXT */)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.message), 1 /* TEXT */), test.extension ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, " Extension: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.extension), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), test.effective_caller_id_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, " DID sortant de l’extension: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.effective_caller_id_number), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), test.wss_url ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" WebSocket URL: "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.wss_url), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), test.details ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(test.details.extensionsCount) + " extension(s) trouvée(s) ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.testRecommendations ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [_hoisted_16, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.testRecommendations, function (rec, idx) {
             return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
               key: idx,
               "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-recommendation', rec.severity])
-            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(rec.title), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_17, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(rec.steps, function (step, stepIdx) {
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(rec.title), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", _hoisted_18, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(rec.steps, function (step, stepIdx) {
               return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
                 key: stepIdx
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(step), 1 /* TEXT */);
@@ -88668,16 +88837,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }, ["prevent"])),
             "class": "hc-button-danger",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('delete'))
-          }, null, 8 /* PROPS */, _hoisted_18)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          }, null, 8 /* PROPS */, _hoisted_19)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "button",
             "class": "hc-button-secondary",
             disabled: $data.testingConnection || !$data.setting.api_token || !$data.setting.domain_uuid,
             onClick: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.testConnection && $options.testConnection.apply($options, arguments);
             }, ["prevent"]))
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.testingConnection ? "Diagnostic en cours..." : "Diagnostic complet"), 9 /* TEXT, PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.testingConnection ? "Diagnostic en cours..." : "Diagnostic complet"), 9 /* TEXT, PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-          }, null, 8 /* PROPS */, _hoisted_20)];
+          }, null, 8 /* PROPS */, _hoisted_21)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {

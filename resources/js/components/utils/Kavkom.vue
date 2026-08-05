@@ -68,6 +68,13 @@ export default {
         id: {
             type: String,
         },
+        // This component is only mounted from the CRM click-to-call screen.
+        // Answer the agent leg immediately so the PBX does not time it out
+        // while the user is looking for an "Accept" button.
+        autoAnswer: {
+            type: Boolean,
+            default: true,
+        },
     },
 
     data() {
@@ -99,6 +106,13 @@ export default {
     },
 
     methods: {
+        /** Reconnect with the credentials saved after the component mounted. */
+        async refreshWebphone() {
+            this.connectionAttempts = 0;
+            await this.teardown();
+            await this.registerWebphone();
+        },
+
         async registerWebphone() {
             this.status = "connecting";
             this.isRegistered = false;
@@ -153,6 +167,17 @@ export default {
                     logBuiltinEnabled: true,
                     logLevel: "debug",
                     logConnector: this.createSipLogger(),
+                    transportOptions: {
+                        // SimpleUser ne renseigne `server` dans
+                        // transportOptions que si on ne fournit pas nous-
+                        // mêmes cet objet ; on doit donc le redéfinir ici.
+                        server,
+                        // Sans ping périodique, le proxy WSS de Kavkom coupe
+                        // la connexion pour inactivité (fermeture code 1006
+                        // observée toutes les ~2 minutes), désenregistrant
+                        // l'extension entre deux appels.
+                        keepAliveInterval: 30,
+                    },
                 },
                 media: {
                     constraints: { audio: true, video: false },
@@ -187,16 +212,31 @@ export default {
                  * connects the prospect. */
                 onCallReceived: () => {
                     this.status = "ringing";
-                    this.logInfo("Appel entrant du PBX Kavkom (leg agent)");
-                    this.playRingtone();
+                    this.logInfo("Appel entrant du PBX Kavkom (leg agent)", {
+                        autoAnswer: this.autoAnswer,
+                    });
                     this.$emit("ringing-call");
+
+                    if (this.autoAnswer) {
+                        // The former local ringtone was the repeated "beep"
+                        // heard while waiting for a manual response. It also
+                        // made it easy to exceed the PBX agent-leg timeout.
+                        this.stopRingtone();
+                        void this.answer(true);
+                    } else {
+                        this.playRingtone();
+                    }
                 },
 
                 onCallAnswered: () => {
                     this.stopRingtone();
                     this.status = "in-call";
                     this.callEstablishedAt = Date.now();
-                    this.logInfo("Appel établi (leg agent connecté)");
+                    this.playRemoteAudio();
+                    this.logInfo("Appel établi (leg agent connecté)", {
+                        remoteAudioPaused: this.$refs.remoteAudio?.paused,
+                        remoteAudioMuted: this.$refs.remoteAudio?.muted,
+                    });
                     this.$emit("answered-call");
                 },
 
@@ -252,15 +292,38 @@ export default {
                 });
         },
 
-        async answer() {
+        async answer(automatic = false) {
             try {
                 await this.simpleUser?.answer();
-                this.logInfo("Leg agent accepté par l'utilisateur");
+                this.logInfo("Leg agent accepté", { automatic });
             } catch (error) {
                 this.stopRingtone();
                 this.status = "registered";
                 this.logError("Échec de l'acceptation de l'appel Kavkom", { error });
                 this.$emit("call-failed", "Impossible d'accepter l'appel Kavkom.");
+            }
+        },
+
+        async playRemoteAudio() {
+            const audio = this.$refs.remoteAudio;
+            if (!audio) {
+                this.logWarn("Élément audio distant introuvable.");
+                return;
+            }
+
+            try {
+                await audio.play();
+                const stream = audio.srcObject;
+                this.logInfo("Lecture audio distante démarrée", {
+                    hasStream: !!stream,
+                    audioTracks: stream?.getAudioTracks?.().length || 0,
+                });
+            } catch (error) {
+                this.logError("Lecture audio distante bloquée par le navigateur", { error });
+                this.$emit(
+                    "connection-error",
+                    "Le navigateur a bloqué le son de l'appel. Autorisez l'audio et le microphone pour ce site."
+                );
             }
         },
 
@@ -345,15 +408,17 @@ export default {
             }
         },
 
-        teardown() {
-            if (this.simpleUser) {
-                this.simpleUser
-                    .disconnect()
-                    .catch(() => {})
-                    .finally(() => {
-                        this.simpleUser = null;
-                        this.isRegistered = false;
-                    });
+        async teardown() {
+            const simpleUser = this.simpleUser;
+            this.simpleUser = null;
+            this.isRegistered = false;
+
+            if (simpleUser) {
+                try {
+                    await simpleUser.disconnect();
+                } catch (_) {
+                    // The old WSS transport may already be closed.
+                }
             }
         },
 
@@ -421,28 +486,28 @@ export default {
 
         logInfo(message, data = {}) {
             console.log(
-                `[Kavkom] ${message}`,
+                `[Kavkom ${new Date().toISOString()}] ${message}`,
                 Object.keys(data).length > 0 ? data : ""
             );
         },
 
         logDebug(message, data = {}) {
             console.debug(
-                `[Kavkom DEBUG] ${message}`,
+                `[Kavkom DEBUG ${new Date().toISOString()}] ${message}`,
                 Object.keys(data).length > 0 ? data : ""
             );
         },
 
         logWarn(message, data = {}) {
             console.warn(
-                `[Kavkom WARNING] ${message}`,
+                `[Kavkom WARNING ${new Date().toISOString()}] ${message}`,
                 Object.keys(data).length > 0 ? data : ""
             );
         },
 
         logError(message, data = {}) {
             console.error(
-                `[Kavkom ERROR] ${message}`,
+                `[Kavkom ERROR ${new Date().toISOString()}] ${message}`,
                 Object.keys(data).length > 0 ? data : ""
             );
         },

@@ -37,15 +37,17 @@ class KavkomServiceTest extends TestCase
 
         $service = new KavkomService();
 
-        $result = $service->originateCall('test-token', 'domain-uuid', '0611223344', '0699887766');
+        $result = $service->originateCall('test-token', 'domain-uuid', '901', '0699887766', [
+            'src_cid_number' => '33178902698',
+        ]);
 
         $this->assertTrue($result['success']);
         $this->assertSame('a1b2c3d4', $result['call_uuid']);
         Http::assertSent(function ($request) {
             return $request->url() === 'https://api.kavkom.com/api/pbx/v1/active_call/call'
-                && $request['src'] === '0611223344'
-                && $request['destination'] === '0699887766'
-                && $request['src_cid_number'] === '0699887766';
+                && $request['src'] === '901'
+                && $request['destination'] === '33699887766'
+                && $request['src_cid_number'] === '33178902698';
         });
     }
 
@@ -68,11 +70,13 @@ class KavkomServiceTest extends TestCase
 
         $service = new KavkomService();
 
-        $service->originateCall('test-token', 'domain-uuid', '901', '06&#xA0;18&#xA0;41&#xA0;66&#xA0;33');
+        $service->originateCall('test-token', 'domain-uuid', '901', '06&#xA0;18&#xA0;41&#xA0;66&#xA0;33', [
+            'src_cid_number' => '33178902698',
+        ]);
 
         Http::assertSent(function ($request) {
-            return $request['destination'] === '0618416633'
-                && $request['src_cid_number'] === '0618416633';
+            return $request['destination'] === '33618416633'
+                && $request['src_cid_number'] === '33178902698';
         });
     }
 
@@ -105,7 +109,7 @@ class KavkomServiceTest extends TestCase
                 'success' => true,
                 'data' => [
                     ['extension' => '901', 'enabled' => 'true'],
-                    ['extension' => '902', 'enabled' => 'true', 'password' => 'sip-secret', 'user_context' => 'client.kavkom.com'],
+                    ['extension' => '902', 'enabled' => 'true', 'password' => 'sip-secret', 'user_context' => 'client.kavkom.com', 'effective_caller_id_number' => '33178902698'],
                 ],
             ], 200),
         ]);
@@ -117,6 +121,7 @@ class KavkomServiceTest extends TestCase
         $this->assertTrue($result['success']);
         $this->assertSame('902', $result['extension']);
         $this->assertSame('sip-secret', $result['password']);
+        $this->assertSame('33178902698', $result['effective_caller_id_number']);
     }
 
     public function test_it_fails_to_resolve_extension_when_domain_has_none(): void
