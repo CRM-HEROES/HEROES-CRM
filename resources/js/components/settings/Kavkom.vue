@@ -26,7 +26,7 @@
                     />
                 </v-field>
 
-                <v-field label="Numéro Kavkom" required v-slot="{ label }">
+                <v-field label="Numéro sortant Kavkom (DID autorisé)" required v-slot="{ label }">
                     <input
                         :placeholder="label + ' ...'"
                         v-model.trim="setting.phone_number"
@@ -48,9 +48,9 @@
                 </v-field>
 
                 <div class="hc-kavkom-number-help">
-                    Indiquez votre extension Kavkom personnelle (par exemple
-                    901). Le CRM s'y connecte directement : aucun autre onglet
-                    Kavkom ne doit rester ouvert pour recevoir les appels.
+                    Indiquez le numéro sortant réellement attribué et autorisé
+                    par Kavkom (par exemple 33178902698), pas le numéro du
+                    prospect. Il sera présenté au PBX comme caller ID.
                 </div>
 
                 <div class="hc-kavkom-help">
@@ -73,6 +73,9 @@
                         <div class="hc-kavkom-result-message">{{ test.message }}</div>
                         <div v-if="test.extension" class="hc-kavkom-result-detail">
                             Extension: {{ test.extension }}
+                        </div>
+                        <div v-if="test.effective_caller_id_number" class="hc-kavkom-result-detail">
+                            DID sortant de l’extension: {{ test.effective_caller_id_number }}
                         </div>
                         <div v-if="test.wss_url" class="hc-kavkom-result-detail">
                             WebSocket URL: <code>{{ test.wss_url }}</code>
@@ -341,10 +344,12 @@ export default {
                 const { data } = await ApiService.post("settings/kavkom/test-full", {
                     api_token: this.setting.api_token,
                     domain_uuid: this.setting.domain_uuid,
+                    extension: this.setting.extension,
+                    phone_number: this.setting.phone_number,
                 });
 
                 if (data.success) {
-                    this.testMessage = "Diagnostic réussi! Tous les tests sont passés. Vous pouvez maintenant utiliser le softphone.";
+                    this.testMessage = "Diagnostic réussi. Cliquez maintenant sur Enregistrer pour appliquer cette extension au softphone.";
                     this.testMessageType = "success";
                 } else {
                     this.testMessage = data.message || "Le diagnostic a détecté des problèmes. Consultez les recommandations ci-dessous.";
@@ -377,9 +382,14 @@ export default {
                 this.testMessage = "Paramètres enregistrés. L’interface Kavkom s’ouvre maintenant.";
                 this.testMessageType = "success";
                 window.dispatchEvent(new CustomEvent("hc:kavkom-settings-saved"));
+                store.commit(CLOSE_MODAL);
+            } catch (error) {
+                this.testMessage =
+                    error.response?.data?.message ||
+                    "Impossible d'enregistrer les paramètres Kavkom.";
+                this.testMessageType = "error";
             } finally {
                 this.updatingSetting = false;
-                store.commit(CLOSE_MODAL);
             }
         },
 
