@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Import;
 use App\Models\Role;
 use App\Models\Project;
+use Illuminate\Support\Facades\DB;
 
 class RoleController extends Controller
 {
@@ -31,9 +32,18 @@ class RoleController extends Controller
         abort_unless($project->id == $role->project_id, 404);
         abort_if($import->is_processing, 404);
 
-        $import->update([
-            'roles' => array_unique(array_values(array_merge($import->roles ?: [], [$role->id])))
-        ]);
+        // Same lost-update race as UserController::update() — the
+        // "Relations" step fires one PUT per role checkbox ticked, often
+        // near-simultaneously, so reading+writing the already-loaded
+        // $import->roles array lets concurrent requests overwrite each
+        // other. Lock the row for the read+write to serialize them.
+        DB::transaction(function () use ($import, $role) {
+            $current = Import::whereKey($import->id)->lockForUpdate()->value('roles') ?: [];
+
+            Import::whereKey($import->id)->update([
+                'roles' => array_unique(array_values(array_merge($current, [$role->id]))),
+            ]);
+        });
 
         return ['message' => trans('common.success.updated_resource')];
     }
@@ -47,11 +57,15 @@ class RoleController extends Controller
         abort_unless($project->id == $role->project_id, 404);
         abort_if($import->is_processing, 404);
 
-        $import->update([
-            'roles' => array_values(array_filter($import->roles ?: [], function($roleId) use($role) {
-                return $roleId != $role->id;
-            }))
-        ]);
+        DB::transaction(function () use ($import, $role) {
+            $current = Import::whereKey($import->id)->lockForUpdate()->value('roles') ?: [];
+
+            Import::whereKey($import->id)->update([
+                'roles' => array_values(array_filter($current, function ($roleId) use ($role) {
+                    return $roleId != $role->id;
+                })),
+            ]);
+        });
 
         return ['message' => trans('common.success.deleted_resource')];
     }

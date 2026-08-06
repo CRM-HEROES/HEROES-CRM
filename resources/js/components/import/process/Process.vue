@@ -433,6 +433,18 @@ export default {
          * Launch import
          */
         async processImport() {
+            // The "Importer" button stays visible/clickable during the
+            // network round-trip (is_processing only flips locally once the
+            // request resolves), so a fast double-click fired two PUT
+            // requests for the same import. Both raced the isDirty() check
+            // in ImportObserver::launchOrStop() and each dispatched its own
+            // ImportProspects job, causing two workers to process — and
+            // wipe out — the same import concurrently. Guarding here so a
+            // second click while the first request is in flight is a no-op.
+            if (this.processingImport) {
+                return;
+            }
+
             this.processingImport = true;
 
             // Référence à l'import courant : reste valide même après avoir
