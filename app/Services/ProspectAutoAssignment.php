@@ -10,6 +10,7 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 
 class ProspectAutoAssignment
 {
@@ -73,8 +74,10 @@ class ProspectAutoAssignment
 
     /**
      * Assign a batch of prospects belonging to the same project, dispatching them
-     * proportionally (round-robin on the least-loaded eligible user) using a single
-     * in-memory load count instead of re-querying the database for each prospect.
+     * one by one in strict round-robin order across the eligible users (1st
+     * prospect to the 1st user, 2nd to the 2nd, ..., wrapping back to the 1st
+     * once every user has had a turn) — so N prospects split evenly across
+     * K users regardless of each user's pre-existing historical load.
      *
      * MODIFIÉ: accepte maintenant $roleIds (rôles sélectionnés pour
      * l'import de ces prospects) et le transmet à getProjectUsers().
@@ -90,9 +93,8 @@ class ProspectAutoAssignment
             return 0;
         }
 
-        $counts = $this->getProjectUserCounts($project);
         $orderedUsers = $users->sortBy('id')->values();
-        $loads = $orderedUsers->mapWithKeys(fn(User $user) => [$user->id => (int)($counts[$user->id] ?? 0)])->all();
+        $rotationKey = $orderedUsers->pluck('id')->all();
 
         $assigned = 0;
 
@@ -101,15 +103,11 @@ class ProspectAutoAssignment
                 continue;
             }
 
-            $candidate = $this->leastLoadedUser($orderedUsers, $loads);
-            if (!$candidate) {
-                continue;
-            }
+            $candidate = $orderedUsers[$this->nextRoundRobinPosition($rotationKey) % $orderedUsers->count()];
 
             if (!$this->attachProspectToUser($prospect, $candidate)) {
                 continue;
             }
-            $loads[$candidate->id]++;
             $assigned++;
         }
 
@@ -144,37 +142,27 @@ class ProspectAutoAssignment
             return false;
         }
 
-        $counts = $this->getProjectUserCounts($project);
         $orderedUsers = $users->sortBy('id')->values();
-        $loads = $orderedUsers->mapWithKeys(fn(User $user) => [$user->id => (int)($counts[$user->id] ?? 0)])->all();
-
-        $candidate = $this->leastLoadedUser($orderedUsers, $loads);
-        if (!$candidate) {
-            return false;
-        }
+        $candidate = $orderedUsers[$this->nextRoundRobinPosition($orderedUsers->pluck('id')->all()) % $orderedUsers->count()];
 
         return $this->attachProspectToUser($prospect, $candidate);
     }
 
     /**
-     * Picks the user with the lowest current load. Ties are broken deterministically
-     * by user id (orderedUsers is sorted ascending by id), so the same batch always
-     * dispatches prospects the same way — no external/AI dependency involved.
+     * Atomically advances (and returns) the rotation counter shared by every
+     * caller assigning against the same pool of eligible users — keyed by
+     * the sorted user IDs, so an import selecting users [2,4,7] rotates
+     * independently from one selecting [1,3]. Redis' INCR is atomic, so
+     * concurrent workers (e.g. several import batches running at once)
+     * never hand out the same turn twice, guaranteeing the strict 1-2-3-1-2-3
+     * distribution regardless of how many processes are assigning at once.
      */
-    protected function leastLoadedUser($orderedUsers, array $loads): ?User
+    protected function nextRoundRobinPosition(array $candidateUserIds): int
     {
-        $candidate = null;
-        $minLoad = null;
+        sort($candidateUserIds);
+        $key = 'prospect_assignment_round_robin:' . implode('-', $candidateUserIds);
 
-        foreach ($orderedUsers as $user) {
-            $load = $loads[$user->id] ?? 0;
-            if ($minLoad === null || $load < $minLoad) {
-                $minLoad = $load;
-                $candidate = $user;
-            }
-        }
-
-        return $candidate;
+        return (int) Redis::incr($key) - 1;
     }
 
     protected function attachProspectToUser(Prospect $prospect, User $candidate): bool
@@ -298,42 +286,54 @@ class ProspectAutoAssignment
             return collect();
         }
 
-        // Un utilisateur doit avoir eu au moins une activité aujourd'hui
-        // (peu importe l'heure exacte) pour être éligible.
-        $today = Carbon::today();
-
+        // SUPPRIMÉ: l'exigence "actif aujourd'hui" (last_activity du jour).
+        // Elle excluait totalement les utilisateurs sélectionnés pour un
+        // import dès qu'ils n'avaient pas encore ouvert l'appli dans la
+        // journée, ramenant le pool de candidats à 0 (ou 1, cassant la
+        // répartition proportionnelle) même si l'utilisateur restait un
+        // destinataire valide pour ces prospects.
         return $project->users()
             ->whereNull('banned_at')
             ->whereIn('users.id', $candidateUserIds)
             ->get(['users.id', 'users.name', 'users.role', 'users.last_activity'])
-            ->filter(function (User $user) use ($busyUserIds, $excludeUserIds, $today) {
+            ->filter(function (User $user) use ($busyUserIds, $excludeUserIds) {
                 return !in_array($user->id, $busyUserIds, true)
-                    && !in_array($user->id, $excludeUserIds, true)
-                    && $user->last_activity
-                    && Carbon::parse($user->last_activity)->isSameDay($today);
+                    && !in_array($user->id, $excludeUserIds, true);
             })
             ->values();
     }
 
     /**
-     * IDs of users currently in an RDV (events.started_at <= now <= events.ended_at).
+     * IDs of users currently "off" — not just in any ongoing RDV, but in an
+     * ongoing event that is either longer than 1 day (an absence/leave
+     * rather than a short appointment) or booked on the "Off" calendar.
+     * A short RDV no longer makes a user ineligible for auto-assignment.
      */
     protected function getUsersInOngoingEvent(): array
     {
         $now = Carbon::now();
 
+        $offCondition = function ($query) {
+            $query->where('calendars.name', 'Off')
+                ->orWhereRaw('TIMESTAMPDIFF(SECOND, events.started_at, events.ended_at) > 86400');
+        };
+
         $directUserIds = DB::table('events')
-            ->whereNull('deleted_at')
-            ->whereNotNull('user_id')
-            ->where('started_at', '<=', $now)
-            ->where('ended_at', '>=', $now)
-            ->pluck('user_id');
+            ->join('calendars', 'calendars.id', '=', 'events.calendar_id')
+            ->whereNull('events.deleted_at')
+            ->whereNotNull('events.user_id')
+            ->where('events.started_at', '<=', $now)
+            ->where('events.ended_at', '>=', $now)
+            ->where($offCondition)
+            ->pluck('events.user_id');
 
         $pivotUserIds = DB::table('user_event')
             ->join('events', 'events.id', '=', 'user_event.event_id')
+            ->join('calendars', 'calendars.id', '=', 'events.calendar_id')
             ->whereNull('events.deleted_at')
             ->where('events.started_at', '<=', $now)
             ->where('events.ended_at', '>=', $now)
+            ->where($offCondition)
             ->pluck('user_event.user_id');
 
         return $directUserIds->merge($pivotUserIds)
@@ -393,14 +393,8 @@ class ProspectAutoAssignment
                 continue;
             }
 
-            $counts = $this->getProjectUserCounts($project);
             $orderedUsers = $availableUsers->sortBy('id')->values();
-            $loads = $orderedUsers->mapWithKeys(fn(User $user) => [$user->id => (int)($counts[$user->id] ?? 0)])->all();
-
-            $candidate = $this->leastLoadedUser($orderedUsers, $loads);
-            if (!$candidate) {
-                continue;
-            }
+            $candidate = $orderedUsers[$this->nextRoundRobinPosition($orderedUsers->pluck('id')->all()) % $orderedUsers->count()];
 
             DB::table('prospect_user')
                 ->where('prospect_id', $prospect->id)
@@ -419,17 +413,6 @@ class ProspectAutoAssignment
         }
 
         return $reassigned;
-    }
-
-    protected function getProjectUserCounts(Project $project): array
-    {
-        return DB::table('prospect_user')
-            ->join('prospects', 'prospect_user.prospect_id', '=', 'prospects.id')
-            ->where('prospects.project_id', $project->id)
-            ->select('prospect_user.user_id', DB::raw('count(*) as total'))
-            ->groupBy('prospect_user.user_id')
-            ->pluck('total', 'prospect_user.user_id')
-            ->toArray();
     }
 
     /**

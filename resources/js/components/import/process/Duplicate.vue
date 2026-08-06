@@ -237,6 +237,14 @@ export default {
 
     watch: {
         async duplicateFields(newValue) {
+            // prospectImport can turn null between the setter running and
+            // this watcher firing (e.g. the import was removed from the
+            // store, navigation away from the import screen), so this must
+            // not assume it is still set.
+            if (!this.prospectImport) {
+                return;
+            }
+
             try {
                 await store.dispatch(UPDATE_IMPORT, {
                     id: this.prospectImport.id,
@@ -258,6 +266,9 @@ export default {
                     : [];
             },
             set(value) {
+                if (!this.prospectImport) {
+                    return;
+                }
                 this.prospectImport.duplicates_fields = value;
             },
         },
