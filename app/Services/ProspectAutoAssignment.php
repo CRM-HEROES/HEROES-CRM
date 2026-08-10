@@ -105,7 +105,7 @@ class ProspectAutoAssignment
 
             $candidate = $orderedUsers[$this->nextRoundRobinPosition($rotationKey) % $orderedUsers->count()];
 
-            if (!$this->attachProspectToUser($prospect, $candidate)) {
+            if (!$this->assignIfStillUnassigned($prospect, $candidate)) {
                 continue;
             }
             $assigned++;
@@ -145,7 +145,33 @@ class ProspectAutoAssignment
         $orderedUsers = $users->sortBy('id')->values();
         $candidate = $orderedUsers[$this->nextRoundRobinPosition($orderedUsers->pluck('id')->all()) % $orderedUsers->count()];
 
-        return $this->attachProspectToUser($prospect, $candidate);
+        return $this->assignIfStillUnassigned($prospect, $candidate);
+    }
+
+    /**
+     * The end-of-import batch assignment (assignUnassignedProspects, called
+     * from ImportProspects) and the "app:assign-prospects" scheduled command
+     * (every 5 minutes, via assignUnassignedProspects too) both scan the
+     * same pool of prospects with no users yet. A large import can still be
+     * running when the schedule fires, so both processes see the same
+     * unassigned prospect at once: each passes the earlier "no user yet"
+     * check, then each attaches its own (different) candidate — the
+     * prospect ends up with two owners instead of one, breaking the 1-2-3
+     * proportional split. Locking the prospect row for the check+attach
+     * serializes concurrent callers: whichever commits first wins, the
+     * other sees the row already assigned once it acquires the lock.
+     */
+    protected function assignIfStillUnassigned(Prospect $prospect, User $candidate): bool
+    {
+        return DB::transaction(function () use ($prospect, $candidate) {
+            DB::table('prospects')->where('id', $prospect->id)->lockForUpdate()->first();
+
+            if (DB::table('prospect_user')->where('prospect_id', $prospect->id)->exists()) {
+                return false;
+            }
+
+            return $this->attachProspectToUser($prospect, $candidate);
+        });
     }
 
     /**

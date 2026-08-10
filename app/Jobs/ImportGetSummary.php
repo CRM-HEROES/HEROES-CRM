@@ -71,7 +71,12 @@ class ImportGetSummary implements ShouldQueue
                 }
 
                 if ($isHeaderRow) {
-                    $headers = $data;
+                    // Only the first sheet's header defines the column
+                    // mapping (applied by index to every sheet), so a
+                    // later sheet's header row must not overwrite it.
+                    if ($headers === null) {
+                        $headers = $data;
+                    }
                     $isHeaderRow = false;
                 } else {
                     $values[] = $data;
