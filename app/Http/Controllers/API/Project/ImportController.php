@@ -151,8 +151,9 @@ class ImportController extends Controller
     }
 
     /**
-     * Download the CSV export of a public Google Sheets URL
-     * and store it on the "imports" disk, exactly like an uploaded file.
+     * Download the XLSX export of a public Google Sheets URL (all of its
+     * sheets/tabs) and store it on the "imports" disk, exactly like an
+     * uploaded file.
      */
     protected function storeGoogleSheet(string $url, Project $project)
     {
@@ -163,16 +164,17 @@ class ImportController extends Controller
         }
 
         $spreadsheetId = $matches[1];
-        $gid = null;
-        if (preg_match('~[?#&]gid=(\d+)~', $url, $gidMatches)) {
-            $gid = $gidMatches[1];
-        }
 
-        // Ne pas ajouter "gid=0" par défaut : ce n'est pas toujours l'identifiant
-        // du premier onglet (l'export renvoie alors 400/404). Sans "gid", Google
-        // exporte automatiquement le premier onglet du document.
-        $exportUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/export?format=csv"
-            . ($gid !== null ? "&gid={$gid}" : '');
+        // Export the whole workbook as XLSX (not a single-tab CSV export) so
+        // that every sheet/tab in the document gets imported, not just the
+        // one the shared URL happens to point to. ImportProspects reads
+        // every sheet of the workbook via Box Spout's sheet iterator.
+        return $this->downloadGoogleSheetXlsx($spreadsheetId, $project);
+    }
+
+    protected function downloadGoogleSheetXlsx(string $spreadsheetId, Project $project)
+    {
+        $exportUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/export?format=xlsx";
 
         try {
             $response = Http::timeout(15)->connectTimeout(5)->get($exportUrl);
@@ -188,7 +190,7 @@ class ImportController extends Controller
             ]);
         }
 
-        $name = Str::random(30) . '.csv';
+        $name = Str::random(30) . '.xlsx';
         $path = $project->slug . '/' . $name;
 
         Storage::disk('imports')->put($path, $response->body());

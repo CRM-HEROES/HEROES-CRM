@@ -111,10 +111,7 @@ class ImportProspects implements ShouldQueue
      */
     protected function getKnownDefaultField($header): ?string
     {
-        $header = Str::ascii((string) $header);
-        $header = str_replace(['\\_', '_'], ' ', $header);
-        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
-        $header = strtolower(trim(preg_replace('/\s+/', ' ', $header)));
+        $header = $this->normalizeHeaderText($header);
 
         return [
             'email' => 'email',
@@ -133,6 +130,81 @@ class ImportProspects implements ShouldQueue
             'created at' => 'created_at',
             'date de creation' => 'created_at',
         ][$header] ?? null;
+    }
+
+    /**
+     * Normalize a header for comparison: strip accents/case/punctuation so
+     * that "E-mail", "e_mail" and "E Mail" are recognised as the same header.
+     */
+    protected function normalizeHeaderText($header): string
+    {
+        $header = Str::ascii((string) $header);
+        $header = str_replace(['\\_', '_'], ' ', $header);
+        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
+
+        return strtolower(trim(preg_replace('/\s+/', ' ', $header)));
+    }
+
+    /**
+     * A spreadsheet's column meaning: the CRM field it is already known to
+     * map to, or its normalized text when it isn't a recognised alias.
+     * Comparing this between two headers tells us whether they refer to the
+     * same column even if worded differently (e.g. "email" / "e-mail").
+     */
+    protected function resolveHeaderAlias($header): string
+    {
+        return $this->getKnownDefaultField($header) ?? $this->normalizeHeaderText($header);
+    }
+
+    /**
+     * Build a map from a sheet's own column index to the column index of
+     * the import's reference headers (taken from the first sheet). Needed
+     * because a workbook can contain several tabs whose columns are not in
+     * the same order, or are missing/adding a few, e.g. one Google Sheets
+     * tab per campaign. Columns that cannot be matched to a reference
+     * header are dropped rather than corrupting other fields by shifting
+     * columns.
+     */
+    protected function buildSheetColumnMap(array $sheetHeader): array
+    {
+        $masterHeaders = $this->import->headers ?: [];
+
+        if (empty($masterHeaders)) {
+            // No reference headers to align to: keep the sheet's own order.
+            return array_combine(array_keys($sheetHeader), array_keys($sheetHeader));
+        }
+
+        $masterAliases = array_map(function ($header) {
+            return $this->resolveHeaderAlias($header);
+        }, $masterHeaders);
+
+        $columnMap = [];
+
+        foreach ($sheetHeader as $sheetIndex => $header) {
+            $masterIndex = array_search($this->resolveHeaderAlias($header), $masterAliases, true);
+
+            if ($masterIndex !== false) {
+                $columnMap[$sheetIndex] = $masterIndex;
+            }
+        }
+
+        return $columnMap;
+    }
+
+    /**
+     * Reorder a sheet's row so its values sit at the same column index as
+     * the import's reference headers, using the map built by
+     * buildSheetColumnMap(). Unmatched source columns are dropped.
+     */
+    protected function remapRowToMasterColumns(array $row, array $columnMap): array
+    {
+        $remapped = [];
+
+        foreach ($columnMap as $sheetIndex => $masterIndex) {
+            $remapped[$masterIndex] = $row[$sheetIndex] ?? null;
+        }
+
+        return $remapped;
     }
 
     /**
@@ -240,13 +312,15 @@ class ImportProspects implements ShouldQueue
         $reader->open($filepath);
 
         // SHEET LOOP
-        // Loop through the spreadsheet sheets
+        // Loop through all sheets in the workbook so Google Sheets
+        // imports can import every tab in the document.
         foreach ($reader->getSheetIterator() as $sheet) {
 
             // Indicate the first row
             // as the header of the file
             $isHeaderRow = true;
             $headerRow = null;
+            $columnMap = [];
 
             // ROW LOOP
             // Loop through the sheet rows
@@ -256,6 +330,12 @@ class ImportProspects implements ShouldQueue
                 if ($isHeaderRow) {
                     $isHeaderRow = false;
                     $headerRow = $this->getCellsValues($r);
+                    // Different tabs of the same Google Sheets document can
+                    // have columns in a different order, missing, or extra
+                    // ones — align this sheet's columns to the reference
+                    // headers instead of assuming the same column index
+                    // means the same field on every sheet.
+                    $columnMap = $this->buildSheetColumnMap($headerRow);
                     continue;
                 }
 
@@ -270,6 +350,9 @@ class ImportProspects implements ShouldQueue
                 if ($row === $headerRow) {
                     continue;
                 }
+
+                // Realign this sheet's row to the reference column order.
+                $row = $this->remapRowToMasterColumns($row, $columnMap);
 
                 // Convert import row to prospect data
                 $prospect = $this->importRowToProspect($row, $rowsCount);
@@ -309,8 +392,6 @@ class ImportProspects implements ShouldQueue
                 }
             }
 
-            // We only import the first sheet in the import file
-            break;
         }
 
         // Create remaining prospects
