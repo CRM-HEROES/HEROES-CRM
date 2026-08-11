@@ -728,7 +728,7 @@ class ImportProspects implements ShouldQueue
             $reader = ReaderEntityFactory::createCSVReader();
 
             if ($this->import->field_delimiter) {
-                $reader->setFieldDelimiter($this->import->field_delimiter);
+                $reader->setFieldDelimiter($this->normalizeCsvDelimiter($this->import->field_delimiter));
             }
 
             if ($this->import->field_enclosure) {
@@ -745,6 +745,14 @@ class ImportProspects implements ShouldQueue
 
         // XLSX
         return ReaderEntityFactory::createXLSXReader();
+    }
+
+    /**
+     * Normalize CSV delimiter values to actual parser delimiters.
+     */
+    protected function normalizeCsvDelimiter(string $delimiter): string
+    {
+        return $delimiter === 'tab' ? "\t" : $delimiter;
     }
 
     /**
