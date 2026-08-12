@@ -57,18 +57,30 @@ information que le prospect n'a pas confirmée.`;
  * The wire protocol (setup/realtimeInput/serverContent) mirrors
  * resources/js/components/utils/VoiceAssistant.vue, already validated
  * against the Gemini Live API. Function-calling message shapes
- * (toolCall/toolResponse) follow Gemini's general tool-use contract but
- * have not been exercised against a live Gemini Live session — verify
- * with real traffic (log raw messages) once a GEMINI_API_KEY is available.
+ * (toolCall/clientContent/toolResponse) match the official Live API
+ * reference (https://ai.google.dev/api/live), but have only been
+ * exercised via simulate-call.js (text mode) — the AUDIO path used by
+ * real calls shares all of this code and only swaps the transport, so a
+ * clean simulate-call.js run is a good signal, but a real call should
+ * still be checked once FreeSWITCH is in place.
  */
 class GeminiCallBridge {
     constructor({ callUuid, prospectId }) {
         this.callUuid = callUuid;
         this.prospectId = prospectId;
         this.ws = null;
+        this.ready = false;
         this.collected = {};
         this.transcript = [];
-        this.onAudio = null; // (base64Pcm24k) => void, set by the caller
+        this.onAudio = null; // (base64Pcm24k) => void, set by the caller (ws-server.js)
+        this.onText = null; // (text) => void, set by the caller (simulate-call.js); fed
+        // from outputAudioTranscription — the native-audio models used here only
+        // support the AUDIO response modality (confirmed against a live session:
+        // requesting TEXT gets the connection closed with code 1007), so text mode
+        // just means "connect normally but don't play the audio back", not a
+        // different modality.
+        this.onReady = null; // () => void, fires once Gemini has acked the setup message
+        this.onTurnComplete = null; // () => void, fires once Gemini has finished responding to a turn
     }
 
     connect() {
@@ -118,6 +130,22 @@ class GeminiCallBridge {
         );
     }
 
+    /** Text equivalent of pushAudio(), used by simulate-call.js. */
+    pushText(text) {
+        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+            return;
+        }
+        this.transcript.push(`Interlocuteur (simulé): ${text}`);
+        this.ws.send(
+            JSON.stringify({
+                clientContent: {
+                    turns: [{ role: "user", parts: [{ text }] }],
+                    turnComplete: true,
+                },
+            })
+        );
+    }
+
     _handleMessage(raw) {
         let message;
         try {
@@ -129,6 +157,10 @@ class GeminiCallBridge {
 
         if (message.setupComplete) {
             console.log(`[Gemini ${this.callUuid}] Setup complete.`);
+            this.ready = true;
+            if (this.onReady) {
+                this.onReady();
+            }
             return;
         }
 
@@ -145,6 +177,12 @@ class GeminiCallBridge {
                 if (part.inlineData?.data && this.onAudio) {
                     this.onAudio(part.inlineData.data);
                 }
+                if (part.text) {
+                    this.transcript.push(`IA: ${part.text}`);
+                    if (this.onText) {
+                        this.onText(part.text);
+                    }
+                }
             });
 
             if (content.inputTranscription?.text) {
@@ -152,6 +190,13 @@ class GeminiCallBridge {
             }
             if (content.outputTranscription?.text) {
                 this.transcript.push(`IA: ${content.outputTranscription.text}`);
+                if (this.onText) {
+                    this.onText(content.outputTranscription.text);
+                }
+            }
+
+            if (content.turnComplete && this.onTurnComplete) {
+                this.onTurnComplete();
             }
         }
     }
@@ -174,7 +219,6 @@ class GeminiCallBridge {
                 toolResponse: {
                     functionResponses: calls.map((call) => ({
                         id: call.id,
-                        name: call.name,
                         response: { result: "ok" },
                     })),
                 },
@@ -197,7 +241,7 @@ class GeminiCallBridge {
     }
 
     async finalize() {
-        if (this.ws) {
+        if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             try {
                 this.ws.close();
             } catch (_) {
