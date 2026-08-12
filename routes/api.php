@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\API\AiPhoneAgentController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\GeminiLiveController;
 use App\Http\Controllers\API\KavkomController;
 use App\Http\Controllers\API\KavkomWebhookController;
 use App\Http\Controllers\API\ProjectController;
@@ -207,6 +209,10 @@ Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class
 // domain and API token already configured in the user's Kavkom modal.
 Route::post('/webhooks/kavkom/cdr', [KavkomWebhookController::class, 'cdr'])->name('webhooks.kavkom.cdr');
 
+// The Node ai-phone-agent bridge posts here once a live AI-answered call
+// ends. No CRM session either — authenticated by a shared secret header.
+Route::post('/webhooks/ai-phone-agent/calls', [AiPhoneAgentController::class, 'ingest'])->name('webhooks.ai-phone-agent.calls');
+
 // User Permission
 Route::get('permission', [PermissionController::class, 'index'])->name("permission");
 
@@ -270,6 +276,12 @@ Route::group([
     Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
     Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
+
+    // Gemini Live (voice assistant)
+    Route::post('/voice-assistant/token', [GeminiLiveController::class, 'token'])->name('voice-assistant.token');
+
+    // AI phone agent ("Appeler avec l'IA" on a prospect)
+    Route::post('/settings/ai-phone-agent/call', [AiPhoneAgentController::class, 'trigger'])->name('settings.ai-phone-agent.call');
 
     // Default field
     Route::get('default-field', [DefaultFieldController::class, 'index'])->name('default-field');

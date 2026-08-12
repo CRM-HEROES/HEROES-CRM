@@ -6860,20 +6860,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _context.prev = 0;
-              _context.next = 3;
+              if (_this.prospectImport) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
+              _context.prev = 2;
+              _context.next = 5;
               return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_import__WEBPACK_IMPORTED_MODULE_2__.UPDATE_IMPORT, {
                 id: _this.prospectImport.id,
                 duplicates_fields: newValue
               });
-            case 3:
-              _context.prev = 3;
-              return _context.finish(3);
             case 5:
+              _context.prev = 5;
+              return _context.finish(5);
+            case 7:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[0,, 3, 5]]);
+        }, _callee, null, [[2,, 5, 7]]);
       }))();
     }
   },
@@ -6883,6 +6889,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return this.prospectImport && this.prospectImport.duplicates_fields ? this.prospectImport.duplicates_fields : [];
       },
       set: function set(value) {
+        if (!this.prospectImport) {
+          return;
+        }
         this.prospectImport.duplicates_fields = value;
       }
     },
@@ -8280,14 +8289,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
+              if (!_this5.processingImport) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
               _this5.processingImport = true;
 
               // Référence à l'import courant : reste valide même après avoir
               // réinitialisé le panneau (SET_IMPORT null vide juste la sélection,
               // pas l'objet lui-même).
               currentImport = _this5.prospectImport;
-              _context5.prev = 2;
-              _context5.next = 5;
+              _context5.prev = 4;
+              _context5.next = 7;
               return _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_project_import__WEBPACK_IMPORTED_MODULE_5__.UPDATE_IMPORT, {
                 id: currentImport.id,
                 is_processing: true,
@@ -8295,7 +8310,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 welcome_sms_message: _this5.welcomeSmsMessage,
                 welcome_sms_source: _this5.welcomeSmsSource
               });
-            case 5:
+            case 7:
               currentImport.is_processing = true;
               currentImport.notify_welcome_sms = _this5.notifyWelcomeSms;
               currentImport.welcome_sms_message = _this5.welcomeSmsMessage;
@@ -8318,18 +8333,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _store__WEBPACK_IMPORTED_MODULE_2__["default"].commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_5__.SET_IMPORT, null);
               // Rafraîchit la liste des imports (statut à jour)
               _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_project_import__WEBPACK_IMPORTED_MODULE_5__.FETCH_IMPORTS);
-            case 14:
-              _context5.prev = 14;
+            case 16:
+              _context5.prev = 16;
               _this5.processingImport = false;
-              return _context5.finish(14);
-            case 17:
+              return _context5.finish(16);
+            case 19:
               // Tuto:
               tuto(document.getElementById("hc-import-process-prospects-table-setting"), "Utilisez les colonnes de votre import comme colonnes dans votre tableau de prospects.", "import.process.prospects-table-setting");
-            case 18:
+            case 20:
             case "end":
               return _context5.stop();
           }
-        }, _callee5, null, [[2,, 14, 17]]);
+        }, _callee5, null, [[4,, 16, 19]]);
       }))();
     },
     /**
@@ -10582,7 +10597,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dayjs/locale/fr */ "./node_modules/dayjs/locale/fr.js");
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_151__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_152__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_permission__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/permission */ "./resources/js/actions/permission.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
@@ -10732,6 +10747,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Header_vue__WEBPACK_IMPORTED_MODULE_148__ = __webpack_require__(/*! ./Header.vue */ "./resources/js/components/layouts/Header.vue");
 /* harmony import */ var _Footer_vue__WEBPACK_IMPORTED_MODULE_149__ = __webpack_require__(/*! ./Footer.vue */ "./resources/js/components/layouts/Footer.vue");
 /* harmony import */ var _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_150__ = __webpack_require__(/*! @/components/Confirm.vue */ "./resources/js/components/Confirm.vue");
+/* harmony import */ var _components_utils_VoiceAssistant_vue__WEBPACK_IMPORTED_MODULE_151__ = __webpack_require__(/*! @/components/utils/VoiceAssistant.vue */ "./resources/js/components/utils/VoiceAssistant.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -10753,6 +10769,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 // Slides and Modals
+
 
 
 
@@ -11044,7 +11061,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     MenuIconSlide: _components_menu_icon_Slide_vue__WEBPACK_IMPORTED_MODULE_145__["default"],
     TrashSlide: _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_146__["default"],
     ApiPappersSlide: _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_147__["default"],
-    Confirm: _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_150__["default"]
+    Confirm: _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_150__["default"],
+    VoiceAssistant: _components_utils_VoiceAssistant_vue__WEBPACK_IMPORTED_MODULE_151__["default"]
   },
   data: function data() {
     return {
@@ -11056,7 +11074,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     dayjs.locale(this.locale);
   },
-  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_151__.mapActions)({
+  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_152__.mapActions)({
     signOut: "auth/logout"
   })), {}, {
     logout: function logout() {
@@ -11093,7 +11111,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_151__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_151__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_151__.mapGetters)(["project", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_152__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_152__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_152__.mapGetters)(["project", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
     projectSlug: function projectSlug() {
       return this.project ? this.project.slug : null;
     }
@@ -29045,6 +29063,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       kavkomCallMessage: "",
       kavkomCallSuccess: false,
       kavkomCallState: "idle",
+      // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
+      // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
+      // au prospect une fois la conférence à 3 établie côté serveur.
+      callingViaAi: false,
+      aiCallMessage: "",
+      aiCallSuccess: false,
       // Softphone prêt = enregistré en SIP côté navigateur, capable
       // de recevoir/auto-répondre au leg agent envoyé par le PBX.
       kavkomReady: false,
@@ -29285,6 +29309,84 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3, null, [[13, 27, 31, 34]]);
       }))();
     },
+    /**
+     * "Appeler avec l'IA" : votre poste Kavkom sonne exactement comme un
+     * clic-à-appeler classique (même softphone ci-dessus), mais côté
+     * serveur le prospect est mis en conférence avec vous ET l'agent
+     * vocal Gemini Live, qui mène la conversation. Voir
+     * AiPhoneAgentController::trigger().
+     */
+    triggerAiCall: function triggerAiCall(number) {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var _this5$interactionPro;
+        var _yield$ApiService$pos2, data, _error$response4, _error$response5, _error$response6;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              if (number) {
+                _context4.next = 3;
+                break;
+              }
+              console.warn("[AI Call] Appel ignoré : aucun numéro fourni.");
+              return _context4.abrupt("return");
+            case 3:
+              if ((_this5$interactionPro = _this5.interactionProspect) !== null && _this5$interactionPro !== void 0 && _this5$interactionPro.id) {
+                _context4.next = 6;
+                break;
+              }
+              console.warn("[AI Call] Appel ignoré : aucun prospect en contexte.");
+              return _context4.abrupt("return");
+            case 6:
+              _this5.callingViaAi = true;
+              _this5.aiCallMessage = "";
+              _context4.prev = 8;
+              _context4.next = 11;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/ai-phone-agent/call", {
+                prospect_id: _this5.interactionProspect.id,
+                destination: number
+              });
+            case 11:
+              _yield$ApiService$pos2 = _context4.sent;
+              data = _yield$ApiService$pos2.data;
+              if (data.success) {
+                _context4.next = 18;
+                break;
+              }
+              console.warn("[AI Call] L'API a refusé le lancement de l'appel.", {
+                message: data.message
+              });
+              _this5.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
+              _this5.aiCallSuccess = false;
+              return _context4.abrupt("return");
+            case 18:
+              _this5.aiCallMessage = "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
+              _this5.aiCallSuccess = true;
+              console.log("[AI Call] Appel lancé.", {
+                prospectId: _this5.interactionProspect.id
+              });
+              _context4.next = 28;
+              break;
+            case 23:
+              _context4.prev = 23;
+              _context4.t0 = _context4["catch"](8);
+              console.error("[AI Call] Erreur lors du lancement de l'appel IA.", {
+                status: (_error$response4 = _context4.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status,
+                message: ((_error$response5 = _context4.t0.response) === null || _error$response5 === void 0 || (_error$response5 = _error$response5.data) === null || _error$response5 === void 0 ? void 0 : _error$response5.message) || _context4.t0.message
+              });
+              _this5.aiCallMessage = ((_error$response6 = _context4.t0.response) === null || _error$response6 === void 0 || (_error$response6 = _error$response6.data) === null || _error$response6 === void 0 ? void 0 : _error$response6.message) || "Erreur inattendue lors du lancement de l'appel avec l'IA.";
+              _this5.aiCallSuccess = false;
+            case 28:
+              _context4.prev = 28;
+              _this5.callingViaAi = false;
+              return _context4.finish(28);
+            case 31:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[8, 23, 28, 31]]);
+      }))();
+    },
     onKavkomReady: function onKavkomReady() {
       this.kavkomReady = true;
       if (this.pendingKavkomNumber) {
@@ -29332,7 +29434,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
     },
     openKavkomAfterSave: function openKavkomAfterSave() {
-      var _this5 = this;
+      var _this6 = this;
       this.tab = 1;
       this.frameTab = 2;
 
@@ -29343,93 +29445,93 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.triggerKavkomCall(this.interaction.number);
       }
       this.$nextTick(function () {
-        var _this5$$refs$kavkomWe;
-        (_this5$$refs$kavkomWe = _this5.$refs.kavkomWebphone) === null || _this5$$refs$kavkomWe === void 0 ? void 0 : _this5$$refs$kavkomWe.refreshWebphone();
+        var _this6$$refs$kavkomWe;
+        (_this6$$refs$kavkomWe = _this6.$refs.kavkomWebphone) === null || _this6$$refs$kavkomWe === void 0 ? void 0 : _this6$$refs$kavkomWe.refreshWebphone();
       });
     },
     /**
      *
      */
     addInteraction: function addInteraction() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _this6.addingInteraction = true;
-              _context4.prev = 1;
-              _context4.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this6.interaction);
+              _this7.addingInteraction = true;
+              _context5.prev = 1;
+              _context5.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this7.interaction);
             case 4:
-              _this6.interaction = _context4.sent;
+              _this7.interaction = _context5.sent;
             case 5:
-              _context4.prev = 5;
-              _this6.addingInteraction = false;
-              return _context4.finish(5);
+              _context5.prev = 5;
+              _this7.addingInteraction = false;
+              return _context5.finish(5);
             case 8:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[1,, 5, 8]]);
+        }, _callee5, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var _this7$interactionPro;
-        var _this7$logKavkomWarn;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var _this8$interactionPro;
+        var _this8$logKavkomWarn;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              if (!(!_this7.interaction || !((_this7$interactionPro = _this7.interactionProspect) !== null && _this7$interactionPro !== void 0 && _this7$interactionPro.id))) {
-                _context5.next = 2;
+              if (!(!_this8.interaction || !((_this8$interactionPro = _this8.interactionProspect) !== null && _this8$interactionPro !== void 0 && _this8$interactionPro.id))) {
+                _context6.next = 2;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 2:
-              if (_this7.interactionProspect) {
-                _context5.next = 5;
+              if (_this8.interactionProspect) {
+                _context6.next = 5;
                 break;
               }
-              (_this7$logKavkomWarn = _this7.logKavkomWarn) === null || _this7$logKavkomWarn === void 0 ? void 0 : _this7$logKavkomWarn.call(_this7, "updateInteraction ignoré : aucun prospect actif");
-              return _context5.abrupt("return");
+              (_this8$logKavkomWarn = _this8.logKavkomWarn) === null || _this8$logKavkomWarn === void 0 ? void 0 : _this8$logKavkomWarn.call(_this8, "updateInteraction ignoré : aucun prospect actif");
+              return _context6.abrupt("return");
             case 5:
-              if (_this7.interaction.id) {
-                _context5.next = 16;
+              if (_this8.interaction.id) {
+                _context6.next = 16;
                 break;
               }
-              _context5.prev = 6;
-              _context5.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this7.interaction);
+              _context6.prev = 6;
+              _context6.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this8.interaction);
             case 9:
-              _this7.interaction = _context5.sent;
-              _context5.next = 15;
+              _this8.interaction = _context6.sent;
+              _context6.next = 15;
               break;
             case 12:
-              _context5.prev = 12;
-              _context5.t0 = _context5["catch"](6);
-              console.error("Échec création interaction", _context5.t0);
+              _context6.prev = 12;
+              _context6.t0 = _context6["catch"](6);
+              console.error("Échec création interaction", _context6.t0);
             case 15:
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 16:
-              _context5.prev = 16;
-              _context5.next = 19;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this7.interaction);
+              _context6.prev = 16;
+              _context6.next = 19;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this8.interaction);
             case 19:
-              _context5.next = 24;
+              _context6.next = 24;
               break;
             case 21:
-              _context5.prev = 21;
-              _context5.t1 = _context5["catch"](16);
-              console.error("Échec mise à jour interaction", _context5.t1);
+              _context6.prev = 21;
+              _context6.t1 = _context6["catch"](16);
+              console.error("Échec mise à jour interaction", _context6.t1);
             case 24:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5, null, [[6, 12], [16, 21]]);
+        }, _callee6, null, [[6, 12], [16, 21]]);
       }))();
     },
     /**
@@ -29450,46 +29552,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              _this8.updatingPhoneNumber = true;
-              _context6.prev = 1;
-              _context6.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
-                id: _this8.interactionProspect.id,
-                phone_number: _this8.phoneNumber
-              });
-            case 4:
-              _context6.prev = 4;
-              _this8.updatingPhoneNumber = false;
-              _this8.tab = 0;
-              return _context6.finish(4);
-            case 8:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _this9.updatingMobilePhoneNumber = true;
+              _this9.updatingPhoneNumber = true;
               _context7.prev = 1;
               _context7.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
                 id: _this9.interactionProspect.id,
-                mobile_phone_number: _this9.mobilePhoneNumber
+                phone_number: _this9.phoneNumber
               });
             case 4:
               _context7.prev = 4;
-              _this9.updatingMobilePhoneNumber = false;
+              _this9.updatingPhoneNumber = false;
               _this9.tab = 0;
               return _context7.finish(4);
             case 8:
@@ -29499,45 +29576,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee7, null, [[1,, 4, 8]]);
       }))();
     },
-    fetchSelectedProspects: function fetchSelectedProspects() {
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              if (!(_this10.prospectsSelected.length == 0)) {
-                _context8.next = 3;
+              _this10.updatingMobilePhoneNumber = true;
+              _context8.prev = 1;
+              _context8.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
+                id: _this10.interactionProspect.id,
+                mobile_phone_number: _this10.mobilePhoneNumber
+              });
+            case 4:
+              _context8.prev = 4;
+              _this10.updatingMobilePhoneNumber = false;
+              _this10.tab = 0;
+              return _context8.finish(4);
+            case 8:
+            case "end":
+              return _context8.stop();
+          }
+        }, _callee8, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
+            case 0:
+              if (!(_this11.prospectsSelected.length == 0)) {
+                _context9.next = 3;
                 break;
               }
-              _this10.selectedProspects = [];
-              return _context8.abrupt("return");
+              _this11.selectedProspects = [];
+              return _context9.abrupt("return");
             case 3:
-              _context8.prev = 3;
-              _context8.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this10.project.slug, {
+              _context9.prev = 3;
+              _context9.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this11.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this10.prospectsSelected
+                    ids: _this11.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context8.sent;
+              _yield$ProspectServic = _context9.sent;
               data = _yield$ProspectServic.data;
-              _this10.selectedProspects = data.data.filter(function (prospect) {
+              _this11.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context8.prev = 9;
-              _this10.fetchingProspect = false;
-              return _context8.finish(9);
+              _context9.prev = 9;
+              _this11.fetchingProspect = false;
+              return _context9.finish(9);
             case 12:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
-        }, _callee8, null, [[3,, 9, 12]]);
+        }, _callee9, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -29557,24 +29659,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this11 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-          while (1) switch (_context9.prev = _context9.next) {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) switch (_context10.prev = _context10.next) {
             case 0:
-              if (newValue && _this11.leftSlideOpen(_this11.name)) {
-                _this11.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this11.interaction.number)) {
-                  _this11.interaction.number = newValue.phone_number;
+              if (newValue && _this12.leftSlideOpen(_this12.name)) {
+                _this12.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this12.interaction.number)) {
+                  _this12.interaction.number = newValue.phone_number;
                 } else {
-                  _this11.interaction.number = newValue.mobile_phone_number;
+                  _this12.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
-        }, _callee9);
+        }, _callee10);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -52372,6 +52474,597 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+var INPUT_SAMPLE_RATE = 16000;
+var OUTPUT_SAMPLE_RATE = 24000;
+var FLUSH_INTERVAL_MS = 200;
+var LEVEL_FFT_SIZE = 256;
+var DRAG_THRESHOLD_PX = 4;
+var POSITION_STORAGE_KEY = "hc-voice-assistant-position";
+var RECORDER_WORKLET_SOURCE = "\nclass PCMRecorderProcessor extends AudioWorkletProcessor {\n    process(inputs) {\n        const input = inputs[0];\n        if (input && input[0]) {\n            this.port.postMessage(input[0].slice());\n        }\n        return true;\n    }\n}\nregisterProcessor(\"pcm-recorder-processor\", PCMRecorderProcessor);\n";
+function floatTo16BitPCM(chunks, totalLength) {
+  var merged = new Float32Array(totalLength);
+  var offset = 0;
+  chunks.forEach(function (chunk) {
+    merged.set(chunk, offset);
+    offset += chunk.length;
+  });
+  var pcm = new Int16Array(totalLength);
+  for (var i = 0; i < totalLength; i++) {
+    var s = Math.max(-1, Math.min(1, merged[i]));
+    pcm[i] = s < 0 ? s * 0x8000 : s * 0x7fff;
+  }
+  return pcm;
+}
+function int16ArrayToBase64(int16Array) {
+  var bytes = new Uint8Array(int16Array.buffer);
+  var binary = "";
+  var chunkSize = 0x8000;
+  for (var i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+function base64ToFloat32Array(base64) {
+  var binary = atob(base64);
+  var bytes = new Uint8Array(binary.length);
+  for (var i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  var int16 = new Int16Array(bytes.buffer);
+  var float32 = new Float32Array(int16.length);
+  for (var _i = 0; _i < int16.length; _i++) {
+    float32[_i] = int16[_i] / 0x8000;
+  }
+  return float32;
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      status: "idle",
+      // idle | connecting | active | error
+      isSpeaking: false,
+      errorMessage: "",
+      ws: null,
+      mediaStream: null,
+      inputAudioContext: null,
+      inputAnalyser: null,
+      workletNode: null,
+      pendingChunks: [],
+      pendingLength: 0,
+      flushTimer: null,
+      playbackAudioContext: null,
+      playbackAnalyser: null,
+      playbackSources: [],
+      nextPlaybackTime: 0,
+      levelMeterFrame: null,
+      levelBuffer: null,
+      position: null,
+      dragging: false,
+      dragMoved: false,
+      dragStart: {
+        x: 0,
+        y: 0
+      },
+      dragOffset: {
+        x: 0,
+        y: 0
+      }
+    };
+  },
+  computed: {
+    buttonStatusClass: function buttonStatusClass() {
+      if (this.status === "connecting") return "status-connecting";
+      if (this.status === "error") return "status-error";
+      if (this.status === "active") return this.isSpeaking ? "status-speaking" : "status-listening";
+      return "status-idle";
+    },
+    iconClass: function iconClass() {
+      if (this.status === "connecting") return "fa-spinner fa-spin";
+      if (this.status === "active") return "fa-microphone-slash";
+      return "fa-microphone";
+    },
+    wrapperStyle: function wrapperStyle() {
+      if (!this.position) {
+        return {};
+      }
+      return {
+        left: "".concat(this.position.x, "px"),
+        top: "".concat(this.position.y, "px"),
+        right: "auto",
+        bottom: "auto"
+      };
+    },
+    panelBelow: function panelBelow() {
+      return !!this.position && this.position.y < 140;
+    }
+  },
+  mounted: function mounted() {
+    this.loadPosition();
+    window.addEventListener("resize", this.clampPosition);
+  },
+  beforeUnmount: function beforeUnmount() {
+    this.stop();
+    window.removeEventListener("resize", this.clampPosition);
+    window.removeEventListener("pointermove", this.onPointerMove);
+    window.removeEventListener("pointerup", this.onPointerUp);
+  },
+  methods: {
+    // Drag to reposition
+    loadPosition: function loadPosition() {
+      var _this = this;
+      try {
+        var saved = JSON.parse(localStorage.getItem(POSITION_STORAGE_KEY) || "null");
+        if (saved && typeof saved.x === "number" && typeof saved.y === "number") {
+          this.position = saved;
+          this.$nextTick(function () {
+            return _this.clampPosition();
+          });
+        }
+      } catch (_) {
+        this.position = null;
+      }
+    },
+    clampPosition: function clampPosition() {
+      if (!this.position || !this.$refs.wrapper) return;
+      var rect = this.$refs.wrapper.getBoundingClientRect();
+      var maxX = Math.max(0, window.innerWidth - rect.width);
+      var maxY = Math.max(0, window.innerHeight - rect.height);
+      this.position = {
+        x: Math.min(Math.max(this.position.x, 0), maxX),
+        y: Math.min(Math.max(this.position.y, 0), maxY)
+      };
+    },
+    onPointerDown: function onPointerDown(event) {
+      if (event.button !== undefined && event.button !== 0) return;
+      this.dragging = true;
+      this.dragMoved = false;
+      this.dragStart = {
+        x: event.clientX,
+        y: event.clientY
+      };
+      var rect = this.$refs.wrapper.getBoundingClientRect();
+      this.dragOffset = {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+      window.addEventListener("pointermove", this.onPointerMove);
+      window.addEventListener("pointerup", this.onPointerUp);
+    },
+    onPointerMove: function onPointerMove(event) {
+      if (!this.dragging) return;
+      if (!this.dragMoved) {
+        var dist = Math.hypot(event.clientX - this.dragStart.x, event.clientY - this.dragStart.y);
+        if (dist < DRAG_THRESHOLD_PX) return;
+        this.dragMoved = true;
+      }
+      var rect = this.$refs.wrapper.getBoundingClientRect();
+      var x = Math.min(Math.max(event.clientX - this.dragOffset.x, 0), window.innerWidth - rect.width);
+      var y = Math.min(Math.max(event.clientY - this.dragOffset.y, 0), window.innerHeight - rect.height);
+      this.position = {
+        x: x,
+        y: y
+      };
+    },
+    onPointerUp: function onPointerUp() {
+      this.dragging = false;
+      window.removeEventListener("pointermove", this.onPointerMove);
+      window.removeEventListener("pointerup", this.onPointerUp);
+      if (this.dragMoved && this.position) {
+        localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(this.position));
+      }
+    },
+    onButtonClick: function onButtonClick() {
+      if (this.dragMoved) {
+        this.dragMoved = false;
+        return;
+      }
+      this.toggle();
+    },
+    // Session lifecycle
+    toggle: function toggle() {
+      if (this.status === "idle" || this.status === "error") {
+        this.start();
+      } else {
+        this.stop();
+      }
+    },
+    start: function start() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var tokenData, _yield$ApiService$pos, data, _error$response, _tokenData;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _this2.status = "connecting";
+              _this2.errorMessage = "";
+              _context.prev = 2;
+              _context.next = 5;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("voice-assistant/token");
+            case 5:
+              _yield$ApiService$pos = _context.sent;
+              data = _yield$ApiService$pos.data;
+              tokenData = data;
+              _context.next = 14;
+              break;
+            case 10:
+              _context.prev = 10;
+              _context.t0 = _context["catch"](2);
+              _this2.fail(((_error$response = _context.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context.t0.message || "Erreur inattendue lors de la connexion à l'assistant vocal.");
+              return _context.abrupt("return");
+            case 14:
+              if (!(!tokenData || !tokenData.success)) {
+                _context.next = 17;
+                break;
+              }
+              _this2.fail(((_tokenData = tokenData) === null || _tokenData === void 0 ? void 0 : _tokenData.message) || "Assistant vocal indisponible.");
+              return _context.abrupt("return");
+            case 17:
+              _context.prev = 17;
+              _context.next = 20;
+              return _this2.startMicCapture();
+            case 20:
+              _context.next = 27;
+              break;
+            case 22:
+              _context.prev = 22;
+              _context.t1 = _context["catch"](17);
+              _this2.logError("Impossible d'accéder au microphone", {
+                error: _context.t1
+              });
+              _this2.fail("Impossible d'accéder au microphone. Autorisez l'accès au micro pour ce site.");
+              return _context.abrupt("return");
+            case 27:
+              _this2.connectSocket(tokenData.token, tokenData.model);
+            case 28:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[2, 10], [17, 22]]);
+      }))();
+    },
+    startMicCapture: function startMicCapture() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var AudioContextClass, blob, workletUrl, source;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _context2.next = 2;
+              return navigator.mediaDevices.getUserMedia({
+                audio: {
+                  channelCount: 1,
+                  echoCancellation: true,
+                  noiseSuppression: true
+                }
+              });
+            case 2:
+              _this3.mediaStream = _context2.sent;
+              AudioContextClass = window.AudioContext || window.webkitAudioContext;
+              _this3.inputAudioContext = new AudioContextClass({
+                sampleRate: INPUT_SAMPLE_RATE
+              });
+              blob = new Blob([RECORDER_WORKLET_SOURCE], {
+                type: "application/javascript"
+              });
+              workletUrl = URL.createObjectURL(blob);
+              _context2.prev = 7;
+              _context2.next = 10;
+              return _this3.inputAudioContext.audioWorklet.addModule(workletUrl);
+            case 10:
+              _context2.prev = 10;
+              URL.revokeObjectURL(workletUrl);
+              return _context2.finish(10);
+            case 13:
+              source = _this3.inputAudioContext.createMediaStreamSource(_this3.mediaStream);
+              _this3.inputAnalyser = _this3.inputAudioContext.createAnalyser();
+              _this3.inputAnalyser.fftSize = LEVEL_FFT_SIZE;
+              source.connect(_this3.inputAnalyser);
+              _this3.workletNode = new AudioWorkletNode(_this3.inputAudioContext, "pcm-recorder-processor");
+              _this3.workletNode.port.onmessage = function (event) {
+                _this3.pendingChunks.push(event.data);
+                _this3.pendingLength += event.data.length;
+              };
+              source.connect(_this3.workletNode);
+              _this3.flushTimer = window.setInterval(function () {
+                return _this3.flushPendingAudio();
+              }, FLUSH_INTERVAL_MS);
+              _this3.startLevelMeter();
+            case 22:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[7,, 10, 13]]);
+      }))();
+    },
+    flushPendingAudio: function flushPendingAudio() {
+      if (!this.pendingLength || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        return;
+      }
+      var pcm = floatTo16BitPCM(this.pendingChunks, this.pendingLength);
+      this.pendingChunks = [];
+      this.pendingLength = 0;
+      this.ws.send(JSON.stringify({
+        realtimeInput: {
+          audio: {
+            mimeType: "audio/pcm;rate=".concat(INPUT_SAMPLE_RATE),
+            data: int16ArrayToBase64(pcm)
+          }
+        }
+      }));
+    },
+    connectSocket: function connectSocket(token, model) {
+      var _this4 = this;
+      var url = "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContentConstrained" + "?access_token=".concat(encodeURIComponent(token));
+      this.ws = new WebSocket(url);
+      this.ws.onopen = function () {
+        _this4.logInfo("WebSocket Gemini Live ouvert");
+        _this4.ws.send(JSON.stringify({
+          setup: {
+            model: model,
+            generationConfig: {
+              responseModalities: ["AUDIO"]
+            },
+            systemInstruction: {
+              parts: [{
+                text: "Tu es l'assistant vocal du CRM Heroes. Réponds de façon brève, " + "naturelle et utile, en français sauf si on te parle dans une autre langue."
+              }]
+            }
+          }
+        }));
+      };
+      this.ws.onmessage = /*#__PURE__*/function () {
+        var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3(event) {
+          var raw, message;
+          return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+            while (1) switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!(event.data instanceof Blob)) {
+                  _context3.next = 6;
+                  break;
+                }
+                _context3.next = 3;
+                return event.data.text();
+              case 3:
+                _context3.t0 = _context3.sent;
+                _context3.next = 7;
+                break;
+              case 6:
+                _context3.t0 = event.data;
+              case 7:
+                raw = _context3.t0;
+                _context3.prev = 8;
+                message = JSON.parse(raw);
+                _context3.next = 16;
+                break;
+              case 12:
+                _context3.prev = 12;
+                _context3.t1 = _context3["catch"](8);
+                _this4.logWarn("Message Gemini illisible", {
+                  raw: raw
+                });
+                return _context3.abrupt("return");
+              case 16:
+                _this4.handleServerMessage(message);
+              case 17:
+              case "end":
+                return _context3.stop();
+            }
+          }, _callee3, null, [[8, 12]]);
+        }));
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }();
+      this.ws.onerror = function (event) {
+        _this4.logError("Erreur WebSocket Gemini Live", {
+          event: event
+        });
+      };
+      this.ws.onclose = function (event) {
+        _this4.logInfo("WebSocket Gemini Live fermé", {
+          code: event.code,
+          reason: event.reason
+        });
+        if (_this4.status === "active" || _this4.status === "connecting") {
+          _this4.fail("La connexion à l'assistant vocal a été interrompue.");
+        }
+      };
+    },
+    handleServerMessage: function handleServerMessage(message) {
+      var _this5 = this;
+      if (message.setupComplete) {
+        this.status = "active";
+        return;
+      }
+      if (message.serverContent) {
+        var _content$modelTurn;
+        var content = message.serverContent;
+        if (content.interrupted) {
+          this.stopPlayback();
+        }
+        var parts = ((_content$modelTurn = content.modelTurn) === null || _content$modelTurn === void 0 ? void 0 : _content$modelTurn.parts) || [];
+        parts.forEach(function (part) {
+          var _part$inlineData;
+          if ((_part$inlineData = part.inlineData) !== null && _part$inlineData !== void 0 && _part$inlineData.data) {
+            _this5.enqueuePlayback(part.inlineData.data);
+          }
+        });
+        if (content.turnComplete) {
+          this.isSpeaking = false;
+        }
+        return;
+      }
+      if (message.error) {
+        this.logError("Erreur renvoyée par Gemini Live", {
+          error: message.error
+        });
+        this.fail("L'assistant vocal a signalé une erreur.");
+      }
+    },
+    ensurePlaybackContext: function ensurePlaybackContext() {
+      if (!this.playbackAudioContext) {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        this.playbackAudioContext = new AudioContextClass({
+          sampleRate: OUTPUT_SAMPLE_RATE
+        });
+        this.nextPlaybackTime = 0;
+        this.playbackAnalyser = this.playbackAudioContext.createAnalyser();
+        this.playbackAnalyser.fftSize = LEVEL_FFT_SIZE;
+        this.playbackAnalyser.connect(this.playbackAudioContext.destination);
+      }
+      return this.playbackAudioContext;
+    },
+    enqueuePlayback: function enqueuePlayback(base64Data) {
+      var _this6 = this;
+      var ctx = this.ensurePlaybackContext();
+      var float32 = base64ToFloat32Array(base64Data);
+      if (!float32.length) {
+        return;
+      }
+      var buffer = ctx.createBuffer(1, float32.length, OUTPUT_SAMPLE_RATE);
+      buffer.copyToChannel(float32, 0);
+      var source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(this.playbackAnalyser);
+      var startTime = Math.max(ctx.currentTime, this.nextPlaybackTime);
+      source.start(startTime);
+      this.nextPlaybackTime = startTime + buffer.duration;
+      this.isSpeaking = true;
+      this.playbackSources.push(source);
+      source.onended = function () {
+        _this6.playbackSources = _this6.playbackSources.filter(function (s) {
+          return s !== source;
+        });
+      };
+    },
+    stopPlayback: function stopPlayback() {
+      this.playbackSources.forEach(function (source) {
+        try {
+          source.stop();
+        } catch (_) {
+          // Already stopped.
+        }
+      });
+      this.playbackSources = [];
+      this.isSpeaking = false;
+      if (this.playbackAudioContext) {
+        this.nextPlaybackTime = this.playbackAudioContext.currentTime;
+      }
+    },
+    // Audio-reactive visual feedback
+    startLevelMeter: function startLevelMeter() {
+      var _this7 = this;
+      this.levelBuffer = new Uint8Array(LEVEL_FFT_SIZE);
+      var step = function step() {
+        var analyser = _this7.isSpeaking ? _this7.playbackAnalyser : _this7.inputAnalyser;
+        if (analyser && _this7.$refs.button) {
+          analyser.getByteTimeDomainData(_this7.levelBuffer);
+          var sumSquares = 0;
+          for (var i = 0; i < _this7.levelBuffer.length; i++) {
+            var normalized = (_this7.levelBuffer[i] - 128) / 128;
+            sumSquares += normalized * normalized;
+          }
+          var rms = Math.sqrt(sumSquares / _this7.levelBuffer.length);
+          var level = Math.min(1, rms * 4);
+          _this7.$refs.button.style.setProperty("--hc-voice-level", level.toFixed(3));
+        }
+        _this7.levelMeterFrame = window.requestAnimationFrame(step);
+      };
+      this.levelMeterFrame = window.requestAnimationFrame(step);
+    },
+    stopLevelMeter: function stopLevelMeter() {
+      var _this$$refs$button;
+      if (this.levelMeterFrame) {
+        window.cancelAnimationFrame(this.levelMeterFrame);
+        this.levelMeterFrame = null;
+      }
+      (_this$$refs$button = this.$refs.button) === null || _this$$refs$button === void 0 ? void 0 : _this$$refs$button.style.setProperty("--hc-voice-level", 0);
+    },
+    // Teardown
+    fail: function fail(message) {
+      this.status = "error";
+      this.errorMessage = message;
+      this.teardown();
+    },
+    stop: function stop() {
+      this.status = "idle";
+      this.errorMessage = "";
+      this.teardown();
+    },
+    teardown: function teardown() {
+      this.stopLevelMeter();
+      if (this.flushTimer) {
+        window.clearInterval(this.flushTimer);
+        this.flushTimer = null;
+      }
+      this.pendingChunks = [];
+      this.pendingLength = 0;
+      if (this.ws) {
+        var ws = this.ws;
+        this.ws = null;
+        try {
+          ws.close();
+        } catch (_) {
+          // Already closed.
+        }
+      }
+      if (this.workletNode) {
+        this.workletNode.port.onmessage = null;
+        this.workletNode.disconnect();
+        this.workletNode = null;
+      }
+      this.inputAnalyser = null;
+      if (this.mediaStream) {
+        this.mediaStream.getTracks().forEach(function (track) {
+          return track.stop();
+        });
+        this.mediaStream = null;
+      }
+      if (this.inputAudioContext) {
+        this.inputAudioContext.close()["catch"](function () {});
+        this.inputAudioContext = null;
+      }
+      this.stopPlayback();
+      this.playbackAnalyser = null;
+      if (this.playbackAudioContext) {
+        this.playbackAudioContext.close()["catch"](function () {});
+        this.playbackAudioContext = null;
+      }
+    },
+    logInfo: function logInfo(message) {
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      console.log("[VoiceAssistant ".concat(new Date().toISOString(), "] ").concat(message), data);
+    },
+    logWarn: function logWarn(message) {
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      console.warn("[VoiceAssistant WARNING ".concat(new Date().toISOString(), "] ").concat(message), data);
+    },
+    logError: function logError(message) {
+      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+      console.error("[VoiceAssistant ERROR ".concat(new Date().toISOString(), "] ").concat(message), data);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/vehicle/add/Layout.vue?vue&type=script&lang=js":
 /*!************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/vehicle/add/Layout.vue?vue&type=script&lang=js ***!
@@ -62601,6 +63294,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tooltip");
   var _component_tutorial_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tutorial-tooltip");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_voice_assistant = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("voice-assistant");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     id: "hc-main-layout",
     onKeydown: _cache[0] || (_cache[0] = function () {
@@ -62727,7 +63421,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 2
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_user_sessions_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_locale_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_tutorial_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_confirm), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tutorial_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: _ctx.changing
-  }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */);
+  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_voice_assistant)], 32 /* HYDRATE_EVENTS */);
 }
 
 /***/ }),
@@ -77512,10 +78206,14 @@ var _hoisted_38 = {
   "class": "hc-kavkom-call-number"
 };
 var _hoisted_39 = ["disabled"];
-var _hoisted_40 = ["textContent"];
-var _hoisted_41 = ["textContent"];
+var _hoisted_40 = ["disabled"];
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fas fa-robot"
+}, null, -1 /* HOISTED */);
 var _hoisted_42 = ["textContent"];
 var _hoisted_43 = ["textContent"];
+var _hoisted_44 = ["textContent"];
+var _hoisted_45 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -77533,7 +78231,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("slide", true);
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[22] || (_cache[22] = function ($event) {
+    onOpen: _cache[23] || (_cache[23] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects();
     }),
     title: _ctx.$t('prospect.interaction.title', {
@@ -77566,7 +78264,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "4": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[15] || (_cache[15] = function ($event) {
+                onBack: _cache[16] || (_cache[16] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setInteractionProspect
@@ -77578,11 +78276,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 style: {
                   "height": "100%"
                 },
-                onSubmit: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onSubmit: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.updateProspectPhoneNumber && $options.updateProspectPhoneNumber.apply($options, arguments);
                 }, ["prevent"]))
               }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[16] || (_cache[16] = function ($event) {
+                onClick: _cache[17] || (_cache[17] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -77593,65 +78291,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_40)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-                padding: "12px",
-                style: {
-                  "height": "auto"
-                }
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-                    label: _ctx.$t('field.prospect.phone_number')
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-                        type: "tel",
-                        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
-                          return $data.phoneNumber = $event;
-                        })
-                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.phoneNumber, void 0, {
-                        lazy: true
-                      }]])];
-                    }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["label"])];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_41)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-                loading: $data.updatingPhoneNumber
-              }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
-            }),
-            "6": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-                "class": "hc-flex-column",
-                style: {
-                  "height": "100%"
-                },
-                onSubmit: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-                  return $options.updateProspectMobilePhoneNumber && $options.updateProspectMobilePhoneNumber.apply($options, arguments);
-                }, ["prevent"]))
-              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[19] || (_cache[19] = function ($event) {
-                  return $data.tab = 0;
-                }),
-                "class": "bordered"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-left"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
                   }, null, 8 /* PROPS */, _hoisted_42)];
                 }),
                 _: 1 /* STABLE */
@@ -77668,7 +78307,66 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "tel",
-                        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+                        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+                          return $data.phoneNumber = $event;
+                        })
+                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.phoneNumber, void 0, {
+                        lazy: true
+                      }]])];
+                    }),
+                    _: 1 /* STABLE */
+                  }, 8 /* PROPS */, ["label"])];
+                }),
+                _: 1 /* STABLE */
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
+                  }, null, 8 /* PROPS */, _hoisted_43)];
+                }),
+                _: 1 /* STABLE */
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+                loading: $data.updatingPhoneNumber
+              }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
+            }),
+            "6": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+                "class": "hc-flex-column",
+                style: {
+                  "height": "100%"
+                },
+                onSubmit: _cache[22] || (_cache[22] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                  return $options.updateProspectMobilePhoneNumber && $options.updateProspectMobilePhoneNumber.apply($options, arguments);
+                }, ["prevent"]))
+              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[20] || (_cache[20] = function ($event) {
+                  return $data.tab = 0;
+                }),
+                "class": "bordered"
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    "class": "fa fa-caret-left"
+                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                    "class": "hc-item-main-content",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
+                  }, null, 8 /* PROPS */, _hoisted_44)];
+                }),
+                _: 1 /* STABLE */
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+                padding: "12px",
+                style: {
+                  "height": "auto"
+                }
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+                    label: _ctx.$t('field.prospect.phone_number')
+                  }, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                        type: "tel",
+                        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
                           return $data.mobilePhoneNumber = $event;
                         })
                       }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.mobilePhoneNumber, void 0, {
@@ -77683,7 +78381,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_43)];
+                  }, null, 8 /* PROPS */, _hoisted_45)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -77911,11 +78609,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                 type: "button",
                 "class": "hc-button-secondary",
-                disabled: $data.callingViaKavkom || !$data.kavkomReady,
+                disabled: $data.callingViaKavkom || $data.callingViaAi || !$data.kavkomReady,
                 onClick: _cache[14] || (_cache[14] = function ($event) {
                   return $options.triggerKavkomCall($data.interaction.number);
                 })
-              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 9 /* TEXT, PROPS */, _hoisted_39)])])];
+              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 9 /* TEXT, PROPS */, _hoisted_39), $data.aiCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                key: 1,
+                "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.aiCallSuccess ? 'success' : 'error'])
+              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.aiCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+                type: "button",
+                "class": "hc-button-secondary hc-ai-call-button",
+                disabled: $data.callingViaKavkom || $data.callingViaAi || !$data.kavkomReady,
+                title: "L'IA parle au prospect, vous restez en ligne",
+                onClick: _cache[15] || (_cache[15] = function ($event) {
+                  return $options.triggerAiCall($data.interaction.number);
+                })
+              }, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaAi ? "Appel IA en cours..." : "Appeler avec l'IA"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_40)])])];
             }),
             key: "2"
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
@@ -96906,6 +97615,82 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-087046d5"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
+var _hoisted_1 = {
+  key: 0,
+  "class": "hc-voice-assistant-panel"
+};
+var _hoisted_2 = {
+  "class": "hc-voice-assistant-status"
+};
+var _hoisted_3 = {
+  key: 0
+};
+var _hoisted_4 = {
+  key: 1
+};
+var _hoisted_5 = {
+  key: 2
+};
+var _hoisted_6 = {
+  key: 0
+};
+var _hoisted_7 = {
+  key: 1
+};
+var _hoisted_8 = ["title"];
+var _hoisted_9 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "hc-voice-assistant-ring ring-1"
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "hc-voice-assistant-ring ring-2"
+  }, null, -1 /* HOISTED */);
+});
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    ref: "wrapper",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-voice-assistant", {
+      'panel-below': $options.panelBelow
+    }]),
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.wrapperStyle)
+  }, [$data.status !== 'idle' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [$data.status === 'connecting' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, "Connexion à l'assistant vocal…")) : $data.status === 'error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.errorMessage || "Erreur de l'assistant vocal."), 1 /* TEXT */)) : $data.status === 'active' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_5, [$data.isSpeaking ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_6, "Gemini répond…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_7, "Assistant vocal actif — parlez."))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    ref: "button",
+    type: "button",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-voice-assistant-button", [$options.buttonStatusClass, {
+      'is-dragging': $data.dragging
+    }]]),
+    title: $data.status === 'idle' ? 'Démarrer l\'assistant vocal (glisser pour déplacer)' : 'Arrêter l\'assistant vocal',
+    onPointerdown: _cache[0] || (_cache[0] = function () {
+      return $options.onPointerDown && $options.onPointerDown.apply($options, arguments);
+    }),
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $options.onButtonClick && $options.onButtonClick.apply($options, arguments);
+    })
+  }, [_hoisted_9, _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["fas", $options.iconClass])
+  }, null, 2 /* CLASS */)], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, _hoisted_8)], 6 /* CLASS, STYLE */);
+}
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/vehicle/add/Layout.vue?vue&type=template&id=09ba0174":
 /*!****************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/vehicle/add/Layout.vue?vue&type=template&id=09ba0174 ***!
@@ -99499,7 +100284,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n.hc-kavkom-settings-btn {\n    position: relative;\n    z-index: 20;\n    cursor: pointer;\n    pointer-events: auto !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n.hc-ai-call-button {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    background: #0d6efd !important;\n    border-color: #0d6efd !important;\n}\n.hc-kavkom-settings-btn {\n    position: relative;\n    z-index: 20;\n    cursor: pointer;\n    pointer-events: auto !important;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -100604,6 +101389,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ringover > div {\n    box-shadow: none !important;\n    padding-top: 0 !important;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-voice-assistant[data-v-087046d5] {\n    position: fixed;\n    right: 24px;\n    bottom: 24px;\n    z-index: 1050;\n    width: 52px;\n    height: 52px;\n}\n.hc-voice-assistant-panel[data-v-087046d5] {\n    position: absolute;\n    right: 0;\n    bottom: 64px;\n    max-width: 260px;\n    padding: 8px 12px;\n    border-radius: 8px;\n    background: #212529;\n    color: #fff;\n    font-size: 12px;\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);\n}\n.hc-voice-assistant.panel-below .hc-voice-assistant-panel[data-v-087046d5] {\n    bottom: auto;\n    top: 64px;\n}\n.hc-voice-assistant-button[data-v-087046d5] {\n    position: absolute;\n    inset: 0;\n    border-radius: 50%;\n    border: none;\n    background: #0d6efd;\n    color: #fff;\n    font-size: 20px;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);\n    cursor: grab;\n    touch-action: none;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n    transition: background-color 0.15s ease, transform 0.1s ease;\n    --hc-voice-level: 0;\n}\n.hc-voice-assistant-button.is-dragging[data-v-087046d5] {\n    cursor: grabbing;\n}\n.hc-voice-assistant-ring[data-v-087046d5] {\n    position: absolute;\n    inset: -6px;\n    border-radius: 50%;\n    border: 2px solid currentColor;\n    opacity: 0;\n    pointer-events: none;\n}\n.hc-voice-assistant-button.status-listening .hc-voice-assistant-ring[data-v-087046d5],\n.hc-voice-assistant-button.status-speaking .hc-voice-assistant-ring[data-v-087046d5] {\n    animation: hc-voice-assistant-ring-pulse-087046d5 1.8s ease-out infinite;\n}\n.hc-voice-assistant-button.status-speaking .hc-voice-assistant-ring[data-v-087046d5] {\n    animation-duration: 1s;\n}\n.hc-voice-assistant-ring.ring-2[data-v-087046d5] {\n    animation-delay: 0.5s;\n}\n.hc-voice-assistant-button.status-speaking .hc-voice-assistant-ring.ring-2[data-v-087046d5] {\n    animation-delay: 0.3s;\n}\n@keyframes hc-voice-assistant-ring-pulse-087046d5 {\n0% {\n        transform: scale(calc(1 + var(--hc-voice-level, 0) * 0.3));\n        opacity: 0.6;\n}\n100% {\n        transform: scale(1.9);\n        opacity: 0;\n}\n}\n.hc-voice-assistant-button.status-listening[data-v-087046d5],\n.hc-voice-assistant-button.status-speaking[data-v-087046d5] {\n    transform: scale(calc(1 + var(--hc-voice-level, 0) * 0.12));\n}\n.hc-voice-assistant-button.status-connecting[data-v-087046d5] {\n    background: #6c757d;\n}\n.hc-voice-assistant-button.status-connecting[data-v-087046d5]::after {\n    content: \"\";\n    position: absolute;\n    inset: -5px;\n    border-radius: 50%;\n    border: 2px solid transparent;\n    border-top-color: #fff;\n    animation: hc-voice-assistant-spin-087046d5 0.8s linear infinite;\n}\n.hc-voice-assistant-button.status-listening[data-v-087046d5] {\n    background: #0d6efd;\n}\n.hc-voice-assistant-button.status-speaking[data-v-087046d5] {\n    background: #fd7e14;\n}\n.hc-voice-assistant-button.status-error[data-v-087046d5] {\n    background: #dc3545;\n    animation: hc-voice-assistant-shake-087046d5 0.4s ease-in-out;\n}\n@keyframes hc-voice-assistant-spin-087046d5 {\nto {\n        transform: rotate(360deg);\n}\n}\n@keyframes hc-voice-assistant-shake-087046d5 {\n0%,\n    100% {\n        transform: translateX(0);\n}\n25% {\n        transform: translateX(-4px);\n}\n75% {\n        transform: translateX(4px);\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -102907,6 +103716,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Ringover_vue_vue_type_style_index_0_id_11eb78cd_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_style_index_0_id_087046d5_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_style_index_0_id_087046d5_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_style_index_0_id_087046d5_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -117110,6 +117949,37 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/VoiceAssistant.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/utils/VoiceAssistant.vue ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _VoiceAssistant_vue_vue_type_template_id_087046d5_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true */ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true");
+/* harmony import */ var _VoiceAssistant_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./VoiceAssistant.vue?vue&type=script&lang=js */ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js");
+/* harmony import */ var _VoiceAssistant_vue_vue_type_style_index_0_id_087046d5_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css */ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_VoiceAssistant_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_VoiceAssistant_vue_vue_type_template_id_087046d5_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-087046d5"],['__file',"resources/js/components/utils/VoiceAssistant.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/vehicle/add/Layout.vue":
 /*!********************************************************!*\
   !*** ./resources/js/components/vehicle/add/Layout.vue ***!
@@ -125178,6 +126048,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./VoiceAssistant.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/vehicle/add/Layout.vue?vue&type=script&lang=js":
 /*!********************************************************************************!*\
   !*** ./resources/js/components/vehicle/add/Layout.vue?vue&type=script&lang=js ***!
@@ -133210,6 +134096,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_template_id_087046d5_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_template_id_087046d5_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=template&id=087046d5&scoped=true");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/vehicle/add/Layout.vue?vue&type=template&id=09ba0174":
 /*!**************************************************************************************!*\
   !*** ./resources/js/components/vehicle/add/Layout.vue?vue&type=template&id=09ba0174 ***!
@@ -134242,6 +135144,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Ringover_vue_vue_type_style_index_0_id_11eb78cd_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Ringover.vue?vue&type=style&index=0&id=11eb78cd&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/Ringover.vue?vue&type=style&index=0&id=11eb78cd&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_VoiceAssistant_vue_vue_type_style_index_0_id_087046d5_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/VoiceAssistant.vue?vue&type=style&index=0&id=087046d5&scoped=true&lang=css");
 
 
 /***/ }),

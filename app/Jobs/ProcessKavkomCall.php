@@ -6,6 +6,7 @@ use App\Models\Interaction;
 use App\Models\KavkomCall;
 use App\Models\UserSetting;
 use App\Services\Anthropic;
+use App\Services\ProspectCallDataMerger;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -25,7 +26,7 @@ class ProcessKavkomCall implements ShouldQueue
 
     public function __construct(public int $callId) {}
 
-    public function handle(Anthropic $anthropic): void
+    public function handle(Anthropic $anthropic, ProspectCallDataMerger $merger): void
     {
         $call = KavkomCall::with('prospect')->findOrFail($this->callId);
         if ($call->processed_at || !$call->prospect) {
@@ -44,7 +45,7 @@ class ProcessKavkomCall implements ShouldQueue
                 Log::channel('kavkom')->info('Temporary Kavkom recording deleted.', ['call_uuid' => $call->call_uuid]);
             }
             $analysis = $this->analyse($anthropic, $transcript);
-            $interaction = $this->storeInteraction($call, $transcript, $analysis);
+            $interaction = $this->storeInteraction($call, $transcript, $analysis, $merger);
 
             $call->update(['interaction_id' => $interaction->id, 'status' => 'processed', 'processed_at' => now(), 'error' => null]);
             Log::channel('kavkom')->info('Kavkom call processed.', ['call_uuid' => $call->call_uuid, 'interaction_id' => $interaction->id]);
@@ -116,28 +117,14 @@ PROMPT;
         return $json;
     }
 
-    private function storeInteraction(KavkomCall $call, string $transcript, array $analysis): Interaction
+    private function storeInteraction(KavkomCall $call, string $transcript, array $analysis, ProspectCallDataMerger $merger): Interaction
     {
         $interaction = $call->interaction ?: $call->prospect->interactions()->make();
         $interaction->fill(['creator_id' => $call->user_id, 'from_user' => true, 'number' => $call->destination, 'source' => 'kavkom', 'status' => 'completed', 'ended_at' => $call->completed_at ?: now(), 'path' => null, 'size' => 0, 'data' => ['call_uuid' => $call->call_uuid, 'transcript' => $transcript, 'analysis' => $analysis, 'recording_deleted_at' => now()->toIso8601String()]])->save();
 
-        $allowed = ['first_name', 'last_name', 'email', 'phone_number', 'mobile_phone_number', 'company_name', 'job_title', 'street', 'postal_code', 'city', 'country'];
-        $updates = [];
-        foreach ($allowed as $field) {
-            $value = data_get($analysis, 'extracted.'.$field);
-            if (is_string($value) && trim($value) !== '' && blank($call->prospect->{$field})) $updates[$field] = trim($value);
-        }
-        $meta = $call->prospect->meta ?: [];
-        $meta['kavkom_last_analysis'] = [
-            'call_uuid' => $call->call_uuid,
-            'summary' => data_get($analysis, 'summary'),
-            'qualification' => data_get($analysis, 'qualification'),
-            'needs' => data_get($analysis, 'needs', []),
-            'objections' => data_get($analysis, 'objections', []),
-            'next_steps' => data_get($analysis, 'next_steps', []),
-            'budget' => data_get($analysis, 'extracted.budget'),
-            'project' => data_get($analysis, 'extracted.project'),
-        ];
+        $updates = $merger->buildProspectUpdates($call->prospect, $analysis);
+        $meta = $merger->buildMeta($call->prospect, $analysis, 'kavkom_last_analysis');
+        $meta['kavkom_last_analysis']['call_uuid'] = $call->call_uuid;
         $updates['meta'] = $meta;
         $call->prospect->update($updates);
         return $interaction;

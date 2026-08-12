@@ -1,0 +1,29 @@
+<!--
+    Example SIP gateway registering FreeSWITCH itself as a Kavkom
+    extension — the "extension dédiée" from the project prerequisites.
+    Once registered, FreeSWITCH can dial both other Kavkom extensions
+    (the CRM user's own extension) and external PSTN numbers (the
+    prospect) through this same gateway, exactly like any other extension
+    would — matching FS_DIAL_PREFIX_INTERNAL / FS_DIAL_PREFIX_EXTERNAL in
+    .env.example, both defaulting to "sofia/gateway/kavkom/".
+
+    Fill in <extension>/<password>/<user_context> with the credentials
+    from the dedicated Kavkom extension (see prerequisite #1 in the plan —
+    same fields returned by KavkomService::resolveExtension() for a normal
+    user extension: extension, password, user_context).
+
+    Save as conf/sip_profiles/external/kavkom.xml (adjust to whichever
+    sofia profile you use for outbound registrations).
+-->
+<include>
+    <gateway name="kavkom">
+        <param name="username" value="EXTENSION"/>
+        <param name="password" value="PASSWORD"/>
+        <param name="realm" value="USER_CONTEXT"/>
+        <param name="proxy" value="USER_CONTEXT"/>
+        <param name="register" value="true"/>
+        <param name="expire-seconds" value="600"/>
+        <param name="retry-seconds" value="30"/>
+        <param name="caller-id-in-from" value="true"/>
+    </gateway>
+</include>
