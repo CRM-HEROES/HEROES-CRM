@@ -264,8 +264,13 @@ class ProspectObserver
                     'revisionable_type' => get_class($prospect),
                     'revisionable_id' => $prospect->getKey(),
                     'key' => "meta->{$field}",
-                    'old_value' => $oldValue,
-                    'new_value' => $newValue,
+                    // Revision::insert() is a raw bulk insert: it bypasses
+                    // Eloquent casts, so an array value here (e.g. a nested
+                    // meta field like ai_phone_agent_last_analysis) would
+                    // crash the query binder with "Array to string
+                    // conversion" instead of being JSON-encoded.
+                    'old_value' => is_array($oldValue) ? json_encode($oldValue) : $oldValue,
+                    'new_value' => is_array($newValue) ? json_encode($newValue) : $newValue,
                     'user_id' => auth()->id(),
                     'created_at' => \Carbon\Carbon::now(),
                     'updated_at' => \Carbon\Carbon::now(),
