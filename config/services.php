@@ -42,4 +42,15 @@ return [
         'transcription_model' => env('OPENAI_TRANSCRIPTION_MODEL', 'whisper-1'),
     ],
 
+    'gemini' => [
+        'key' => env('GEMINI_API_KEY'),
+        'live_model' => env('GEMINI_LIVE_MODEL', 'models/gemini-2.5-flash-native-audio-preview-09-2025'),
+        'api_version' => env('GEMINI_API_VERSION', 'v1alpha'),
+    ],
+
+    'ai_phone_agent' => [
+        'secret' => env('AI_PHONE_AGENT_SHARED_SECRET'),
+        'bridge_url' => env('AI_PHONE_AGENT_BRIDGE_URL'),
+    ],
+
 ];

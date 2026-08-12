@@ -1,0 +1,16 @@
+<!--
+    Conference profile referenced by FS_CONFERENCE_PROFILE (default
+    "ai-agent"). Add this <profile> inside <profiles> in
+    conf/autoload_configs/conference.conf.xml.
+
+    A plain, unmoderated 3-way room is enough for v1 — no PIN, no
+    music-on-hold-while-alone (the AI tap joins first so the room is never
+    actually empty).
+-->
+<profile name="ai-agent">
+    <param name="rate" value="16000"/>
+    <param name="domain" value="$${domain}"/>
+    <param name="caller-id-name" value="Heroes CRM"/>
+    <param name="caller-controls" value="none"/>
+    <param name="moderator-controls" value="none"/>
+</profile>

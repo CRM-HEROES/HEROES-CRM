@@ -503,13 +503,38 @@
                                 <button
                                     type="button"
                                     class="hc-button-secondary"
-                                    :disabled="callingViaKavkom || !kavkomReady"
+                                    :disabled="callingViaKavkom || callingViaAi || !kavkomReady"
                                     @click="triggerKavkomCall(interaction.number)"
                                 >
                                     {{
                                         callingViaKavkom
                                             ? "Appel en cours..."
                                             : "Appeler"
+                                    }}
+                                </button>
+
+                                <div
+                                    v-if="aiCallMessage"
+                                    :class="[
+                                        'hc-kavkom-call-status',
+                                        aiCallSuccess ? 'success' : 'error',
+                                    ]"
+                                >
+                                    {{ aiCallMessage }}
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="hc-button-secondary hc-ai-call-button"
+                                    :disabled="callingViaKavkom || callingViaAi || !kavkomReady"
+                                    title="L'IA parle au prospect, vous restez en ligne"
+                                    @click="triggerAiCall(interaction.number)"
+                                >
+                                    <i class="fas fa-robot"></i>
+                                    {{
+                                        callingViaAi
+                                            ? "Appel IA en cours..."
+                                            : "Appeler avec l'IA"
                                     }}
                                 </button>
                             </div>
@@ -679,6 +704,14 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+.hc-ai-call-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
+}
 .hc-kavkom-settings-btn {
     position: relative;
     z-index: 20;
@@ -739,6 +772,12 @@ export default {
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
             kavkomCallState: "idle",
+            // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
+            // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
+            // au prospect une fois la conférence à 3 établie côté serveur.
+            callingViaAi: false,
+            aiCallMessage: "",
+            aiCallSuccess: false,
             // Softphone prêt = enregistré en SIP côté navigateur, capable
             // de recevoir/auto-répondre au leg agent envoyé par le PBX.
             kavkomReady: false,
@@ -935,6 +974,57 @@ export default {
                 }
             } finally {
                 this.callingViaKavkom = false;
+            }
+        },
+
+        /**
+         * "Appeler avec l'IA" : votre poste Kavkom sonne exactement comme un
+         * clic-à-appeler classique (même softphone ci-dessus), mais côté
+         * serveur le prospect est mis en conférence avec vous ET l'agent
+         * vocal Gemini Live, qui mène la conversation. Voir
+         * AiPhoneAgentController::trigger().
+         */
+        async triggerAiCall(number) {
+            if (!number) {
+                console.warn("[AI Call] Appel ignoré : aucun numéro fourni.");
+                return;
+            }
+            if (!this.interactionProspect?.id) {
+                console.warn("[AI Call] Appel ignoré : aucun prospect en contexte.");
+                return;
+            }
+
+            this.callingViaAi = true;
+            this.aiCallMessage = "";
+
+            try {
+                const { data } = await ApiService.post("settings/ai-phone-agent/call", {
+                    prospect_id: this.interactionProspect.id,
+                    destination: number,
+                });
+
+                if (!data.success) {
+                    console.warn("[AI Call] L'API a refusé le lancement de l'appel.", { message: data.message });
+                    this.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
+                    this.aiCallSuccess = false;
+                    return;
+                }
+
+                this.aiCallMessage =
+                    "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
+                this.aiCallSuccess = true;
+                console.log("[AI Call] Appel lancé.", { prospectId: this.interactionProspect.id });
+            } catch (error) {
+                console.error("[AI Call] Erreur lors du lancement de l'appel IA.", {
+                    status: error.response?.status,
+                    message: error.response?.data?.message || error.message,
+                });
+                this.aiCallMessage =
+                    error.response?.data?.message ||
+                    "Erreur inattendue lors du lancement de l'appel avec l'IA.";
+                this.aiCallSuccess = false;
+            } finally {
+                this.callingViaAi = false;
             }
         },
 

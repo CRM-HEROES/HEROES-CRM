@@ -223,6 +223,8 @@
         <tooltip />
         <tutorial-tooltip />
         <loading :loading="changing" />
+
+        <voice-assistant />
     </div>
 </template>
 
@@ -420,6 +422,7 @@ import LayoutHeader from "./Header.vue";
 import LayoutFooter from "./Footer.vue";
 
 import Confirm from "@/components/Confirm.vue";
+import VoiceAssistant from "@/components/utils/VoiceAssistant.vue";
 
 export default {
     name: "main",
@@ -589,6 +592,7 @@ export default {
         ApiPappersSlide,
 
         Confirm,
+        VoiceAssistant,
     },
 
     data() {

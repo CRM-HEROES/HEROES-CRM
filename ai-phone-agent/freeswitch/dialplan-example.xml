@@ -1,0 +1,23 @@
+<!--
+    Example dialplan extension for the FreeSWITCH "AI tap" — the loopback
+    channel that ai-phone-agent dials into every conference (see
+    FS_LOOPBACK_TARGET in .env.example, default "loopback/ai-agent-tap/default").
+
+    It does nothing on its own: it just answers and stays parked, silently
+    "in" the conference. The actual audio capture/injection is attached
+    from outside, over ESL, by esl-client.js (`uuid_audio_stream ... start`)
+    once this leg has answered — that's what makes this channel's audio
+    equal to the mixed conference audio (what the AI should hear), and
+    whatever esl-client.js plays back onto this channel gets injected into
+    the conference for the CRM user and the prospect to hear.
+
+    Copy this <extension> into conf/dialplan/default.xml, inside the
+    existing <context name="default"> block (or a dedicated context if you
+    don't want it reachable any other way).
+-->
+<extension name="ai-agent-tap">
+    <condition field="destination_number" expression="^ai-agent-tap$">
+        <action application="answer"/>
+        <action application="park"/>
+    </condition>
+</extension>

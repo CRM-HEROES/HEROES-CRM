@@ -134,6 +134,14 @@ return [
             'days' => 14,
             'replace_placeholders' => true,
         ],
+
+        'ai-phone-agent' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ai-phone-agent.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];
