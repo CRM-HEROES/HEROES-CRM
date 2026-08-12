@@ -71,7 +71,12 @@ class ImportGetSummary implements ShouldQueue
                 }
 
                 if ($isHeaderRow) {
-                    $headers = $data;
+                    // Only the first sheet's header defines the column
+                    // mapping (applied by index to every sheet), so a
+                    // later sheet's header row must not overwrite it.
+                    if ($headers === null) {
+                        $headers = $data;
+                    }
                     $isHeaderRow = false;
                 } else {
                     $values[] = $data;
@@ -111,7 +116,7 @@ class ImportGetSummary implements ShouldQueue
             $meta= $this->import->meta;
 
             if ($this->import->field_delimiter) {
-                $reader->setFieldDelimiter($this->import->field_delimiter == 'tab' ? "\t" : $this->import->field_delimiter);
+                $reader->setFieldDelimiter($this->normalizeCsvDelimiter($this->import->field_delimiter));
             }
             
             if ($this->import->field_enclosure) {
@@ -128,5 +133,13 @@ class ImportGetSummary implements ShouldQueue
 
         // XLSX
         return ReaderEntityFactory::createXLSXReader();
+    }
+
+    /**
+     * Normalize CSV delimiter values to actual parser delimiters.
+     */
+    protected function normalizeCsvDelimiter(string $delimiter): string
+    {
+        return $delimiter === 'tab' ? "\t" : $delimiter;
     }
 }

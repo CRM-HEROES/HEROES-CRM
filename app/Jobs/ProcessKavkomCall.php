@@ -58,8 +58,10 @@ class ProcessKavkomCall implements ShouldQueue
 
     private function downloadRecording(KavkomCall $call, string $url): array
     {
-        if (!filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https') {
-            throw new \RuntimeException('The Kavkom recording URL must be an HTTPS URL.');
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        if (!filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https'
+            || ($host !== 'kavkom.com' && !str_ends_with($host, '.kavkom.com'))) {
+            throw new \RuntimeException('The recording URL must be an HTTPS URL hosted by Kavkom.');
         }
 
         $request = Http::timeout(120)->accept('*/*');
@@ -72,10 +74,12 @@ class ProcessKavkomCall implements ShouldQueue
             throw new \RuntimeException('Unable to download the Kavkom recording (HTTP '.$response->status().').');
         }
 
-        $contentType = strtolower((string) $response->header('Content-Type'));
+        $contentType = strtolower(trim(strtok((string) $response->header('Content-Type'), ';')));
         $size = strlen($response->body());
         $extension = $this->extension($contentType, $url);
-        $isAudio = str_starts_with($contentType, 'audio/') || ($contentType === 'application/octet-stream' && in_array($extension, ['mp3', 'wav', 'm4a', 'ogg'], true));
+        $supportedExtensions = ['flac', 'm4a', 'mp3', 'mp4', 'mpeg', 'mpga', 'ogg', 'wav', 'webm'];
+        $isAudio = str_starts_with($contentType, 'audio/')
+            || ($contentType === 'application/octet-stream' && in_array($extension, $supportedExtensions, true));
         if (!$isAudio || $size > 25 * 1024 * 1024) {
             throw new \RuntimeException('Kavkom recording is not a supported audio file or exceeds Whisper’s 25 MB limit.');
         }
