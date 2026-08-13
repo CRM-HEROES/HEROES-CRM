@@ -20,6 +20,7 @@ class ProspectCallDataMerger
         'mobile_phone_number',
         'company_name',
         'job_title',
+        'website_url',
         'street',
         'postal_code',
         'city',

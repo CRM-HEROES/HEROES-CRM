@@ -111,7 +111,7 @@ class ProcessKavkomCall implements ShouldQueue
     private function analyse(Anthropic $anthropic, string $transcript): array
     {
         $prompt = <<<'PROMPT'
-Analyse cet appel commercial. Ne déduis jamais une information absente. Retourne uniquement un objet JSON valide avec les clés : summary (string), qualification (hot|warm|cold|unqualified|unknown), needs (array), objections (array), products_services (array), next_steps (array), extracted (objet avec first_name,last_name,email,phone_number,mobile_phone_number,company_name,job_title,street,postal_code,city,country,budget,project; valeurs string ou null).
+Analyse cet appel commercial. Ne déduis jamais une information absente. Retourne uniquement un objet JSON valide avec les clés : summary (string), qualification (hot|warm|cold|unqualified|unknown), needs (array), objections (array), products_services (array), next_steps (array), extracted (objet avec first_name,last_name,email,phone_number,mobile_phone_number,company_name,job_title,website_url,street,postal_code,city,country,budget,project; valeurs string ou null).
 
 TRANSCRIPTION :
 PROMPT;

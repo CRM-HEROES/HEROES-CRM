@@ -19,6 +19,7 @@ const RECORD_PROSPECT_INFO_TOOL = {
             mobile_phone_number: { type: "STRING" },
             company_name: { type: "STRING" },
             job_title: { type: "STRING" },
+            website_url: { type: "STRING" },
             street: { type: "STRING" },
             postal_code: { type: "STRING" },
             city: { type: "STRING" },
@@ -43,10 +44,17 @@ intervenir à tout moment. Présente-toi brièvement comme un assistant IA
 qui appelle pour le compte de l'utilisateur, explique la raison de
 l'appel, puis pose les questions nécessaires pour qualifier le prospect :
 coordonnées, entreprise, besoin, budget. Reste naturelle, brève et polie,
-en français sauf si le prospect s'exprime dans une autre langue. Appelle
-l'outil record_prospect_info dès que tu obtiens ou confirmes une
-information, sans attendre la fin de l'appel. N'invente jamais une
-information que le prospect n'a pas confirmée.`;
+en français sauf si le prospect s'exprime dans une autre langue.
+
+Règle stricte sur l'outil record_prospect_info : appelle-le après CHAQUE
+message du prospect qui contient au moins une information utile (nom,
+ville, téléphone, email, entreprise, site web, besoin, budget...), même
+une seule donnée isolée — n'attends jamais un message suivant ni la fin
+de l'appel pour enregistrer une information déjà donnée. Si le prospect
+donne trois informations dans une même phrase, inclus les trois dans le
+même appel d'outil. N'invente jamais une information que le prospect n'a
+pas confirmée, et ne devine jamais une valeur approximative (par exemple
+ne convertis pas un âge en date de naissance).`;
 
 /**
  * One instance per phone call: owns the Gemini Live WebSocket, relays
