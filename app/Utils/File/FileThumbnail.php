@@ -57,7 +57,10 @@ class FileThumbnail
             $imagick->writeImage($disk->path($thumbnail));
 
             return $disk->get($thumbnail);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // \Exception alone never catches "Class Imagick not found"
+            // (a \Error), so a missing Imagick extension crashed the
+            // request instead of just failing to produce a thumbnail.
             return null;
         }
     }
@@ -76,7 +79,10 @@ class FileThumbnail
             $imagick->writeImage($disk->path($thumbnail));
             
             return $disk->get($thumbnail);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            // \Exception alone never catches "Class Imagick not found"
+            // (a \Error), so a missing Imagick extension crashed the
+            // request instead of just failing to produce a thumbnail.
             return null;
         }
     }
