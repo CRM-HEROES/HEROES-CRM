@@ -6,6 +6,7 @@ use App\Events\ProjectUserAttached;
 use App\Events\ProspectLabelAttached;
 use App\Events\ProspectUserAttached;
 use App\Events\UserDeviceCreated;
+use App\Listeners\GenerateAiQuoteOnLabelAttachedListener;
 use App\Listeners\ProjectUserAttachedListener;
 use App\Listeners\ProspectLabelAttachedListener;
 use App\Listeners\ProspectUserAttachedListener;
@@ -156,7 +157,12 @@ class EventServiceProvider extends ServiceProvider
             ProspectLabelAttached::class,
             [ProspectLabelAttachedListener::class, 'handle']
         );
-    
+
+        LaravelEvent::listen(
+            ProspectLabelAttached::class,
+            [GenerateAiQuoteOnLabelAttachedListener::class, 'handle']
+        );
+
         LaravelEvent::listen(
             ProspectUserAttached::class,
             [ProspectUserAttachedListener::class, 'handle']

@@ -142,6 +142,14 @@ return [
             'days' => 14,
             'replace_placeholders' => true,
         ],
+
+        'ai-quote' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/ai-quote.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];
