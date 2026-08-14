@@ -63,4 +63,9 @@ return [
         'bridge_url' => env('AI_PHONE_AGENT_BRIDGE_URL'),
     ],
 
+    'ai_quote' => [
+        'trigger_label' => env('AI_QUOTE_TRIGGER_LABEL', 'Bilan réalisé'),
+        'document_template_name' => env('AI_QUOTE_DOCUMENT_TEMPLATE', 'Devis IA'),
+    ],
+
 ];
