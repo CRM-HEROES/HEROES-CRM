@@ -4,9 +4,11 @@ namespace App\Jobs;
 
 use App\Models\Interaction;
 use App\Models\KavkomCall;
+use App\Models\ProspectCallQualification;
 use App\Models\UserSetting;
 use App\Services\Anthropic;
 use App\Services\ProspectCallDataMerger;
+use App\Services\ProspectCallScorer;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -15,6 +17,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProcessKavkomCall implements ShouldQueue
@@ -26,15 +29,30 @@ class ProcessKavkomCall implements ShouldQueue
 
     public function __construct(public int $callId) {}
 
-    public function handle(Anthropic $anthropic, ProspectCallDataMerger $merger): void
+    public function handle(Anthropic $anthropic, ProspectCallDataMerger $merger, ProspectCallScorer $scorer): void
     {
-        $call = KavkomCall::with('prospect')->findOrFail($this->callId);
-        if ($call->processed_at || !$call->prospect) {
-            Log::channel('kavkom')->info('Kavkom call skipped.', ['call_uuid' => $call->call_uuid, 'processed' => (bool) $call->processed_at, 'has_prospect' => (bool) $call->prospect]);
-            return;
-        }
+        $call = DB::transaction(function () {
+            $call = KavkomCall::lockForUpdate()->findOrFail($this->callId);
+            if ($call->processed_at || $call->status === 'processing') return null;
+            $cdrStatus = strtolower((string) (data_get($call->webhook_payload, 'status') ?: data_get($call->webhook_payload, 'cdr.status')));
+            if (in_array($cdrStatus, ['failed', 'no_answer', 'no_user_response', 'busy', 'cancelled', 'canceled', 'unallocated_number'], true)) {
+                $call->update(['status' => 'ignored', 'error' => 'Call was not connected (Kavkom status: '.$cdrStatus.').']);
+                return null;
+            }
+            $call->update(['status' => 'processing', 'error' => null]);
+            return $call;
+        });
+        if (!$call) return; // duplicate webhook/job: the first worker owns it.
+        $call->load('prospect');
 
         try {
+            Log::channel('kavkom')->info('Kavkom post-call processing started.', [
+                'call_uuid' => $call->call_uuid,
+                'attempt' => $this->attempts(),
+                'prospect_id' => $call->prospect_id,
+                'has_recording_url' => (bool) $call->recording_url,
+            ]);
+            if (!$call->prospect) throw new \RuntimeException('Prospect not linked to this call yet.');
             if (!$call->recording_url) throw new \RuntimeException('Recording URL missing from Kavkom CDR.');
             Log::channel('kavkom')->info('Kavkom transcription started.', ['call_uuid' => $call->call_uuid, 'prospect_id' => $call->prospect_id]);
             $audio = $this->downloadRecording($call, $call->recording_url);
@@ -44,8 +62,16 @@ class ProcessKavkomCall implements ShouldQueue
                 Storage::disk('local')->delete($audio['path']);
                 Log::channel('kavkom')->info('Temporary Kavkom recording deleted.', ['call_uuid' => $call->call_uuid]);
             }
+            Log::channel('kavkom')->info('Kavkom AI analysis started.', [
+                'call_uuid' => $call->call_uuid,
+                'transcript_characters' => mb_strlen($transcript),
+            ]);
             $analysis = $this->analyse($anthropic, $transcript);
-            $interaction = $this->storeInteraction($call, $transcript, $analysis, $merger);
+            Log::channel('kavkom')->info('Kavkom AI analysis completed.', [
+                'call_uuid' => $call->call_uuid,
+                'analysis_keys' => array_keys($analysis),
+            ]);
+            $interaction = $this->storeInteraction($call, $transcript, $analysis, $merger, $scorer);
 
             $call->update(['interaction_id' => $interaction->id, 'status' => 'processed', 'processed_at' => now(), 'error' => null]);
             Log::channel('kavkom')->info('Kavkom call processed.', ['call_uuid' => $call->call_uuid, 'interaction_id' => $interaction->id]);
@@ -111,7 +137,12 @@ class ProcessKavkomCall implements ShouldQueue
     private function analyse(Anthropic $anthropic, string $transcript): array
     {
         $prompt = <<<'PROMPT'
+Analyse this French sales call. Do not infer facts that are absent. Return only valid JSON with: summary (string), needs (array of strings), products_services (array of strings), budget (string|null), urgency (immediate|short_term|medium_term|long_term|unknown), objections (array), important_questions (array), interest_level (high|medium|low|unknown), sentiment (positive|neutral|negative|mixed|unknown), important_information (array), next_steps (array), conversion_probability (integer 0 to 100), extracted (object with first_name,last_name,email,phone_number,mobile_phone_number,company_name,job_title,website_url,street,postal_code,city,country,budget,project; string or null values).
+
+TRANSCRIPT:
 Analyse cet appel commercial. Ne déduis jamais une information absente. Retourne uniquement un objet JSON valide avec les clés : summary (string), qualification (hot|warm|cold|unqualified|unknown), needs (array), objections (array), products_services (array), next_steps (array), extracted (objet avec first_name,last_name,email,phone_number,mobile_phone_number,company_name,job_title,website_url,street,postal_code,city,country,budget,project; valeurs string ou null).
+
+The following full schema is authoritative (ignore any conflicting text above): summary, needs, products_services, budget, urgency, objections, important_questions, interest_level, sentiment, important_information, next_steps, conversion_probability, extracted. Include every key and no markdown.
 
 TRANSCRIPTION :
 PROMPT;
@@ -121,16 +152,45 @@ PROMPT;
         return $json;
     }
 
-    private function storeInteraction(KavkomCall $call, string $transcript, array $analysis, ProspectCallDataMerger $merger): Interaction
+    private function storeInteraction(KavkomCall $call, string $transcript, array $analysis, ProspectCallDataMerger $merger, ProspectCallScorer $scorer): Interaction
     {
+        $score = $scorer->score($analysis);
+        $analysis['qualification'] = $score['qualification'];
+        $analysis['conversion_probability'] = $score['conversion_probability'];
         $interaction = $call->interaction ?: $call->prospect->interactions()->make();
         $interaction->fill(['creator_id' => $call->user_id, 'from_user' => true, 'number' => $call->destination, 'source' => 'kavkom', 'status' => 'completed', 'ended_at' => $call->completed_at ?: now(), 'path' => null, 'size' => 0, 'data' => ['call_uuid' => $call->call_uuid, 'transcript' => $transcript, 'analysis' => $analysis, 'recording_deleted_at' => now()->toIso8601String()]])->save();
 
         $updates = $merger->buildProspectUpdates($call->prospect, $analysis);
         $meta = $merger->buildMeta($call->prospect, $analysis, 'kavkom_last_analysis');
         $meta['kavkom_last_analysis']['call_uuid'] = $call->call_uuid;
+        $scoreBefore = (int) data_get($meta, 'kavkom_score.current', 0);
+        $meta['kavkom_score'] = [
+            'current' => $score['score'],
+            'qualification' => $score['qualification'],
+            'updated_at' => now()->toIso8601String(),
+        ];
         $updates['meta'] = $meta;
         $call->prospect->update($updates);
+
+        ProspectCallQualification::updateOrCreate(
+            ['kavkom_call_id' => $call->id],
+            [
+                'prospect_id' => $call->prospect_id,
+                'interaction_id' => $interaction->id,
+                'score_before' => $scoreBefore,
+                'score_after' => $score['score'],
+                'qualification' => $score['qualification'],
+                'conversion_probability' => $score['conversion_probability'],
+                'analysis' => $analysis,
+            ]
+        );
+        Log::channel('kavkom')->info('Kavkom prospect qualification saved.', [
+            'call_uuid' => $call->call_uuid,
+            'prospect_id' => $call->prospect_id,
+            'score_before' => $scoreBefore,
+            'score_after' => $score['score'],
+            'qualification' => $score['qualification'],
+        ]);
         return $interaction;
     }
 

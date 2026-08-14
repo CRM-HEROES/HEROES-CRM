@@ -29063,6 +29063,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       kavkomCallMessage: "",
       kavkomCallSuccess: false,
       kavkomCallState: "idle",
+      kavkomCallUuid: null,
+      kavkomDebugTimer: null,
+      kavkomDebugLastStatus: null,
       // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
       // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
       // au prospect une fois la conférence à 3 établie côté serveur.
@@ -29087,6 +29090,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   beforeDestroy: function beforeDestroy() {
     window.removeEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
+    this.stopKavkomDebugPolling();
+  },
+  beforeUnmount: function beforeUnmount() {
+    this.stopKavkomDebugPolling();
   },
   methods: {
     newInteraction: function newInteraction() {
@@ -29281,10 +29288,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 callUuid: data.call_uuid || null,
                 apiConfirmation: true
               });
-              _context3.next = 31;
+              if (data.call_uuid) {
+                _this4.kavkomCallUuid = data.call_uuid;
+                _this4.startKavkomDebugPolling(data.call_uuid);
+              }
+              _context3.next = 32;
               break;
-            case 27:
-              _context3.prev = 27;
+            case 28:
+              _context3.prev = 28;
               _context3.t0 = _context3["catch"](13);
               console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
                 status: (_error$response = _context3.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
@@ -29298,16 +29309,76 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.kavkomCallSuccess = false;
                 _this4.kavkomCallState = "failed";
               }
-            case 31:
-              _context3.prev = 31;
+            case 32:
+              _context3.prev = 32;
               _this4.callingViaKavkom = false;
-              return _context3.finish(31);
-            case 34:
+              return _context3.finish(32);
+            case 35:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[13, 27, 31, 34]]);
+        }, _callee3, null, [[13, 28, 32, 35]]);
       }))();
+    },
+    startKavkomDebugPolling: function startKavkomDebugPolling(callUuid) {
+      var _this5 = this;
+      this.stopKavkomDebugPolling();
+      this.kavkomDebugLastStatus = null;
+      var polls = 0;
+      console.log("[Kavkom][Debug] Server-side processing tracking enabled.", {
+        callUuid: callUuid
+      });
+      this.kavkomDebugTimer = window.setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var _yield$ApiService$get, data, signature, _error$response4;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              polls += 1;
+              _context4.prev = 1;
+              _context4.next = 4;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].get("settings/kavkom/call/".concat(encodeURIComponent(callUuid), "/status"));
+            case 4:
+              _yield$ApiService$get = _context4.sent;
+              data = _yield$ApiService$get.data;
+              signature = "".concat(data.status, "|").concat(data.has_recording, "|").concat(data.processed_at, "|").concat(data.error || "");
+              if (signature !== _this5.kavkomDebugLastStatus) {
+                _this5.kavkomDebugLastStatus = signature;
+                console.log("[Kavkom][Debug] Server processing status.", {
+                  callUuid: data.call_uuid,
+                  status: data.status,
+                  hasRecording: data.has_recording,
+                  processedAt: data.processed_at,
+                  interactionId: data.interaction_id,
+                  error: data.error || null
+                });
+              }
+              if (["processed", "ignored"].includes(data.status) || polls >= 60) {
+                _this5.stopKavkomDebugPolling();
+              }
+              _context4.next = 14;
+              break;
+            case 11:
+              _context4.prev = 11;
+              _context4.t0 = _context4["catch"](1);
+              // A 404 is normal until Kavkom has posted the CDR.
+              if (polls === 1 || polls % 6 === 0) {
+                console.debug("[Kavkom][Debug] CDR not received yet.", {
+                  callUuid: callUuid,
+                  status: (_error$response4 = _context4.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status
+                });
+              }
+            case 14:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[1, 11]]);
+      })), 5000);
+    },
+    stopKavkomDebugPolling: function stopKavkomDebugPolling() {
+      if (this.kavkomDebugTimer) {
+        window.clearInterval(this.kavkomDebugTimer);
+        this.kavkomDebugTimer = null;
+      }
     },
     /**
      * "Appeler avec l'IA" : votre poste Kavkom sonne exactement comme un
@@ -29317,78 +29388,79 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * AiPhoneAgentController::trigger().
      */
     triggerAiCall: function triggerAiCall(number) {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var _this5$interactionPro;
-        var _yield$ApiService$pos2, data, _error$response4, _error$response5, _error$response6;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var _this6$interactionPro;
+        var _yield$ApiService$pos2, data, _error$response5, _error$response6, _error$response7;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
               if (number) {
-                _context4.next = 3;
+                _context5.next = 3;
                 break;
               }
               console.warn("[AI Call] Appel ignoré : aucun numéro fourni.");
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 3:
-              if ((_this5$interactionPro = _this5.interactionProspect) !== null && _this5$interactionPro !== void 0 && _this5$interactionPro.id) {
-                _context4.next = 6;
+              if ((_this6$interactionPro = _this6.interactionProspect) !== null && _this6$interactionPro !== void 0 && _this6$interactionPro.id) {
+                _context5.next = 6;
                 break;
               }
               console.warn("[AI Call] Appel ignoré : aucun prospect en contexte.");
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 6:
-              _this5.callingViaAi = true;
-              _this5.aiCallMessage = "";
-              _context4.prev = 8;
-              _context4.next = 11;
+              _this6.callingViaAi = true;
+              _this6.aiCallMessage = "";
+              _context5.prev = 8;
+              _context5.next = 11;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/ai-phone-agent/call", {
-                prospect_id: _this5.interactionProspect.id,
+                prospect_id: _this6.interactionProspect.id,
                 destination: number
               });
             case 11:
-              _yield$ApiService$pos2 = _context4.sent;
+              _yield$ApiService$pos2 = _context5.sent;
               data = _yield$ApiService$pos2.data;
               if (data.success) {
-                _context4.next = 18;
+                _context5.next = 18;
                 break;
               }
               console.warn("[AI Call] L'API a refusé le lancement de l'appel.", {
                 message: data.message
               });
-              _this5.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
-              _this5.aiCallSuccess = false;
-              return _context4.abrupt("return");
+              _this6.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
+              _this6.aiCallSuccess = false;
+              return _context5.abrupt("return");
             case 18:
-              _this5.aiCallMessage = "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
-              _this5.aiCallSuccess = true;
+              _this6.aiCallMessage = "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
+              _this6.aiCallSuccess = true;
               console.log("[AI Call] Appel lancé.", {
-                prospectId: _this5.interactionProspect.id
+                prospectId: _this6.interactionProspect.id
               });
-              _context4.next = 28;
+              _context5.next = 28;
               break;
             case 23:
-              _context4.prev = 23;
-              _context4.t0 = _context4["catch"](8);
+              _context5.prev = 23;
+              _context5.t0 = _context5["catch"](8);
               console.error("[AI Call] Erreur lors du lancement de l'appel IA.", {
-                status: (_error$response4 = _context4.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status,
-                message: ((_error$response5 = _context4.t0.response) === null || _error$response5 === void 0 || (_error$response5 = _error$response5.data) === null || _error$response5 === void 0 ? void 0 : _error$response5.message) || _context4.t0.message
+                status: (_error$response5 = _context5.t0.response) === null || _error$response5 === void 0 ? void 0 : _error$response5.status,
+                message: ((_error$response6 = _context5.t0.response) === null || _error$response6 === void 0 || (_error$response6 = _error$response6.data) === null || _error$response6 === void 0 ? void 0 : _error$response6.message) || _context5.t0.message
               });
-              _this5.aiCallMessage = ((_error$response6 = _context4.t0.response) === null || _error$response6 === void 0 || (_error$response6 = _error$response6.data) === null || _error$response6 === void 0 ? void 0 : _error$response6.message) || "Erreur inattendue lors du lancement de l'appel avec l'IA.";
-              _this5.aiCallSuccess = false;
+              _this6.aiCallMessage = ((_error$response7 = _context5.t0.response) === null || _error$response7 === void 0 || (_error$response7 = _error$response7.data) === null || _error$response7 === void 0 ? void 0 : _error$response7.message) || "Erreur inattendue lors du lancement de l'appel avec l'IA.";
+              _this6.aiCallSuccess = false;
             case 28:
-              _context4.prev = 28;
-              _this5.callingViaAi = false;
-              return _context4.finish(28);
+              _context5.prev = 28;
+              _this6.callingViaAi = false;
+              return _context5.finish(28);
             case 31:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[8, 23, 28, 31]]);
+        }, _callee5, null, [[8, 23, 28, 31]]);
       }))();
     },
     onKavkomReady: function onKavkomReady() {
       this.kavkomReady = true;
+      console.log("[Kavkom][Debug] SIP softphone ready.");
       if (this.pendingKavkomNumber) {
         var number = this.pendingKavkomNumber;
         this.pendingKavkomNumber = "";
@@ -29396,6 +29468,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     },
     onKavkomCallRinging: function onKavkomCallRinging() {
+      console.log("[Kavkom][Debug] Agent leg ringing.");
       this.interaction.status = "ringing";
       this.updateInteraction();
       this.kavkomCallState = "ringing";
@@ -29403,6 +29476,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
     },
     onKavkomCallAnswered: function onKavkomCallAnswered() {
+      console.log("[Kavkom][Debug] Call answered; media bridge active.");
       this.interaction.status = "answered";
       this.updateInteraction();
       this.kavkomCallState = "active";
@@ -29410,6 +29484,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = "Appel Kavkom en cours.";
     },
     onKavkomConnectionError: function onKavkomConnectionError(message) {
+      console.error("[Kavkom][Debug] SIP connection error.", {
+        message: message
+      });
       this.kavkomReady = false;
       this.callingViaKavkom = false;
       this.kavkomCallState = "failed";
@@ -29417,15 +29494,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = message;
     },
     onKavkomCallFailed: function onKavkomCallFailed(message) {
+      console.warn("[Kavkom][Debug] Call failed.", {
+        message: message
+      });
       this.callingViaKavkom = false;
       this.kavkomCallState = "failed";
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
     },
     onKavkomCallHangup: function onKavkomCallHangup() {
-      var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$durationMs = _ref.durationMs,
-        durationMs = _ref$durationMs === void 0 ? null : _ref$durationMs;
+      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref2$durationMs = _ref2.durationMs,
+        durationMs = _ref2$durationMs === void 0 ? null : _ref2$durationMs;
+      console.log("[Kavkom][Debug] Call hangup.", {
+        durationMs: durationMs
+      });
       this.interaction.status = "hangup";
       this.updateInteraction();
       this.callingViaKavkom = false;
@@ -29434,7 +29517,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = this.kavkomCallSuccess ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom." : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
     },
     openKavkomAfterSave: function openKavkomAfterSave() {
-      var _this6 = this;
+      var _this7 = this;
       this.tab = 1;
       this.frameTab = 2;
 
@@ -29445,93 +29528,93 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.triggerKavkomCall(this.interaction.number);
       }
       this.$nextTick(function () {
-        var _this6$$refs$kavkomWe;
-        (_this6$$refs$kavkomWe = _this6.$refs.kavkomWebphone) === null || _this6$$refs$kavkomWe === void 0 ? void 0 : _this6$$refs$kavkomWe.refreshWebphone();
+        var _this7$$refs$kavkomWe;
+        (_this7$$refs$kavkomWe = _this7.$refs.kavkomWebphone) === null || _this7$$refs$kavkomWe === void 0 ? void 0 : _this7$$refs$kavkomWe.refreshWebphone();
       });
     },
     /**
      *
      */
     addInteraction: function addInteraction() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _this7.addingInteraction = true;
-              _context5.prev = 1;
-              _context5.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this7.interaction);
+              _this8.addingInteraction = true;
+              _context6.prev = 1;
+              _context6.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this8.interaction);
             case 4:
-              _this7.interaction = _context5.sent;
+              _this8.interaction = _context6.sent;
             case 5:
-              _context5.prev = 5;
-              _this7.addingInteraction = false;
-              return _context5.finish(5);
+              _context6.prev = 5;
+              _this8.addingInteraction = false;
+              return _context6.finish(5);
             case 8:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5, null, [[1,, 5, 8]]);
+        }, _callee6, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var _this8$interactionPro;
-        var _this8$logKavkomWarn;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var _this9$interactionPro;
+        var _this9$logKavkomWarn;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (!(!_this8.interaction || !((_this8$interactionPro = _this8.interactionProspect) !== null && _this8$interactionPro !== void 0 && _this8$interactionPro.id))) {
-                _context6.next = 2;
+              if (!(!_this9.interaction || !((_this9$interactionPro = _this9.interactionProspect) !== null && _this9$interactionPro !== void 0 && _this9$interactionPro.id))) {
+                _context7.next = 2;
                 break;
               }
-              return _context6.abrupt("return");
+              return _context7.abrupt("return");
             case 2:
-              if (_this8.interactionProspect) {
-                _context6.next = 5;
+              if (_this9.interactionProspect) {
+                _context7.next = 5;
                 break;
               }
-              (_this8$logKavkomWarn = _this8.logKavkomWarn) === null || _this8$logKavkomWarn === void 0 ? void 0 : _this8$logKavkomWarn.call(_this8, "updateInteraction ignoré : aucun prospect actif");
-              return _context6.abrupt("return");
+              (_this9$logKavkomWarn = _this9.logKavkomWarn) === null || _this9$logKavkomWarn === void 0 ? void 0 : _this9$logKavkomWarn.call(_this9, "updateInteraction ignoré : aucun prospect actif");
+              return _context7.abrupt("return");
             case 5:
-              if (_this8.interaction.id) {
-                _context6.next = 16;
+              if (_this9.interaction.id) {
+                _context7.next = 16;
                 break;
               }
-              _context6.prev = 6;
-              _context6.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this8.interaction);
+              _context7.prev = 6;
+              _context7.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this9.interaction);
             case 9:
-              _this8.interaction = _context6.sent;
-              _context6.next = 15;
+              _this9.interaction = _context7.sent;
+              _context7.next = 15;
               break;
             case 12:
-              _context6.prev = 12;
-              _context6.t0 = _context6["catch"](6);
-              console.error("Échec création interaction", _context6.t0);
+              _context7.prev = 12;
+              _context7.t0 = _context7["catch"](6);
+              console.error("Échec création interaction", _context7.t0);
             case 15:
-              return _context6.abrupt("return");
+              return _context7.abrupt("return");
             case 16:
-              _context6.prev = 16;
-              _context6.next = 19;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this8.interaction);
+              _context7.prev = 16;
+              _context7.next = 19;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this9.interaction);
             case 19:
-              _context6.next = 24;
+              _context7.next = 24;
               break;
             case 21:
-              _context6.prev = 21;
-              _context6.t1 = _context6["catch"](16);
-              console.error("Échec mise à jour interaction", _context6.t1);
+              _context7.prev = 21;
+              _context7.t1 = _context7["catch"](16);
+              console.error("Échec mise à jour interaction", _context7.t1);
             case 24:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
-        }, _callee6, null, [[6, 12], [16, 21]]);
+        }, _callee7, null, [[6, 12], [16, 21]]);
       }))();
     },
     /**
@@ -29552,46 +29635,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
-            case 0:
-              _this9.updatingPhoneNumber = true;
-              _context7.prev = 1;
-              _context7.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
-                id: _this9.interactionProspect.id,
-                phone_number: _this9.phoneNumber
-              });
-            case 4:
-              _context7.prev = 4;
-              _this9.updatingPhoneNumber = false;
-              _this9.tab = 0;
-              return _context7.finish(4);
-            case 8:
-            case "end":
-              return _context7.stop();
-          }
-        }, _callee7, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              _this10.updatingMobilePhoneNumber = true;
+              _this10.updatingPhoneNumber = true;
               _context8.prev = 1;
               _context8.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
                 id: _this10.interactionProspect.id,
-                mobile_phone_number: _this10.mobilePhoneNumber
+                phone_number: _this10.phoneNumber
               });
             case 4:
               _context8.prev = 4;
-              _this10.updatingMobilePhoneNumber = false;
+              _this10.updatingPhoneNumber = false;
               _this10.tab = 0;
               return _context8.finish(4);
             case 8:
@@ -29601,45 +29659,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee8, null, [[1,, 4, 8]]);
       }))();
     },
-    fetchSelectedProspects: function fetchSelectedProspects() {
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              if (!(_this11.prospectsSelected.length == 0)) {
-                _context9.next = 3;
+              _this11.updatingMobilePhoneNumber = true;
+              _context9.prev = 1;
+              _context9.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
+                id: _this11.interactionProspect.id,
+                mobile_phone_number: _this11.mobilePhoneNumber
+              });
+            case 4:
+              _context9.prev = 4;
+              _this11.updatingMobilePhoneNumber = false;
+              _this11.tab = 0;
+              return _context9.finish(4);
+            case 8:
+            case "end":
+              return _context9.stop();
+          }
+        }, _callee9, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) switch (_context10.prev = _context10.next) {
+            case 0:
+              if (!(_this12.prospectsSelected.length == 0)) {
+                _context10.next = 3;
                 break;
               }
-              _this11.selectedProspects = [];
-              return _context9.abrupt("return");
+              _this12.selectedProspects = [];
+              return _context10.abrupt("return");
             case 3:
-              _context9.prev = 3;
-              _context9.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this11.project.slug, {
+              _context10.prev = 3;
+              _context10.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this12.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this11.prospectsSelected
+                    ids: _this12.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context9.sent;
+              _yield$ProspectServic = _context10.sent;
               data = _yield$ProspectServic.data;
-              _this11.selectedProspects = data.data.filter(function (prospect) {
+              _this12.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context9.prev = 9;
-              _this11.fetchingProspect = false;
-              return _context9.finish(9);
+              _context10.prev = 9;
+              _this12.fetchingProspect = false;
+              return _context10.finish(9);
             case 12:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
-        }, _callee9, null, [[3,, 9, 12]]);
+        }, _callee10, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -29659,24 +29742,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this12 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-          while (1) switch (_context10.prev = _context10.next) {
+      var _this13 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
             case 0:
-              if (newValue && _this12.leftSlideOpen(_this12.name)) {
-                _this12.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this12.interaction.number)) {
-                  _this12.interaction.number = newValue.phone_number;
+              if (newValue && _this13.leftSlideOpen(_this13.name)) {
+                _this13.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this13.interaction.number)) {
+                  _this13.interaction.number = newValue.phone_number;
                 } else {
-                  _this12.interaction.number = newValue.mobile_phone_number;
+                  _this13.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context10.stop();
+              return _context11.stop();
           }
-        }, _callee10);
+        }, _callee11);
       }))();
     },
     selectedProspects: function selectedProspects() {

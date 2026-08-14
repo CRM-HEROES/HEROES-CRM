@@ -12,4 +12,5 @@ class KavkomCall extends Model
 
     public function prospect() { return $this->belongsTo(Prospect::class); }
     public function interaction() { return $this->belongsTo(Interaction::class); }
+    public function qualification() { return $this->hasOne(ProspectCallQualification::class); }
 }

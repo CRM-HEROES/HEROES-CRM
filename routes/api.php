@@ -273,6 +273,7 @@ Route::group([
     // Kavkom
     Route::post('/settings/kavkom/test', [KavkomController::class, 'test'])->name('settings.kavkom.test');
     Route::post('/settings/kavkom/call', [KavkomController::class, 'call'])->name('settings.kavkom.call');
+    Route::get('/settings/kavkom/call/{callUuid}/status', [KavkomController::class, 'callStatus'])->name('settings.kavkom.call.status');
     Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
     Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');

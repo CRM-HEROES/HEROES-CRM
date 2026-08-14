@@ -42,6 +42,16 @@ return [
         'transcription_model' => env('OPENAI_TRANSCRIPTION_MODEL', 'whisper-1'),
     ],
 
+    // Kavkom sends the post-call CDR to our public endpoint. This is a
+    // separate secret configured as a custom header in Kavkom; an API token
+    // must never be used as a webhook secret.
+    'kavkom' => [
+        'webhook_secret' => env('KAVKOM_WEBHOOK_SECRET'),
+        // Optional base URL used only when the CDR mapping supplies a
+        // recording path rather than a complete HTTPS URL.
+        'recording_base_url' => env('KAVKOM_RECORDING_BASE_URL'),
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'live_model' => env('GEMINI_LIVE_MODEL', 'models/gemini-2.5-flash-native-audio-preview-09-2025'),

@@ -772,6 +772,9 @@ export default {
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
             kavkomCallState: "idle",
+            kavkomCallUuid: null,
+            kavkomDebugTimer: null,
+            kavkomDebugLastStatus: null,
             // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
             // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
             // au prospect une fois la conférence à 3 établie côté serveur.
@@ -799,6 +802,11 @@ export default {
 
     beforeDestroy() {
         window.removeEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
+        this.stopKavkomDebugPolling();
+    },
+
+    beforeUnmount() {
+        this.stopKavkomDebugPolling();
     },
 
     methods: {
@@ -957,6 +965,10 @@ export default {
                     callUuid: data.call_uuid || null,
                     apiConfirmation: true,
                 });
+                if (data.call_uuid) {
+                    this.kavkomCallUuid = data.call_uuid;
+                    this.startKavkomDebugPolling(data.call_uuid);
+                }
             } catch (error) {
                 console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
                     status: error.response?.status,
@@ -974,6 +986,60 @@ export default {
                 }
             } finally {
                 this.callingViaKavkom = false;
+            }
+        },
+
+        startKavkomDebugPolling(callUuid) {
+            this.stopKavkomDebugPolling();
+            this.kavkomDebugLastStatus = null;
+            let polls = 0;
+
+            console.log("[Kavkom][Debug] Server-side processing tracking enabled.", { callUuid });
+            this.kavkomDebugTimer = window.setInterval(async () => {
+                polls += 1;
+                if (this.kavkomCallUuid !== callUuid) {
+                    return;
+                }
+                try {
+                    const { data } = await ApiService.get(
+                        `settings/kavkom/call/${encodeURIComponent(callUuid)}/status`
+                    );
+                    // A request from a previous call can resolve after a
+                    // new call starts. Never display that stale response.
+                    if (this.kavkomCallUuid !== callUuid) {
+                        return;
+                    }
+                    const signature = `${data.status}|${data.has_recording}|${data.processed_at}|${data.error || ""}`;
+                    if (signature !== this.kavkomDebugLastStatus) {
+                        this.kavkomDebugLastStatus = signature;
+                        console.log("[Kavkom][Debug] Server processing status.", {
+                            callUuid: data.call_uuid,
+                            status: data.status,
+                            hasRecording: data.has_recording,
+                            processedAt: data.processed_at,
+                            interactionId: data.interaction_id,
+                            error: data.error || null,
+                        });
+                    }
+                    if (["processed", "ignored"].includes(data.status) || polls >= 60) {
+                        this.stopKavkomDebugPolling();
+                    }
+                } catch (error) {
+                    // A 404 is normal until Kavkom has posted the CDR.
+                    if (polls === 1 || polls % 6 === 0) {
+                        console.debug("[Kavkom][Debug] CDR not received yet.", {
+                            callUuid,
+                            status: error.response?.status,
+                        });
+                    }
+                }
+            }, 5000);
+        },
+
+        stopKavkomDebugPolling() {
+            if (this.kavkomDebugTimer) {
+                window.clearInterval(this.kavkomDebugTimer);
+                this.kavkomDebugTimer = null;
             }
         },
 
@@ -1030,6 +1096,7 @@ export default {
 
         onKavkomReady() {
             this.kavkomReady = true;
+            console.log("[Kavkom][Debug] SIP softphone ready.");
 
             if (this.pendingKavkomNumber) {
                 const number = this.pendingKavkomNumber;
@@ -1039,6 +1106,7 @@ export default {
         },
 
         onKavkomCallRinging() {
+            console.log("[Kavkom][Debug] Agent leg ringing.");
             this.interaction.status = "ringing";
             this.updateInteraction();
             this.kavkomCallState = "ringing";
@@ -1047,6 +1115,7 @@ export default {
         },
 
         onKavkomCallAnswered() {
+            console.log("[Kavkom][Debug] Call answered; media bridge active.");
             this.interaction.status = "answered";
             this.updateInteraction();
             this.kavkomCallState = "active";
@@ -1055,6 +1124,7 @@ export default {
         },
 
         onKavkomConnectionError(message) {
+            console.error("[Kavkom][Debug] SIP connection error.", { message });
             this.kavkomReady = false;
             this.callingViaKavkom = false;
             this.kavkomCallState = "failed";
@@ -1063,6 +1133,7 @@ export default {
         },
 
         onKavkomCallFailed(message) {
+            console.warn("[Kavkom][Debug] Call failed.", { message });
             this.callingViaKavkom = false;
             this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
@@ -1070,6 +1141,7 @@ export default {
         },
 
         onKavkomCallHangup({ durationMs = null } = {}) {
+            console.log("[Kavkom][Debug] Call hangup.", { durationMs });
             this.interaction.status = "hangup";
             this.updateInteraction();
             this.callingViaKavkom = false;

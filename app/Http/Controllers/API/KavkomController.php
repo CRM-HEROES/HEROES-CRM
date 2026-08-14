@@ -135,6 +135,24 @@ class KavkomController extends Controller
         return response()->json($result, 200);
     }
 
+    /** Lightweight, authenticated status endpoint used by the call UI debug log. */
+    public function callStatus(Request $request, string $callUuid)
+    {
+        $call = KavkomCall::query()
+            ->where('call_uuid', $callUuid)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        return response()->json([
+            'call_uuid' => $call->call_uuid,
+            'status' => $call->status,
+            'error' => $call->error,
+            'has_recording' => (bool) $call->recording_url,
+            'interaction_id' => $call->interaction_id,
+            'processed_at' => optional($call->processed_at)->toIso8601String(),
+        ]);
+    }
+
     /**
      * Comprehensive test that checks:
      * 1. REST API connectivity

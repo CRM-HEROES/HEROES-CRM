@@ -53,10 +53,17 @@ class ProspectCallDataMerger
             'summary' => data_get($analysis, 'summary'),
             'qualification' => data_get($analysis, 'qualification'),
             'needs' => data_get($analysis, 'needs', []),
+            'products_services' => data_get($analysis, 'products_services', []),
             'objections' => data_get($analysis, 'objections', []),
+            'important_questions' => data_get($analysis, 'important_questions', []),
             'next_steps' => data_get($analysis, 'next_steps', []),
             'budget' => data_get($analysis, 'extracted.budget'),
             'project' => data_get($analysis, 'extracted.project'),
+            'urgency' => data_get($analysis, 'urgency'),
+            'interest_level' => data_get($analysis, 'interest_level'),
+            'sentiment' => data_get($analysis, 'sentiment'),
+            'important_information' => data_get($analysis, 'important_information', []),
+            'conversion_probability' => data_get($analysis, 'conversion_probability'),
         ];
 
         return $meta;
