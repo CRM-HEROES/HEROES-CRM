@@ -49,6 +49,8 @@ class Import extends Model
         'processed_at',
         'rows_count',
         'roles',
+        'sheets',
+        'selected_sheets',
         'source',
         'token',
         'users',
@@ -90,6 +92,8 @@ class Import extends Model
         'projects'  => 'json',
         'roles'     => 'json',
         'prospects' => 'json',
+        'sheets'    => 'json',
+        'selected_sheets' => 'json',
         'users'     => 'json',
         'values'    => 'json',
     ];

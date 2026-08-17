@@ -569,6 +569,14 @@ export default {
          * @param {*} e
          */
         search(e) {
+            // Flush the pending debounced keyword update
+            // so Enter uses the value just typed, instead of
+            // a stale one from before the 300ms debounce fired
+            if (this.keywordTimeout !== undefined) {
+                clearTimeout(this.keywordTimeout);
+                this.keyword = this.tmpKeyword;
+            }
+
             if (this.keyword.length == 0) {
                 store.commit(INIT_PROSPECT_PARAMS);
                 store.dispatch(FETCH_PROSPECTS);
@@ -1183,6 +1191,20 @@ export default {
             this.fetchProspects();
             this.fetchUsers();
             this.fetchProjects();
+
+            // Live filter the prospects table as the user
+            // types, without waiting for Enter, when already
+            // on the prospect list page
+            if (this.project && this.$route.name == "prospect") {
+                if (this.keyword.length == 0) {
+                    store.commit(INIT_PROSPECT_PARAMS);
+                } else {
+                    store.commit(SET_PROSPECT_PARAMS, {
+                        query: this.keyword,
+                    });
+                }
+                store.dispatch(FETCH_PROSPECTS);
+            }
         },
 
         async selected() {

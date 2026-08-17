@@ -44,12 +44,18 @@ class ImportGetSummary implements ShouldQueue
      */
     protected function getFileSummary()
     {
+        // File path
+        $filepath = Storage::disk("imports")->path($this->import->path);
+
+        // List every sheet/tab in the workbook (cheap: sheet names only,
+        // no row data) so the user can choose which ones to import —
+        // useful for multi-tab Google Sheets exports where tabs don't all
+        // share the same columns.
+        $sheetNames = $this->getSheetNames($filepath);
+
         // Choose reader type
         // depending on the type of file to import
         $reader = $this->getFileReader();
-
-        // File path
-        $filepath = Storage::disk("imports")->path($this->import->path);
 
         // Open the file using the Memory Spout reader
         $reader->open($filepath);
@@ -94,11 +100,33 @@ class ImportGetSummary implements ShouldQueue
 
         // Update import header and values
         // for summary
+        $this->import->sheets = $sheetNames;
         $this->import->headers = $headers;
         $this->import->values = $values;
         $this->import->save();
     }
-    
+
+    /**
+     * List every sheet/tab name in the workbook. Box Spout's sheet
+     * iterator only reads sheet metadata (not row data) until
+     * getRowIterator() is called on a given sheet, so this is cheap even
+     * for large files. Not meaningful for CSV (always a single sheet).
+     */
+    protected function getSheetNames(string $filepath): array
+    {
+        $reader = $this->getFileReader();
+        $reader->open($filepath);
+
+        $names = [];
+        foreach ($reader->getSheetIterator() as $sheet) {
+            $names[] = $sheet->getName();
+        }
+
+        $reader->close();
+
+        return $names;
+    }
+
     /**
      * Choose reader type
      * depending on the type of file to import

@@ -622,6 +622,7 @@
             "tab": {
                 "mapping": {
                     "title": "Mapping",
+                    "sheets": "Feuilles à importer",
                     "cancel": "Annuler le mapping",
                     "event": "RDV",
                     "order": "Devis",

@@ -90,6 +90,7 @@ class ImportController extends Controller
         $this->validate(request(), [
             'mapping' => 'sometimes|array',
             'duplicates_fields' => 'sometimes|array',
+            'selected_sheets' => 'sometimes|nullable|array',
             'notify_welcome_sms' => 'sometimes|boolean',
             'welcome_sms_message' => 'sometimes|nullable|string|required_if:notify_welcome_sms,true',
             'welcome_sms_source' => 'sometimes|nullable|in:brevo,smsbox,ultramsg,mtarget',
@@ -100,6 +101,7 @@ class ImportController extends Controller
             'headers',
             'mapping',
             'duplicates_fields',
+            'selected_sheets',
             'is_processing',
             'notify_welcome_sms',
             'welcome_sms_message',

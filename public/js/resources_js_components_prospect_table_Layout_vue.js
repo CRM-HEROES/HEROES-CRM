@@ -310,6 +310,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * @param {*} e
      */
     search: function search(e) {
+      // Flush the pending debounced keyword update
+      // so Enter uses the value just typed, instead of
+      // a stale one from before the 300ms debounce fired
+      if (this.keywordTimeout !== undefined) {
+        clearTimeout(this.keywordTimeout);
+        this.keyword = this.tmpKeyword;
+      }
       if (this.keyword.length == 0) {
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.INIT_PROSPECT_PARAMS);
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
@@ -861,6 +868,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.fetchProspects();
       this.fetchUsers();
       this.fetchProjects();
+
+      // Live filter the prospects table as the user
+      // types, without waiting for Enter, when already
+      // on the prospect list page
+      if (this.project && this.$route.name == "prospect") {
+        if (this.keyword.length == 0) {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.INIT_PROSPECT_PARAMS);
+        } else {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_PARAMS, {
+            query: this.keyword
+          });
+        }
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
+      }
     },
     selected: function selected() {
       var _this7 = this;
@@ -13462,16 +13483,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onChange: _cache[6] || (_cache[6] = function () {
       return $options.search && $options.search.apply($options, arguments);
     }),
+    onKeydown: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $event.target.blur();
+    }, ["prevent"]), ["enter"])),
     ref: "search"
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
-    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleWithField && $options.toggleWithField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */), [[_directive_tooltip, $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'Sans ' + $props.column.name : 'Tous' : 'Avec ' + $props.column.name]]), !$props.column.meta && $props.column.id == 'street' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
     key: 0,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-check', 'hc-default-header-cell-label-valid', $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? 'icon-red' : 'icon-grey' : 'icon-green']),
-    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleValidField && $options.toggleValidField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {

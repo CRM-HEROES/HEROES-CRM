@@ -77,6 +77,8 @@ class ImportProspects implements ShouldQueue
     protected $seenDuplicates = ['email' => [], 'phone' => [], 'mobile' => []];
     protected $existingEmails = [];
     protected $existingMobiles = [];
+    protected $suspiciousRowsCount = 0;
+    protected $updatedDuplicatesCount = 0;
 
     /**
      * Create a new job instance.
@@ -248,7 +250,21 @@ class ImportProspects implements ShouldQueue
         // run's data), so it ends up importing nothing. This lock ensures
         // only one worker processes a given import at a time; a duplicate
         // run releases immediately instead of racing the first one.
-        $lock = Cache::store('redis')->lock('import-processing-' . $this->import->id, 3600);
+        // Fall back to the default cache store when Redis isn't available
+        // (e.g. local/dev environments without the Redis extension), so a
+        // missing Redis setup doesn't crash the import outright.
+        try {
+            $store = Cache::store('redis');
+            $store->get('import-processing-probe');
+        } catch (\Throwable $e) {
+            Log::warning('ImportProspects: redis cache store unavailable, falling back to default store for the lock', [
+                'import_id' => $this->import->id,
+                'message' => $e->getMessage(),
+            ]);
+            $store = Cache::store();
+        }
+
+        $lock = $store->lock('import-processing-' . $this->import->id, 3600);
 
         if (!$lock->get()) {
             Log::warning('ImportProspects: import already being processed by another worker, skipping duplicate run', [
@@ -313,8 +329,16 @@ class ImportProspects implements ShouldQueue
 
         // SHEET LOOP
         // Loop through all sheets in the workbook so Google Sheets
-        // imports can import every tab in the document.
+        // imports can import every tab in the document, unless the user
+        // restricted the import to a subset of sheets.
         foreach ($reader->getSheetIterator() as $sheet) {
+
+            if (
+                !empty($this->import->selected_sheets)
+                && !in_array($sheet->getName(), $this->import->selected_sheets, true)
+            ) {
+                continue;
+            }
 
             // Indicate the first row
             // as the header of the file
@@ -357,6 +381,21 @@ class ImportProspects implements ShouldQueue
                 // Convert import row to prospect data
                 $prospect = $this->importRowToProspect($row, $rowsCount);
 
+                // Skip rows whose email/phone don't look like an email/phone
+                // at all (columns shifted in the source spreadsheet) instead
+                // of importing garbled data into the wrong fields.
+                if ($this->isSuspiciousProspect($prospect)) {
+                    ++$this->suspiciousRowsCount;
+
+                    Log::warning('ImportProspects: suspicious row skipped, columns look shifted in the source spreadsheet', [
+                        'import_id' => $this->import->id,
+                        'sheet' => $sheet->getName(),
+                        'row' => $row,
+                    ]);
+
+                    continue;
+                }
+
                 // Skip rows with neither an email nor a phone number (e.g.
                 // manually pasted rows in the source spreadsheet that only
                 // contain a name) — without a way to contact them, they are
@@ -366,8 +405,15 @@ class ImportProspects implements ShouldQueue
                     continue;
                 }
 
-                // Skip if prospect is a duplicate (by email or phone)
+                // Skip if prospect is a duplicate (by email or phone) —
+                // but still refresh the existing prospect's meta answers
+                // (e.g. the recontact date) instead of silently dropping
+                // the new data, see updateExistingDuplicateProspect().
                 if ($this->isDuplicateProspect($prospect)) {
+                    if ($this->updateExistingDuplicateProspect($prospect)) {
+                        ++$this->updatedDuplicatesCount;
+                    }
+
                     continue;
                 }
 
@@ -440,6 +486,8 @@ class ImportProspects implements ShouldQueue
             'import_id' => $this->import->id,
             'project_id' => $this->import->project_id,
             'rows_count' => $rowsCount,
+            'suspicious_rows_count' => $this->suspiciousRowsCount,
+            'updated_duplicates_count' => $this->updatedDuplicatesCount,
         ]);
 
         // Send notification to the import's creator
@@ -765,14 +813,24 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
+            // Exclude this import's own prospects: they are about to be
+            // deleted and recreated by removePreviousImportProspects(), so
+            // treating them as "already existing" would make every row of
+            // a re-processed import look like a duplicate of itself,
+            // silently wiping the import's data instead of recreating it.
+            // Prospects with no import_id (created manually) must still
+            // count as "existing", hence the whereNull branch.
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
+            })
             ->whereNull('deleted_at')
             ->whereNotNull('email')
             ->where('email', '<>', '')
-            ->select('email')
+            ->select('id', 'email')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$emails) {
                 foreach ($rows as $p) {
-                    $emails[strtolower(trim($p->email))] = true;
+                    $emails[strtolower(trim($p->email))] = $p->id;
                 }
             });
 
@@ -789,16 +847,21 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
+            // See getExistingEmails() for why this import's own (about to
+            // be recreated) prospects must be excluded here.
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
+            })
             ->whereNull('deleted_at')
             ->whereNotNull('mobile_phone_number')
             ->where('mobile_phone_number', '<>', '')
-            ->select('mobile_phone_number')
+            ->select('id', 'mobile_phone_number')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$mobiles) {
                 foreach ($rows as $p) {
                     $key = $this->normalizePhone($p->mobile_phone_number);
                     if ($key !== '') {
-                        $mobiles[$key] = true;
+                        $mobiles[$key] = $p->id;
                     }
                 }
             });
@@ -824,6 +887,32 @@ class ImportProspects implements ShouldQueue
         return empty($prospect['email'])
             && empty($prospect['phone_number'])
             && empty($prospect['mobile_phone_number']);
+    }
+
+    /**
+     * A source spreadsheet row whose cells got shifted (e.g. a lead that
+     * skipped one question, so the automation feeding the sheet wrote the
+     * next answer one column too early) ends up with a name in the email
+     * field, or a phone number in the name field. Importing that as-is
+     * would silently corrupt the prospect instead of erroring out, so
+     * these rows are flagged and skipped for manual review instead.
+     */
+    protected function isSuspiciousProspect($prospect)
+    {
+        if (!empty($prospect['email']) && !str_contains($prospect['email'], '@')) {
+            return true;
+        }
+
+        // Count actual digits regardless of formatting (spaces, dots,
+        // dashes are common in phone numbers, e.g. "06 66 34 59 06"), and
+        // only flag values too short to be a real phone number at all.
+        foreach (['mobile_phone_number', 'phone_number'] as $field) {
+            if (!empty($prospect[$field]) && strlen($this->normalizePhone($prospect[$field])) < 6) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -874,6 +963,67 @@ class ImportProspects implements ShouldQueue
         }
 
         return false; // Not a duplicate
+    }
+
+    /**
+     * A lead that already exists in the CRM (matched by email or mobile)
+     * is never re-created, but re-importing it must still refresh its
+     * answers — e.g. "quand souhaitez-vous être recontacté" — otherwise a
+     * corrected/updated sheet silently stops updating known leads, which
+     * has caused missed appointments in production. Only meta fields are
+     * merged in (never email/phone/name) to avoid the identity fields
+     * themselves being touched, and suspicious (likely column-shifted)
+     * rows are never merged in, to avoid corrupting an already-good
+     * existing prospect with garbled data.
+     */
+    protected function updateExistingDuplicateProspect($prospect)
+    {
+        if ($this->isSuspiciousProspect($prospect)) {
+            return false;
+        }
+
+        $existingId = null;
+
+        if (!empty($prospect['email'])) {
+            $existingId = $this->existingEmails[strtolower(trim($prospect['email']))] ?? null;
+        }
+
+        if (!$existingId && !empty($prospect['mobile_phone_number'])) {
+            $mobile = $this->normalizePhone($prospect['mobile_phone_number']);
+            $existingId = $mobile !== '' ? ($this->existingMobiles[$mobile] ?? null) : null;
+        }
+
+        if (!$existingId) {
+            return false;
+        }
+
+        $newMeta = array_filter($prospect['meta'] ?? [], function ($value) {
+            return $value !== null && $value !== '';
+        });
+
+        if (empty($newMeta)) {
+            return false;
+        }
+
+        $existing = DB::table('prospects')->where('id', $existingId)->first(['meta']);
+
+        if (!$existing) {
+            return false;
+        }
+
+        $existingMeta = json_decode($existing->meta ?: '{}', true) ?: [];
+        $mergedMeta = array_merge($existingMeta, $newMeta);
+
+        if ($mergedMeta == $existingMeta) {
+            return false;
+        }
+
+        DB::table('prospects')->where('id', $existingId)->update([
+            'meta' => json_encode($mergedMeta),
+            'updated_at' => $this->date,
+        ]);
+
+        return true;
     }
 
     /**

@@ -47,6 +47,7 @@
             @focus="$emit('focus'), showRequired()"
             @blur="$emit('blur'), hideRequired(), hideOptions()"
             @change="search"
+            @keydown.enter.prevent="$event.target.blur()"
             ref="search"
         />
 
