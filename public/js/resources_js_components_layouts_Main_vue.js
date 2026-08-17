@@ -22552,6 +22552,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     date: function date() {
       return dayjs(this.file.created_at).fromNow();
     },
+    /**
+     *
+     */
+    isPdf: function isPdf() {
+      return this.file.extension === "pdf";
+    },
     size: function size() {
       var units = ["Bytes", "KB", "MB", "GB", "TB"];
       var size = this.file.size;
@@ -73259,9 +73265,17 @@ var _hoisted_3 = {
   "class": "hc-prospect-file-thumbnail-content"
 };
 var _hoisted_4 = ["src"];
-var _hoisted_5 = ["textContent"];
-var _hoisted_6 = ["textContent"];
-var _hoisted_7 = ["textContent"];
+var _hoisted_5 = {
+  key: 0,
+  "class": "hc-prospect-file-type-badge"
+};
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-file-pdf"
+}, null, -1 /* HOISTED */);
+var _hoisted_7 = [_hoisted_6];
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
@@ -73270,7 +73284,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     target: "_blank"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
     src: $props.file.thumbnail
-  }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_4), $options.isPdf ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, _hoisted_7)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-file-remove",
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.removeFile && $options.removeFile.apply($options, arguments);
@@ -73278,13 +73292,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, " × ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-file-name",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.file.name)
-  }, null, 8 /* PROPS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-file-date",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.date)
-  }, null, 8 /* PROPS */, _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-file-size",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.size)
-  }, null, 8 /* PROPS */, _hoisted_7), _ctx.can('all.project.document.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+  }, null, 8 /* PROPS */, _hoisted_10), _ctx.can('all.project.document.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 0,
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.edit && $options.edit.apply($options, arguments);
@@ -100151,7 +100165,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-file {\n    padding: 8px;\n    float: left;\n    width: 33.333%;\n    display: block;\n    text-decoration: none;\n    position: relative;\n    border-radius: 10px;\n    transition: all 200ms ease-out;\n}\n.hc-prospect-file:hover {\n    transform: scale(1.025);\n    background-color: #eee;\n}\n.hc-prospect-file-thumbnail {\n    width: 100%;\n    border-radius: 5px;\n    overflow: hidden;\n    position: relative;\n    background-color: #eee;\n    box-shadow: 0 2px 5px -2px #0007;\n}\n.hc-prospect-file-thumbnail-content {\n    text-align: center;\n    width: 100%;\n    padding-top: 80%;\n}\n.hc-prospect-file-thumbnail-content > img {\n    bottom: 0;\n    height: auto;\n    left: 0;\n    margin: auto;\n    position: absolute;\n    top: 0;\n    right: 0;\n    width: 100%;\n}\n.hc-prospect-file-remove {\n    opacity: 0;\n    transform: scale(0.8);\n    position: absolute;\n    top: 2px;\n    right: 2px;\n    width: 20px;\n    height: 20px;\n    transition: all 100ms ease-out;\n    color: #ffffff;\n    font-size: 9px;\n    font-weight: bold;\n    text-align: center;\n    line-height: 20px;\n    text-decoration: none;\n    border-radius: 50%;\n    cursor: pointer;\n    background-color: #7939b8;\n}\n.hc-prospect-file-access {\n    opacity: 0;\n    transform: scale(0.8);\n    position: absolute;\n    top: 2px;\n    left: 2px;\n    width: 20px;\n    height: 20px;\n    transition: all 100ms ease-out;\n    color: #ffffff;\n    font-size: 9px;\n    font-weight: bold;\n    text-align: center;\n    line-height: 20px;\n    text-decoration: none;\n    border-radius: 50%;\n    cursor: pointer;\n    background-color: #6E6E6E;\n}\n.hc-prospect-file:hover .hc-prospect-file-remove,\n.hc-prospect-file:hover .hc-prospect-file-access {\n    opacity: 1;\n    transform: scale(1);\n}\n.hc-prospect-file-name,\n.hc-prospect-file-date {\n    overflow: hidden;\n    white-space: nowrap;\n    text-overflow: ellipsis;\n}\n.hc-prospect-file-name {\n    padding-top: 7px;\n    color: #000000;\n}\n.hc-prospect-file-date {\n    font-size: 11px;\n    color: #777;\n}\n.hc-prospect-file-size {\n    font-size: 11px;\n    color: #777;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-file {\n    padding: 8px;\n    float: left;\n    width: 33.333%;\n    display: block;\n    text-decoration: none;\n    position: relative;\n    border-radius: 10px;\n    transition: all 200ms ease-out;\n}\n.hc-prospect-file:hover {\n    transform: scale(1.025);\n    background-color: #eee;\n}\n.hc-prospect-file-thumbnail {\n    width: 100%;\n    border-radius: 5px;\n    overflow: hidden;\n    position: relative;\n    background-color: #eee;\n    box-shadow: 0 2px 5px -2px #0007;\n}\n.hc-prospect-file-thumbnail-content {\n    text-align: center;\n    width: 100%;\n    padding-top: 80%;\n}\n.hc-prospect-file-thumbnail-content > img {\n    bottom: 0;\n    height: auto;\n    left: 0;\n    margin: auto;\n    position: absolute;\n    top: 0;\n    right: 0;\n    width: 100%;\n}\n.hc-prospect-file-remove {\n    opacity: 0;\n    transform: scale(0.8);\n    position: absolute;\n    top: 2px;\n    right: 2px;\n    width: 20px;\n    height: 20px;\n    transition: all 100ms ease-out;\n    color: #ffffff;\n    font-size: 9px;\n    font-weight: bold;\n    text-align: center;\n    line-height: 20px;\n    text-decoration: none;\n    border-radius: 50%;\n    cursor: pointer;\n    background-color: #7939b8;\n}\n.hc-prospect-file-type-badge {\n    position: absolute;\n    bottom: 5px;\n    left: 5px;\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background-color: #ffffff;\n    box-shadow: 0 1px 4px #0003;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 12px;\n    color: #d63b3b;\n}\n.hc-prospect-file-access {\n    opacity: 0;\n    transform: scale(0.8);\n    position: absolute;\n    top: 2px;\n    left: 2px;\n    width: 20px;\n    height: 20px;\n    transition: all 100ms ease-out;\n    color: #ffffff;\n    font-size: 9px;\n    font-weight: bold;\n    text-align: center;\n    line-height: 20px;\n    text-decoration: none;\n    border-radius: 50%;\n    cursor: pointer;\n    background-color: #6E6E6E;\n}\n.hc-prospect-file:hover .hc-prospect-file-remove,\n.hc-prospect-file:hover .hc-prospect-file-access {\n    opacity: 1;\n    transform: scale(1);\n}\n.hc-prospect-file-name,\n.hc-prospect-file-date {\n    overflow: hidden;\n    white-space: nowrap;\n    text-overflow: ellipsis;\n}\n.hc-prospect-file-name {\n    padding-top: 7px;\n    color: #000000;\n}\n.hc-prospect-file-date {\n    font-size: 11px;\n    color: #777;\n}\n.hc-prospect-file-size {\n    font-size: 11px;\n    color: #777;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

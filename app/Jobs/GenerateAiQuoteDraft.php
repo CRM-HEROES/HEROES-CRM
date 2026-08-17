@@ -152,7 +152,7 @@ PROMPT;
         $stream = $documentDisk->readStream($prospect->project->slug . '/' . $pathinfo['basename']);
         $folderDisk->writeStream($path, $stream);
 
-        $prospect->files()->create([
+        $file = $prospect->files()->create([
             'folder_id' => $document->folder_id,
             'from_user' => 1,
             'creator_id' => $this->userId,
@@ -160,5 +160,13 @@ PROMPT;
             'name' => $document->name . ' - ' . $timestamp,
             'size' => filesize($outputFile),
         ]);
+
+        // Files are only visible in listings to users explicitly shared on
+        // the folder or the file (see FileController::index). Without this,
+        // the generated quote would be retrievable by direct link but never
+        // show up in the prospect's file list for the user who triggered it.
+        if ($this->userId) {
+            $file->users()->attach($this->userId);
+        }
     }
 }

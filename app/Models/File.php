@@ -43,6 +43,7 @@ class File extends Model
     protected $appends = [
         'url',
         'thumbnail',
+        'extension',
     ];
 
 
@@ -76,6 +77,16 @@ class File extends Model
             'folder' => $this->folder->id,
             'file' => $this->id
         ]) : null;
+    }
+
+    /**
+     * Get file extension
+     *
+     * @return string
+     */
+    public function getExtensionAttribute()
+    {
+        return $this->path ? strtolower(pathinfo($this->path, PATHINFO_EXTENSION)) : null;
     }
 
     // Relationships

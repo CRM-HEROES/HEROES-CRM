@@ -2,11 +2,18 @@
     <a
         class="hc-prospect-profile-file hc-flex-column"
         :href="file.url"
+        target="_blank"
         style="width: 50%"
     >
         <div class="hc-prospect-profile-file-thumbnail hc-flex-column">
             <div class="hc-prospect-profile-file-thumbnail-content">
                 <img :src="file.thumbnail" />
+                <div
+                    v-if="isPdf"
+                    class="hc-prospect-profile-file-type-badge"
+                >
+                    <i class="fa fa-file-pdf"></i>
+                </div>
                 <div
                     class="hc-prospect-profile-file-remove"
                     @click.prevent.stop="removeFile"
@@ -83,6 +90,22 @@
     background-color: #7939b8;
 }
 
+.hc-prospect-profile-file-type-badge {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: #ffffff;
+    box-shadow: 0 1px 4px #0003;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    color: #d63b3b;
+}
+
 .hc-prospect-profile-file:hover .hc-prospect-profile-file-remove {
     opacity: 1;
     transform: scale(1);
@@ -145,6 +168,13 @@ export default {
          */
         date() {
             return dayjs(this.file.created_at).fromNow();
+        },
+
+        /**
+         *
+         */
+        isPdf() {
+            return this.file.extension === "pdf";
         },
     },
 };
