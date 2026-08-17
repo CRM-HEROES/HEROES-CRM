@@ -27,6 +27,19 @@
             >
                 <span>Modifier le champ</span>
             </span>
+            <span
+                v-if="canToggleUnique"
+                :class="['fa', 'fa-clone', field.unique ? 'icon-green' : '']"
+                @click.prevent="toggleUnique"
+            >
+                <span
+                    v-text="
+                        field.unique
+                            ? 'Vérification doublon activée'
+                            : 'Vérifier doublon lors de la saisie'
+                    "
+                ></span>
+            </span>
         </div>
 
         <input
@@ -97,7 +110,7 @@ import {
 } from "@/actions/project/prospect";
 
 import { OPEN_MODAL } from "@/actions/modal";
-import { SET_FIELD } from "@/actions/project/field";
+import { SET_FIELD, UPDATE_FIELD } from "@/actions/project/field";
 
 export default {
     props: {
@@ -252,6 +265,17 @@ export default {
         },
 
         /**
+         * Toggle the "check duplicate on input" (unique)
+         * setting for the current field
+         */
+        async toggleUnique() {
+            await store.dispatch(UPDATE_FIELD, {
+                id: this.field.id,
+                unique: !this.field.unique,
+            });
+        },
+
+        /**
          * Show asterisk sign for required search
          */
         showRequired() {
@@ -343,6 +367,26 @@ export default {
 
         isValidFilter() {
             return this.prospectsParamExists(this.isValidFilterKey);
+        },
+
+        /**
+         * Only show the quick duplicate-check
+         * shortcut for email and phone fields.
+         * Built-in email/phone fields are created without
+         * a "type" (they default to "text" in DB), so we
+         * also match them by slug, in addition to matching
+         * custom fields by their "email"/"tel" type.
+         */
+        canToggleUnique() {
+            if (!this.field || !this.can("all.project.field.update")) {
+                return false;
+            }
+
+            return (
+                ["email", "phone_number", "mobile_phone_number"].includes(
+                    this.field.slug
+                ) || ["email", "tel"].includes(this.field.type)
+            );
         },
     },
 };

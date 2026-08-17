@@ -29340,12 +29340,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               polls += 1;
-              _context4.prev = 1;
-              _context4.next = 4;
+              if (!(_this5.kavkomCallUuid !== callUuid)) {
+                _context4.next = 3;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 3:
+              _context4.prev = 3;
+              _context4.next = 6;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].get("settings/kavkom/call/".concat(encodeURIComponent(callUuid), "/status"));
-            case 4:
+            case 6:
               _yield$ApiService$get = _context4.sent;
               data = _yield$ApiService$get.data;
+              if (!(_this5.kavkomCallUuid !== callUuid)) {
+                _context4.next = 10;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 10:
               signature = "".concat(data.status, "|").concat(data.has_recording, "|").concat(data.processed_at, "|").concat(data.error || "");
               if (signature !== _this5.kavkomDebugLastStatus) {
                 _this5.kavkomDebugLastStatus = signature;
@@ -29361,11 +29373,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (["processed", "ignored"].includes(data.status) || polls >= 60) {
                 _this5.stopKavkomDebugPolling();
               }
-              _context4.next = 14;
+              _context4.next = 18;
               break;
-            case 11:
-              _context4.prev = 11;
-              _context4.t0 = _context4["catch"](1);
+            case 15:
+              _context4.prev = 15;
+              _context4.t0 = _context4["catch"](3);
               // A 404 is normal until Kavkom has posted the CDR.
               if (polls === 1 || polls % 6 === 0) {
                 console.debug("[Kavkom][Debug] CDR not received yet.", {
@@ -29373,11 +29385,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   status: (_error$response4 = _context4.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status
                 });
               }
-            case 14:
+            case 18:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[1, 11]]);
+        }, _callee4, null, [[3, 15]]);
       })), 5000);
     },
     stopKavkomDebugPolling: function stopKavkomDebugPolling() {

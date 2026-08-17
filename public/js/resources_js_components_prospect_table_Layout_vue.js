@@ -7841,6 +7841,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     /**
+     * Toggle the "check duplicate on input" (unique)
+     * setting for the current field
+     */
+    toggleUnique: function toggleUnique() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.UPDATE_FIELD, {
+                id: _this5.field.id,
+                unique: !_this5.field.unique
+              });
+            case 2:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
+      }))();
+    },
+    /**
      * Show asterisk sign for required search
      */
     showRequired: function showRequired() {
@@ -7850,17 +7872,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Hide asterisk sign for required search
      */
     hideRequired: function hideRequired() {
-      var _this5 = this;
+      var _this6 = this;
       setTimeout(function () {
-        _this5.requiredShown = false;
+        _this6.requiredShown = false;
       }, 200);
     },
     /**
      */
     hideOptions: function hideOptions() {
-      var _this6 = this;
+      var _this7 = this;
       setTimeout(function () {
-        _this6.showOptions = false;
+        _this7.showOptions = false;
       }, 200);
     }
   },
@@ -7889,9 +7911,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Current field
      */
     field: function field() {
-      var _this7 = this;
+      var _this8 = this;
       return this.fields.find(function (f) {
-        return f["for"] == "prospect" && (_this7.column.category == "meta" ? f.meta && f.slug == _this7.column.id : !f.meta && f.slug == _this7.column.id);
+        return f["for"] == "prospect" && (_this8.column.category == "meta" ? f.meta && f.slug == _this8.column.id : !f.meta && f.slug == _this8.column.id);
       });
     },
     isRequiredFilterKey: function isRequiredFilterKey() {
@@ -7905,6 +7927,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     isValidFilter: function isValidFilter() {
       return this.prospectsParamExists(this.isValidFilterKey);
+    },
+    /**
+     * Only show the quick duplicate-check
+     * shortcut for email and phone fields.
+     * Built-in email/phone fields are created without
+     * a "type" (they default to "text" in DB), so we
+     * also match them by slug, in addition to matching
+     * custom fields by their "email"/"tel" type.
+     */
+    canToggleUnique: function canToggleUnique() {
+      if (!this.field || !this.can("all.project.field.update")) {
+        return false;
+      }
+      return ["email", "phone_number", "mobile_phone_number"].includes(this.field.slug) || ["email", "tel"].includes(this.field.type);
     }
   })
 });
@@ -13381,8 +13417,9 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Trier", -1 /* HOISTED */);
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Modifier le champ", -1 /* HOISTED */);
 var _hoisted_3 = [_hoisted_2];
-var _hoisted_4 = ["placeholder"];
-var _hoisted_5 = ["textContent"];
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = ["placeholder"];
+var _hoisted_6 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
@@ -13390,7 +13427,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-default-header-cell-label', $data.requiredShown ? 'required-shown' : '', $data.showOptions ? 'show-options' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-default-header-cell-options",
-    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $data.showOptions = !$data.showOptions;
     }, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -13406,32 +13443,40 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.edit && $options.edit.apply($options, arguments);
     }, ["prevent"]))
-  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canToggleUnique ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 1,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-clone', $options.field.unique ? 'icon-green' : '']),
+    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.toggleUnique && $options.toggleUnique.apply($options, arguments);
+    }, ["prevent"]))
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.field.unique ? 'Vérification doublon activée' : 'Vérifier doublon lors de la saisie')
+  }, null, 8 /* PROPS */, _hoisted_4)], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     placeholder: $props.column.name + ' ...',
-    onFocus: _cache[3] || (_cache[3] = function ($event) {
+    onFocus: _cache[4] || (_cache[4] = function ($event) {
       return _ctx.$emit('focus'), $options.showRequired();
     }),
-    onBlur: _cache[4] || (_cache[4] = function ($event) {
+    onBlur: _cache[5] || (_cache[5] = function ($event) {
       return _ctx.$emit('blur'), $options.hideRequired(), $options.hideOptions();
     }),
-    onChange: _cache[5] || (_cache[5] = function () {
+    onChange: _cache[6] || (_cache[6] = function () {
       return $options.search && $options.search.apply($options, arguments);
     }),
     ref: "search"
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
-    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleWithField && $options.toggleWithField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */), [[_directive_tooltip, $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'Sans ' + $props.column.name : 'Tous' : 'Avec ' + $props.column.name]]), !$props.column.meta && $props.column.id == 'street' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
     key: 0,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-check', 'hc-default-header-cell-label-valid', $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? 'icon-red' : 'icon-grey' : 'icon-green']),
-    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleValidField && $options.toggleValidField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.name)
-  }, null, 8 /* PROPS */, _hoisted_5)], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, _hoisted_6)], 2 /* CLASS */);
 }
 
 /***/ }),
