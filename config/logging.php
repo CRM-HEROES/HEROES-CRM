@@ -150,6 +150,14 @@ return [
             'days' => 14,
             'replace_placeholders' => true,
         ],
+
+        'archer' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/archer.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+            'days' => 14,
+            'replace_placeholders' => true,
+        ],
     ],
 
 ];
