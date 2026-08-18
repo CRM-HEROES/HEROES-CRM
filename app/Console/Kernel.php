@@ -46,6 +46,11 @@ class Kernel extends ConsoleKernel
         // Automatic assignment of unassigned prospects
         $schedule->command('app:assign-prospects')->everyFiveMinutes()->withoutOverlapping();
         $schedule->command('app:reassign-unavailable-prospects')->everyFiveMinutes()->withoutOverlapping();
+
+        // ARCHER (P6): nightly prospect enrichment. Rank runs an hour after
+        // enrich to give the queue time to work through the batch.
+        $schedule->command('archer:enrich')->dailyAt('02:00')->withoutOverlapping();
+        $schedule->command('archer:rank')->dailyAt('03:00')->withoutOverlapping();
     }
 
     /**

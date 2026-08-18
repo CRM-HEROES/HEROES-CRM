@@ -68,4 +68,15 @@ return [
         'document_template_name' => env('AI_QUOTE_DOCUMENT_TEMPLATE', 'Devis IA'),
     ],
 
+    // ARCHER nightly enrichment (P6): contact verification + LinkedIn lookup.
+    'dropcontact' => [
+        'key' => env('DROPCONTACT_API_KEY'),
+        'base_url' => env('DROPCONTACT_BASE_URL', 'https://api.dropcontact.io'),
+    ],
+
+    'proxycurl' => [
+        'key' => env('PROXYCURL_API_KEY'),
+        'base_url' => env('PROXYCURL_BASE_URL', 'https://nubela.co/proxycurl/api'),
+    ],
+
 ];

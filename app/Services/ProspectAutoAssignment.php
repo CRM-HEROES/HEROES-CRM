@@ -36,6 +36,14 @@ class ProspectAutoAssignment
         $assigned = 0;
 
         $query->orderBy('id')->chunkById(500, function ($prospects) use ($project, $importId, &$assigned) {
+        // ARCHER (P6): within each fetched page, prospects flagged as
+        // top-20% ("tête de file") are assigned before the rest, so a
+        // high-scoring prospect isn't stuck behind older, lower-priority
+        // ones purely because of import order.
+        $prospects = $prospects->sortByDesc(function ($prospect) {
+            return ($prospect->archer_priority ? 1000 : 0) + ($prospect->archer_score ?? 0);
+        })->values();
+
         foreach ($prospects->groupBy('project_id') as $projectId => $projectProspects) {
             $projectModel = ($project && (int)$project->id === (int)$projectId)
                 ? $project

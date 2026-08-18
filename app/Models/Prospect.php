@@ -57,6 +57,14 @@ class Prospect extends Authenticatable
         'title',
         'valid_address',
         'website_url',
+        'sector',
+        'appetency_score',
+        'verified_email',
+        'verified_phone',
+        'linkedin_url',
+        'archer_score',
+        'archer_priority',
+        'archer_scored_at',
     ];
 
     
@@ -71,6 +79,10 @@ class Prospect extends Authenticatable
         'processed_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'verified_email' => 'boolean',
+        'verified_phone' => 'boolean',
+        'archer_priority' => 'boolean',
+        'archer_scored_at' => 'datetime',
     ];
 
     /**
@@ -197,6 +209,14 @@ class Prospect extends Authenticatable
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    /**
+     * ARCHER enrichment history (see App\Services\Archer)
+     */
+    public function enrichments()
+    {
+        return $this->hasMany(ProspectEnrichment::class);
     }
 
     /**
