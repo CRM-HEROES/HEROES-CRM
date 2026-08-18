@@ -28,7 +28,7 @@ class ArcherScorer
             $score += 15;
         }
 
-        if (!empty($enrichment['linkedin_url'])) {
+        if (!empty($enrichment['profile_found'])) {
             $score += 10;
         }
 

@@ -71,12 +71,14 @@ return [
     // ARCHER nightly enrichment (P6): contact verification + LinkedIn lookup.
     'dropcontact' => [
         'key' => env('DROPCONTACT_API_KEY'),
-        'base_url' => env('DROPCONTACT_BASE_URL', 'https://api.dropcontact.io'),
+        'base_url' => env('DROPCONTACT_BASE_URL', 'https://api.dropcontact.com'),
     ],
 
-    'proxycurl' => [
-        'key' => env('PROXYCURL_API_KEY'),
-        'base_url' => env('PROXYCURL_BASE_URL', 'https://nubela.co/proxycurl/api'),
+    // NinjaPear: what Proxycurl became after being sunset (LinkedIn lawsuit,
+    // 2025) — same nubela.co account/API key, no LinkedIn/social scraping.
+    'ninjapear' => [
+        'key' => env('NINJAPEAR_API_KEY'),
+        'base_url' => env('NINJAPEAR_BASE_URL', 'https://nubela.co'),
     ],
 
 ];

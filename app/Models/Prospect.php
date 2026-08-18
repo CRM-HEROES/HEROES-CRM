@@ -61,7 +61,7 @@ class Prospect extends Authenticatable
         'appetency_score',
         'verified_email',
         'verified_phone',
-        'linkedin_url',
+        'external_profile_url',
         'archer_score',
         'archer_priority',
         'archer_scored_at',

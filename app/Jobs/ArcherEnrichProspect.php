@@ -6,7 +6,7 @@ use App\Models\Prospect;
 use App\Models\ProspectEnrichment;
 use App\Services\Archer\ArcherScorer;
 use App\Services\Archer\DropcontactClient;
-use App\Services\Archer\ProxycurlClient;
+use App\Services\Archer\NinjaPearClient;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -16,8 +16,8 @@ use Illuminate\Support\Facades\Log;
 
 /**
  * One ARCHER enrichment pass for a single prospect: verify contact info via
- * Dropcontact, resolve a LinkedIn profile via Proxycurl, compute the ARCHER
- * score, and write both the audit row (prospect_enrichments) and the
+ * Dropcontact, match a professional profile via NinjaPear, compute the
+ * ARCHER score, and write both the audit row (prospect_enrichments) and the
  * denormalized fields on the prospect used for sorting/filtering.
  *
  * Ranking into the top 20% ("tête de file") happens afterwards, once the
@@ -31,9 +31,14 @@ class ArcherEnrichProspect implements ShouldQueue
     public int $tries = 3;
     public array $backoff = [30, 120, 300];
 
+    // Dropcontact's verification is async and gets polled inline (up to
+    // ~60s, see DropcontactClient::$pollAttempts) — the default 60s queue
+    // worker timeout would kill the job mid-poll, so this needs headroom.
+    public int $timeout = 150;
+
     public function __construct(public int $prospectId) {}
 
-    public function handle(DropcontactClient $dropcontact, ProxycurlClient $proxycurl, ArcherScorer $scorer): void
+    public function handle(DropcontactClient $dropcontact, NinjaPearClient $ninjaPear, ArcherScorer $scorer): void
     {
         $prospect = Prospect::withoutGlobalScopes()->find($this->prospectId);
         if (!$prospect) {
@@ -45,7 +50,7 @@ class ArcherEnrichProspect implements ShouldQueue
 
         try {
             $emailResult = $dropcontact->verify($prospect);
-            $linkedinResult = $proxycurl->lookup($prospect);
+            $profileResult = $ninjaPear->lookup($prospect);
         } catch (\Throwable $exception) {
             $this->recordFailure($prospect, $exception);
             throw $exception;
@@ -53,8 +58,12 @@ class ArcherEnrichProspect implements ShouldQueue
 
         $enrichment = [
             'email_verified' => $emailResult['email_verified'] ?? null,
-            'phone_verified' => $linkedinResult['phone_verified'] ?? null,
-            'linkedin_url' => $linkedinResult['linkedin_url'] ?? null,
+            // NinjaPear no longer verifies phone numbers (see NinjaPearClient
+            // docblock) — the phone signal now comes from whether Dropcontact
+            // itself returned a number for this contact.
+            'phone_verified' => isset($emailResult['phone']) ? filled($emailResult['phone']) : null,
+            'profile_found' => $profileResult['profile_found'] ?? null,
+            'external_profile_url' => $profileResult['external_profile_url'] ?? null,
         ];
 
         $score = $scorer->score($enrichment, $prospect->appetency_score);
@@ -67,9 +76,9 @@ class ArcherEnrichProspect implements ShouldQueue
             'email_verified_at' => $enrichment['email_verified'] !== null ? $now : null,
             'phone_verified' => $enrichment['phone_verified'],
             'phone_verified_at' => $enrichment['phone_verified'] !== null ? $now : null,
-            'linkedin_url' => $enrichment['linkedin_url'],
+            'external_profile_url' => $enrichment['external_profile_url'],
             'dropcontact_data' => $emailResult['raw'] ?? null,
-            'proxycurl_data' => $linkedinResult['raw'] ?? null,
+            'ninjapear_data' => $profileResult['raw'] ?? null,
             'score' => $score,
         ]);
 
@@ -78,9 +87,10 @@ class ArcherEnrichProspect implements ShouldQueue
         // pre-existing data — it only ever fills gaps.
         $prospect->fill([
             'email' => $prospect->email ?: ($emailResult['email'] ?? null),
+            'phone_number' => $prospect->phone_number ?: ($emailResult['phone'] ?? null),
             'verified_email' => (bool) ($enrichment['email_verified'] ?? $prospect->verified_email),
             'verified_phone' => (bool) ($enrichment['phone_verified'] ?? $prospect->verified_phone),
-            'linkedin_url' => $prospect->linkedin_url ?: $enrichment['linkedin_url'],
+            'external_profile_url' => $prospect->external_profile_url ?: $enrichment['external_profile_url'],
             'archer_score' => $score,
             'archer_scored_at' => $now,
         ]);
