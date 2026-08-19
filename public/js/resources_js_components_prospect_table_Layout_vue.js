@@ -12315,7 +12315,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_cell = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cell");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
     id: 'prospect-' + $props.prospect.id,
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$props.prospect.deleted_at ? 'deleted' : '', $props.prospect.processed_at ? 'processed' : '', $options.isSelected ? 'selected' : '', $props.prospect.id == _ctx.viewedProspect ? 'viewed' : ''])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$props.prospect.deleted_at ? 'deleted' : '', $props.prospect.processed_at ? 'processed' : '', $props.prospect.duplicate_id ? 'duplicate' : '', $options.isSelected ? 'selected' : '', $props.prospect.id == _ctx.viewedProspect ? 'viewed' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Select prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {

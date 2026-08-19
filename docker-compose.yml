@@ -121,6 +121,34 @@ services:
     networks:
       - heroes-network
 
+  # FreeSWITCH Service (ai-phone-agent / Kavkom bridge)
+  # Uses network_mode: host, NOT heroes-network: SIP/RTP need the host's
+  # real IP to talk to Kavkom, which a bridge network + port mapping cannot
+  # provide reliably (see ai-phone-agent/freeswitch/docker/entrypoint.sh).
+  # A service on network_mode: host cannot also join a custom network, so
+  # it reaches/is reached by the other services via 127.0.0.1, not by
+  # container name.
+  freeswitch:
+    build:
+      context: ./ai-phone-agent/freeswitch/docker
+      dockerfile: Dockerfile
+      secrets:
+        - signalwire_token
+    image: heroescrm-freeswitch:latest
+    container_name: freeswitch
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      KAVKOM_EXTENSION: ${KAVKOM_EXTENSION}
+      KAVKOM_PASSWORD: ${KAVKOM_PASSWORD}
+      KAVKOM_USER_CONTEXT: ${KAVKOM_USER_CONTEXT}
+      ESL_PASSWORD: ${FS_ESL_PASSWORD}
+      EXTERNAL_IP: ${FREESWITCH_EXTERNAL_IP}
+
+secrets:
+  signalwire_token:
+    file: ./ai-phone-agent/freeswitch/docker/signalwire_token.txt
+
 #Docker Networks
 networks:
   heroes-network:
