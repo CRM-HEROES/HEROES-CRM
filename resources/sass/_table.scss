@@ -152,7 +152,8 @@
                 &.viewed,
                 &.processed,
                 &.selected,
-                &.deleted {
+                &.deleted,
+                &.duplicate {
                     > td:after {
                         bottom: -1px;
                         content: "";
@@ -190,6 +191,13 @@
                     > td:after {
                         background-color: #ff110019;
                         border: 1px solid #ffecd4;
+                    }
+                }
+
+                &.duplicate {
+                    > td:after {
+                        background-color: #7939b819;
+                        border: 1px solid #d9c2f0;
                     }
                 }
 
@@ -1862,6 +1870,13 @@ textarea.hc-default-cell-input {
                         > td:after {
                             background-color: #efbe7f10;
                             border-color: #4c473f;
+                        }
+                    }
+
+                    &.duplicate {
+                        > td:after {
+                            background-color: #a46dd910;
+                            border-color: #4c3f4c;
                         }
                     }
                 }

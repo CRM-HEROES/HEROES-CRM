@@ -4,6 +4,7 @@
         :class="[
             prospect.deleted_at ? 'deleted' : '',
             prospect.processed_at ? 'processed' : '',
+            prospect.duplicate_id ? 'duplicate' : '',
             isSelected ? 'selected' : '',
             prospect.id == viewedProspect ? 'viewed' : '',
         ]"

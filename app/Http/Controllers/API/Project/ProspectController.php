@@ -554,7 +554,8 @@ class ProspectController extends Controller
                     'mobile_phone_number',
                     'phone_number',
                     'processed_at',
-                    'prospects.deleted_at'
+                    'prospects.deleted_at',
+                    'duplicate_id'
                 ]
         );
 
