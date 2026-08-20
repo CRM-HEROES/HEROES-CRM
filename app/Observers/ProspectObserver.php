@@ -44,17 +44,6 @@ class ProspectObserver
     }
 
     /**
-     * Handle the Prospect "updating" event.
-     *
-     * @param  \App\Models\Prospect  $prospect
-     * @return void
-     */
-    public function updating(Prospect $prospect)
-    {
-        $this->checkUniqueValue($prospect);
-    }
-
-    /**
      * Handle the Prospect "updated" event.
      *
      * @param  \App\Models\Prospect  $prospect
@@ -87,36 +76,6 @@ class ProspectObserver
             }
         }
         $prospect->meta = $meta;
-    }
-
-    /**
-     * Check unique value
-     *
-     * @param  \App\Models\Prospect  $prospect
-     * @return void
-     */
-    protected function checkUniqueValue(Prospect $prospect)
-    {
-        foreach (
-            $prospect->project->fields()
-                ->where('for', 'prospect')
-                ->where('meta', 0)
-                ->where('unique', 1)
-                ->get(['id', 'slug', 'name']) as $field
-        ) {
-            if (!$prospect->isDirty($field->slug) || empty($prospect->{$field->slug})) {
-                continue;
-            }
-        
-            $d = Prospect::
-                where('id', '!=', $prospect->id)
-                ->where($field->slug, $prospect->{$field->slug})
-                ->first(['id', 'first_name', 'last_name']);
-
-            if ($d) {
-                abort(400, 'Valeur dupliquée pour la colonne: ' . $field->name . ', Prospect: ' . $d->full_name);
-            }
-        }
     }
 
     /**

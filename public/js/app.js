@@ -43686,6 +43686,7 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
   }))();
 }), _defineProperty(_objectSpread2, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var _yield$ProspectServic5, data;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
@@ -43693,6 +43694,31 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
           _context5.next = 3;
           return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 3:
+          _yield$ProspectServic5 = _context5.sent;
+          data = _yield$ProspectServic5.data;
+          // The backend may compute fields the client can't know in advance
+          // (e.g. duplicate_id/duplicate_group_id/duplicate_fields from the
+          // automatic duplicate check) — without merging those back in, a
+          // row only ever picks up its duplicate color after a full page
+          // reload.
+          if (data && ("duplicate_id" in data || "duplicate_group_id" in data)) {
+            context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, {
+              id: params.id,
+              duplicate_id: data.duplicate_id,
+              duplicate_group_id: data.duplicate_group_id,
+              duplicate_fields: data.duplicate_fields
+            });
+          }
+
+          // Same story for whichever other prospect(s) this duplicate check
+          // matched against — if one is already loaded in the table, it
+          // needs the same patch, or it stays uncolored until a reload.
+          if (data && data.duplicate_partners) {
+            data.duplicate_partners.forEach(function (partner) {
+              context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, partner);
+            });
+          }
+        case 7:
         case "end":
           return _context5.stop();
       }

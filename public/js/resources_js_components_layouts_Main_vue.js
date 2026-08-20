@@ -3761,15 +3761,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _yield$ApiService$get = _context.sent;
               data = _yield$ApiService$get.data;
               _this.duplicates = data;
-            case 10:
-              _context.prev = 10;
+
+              // The detection above updates duplicate_group_id in the
+              // database, but the main prospects table already has its
+              // own (now stale) copy of each row loaded in the store —
+              // without this, the new/updated duplicate coloring only
+              // ever appeared after a full page reload.
+              _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.FETCH_PROSPECTS);
+            case 11:
+              _context.prev = 11;
               _this.fetchingDuplicates = false;
-              return _context.finish(10);
-            case 13:
+              return _context.finish(11);
+            case 14:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[2,, 10, 13]]);
+        }, _callee, null, [[2,, 11, 14]]);
       }))();
     },
     duplicateChecked: function duplicateChecked(index, shift, checked) {
@@ -59753,8 +59760,8 @@ __webpack_require__.r(__webpack_exports__);
 var _withScopeId = function _withScopeId(n) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-d0f05d76"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
 };
-var _hoisted_1 = ["textContent"];
-var _hoisted_2 = ["textContent"];
+var _hoisted_1 = ["title", "textContent"];
+var _hoisted_2 = ["title", "textContent"];
 var _hoisted_3 = ["textContent"];
 var _hoisted_4 = ["textContent"];
 var _hoisted_5 = ["textContent"];
@@ -59775,10 +59782,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "fa fa-columns"
       })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-item-main-content",
+        title: $props.column.header,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.header)
       }, null, 8 /* PROPS */, _hoisted_1), $props.mapping ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 2,
         "class": "hc-prospect-import-column-mapping",
+        title: $props.mapping,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.mapping)
       }, null, 8 /* PROPS */, _hoisted_2)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
         key: 3,
