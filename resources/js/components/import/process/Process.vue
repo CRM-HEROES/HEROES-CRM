@@ -52,6 +52,26 @@
         </item-list>
 
         <item
+            v-if="prospectImport.source == 'google_sheets' && prospectImport.sync_enabled"
+            style="color: #075985 !important; background-color: #e0f2fe"
+        >
+            <icon class="fa fa-refresh" style="color: #075985" />
+            <div
+                class="hc-item-main-content hc-flex-column"
+                style="padding: 5px 0"
+            >
+                <span
+                    v-text="$t('import.process.tab.import.sync.active')"
+                    style="color: #075985"
+                ></span>
+                <span
+                    style="white-space: normal; color: #0369a1"
+                    v-text="syncStatusLabel"
+                ></span>
+            </div>
+        </item>
+
+        <item
             v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0) && (!prospectImport.users || prospectImport.users.length === 0)"
             style="color: #92400e !important; background-color: #fef3c7"
         >
@@ -901,6 +921,35 @@ export default {
                     ({ header }) =>
                         removeStringAccent(header).indexOf(keyword) >= 0
                 );
+        },
+
+        /**
+         * Interval label + last synced date,
+         * shown on the "sync active" info item
+         */
+        syncStatusLabel() {
+            const knownIntervals = [15, 30, 60, 180, 1440];
+            const intervalMinutes = this.prospectImport.sync_interval_minutes;
+            const interval = knownIntervals.includes(intervalMinutes)
+                ? this.$t(
+                      "import.add.google_sheets.sync_interval_" +
+                          intervalMinutes
+                  )
+                : intervalMinutes + " min";
+
+            const lastSyncedAt = this.prospectImport.last_synced_at
+                ? dayjs(new Date(this.prospectImport.last_synced_at)).format(
+                      "DD/MM/YYYY HH:mm:ss"
+                  )
+                : this.$t("import.update.google_sheets.never_synced");
+
+            return (
+                interval +
+                " · " +
+                this.$t("import.update.google_sheets.last_synced_at") +
+                " : " +
+                lastSyncedAt
+            );
         },
 
         /**

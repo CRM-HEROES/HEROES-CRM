@@ -604,7 +604,14 @@
             "google_sheets": {
                 "url": "Lien Google Sheets",
                 "invalid_url": "Ce lien Google Sheets n'est pas valide.",
-                "unreachable": "Impossible de récupérer ce fichier Google Sheets. Vérifiez que le lien de partage autorise \"Tous les utilisateurs disposant du lien\" à voir le document."
+                "unreachable": "Impossible de récupérer ce fichier Google Sheets. Vérifiez que le lien de partage autorise \"Tous les utilisateurs disposant du lien\" à voir le document.",
+                "sync_enabled": "Synchroniser automatiquement",
+                "sync_interval": "Fréquence de synchronisation",
+                "sync_interval_15": "Toutes les 15 minutes",
+                "sync_interval_30": "Toutes les 30 minutes",
+                "sync_interval_60": "Toutes les heures",
+                "sync_interval_180": "Toutes les 3 heures",
+                "sync_interval_1440": "Une fois par jour"
             },
             "name": "Nom",
             "field_delimiter": "Séparateur de champs",
@@ -615,7 +622,14 @@
             "space": "(Espace)"
         },
         "update": {
-            "name": "Nom"
+            "name": "Nom",
+            "google_sheets": {
+                "url": "Lien Google Sheets",
+                "sync_enabled": "Synchroniser automatiquement",
+                "sync_interval": "Fréquence de synchronisation",
+                "last_synced_at": "Dernière synchronisation",
+                "never_synced": "Jamais synchronisé"
+            }
         },
         "process": {
             "title": "Import",
@@ -672,6 +686,9 @@
                         "replace_duplicating": "Ecraser les données modifiées des anciens prospects par celles des nouveaux"
                     },
                     "processing": "Nous vous enverrons un mail lorsque l'import sera terminé.",
+                    "sync": {
+                        "active": "Synchronisation automatique activée"
+                    },
                     "notify_welcome_sms": "Notifier par SMS de bienvenue",
                     "welcome_sms_source": "Origine du SMS de bienvenue",
                     "welcome_sms_message": "Message du SMS de bienvenue",

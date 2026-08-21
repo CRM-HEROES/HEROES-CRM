@@ -49,6 +49,48 @@
                     v-model="prospectImport.url"
             /></v-field>
 
+            <v-field
+                v-if="prospectImport.source == 'google_sheets'"
+                :label="$t('import.add.google_sheets.sync_enabled')"
+            >
+                <input
+                    type="checkbox"
+                    style="width: auto; min-height: 0"
+                    v-model="prospectImport.sync_enabled"
+                />
+            </v-field>
+
+            <v-field
+                v-if="
+                    prospectImport.source == 'google_sheets' &&
+                    prospectImport.sync_enabled
+                "
+                :label="$t('import.add.google_sheets.sync_interval')"
+            >
+                <select v-model.number="prospectImport.sync_interval_minutes">
+                    <option
+                        :value="15"
+                        v-text="$t('import.add.google_sheets.sync_interval_15')"
+                    ></option>
+                    <option
+                        :value="30"
+                        v-text="$t('import.add.google_sheets.sync_interval_30')"
+                    ></option>
+                    <option
+                        :value="60"
+                        v-text="$t('import.add.google_sheets.sync_interval_60')"
+                    ></option>
+                    <option
+                        :value="180"
+                        v-text="$t('import.add.google_sheets.sync_interval_180')"
+                    ></option>
+                    <option
+                        :value="1440"
+                        v-text="$t('import.add.google_sheets.sync_interval_1440')"
+                    ></option>
+                </select>
+            </v-field>
+
             <v-field :label="$t('import.add.name')" required v-slot="{ label }"
                 ><input
                     required
@@ -122,6 +164,8 @@ export default {
                 source: "file",
                 file: null,
                 url: "",
+                sync_enabled: false,
+                sync_interval_minutes: 30,
                 field_delimiter: ",",
                 field_enclosure: "",
             };
