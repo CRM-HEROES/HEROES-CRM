@@ -3763,29 +3763,31 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
-/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _actions_project_prospect_message__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect/message */ "./resources/js/actions/project/prospect/message.js");
-/* harmony import */ var _actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/prospect/order */ "./resources/js/actions/project/prospect/order.js");
-/* harmony import */ var _cell_DefaultCell_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./cell/DefaultCell.vue */ "./resources/js/components/prospect/table/cell/DefaultCell.vue");
-/* harmony import */ var _cell_EventCell_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cell/EventCell.vue */ "./resources/js/components/prospect/table/cell/EventCell.vue");
-/* harmony import */ var _cell_EventFieldCell_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cell/EventFieldCell.vue */ "./resources/js/components/prospect/table/cell/EventFieldCell.vue");
-/* harmony import */ var _cell_InteractionCell_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cell/InteractionCell.vue */ "./resources/js/components/prospect/table/cell/InteractionCell.vue");
-/* harmony import */ var _cell_MetaCell_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cell/MetaCell.vue */ "./resources/js/components/prospect/table/cell/MetaCell.vue");
-/* harmony import */ var _cell_RelationCell_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./cell/RelationCell.vue */ "./resources/js/components/prospect/table/cell/RelationCell.vue");
-/* harmony import */ var _cell_SmsCell_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./cell/SmsCell.vue */ "./resources/js/components/prospect/table/cell/SmsCell.vue");
-/* harmony import */ var _cell_StreetCell_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./cell/StreetCell.vue */ "./resources/js/components/prospect/table/cell/StreetCell.vue");
-/* harmony import */ var _cell_ThreadCell_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./cell/ThreadCell.vue */ "./resources/js/components/prospect/table/cell/ThreadCell.vue");
+/* harmony import */ var _utils_duplicateColor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/duplicateColor */ "./resources/js/utils/duplicateColor.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_project_prospect_message__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/prospect/message */ "./resources/js/actions/project/prospect/message.js");
+/* harmony import */ var _actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/prospect/order */ "./resources/js/actions/project/prospect/order.js");
+/* harmony import */ var _cell_DefaultCell_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./cell/DefaultCell.vue */ "./resources/js/components/prospect/table/cell/DefaultCell.vue");
+/* harmony import */ var _cell_EventCell_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./cell/EventCell.vue */ "./resources/js/components/prospect/table/cell/EventCell.vue");
+/* harmony import */ var _cell_EventFieldCell_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./cell/EventFieldCell.vue */ "./resources/js/components/prospect/table/cell/EventFieldCell.vue");
+/* harmony import */ var _cell_InteractionCell_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./cell/InteractionCell.vue */ "./resources/js/components/prospect/table/cell/InteractionCell.vue");
+/* harmony import */ var _cell_MetaCell_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./cell/MetaCell.vue */ "./resources/js/components/prospect/table/cell/MetaCell.vue");
+/* harmony import */ var _cell_RelationCell_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./cell/RelationCell.vue */ "./resources/js/components/prospect/table/cell/RelationCell.vue");
+/* harmony import */ var _cell_SmsCell_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./cell/SmsCell.vue */ "./resources/js/components/prospect/table/cell/SmsCell.vue");
+/* harmony import */ var _cell_StreetCell_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./cell/StreetCell.vue */ "./resources/js/components/prospect/table/cell/StreetCell.vue");
+/* harmony import */ var _cell_ThreadCell_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./cell/ThreadCell.vue */ "./resources/js/components/prospect/table/cell/ThreadCell.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -3809,15 +3811,15 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    DefaultCell: _cell_DefaultCell_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-    EventCell: _cell_EventCell_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
-    EventFieldCell: _cell_EventFieldCell_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    InteractionCell: _cell_InteractionCell_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
-    MetaCell: _cell_MetaCell_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
-    RelationCell: _cell_RelationCell_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
-    SmsCell: _cell_SmsCell_vue__WEBPACK_IMPORTED_MODULE_13__["default"],
-    StreetCell: _cell_StreetCell_vue__WEBPACK_IMPORTED_MODULE_14__["default"],
-    ThreadCell: _cell_ThreadCell_vue__WEBPACK_IMPORTED_MODULE_15__["default"]
+    DefaultCell: _cell_DefaultCell_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    EventCell: _cell_EventCell_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    EventFieldCell: _cell_EventFieldCell_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+    InteractionCell: _cell_InteractionCell_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
+    MetaCell: _cell_MetaCell_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
+    RelationCell: _cell_RelationCell_vue__WEBPACK_IMPORTED_MODULE_13__["default"],
+    SmsCell: _cell_SmsCell_vue__WEBPACK_IMPORTED_MODULE_14__["default"],
+    StreetCell: _cell_StreetCell_vue__WEBPACK_IMPORTED_MODULE_15__["default"],
+    ThreadCell: _cell_ThreadCell_vue__WEBPACK_IMPORTED_MODULE_16__["default"]
   },
   props: {
     /**
@@ -3867,11 +3869,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (this.disabled || this.prospect.id <= 0) {
         return;
       }
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_CATEGORY, this.categories.find(function (c) {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT_CATEGORY, this.categories.find(function (c) {
         return c.id == _this.column.id;
       }));
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-labels");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-labels");
     },
     /**
      * Manage prospect events
@@ -3901,25 +3903,25 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (this.column.id != "events") {
         event.calendar_id = this.column.id;
       }
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENT, event);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-events");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_5__.SET_EVENT, event);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-events");
     },
     /**
      * Manage prospect interactions
      * See: @/components/prospect/interaction/Slide.vue
      */
     manageInteractions: function manageInteractions() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_3__.SET_INTERACTION_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-interactions");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-interactions");
     },
     /**
      * Manage prospect sms
      * See: @/components/prospect/sms/Slide.vue
      */
     manageSms: function manageSms() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-sms");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-sms");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
     },
     /**
      * Manage prospect users
@@ -3929,8 +3931,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (this.disabled || this.prospect.id <= 0) {
         return;
       }
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-users");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-users");
     },
     /**
      * Manage prospect groups
@@ -3940,17 +3942,17 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (this.disabled || this.prospect.id <= 0) {
         return;
       }
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-groups");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-groups");
     },
     /**
      * Manage prospect messages
      * See: @/components/prospect/message/Slide.vue
      */
     manageMessages: function manageMessages(threadId) {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-messages");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_message__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_MESSAGE_THREAD, this.threads.find(function (thread) {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-messages");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_message__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_MESSAGE_THREAD, this.threads.find(function (thread) {
         return thread.id == threadId;
       }));
     },
@@ -3958,23 +3960,23 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     manageOrders: function manageOrders() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_ORDER_TAB, 0);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-orders");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_ORDER, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_7__.SET_PROSPECT_ORDER_TAB, 0);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-orders");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_7__.SET_PROSPECT_ORDER, null);
     },
     /**
      *
      * @param {*} order
      */
     showOrder: function showOrder(order) {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_ORDER_TAB, 0);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-orders");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT, this.prospect);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_6__.SHOW_PROSPECT_ORDER, order.id);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_7__.SET_PROSPECT_ORDER_TAB, 0);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-orders");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, this.prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_order__WEBPACK_IMPORTED_MODULE_7__.SHOW_PROSPECT_ORDER, order.id);
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_16__.mapGetters)(["categories", "prospectsParamExists", "threads", "canEvent"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_17__.mapGetters)(["categories", "prospectsParamExists", "threads", "canEvent"])), {}, {
     /**
      * Do not allow user
      * to edit field
@@ -3998,6 +4000,45 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      */
     category: function category() {
       return this.column.category;
+    },
+    /**
+     * The field slug this cell renders, in the same shape
+     * prospect.duplicate_fields stores it — only "default" (built-in)
+     * and "meta" (custom) columns map to an actual prospect field.
+     */
+    fieldSlug: function fieldSlug() {
+      if (this.category == "default") {
+        return this.column.key;
+      }
+      if (this.category == "meta") {
+        return this.column.id;
+      }
+      return null;
+    },
+    /**
+     * Only this specific cell (e.g. Email) highlights when it caused
+     * the duplicate match — not every cell in the row — so the color
+     * points at what's actually duplicated instead of the whole
+     * prospect.
+     */
+    isDuplicateField: function isDuplicateField() {
+      return this.fieldSlug && Array.isArray(this.prospect.duplicate_fields) && this.prospect.duplicate_fields.includes(this.fieldSlug);
+    },
+    /**
+     * Same color for every cell/prospect sharing this duplicate
+     * cluster — see App\Services\ProspectDuplicateChecker and
+     * App\Jobs\CheckDuplicatedProspects for where duplicate_group_id
+     * comes from.
+     */
+    duplicateStyle: function duplicateStyle() {
+      if (!this.isDuplicateField) {
+        return {};
+      }
+      var color = (0,_utils_duplicateColor__WEBPACK_IMPORTED_MODULE_1__.duplicateColor)(this.prospect.duplicate_group_id);
+      return {
+        backgroundColor: color + "26",
+        boxShadow: "inset 0 0 0 1px ".concat(color, "88")
+      };
     },
     /**
      * Check if column is filtered
@@ -11705,8 +11746,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_interaction_cell = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-cell");
   var _component_sms_cell = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("sms-cell");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDynamicComponent)($props.tag), {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isFiltered ? 'filtered' : '']),
-    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.style)
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isFiltered ? 'filtered' : '', $options.isDuplicateField ? 'duplicate' : '']),
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)([$options.style, $options.duplicateStyle])
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [$props.column.key == 'street' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_street_cell, {
@@ -12315,7 +12356,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_cell = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cell");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
     id: 'prospect-' + $props.prospect.id,
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$props.prospect.deleted_at ? 'deleted' : '', $props.prospect.processed_at ? 'processed' : '', $props.prospect.duplicate_id ? 'duplicate' : '', $options.isSelected ? 'selected' : '', $props.prospect.id == _ctx.viewedProspect ? 'viewed' : ''])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$props.prospect.deleted_at ? 'deleted' : '', $props.prospect.processed_at ? 'processed' : '', $options.isSelected ? 'selected' : '', $props.prospect.id == _ctx.viewedProspect ? 'viewed' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Select prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
@@ -15015,6 +15056,46 @@ function useDrag(element) {
     origin: origin,
     position: position
   };
+}
+
+/***/ }),
+
+/***/ "./resources/js/utils/duplicateColor.js":
+/*!**********************************************!*\
+  !*** ./resources/js/utils/duplicateColor.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   duplicateColor: () => (/* binding */ duplicateColor)
+/* harmony export */ });
+/**
+ * One color per duplicate cluster (every prospect sharing the same
+ * duplicate_group_id gets the same color), so distinct groups of
+ * duplicates are visually told apart in the table instead of all
+ * blending into a single "duplicate" color. Picked away from the hues
+ * already used for deleted/processed/selected/viewed rows (red/orange/
+ * blue/yellow).
+ */
+var PALETTE = ["#7939b8",
+// violet
+"#c2185b",
+// magenta
+"#00897b",
+// teal
+"#6d4c41",
+// brown
+"#4527a0",
+// indigo
+"#ad1457",
+// dark pink
+"#00695c",
+// dark teal
+"#558b2f" // olive
+];
+function duplicateColor(groupId) {
+  return PALETTE[groupId % PALETTE.length];
 }
 
 /***/ }),

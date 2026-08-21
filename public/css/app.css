@@ -394,7 +394,7 @@ body {
   top: -1px;
   z-index: 1;
 }
-.hc-table > table > tbody > tr.viewed > td:after, .hc-table > table > tbody > tr.processed > td:after, .hc-table > table > tbody > tr.selected > td:after, .hc-table > table > tbody > tr.deleted > td:after, .hc-table > table > tbody > tr.duplicate > td:after {
+.hc-table > table > tbody > tr.viewed > td:after, .hc-table > table > tbody > tr.processed > td:after, .hc-table > table > tbody > tr.selected > td:after, .hc-table > table > tbody > tr.deleted > td:after {
   bottom: -1px;
   content: "";
   display: inline-block;
@@ -419,10 +419,6 @@ body {
 .hc-table > table > tbody > tr.deleted > td:after {
   background-color: rgba(255, 17, 0, 0.0980392157);
   border: 1px solid #ffecd4;
-}
-.hc-table > table > tbody > tr.duplicate > td:after {
-  background-color: rgba(121, 57, 184, 0.0980392157);
-  border: 1px solid #d9c2f0;
 }
 .hc-table > table > tbody > tr:hover > td.fixed {
   background-color: #eeeeee;
@@ -1941,10 +1937,6 @@ textarea.hc-default-cell-input {
 .dark .hc-table > table > tbody > tr.processed > td:after {
   background-color: rgba(239, 190, 127, 0.062745098);
   border-color: #4c473f;
-}
-.dark .hc-table > table > tbody > tr.duplicate > td:after {
-  background-color: rgba(164, 109, 217, 0.062745098);
-  border-color: #4c3f4c;
 }
 .dark .hc-table-fixed-headers > div {
   background-color: #2e302e;

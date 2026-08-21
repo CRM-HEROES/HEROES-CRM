@@ -1,5 +1,9 @@
 <template>
-    <component :is="tag" :class="[isFiltered ? 'filtered' : '']" :style="style">
+    <component
+        :is="tag"
+        :class="[isFiltered ? 'filtered' : '', isDuplicateField ? 'duplicate' : '']"
+        :style="[style, duplicateStyle]"
+    >
         <street-cell
             v-if="column.key == 'street'"
             :prospect="prospect"
@@ -116,6 +120,7 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import { duplicateColor } from "@/utils/duplicateColor";
 
 // Actions
 import { OPEN_SLIDE } from "@/actions/slide";
@@ -372,6 +377,54 @@ export default {
          */
         category() {
             return this.column.category;
+        },
+
+        /**
+         * The field slug this cell renders, in the same shape
+         * prospect.duplicate_fields stores it — only "default" (built-in)
+         * and "meta" (custom) columns map to an actual prospect field.
+         */
+        fieldSlug() {
+            if (this.category == "default") {
+                return this.column.key;
+            }
+            if (this.category == "meta") {
+                return this.column.id;
+            }
+            return null;
+        },
+
+        /**
+         * Only this specific cell (e.g. Email) highlights when it caused
+         * the duplicate match — not every cell in the row — so the color
+         * points at what's actually duplicated instead of the whole
+         * prospect.
+         */
+        isDuplicateField() {
+            return (
+                this.fieldSlug &&
+                Array.isArray(this.prospect.duplicate_fields) &&
+                this.prospect.duplicate_fields.includes(this.fieldSlug)
+            );
+        },
+
+        /**
+         * Same color for every cell/prospect sharing this duplicate
+         * cluster — see App\Services\ProspectDuplicateChecker and
+         * App\Jobs\CheckDuplicatedProspects for where duplicate_group_id
+         * comes from.
+         */
+        duplicateStyle() {
+            if (!this.isDuplicateField) {
+                return {};
+            }
+
+            const color = duplicateColor(this.prospect.duplicate_group_id);
+
+            return {
+                backgroundColor: color + "26",
+                boxShadow: `inset 0 0 0 1px ${color}88`,
+            };
         },
 
         /**

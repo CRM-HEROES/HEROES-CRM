@@ -8,11 +8,16 @@
         <icon v-if="mapping" class="fa fa-link" />
         <icon v-else class="fa fa-columns" />
 
-        <div class="hc-item-main-content" v-text="column.header"></div>
+        <div
+            class="hc-item-main-content"
+            :title="column.header"
+            v-text="column.header"
+        ></div>
 
         <div
             v-if="mapping"
             class="hc-prospect-import-column-mapping"
+            :title="mapping"
             v-text="mapping"
         ></div>
         <icon

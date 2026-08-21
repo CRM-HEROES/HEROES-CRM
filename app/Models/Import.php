@@ -53,6 +53,10 @@ class Import extends Model
         'selected_sheets',
         'source',
         'token',
+        'url',
+        'sync_enabled',
+        'sync_interval_minutes',
+        'last_synced_at',
         'users',
         'values',
     ];
@@ -94,6 +98,8 @@ class Import extends Model
         'prospects' => 'json',
         'sheets'    => 'json',
         'selected_sheets' => 'json',
+        'sync_enabled' => 'boolean',
+        'last_synced_at' => 'datetime',
         'users'     => 'json',
         'values'    => 'json',
     ];

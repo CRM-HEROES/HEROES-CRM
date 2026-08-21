@@ -11,18 +11,20 @@
                 >
                     <div
                         class="hc-item-main-content"
-                        style="font-weight: bold; padding: 0 5px"
+                        style="font-weight: bold; padding: 0 5px; flex: none"
                         v-text="$t('import.process.tab.mapping.sheets')"
                     ></div>
-                    <item
-                        v-for="sheetName in prospectImport.sheets"
-                        :key="sheetName"
-                        tag="label"
-                        style="padding-right: 5px"
-                    >
-                        <div class="hc-item-main-content" v-text="sheetName"></div>
-                        <checkbox v-model="selectedSheets" :value="sheetName" />
-                    </item>
+                    <div class="hc-import-sheets-toggles">
+                        <item
+                            v-for="sheetName in prospectImport.sheets"
+                            :key="sheetName"
+                            tag="label"
+                            style="padding-right: 5px"
+                        >
+                            <div class="hc-item-main-content" v-text="sheetName"></div>
+                            <checkbox v-model="selectedSheets" :value="sheetName" />
+                        </item>
+                    </div>
                 </item-list>
                 <search v-model="columnKeyword" />
                 <item-list padding="5px" id="hc-import-process-mapping-columns">
@@ -423,6 +425,24 @@
         </template>
     </tab-layout>
 </template>
+
+<style>
+#hc-import-process-mapping-sheets {
+    flex: none;
+    height: auto;
+}
+
+.hc-import-sheets-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+}
+
+.hc-import-sheets-toggles .hc-item {
+    width: auto;
+}
+</style>
 
 <script>
 import { mapGetters } from "vuex";

@@ -6,11 +6,10 @@ use App\Filters\ImportRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Import;
 use App\Models\Project;
+use App\Services\Import\GoogleSheetDownloader;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 class ImportController extends Controller
 {
@@ -33,16 +32,20 @@ class ImportController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'url' => 'required_if:source,google_sheets',
+            'sync_enabled' => 'sometimes|boolean',
+            'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
         ]);
 
         $import = $project
             ->imports()
             ->create(array_merge($request->only(
-                'name', 
-                'source', 
-                'field_delimiter', 
-                'field_enclosure'
-            ), 
+                'name',
+                'source',
+                'field_delimiter',
+                'field_enclosure',
+                'sync_enabled',
+                'sync_interval_minutes'
+            ),
             $this->storeFile($request, $project),
             [
                 'creator_id' => auth()->id(),
@@ -94,6 +97,9 @@ class ImportController extends Controller
             'notify_welcome_sms' => 'sometimes|boolean',
             'welcome_sms_message' => 'sometimes|nullable|string|required_if:notify_welcome_sms,true',
             'welcome_sms_source' => 'sometimes|nullable|in:brevo,smsbox,ultramsg,mtarget',
+            'url' => 'sometimes|nullable|url',
+            'sync_enabled' => 'sometimes|boolean',
+            'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
         ]);
 
         $import->update($request->only(
@@ -105,7 +111,10 @@ class ImportController extends Controller
             'is_processing',
             'notify_welcome_sms',
             'welcome_sms_message',
-            'welcome_sms_source'
+            'welcome_sms_source',
+            'url',
+            'sync_enabled',
+            'sync_interval_minutes'
         ));
 
         return ['message' => trans('common.success.updated_resource')];
@@ -155,51 +164,18 @@ class ImportController extends Controller
     /**
      * Download the XLSX export of a public Google Sheets URL (all of its
      * sheets/tabs) and store it on the "imports" disk, exactly like an
-     * uploaded file.
+     * uploaded file. The URL itself is persisted alongside the file so
+     * SyncGoogleSheetImports can re-download it periodically.
      */
     protected function storeGoogleSheet(string $url, Project $project)
     {
-        if (!preg_match('~docs\.google\.com/spreadsheets/d/([a-zA-Z0-9_-]+)~', $url, $matches)) {
-            throw ValidationException::withMessages([
-                'url' => "Ce lien Google Sheets n'est pas valide.",
-            ]);
-        }
+        $downloader = app(GoogleSheetDownloader::class);
 
-        $spreadsheetId = $matches[1];
+        $spreadsheetId = $downloader->extractSpreadsheetId($url);
 
-        // Export the whole workbook as XLSX (not a single-tab CSV export) so
-        // that every sheet/tab in the document gets imported, not just the
-        // one the shared URL happens to point to. ImportProspects reads
-        // every sheet of the workbook via Box Spout's sheet iterator.
-        return $this->downloadGoogleSheetXlsx($spreadsheetId, $project);
-    }
-
-    protected function downloadGoogleSheetXlsx(string $spreadsheetId, Project $project)
-    {
-        $exportUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/export?format=xlsx";
-
-        try {
-            $response = Http::timeout(15)->connectTimeout(5)->get($exportUrl);
-        } catch (\Illuminate\Http\Client\ConnectionException $e) {
-            throw ValidationException::withMessages([
-                'url' => "Impossible de contacter Google Sheets (problème réseau). Réessayez.",
-            ]);
-        }
-
-        if ($response->failed() || Str::contains($response->header('Content-Type', ''), 'text/html')) {
-            throw ValidationException::withMessages([
-                'url' => "Impossible de récupérer ce fichier Google Sheets. Vérifiez que le lien de partage autorise \"Tous les utilisateurs disposant du lien\" à voir le document.",
-            ]);
-        }
-
-        $name = Str::random(30) . '.xlsx';
-        $path = $project->slug . '/' . $name;
-
-        Storage::disk('imports')->put($path, $response->body());
-
-        return [
-            'path' => $path,
-            'size' => strlen($response->body()),
-        ];
+        return array_merge(
+            $downloader->download($spreadsheetId, $project->slug),
+            ['url' => $url]
+        );
     }
 }
