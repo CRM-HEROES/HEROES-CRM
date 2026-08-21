@@ -1,0 +1,130 @@
+name: heroes-telephony
+
+# Stack autonome : ne modifie ni ne rejoint les services CRM existants.
+# Démarrage : docker compose -f docker-compose.telephony.yml up -d --build
+services:
+  telephony-freeswitch:
+    build:
+      context: ./docker/telephony/freeswitch
+      dockerfile: Dockerfile
+      secrets:
+        - signalwire_token
+    image: heroescrm-telephony-freeswitch:latest
+    container_name: telephony-freeswitch
+    restart: unless-stopped
+    environment:
+      KAVKOM_EXTENSION: ${KAVKOM_EXTENSION}
+      KAVKOM_PASSWORD: ${KAVKOM_PASSWORD}
+      KAVKOM_USER_CONTEXT: ${KAVKOM_USER_CONTEXT}
+      ESL_PASSWORD: ${FS_ESL_PASSWORD}
+      EXTERNAL_IP: ${FREESWITCH_EXTERNAL_IP}
+      EXT_SIP_IP: ${FREESWITCH_EXT_SIP_IP:-${FREESWITCH_EXTERNAL_IP}}
+      EXT_RTP_IP: ${FREESWITCH_EXT_RTP_IP:-${FREESWITCH_EXTERNAL_IP}}
+      EXTERNAL_SIP_PORT: ${FREESWITCH_SIP_PORT:-5080}
+      RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-26384}
+      RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-26483}
+    ports:
+      # SIP/RTP doivent conserver le même port interne et public : ces ports
+      # sont annoncés à l'opérateur dans le SDP.
+      # The external Sofia profile must listen on, and advertise, the exact
+      # same port exposed by Docker. This keeps the SIP Contact routable.
+      - "${FREESWITCH_SIP_PORT:-5080}:${FREESWITCH_SIP_PORT:-5080}/tcp"
+      - "${FREESWITCH_SIP_PORT:-5080}:${FREESWITCH_SIP_PORT:-5080}/udp"
+      - "${FREESWITCH_RTP_START_PORT:-26384}-${FREESWITCH_RTP_END_PORT:-26483}:${FREESWITCH_RTP_START_PORT:-26384}-${FREESWITCH_RTP_END_PORT:-26483}/udp"
+    networks:
+      - telephony-network
+    healthcheck:
+      # fs_cli otherwise assumes the default password (ClueCon), while the
+      # entrypoint replaces it with ESL_PASSWORD.
+      test: ["CMD-SHELL", "fs_cli -p \"$${ESL_PASSWORD}\" -x 'status' | grep -q UP"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 45s
+
+  ai-phone-agent:
+    build:
+      context: ./ai-phone-agent
+      dockerfile: Dockerfile
+    image: heroescrm-ai-phone-agent:latest
+    container_name: ai-phone-agent
+    restart: unless-stopped
+    depends_on:
+      telephony-freeswitch:
+        condition: service_healthy
+    env_file:
+      - ./ai-phone-agent/.env
+    environment:
+      FS_ESL_HOST: telephony-freeswitch
+      FS_ESL_PORT: 8021
+      WS_PUBLIC_URL: ws://ai-phone-agent:4001/
+    ports:
+      # API privée pour la future intégration CRM ; Nginx 80/443 reste intact.
+      - "127.0.0.1:${AI_PHONE_AGENT_HTTP_PORT:-14000}:4000"
+      # The browser connects directly to the bridge's transcript WebSocket.
+      - "127.0.0.1:${AI_PHONE_AGENT_TRANSCRIPT_PORT:-14002}:4002"
+    expose:
+      - "4001"
+    volumes:
+      - ai-phone-agent-calls:/data/calls
+    networks:
+      - telephony-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('net').connect(4000, '127.0.0.1').on('connect',()=>process.exit(0)).on('error',()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  orchestrator:
+    image: heroescrm-ai-phone-agent:latest
+    container_name: telephony-orchestrator
+    restart: unless-stopped
+    depends_on:
+      ai-phone-agent:
+        condition: service_healthy
+    env_file:
+      - ./ai-phone-agent/.env
+    environment:
+      VOICE_BRIDGE_URL: http://ai-phone-agent:4000
+    command: ["node", "orchestrator.js"]
+    ports:
+      - "127.0.0.1:${ORCHESTRATOR_HTTP_PORT:-14010}:4010"
+    networks:
+      - telephony-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"require('http').get('http://127.0.0.1:4010/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  dashboard:
+    image: heroescrm-ai-phone-agent:latest
+    container_name: telephony-dashboard
+    restart: unless-stopped
+    depends_on:
+      - ai-phone-agent
+    env_file:
+      - ./ai-phone-agent/.env
+    environment:
+      TRANSCRIPT_PUBLIC_URL: ws://localhost:${AI_PHONE_AGENT_TRANSCRIPT_PORT:-14002}
+    command: ["node", "dashboard-server.js"]
+    ports:
+      - "127.0.0.1:${AI_PHONE_AGENT_DASHBOARD_PORT:-14100}:4100"
+    networks:
+      - telephony-network
+
+secrets:
+  signalwire_token:
+    # The authenticated FreeSWITCH package repository requires a SignalWire
+    # Personal Access Token (PAT), not a project REST API token. Docker
+    # injects it only while building and never saves it in an image layer.
+    environment: SIGNALWIRE_PERSONAL_ACCESS_TOKEN
+
+networks:
+  telephony-network:
+    name: heroes-telephony-network
+    driver: bridge
+
+volumes:
+  ai-phone-agent-calls:

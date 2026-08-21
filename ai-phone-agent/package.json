@@ -5,7 +5,10 @@
   "description": "Bridges a FreeSWITCH conference (CRM user + prospect) to Gemini Live so the AI leads outbound sales calls.",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
+    "start:orchestrator": "node orchestrator.js",
+    "start:dashboard": "node dashboard-server.js",
+    "test": "node --test test/**/*.test.js"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
