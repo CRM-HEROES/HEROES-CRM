@@ -25,11 +25,16 @@ class EslClient {
         }
 
         this.ready = new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                this.ready = null;
+                reject(new Error("Timed out connecting to FreeSWITCH ESL."));
+            }, 10000);
             this.conn = new esl.Connection(
                 config.freeswitch.eslHost,
                 config.freeswitch.eslPort,
                 config.freeswitch.eslPassword,
                 () => {
+                    clearTimeout(timeout);
                     console.log("[ESL] Connected to FreeSWITCH.");
                     this.conn.subscribe(["CHANNEL_ANSWER", "CHANNEL_HANGUP", "BACKGROUND_JOB"]);
                     resolve(this.conn);
@@ -37,7 +42,9 @@ class EslClient {
             );
 
             this.conn.on("error", (error) => {
+                clearTimeout(timeout);
                 console.error("[ESL] Connection error.", error);
+                this.ready = null;
                 reject(error);
             });
         });

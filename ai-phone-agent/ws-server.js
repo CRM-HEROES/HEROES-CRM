@@ -1,6 +1,8 @@
 const WebSocket = require("ws");
 const config = require("./config");
 const { GeminiCallBridge } = require("./gemini-call-bridge");
+const transcriptHub = require("./transcript-hub");
+const activeBridges = new Map();
 
 /**
  * Accepts the WebSocket connections opened by FreeSWITCH's
@@ -32,11 +34,15 @@ function startWsServer() {
                 bridge = new GeminiCallBridge({
                     callUuid: metadata.call_uuid || `unknown-${Date.now()}`,
                     prospectId: metadata.prospect_id,
+                    systemContext: metadata.context || "",
                 });
+                activeBridges.set(bridge.callUuid, bridge);
                 bridge.onAudio = (base64Pcm24k) => {
                     if (ws.readyState !== WebSocket.OPEN) {
                         return;
                     }
+                    const audio = Buffer.from(base64Pcm24k, "base64");
+                    bridge.recordOutbound(audio);
                     ws.send(
                         JSON.stringify({
                             type: "streamAudio",
@@ -44,17 +50,25 @@ function startWsServer() {
                         })
                     );
                 };
+                bridge.onInterrupted = () => {
+                    // mod_audio_stream handles immediate frames; this command
+                    // clears any FreeSWITCH playback queued before the barge-in.
+                    ws.send(JSON.stringify({ type: "clearAudio" }));
+                    transcriptHub.publish({ type: "interrupted", call_uuid: bridge.callUuid, at: new Date().toISOString() });
+                };
                 bridge.connect();
                 return;
             }
 
             if (isBinary && bridge) {
+                bridge.recordInbound(data);
                 bridge.pushAudio(data);
             }
         });
 
         ws.on("close", async () => {
             if (bridge) {
+                activeBridges.delete(bridge.callUuid);
                 await bridge.finalize();
             }
         });
@@ -68,4 +82,5 @@ function startWsServer() {
     return wss;
 }
 
-module.exports = { startWsServer };
+function getBridge(callUuid) { return activeBridges.get(callUuid); }
+module.exports = { startWsServer, getBridge };

@@ -1,5 +1,8 @@
 const WebSocket = require("ws");
 const config = require("./config");
+const { CallArchive } = require("./call-archive");
+const transcriptHub = require("./transcript-hub");
+const { extractTranscript } = require("./post-call-extractor");
 
 const INPUT_SAMPLE_RATE = 16000;
 
@@ -73,13 +76,18 @@ ne convertis pas un âge en date de naissance).`;
  * still be checked once FreeSWITCH is in place.
  */
 class GeminiCallBridge {
-    constructor({ callUuid, prospectId }) {
+    constructor({ callUuid, prospectId, systemContext = "" }) {
         this.callUuid = callUuid;
         this.prospectId = prospectId;
         this.ws = null;
         this.ready = false;
         this.collected = {};
         this.transcript = [];
+        this.archive = new CallArchive(callUuid);
+        this.systemContext = systemContext;
+        this.paused = false;
+        this.closedByUs = false;
+        this.reconnects = 0;
         this.onAudio = null; // (base64Pcm24k) => void, set by the caller (ws-server.js)
         this.onText = null; // (text) => void, set by the caller (simulate-call.js); fed
         // from outputAudioTranscription — the native-audio models used here only
@@ -105,7 +113,7 @@ class GeminiCallBridge {
                     setup: {
                         model: config.gemini.model,
                         generationConfig: { responseModalities: ["AUDIO"] },
-                        systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+                        systemInstruction: { parts: [{ text: `${SYSTEM_INSTRUCTION}\n\nContexte CRM de cet appel : ${this.systemContext}` }] },
                         tools: [{ functionDeclarations: [RECORD_PROSPECT_INFO_TOOL] }],
                         inputAudioTranscription: {},
                         outputAudioTranscription: {},
@@ -118,12 +126,18 @@ class GeminiCallBridge {
         this.ws.on("error", (error) => console.error(`[Gemini ${this.callUuid}] WebSocket error.`, error));
         this.ws.on("close", (code, reason) => {
             console.log(`[Gemini ${this.callUuid}] WebSocket closed.`, code, reason?.toString());
+            // Live sessions have a finite lifetime. Reconnect once the socket
+            // closes unexpectedly and carry the factual transcript as context.
+            if (!this.closedByUs && this.reconnects < 3) {
+                this.reconnects += 1;
+                setTimeout(() => { this.systemContext += `\nConversation déjà tenue:\n${this.transcript.slice(-40).join("\n")}`; this.connect(); }, 500 * this.reconnects);
+            }
         });
     }
 
     /** @param {Buffer} pcm16kBuffer Raw L16 PCM at 16kHz, as received from FreeSWITCH. */
     pushAudio(pcm16kBuffer) {
-        if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+        if (this.paused || !this.ws || this.ws.readyState !== WebSocket.OPEN) {
             return;
         }
         this.ws.send(
@@ -186,7 +200,7 @@ class GeminiCallBridge {
                     this.onAudio(part.inlineData.data);
                 }
                 if (part.text) {
-                    this.transcript.push(`IA: ${part.text}`);
+                    this._appendTranscript("assistant", part.text);
                     if (this.onText) {
                         this.onText(part.text);
                     }
@@ -194,10 +208,10 @@ class GeminiCallBridge {
             });
 
             if (content.inputTranscription?.text) {
-                this.transcript.push(`Interlocuteur: ${content.inputTranscription.text}`);
+                this._appendTranscript("caller", content.inputTranscription.text);
             }
             if (content.outputTranscription?.text) {
-                this.transcript.push(`IA: ${content.outputTranscription.text}`);
+                this._appendTranscript("assistant", content.outputTranscription.text);
                 if (this.onText) {
                     this.onText(content.outputTranscription.text);
                 }
@@ -206,8 +220,19 @@ class GeminiCallBridge {
             if (content.turnComplete && this.onTurnComplete) {
                 this.onTurnComplete();
             }
+            if (content.interrupted && this.onInterrupted) this.onInterrupted();
         }
     }
+
+    _appendTranscript(speaker, text) {
+        this.transcript.push(`${speaker === "assistant" ? "IA" : "Interlocuteur"}: ${text}`);
+        this.archive.event(speaker, text);
+        transcriptHub.publish({ type: "transcript", call_uuid: this.callUuid, speaker, text, at: new Date().toISOString() });
+    }
+
+    setPaused(paused) { this.paused = paused; }
+    recordInbound(buffer) { this.archive.writeInbound(buffer); }
+    recordOutbound(buffer) { this.archive.writeOutbound(buffer); }
 
     _handleToolCall(toolCall) {
         const calls = toolCall.functionCalls || [];
@@ -249,6 +274,7 @@ class GeminiCallBridge {
     }
 
     async finalize() {
+        this.closedByUs = true;
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             try {
                 this.ws.close();
@@ -257,12 +283,31 @@ class GeminiCallBridge {
             }
         }
 
+        const transcript = this.transcript.join("\n");
+        let analysis = this.buildAnalysis();
+        try {
+            const extraction = await extractTranscript(transcript);
+            if (extraction) analysis = {
+                ...analysis,
+                post_call_extraction: extraction,
+                summary: extraction.resume_appel || analysis.summary,
+                qualification: ({ chaud: "hot", tiede: "warm", froid: "cold" })[extraction.niveau_interet] || analysis.qualification,
+                needs: extraction.besoin_exprime ? [extraction.besoin_exprime] : analysis.needs,
+                objections: extraction.objections || analysis.objections,
+                next_steps: extraction.action_suivante ? [extraction.action_suivante] : analysis.next_steps,
+                extracted: { ...analysis.extracted, budget: extraction.budget || analysis.extracted.budget, project: extraction.besoin_exprime || analysis.extracted.project },
+            };
+        } catch (error) {
+            console.error(`[Gemini ${this.callUuid}] Post-call extraction failed.`, error.message);
+        }
         const body = {
             call_uuid: this.callUuid,
             prospect_id: this.prospectId,
-            transcript: this.transcript.join("\n"),
-            analysis: this.buildAnalysis(),
+            transcript,
+            analysis,
+            test_mode: config.testMode,
         };
+        this.archive.close();
 
         try {
             const response = await fetch(`${config.laravelBaseUrl}/api/webhooks/ai-phone-agent/calls`, {

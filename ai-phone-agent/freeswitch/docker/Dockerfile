@@ -10,7 +10,7 @@ FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         gnupg2 wget lsb-release software-properties-common apt-transport-https curl \
-        ca-certificates git cmake build-essential libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev \
+        ca-certificates git cmake pkg-config build-essential libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Dépôt FreeSWITCH (SignalWire), authentifié avec le token fourni au build

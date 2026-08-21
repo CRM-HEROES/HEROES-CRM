@@ -35,6 +35,7 @@ class AiPhoneAgentController extends Controller
             'project_slug' => ['nullable', 'string'],
             'transcript' => ['nullable', 'string'],
             'analysis' => ['required', 'array'],
+            'test_mode' => ['nullable', 'boolean'],
         ]);
 
         if (!empty($data['prospect_id'])) {
@@ -65,6 +66,13 @@ class AiPhoneAgentController extends Controller
         $updates = $merger->buildProspectUpdates($prospect, $analysis);
         $meta = $merger->buildMeta($prospect, $analysis, 'ai_phone_agent_last_analysis');
         $meta['ai_phone_agent_last_analysis']['call_uuid'] = $data['call_uuid'] ?? null;
+        if (!empty($data['test_mode'])) {
+            // This CRM has no dedicated prospect-status column. Keep test
+            // qualification visibly pending in metadata rather than treating
+            // it as a final production update.
+            $meta['ai_phone_agent_last_analysis']['status'] = 'a_valider_humain';
+            $meta['ai_phone_agent_last_analysis']['test'] = true;
+        }
         $updates['meta'] = $meta;
         $prospect->update($updates);
 
