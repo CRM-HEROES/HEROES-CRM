@@ -204,11 +204,34 @@ const actions = {
      */
     async [UPDATE_PROSPECT](context, params) {
         context.commit(UPDATE_PROSPECT, params);
-        await ProspectService.update(
+        const { data } = await ProspectService.update(
             context.state.project.slug,
             params.id,
             params
         );
+
+        // The backend may compute fields the client can't know in advance
+        // (e.g. duplicate_id/duplicate_group_id/duplicate_fields from the
+        // automatic duplicate check) — without merging those back in, a
+        // row only ever picks up its duplicate color after a full page
+        // reload.
+        if (data && ("duplicate_id" in data || "duplicate_group_id" in data)) {
+            context.commit(UPDATE_PROSPECT, {
+                id: params.id,
+                duplicate_id: data.duplicate_id,
+                duplicate_group_id: data.duplicate_group_id,
+                duplicate_fields: data.duplicate_fields,
+            });
+        }
+
+        // Same story for whichever other prospect(s) this duplicate check
+        // matched against — if one is already loaded in the table, it
+        // needs the same patch, or it stays uncolored until a reload.
+        if (data && data.duplicate_partners) {
+            data.duplicate_partners.forEach((partner) => {
+                context.commit(UPDATE_PROSPECT, partner);
+            });
+        }
     },
 
     /**

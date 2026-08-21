@@ -211,6 +211,13 @@ export default {
                     `project/${this.project.slug}/duplicate/show`
                 );
                 this.duplicates = data;
+
+                // The detection above updates duplicate_group_id in the
+                // database, but the main prospects table already has its
+                // own (now stale) copy of each row loaded in the store —
+                // without this, the new/updated duplicate coloring only
+                // ever appeared after a full page reload.
+                store.dispatch(FETCH_PROSPECTS);
             } finally {
                 this.fetchingDuplicates = false;
             }

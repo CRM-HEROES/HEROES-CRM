@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
+use App\Services\ProspectDuplicateChecker;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -70,6 +71,8 @@ class ProspectController extends Controller
                 'creator_id' => auth()->id(),
             ]
         ));
+
+        (new ProspectDuplicateChecker())->check($prospect);
 
         $prospect->load('creator');
         $prospect->load('users');
@@ -186,7 +189,19 @@ class ProspectController extends Controller
             $defaultFieldValues, ['meta' => array_merge($prospect->meta ?: [], $metaFieldValues)]
         ));
 
-        return ['message' => trans('common.success.updated_resource')];
+        $duplicatePartners = (new ProspectDuplicateChecker())->check($prospect);
+
+        return [
+            'message' => trans('common.success.updated_resource'),
+            'duplicate_id' => $prospect->duplicate_id,
+            'duplicate_group_id' => $prospect->duplicate_group_id,
+            'duplicate_fields' => $prospect->duplicate_fields,
+            // Any other prospect this check touched (its duplicate
+            // partner(s)) — without this, a partner already loaded in the
+            // table only ever picks up its own new color after a full
+            // page reload.
+            'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
+        ];
     }
 
     /**
@@ -555,7 +570,9 @@ class ProspectController extends Controller
                     'phone_number',
                     'processed_at',
                     'prospects.deleted_at',
-                    'duplicate_id'
+                    'duplicate_id',
+                    'duplicate_group_id',
+                    'duplicate_fields'
                 ]
         );
 
