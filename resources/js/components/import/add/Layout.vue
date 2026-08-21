@@ -179,7 +179,14 @@ export default {
 
             var formData = new FormData();
             for (const i in this.prospectImport) {
-                formData.append(i, this.prospectImport[i]);
+                let value = this.prospectImport[i];
+                // FormData stringifies booleans as the literal "true"/"false",
+                // which Laravel's "boolean" validation rule rejects (it only
+                // accepts true/false/0/1/"0"/"1"). Send 1/0 instead.
+                if (typeof value === "boolean") {
+                    value = value ? 1 : 0;
+                }
+                formData.append(i, value);
             }
 
             let succeeded = false;

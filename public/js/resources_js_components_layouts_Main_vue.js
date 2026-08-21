@@ -6533,14 +6533,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     storeImport: function storeImport() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var formData, i, succeeded, pi, prospectImport, errors, message;
+        var formData, i, value, succeeded, pi, prospectImport, errors, message;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _this.addingImport = true;
               formData = new FormData();
               for (i in _this.prospectImport) {
-                formData.append(i, _this.prospectImport[i]);
+                value = _this.prospectImport[i]; // FormData stringifies booleans as the literal "true"/"false",
+                // which Laravel's "boolean" validation rule rejects (it only
+                // accepts true/false/0/1/"0"/"1"). Send 1/0 instead.
+                if (typeof value === "boolean") {
+                  value = value ? 1 : 0;
+                }
+                formData.append(i, value);
               }
               succeeded = false;
               _context.prev = 4;
