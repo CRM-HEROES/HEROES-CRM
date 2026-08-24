@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+: "${KAVKOM_EXTENSION:?KAVKOM_EXTENSION is required}"
+: "${KAVKOM_PASSWORD:?KAVKOM_PASSWORD is required}"
+: "${KAVKOM_USER_CONTEXT:?KAVKOM_USER_CONTEXT is required}"
+: "${ESL_PASSWORD:?ESL_PASSWORD is required}"
+: "${EXTERNAL_IP:?EXTERNAL_IP is required}"
+
+RTP_START_PORT="${RTP_START_PORT:-26384}"
+RTP_END_PORT="${RTP_END_PORT:-26483}"
+EXTERNAL_SIP_PORT="${EXTERNAL_SIP_PORT:-5080}"
+
+cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
+<include>
+  <gateway name="kavkom">
+    <param name="username" value="${KAVKOM_EXTENSION}"/>
+    <param name="password" value="${KAVKOM_PASSWORD}"/>
+    <param name="realm" value="${KAVKOM_USER_CONTEXT}"/>
+    <param name="proxy" value="${KAVKOM_USER_CONTEXT}"/>
+    <param name="register" value="true"/>
+    <param name="expire-seconds" value="600"/>
+    <param name="retry-seconds" value="30"/>
+    <param name="caller-id-in-from" value="true"/>
+  </gateway>
+</include>
+EOF
+
+EXT_SIP_IP="${EXT_SIP_IP:-$EXTERNAL_IP}"
+EXT_RTP_IP="${EXT_RTP_IP:-$EXTERNAL_IP}"
+sed -i "s#<param name=\"ext-rtp-ip\".*#<param name=\"ext-rtp-ip\" value=\"${EXT_RTP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
+sed -i "s#<param name=\"ext-sip-ip\".*#<param name=\"ext-sip-ip\" value=\"${EXT_SIP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
+sed -i "s#external_sip_port=[0-9]*#external_sip_port=${EXTERNAL_SIP_PORT}#" /etc/freeswitch/vars.xml
+sed -i "s#<param name=\"rtp-start-port\" value=\"[0-9]*\"/>#<param name=\"rtp-start-port\" value=\"${RTP_START_PORT}\"/>#" /etc/freeswitch/autoload_configs/switch.conf.xml
+sed -i "s#<param name=\"rtp-end-port\" value=\"[0-9]*\"/>#<param name=\"rtp-end-port\" value=\"${RTP_END_PORT}\"/>#" /etc/freeswitch/autoload_configs/switch.conf.xml
+sed -i "s#<param name=\"password\" value=\"[^\"]*\"/>#<param name=\"password\" value=\"${ESL_PASSWORD}\"/>#" /etc/freeswitch/autoload_configs/event_socket.conf.xml
+# ESL n'est pas publié sur l'hôte : il est accessible uniquement par
+# ai-phone-agent à travers le réseau Docker privé.
+sed -i "s#<param name=\"listen-ip\" value=\"[^\"]*\"/>#<param name=\"listen-ip\" value=\"0.0.0.0\"/>#" /etc/freeswitch/autoload_configs/event_socket.conf.xml
+# The default ESL ACL accepts loopback only.  The ESL port is deliberately
+# not published to the host; allow IPv4 peers on this private Compose network
+# so ai-phone-agent can control FreeSWITCH.
+sed -i 's#<!--[[:space:]]*<param name="apply-inbound-acl" value="loopback.auto"/>[[:space:]]*-->#<param name="apply-inbound-acl" value="any_v4.auto"/>#' /etc/freeswitch/autoload_configs/event_socket.conf.xml
+
+DIALPLAN=/etc/freeswitch/dialplan/default.xml
+if ! grep -q "ai-agent-tap" "$DIALPLAN"; then
+  sed -i '/<context name="default">/a\
+    <extension name="ai-agent-tap">\
+      <condition field="destination_number" expression="^ai-agent-tap$">\
+        <action application="answer"/>\
+        <action application="park"/>\
+      </condition>\
+    </extension>' "$DIALPLAN"
+fi
+
+CONF_FILE=/etc/freeswitch/autoload_configs/conference.conf.xml
+if ! grep -q 'profile name="ai-agent"' "$CONF_FILE"; then
+  sed -i '/<profiles>/a\
+    <profile name="ai-agent">\
+      <param name="rate" value="16000"/>\
+      <param name="domain" value="$${domain}"/>\
+      <param name="caller-id-name" value="Heroes CRM"/>\
+      <param name="caller-controls" value="none"/>\
+      <param name="moderator-controls" value="none"/>\
+    </profile>' "$CONF_FILE"
+fi
+
+exec "$@"

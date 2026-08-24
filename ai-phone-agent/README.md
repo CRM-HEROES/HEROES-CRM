@@ -34,6 +34,32 @@ CRM (Slide.vue) → Laravel (AiPhoneAgentController::trigger) → ce service
 4. Accès réseau sortant vers `generativelanguage.googleapis.com` (Gemini
    Live) et vers l'URL publique de votre instance Laravel.
 
+## Stack Docker et campagnes Kavkom
+
+`docker-compose.telephony.yml` lance quatre composants isolés : FreeSWITCH,
+`ai-phone-agent` (pont audio/Gemini Live), `orchestrator` (WebSocket Kavkom
+`/calls`) et `dashboard` (transcription en direct). Le pont archive par appel
+`transcript.jsonl`, la piste prospect en PCM 16 kHz et la piste IA en PCM 24
+kHz dans le volume Docker `ai-phone-agent-calls`.
+
+Avant le démarrage, copiez `.env.example` en `.env`, renseignez les secrets
+Gemini/Kavkom/CRM, et conservez `TEST_MODE=true` avec `TEST_ALLOWED_NUMBERS`
+pendant les essais. Le jeton `KAVKOM_REFRESH_ACCESS_TOKEN` reste exclusivement
+dans cet environnement serveur. Si votre tenant émet ce jeton depuis un
+endpoint dédié, configurez aussi `KAVKOM_REFRESH_TOKEN_ENDPOINT` et
+`KAVKOM_REFRESH_BEARER`.
+
+L'orchestrateur écoute sur `POST /campaigns` (port local `14010` par défaut) :
+
+```json
+{"prospects":[{"prospect_id":42,"destination_number":"+33612345678","extension":"1001","context":"Prospect intéressé par l'offre CRM."}]}
+```
+
+Il corrèle l'UUID FreeSWITCH et le `callUuid` Kavkom par extension, numéro et
+horodatage, répond aux heartbeats `ping`, suspend Gemini pendant `held`, et
+expose `GET /health`. À l'arrêt, il révoque le jeton d'accès. Le dashboard est
+disponible sur `http://localhost:14100`.
+
 ## Installation
 
 ```sh

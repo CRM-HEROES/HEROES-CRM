@@ -147,7 +147,9 @@ services:
 
 secrets:
   signalwire_token:
-    file: ./ai-phone-agent/freeswitch/docker/signalwire_token.txt
+    # FreeSWITCH package downloads need a SignalWire Personal Access Token.
+    # Docker exposes it only at build time; it is not copied into an image.
+    environment: SIGNALWIRE_PERSONAL_ACCESS_TOKEN
 
 #Docker Networks
 networks:

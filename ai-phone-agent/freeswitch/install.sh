@@ -72,7 +72,7 @@ echo "--- Étape 2/9 : installation de mod_audio_stream ---"
 MOD_PATH=$(find /usr/lib*/freeswitch/mod -name "mod_audio_stream.so" 2>/dev/null | head -n1 || true)
 
 if [ -z "$MOD_PATH" ]; then
-    apt-get -y install git libfreeswitch-dev libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev cmake build-essential
+    apt-get -y install git libfreeswitch-dev libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev cmake pkg-config build-essential
 
     BUILD_DIR=$(mktemp -d)
     git clone https://github.com/amigniter/mod_audio_stream.git "$BUILD_DIR/mod_audio_stream"

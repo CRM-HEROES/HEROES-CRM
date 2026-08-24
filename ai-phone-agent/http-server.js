@@ -2,6 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const config = require("./config");
 const eslClient = require("./esl-client");
+const { getBridge } = require("./ws-server");
 
 function checkSecret(req, res, next) {
     const provided = req.header("X-AI-Agent-Secret") || "";
@@ -34,6 +35,10 @@ function createHttpServer() {
                 message: "prospect_id, destination_number et user_extension sont requis.",
             });
         }
+        const normalizedDestination = String(destination).replace(/\D/g, "");
+        if (config.testMode && !config.testAllowedNumbers.includes(normalizedDestination)) {
+            return res.status(403).json({ success: false, message: "TEST_MODE: ce numéro n'est pas dans TEST_ALLOWED_NUMBERS." });
+        }
 
         const callUuid = crypto.randomUUID();
         const room = `ai-call-${callUuid}`;
@@ -46,6 +51,7 @@ function createHttpServer() {
             await eslClient.startAudioStream(aiChannel, config.wsPublicUrl, {
                 call_uuid: callUuid,
                 prospect_id: prospectId,
+                context: String(req.body.context || "").slice(0, 8000),
             });
 
             // 2. Ring the CRM user's own Kavkom extension — their browser
@@ -80,6 +86,12 @@ function createHttpServer() {
                 });
             }
         }
+    });
+
+    app.post("/calls/:callUuid/pause", checkSecret, (req, res) => {
+        const bridge = getBridge(req.params.callUuid);
+        if (bridge) bridge.setPaused(Boolean(req.body.paused));
+        res.json({ success: true, active: Boolean(bridge) });
     });
 
     app.listen(config.httpPort, () => {

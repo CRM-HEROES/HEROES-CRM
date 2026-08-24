@@ -1,0 +1,2 @@
+const test = require("node:test"); const assert = require("node:assert/strict"); const { validate } = require("../post-call-extractor");
+test("post-call JSON fixture requires explicit null fields", () => { const output = { besoin_exprime: "Un CRM", budget: null, disponibilite: null, niveau_interet: "chaud", objections: [], action_suivante: "Rappeler lundi", resume_appel: "Le prospect souhaite un CRM.", statut_appel: "rappeler" }; assert.deepEqual(validate(output), output); assert.throws(() => validate({ ...output, budget: undefined })); });
