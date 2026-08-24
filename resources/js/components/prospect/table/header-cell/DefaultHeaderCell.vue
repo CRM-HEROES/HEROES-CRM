@@ -270,10 +270,21 @@ export default {
          * setting for the current field
          */
         async toggleUnique() {
+            const unique = !this.field.unique;
+
             await store.dispatch(UPDATE_FIELD, {
                 id: this.field.id,
-                unique: !this.field.unique,
+                unique: unique,
             });
+
+            // Activating the check scans every existing prospect for
+            // this field server-side (see FieldController::update) —
+            // refetch so the newly computed duplicate colors and the
+            // duplicates-first ranking show up immediately, without
+            // needing to resave each row.
+            if (unique) {
+                store.dispatch(FETCH_PROSPECTS);
+            }
         },
 
         /**

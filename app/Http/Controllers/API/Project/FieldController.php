@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\Project;
 
 use App\Filters\FieldRequestFilters;
 use App\Http\Controllers\Controller;
+use App\Jobs\CheckDuplicatedProspects;
 use App\Jobs\FieldToCategory;
 use App\Models\Field;
 use App\Models\Project;
@@ -100,6 +101,16 @@ class FieldController extends Controller
             'searchable',
             'order'
         ));
+
+        // Turning "unique" on only used to affect future saves (see
+        // ProspectDuplicateChecker) — existing prospects never got
+        // checked, so nothing highlighted until each one was resaved.
+        // Running the same scan the "Trouver les doublons" panel uses
+        // (synchronously, scoped to this one field) flags every
+        // already-existing match immediately.
+        if ($field->wasChanged('unique') && $field->unique && $field->for == 'prospect') {
+            dispatch((new CheckDuplicatedProspects($project, [$field->id]))->onConnection('sync'));
+        }
 
         return ['message' => trans('common.success.updated_resource')];
     }

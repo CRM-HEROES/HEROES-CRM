@@ -11,6 +11,7 @@ use App\Models\UserSetting;
 use App\Services\ProspectDuplicateChecker;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -209,9 +210,46 @@ class ProspectController extends Controller
      */
     public function destroy(Project $project, Prospect $prospect)
     {
+        $groupId = $prospect->duplicate_group_id;
+
         $prospect->delete();
 
-        return ['message' => trans('common.success.deleted_resource')];
+        $duplicatePartners = $groupId
+            ? $this->recheckDuplicateGroupMembers([$groupId], [$prospect->id])
+            : collect();
+
+        return [
+            'message' => trans('common.success.deleted_resource'),
+            // The deleted prospect may have been the only reason its
+            // duplicate-cluster partner(s) were still flagged — without
+            // pushing their fresh state back, they'd stay colored/
+            // prioritized in the table until a full page reload.
+            'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
+        ];
+    }
+
+    /**
+     * Deleting a prospect can leave its former duplicate-cluster
+     * partner(s) with no one left to match. ProspectDuplicateChecker
+     * already knows how to clear duplicate_group_id/duplicate_fields
+     * when a prospect no longer matches anyone (see its "no more
+     * matches" branch), so we just re-run it for whoever shared the
+     * affected group(s) — excluding the prospect(s) just removed — and
+     * hand back their fresh state.
+     *
+     * @return Collection<int, Prospect>
+     */
+    protected function recheckDuplicateGroupMembers(array $groupIds, array $excludeIds): Collection
+    {
+        $members = Prospect::withoutGlobalScopes()
+            ->whereIn('duplicate_group_id', $groupIds)
+            ->whereNotIn('id', $excludeIds)
+            ->whereNull('deleted_at')
+            ->get();
+
+        $checker = new ProspectDuplicateChecker();
+
+        return $members->each(fn($member) => $checker->check($member));
     }
 
     /**
@@ -233,12 +271,21 @@ class ProspectController extends Controller
 
         switch ($request->input('action')) {
             case "delete":
-                $prospects->delete();
-                return ['message' => trans('common.success.deleted_resource')];
-
             case "force_delete":
-                $prospects->forceDelete();
-                return ['message' => trans('common.success.deleted_resource')];
+                $removed = $prospects->get(['id', 'duplicate_group_id']);
+                $ids = $removed->pluck('id')->all();
+                $groupIds = $removed->pluck('duplicate_group_id')->filter()->unique()->values()->all();
+
+                $request->input('action') == 'delete' ? $prospects->delete() : $prospects->forceDelete();
+
+                $duplicatePartners = !empty($groupIds)
+                    ? $this->recheckDuplicateGroupMembers($groupIds, $ids)
+                    : collect();
+
+                return [
+                    'message' => trans('common.success.deleted_resource'),
+                    'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
+                ];
 
             case "restore":
                 $prospects->restore();
@@ -789,6 +836,14 @@ class ProspectController extends Controller
             })
 
             ->filter($filters)
+
+            // Prospects belonging to a duplicate cluster sort first (see
+            // App\Services\ProspectDuplicateChecker / App\Jobs\CheckDuplicatedProspects
+            // for duplicate_group_id), the normal sort staying the
+            // secondary key so relative order is otherwise unaffected.
+            ->when($request->boolean('duplicatesFirst'), function($query) {
+                $query->orderByRaw('duplicate_group_id IS NULL');
+            })
 
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder);

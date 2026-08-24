@@ -7909,15 +7909,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     toggleUnique: function toggleUnique() {
       var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var unique;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _context5.next = 2;
+              unique = !_this5.field.unique;
+              _context5.next = 3;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.UPDATE_FIELD, {
                 id: _this5.field.id,
-                unique: !_this5.field.unique
+                unique: unique
               });
-            case 2:
+            case 3:
+              // Activating the check scans every existing prospect for
+              // this field server-side (see FieldController::update) —
+              // refetch so the newly computed duplicate colors and the
+              // duplicates-first ranking show up immediately, without
+              // needing to resave each row.
+              if (unique) {
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+              }
+            case 4:
             case "end":
               return _context5.stop();
           }

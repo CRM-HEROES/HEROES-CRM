@@ -104,7 +104,8 @@ class ProspectDuplicateChecker
 
         $query = Prospect::withoutGlobalScopes()
             ->where('project_id', $prospect->project_id)
-            ->where('id', '!=', $prospect->id);
+            ->where('id', '!=', $prospect->id)
+            ->whereNull('deleted_at');
 
         if ($field->meta) {
             $query->whereRaw("JSON_EXTRACT(meta, '\$.$field->slug') = ?", [json_encode($value)]);

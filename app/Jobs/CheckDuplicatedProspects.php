@@ -53,7 +53,7 @@ class CheckDuplicatedProspects implements ShouldQueue
         // Pairwise pointer (earlier -> later), used only by the
         // duplicate-management panel to list each matching pair once.
         $params = [$this->project->id, $this->project->id];
-        $query = "UPDATE prospects P1 INNER JOIN prospects P2 ON P1.project_id = ? AND P2.project_id = ? AND P1.id < P2.id";
+        $query = "UPDATE prospects P1 INNER JOIN prospects P2 ON P1.project_id = ? AND P2.project_id = ? AND P1.id < P2.id AND P1.deleted_at IS NULL AND P2.deleted_at IS NULL";
 
     	foreach ($fields as $field) {
 	        if ($field->meta) {
@@ -118,7 +118,7 @@ class CheckDuplicatedProspects implements ShouldQueue
                     MIN(id) OVER (PARTITION BY $keyExpr) AS group_id,
                     COUNT(*) OVER (PARTITION BY $keyExpr) AS cnt
                 FROM prospects
-                WHERE project_id = ? AND ($nonBlank)
+                WHERE project_id = ? AND deleted_at IS NULL AND ($nonBlank)
             ) G ON G.id = P.id
             SET P.duplicate_group_id = G.group_id,
                 P.duplicate_fields = JSON_MERGE_PRESERVE(COALESCE(P.duplicate_fields, JSON_ARRAY()), $fieldSlugsJson)
