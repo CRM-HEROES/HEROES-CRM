@@ -7920,14 +7920,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 unique: unique
               });
             case 3:
-              // Activating the check scans every existing prospect for
-              // this field server-side (see FieldController::update) —
-              // refetch so the newly computed duplicate colors and the
-              // duplicates-first ranking show up immediately, without
-              // needing to resave each row.
-              if (unique) {
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
-              }
+              // Either direction changes what's colored/prioritized
+              // server-side (see FieldController::update: activating
+              // scans every existing prospect for this field, deactivating
+              // strips this field out of duplicate_fields project-wide) —
+              // refetch so the table reflects it immediately instead of
+              // waiting for the next unrelated reload.
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
             case 4:
             case "end":
               return _context5.stop();
