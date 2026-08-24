@@ -43608,17 +43608,27 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
           if (context.state.project.prospectsFields) {
             params.fields = context.state.project.prospectsFields;
           }
-          _context.next = 7;
+
+          // As soon as any field is flagged "unique" (the duplicate-check
+          // toggle next to Email/Numéro in DefaultHeaderCell.vue), rank
+          // every prospect belonging to a duplicate cluster first — see
+          // ProspectController::getProspects' duplicatesFirst handling.
+          if (context.getters.fields && context.getters.fields.some(function (field) {
+            return field["for"] == "prospect" && field.unique;
+          })) {
+            params.duplicatesFirst = 1;
+          }
+          _context.next = 8;
           return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_0__["default"].get(context.state.project.slug, {
             params: params
           });
-        case 7:
+        case 8:
           _yield$ProspectServic = _context.sent;
           data = _yield$ProspectServic.data;
           context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS, data.data);
           context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_TOTAL, data.total);
           return _context.abrupt("return", data.data);
-        case 12:
+        case 13:
         case "end":
           return _context.stop();
       }
@@ -43726,14 +43736,29 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
   }))();
 }), _defineProperty(_objectSpread2, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    var _yield$ProspectServic6, data;
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
           _context6.next = 2;
           return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
         case 2:
+          _yield$ProspectServic6 = _context6.sent;
+          data = _yield$ProspectServic6.data;
           context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT, slug);
-        case 3:
+
+          // Removing this prospect may have freed its duplicate-cluster
+          // partner(s) (see ProspectController::destroy) — patch their
+          // fresh state in so they stop being colored immediately, then
+          // refetch so the list re-sorts them out of the duplicates-first
+          // priority ranking and back to their normal position.
+          if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
+            data.duplicate_partners.forEach(function (partner) {
+              context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, partner);
+            });
+            context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+          }
+        case 6:
         case "end":
           return _context6.stop();
       }
@@ -43741,6 +43766,7 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
   }))();
 }), _defineProperty(_objectSpread2, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_REMOVE_PROSPECT, function (context, prospects) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+    var _yield$ProspectServic7, data;
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
@@ -43748,6 +43774,17 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
           _context7.next = 3;
           return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_0__["default"].bulkDestroy(context.state.project.slug, prospects);
         case 3:
+          _yield$ProspectServic7 = _context7.sent;
+          data = _yield$ProspectServic7.data;
+          // Same reasoning as REMOVE_PROSPECT: a bulk removal can free
+          // several duplicate-cluster partners at once.
+          if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
+            data.duplicate_partners.forEach(function (partner) {
+              context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, partner);
+            });
+            context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+          }
+        case 6:
         case "end":
           return _context7.stop();
       }
@@ -43755,6 +43792,7 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
   }))();
 }), _defineProperty(_objectSpread2, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_FORCE_REMOVE_PROSPECT, function (context, prospects) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+    var _yield$ProspectServic8, data;
     return _regeneratorRuntime().wrap(function _callee8$(_context8) {
       while (1) switch (_context8.prev = _context8.next) {
         case 0:
@@ -43762,6 +43800,17 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
           _context8.next = 3;
           return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_0__["default"].bulkForceDestroy(context.state.project.slug, prospects);
         case 3:
+          _yield$ProspectServic8 = _context8.sent;
+          data = _yield$ProspectServic8.data;
+          // Same reasoning as REMOVE_PROSPECT: a bulk removal can free
+          // several duplicate-cluster partners at once.
+          if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
+            data.duplicate_partners.forEach(function (partner) {
+              context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, partner);
+            });
+            context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+          }
+        case 6:
         case "end":
           return _context8.stop();
       }
