@@ -12,6 +12,12 @@ RUN --mount=type=cache,target=/root/.npm \
 
 COPY . ./
 
-USER node
+# Named Docker volumes are created as root. Keep the image entrypoint as root
+# just long enough to grant the runtime user access to call recordings; it then
+# drops privileges before launching Node.
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
 EXPOSE 4000 4001 4002 4010 4100
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
 CMD ["npm", "start"]
