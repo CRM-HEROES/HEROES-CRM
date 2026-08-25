@@ -6,10 +6,19 @@ set -euo pipefail
 : "${KAVKOM_USER_CONTEXT:?KAVKOM_USER_CONTEXT is required}"
 : "${ESL_PASSWORD:?ESL_PASSWORD is required}"
 : "${EXTERNAL_IP:?EXTERNAL_IP is required}"
+: "${LOCAL_TEST_SIP_PASSWORD:?LOCAL_TEST_SIP_PASSWORD is required}"
 
 RTP_START_PORT="${RTP_START_PORT:-26384}"
 RTP_END_PORT="${RTP_END_PORT:-26483}"
 EXTERNAL_SIP_PORT="${EXTERNAL_SIP_PORT:-5080}"
+EXTERNAL_TLS_PORT="${EXTERNAL_TLS_PORT:-5081}"
+KAVKOM_SIP_TRANSPORT="${KAVKOM_SIP_TRANSPORT:-udp}"
+KAVKOM_SIP_PORT="${KAVKOM_SIP_PORT:-5060}"
+
+case "$KAVKOM_SIP_TRANSPORT" in
+  udp|tcp|tls) ;;
+  *) echo "KAVKOM_SIP_TRANSPORT must be udp, tcp, or tls." >&2; exit 1 ;;
+esac
 
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
 <include>
@@ -17,7 +26,9 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     <param name="username" value="${KAVKOM_EXTENSION}"/>
     <param name="password" value="${KAVKOM_PASSWORD}"/>
     <param name="realm" value="${KAVKOM_USER_CONTEXT}"/>
-    <param name="proxy" value="${KAVKOM_USER_CONTEXT}"/>
+    <param name="proxy" value="${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}"/>
+    <param name="register-proxy" value="${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}"/>
+    <param name="register-transport" value="${KAVKOM_SIP_TRANSPORT}"/>
     <param name="register" value="true"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>
@@ -31,6 +42,11 @@ EXT_RTP_IP="${EXT_RTP_IP:-$EXTERNAL_IP}"
 sed -i "s#<param name=\"ext-rtp-ip\".*#<param name=\"ext-rtp-ip\" value=\"${EXT_RTP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
 sed -i "s#<param name=\"ext-sip-ip\".*#<param name=\"ext-sip-ip\" value=\"${EXT_SIP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
 sed -i "s#external_sip_port=[0-9]*#external_sip_port=${EXTERNAL_SIP_PORT}#" /etc/freeswitch/vars.xml
+sed -i "s#external_tls_port=[0-9]*#external_tls_port=${EXTERNAL_TLS_PORT}#" /etc/freeswitch/vars.xml
+if [ "$KAVKOM_SIP_TRANSPORT" = "tls" ]; then
+  sed -i 's#external_ssl_enable=[^\"]*#external_ssl_enable=true#' /etc/freeswitch/vars.xml
+fi
+sed -i "s#default_password=[^\"]*#default_password=${LOCAL_TEST_SIP_PASSWORD}#" /etc/freeswitch/vars.xml
 sed -i "s#<param name=\"rtp-start-port\" value=\"[0-9]*\"/>#<param name=\"rtp-start-port\" value=\"${RTP_START_PORT}\"/>#" /etc/freeswitch/autoload_configs/switch.conf.xml
 sed -i "s#<param name=\"rtp-end-port\" value=\"[0-9]*\"/>#<param name=\"rtp-end-port\" value=\"${RTP_END_PORT}\"/>#" /etc/freeswitch/autoload_configs/switch.conf.xml
 sed -i "s#<param name=\"password\" value=\"[^\"]*\"/>#<param name=\"password\" value=\"${ESL_PASSWORD}\"/>#" /etc/freeswitch/autoload_configs/event_socket.conf.xml

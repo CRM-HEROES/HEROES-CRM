@@ -16,6 +16,7 @@ module.exports = {
     testMode: process.env.TEST_MODE === "true",
     testAllowedNumbers: (process.env.TEST_ALLOWED_NUMBERS || "").split(",").map((value) => value.replace(/\D/g, "")).filter(Boolean),
     recordingDir: required("CALL_RECORDING_DIR", "/data/calls"),
+    localTestSipUser: required("LOCAL_TEST_SIP_USER", "1000"),
 
     gemini: {
         apiKey: required("GEMINI_API_KEY", ""),
