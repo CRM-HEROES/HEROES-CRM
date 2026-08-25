@@ -1117,6 +1117,14 @@
                     "source": "Source",
                     "sms": "SMS"
                 },
+                "email": {
+                    "title": "Send an email",
+                    "name": "Send an email",
+                    "subject": "Subject",
+                    "body": "Message",
+                    "enter_subject": "Enter a subject",
+                    "enter_message": "Enter a message"
+                },
                 "event": {
                     "title": "Create an event",
                     "name": "Create a {duration} mn {calendar} for {user} in {min_days} to {max_days} days",
