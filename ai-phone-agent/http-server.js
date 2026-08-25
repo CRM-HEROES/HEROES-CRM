@@ -94,6 +94,30 @@ function createHttpServer() {
         res.json({ success: true, active: Boolean(bridge) });
     });
 
+    // LAN-only test path: rings a registered Linphone account and joins it to
+    // Gemini without Kavkom, PSTN, or an external destination number.
+    app.post("/local-test", checkSecret, async (req, res) => {
+        const userExtension = String(req.body?.user_extension || config.localTestSipUser);
+        const callUuid = crypto.randomUUID();
+        const room = `ai-local-${callUuid}`;
+        try {
+            const aiChannel = await eslClient.originateIntoConference(config.freeswitch.loopbackTarget, room);
+            await eslClient.waitForAnswer(aiChannel);
+            await eslClient.startAudioStream(aiChannel, config.wsPublicUrl, {
+                call_uuid: callUuid,
+                prospect_id: null,
+                context: "Local Linphone voice test. Speak naturally in French.",
+            });
+            const userChannel = await eslClient.originateIntoConference(`user/${userExtension}`, room);
+            res.json({ success: true, call_uuid: callUuid, user_extension: userExtension });
+            eslClient.waitForHangup(userChannel)
+                .finally(() => eslClient.hangup(aiChannel));
+        } catch (error) {
+            console.error(`[HTTP] Failed local Linphone test ${callUuid}.`, error);
+            if (!res.headersSent) res.status(500).json({ success: false, message: "Impossible de démarrer le test Linphone. Consultez les logs." });
+        }
+    });
+
     app.listen(config.httpPort, () => {
         console.log(`[HTTP] Control API listening on port ${config.httpPort}.`);
     });
