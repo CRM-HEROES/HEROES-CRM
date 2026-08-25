@@ -8,6 +8,7 @@ use App\Jobs\CheckDuplicatedProspects;
 use App\Jobs\FieldToCategory;
 use App\Models\Field;
 use App\Models\Project;
+use App\Models\Prospect;
 use Illuminate\Http\Request;
 
 class FieldController extends Controller
@@ -102,17 +103,51 @@ class FieldController extends Controller
             'order'
         ));
 
-        // Turning "unique" on only used to affect future saves (see
-        // ProspectDuplicateChecker) — existing prospects never got
-        // checked, so nothing highlighted until each one was resaved.
-        // Running the same scan the "Trouver les doublons" panel uses
-        // (synchronously, scoped to this one field) flags every
-        // already-existing match immediately.
-        if ($field->wasChanged('unique') && $field->unique && $field->for == 'prospect') {
-            dispatch((new CheckDuplicatedProspects($project, [$field->id]))->onConnection('sync'));
+        if ($field->wasChanged('unique') && $field->for == 'prospect') {
+            if ($field->unique) {
+                // Turning "unique" on only used to affect future saves
+                // (see ProspectDuplicateChecker) — existing prospects
+                // never got checked, so nothing highlighted until each
+                // one was resaved. Running the same scan the "Trouver
+                // les doublons" panel uses (synchronously, scoped to
+                // this one field) flags every already-existing match
+                // immediately.
+                dispatch((new CheckDuplicatedProspects($project, [$field->id]))->onConnection('sync'));
+            } else {
+                // Turning it back off must undo exactly that: drop this
+                // field from every prospect's duplicate_fields so the
+                // table stops coloring/prioritizing on it. A prospect
+                // that was only flagged because of this field loses its
+                // duplicate_group_id entirely; one still flagged by
+                // another (still-unique) field keeps it untouched.
+                $this->clearFieldFromDuplicates($project, $field);
+            }
         }
 
         return ['message' => trans('common.success.updated_resource')];
+    }
+
+    /**
+     * @see FieldController::update()
+     */
+    protected function clearFieldFromDuplicates(Project $project, Field $field): void
+    {
+        Prospect::withoutGlobalScopes()
+            ->where('project_id', $project->id)
+            ->whereJsonContains('duplicate_fields', $field->slug)
+            ->get(['id', 'duplicate_fields'])
+            ->each(function ($prospect) use ($field) {
+                $fields = collect($prospect->duplicate_fields ?: [])
+                    ->reject(fn($slug) => $slug === $field->slug)
+                    ->values()
+                    ->all();
+
+                Prospect::withoutGlobalScopes()->whereKey($prospect->id)->update(
+                    empty($fields)
+                        ? ['duplicate_fields' => null, 'duplicate_group_id' => null]
+                        : ['duplicate_fields' => $fields]
+                );
+            });
     }
 
     /**

@@ -1119,6 +1119,14 @@
                     "source": "Source",
                     "sms": "SMS"
                 },
+                "email": {
+                    "title": "Envoyer un email",
+                    "name": "Envoyer un email",
+                    "subject": "Objet",
+                    "body": "Message",
+                    "enter_subject": "Saisir un objet",
+                    "enter_message": "Saisir un message"
+                },
                 "event": {
                     "title": "Créer un RDV",
                     "name": "Créer un {calendar} de {duration} mn pour {user} entre {min_days} et {max_days} jours",

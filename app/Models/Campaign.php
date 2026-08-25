@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filters\EventFilters;
 use App\Filters\Filters;
 use App\Filters\OrderFilters;
 use App\Filters\ProspectFilters;
@@ -80,6 +81,16 @@ class Campaign extends Model
             });
 
             return $this->matchingItems($query, new OrderFilters());
+
+        // Matching events
+        } else if ($this->for == "event") {
+            // Only events that belong to a prospect
+            // in the current project
+            $query = Event::whereHas('prospect', function($query) {
+                $query->where('project_id', $this->project_id);
+            });
+
+            return $this->matchingItems($query, new EventFilters());
         }
     }
 
@@ -103,6 +114,13 @@ class Campaign extends Model
                 $query
                     ->where('campaigns.id', $this->id)
                     ->where('campaign_order.action_id', $action->id);
+            });
+        // Event
+        } else if ($this->for == "event") {
+            return $query->whereDoesntHave('campaigns', function($query) use($action) {
+                $query
+                    ->where('campaigns.id', $this->id)
+                    ->where('campaign_event.action_id', $action->id);
             });
         }
     }

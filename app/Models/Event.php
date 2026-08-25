@@ -50,7 +50,7 @@ class Event extends Model
         'valid_address',
     ];
 
-    
+
     /**
      * The attributes that should be cast.
      *
@@ -84,6 +84,14 @@ class Event extends Model
     public function calendar()
     {
         return $this->belongsTo(Calendar::class);
+    }
+
+    /**
+     * Campaigns
+     */
+    public function campaigns()
+    {
+        return $this->belongsToMany(Campaign::class, 'campaign_event');
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Console\Commands\Campaign\Event\ProspectAttachUserAction as EventProspec
 use App\Console\Commands\Campaign\Event\ProspectDetachGroupAction as EventProspectDetachGroupAction;
 use App\Console\Commands\Campaign\Event\ProspectDetachLabelAction as EventProspectDetachLabelAction;
 use App\Console\Commands\Campaign\Event\ProspectDetachUserAction as EventProspectDetachUserAction;
+use App\Console\Commands\Campaign\Event\ProspectEmailAction as EventProspectEmailAction;
 use App\Console\Commands\Campaign\Event\ProspectEventAction as EventProspectEventAction;
 use App\Console\Commands\Campaign\Event\ProspectMessageAction as EventProspectMessageAction;
 use App\Console\Commands\Campaign\Event\ProspectNotProcessedAction as EventProspectNotProcessedAction;
@@ -23,6 +24,7 @@ use App\Console\Commands\Campaign\Prospect\ProspectDeleteAction;
 use App\Console\Commands\Campaign\Prospect\ProspectDetachGroupAction;
 use App\Console\Commands\Campaign\Prospect\ProspectDetachLabelAction;
 use App\Console\Commands\Campaign\Prospect\ProspectDetachUserAction;
+use App\Console\Commands\Campaign\Prospect\ProspectEmailAction;
 use App\Console\Commands\Campaign\Prospect\ProspectEventAction;
 use App\Console\Commands\Campaign\Prospect\ProspectFileDocumentAction;
 use App\Console\Commands\Campaign\Prospect\ProspectGetLatLngAction;
@@ -40,6 +42,7 @@ use App\Console\Commands\Campaign\Order\ProspectAttachUserAction as OrderProspec
 use App\Console\Commands\Campaign\Order\ProspectDetachGroupAction as OrderProspectDetachGroupAction;
 use App\Console\Commands\Campaign\Order\ProspectDetachLabelAction as OrderProspectDetachLabelAction;
 use App\Console\Commands\Campaign\Order\ProspectDetachUserAction as OrderProspectDetachUserAction;
+use App\Console\Commands\Campaign\Order\ProspectEmailAction as OrderProspectEmailAction;
 use App\Console\Commands\Campaign\Order\ProspectEventAction as OrderProspectEventAction;
 use App\Console\Commands\Campaign\Order\ProspectMessageAction as OrderProspectMessageAction;
 use App\Console\Commands\Campaign\Order\ProspectNotProcessedAction as OrderProspectNotProcessedAction;
@@ -60,6 +63,7 @@ use App\Console\Commands\Campaign\Order\ProspectMessageInvoiceAction;
 
 use App\Models\Campaign as CampaignModel;
 use App\Models\CampaignAction;
+use App\Models\Event;
 use App\Models\Order;
 use App\Models\Prospect;
 use Illuminate\Console\Command;
@@ -109,6 +113,7 @@ class Campaign extends Command
                 'prospect-detach-group'     => new ProspectDetachGroupAction(),
                 'prospect-detach-label'     => new ProspectDetachLabelAction(),
                 'prospect-detach-user'      => new ProspectDetachUserAction(),
+                'prospect-email'            => new ProspectEmailAction(),
                 'prospect-event'            => new ProspectEventAction(),
                 'prospect-get-lat-lng'      => new ProspectGetLatLngAction(),
                 'prospect-file-document'    => new ProspectFileDocumentAction(),
@@ -137,6 +142,7 @@ class Campaign extends Command
                 'prospect-detach-group'    => new OrderProspectDetachGroupAction(),
                 'prospect-detach-label'    => new OrderProspectDetachLabelAction(),
                 'prospect-detach-user'     => new OrderProspectDetachUserAction(),
+                'prospect-email'           => new OrderProspectEmailAction(),
                 'prospect-event'           => new OrderProspectEventAction(),
                 'prospect-file-invoice'    => new ProspectFileInvoiceAction(),
                 'prospect-message'         => new OrderProspectMessageAction(),
@@ -152,6 +158,7 @@ class Campaign extends Command
                 'prospect-detach-group'    => new EventProspectDetachGroupAction(),
                 'prospect-detach-label'    => new EventProspectDetachLabelAction(),
                 'prospect-detach-user'     => new EventProspectDetachUserAction(),
+                'prospect-email'           => new EventProspectEmailAction(),
                 'prospect-event'           => new EventProspectEventAction(),
                 'prospect-message'         => new EventProspectMessageAction(),
                 'prospect-not-processed'   => new EventProspectNotProcessedAction(),
@@ -348,6 +355,9 @@ class Campaign extends Command
         } else if ($model instanceof Order) {
             $table = "campaign_order";
             $item_id = "order_id";
+        } else if ($model instanceof Event) {
+            $table = "campaign_event";
+            $item_id = "event_id";
         } else {
             return;
         }

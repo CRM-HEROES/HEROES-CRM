@@ -78,6 +78,10 @@
                 @dragging="dragNewField"
                 @dragged="dropNewField"
             />
+            <action-prospect-email-slide
+                @dragging="dragNewField"
+                @dragged="dropNewField"
+            />
             <action-prospect-event-slide
                 @dragging="dragNewField"
                 @dragged="dropNewField"
@@ -241,6 +245,7 @@ import MatchingSlide from "./slides/matching/Slide.vue";
 // Prospect actions
 import ActionProspectMessageSlide from "./actions/prospect/message/Slide.vue";
 import ActionProspectSmsSlide from "./actions/prospect/sms/Slide.vue";
+import ActionProspectEmailSlide from "./actions/prospect/email/Slide.vue";
 import ActionProspectEventSlide from "./actions/prospect/event/Slide.vue";
 import ActionProspectAttachLabelSlide from "./actions/prospect/attach-label/Slide.vue";
 import ActionProspectDetachLabelSlide from "./actions/prospect/detach-label/Slide.vue";
@@ -274,6 +279,7 @@ export default {
 
         ActionProspectMessageSlide,
         ActionProspectSmsSlide,
+        ActionProspectEmailSlide,
         ActionProspectEventSlide,
         ActionProspectAttachLabelSlide,
         ActionProspectDetachLabelSlide,
