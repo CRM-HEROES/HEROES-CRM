@@ -607,7 +607,7 @@
                 "unreachable": "Impossible de récupérer ce fichier Google Sheets. Vérifiez que le lien de partage autorise \"Tous les utilisateurs disposant du lien\" à voir le document.",
                 "sync_enabled": "Synchroniser automatiquement",
                 "sync_interval": "Fréquence de synchronisation",
-                "sync_interval_15": "Toutes les 15 minutes",
+                "sync_interval_5": "Toutes les 5 minutes",
                 "sync_interval_30": "Toutes les 30 minutes",
                 "sync_interval_60": "Toutes les heures",
                 "sync_interval_180": "Toutes les 3 heures",

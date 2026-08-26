@@ -31,7 +31,7 @@ class ImportController extends Controller
     {
         $this->validate($request, [
             'name' => 'required',
-            'url' => 'required_if:source,google_sheets',
+            'source_url' => 'required_if:source,google_sheets',
             'sync_enabled' => 'sometimes|boolean',
             'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
         ]);
@@ -97,7 +97,7 @@ class ImportController extends Controller
             'notify_welcome_sms' => 'sometimes|boolean',
             'welcome_sms_message' => 'sometimes|nullable|string|required_if:notify_welcome_sms,true',
             'welcome_sms_source' => 'sometimes|nullable|in:brevo,smsbox,ultramsg,mtarget',
-            'url' => 'sometimes|nullable|url',
+            'source_url' => 'sometimes|nullable|url',
             'sync_enabled' => 'sometimes|boolean',
             'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
         ]);
@@ -112,7 +112,7 @@ class ImportController extends Controller
             'notify_welcome_sms',
             'welcome_sms_message',
             'welcome_sms_source',
-            'url',
+            'source_url',
             'sync_enabled',
             'sync_interval_minutes'
         ));
@@ -144,7 +144,7 @@ class ImportController extends Controller
     protected function storeFile(Request $request, Project $project)
     {
         if ($request->input('source') == 'google_sheets') {
-            return $this->storeGoogleSheet($request->input('url'), $project);
+            return $this->storeGoogleSheet($request->input('source_url'), $project);
         }
 
         if ($request->input('source') != 'file') {
@@ -164,8 +164,11 @@ class ImportController extends Controller
     /**
      * Download the XLSX export of a public Google Sheets URL (all of its
      * sheets/tabs) and store it on the "imports" disk, exactly like an
-     * uploaded file. The URL itself is persisted alongside the file so
-     * SyncGoogleSheetImports can re-download it periodically.
+     * uploaded file. The URL itself is persisted as "source_url" (not
+     * "url" — Import already has a "url" *accessor* for the file download
+     * link, so a same-named column would be silently shadowed by it)
+     * alongside the file so SyncGoogleSheetImports can re-download it
+     * periodically.
      */
     protected function storeGoogleSheet(string $url, Project $project)
     {
@@ -175,7 +178,7 @@ class ImportController extends Controller
 
         return array_merge(
             $downloader->download($spreadsheetId, $project->slug),
-            ['url' => $url]
+            ['source_url' => $url]
         );
     }
 }

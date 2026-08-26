@@ -46,7 +46,7 @@
                     required
                     type="url"
                     :placeholder="label + ' ...'"
-                    v-model="prospectImport.url"
+                    v-model="prospectImport.source_url"
             /></v-field>
 
             <v-field
@@ -69,8 +69,8 @@
             >
                 <select v-model.number="prospectImport.sync_interval_minutes">
                     <option
-                        :value="15"
-                        v-text="$t('import.add.google_sheets.sync_interval_15')"
+                        :value="5"
+                        v-text="$t('import.add.google_sheets.sync_interval_5')"
                     ></option>
                     <option
                         :value="30"
@@ -163,7 +163,7 @@ export default {
                 description: "",
                 source: "file",
                 file: null,
-                url: "",
+                source_url: "",
                 sync_enabled: false,
                 sync_interval_minutes: 30,
                 field_delimiter: ",",

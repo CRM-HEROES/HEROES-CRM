@@ -607,7 +607,7 @@
                 "unreachable": "Unable to fetch this Google Sheets file. Make sure the share link allows \"Anyone with the link\" to view the document.",
                 "sync_enabled": "Sync automatically",
                 "sync_interval": "Sync frequency",
-                "sync_interval_15": "Every 15 minutes",
+                "sync_interval_5": "Every 5 minutes",
                 "sync_interval_30": "Every 30 minutes",
                 "sync_interval_60": "Every hour",
                 "sync_interval_180": "Every 3 hours",

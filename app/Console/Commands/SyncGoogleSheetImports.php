@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\ImportProspects;
 use App\Models\Import;
 use App\Services\Import\GoogleSheetDownloader;
 use Carbon\Carbon;
@@ -19,7 +20,7 @@ class SyncGoogleSheetImports extends Command
             ->where('source', 'google_sheets')
             ->where('sync_enabled', true)
             ->where('is_processing', false)
-            ->whereNotNull('url')
+            ->whereNotNull('source_url')
             ->get();
 
         $synced = 0;
@@ -45,7 +46,11 @@ class SyncGoogleSheetImports extends Command
      */
     protected function isDue(Import $import): bool
     {
-        $reference = $import->last_synced_at ?: $import->processed_at;
+        // last_synced_at is cast to Carbon, but processed_at isn't (kept as
+        // a plain string by the model), so it must be parsed explicitly.
+        $reference = $import->last_synced_at ?: (
+            $import->processed_at ? Carbon::parse($import->processed_at) : null
+        );
 
         if (!$reference) {
             return true;
@@ -57,15 +62,18 @@ class SyncGoogleSheetImports extends Command
     }
 
     /**
-     * Re-download the sheet and, on success, hand off to the same
-     * "is_processing = true" flow the manual "Re importer" button uses
-     * (ImportObserver::launchOrStop dispatches ImportProspects, which
-     * already knows how to update existing prospects and add new ones).
+     * Re-download the sheet and, on success, run an *incremental*
+     * ImportProspects pass: existing prospects (already imported by this
+     * same import on a previous sync) are recognised via
+     * existingEmails/existingMobiles and skipped or have their meta
+     * merged if it changed, instead of being wiped and recreated — only
+     * genuinely new rows get inserted. See ImportProspects's $incremental
+     * flag for the details.
      */
     protected function syncImport(Import $import, GoogleSheetDownloader $downloader): bool
     {
         try {
-            $spreadsheetId = $downloader->extractSpreadsheetId($import->url);
+            $spreadsheetId = $downloader->extractSpreadsheetId($import->source_url);
             $file = $downloader->download($spreadsheetId, $import->project->slug);
         } catch (\Throwable $e) {
             Log::warning('SyncGoogleSheetImports: failed to download sheet, will retry next run', [
@@ -76,12 +84,22 @@ class SyncGoogleSheetImports extends Command
             return false;
         }
 
-        $import->update([
-            'path' => $file['path'],
-            'size' => $file['size'],
-            'last_synced_at' => Carbon::now(),
-            'is_processing' => true,
-        ]);
+        // Bypass ImportObserver here: flipping is_processing through a
+        // normal update() would make it dispatch its own *non-incremental*
+        // ImportProspects run (ImportObserver::launchOrStop), which wipes
+        // and recreates every prospect of the import on every sync. The
+        // incremental run is dispatched explicitly below instead.
+        Import::withoutEvents(function () use ($import, $file) {
+            $import->update([
+                'path' => $file['path'],
+                'size' => $file['size'],
+                'last_synced_at' => Carbon::now(),
+                'processed_at' => null,
+                'is_processing' => true,
+            ]);
+        });
+
+        ImportProspects::dispatch($import, true)->onQueue('imports');
 
         return true;
     }
