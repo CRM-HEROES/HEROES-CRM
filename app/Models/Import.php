@@ -53,7 +53,7 @@ class Import extends Model
         'selected_sheets',
         'source',
         'token',
-        'url',
+        'source_url',
         'sync_enabled',
         'sync_interval_minutes',
         'last_synced_at',

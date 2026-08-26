@@ -6520,7 +6520,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         description: "",
         source: "file",
         file: null,
-        url: "",
+        source_url: "",
         sync_enabled: false,
         sync_interval_minutes: 30,
         field_delimiter: ",",
@@ -8844,7 +8844,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * shown on the "sync active" info item
      */
     syncStatusLabel: function syncStatusLabel() {
-      var knownIntervals = [15, 30, 60, 180, 1440];
+      var knownIntervals = [5, 30, 60, 180, 1440];
       var intervalMinutes = this.prospectImport.sync_interval_minutes;
       var interval = knownIntervals.includes(intervalMinutes) ? this.$t("import.add.google_sheets.sync_interval_" + intervalMinutes) : intervalMinutes + " min";
       var lastSyncedAt = this.prospectImport.last_synced_at ? dayjs(new Date(this.prospectImport.last_synced_at)).format("DD/MM/YYYY HH:mm:ss") : this.$t("import.update.google_sheets.never_synced");
@@ -9664,7 +9664,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 name: _this.prospectImportToUpdate.name
               };
               if (_this.prospectImportToUpdate.source == "google_sheets") {
-                payload.url = _this.prospectImportToUpdate.url;
+                payload.source_url = _this.prospectImportToUpdate.source_url;
                 payload.sync_enabled = _this.prospectImportToUpdate.sync_enabled;
                 payload.sync_interval_minutes = _this.prospectImportToUpdate.sync_interval_minutes;
               }
@@ -59683,9 +59683,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             type: "url",
             placeholder: label + ' ...',
             "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-              return $data.prospectImport.url = $event;
+              return $data.prospectImport.source_url = $event;
             })
-          }, null, 8 /* PROPS */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectImport.url]])];
+          }, null, 8 /* PROPS */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectImport.source_url]])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.prospectImport.source == 'google_sheets' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_v_field, {
@@ -59715,8 +59715,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return $data.prospectImport.sync_interval_minutes = $event;
             })
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-            value: 15,
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_15'))
+            value: 5,
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_5'))
           }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
             value: 30,
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_30'))
@@ -62181,9 +62181,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             type: "url",
             placeholder: label + ' ...',
             "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-              return $data.prospectImportToUpdate.url = $event;
+              return $data.prospectImportToUpdate.source_url = $event;
             })
-          }, null, 8 /* PROPS */, _hoisted_2), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectImportToUpdate.url]])];
+          }, null, 8 /* PROPS */, _hoisted_2), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectImportToUpdate.source_url]])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
@@ -62212,8 +62212,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return $data.prospectImportToUpdate.sync_interval_minutes = $event;
             })
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-            value: 15,
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_15'))
+            value: 5,
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_5'))
           }, null, 8 /* PROPS */, _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
             value: 30,
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.add.google_sheets.sync_interval_30'))

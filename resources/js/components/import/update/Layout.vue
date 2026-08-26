@@ -23,7 +23,7 @@
                         required
                         type="url"
                         :placeholder="label + ' ...'"
-                        v-model="prospectImportToUpdate.url"
+                        v-model="prospectImportToUpdate.source_url"
                 /></v-field>
 
                 <v-field :label="$t('import.update.google_sheets.sync_enabled')">
@@ -44,9 +44,9 @@
                         "
                     >
                         <option
-                            :value="15"
+                            :value="5"
                             v-text="
-                                $t('import.add.google_sheets.sync_interval_15')
+                                $t('import.add.google_sheets.sync_interval_5')
                             "
                         ></option>
                         <option
@@ -139,7 +139,7 @@ export default {
                 };
 
                 if (this.prospectImportToUpdate.source == "google_sheets") {
-                    payload.url = this.prospectImportToUpdate.url;
+                    payload.source_url = this.prospectImportToUpdate.source_url;
                     payload.sync_enabled =
                         this.prospectImportToUpdate.sync_enabled;
                     payload.sync_interval_minutes =
