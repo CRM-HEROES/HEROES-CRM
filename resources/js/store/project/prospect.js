@@ -17,6 +17,7 @@ import {
     SET_PROSPECTS_TOTAL,
     SET_PROSPECTS_SORT_BY,
     SET_PROSPECTS_SORT_ORDER,
+    SET_PROSPECTS_DUPLICATES_FIRST,
     SET_PROSPECTS_FIELDS,
     SET_PROSPECT_PARAMS,
     ADD_PROSPECT_PARAMS,
@@ -69,6 +70,10 @@ export const state = {
     prospectsCount: 50,
     prospectsSortBy: null,
     prospectsSortOrder: "desc",
+    // Set when "Rechercher des duplications" finds duplicate clusters, so
+    // the main table groups them together (see FETCH_PROSPECTS below).
+    // Cleared as soon as the user picks a column sort themselves.
+    prospectsDuplicatesFirst: false,
     prospectsFields: null,
     prospectsOptions: false,
     prospectsMenus: true,
@@ -140,15 +145,18 @@ const actions = {
             params.fields = context.state.project.prospectsFields;
         }
 
-        // As soon as any field is flagged "unique" (the duplicate-check
-        // toggle next to Email/Numéro in DefaultHeaderCell.vue), rank
-        // every prospect belonging to a duplicate cluster first — see
-        // ProspectController::getProspects' duplicatesFirst handling.
+        // Rank every prospect belonging to a duplicate cluster first (and
+        // grouped together, see ProspectController::getProspects'
+        // duplicatesFirst handling) either as soon as any field is flagged
+        // "unique" (the duplicate-check toggle next to Email/Numéro in
+        // DefaultHeaderCell.vue), or right after "Rechercher des
+        // duplications" found some (prospectsDuplicatesFirst).
         if (
-            context.getters.fields &&
-            context.getters.fields.some(
-                (field) => field.for == "prospect" && field.unique
-            )
+            context.state.project.prospectsDuplicatesFirst ||
+            (context.getters.fields &&
+                context.getters.fields.some(
+                    (field) => field.for == "prospect" && field.unique
+                ))
         ) {
             params.duplicatesFirst = 1;
         }
@@ -649,6 +657,8 @@ const mutations = {
      */
     [SET_PROSPECTS_SORT_BY](state, column) {
         state.project.prospectsSortBy = column;
+        // A manual column sort overrides the duplicates grouping.
+        state.project.prospectsDuplicatesFirst = false;
     },
 
     /**
@@ -656,6 +666,13 @@ const mutations = {
      */
     [SET_PROSPECTS_SORT_ORDER](state, order) {
         state.project.prospectsSortOrder = order;
+    },
+
+    /**
+     * @param {*} state
+     */
+    [SET_PROSPECTS_DUPLICATES_FIRST](state, value) {
+        state.project.prospectsDuplicatesFirst = value;
     },
 
     /**

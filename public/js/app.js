@@ -28343,6 +28343,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   SET_PROSPECT: () => (/* binding */ SET_PROSPECT),
 /* harmony export */   SET_PROSPECTS: () => (/* binding */ SET_PROSPECTS),
 /* harmony export */   SET_PROSPECTS_COUNT: () => (/* binding */ SET_PROSPECTS_COUNT),
+/* harmony export */   SET_PROSPECTS_DUPLICATES_FIRST: () => (/* binding */ SET_PROSPECTS_DUPLICATES_FIRST),
 /* harmony export */   SET_PROSPECTS_FIELDS: () => (/* binding */ SET_PROSPECTS_FIELDS),
 /* harmony export */   SET_PROSPECTS_MAX_LINES_PER_ROW: () => (/* binding */ SET_PROSPECTS_MAX_LINES_PER_ROW),
 /* harmony export */   SET_PROSPECTS_MENU: () => (/* binding */ SET_PROSPECTS_MENU),
@@ -28383,6 +28384,7 @@ var SET_PROSPECTS_TOTAL = "setProspectsTotal";
 var SET_PROSPECTS_FIELDS = "setProspectsFields";
 var SET_PROSPECTS_SORT_ORDER = "setProspectsSortOrder";
 var SET_PROSPECTS_SORT_BY = "setProspectsSortBy";
+var SET_PROSPECTS_DUPLICATES_FIRST = "setProspectsDuplicatesFirst";
 var SET_PROSPECTS_MAX_LINES_PER_ROW = "setProspectsMaxLinesPerRow";
 var SET_PROSPECT_PARAMS = "setProspectParams";
 var ADD_PROSPECT_PARAMS = "addProspectParams";
@@ -43570,6 +43572,10 @@ var state = {
   prospectsCount: 50,
   prospectsSortBy: null,
   prospectsSortOrder: "desc",
+  // Set when "Rechercher des duplications" finds duplicate clusters, so
+  // the main table groups them together (see FETCH_PROSPECTS below).
+  // Cleared as soon as the user picks a column sort themselves.
+  prospectsDuplicatesFirst: false,
   prospectsFields: null,
   prospectsOptions: false,
   prospectsMenus: true,
@@ -43609,11 +43615,13 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
             params.fields = context.state.project.prospectsFields;
           }
 
-          // As soon as any field is flagged "unique" (the duplicate-check
-          // toggle next to Email/Numéro in DefaultHeaderCell.vue), rank
-          // every prospect belonging to a duplicate cluster first — see
-          // ProspectController::getProspects' duplicatesFirst handling.
-          if (context.getters.fields && context.getters.fields.some(function (field) {
+          // Rank every prospect belonging to a duplicate cluster first (and
+          // grouped together, see ProspectController::getProspects'
+          // duplicatesFirst handling) either as soon as any field is flagged
+          // "unique" (the duplicate-check toggle next to Email/Numéro in
+          // DefaultHeaderCell.vue), or right after "Rechercher des
+          // duplications" found some (prospectsDuplicatesFirst).
+          if (context.state.project.prospectsDuplicatesFirst || context.getters.fields && context.getters.fields.some(function (field) {
             return field["for"] == "prospect" && field.unique;
           })) {
             params.duplicatesFirst = 1;
@@ -43995,8 +44003,12 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
   state.project.prospectsCount = count;
 }), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_BY, function (state, column) {
   state.project.prospectsSortBy = column;
+  // A manual column sort overrides the duplicates grouping.
+  state.project.prospectsDuplicatesFirst = false;
 }), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_ORDER, function (state, order) {
   state.project.prospectsSortOrder = order;
+}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_DUPLICATES_FIRST, function (state, value) {
+  state.project.prospectsDuplicatesFirst = value;
 }), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_FIELDS, function (state, fields) {
   state.project.prospectsFields = fields;
 }), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PROFILE_SETTING_COLUMN_TAB, function (state, tab) {

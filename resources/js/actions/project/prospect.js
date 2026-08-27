@@ -17,6 +17,7 @@ export const SET_PROSPECTS_TOTAL = "setProspectsTotal";
 export const SET_PROSPECTS_FIELDS = "setProspectsFields";
 export const SET_PROSPECTS_SORT_ORDER = "setProspectsSortOrder";
 export const SET_PROSPECTS_SORT_BY = "setProspectsSortBy";
+export const SET_PROSPECTS_DUPLICATES_FIRST = "setProspectsDuplicatesFirst";
 export const SET_PROSPECTS_MAX_LINES_PER_ROW = "setProspectsMaxLinesPerRow";
 
 export const SET_PROSPECT_PARAMS = "setProspectParams";

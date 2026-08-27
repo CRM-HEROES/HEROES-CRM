@@ -165,7 +165,10 @@ import ApiService from "@/apis/api.service";
 import { mapGetters } from "vuex";
 import store from "@/store";
 
-import { FETCH_PROSPECTS } from "@/actions/project/prospect";
+import {
+    FETCH_PROSPECTS,
+    SET_PROSPECTS_DUPLICATES_FIRST,
+} from "@/actions/project/prospect";
 
 // Components
 import DuplicateRow from "./DuplicateRow.vue";
@@ -211,6 +214,14 @@ export default {
                     `project/${this.project.slug}/duplicate/show`
                 );
                 this.duplicates = data;
+
+                // Bring duplicate clusters to the top of the main table,
+                // grouped by pair, so the ones just found are immediately
+                // visible there too (see ProspectController::getProspects'
+                // duplicatesFirst handling).
+                if (data && data.length > 0) {
+                    store.commit(SET_PROSPECTS_DUPLICATES_FIRST, true);
+                }
 
                 // The detection above updates duplicate_group_id in the
                 // database, but the main prospects table already has its
