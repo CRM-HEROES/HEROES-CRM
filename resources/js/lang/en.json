@@ -688,6 +688,13 @@
                     "sync": {
                         "active": "Automatic sync enabled"
                     },
+                    "realtime": {
+                        "intro": "For real-time sync (instead of waiting for the next automatic pass), you can have Google Sheets notify the CRM directly.",
+                        "step_1": "Open this Google Sheet, then <b>Extensions &gt; Apps Script</b>.",
+                        "step_2": "Paste the script below (replace all existing content), pick the <b>setup</b> function from the dropdown at the top, click <b>Run</b>, then authorize access. Done: every edit to the sheet will now notify the CRM automatically.",
+                        "copy_script": "Copy script",
+                        "script_copied": "Script copied — paste it into Extensions > Apps Script in your Google Sheet"
+                    },
                     "notify_welcome_sms": "Notify with welcome SMS",
                     "welcome_sms_source": "Welcome SMS source",
                     "welcome_sms_message": "Welcome SMS message",

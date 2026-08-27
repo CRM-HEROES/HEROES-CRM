@@ -71,6 +71,38 @@
             </div>
         </item>
 
+        <template
+            v-if="prospectImport.source == 'google_sheets' && prospectImport.sync_enabled"
+        >
+            <item class="hc-import-webservice-step">
+                <icon class="fa fa-bolt" />
+                <div
+                    class="hc-item-main-content"
+                    style="white-space: normal"
+                    v-text="$t('import.process.tab.import.realtime.intro')"
+                ></div>
+            </item>
+            <item class="hc-import-webservice-step">
+                <icon class="fa fa-step-forward" />
+                <div
+                    class="hc-item-main-content"
+                    v-html="$t('import.process.tab.import.realtime.step_1')"
+                ></div>
+            </item>
+            <item class="hc-import-webservice-step">
+                <icon class="fa fa-step-forward" />
+                <div class="hc-item-main-content" style="white-space: normal">
+                    <span v-html="$t('import.process.tab.import.realtime.step_2')"></span>
+                    <br />
+                    <b
+                        v-text="$t('import.process.tab.import.realtime.copy_script')"
+                        @click.stop="copyAppsScriptSnippet"
+                        style="cursor: pointer"
+                    ></b>
+                </div>
+            </item>
+        </template>
+
         <item
             v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0) && (!prospectImport.users || prospectImport.users.length === 0)"
             style="color: #92400e !important; background-color: #fef3c7"
@@ -829,6 +861,22 @@ export default {
                 duration: 5000,
             });
         },
+
+        // REAL-TIME GOOGLE SHEETS SYNC (Apps Script trigger)
+
+        /**
+         * Copy the ready-to-paste Apps Script snippet (with this import's
+         * sync webhook URL/token already embedded) to the clipboard.
+         */
+        copyAppsScriptSnippet() {
+            navigator.clipboard.writeText(this.appsScriptSnippet);
+
+            flashInfo({
+                title: "Import",
+                body: this.$t("import.process.tab.import.realtime.script_copied"),
+                duration: 6000,
+            });
+        },
     },
 
     watch: {
@@ -963,6 +1011,45 @@ export default {
                 this.prospectImport.id +
                 "/prospect?token=" +
                 this.prospectImport.token
+            );
+        },
+
+        /**
+         * Real-time sync webhook URL for this Google Sheets import,
+         * called by the Apps Script trigger on every edit.
+         */
+        googleSheetSyncWebhookUrl() {
+            return (
+                window.location.origin +
+                "/api/webservice/" +
+                this.prospectImport.id +
+                "/sync?token=" +
+                this.prospectImport.token
+            );
+        },
+
+        /**
+         * Ready-to-paste Apps Script snippet, with this import's own
+         * webhook URL already embedded, so the user only has to copy,
+         * paste into Extensions > Apps Script, run "setup" once and
+         * authorize — no manual editing of the script needed.
+         */
+        appsScriptSnippet() {
+            return (
+                '// HEROES CRM — synchronisation en temps réel\n' +
+                '// 1. Ouvre ce Google Sheet > Extensions > Apps Script, colle ce script (remplace le contenu existant).\n' +
+                '// 2. Dans le menu déroulant des fonctions (en haut), choisis "setup", clique sur "Exécuter", puis autorise l\'accès.\n' +
+                '// 3. C\'est fait : chaque modification de cette feuille prévient le CRM automatiquement.\n\n' +
+                'var SYNC_URL = "' + this.googleSheetSyncWebhookUrl + '";\n\n' +
+                'function onEditInstallable(e) {\n' +
+                '  UrlFetchApp.fetch(SYNC_URL, { method: "post", muteHttpExceptions: true });\n' +
+                '}\n\n' +
+                'function setup() {\n' +
+                '  ScriptApp.newTrigger("onEditInstallable")\n' +
+                '    .forSpreadsheet(SpreadsheetApp.getActive())\n' +
+                '    .onEdit()\n' +
+                '    .create();\n' +
+                '}\n'
             );
         },
     },

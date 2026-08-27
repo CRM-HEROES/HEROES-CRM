@@ -689,6 +689,13 @@
                     "sync": {
                         "active": "Synchronisation automatique activée"
                     },
+                    "realtime": {
+                        "intro": "Pour une synchronisation en temps réel (au lieu d'attendre le prochain passage automatique), tu peux prévenir le CRM directement depuis Google Sheets.",
+                        "step_1": "Ouvre ce Google Sheet, puis <b>Extensions &gt; Apps Script</b>.",
+                        "step_2": "Colle le script ci-dessous (remplace tout le contenu existant), choisis la fonction <b>setup</b> dans le menu déroulant en haut, clique sur <b>Exécuter</b>, puis autorise l'accès. C'est fait : chaque modification de la feuille préviendra le CRM automatiquement.",
+                        "copy_script": "Copier le script",
+                        "script_copied": "Script copié — colle-le dans Extensions > Apps Script de ton Google Sheet"
+                    },
                     "notify_welcome_sms": "Notifier par SMS de bienvenue",
                     "welcome_sms_source": "Origine du SMS de bienvenue",
                     "welcome_sms_message": "Message du SMS de bienvenue",
