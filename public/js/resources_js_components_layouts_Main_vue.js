@@ -3762,21 +3762,29 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               data = _yield$ApiService$get.data;
               _this.duplicates = data;
 
+              // Bring duplicate clusters to the top of the main table,
+              // grouped by pair, so the ones just found are immediately
+              // visible there too (see ProspectController::getProspects'
+              // duplicatesFirst handling).
+              if (data && data.length > 0) {
+                _store__WEBPACK_IMPORTED_MODULE_1__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECTS_DUPLICATES_FIRST, true);
+              }
+
               // The detection above updates duplicate_group_id in the
               // database, but the main prospects table already has its
               // own (now stale) copy of each row loaded in the store —
               // without this, the new/updated duplicate coloring only
               // ever appeared after a full page reload.
               _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_2__.FETCH_PROSPECTS);
-            case 11:
-              _context.prev = 11;
+            case 12:
+              _context.prev = 12;
               _this.fetchingDuplicates = false;
-              return _context.finish(11);
-            case 14:
+              return _context.finish(12);
+            case 15:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[2,, 11, 14]]);
+        }, _callee, null, [[2,, 12, 15]]);
       }))();
     },
     duplicateChecked: function duplicateChecked(index, shift, checked) {

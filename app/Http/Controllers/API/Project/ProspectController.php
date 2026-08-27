@@ -839,10 +839,15 @@ class ProspectController extends Controller
 
             // Prospects belonging to a duplicate cluster sort first (see
             // App\Services\ProspectDuplicateChecker / App\Jobs\CheckDuplicatedProspects
-            // for duplicate_group_id), the normal sort staying the
-            // secondary key so relative order is otherwise unaffected.
+            // for duplicate_group_id), then grouped by duplicate_group_id so
+            // a cluster's members land next to each other ("couples") rather
+            // than merely sharing the "has duplicates" bucket. The normal
+            // sort stays the final tiebreaker, both within a cluster and for
+            // the non-duplicate rows that follow.
             ->when($request->boolean('duplicatesFirst'), function($query) {
-                $query->orderByRaw('duplicate_group_id IS NULL');
+                $query
+                    ->orderByRaw('duplicate_group_id IS NULL')
+                    ->orderBy('duplicate_group_id');
             })
 
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
