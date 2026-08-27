@@ -8768,6 +8768,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         body: this.$t("import.process.tab.import.webservice.query_string_copied"),
         duration: 5000
       });
+    },
+    // REAL-TIME GOOGLE SHEETS SYNC (Apps Script trigger)
+    /**
+     * Copy the ready-to-paste Apps Script snippet (with this import's
+     * sync webhook URL/token already embedded) to the clipboard.
+     */
+    copyAppsScriptSnippet: function copyAppsScriptSnippet() {
+      navigator.clipboard.writeText(this.appsScriptSnippet);
+      flashInfo({
+        title: "Import",
+        body: this.$t("import.process.tab.import.realtime.script_copied"),
+        duration: 6000
+      });
     }
   },
   watch: {
@@ -8856,6 +8869,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      */
     webhookURL: function webhookURL() {
       return window.location.origin + "/api/webservice/" + this.prospectImport.id + "/prospect?token=" + this.prospectImport.token;
+    },
+    /**
+     * Real-time sync webhook URL for this Google Sheets import,
+     * called by the Apps Script trigger on every edit.
+     */
+    googleSheetSyncWebhookUrl: function googleSheetSyncWebhookUrl() {
+      return window.location.origin + "/api/webservice/" + this.prospectImport.id + "/sync?token=" + this.prospectImport.token;
+    },
+    /**
+     * Ready-to-paste Apps Script snippet, with this import's own
+     * webhook URL already embedded, so the user only has to copy,
+     * paste into Extensions > Apps Script, run "setup" once and
+     * authorize — no manual editing of the script needed.
+     */
+    appsScriptSnippet: function appsScriptSnippet() {
+      return '// HEROES CRM — synchronisation en temps réel\n' + '// 1. Ouvre ce Google Sheet > Extensions > Apps Script, colle ce script (remplace le contenu existant).\n' + '// 2. Dans le menu déroulant des fonctions (en haut), choisis "setup", clique sur "Exécuter", puis autorise l\'accès.\n' + '// 3. C\'est fait : chaque modification de cette feuille prévient le CRM automatiquement.\n\n' + 'var SYNC_URL = "' + this.googleSheetSyncWebhookUrl + '";\n\n' + 'function onEditInstallable(e) {\n' + '  UrlFetchApp.fetch(SYNC_URL, { method: "post", muteHttpExceptions: true });\n' + '}\n\n' + 'function setup() {\n' + '  ScriptApp.newTrigger("onEditInstallable")\n' + '    .forSpreadsheet(SpreadsheetApp.getActive())\n' + '    .onEdit()\n' + '    .create();\n' + '}\n';
     }
   })
 });
@@ -60884,34 +60913,45 @@ var _hoisted_7 = {
 var _hoisted_8 = ["textContent"];
 var _hoisted_9 = ["textContent"];
 var _hoisted_10 = ["textContent"];
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = ["textContent"];
+var _hoisted_11 = ["innerHTML"];
+var _hoisted_12 = {
+  "class": "hc-item-main-content",
+  style: {
+    "white-space": "normal"
+  }
+};
+var _hoisted_13 = ["innerHTML"];
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1 /* HOISTED */);
 var _hoisted_15 = ["textContent"];
 var _hoisted_16 = ["textContent"];
 var _hoisted_17 = ["textContent"];
-var _hoisted_18 = {
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = {
   "class": "hc-item-main-content hc-flex-column",
   style: {
     "padding": "5px 0"
   }
 };
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = ["innerHTML"];
-var _hoisted_22 = ["innerHTML"];
-var _hoisted_23 = ["innerHTML"];
-var _hoisted_24 = ["innerHTML"];
-var _hoisted_25 = ["innerHTML"];
-var _hoisted_26 = ["innerHTML"];
-var _hoisted_27 = {
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["innerHTML"];
+var _hoisted_28 = ["innerHTML"];
+var _hoisted_29 = ["innerHTML"];
+var _hoisted_30 = ["innerHTML"];
+var _hoisted_31 = ["innerHTML"];
+var _hoisted_32 = ["innerHTML"];
+var _hoisted_33 = {
   "class": "hc-item-main-content"
 };
-var _hoisted_28 = ["innerHTML"];
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1 /* HOISTED */);
-var _hoisted_30 = ["textContent"];
-var _hoisted_31 = ["innerHTML"];
+var _hoisted_34 = ["innerHTML"];
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1 /* HOISTED */);
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = ["innerHTML"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -61023,8 +61063,56 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, null, 8 /* PROPS */, _hoisted_9)])];
         }),
         _: 1 /* STABLE */
-      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !_ctx.prospectImport.is_processing && (!_ctx.prospectImport.roles || _ctx.prospectImport.roles.length === 0) && (!_ctx.prospectImport.users || _ctx.prospectImport.users.length === 0) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 3,
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.source == 'google_sheets' && _ctx.prospectImport.sync_enabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 3
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        "class": "hc-import-webservice-step"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-bolt"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            style: {
+              "white-space": "normal"
+            },
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.realtime.intro'))
+          }, null, 8 /* PROPS */, _hoisted_10)];
+        }),
+        _: 1 /* STABLE */
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        "class": "hc-import-webservice-step"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-step-forward"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            innerHTML: _ctx.$t('import.process.tab.import.realtime.step_1')
+          }, null, 8 /* PROPS */, _hoisted_11)];
+        }),
+        _: 1 /* STABLE */
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        "class": "hc-import-webservice-step"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-step-forward"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            innerHTML: _ctx.$t('import.process.tab.import.realtime.step_2')
+          }, null, 8 /* PROPS */, _hoisted_13), _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.realtime.copy_script')),
+            onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+              return $options.copyAppsScriptSnippet && $options.copyAppsScriptSnippet.apply($options, arguments);
+            }, ["stop"])),
+            style: {
+              "cursor": "pointer"
+            }
+          }, null, 8 /* PROPS */, _hoisted_15)])];
+        }),
+        _: 1 /* STABLE */
+      })], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !_ctx.prospectImport.is_processing && (!_ctx.prospectImport.roles || _ctx.prospectImport.roles.length === 0) && (!_ctx.prospectImport.users || _ctx.prospectImport.users.length === 0) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+        key: 4,
         style: {
           "color": "#92400e !important",
           "background-color": "#fef3c7"
@@ -61042,11 +61130,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               "white-space": "normal"
             },
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Aucun rôle sélectionné dans l\'étape Relations — les prospects importés ne seront assignés à personne automatiquement.')
-          }, null, 8 /* PROPS */, _hoisted_10)];
+          }, null, 8 /* PROPS */, _hoisted_16)];
         }),
         _: 1 /* STABLE */
       })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !_ctx.prospectImport.is_processing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 4,
+        key: 5,
         id: "hc-import-process-process",
         onClick: $options.processImport,
         style: {
@@ -61063,13 +61151,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospectImport.processed_at ? _ctx.$t('import.process.tab.import.re_process') : _ctx.$t('import.process.tab.import.process'))
-          }, null, 8 /* PROPS */, _hoisted_11), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.processingImport
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.is_processing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 5,
+        key: 6,
         onClick: $options.stop,
         style: {
           "color": "white !important",
@@ -61085,7 +61173,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.stop'))
-          }, null, 8 /* PROPS */, _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.stoppingImport
           }, null, 8 /* PROPS */, ["loading"])];
         }),
@@ -61102,13 +61190,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.delete.import'))
-          }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.deletingImport
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"]), _ctx.prospectImport.processed_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 6,
+        key: 7,
         onClick: $options.deleteProspects
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -61120,13 +61208,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.delete.prospects'))
-          }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.deletingProspects
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.processed_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 7,
+        key: 8,
         onClick: $options.deleteImportProspects
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -61138,13 +61226,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.delete.import_and_prospects'))
-          }, null, 8 /* PROPS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.deletingImportProspects
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ['file', 'google_sheets'].includes(_ctx.prospectImport.source) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 8,
+        key: 9,
         onClick: $options.download
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -61153,7 +61241,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.download'))
-          }, null, 8 /* PROPS */, _hoisted_16)];
+          }, null, 8 /* PROPS */, _hoisted_22)];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
@@ -61163,35 +61251,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.view_prospects'))
-          }, null, 8 /* PROPS */, _hoisted_17)];
+          }, null, 8 /* PROPS */, _hoisted_23)];
         }),
         _: 1 /* STABLE */
       }), _ctx.prospectImport.mapping ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 9,
+        key: 10,
         id: "hc-import-process-prospects-table-setting",
         onClick: $options.setProspectsTableSetting
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
             "class": "fa fa-columns"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.prospects_table.title')),
             style: {
               "color": "#333333"
             }
-          }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
             style: {
               "white-space": "normal",
               "color": "#777777"
             },
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.prospects_table.body'))
-          }, null, 8 /* PROPS */, _hoisted_20)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+          }, null, 8 /* PROPS */, _hoisted_26)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
             loading: $data.settingProspectsTable
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.source == 'webservice' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 10
+        key: 11
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
         "class": "hc-import-webservice-step"
       }, {
@@ -61201,7 +61289,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_1')
-          }, null, 8 /* PROPS */, _hoisted_21)];
+          }, null, 8 /* PROPS */, _hoisted_27)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61213,7 +61301,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_2')
-          }, null, 8 /* PROPS */, _hoisted_22)];
+          }, null, 8 /* PROPS */, _hoisted_28)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61225,7 +61313,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_3')
-          }, null, 8 /* PROPS */, _hoisted_23)];
+          }, null, 8 /* PROPS */, _hoisted_29)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61237,7 +61325,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_4')
-          }, null, 8 /* PROPS */, _hoisted_24)];
+          }, null, 8 /* PROPS */, _hoisted_30)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61249,7 +61337,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_5')
-          }, null, 8 /* PROPS */, _hoisted_25)];
+          }, null, 8 /* PROPS */, _hoisted_31)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61261,7 +61349,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_6')
-          }, null, 8 /* PROPS */, _hoisted_26)];
+          }, null, 8 /* PROPS */, _hoisted_32)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61270,18 +61358,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
             "class": "fa fa-external-link"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_7')
-          }, null, 8 /* PROPS */, _hoisted_28), _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", {
+          }, null, 8 /* PROPS */, _hoisted_34), _hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.webhookURL),
-            onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.copyWebhookURLToClipboard && $options.copyWebhookURLToClipboard.apply($options, arguments);
             }, ["stop"])),
             style: {
               "cursor": "pointer"
             }
-          }, null, 8 /* PROPS */, _hoisted_30)])];
+          }, null, 8 /* PROPS */, _hoisted_36)])];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -61293,7 +61381,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             innerHTML: _ctx.$t('import.process.tab.import.webservice.step_8')
-          }, null, 8 /* PROPS */, _hoisted_31)];
+          }, null, 8 /* PROPS */, _hoisted_37)];
         }),
         _: 1 /* STABLE */
       }), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredHeaders, function (header) {
