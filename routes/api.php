@@ -8,6 +8,7 @@ use App\Http\Controllers\API\GeminiLiveController;
 use App\Http\Controllers\API\KavkomController;
 use App\Http\Controllers\API\KavkomWebhookController;
 use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\API\TwilioController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
 
@@ -209,6 +210,10 @@ Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class
 // domain and API token already configured in the user's Kavkom modal.
 Route::post('/webhooks/kavkom/cdr', [KavkomWebhookController::class, 'cdr'])->name('webhooks.kavkom.cdr');
 
+// Twilio's TwiML App calls this when the browser Voice SDK places an
+// outbound call. No CRM session — authenticated via X-Twilio-Signature.
+Route::post('/webhooks/twilio/voice', [TwilioController::class, 'voice'])->name('webhooks.twilio.voice');
+
 // The Node ai-phone-agent bridge posts here once a live AI-answered call
 // ends. No CRM session either — authenticated by a shared secret header.
 Route::post('/webhooks/ai-phone-agent/calls', [AiPhoneAgentController::class, 'ingest'])->name('webhooks.ai-phone-agent.calls');
@@ -283,6 +288,9 @@ Route::group([
     Route::get('/settings/kavkom/call/{callUuid}/status', [KavkomController::class, 'callStatus'])->name('settings.kavkom.call.status');
     Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
     Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
+
+    // Twilio (opérateur de secours, ex. numéros belges)
+    Route::post('/settings/twilio/token', [TwilioController::class, 'token'])->name('settings.twilio.token');
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
 
     // Gemini Live (voice assistant)

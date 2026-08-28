@@ -446,6 +446,7 @@
             "call_by_aircall": "Appeler via Aircall",
             "call_by_ringover": "Appeler via Ringover",
             "call_by_kavkom": "Appeler via Kavkom",
+            "call_by_twilio": "Appeler via Twilio (navigateur)",
             "history": "Historique"
         },
         "message": {

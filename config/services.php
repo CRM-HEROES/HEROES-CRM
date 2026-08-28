@@ -52,6 +52,25 @@ return [
         'recording_base_url' => env('KAVKOM_RECORDING_BASE_URL'),
     ],
 
+    // Twilio Voice JS SDK ("Téléphone dans le navigateur") — compte unique
+    // partagé par toute l'équipe, pas par utilisateur comme Kavkom. Ajouté
+    // comme opérateur de secours quand Kavkom est peu fiable sur certaines
+    // destinations (ex. Belgique) ; Kavkom reste l'opérateur par défaut.
+    'twilio' => [
+        'account_sid' => env('TWILIO_ACCOUNT_SID'),
+        'auth_token' => env('TWILIO_AUTH_TOKEN'),
+        'api_key_sid' => env('TWILIO_API_KEY_SID'),
+        'api_key_secret' => env('TWILIO_API_KEY_SECRET'),
+        'twiml_app_sid' => env('TWILIO_TWIML_APP_SID'),
+        'caller_id_number' => env('TWILIO_CALLER_ID_NUMBER'),
+        // URL publique fixe configurée comme "Voice Request URL" de la
+        // TwiML App Twilio. Utilisée pour valider X-Twilio-Signature au
+        // lieu de l'URL déduite de la requête, peu fiable derrière un
+        // reverse proxy ou un tunnel ngrok en local.
+        'voice_webhook_url' => env('TWILIO_VOICE_WEBHOOK_URL'),
+        'default_country_code' => env('TWILIO_DEFAULT_COUNTRY_CODE', '32'),
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'live_model' => env('GEMINI_LIVE_MODEL', 'models/gemini-2.5-flash-native-audio-preview-09-2025'),
