@@ -184,6 +184,30 @@
                                 </div>
                                 <icon class="fa fa-caret-right" />
                             </item>
+
+                            <!-- Twilio -->
+                            <item
+                                class="hc-prospect-interaction-item"
+                                @click="interactionViaTwilio(number)"
+                            >
+                                <icon class="fa fa-phone" color="#F22F46" />
+                                <div
+                                    class="hc-item-main-content hc-flex-column"
+                                >
+                                    <span
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_twilio'
+                                            )
+                                        "
+                                    ></span>
+                                    <span
+                                        class="hc-prospect-interaction-item-number"
+                                        v-text="number"
+                                    ></span>
+                                </div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -225,7 +249,7 @@
 
             <!-- List of interaction -->
             <template #2>
-                <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
+                <frame-layout :count="7" :tab="frameTab" class="hc-flex-1">
                     <template #1 v-if="interactionProspect">
                         <tab-layout
                             :count="2"
@@ -611,6 +635,68 @@
                             <loading :loading="updatingMobilePhoneNumber" />
                         </form>
                     </template>
+
+                    <template #7 v-if="interactionProspect">
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item @click="tab = 0" class="bordered">
+                                <icon class="fa fa-caret-left" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'prospect.interaction.call_by_twilio'
+                                        )
+                                    "
+                                ></div>
+                            </item>
+                            <div
+                                style="
+                                    flex: 1;
+                                    width: 100%;
+                                    height: 100%;
+                                    overflow: auto;
+                                    padding: 16px;
+                                "
+                            >
+                                <twilio
+                                    id="twilio-phone"
+                                    :number="interaction.number"
+                                    style="flex: 1; width: 100%; height: 100%"
+                                    @outgoing-call="
+                                        (callInfo) => {
+                                            interaction.status = 'initiated';
+                                            interaction.data = {
+                                                id: callInfo.call_sid,
+                                            };
+                                            updateInteraction();
+                                        }
+                                    "
+                                    @ringing-call="
+                                        (interaction.status = 'ringing'),
+                                            updateInteraction()
+                                    "
+                                    @answered-call="
+                                        (interaction.status = 'answered'),
+                                            updateInteraction()
+                                    "
+                                    @hangup-call="
+                                        () => {
+                                            interaction.status = 'hangup';
+                                            updateInteraction();
+                                            nextInteraction();
+                                        }
+                                    "
+                                    @call-error="
+                                        (message) =>
+                                            console.error(
+                                                '[Twilio] Erreur',
+                                                message
+                                            )
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </template>
                 </frame-layout>
             </template>
         </tab-layout>
@@ -741,6 +827,7 @@ import {
 import Ringover from "@/components/utils/Ringover.vue";
 import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
+import Twilio from "@/components/utils/Twilio.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
 
@@ -749,6 +836,7 @@ export default {
         Ringover,
         Kavkom,
         Aircall,
+        Twilio,
         InteractionRow,
         SelectProspect,
     },
@@ -900,6 +988,15 @@ export default {
 
         kavkomSetting() {
             store.commit(OPEN_MODAL, "setting-kavkom");
+        },
+
+        interactionViaTwilio(number) {
+            this.tab = 1;
+            this.frameTab = 6;
+            this.interaction = this.newInteraction();
+            this.interaction.source = "twilio";
+            this.interaction.number = number;
+            this.addInteraction();
         },
 
         /**
