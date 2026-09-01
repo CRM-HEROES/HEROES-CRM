@@ -76,6 +76,7 @@ use App\Http\Controllers\API\Project\Order\StepController as ProjectOrderStepCon
 
 use App\Http\Controllers\API\Project\PermissionController as ProjectPermissionController;
 
+use App\Http\Controllers\API\Project\DoctolibController as ProjectDoctolibController;
 use App\Http\Controllers\API\Project\PipedriveController as ProjectPipedriveController;
 use App\Http\Controllers\API\Project\PipelineController as ProjectPipelineController;
 use App\Http\Controllers\API\Project\Pipeline\LabelController as ProjectPipelineLabelController;
@@ -482,6 +483,10 @@ Route::group([
 
         // User Permission
         Route::get('permission', [ProjectPermissionController::class, 'index'])->name("permission");
+
+        // Doctolib
+        Route::apiResource('doctolib', ProjectDoctolibController::class)->only('index', 'store', 'delete');
+        Route::post('doctolib/{doctolib}/sync', [ProjectDoctolibController::class, 'sync']);
 
         // Pipedrive
         Route::apiResource('pipedrive', ProjectPipedriveController::class)->only('index', 'store', 'delete');

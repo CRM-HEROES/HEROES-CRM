@@ -331,6 +331,14 @@ class Project extends Model
     }
 
     /**
+     * Doctolib accounts
+     */
+    public function doctolibAccounts()
+    {
+        return $this->hasMany(DoctolibAccount::class);
+    }
+
+    /**
      * Pipelines
      */
     public function pipelines()

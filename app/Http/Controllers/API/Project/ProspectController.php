@@ -65,20 +65,80 @@ class ProspectController extends Controller
                 ->toArray()
         )->toArray();
 
-        $prospect =  $project->prospects()->create(array_merge(
-            $defaultFieldValues,
-            [
-                'meta' => $metaFieldValues,
-                'creator_id' => auth()->id(),
-            ]
-        ));
+        // A repeat submission (retried webhook, ad platform resending the
+        // same lead, double form submit...) for an email/phone already
+        // present in this project updates that prospect instead of
+        // creating a duplicate row. Blank incoming values never overwrite
+        // existing good data.
+        $existing = $this->findExistingProspect($project, $defaultFieldValues);
 
-        (new ProspectDuplicateChecker())->check($prospect);
+        if ($existing) {
+            $existing->update(array_merge(
+                array_filter($defaultFieldValues, fn ($value) => filled($value)),
+                ['meta' => array_merge($existing->meta ?: [], array_filter($metaFieldValues, fn ($value) => filled($value)))]
+            ));
+
+            $prospect = $existing;
+        } else {
+            $prospect = $project->prospects()->create(array_merge(
+                $defaultFieldValues,
+                [
+                    'meta' => $metaFieldValues,
+                    'creator_id' => auth()->id(),
+                ]
+            ));
+
+            (new ProspectDuplicateChecker())->check($prospect);
+        }
 
         $prospect->load('creator');
         $prospect->load('users');
 
         return $prospect;
+    }
+
+    /**
+     * Find a non-deleted prospect in this project matching the submitted
+     * email (normalized case/whitespace) or, failing that, mobile/phone
+     * number (exact match — unlike App\Jobs\ImportProspects's bulk
+     * normalizePhone(), this is a single hot-path lookup on prospect
+     * creation, not a full-table dedup pass).
+     *
+     * withoutGlobalScopes() bypasses ProspectScope's per-user visibility
+     * restriction on purpose, same as ProspectDuplicateChecker::matchField()
+     * and ImportProspects's existingEmails/existingMobiles: this must catch
+     * a duplicate across the whole project regardless of who can currently
+     * see it, not just the requesting user's own/assigned prospects.
+     */
+    protected function findExistingProspect(Project $project, array $values): ?Prospect
+    {
+        $query = Prospect::withoutGlobalScopes()
+            ->where('project_id', $project->id)
+            ->whereNull('deleted_at');
+
+        if (!empty($values['email'])) {
+            $prospect = (clone $query)
+                ->whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($values['email']))])
+                ->first();
+
+            if ($prospect) {
+                return $prospect;
+            }
+        }
+
+        foreach (['mobile_phone_number', 'phone_number'] as $field) {
+            if (empty($values[$field])) {
+                continue;
+            }
+
+            $prospect = (clone $query)->where($field, $values[$field])->first();
+
+            if ($prospect) {
+                return $prospect;
+            }
+        }
+
+        return null;
     }
 
     /**
