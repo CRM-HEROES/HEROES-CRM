@@ -30,3 +30,4 @@ nginx/certbot
 mysql-data/
 mysql/
 backup/
+secrets/
