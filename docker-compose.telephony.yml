@@ -12,6 +12,7 @@ services:
     image: heroescrm-telephony-freeswitch:latest
     container_name: telephony-freeswitch
     restart: unless-stopped
+    network_mode: host
     environment:
       KAVKOM_EXTENSION: ${KAVKOM_EXTENSION}
       KAVKOM_PASSWORD: ${KAVKOM_PASSWORD}
@@ -27,21 +28,6 @@ services:
       EXTERNAL_TLS_PORT: ${FREESWITCH_TLS_PORT:-5081}
       RTP_START_PORT: ${FREESWITCH_RTP_START_PORT:-26384}
       RTP_END_PORT: ${FREESWITCH_RTP_END_PORT:-26483}
-    ports:
-      # SIP/RTP doivent conserver le même port interne et public : ces ports
-      # sont annoncés à l'opérateur dans le SDP.
-      # The external Sofia profile must listen on, and advertise, the exact
-      # same port exposed by Docker. This keeps the SIP Contact routable.
-      - "${FREESWITCH_SIP_PORT:-5080}:${FREESWITCH_SIP_PORT:-5080}/tcp"
-      - "${FREESWITCH_SIP_PORT:-5080}:${FREESWITCH_SIP_PORT:-5080}/udp"
-      - "${FREESWITCH_TLS_PORT:-5081}:${FREESWITCH_TLS_PORT:-5081}/tcp"
-      # Local-only SIP profile for Linphone test calls; never expose this on
-      # the public WAN/router.
-      - "127.0.0.1:${FREESWITCH_LOCAL_SIP_PORT:-15060}:5060/tcp"
-      - "127.0.0.1:${FREESWITCH_LOCAL_SIP_PORT:-15060}:5060/udp"
-      - "${FREESWITCH_RTP_START_PORT:-26384}-${FREESWITCH_RTP_END_PORT:-26483}:${FREESWITCH_RTP_START_PORT:-26384}-${FREESWITCH_RTP_END_PORT:-26483}/udp"
-    networks:
-      - telephony-network
     healthcheck:
       # fs_cli otherwise assumes the default password (ClueCon), while the
       # entrypoint replaces it with ESL_PASSWORD.

@@ -36,6 +36,19 @@ RUN git clone https://github.com/amigniter/mod_audio_stream.git /tmp/mod_audio_s
     && sed -i 's#<modules>#<modules>\n    <load module="mod_audio_stream"/>#' \
         /etc/freeswitch/autoload_configs/modules.conf.xml
 
+
+# --- À insérer dans le Dockerfile FreeSWITCH existant, avant ENTRYPOINT ---
+# (juste après l'installation des paquets système habituels convient)
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends stunnel4 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY stunnel/stunnel.conf /etc/stunnel/stunnel.conf
+
+# --- Fin de l'ajout ---
+
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

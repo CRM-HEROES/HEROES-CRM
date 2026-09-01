@@ -17,6 +17,7 @@ class EslClient {
     constructor() {
         this.conn = null;
         this.ready = null;
+        this.answeredChannels = new Set();
     }
 
     connect() {
@@ -37,6 +38,10 @@ class EslClient {
                     clearTimeout(timeout);
                     console.log("[ESL] Connected to FreeSWITCH.");
                     this.conn.subscribe(["CHANNEL_ANSWER", "CHANNEL_HANGUP", "BACKGROUND_JOB"]);
+                    this.conn.on("esl::event::CHANNEL_ANSWER::*", (event) => {
+                        const channelUuid = event.getHeader("Unique-ID");
+                        if (channelUuid) this.answeredChannels.add(channelUuid);
+                    });
                     resolve(this.conn);
                 }
             );
@@ -77,11 +82,11 @@ class EslClient {
 
         return new Promise((resolve, reject) => {
             const jobUuid = crypto.randomUUID();
+            const timer = setTimeout(() => {
+                reject(new Error(`Timed out waiting for BACKGROUND_JOB ${jobUuid}`));
+            }, 10000);
             const onJob = (event) => {
-                if (event.getHeader("Job-UUID") !== jobUuid) {
-                    return;
-                }
-                this.conn.removeListener("esl::event::BACKGROUND_JOB::*", onJob);
+                clearTimeout(timer);
                 const body = (event.getBody() || "").trim();
                 if (body.startsWith("-ERR")) {
                     reject(new Error(`FreeSWITCH originate failed: ${body}`));
@@ -89,12 +94,15 @@ class EslClient {
                     resolve(uuid);
                 }
             };
-            this.conn.on("esl::event::BACKGROUND_JOB::*", onJob);
-            this.conn.bgapi(command, jobUuid);
+            this.conn.bgapi(command, "", jobUuid, onJob);
         });
     }
 
     waitForAnswer(channelUuid, timeoutMs = 45000) {
+        if (this.answeredChannels.has(channelUuid)) {
+            this.answeredChannels.delete(channelUuid);
+            return Promise.resolve();
+        }
         return this._waitForEvent("CHANNEL_ANSWER", channelUuid, timeoutMs);
     }
 

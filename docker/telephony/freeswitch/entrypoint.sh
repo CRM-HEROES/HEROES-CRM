@@ -20,15 +20,32 @@ case "$KAVKOM_SIP_TRANSPORT" in
   *) echo "KAVKOM_SIP_TRANSPORT must be udp, tcp, or tls." >&2; exit 1 ;;
 esac
 
+if [ "${KAVKOM_SIP_TRANSPORT}" = "tls" ]; then
+  stunnel /etc/stunnel/stunnel.conf &
+  KAVKOM_PROXY_HOST="${KAVKOM_USER_CONTEXT}"
+  KAVKOM_PROXY_PORT="${KAVKOM_SIP_PORT}"
+  KAVKOM_REGISTER_HOST="127.0.0.1"
+  KAVKOM_REGISTER_PORT="15062"
+  KAVKOM_REGISTER_TRANSPORT="tcp"
+else
+  KAVKOM_PROXY_HOST="${KAVKOM_USER_CONTEXT}"
+  KAVKOM_PROXY_PORT="${KAVKOM_SIP_PORT}"
+  KAVKOM_REGISTER_HOST="${KAVKOM_USER_CONTEXT}"
+  KAVKOM_REGISTER_PORT="${KAVKOM_SIP_PORT}"
+  KAVKOM_REGISTER_TRANSPORT="${KAVKOM_SIP_TRANSPORT}"
+fi
+
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
 <include>
   <gateway name="kavkom">
     <param name="username" value="${KAVKOM_EXTENSION}"/>
     <param name="password" value="${KAVKOM_PASSWORD}"/>
     <param name="realm" value="${KAVKOM_USER_CONTEXT}"/>
-    <param name="proxy" value="${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}"/>
-    <param name="register-proxy" value="${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}"/>
-    <param name="register-transport" value="${KAVKOM_SIP_TRANSPORT}"/>
+    <param name="from-user" value="${KAVKOM_EXTENSION}"/>
+    <param name="from-domain" value="${KAVKOM_USER_CONTEXT}"/>
+    <param name="proxy" value="${KAVKOM_PROXY_HOST}:${KAVKOM_PROXY_PORT}"/>
+    <param name="register-proxy" value="${KAVKOM_REGISTER_HOST}:${KAVKOM_REGISTER_PORT}"/>
+    <param name="register-transport" value="${KAVKOM_REGISTER_TRANSPORT}"/>
     <param name="register" value="true"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>

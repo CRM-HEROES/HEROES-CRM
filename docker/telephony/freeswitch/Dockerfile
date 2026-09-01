@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         gnupg2 wget lsb-release software-properties-common apt-transport-https curl \
-        ca-certificates git cmake pkg-config build-essential libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev \
+        ca-certificates git cmake pkg-config build-essential libssl-dev zlib1g-dev libevent-dev libspeexdsp-dev stunnel4 \
     && rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=secret,id=signalwire_token \
@@ -28,7 +28,8 @@ RUN git clone https://github.com/amigniter/mod_audio_stream.git /tmp/mod_audio_s
     && sed -i 's#<modules>#<modules>\\n    <load module="mod_audio_stream"/>#' /etc/freeswitch/autoload_configs/modules.conf.xml
 
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY stunnel/stunnel.conf /etc/stunnel/stunnel.conf
+RUN chmod +x /entrypoint.sh && mkdir -p /etc/stunnel
 
 EXPOSE 5080/tcp 5080/udp 26384-26483/udp
 ENTRYPOINT ["/entrypoint.sh"]

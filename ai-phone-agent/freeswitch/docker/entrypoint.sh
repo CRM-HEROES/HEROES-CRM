@@ -14,7 +14,30 @@ set -euo pipefail
 : "${EXTERNAL_IP:?Variable EXTERNAL_IP manquante, IP publique du serveur Docker, indispensable pour que Kavkom puisse repondre}"
 
 # ---------------------------------------------------------------------------
-# Gateway Kavkom
+# Tunnel TLS local vers Kavkom (contournement SNI, cf. stunnel/stunnel.conf)
+# sofia-sip ne propage pas le nom d'hôte au transport TLS créé pour le
+# REGISTER sortant : le ClientHello part sans SNI et Kavkom (routage par nom
+# sur IP mutualisée) ferme la connexion avec l'alerte "unrecognized_name".
+# stunnel gère la vraie connexion TLS+SNI ; FreeSWITCH lui parle en clair
+# sur 127.0.0.1. Doit être levé AVANT que FreeSWITCH démarre.
+# ---------------------------------------------------------------------------
+mkdir -p /var/run/stunnel
+chown stunnel4:stunnel4 /var/run/stunnel 2>/dev/null || true
+
+echo "[entrypoint] Starting stunnel (Kavkom SNI tunnel) on 127.0.0.1:15062 -> aria-madacom.kavkom.com:5061"
+stunnel4 /etc/stunnel/stunnel.conf &
+
+for i in $(seq 1 20); do
+    (exec 3<>/dev/tcp/127.0.0.1/15062) 2>/dev/null && break
+    sleep 0.5
+done
+echo "[entrypoint] Tunnel stunnel prêt."
+
+# ---------------------------------------------------------------------------
+# Gateway Kavkom — passe par le tunnel stunnel local, PAS directement vers
+# Kavkom : proxy/register-proxy pointent sur 127.0.0.1:15062 en clair (TCP),
+# stunnel se charge du TLS+SNI réel derrière. Ne pas remettre
+# ${KAVKOM_USER_CONTEXT} en proxy ici, ça court-circuiterait le tunnel.
 # ---------------------------------------------------------------------------
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
 <include>
@@ -22,7 +45,9 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
         <param name="username" value="${KAVKOM_EXTENSION}"/>
         <param name="password" value="${KAVKOM_PASSWORD}"/>
         <param name="realm" value="${KAVKOM_USER_CONTEXT}"/>
-        <param name="proxy" value="${KAVKOM_USER_CONTEXT}"/>
+        <param name="proxy" value="127.0.0.1:15062"/>
+        <param name="register-proxy" value="127.0.0.1:15062"/>
+        <param name="register-transport" value="tcp"/>
         <param name="register" value="true"/>
         <param name="expire-seconds" value="600"/>
         <param name="retry-seconds" value="30"/>
@@ -30,7 +55,7 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     </gateway>
 </include>
 EOF
-echo "[entrypoint] Gateway kavkom configuré."
+echo "[entrypoint] Gateway kavkom configuré (via tunnel stunnel)."
 
 # ---------------------------------------------------------------------------
 # IP publique — sans ça, Kavkom reçoit l'IP interne du conteneur et ne peut

@@ -22,7 +22,7 @@ module.exports = {
         apiKey: required("GEMINI_API_KEY", ""),
         model: required("GEMINI_LIVE_MODEL", "models/gemini-2.5-flash-native-audio-preview-09-2025"),
         apiVersion: required("GEMINI_API_VERSION", "v1alpha"),
-        extractionModel: required("GEMINI_EXTRACTION_MODEL", "gemini-2.5-flash"),
+        extractionModel: required("GEMINI_EXTRACTION_MODEL", "gemini-2.5-flash-lite"),
     },
 
     freeswitch: {
