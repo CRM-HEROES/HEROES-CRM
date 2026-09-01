@@ -56,6 +56,10 @@ class Kernel extends ConsoleKernel
         // enrich to give the queue time to work through the batch.
         $schedule->command('archer:enrich')->dailyAt('02:00')->withoutOverlapping();
         $schedule->command('archer:rank')->dailyAt('03:00')->withoutOverlapping();
+
+        // Doctolib appointments sync: not enabled yet, App\Jobs\Doctolib\AppointmentsGet
+        // is a stub until Doctolib API/ICS access is configured.
+        // $schedule->command('app:doctolib-sync-appointments')->everyFifteenMinutes()->withoutOverlapping();
     }
 
     /**
