@@ -10,7 +10,6 @@ use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Redis;
 
 class ProspectAutoAssignment
 {
@@ -102,7 +101,7 @@ class ProspectAutoAssignment
         }
 
         $orderedUsers = $users->sortBy('id')->values();
-        $rotationKey = $orderedUsers->pluck('id')->all();
+        $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
 
         $assigned = 0;
 
@@ -111,7 +110,7 @@ class ProspectAutoAssignment
                 continue;
             }
 
-            $candidate = $orderedUsers[$this->nextRoundRobinPosition($rotationKey) % $orderedUsers->count()];
+            $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
 
             if (!$this->assignIfStillUnassigned($prospect, $candidate)) {
                 continue;
@@ -151,7 +150,8 @@ class ProspectAutoAssignment
         }
 
         $orderedUsers = $users->sortBy('id')->values();
-        $candidate = $orderedUsers[$this->nextRoundRobinPosition($orderedUsers->pluck('id')->all()) % $orderedUsers->count()];
+        $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
+        $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
 
         return $this->assignIfStillUnassigned($prospect, $candidate);
     }
@@ -183,20 +183,77 @@ class ProspectAutoAssignment
     }
 
     /**
-     * Atomically advances (and returns) the rotation counter shared by every
-     * caller assigning against the same pool of eligible users — keyed by
-     * the sorted user IDs, so an import selecting users [2,4,7] rotates
-     * independently from one selecting [1,3]. Redis' INCR is atomic, so
-     * concurrent workers (e.g. several import batches running at once)
-     * never hand out the same turn twice, guaranteeing the strict 1-2-3-1-2-3
-     * distribution regardless of how many processes are assigning at once.
+     * MODIFIÉ: remplace l'ancienne rotation round-robin (compteur Redis
+     * clé par pool exact d'utilisateurs éligibles) par une sélection basée
+     * sur la charge réelle actuelle de chaque utilisateur dans le projet.
+     *
+     * L'ancien round-robin utilisait une clé Redis dérivée du pool exact
+     * de candidats (implode('-', $candidateUserIds)). Deux imports dont les
+     * pools se chevauchent partiellement (ex. import A -> rôle "Commercial",
+     * import B -> rôles "Commercial"+"Assistant") utilisaient donc deux
+     * compteurs indépendants : un utilisateur éligible aux deux pools
+     * recevait des leads des deux rotations sans jamais être comparé
+     * équitablement à un utilisateur qui n'est éligible qu'à un seul pool -
+     * ce qui cassait la répartition globale malgré un round-robin "correct"
+     * au sein de chaque pool pris isolément.
+     *
+     * Se base sur le nombre de prospects réellement assignés à chaque
+     * utilisateur (getUserLoadCounts), qui s'auto-corrige quel que soit le
+     * chevauchement des pools, et retire la dépendance à Redis (qui doit
+     * être démarré pour fonctionner) pour cette sélection.
+     *
+     * @param \Illuminate\Support\Collection $orderedUsers Eligible users, sorted by id.
+     * @param array $loadMap [$userId => currently assigned count], mutated in place.
      */
-    protected function nextRoundRobinPosition(array $candidateUserIds): int
+    protected function pickLeastLoadedUser($orderedUsers, array &$loadMap): User
     {
-        sort($candidateUserIds);
-        $key = 'prospect_assignment_round_robin:' . implode('-', $candidateUserIds);
+        $bestUser = null;
+        $bestLoad = null;
 
-        return (int) Redis::incr($key) - 1;
+        foreach ($orderedUsers as $user) {
+            $load = $loadMap[$user->id] ?? 0;
+
+            // Users are iterated in ascending id order and only replace the
+            // current best on a strictly lower load, so ties are broken by
+            // the lowest id.
+            if ($bestLoad === null || $load < $bestLoad) {
+                $bestUser = $user;
+                $bestLoad = $load;
+            }
+        }
+
+        $loadMap[$bestUser->id] = $bestLoad + 1;
+
+        return $bestUser;
+    }
+
+    /**
+     * Number of prospects currently assigned to each of the given users
+     * within the project, used as the fairness signal by
+     * pickLeastLoadedUser(). Users with no prospects yet are included with
+     * a count of 0.
+     */
+    protected function getUserLoadCounts(Project $project, array $userIds): array
+    {
+        $loadMap = array_fill_keys($userIds, 0);
+
+        if (empty($userIds)) {
+            return $loadMap;
+        }
+
+        $counts = DB::table('prospect_user')
+            ->join('prospects', 'prospects.id', '=', 'prospect_user.prospect_id')
+            ->where('prospects.project_id', $project->id)
+            ->whereIn('prospect_user.user_id', $userIds)
+            ->select('prospect_user.user_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('prospect_user.user_id')
+            ->pluck('total', 'user_id');
+
+        foreach ($counts as $userId => $total) {
+            $loadMap[$userId] = (int) $total;
+        }
+
+        return $loadMap;
     }
 
     protected function attachProspectToUser(Prospect $prospect, User $candidate): bool
@@ -428,7 +485,8 @@ class ProspectAutoAssignment
             }
 
             $orderedUsers = $availableUsers->sortBy('id')->values();
-            $candidate = $orderedUsers[$this->nextRoundRobinPosition($orderedUsers->pluck('id')->all()) % $orderedUsers->count()];
+            $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
+            $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
 
             DB::table('prospect_user')
                 ->where('prospect_id', $prospect->id)

@@ -307,15 +307,25 @@ export default {
         ...mapGetters(["project", "fields"]),
 
         /**
+         * Checked fields (duplicateFields) are grouped at the top, so they
+         * stay visible/easy to review among a project's full field list —
+         * the keyword filter still applies on top of that grouping.
          */
         filteredFields() {
             const keyword = removeStringAccent(this.fieldKeyword);
 
-            return this.fields.filter(
-                (field) =>
-                    field.for == "prospect" &&
-                    removeStringAccent(field.name).indexOf(keyword) >= 0
-            );
+            return this.fields
+                .filter(
+                    (field) =>
+                        field.for == "prospect" &&
+                        removeStringAccent(field.name).indexOf(keyword) >= 0
+                )
+                .slice()
+                .sort((a, b) => {
+                    const aChecked = this.duplicateFields.includes(a.id);
+                    const bChecked = this.duplicateFields.includes(b.id);
+                    return aChecked === bChecked ? 0 : aChecked ? -1 : 1;
+                });
         },
 
         /**

@@ -1,5 +1,5 @@
 <template>
-    <item tag="label">
+    <item tag="label" :style="urlStyle">
         <icon class="fa fa-file-upload" />
         <div class="hc-item-main-content" v-text="prospectImport.name"></div>
         <icon
@@ -39,6 +39,10 @@ export default {
     props: {
         prospectImport: {
             type: Object,
+        },
+        color: {
+            type: String,
+            default: null,
         },
     },
 
@@ -143,6 +147,21 @@ export default {
         excludeStyle() {
             return {
                 color: this.isExcluded ? "#CC0000" : "#CCCCCC",
+            };
+        },
+
+        /**
+         * Same color for every import sharing this source_url — see
+         * importColorsByUrl in the parent Layout.vue.
+         */
+        urlStyle() {
+            if (!this.color) {
+                return {};
+            }
+
+            return {
+                backgroundColor: this.color + "26",
+                boxShadow: `inset 0 0 0 1px ${this.color}88`,
             };
         },
     },

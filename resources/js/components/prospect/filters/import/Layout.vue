@@ -24,6 +24,7 @@
                 v-for="prospectImport in filteredImports"
                 :key="prospectImport.id"
                 :prospect-import="prospectImport"
+                :color="importColorsByUrl[prospectImport.source_url]"
             />
         </item-list>
         <buttons v-if="can('all.prospect.import')">
@@ -43,6 +44,7 @@ import {
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
+import { duplicateColor } from "@/utils/duplicateColor";
 
 // Components
 import ImportRow from "./ImportRow.vue";
@@ -170,6 +172,34 @@ export default {
                     removeStringAccent(prospectImport.name).indexOf(keyword) >=
                     0
             );
+        },
+
+        /**
+         * One color per URL shared by 2+ imports, so re-imports of the
+         * same source (e.g. a Google Sheet synced/re-added several times)
+         * are visually grouped together — a unique URL gets no color.
+         */
+        importColorsByUrl() {
+            const groups = {};
+            this.imports.forEach((prospectImport) => {
+                const url = prospectImport.source_url;
+                if (!url) {
+                    return;
+                }
+                if (!groups[url]) {
+                    groups[url] = [];
+                }
+                groups[url].push(prospectImport.id);
+            });
+
+            const colors = {};
+            Object.keys(groups).forEach((url) => {
+                if (groups[url].length > 1) {
+                    colors[url] = duplicateColor(Math.min(...groups[url]));
+                }
+            });
+
+            return colors;
         },
     },
 };
