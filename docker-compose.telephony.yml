@@ -50,14 +50,20 @@ services:
     env_file:
       - ./ai-phone-agent/.env
     environment:
-      FS_ESL_HOST: telephony-freeswitch
+      # FreeSWITCH uses host networking, so its ESL endpoint is reached
+      # through the Docker host gateway from this bridge-network container.
+      FS_ESL_HOST: host.docker.internal
       FS_ESL_PORT: 8021
-      WS_PUBLIC_URL: ws://ai-phone-agent:4001/
+      WS_PUBLIC_URL: ws://127.0.0.1:14001/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       # API privée pour la future intégration CRM ; Nginx 80/443 reste intact.
       - "127.0.0.1:${AI_PHONE_AGENT_HTTP_PORT:-14000}:4000"
       # The browser connects directly to the bridge's transcript WebSocket.
       - "127.0.0.1:${AI_PHONE_AGENT_TRANSCRIPT_PORT:-14002}:4002"
+      # FreeSWITCH (host network) connects to the audio WebSocket through localhost.
+      - "127.0.0.1:${AI_PHONE_AGENT_WS_PORT:-14001}:4001"
     expose:
       - "4001"
     volumes:
