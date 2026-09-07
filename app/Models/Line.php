@@ -18,6 +18,7 @@ class Line extends Model
         'creator_id',
         'name',
         'operator',
+        'user_id',
         'config',
     ];
 
@@ -47,5 +48,13 @@ class Line extends Model
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
+    }
+
+    /**
+     * The agent this line's credentials belong to
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

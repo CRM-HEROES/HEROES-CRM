@@ -27,7 +27,7 @@ class LineController extends Controller
     {
         return $project
             ->lines()
-            ->select('id', 'project_id', 'name', 'operator')
+            ->select('id', 'project_id', 'name', 'operator', 'user_id')
             ->orderBy('name')
             ->get();
     }
@@ -46,6 +46,7 @@ class LineController extends Controller
             ->create(array_merge($request->only(
                 'name',
                 'operator',
+                'user_id',
                 'config'
             ), [
                 'creator_id' => auth()->id(),
@@ -75,6 +76,7 @@ class LineController extends Controller
         $line->update($request->only(
             'name',
             'operator',
+            'user_id',
             'config'
         ));
 
@@ -103,6 +105,7 @@ class LineController extends Controller
         $rules = [
             'name' => 'required|string|max:100',
             'operator' => 'required|string|in:' . implode(',', array_keys($this->operatorConfigFields)),
+            'user_id' => 'nullable|exists:users,id',
             'config' => 'required|array',
         ];
 

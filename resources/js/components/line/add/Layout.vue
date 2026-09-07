@@ -1,5 +1,5 @@
 <template>
-    <tab-layout :count="2" :tab="tab" class="hc-flex-1">
+    <tab-layout :count="3" :tab="tab" class="hc-flex-1">
         <template #1>
             <form
                 class="hc-flex-column"
@@ -23,6 +23,20 @@
                                 v-text="operator.label"
                             ></option></select
                     ></v-field>
+                    <item @click="tab = 2">
+                        <icon class="fa fa-user" />
+                        <div
+                            class="hc-item-main-content"
+                            v-text="
+                                $t('line.assign_to.title', {
+                                    user: assignedUser
+                                        ? assignedUser.name
+                                        : 'un agent ...',
+                                })
+                            "
+                        ></div>
+                        <icon class="fa fa-caret-right" />
+                    </item>
                 </item-list>
                 <buttons>
                     <button
@@ -59,6 +73,10 @@
                             v-model="line.config[field.key]"
                             required
                     /></v-field>
+                    <kavkom-diagnostic
+                        v-if="line.operator === 'kavkom'"
+                        :config="line.config"
+                    />
                 </item-list>
                 <buttons>
                     <button v-text="$t('add')"></button>
@@ -66,10 +84,39 @@
                 <loading :loading="addingLine" />
             </form>
         </template>
+
+        <template #3>
+            <div class="hc-flex-column" style="height: 100%">
+                <item @click="tab = 0">
+                    <icon class="fa fa-caret-left" />
+                    <div
+                        class="hc-item-main-content"
+                        v-text="$t('line.assign_to.pick_title')"
+                    ></div>
+                </item>
+                <search v-model="userKeyword" />
+                <item-list class="hc-flex-1" padding="5px">
+                    <item @click="(line.user_id = null), (tab = 0)">
+                        <icon class="fa fa-times" />
+                        <div
+                            class="hc-item-main-content"
+                            v-text="$t('none')"
+                        ></div>
+                    </item>
+                    <to-user-row
+                        v-for="user in filteredUsers"
+                        :key="user.id"
+                        :user="user"
+                        @click="(line.user_id = user.id), (tab = 0)"
+                    />
+                </item-list>
+            </div>
+        </template>
     </tab-layout>
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 import store from "@/store";
 
 // Actions
@@ -79,11 +126,21 @@ import { CLOSE_MODAL } from "@/actions/modal";
 // Constants
 import lineOperators from "@/constants/lineOperators";
 
+// Components
+import KavkomDiagnostic from "../KavkomDiagnostic.vue";
+import ToUserRow from "../ToUserRow.vue";
+
 export default {
+    components: {
+        KavkomDiagnostic,
+        ToUserRow,
+    },
+
     data() {
         return {
             line: this.newLine(),
             addingLine: false,
+            userKeyword: "",
             tab: 0,
         };
     },
@@ -96,6 +153,7 @@ export default {
             return {
                 name: "",
                 operator: "",
+                user_id: null,
                 config: {},
             };
         },
@@ -118,6 +176,8 @@ export default {
     },
 
     computed: {
+        ...mapGetters(["users"]),
+
         lineOperators() {
             return lineOperators;
         },
@@ -130,6 +190,24 @@ export default {
                 (o) => o.value === this.line.operator
             );
             return operator ? operator.fields : [];
+        },
+
+        /**
+         *
+         */
+        assignedUser() {
+            return this.users.find((u) => u.id == this.line.user_id);
+        },
+
+        /**
+         *
+         */
+        filteredUsers() {
+            const keyword = removeStringAccent(this.userKeyword);
+
+            return this.users.filter(
+                (user) => removeStringAccent(user.name).indexOf(keyword) >= 0
+            );
         },
     },
 };
