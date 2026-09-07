@@ -28,3 +28,6 @@ export const ADD_IMPORT_MAPPING_USER = "addImportMappingUser";
 export const REMOVE_IMPORT_MAPPING = "removeImportMapping";
 export const ADD_IMPORT_ROLE = "addImportRole";
 export const REMOVE_IMPORT_ROLE = "removeImportRole";
+
+export const ADD_IMPORT_USER_GROUP = "addImportUserGroup";
+export const REMOVE_IMPORT_USER_GROUP = "removeImportUserGroup";

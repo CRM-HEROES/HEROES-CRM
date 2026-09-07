@@ -3,16 +3,33 @@
 namespace App\Services;
 
 use App\Events\ProspectUserAttached;
+use App\Models\Group;
 use App\Models\Import;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\User;
+use App\Support\PhoneCountry;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ProspectAutoAssignment
 {
+    /**
+     * Feature toggle for the "busy" (disponibilité) exclusion applied in
+     * getProjectUsers().
+     *
+     * MIS EN PAUSE (demande client, 2026-09-03) : un utilisateur
+     * explicitement sélectionné pour un import (rôle ou choix direct dans
+     * l'étape "Relations") doit recevoir les leads de cet import selon la
+     * sélection faite, sans être écarté parce qu'il est actuellement
+     * occupé (RDV en cours, calendrier "Off", etc.). getUsersInOngoingEvent()
+     * et l'exclusion ci-dessous sont conservés tels quels (pas supprimés)
+     * pour pouvoir revenir en arrière en repassant simplement ce switch à
+     * true si le client change d'avis.
+     */
+    protected bool $enforceAvailabilityFilter = false;
+
     public function assignUnassignedProspects(?Project $project = null, ?int $importId = null): int
     {
         $query = Prospect::doesntHave('users');
@@ -110,7 +127,12 @@ class ProspectAutoAssignment
                 continue;
             }
 
-            $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
+            // Each prospect in the batch may have a different phone country,
+            // so the pool is narrowed per-prospect rather than once for the
+            // whole batch.
+            $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
             if (!$this->assignIfStillUnassigned($prospect, $candidate)) {
                 continue;
@@ -151,7 +173,9 @@ class ProspectAutoAssignment
 
         $orderedUsers = $users->sortBy('id')->values();
         $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
-        $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
+        $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
+        $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+        $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
         return $this->assignIfStillUnassigned($prospect, $candidate);
     }
@@ -299,8 +323,10 @@ class ProspectAutoAssignment
 
     /**
      * Eligible users for a project: must have one of the given role IDs
-     * (selected by the admin for the relevant import), not be banned,
-     * not be busy in an ongoing event, and have been active today.
+     * (selected by the admin for the relevant import) or be one of the
+     * users explicitly selected, and not be banned. The "not busy in an
+     * ongoing event" exclusion exists but is currently paused, see
+     * $enforceAvailabilityFilter.
      *
      * MODIFIÉ (ancien code ci-dessous conservé en commentaire):
      * - Le tableau $allowedRoles codé en dur et le filtre sur $user->role
@@ -357,7 +383,10 @@ class ProspectAutoAssignment
             return collect();
         }
 
-        $busyUserIds = $this->getUsersInOngoingEvent();
+        // PAUSÉ: voir $enforceAvailabilityFilter — un utilisateur sélectionné
+        // pour l'import n'est plus écarté pour indisponibilité tant que ce
+        // switch est à false.
+        $busyUserIds = $this->enforceAvailabilityFilter ? $this->getUsersInOngoingEvent() : [];
 
         $roleTable = config('permission.table_names.roles', 'roles');
         $modelHasRolesTable = config('permission.table_names.model_has_roles', 'model_has_roles');
@@ -386,12 +415,32 @@ class ProspectAutoAssignment
         return $project->users()
             ->whereNull('banned_at')
             ->whereIn('users.id', $candidateUserIds)
-            ->get(['users.id', 'users.name', 'users.role', 'users.last_activity'])
+            ->get(['users.id', 'users.name', 'users.role', 'users.last_activity', 'users.phone_country'])
             ->filter(function (User $user) use ($busyUserIds, $excludeUserIds) {
                 return !in_array($user->id, $busyUserIds, true)
                     && !in_array($user->id, $excludeUserIds, true);
             })
             ->values();
+    }
+
+    /**
+     * Narrows eligible users to those configured for the prospect's phone
+     * country (or with no country preference at all). A lead is never left
+     * unassigned for lack of a country match: if the country can't be
+     * detected, or no eligible user matches it, the full pool is returned
+     * unfiltered and the normal load-based pick decides instead.
+     */
+    protected function filterUsersByCountry($users, ?string $country)
+    {
+        if (!$country) {
+            return $users;
+        }
+
+        $matching = $users->filter(function (User $user) use ($country) {
+            return !$user->phone_country || $user->phone_country === $country;
+        })->values();
+
+        return $matching->isEmpty() ? $users : $matching;
     }
 
     /**
@@ -486,7 +535,9 @@ class ProspectAutoAssignment
 
             $orderedUsers = $availableUsers->sortBy('id')->values();
             $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
-            $candidate = $this->pickLeastLoadedUser($orderedUsers, $loadMap);
+            $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
             DB::table('prospect_user')
                 ->where('prospect_id', $prospect->id)
@@ -525,8 +576,19 @@ class ProspectAutoAssignment
     }
 
     /**
-     * Explicit users selected in the import's Relations step. They are part of
-     * the same allocation pool as users supplied by the selected roles.
+     * Explicit users selected in the import's Relations step, plus the
+     * members of any "Groupes utilisateurs effectués" selected there. They
+     * are all part of the same allocation pool as users supplied by the
+     * selected roles.
+     *
+     * NOUVEAU: le Group model sert déjà à la fois à taguer des prospects
+     * (relation prospects(), utilisée par le champ "groups" de l'import,
+     * distinct de celui-ci) et à regrouper des utilisateurs (relation
+     * users(), déjà exploitée ailleurs dans l'app pour assigner des rôles
+     * de groupe). "user_groups" réutilise ce même modèle Group : les
+     * membres des groupes sélectionnés rejoignent simplement le pool
+     * d'utilisateurs éligibles, au même titre qu'un utilisateur choisi
+     * individuellement.
      */
     protected function getImportUserIds(?int $importId): array
     {
@@ -535,12 +597,24 @@ class ProspectAutoAssignment
         }
 
         $import = Import::find($importId);
-        if (!$import || !is_array($import->users)) {
+        if (!$import) {
             return [];
         }
 
+        $userIds = is_array($import->users) ? $import->users : [];
+
+        if (is_array($import->user_groups) && !empty($import->user_groups)) {
+            $groupUserIds = Group::whereIn('id', $import->user_groups)
+                ->with('users:id')
+                ->get()
+                ->flatMap(fn ($group) => $group->users->pluck('id'))
+                ->all();
+
+            $userIds = array_merge($userIds, $groupUserIds);
+        }
+
         return array_values(array_unique(array_filter(
-            array_map('intval', $import->users),
+            array_map('intval', $userIds),
             fn ($userId) => $userId > 0
         )));
     }

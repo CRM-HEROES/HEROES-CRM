@@ -33,7 +33,7 @@ class ImportController extends Controller
             'name' => 'required',
             'source_url' => 'required_if:source,google_sheets',
             'sync_enabled' => 'sometimes|boolean',
-            'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
+            'sync_interval_minutes' => 'sometimes|nullable|integer|min:1',
         ]);
 
         // Used by the frontend to show a non-blocking warning toast — the
@@ -105,7 +105,7 @@ class ImportController extends Controller
             'welcome_sms_source' => 'sometimes|nullable|in:brevo,smsbox,ultramsg,mtarget',
             'source_url' => 'sometimes|nullable|url',
             'sync_enabled' => 'sometimes|boolean',
-            'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
+            'sync_interval_minutes' => 'sometimes|nullable|integer|min:1',
         ]);
 
         $import->update($request->only(

@@ -1,7 +1,9 @@
 <template>
     <slide
         :name="name"
-        @open="fetchInteractions(), fetchSelectedProspects()"
+        @open="
+            fetchInteractions(), fetchSelectedProspects(), fetchOperatorsConfigStatus()
+        "
         :title="
             $t('prospect.interaction.title', {
                 prospect: interactionProspect
@@ -158,6 +160,12 @@
                                         v-text="number"
                                     ></span>
                                 </div>
+                                <icon
+                                    v-if="ringoverConfigured"
+                                    class="fa fa-check-circle"
+                                    color="#09be0c"
+                                    v-tooltip="$t('line.operator.configured')"
+                                />
                                 <icon class="fa fa-caret-right" />
                             </item>
 
@@ -182,6 +190,12 @@
                                         v-text="number"
                                     ></span>
                                 </div>
+                                <icon
+                                    v-if="kavkomConfigured"
+                                    class="fa fa-check-circle"
+                                    color="#09be0c"
+                                    v-tooltip="$t('line.operator.configured')"
+                                />
                                 <icon class="fa fa-caret-right" />
                             </item>
 
@@ -206,6 +220,12 @@
                                         v-text="number"
                                     ></span>
                                 </div>
+                                <icon
+                                    v-if="twilioConfigured"
+                                    class="fa fa-check-circle"
+                                    color="#09be0c"
+                                    v-tooltip="$t('line.operator.configured')"
+                                />
                                 <icon class="fa fa-caret-right" />
                             </item>
                         </template>
@@ -815,6 +835,7 @@ import ApiService from "@/apis/api.service";
 import { OPEN_MODAL } from "@/actions/modal";
 import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
+import { GET_USER_SETTING } from "@/actions/user/setting";
 import {
     FETCH_PROSPECT_INTERACTIONS,
     ADD_PROSPECT_INTERACTION,
@@ -856,6 +877,8 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
+            ringoverConfigured: false,
+            twilioConfigured: false,
             callingViaKavkom: false,
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
@@ -923,6 +946,30 @@ export default {
             } else if (this.prospectsSelected.length == 0) {
                 this.tab = 1;
                 this.frameTab = 3;
+            }
+        },
+
+        /**
+         * Fetch each telephony operator's configuration so the call
+         * menu can mark the ones that are ready to use.
+         */
+        async fetchOperatorsConfigStatus() {
+            store.dispatch(GET_USER_SETTING, "kavkom");
+
+            try {
+                const { data } = await ApiService.get(
+                    `project/${this.project.slug}/setting/ringover/check`
+                );
+                this.ringoverConfigured = !!data;
+            } catch (error) {
+                this.ringoverConfigured = false;
+            }
+
+            try {
+                const { data } = await ApiService.get("settings/twilio/status");
+                this.twilioConfigured = !!data.configured;
+            } catch (error) {
+                this.twilioConfigured = false;
             }
         },
 
@@ -1461,7 +1508,23 @@ export default {
             "prospectsSelected",
             "leftSlideOpen",
             "can",
+            "userSettings",
         ]),
+
+        /**
+         *
+         */
+        kavkomConfigured() {
+            const setting = this.userSettings.kavkom;
+
+            return !!(
+                setting &&
+                setting.api_token &&
+                setting.domain_uuid &&
+                setting.phone_number &&
+                setting.extension
+            );
+        },
 
         currentProspect() {
             if (this.selectedProspects.length > this.currentProspectIndex) {

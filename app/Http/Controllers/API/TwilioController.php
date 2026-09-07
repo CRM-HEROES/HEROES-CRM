@@ -10,6 +10,15 @@ use Illuminate\Support\Facades\Log;
 class TwilioController extends Controller
 {
     /**
+     * Whether Twilio is configured server-side, so the frontend can show
+     * this at a glance without minting a token per check.
+     */
+    public function status(TwilioService $service)
+    {
+        return ['configured' => $service->isConfigured()];
+    }
+
+    /**
      * Issues a short-lived Access Token for the browser Voice SDK. The
      * Account SID / Auth Token / API Key secret never reach the browser.
      */

@@ -44,6 +44,12 @@
                         "
                     >
                         <option
+                            :value="1"
+                            v-text="
+                                $t('import.add.google_sheets.sync_interval_1')
+                            "
+                        ></option>
+                        <option
                             :value="5"
                             v-text="
                                 $t('import.add.google_sheets.sync_interval_5')

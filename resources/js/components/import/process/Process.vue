@@ -976,7 +976,7 @@ export default {
          * shown on the "sync active" info item
          */
         syncStatusLabel() {
-            const knownIntervals = [5, 30, 60, 180, 1440];
+            const knownIntervals = [1, 5, 30, 60, 180, 1440];
             const intervalMinutes = this.prospectImport.sync_interval_minutes;
             const interval = knownIntervals.includes(intervalMinutes)
                 ? this.$t(

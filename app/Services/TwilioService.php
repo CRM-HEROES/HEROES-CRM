@@ -14,20 +14,32 @@ class TwilioService
     protected const ACCESS_TOKEN_TTL_SECONDS = 3600;
 
     /**
+     * Whether the server-side Twilio configuration is complete, without
+     * minting a token or touching Twilio's API.
+     */
+    public function isConfigured(): bool
+    {
+        return (string) config('services.twilio.account_sid') !== ''
+            && (string) config('services.twilio.api_key_sid') !== ''
+            && (string) config('services.twilio.api_key_secret') !== ''
+            && (string) config('services.twilio.twiml_app_sid') !== '';
+    }
+
+    /**
      * Builds a short-lived Access Token (JWT) for the browser Voice SDK.
      * Never expose Account SID / Auth Token / API Key secret to the
      * browser directly — only this derived, scoped token.
      */
     public function issueAccessToken(string $identity): ?array
     {
+        if (!$this->isConfigured()) {
+            return null;
+        }
+
         $accountSid = (string) config('services.twilio.account_sid');
         $apiKeySid = (string) config('services.twilio.api_key_sid');
         $apiKeySecret = (string) config('services.twilio.api_key_secret');
         $twimlAppSid = (string) config('services.twilio.twiml_app_sid');
-
-        if ($accountSid === '' || $apiKeySid === '' || $apiKeySecret === '' || $twimlAppSid === '') {
-            return null;
-        }
 
         $token = new AccessToken(
             $accountSid,

@@ -86,6 +86,11 @@ export default {
                     name: "Pays",
                     meta: false,
                 },
+                {
+                    slug: "phone_country",
+                    name: "Pays du numéro",
+                    meta: false,
+                },
             ].filter((field) => this.bloc.items.indexOf(field.slug) >= 0);
         },
     },
