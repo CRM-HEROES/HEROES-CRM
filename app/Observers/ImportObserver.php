@@ -7,6 +7,7 @@ use App\Models\Import;
 use App\Jobs\ImportGetSummary;
 use App\Jobs\ImportHandleDuplicatedProspects;
 use App\Jobs\ImportProspects;
+use App\Support\ImportHeaderAliases;
 use Illuminate\Support\Str;
 
 class ImportObserver
@@ -195,40 +196,22 @@ class ImportObserver
         $import->update(['mapping' => $mapping]);
     }
 
-    /** Return the CRM field corresponding to a known CSV/Sheets header. */
+    /**
+     * Return the CRM field corresponding to a known CSV/Sheets header.
+     *
+     * Delegates to ImportHeaderAliases, the single shared alias list also
+     * used by ImportProspects when a row is actually processed — kept in
+     * one place so the two never drift apart.
+     */
     protected function getKnownImportField($header): ?string
     {
-        $header = $this->normalizeImportHeader($header);
-
-        $aliases = [
-            'email' => 'email',
-            'e mail' => 'email',
-            'mail' => 'email',
-            'nom complet' => 'full_name',
-            'full name' => 'full_name',
-            'name' => 'full_name',
-            'numero de telephone' => 'mobile_phone_number',
-            'telephone' => 'mobile_phone_number',
-            'telephone portable' => 'mobile_phone_number',
-            'mobile' => 'mobile_phone_number',
-            'phone' => 'mobile_phone_number',
-            'phone number' => 'mobile_phone_number',
-            'created time' => 'created_at',
-            'created at' => 'created_at',
-            'date de creation' => 'created_at',
-        ];
-
-        return $aliases[$header] ?? null;
+        return ImportHeaderAliases::resolve($header);
     }
 
     /** Normalize headers from CSV files and Google Sheets consistently. */
     protected function normalizeImportHeader($header): string
     {
-        $header = str_replace(['\\_', '_'], ' ', (string) $header);
-        $header = Str::ascii($header);
-        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
-
-        return strtolower(trim(preg_replace('/\s+/', ' ', $header)));
+        return ImportHeaderAliases::normalize($header);
     }
     
 }

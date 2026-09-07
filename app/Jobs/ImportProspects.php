@@ -27,7 +27,9 @@ use App\Jobs\Import\ProspectItemsHandler\SmsHandler;
 use App\Jobs\Import\ProspectItemsHandler\UsersHandler;
 use App\Events\ImportFinished;
 use App\Models\Import;
+use App\Models\User;
 use App\Services\ProspectAutoAssignment;
+use App\Support\ImportHeaderAliases;
 // The trait file is named Sendswelcomesms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
 use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
@@ -44,6 +46,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Str;
 
 class ImportProspects implements ShouldQueue
@@ -120,28 +123,14 @@ class ImportProspects implements ShouldQueue
      * column.  This is deliberately applied again by the worker: an import
      * may have been created with an older automatic mapping before it is
      * started (or restarted).
+     *
+     * Delegates to ImportHeaderAliases, the single shared alias list also
+     * used by ImportObserver::autoMapping() when a mapping is first
+     * generated — kept in one place so the two never drift apart.
      */
     protected function getKnownDefaultField($header): ?string
     {
-        $header = $this->normalizeHeaderText($header);
-
-        return [
-            'email' => 'email',
-            'e mail' => 'email',
-            'mail' => 'email',
-            'full name' => 'full_name',
-            'nom complet' => 'full_name',
-            'name' => 'full_name',
-            'phone number' => 'mobile_phone_number',
-            'numero de telephone' => 'mobile_phone_number',
-            'telephone' => 'mobile_phone_number',
-            'telephone portable' => 'mobile_phone_number',
-            'mobile' => 'mobile_phone_number',
-            'phone' => 'mobile_phone_number',
-            'created time' => 'created_at',
-            'created at' => 'created_at',
-            'date de creation' => 'created_at',
-        ][$header] ?? null;
+        return ImportHeaderAliases::resolve($header);
     }
 
     /**
@@ -150,11 +139,7 @@ class ImportProspects implements ShouldQueue
      */
     protected function normalizeHeaderText($header): string
     {
-        $header = Str::ascii((string) $header);
-        $header = str_replace(['\\_', '_'], ' ', $header);
-        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
-
-        return strtolower(trim(preg_replace('/\s+/', ' ', $header)));
+        return ImportHeaderAliases::normalize($header);
     }
 
     /**
@@ -1010,6 +995,13 @@ class ImportProspects implements ShouldQueue
      * themselves being touched, and suspicious (likely column-shifted)
      * rows are never merged in, to avoid corrupting an already-good
      * existing prospect with garbled data.
+     *
+     * The existing prospect is also reattributed to this import
+     * (import_id) so it is treated as a fresh lead from this import —
+     * visible under its "with this import" filter, and picked up by the
+     * end-of-job automatic assignment sweep (assignUnassignedProspects)
+     * if it currently has no assigned user, instead of only being
+     * caught by the next 5-minute scheduled sweep.
      */
     protected function updateExistingDuplicateProspect($prospect)
     {
@@ -1032,31 +1024,35 @@ class ImportProspects implements ShouldQueue
             return false;
         }
 
-        $newMeta = array_filter($prospect['meta'] ?? [], function ($value) {
-            return $value !== null && $value !== '';
-        });
-
-        if (empty($newMeta)) {
-            return false;
-        }
-
-        $existing = DB::table('prospects')->where('id', $existingId)->first(['meta']);
+        $existing = DB::table('prospects')->where('id', $existingId)->first(['meta', 'import_id']);
 
         if (!$existing) {
             return false;
         }
 
+        $newMeta = array_filter($prospect['meta'] ?? [], function ($value) {
+            return $value !== null && $value !== '';
+        });
+
         $existingMeta = json_decode($existing->meta ?: '{}', true) ?: [];
         $mergedMeta = array_merge($existingMeta, $newMeta);
 
-        if ($mergedMeta == $existingMeta) {
+        $update = ['updated_at' => $this->date];
+
+        if ($mergedMeta != $existingMeta) {
+            $update['meta'] = json_encode($mergedMeta);
+        }
+
+        if ((int) $existing->import_id !== (int) $this->import->id) {
+            $update['import_id'] = $this->import->id;
+        }
+
+        if (count($update) === 1) {
+            // Neither meta nor import attribution actually changed.
             return false;
         }
 
-        DB::table('prospects')->where('id', $existingId)->update([
-            'meta' => json_encode($mergedMeta),
-            'updated_at' => $this->date,
-        ]);
+        DB::table('prospects')->where('id', $existingId)->update($update);
 
         return true;
     }
@@ -1404,8 +1400,10 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
-     * Notify the import's creator
-     * that import has been finished
+     * Notify the import's creator, plus every user who actually received
+     * a prospect from this import — they are the ones who need to know
+     * new leads landed in their queue, not just whoever launched the
+     * import.
      */
     protected function notifyImportFinished()
     {
@@ -1414,16 +1412,35 @@ class ImportProspects implements ShouldQueue
         // ImportFinished::dispatch($this->import);
 
         // and comment this other one
+        $recipients = collect();
+
         if ($this->import->creator) {
-            try {
-              $this
-                ->import
-                ->creator
-                ->notify(
-                    new \App\Notifications\ImportFinished($this->import)
-                );
-            } catch(\Exception $e) {
-            }
+            $recipients->push($this->import->creator);
+        }
+
+        $assignedUserIds = DB::table('prospect_user')
+            ->join('prospects', 'prospects.id', '=', 'prospect_user.prospect_id')
+            ->where('prospects.import_id', $this->import->id)
+            ->distinct()
+            ->pluck('prospect_user.user_id');
+
+        if ($assignedUserIds->isNotEmpty()) {
+            $recipients = $recipients->merge(User::whereIn('id', $assignedUserIds)->get());
+        }
+
+        $recipients = $recipients->unique('id');
+
+        if ($recipients->isEmpty()) {
+            return;
+        }
+
+        try {
+            Notification::send($recipients, new \App\Notifications\ImportFinished($this->import));
+        } catch (\Exception $e) {
+            Log::warning('ImportProspects: failed to notify import finished', [
+                'import_id' => $this->import->id,
+                'message' => $e->getMessage(),
+            ]);
         }
     }
 }

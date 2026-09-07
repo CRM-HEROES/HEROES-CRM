@@ -193,6 +193,14 @@ export default {
 
             try {
                 const pi = await store.dispatch(ADD_IMPORT, formData);
+
+                if (pi.already_imported_url) {
+                    flashWarning({
+                        title: this.$t("import.add.title"),
+                        body: "Cette URL a déjà été importée précédemment.",
+                    });
+                }
+
                 const prospectImport = await store.dispatch(SHOW_IMPORT, pi.id);
                 store.commit(OPEN_SLIDE, "import");
                 store.commit(SET_IMPORT, prospectImport);

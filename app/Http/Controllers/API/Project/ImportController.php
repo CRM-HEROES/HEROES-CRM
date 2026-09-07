@@ -36,6 +36,11 @@ class ImportController extends Controller
             'sync_interval_minutes' => 'sometimes|nullable|integer|min:5',
         ]);
 
+        // Used by the frontend to show a non-blocking warning toast — the
+        // import is still created either way, this is purely informational.
+        $alreadyImportedUrl = $request->input('source') == 'google_sheets'
+            && $project->imports()->where('source_url', $request->input('source_url'))->exists();
+
         $import = $project
             ->imports()
             ->create(array_merge($request->only(
@@ -52,6 +57,7 @@ class ImportController extends Controller
             ]));
 
         $import->refresh();
+        $import->already_imported_url = $alreadyImportedUrl;
 
         return $import;
     }
