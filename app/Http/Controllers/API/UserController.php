@@ -22,8 +22,9 @@ class UserController extends Controller
         'postal_code',
         'city',
         'country',
+        'phone_country',
         'role',
-        
+
         'ip_postal_code',
         'ip_city',
         'ip_country',

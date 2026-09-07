@@ -1371,7 +1371,18 @@ class ImportProspects implements ShouldQueue
 
         // Import relations
         $this->handleProspectsImportLabels($prospectsIds);
-//        $this->handleProspectsImportUsers($prospectsIds);
+        // RÉACTIVÉ (demande client, 2026-09-04) : un utilisateur coché dans
+        // "Utilisateurs affectés" doit recevoir TOUS les leads de l'import,
+        // pas une part répartie équitablement — chaque prospect est donc
+        // attaché à chacun des utilisateurs sélectionnés ici, avant même
+        // que ProspectAutoAssignment ne s'exécute en fin de job. Comme ce
+        // dernier ne traite que les prospects sans utilisateur
+        // (Prospect::doesntHave('users')), un import avec des "Utilisateurs
+        // affectés" non vides n'a donc plus rien à répartir : la
+        // répartition équitable (least-loaded) reste inchangée pour les
+        // pools "Rôles effectués" et "Groupes utilisateurs effectués", qui
+        // ne passent pas par ici.
+        $this->handleProspectsImportUsers($prospectsIds);
         $this->handleProspectsImportGroups($prospectsIds);
     }
 

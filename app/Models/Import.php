@@ -58,6 +58,7 @@ class Import extends Model
         'sync_interval_minutes',
         'last_synced_at',
         'users',
+        'user_groups',
         'values',
     ];
 
@@ -101,6 +102,7 @@ class Import extends Model
         'sync_enabled' => 'boolean',
         'last_synced_at' => 'datetime',
         'users'     => 'json',
+        'user_groups' => 'json',
         'values'    => 'json',
     ];
 

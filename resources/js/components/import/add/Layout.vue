@@ -69,6 +69,10 @@
             >
                 <select v-model.number="prospectImport.sync_interval_minutes">
                     <option
+                        :value="1"
+                        v-text="$t('import.add.google_sheets.sync_interval_1')"
+                    ></option>
+                    <option
                         :value="5"
                         v-text="$t('import.add.google_sheets.sync_interval_5')"
                     ></option>

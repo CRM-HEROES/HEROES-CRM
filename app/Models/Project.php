@@ -259,6 +259,14 @@ class Project extends Model
     }
 
     /**
+     * Lines
+     */
+    public function lines()
+    {
+        return $this->hasMany(Line::class);
+    }
+
+    /**
      * Menus
      */
     public function menus()

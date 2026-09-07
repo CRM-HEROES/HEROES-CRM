@@ -23,6 +23,7 @@ class UserController extends Controller
         'postal_code',
         'city',
         'country',
+        'phone_country',
         'last_activity',
     ];
 
@@ -166,6 +167,7 @@ class UserController extends Controller
             'postal_code',
             'city',
             'country',
+            'phone_country',
             'role',
             'default_projects',
         ]));

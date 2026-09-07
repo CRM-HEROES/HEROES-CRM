@@ -63,6 +63,7 @@ use App\Http\Controllers\API\Project\Import\MappingController as ProjectImportMa
 use App\Http\Controllers\API\Project\Import\UserController as ProjectImportUserController;
 
 use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
+use App\Http\Controllers\API\Project\LineController as ProjectLineController;
 use App\Http\Controllers\API\Project\LogoController as ProjectLogoController;
 use App\Http\Controllers\API\Project\MenuController as ProjectMenuController;
 use App\Http\Controllers\API\Project\MenuIconController as ProjectMenuIconController;
@@ -291,6 +292,7 @@ Route::group([
     Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
 
     // Twilio (opérateur de secours, ex. numéros belges)
+    Route::get('/settings/twilio/status', [TwilioController::class, 'status'])->name('settings.twilio.status');
     Route::post('/settings/twilio/token', [TwilioController::class, 'token'])->name('settings.twilio.token');
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
 
@@ -422,6 +424,9 @@ Route::group([
         // Group
         Route::apiResource('group', ProjectGroupController::class);
 
+        // Line
+        Route::apiResource('line', ProjectLineController::class);
+
         // Google Drive
         Route::get('google/drive', [ProjectGoogleDriveController::class, 'index']);
         Route::delete('google/drive/{account}', [ProjectGoogleDriveController::class, 'destroy']);
@@ -435,6 +440,10 @@ Route::group([
         // Import Relation Group
         Route::apiResource('import.group', ProjectImportGroupController::class)->only('index', 'update', 'destroy');
         Route::apiResource('import.role', \App\Http\Controllers\API\Project\Import\RoleController::class)->only('index', 'update', 'destroy');
+        // Import Relation User Group (groups used as a pool of users, distinct from "import.group" which tags the imported prospects)
+        Route::apiResource('import.user-group', \App\Http\Controllers\API\Project\Import\UserGroupController::class)
+            ->parameters(['user-group' => 'group'])
+            ->only('index', 'update', 'destroy');
         // Import Relation Label
         Route::apiResource('import.label', ProjectImportLabelController::class)->only('index', 'update', 'destroy');
         // Import Relation User

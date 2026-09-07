@@ -135,6 +135,16 @@
                                 :placeholder="label + ' ...'"
                                 v-model="userToCreate.mobile_phone_number"
                         /></v-field>
+                        <v-field :label="$t('phone_country')"
+                            ><select v-model="userToCreate.phone_country">
+                                <option value="">—</option>
+                                <option
+                                    v-for="phoneCountry in phoneCountries"
+                                    :key="phoneCountry.code"
+                                    :value="phoneCountry.code"
+                                    v-text="`${phoneCountry.flag} ${phoneCountry.label} (+${phoneCountry.dial_code})`"
+                                ></option></select
+                        ></v-field>
                         <v-field :label="$t('street')" v-slot="{ label }">
                             <google-map-input
                                 v-model="userToCreate.street"
@@ -210,6 +220,8 @@ import UserService from "@/apis/user";
 import { ADD_USER, SET_USER } from "@/actions/project/user";
 import { ADD_GLOBAL_USER } from "@/actions/user";
 import { CLOSE_MODAL } from "@/actions/modal";
+
+import phoneCountries from "@/constants/phoneCountries";
 
 export default {
     data() {
@@ -341,6 +353,10 @@ export default {
 
     computed: {
         ...mapGetters(["project"]),
+
+        phoneCountries() {
+            return phoneCountries;
+        },
 
         userName() {
             if (!this.user) {

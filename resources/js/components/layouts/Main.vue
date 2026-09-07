@@ -76,6 +76,7 @@
             <add-group-modal v-if="can('all.project.group.add')" />
             <add-import-modal v-if="can('all.prospect.import')" />
             <add-label-modal v-if="can('all.project.category.label.add')" />
+            <add-line-modal v-if="can('all.project.line.add')" />
             <add-menu-modal />
             <add-message-template-modal
                 v-if="can('all.project.message-template.add')"
@@ -136,6 +137,7 @@
             <update-label-modal
                 v-if="can('all.project.category.label.update')"
             />
+            <update-line-modal v-if="can('all.project.line.update')" />
             <update-menu-modal />
             <update-message-template-modal
                 v-if="can('all.project.message-template.update')"
@@ -325,6 +327,7 @@ import AddFolderModal from "@/components/folder/add/Modal.vue";
 import AddGroupModal from "@/components/group/add/Modal.vue";
 import AddImportModal from "@/components/import/add/Modal.vue";
 import AddLabelModal from "@/components/label/add/Modal.vue";
+import AddLineModal from "@/components/line/add/Modal.vue";
 import AddMenuModal from "@/components/menu/add/Modal.vue";
 import AddMessageTemplateModal from "@/components/message-template/add/Modal.vue";
 import AddOrderActionModal from "@/components/order/action/add/Modal.vue";
@@ -363,6 +366,7 @@ import UpdateFolderModal from "@/components/folder/update/Modal.vue";
 import UpdateGroupModal from "@/components/group/update/Modal.vue";
 import UpdateImportModal from "@/components/import/update/Modal.vue";
 import UpdateLabelModal from "@/components/label/update/Modal.vue";
+import UpdateLineModal from "@/components/line/update/Modal.vue";
 import UpdateMenuModal from "@/components/menu/update/Modal.vue";
 import UpdateMessageTemplateModal from "@/components/message-template/update/Modal.vue";
 import UpdateOrderActionModal from "@/components/order/action/update/Modal.vue";
@@ -498,6 +502,7 @@ export default {
         AddGroupModal,
         AddImportModal,
         AddLabelModal,
+        AddLineModal,
         AddMenuModal,
         AddMessageTemplateModal,
         AddOrderActionModal,
@@ -536,6 +541,7 @@ export default {
         UpdateGroupModal,
         UpdateImportModal,
         UpdateLabelModal,
+        UpdateLineModal,
         UpdateMenuModal,
         UpdateMessageTemplateModal,
         UpdateOrderActionModal,

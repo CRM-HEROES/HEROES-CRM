@@ -28,6 +28,23 @@
                                 <icon class="fa fa-caret-right" />
                             </item>
 
+                            <!-- User groups -->
+                            <item
+                                @click="(tab = 1), (itemsTab = 4)"
+                                v-if="filteredRelationUserGroups.length > 0"
+                            >
+                                <icon class="fa fa-people-group" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'import.process.tab.relations.affected_user_groups'
+                                        )
+                                    "
+                                ></div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
+
                             <!-- Groups -->
                             <item
                                 @click="(tab = 1), (itemsTab = 1)"
@@ -80,7 +97,7 @@
                 <template #2>
                     <div class="hc-flex-column" style="height: 100%">
                         <frame-layout
-                            :count="4"
+                            :count="5"
                             :tab="itemsTab"
                             class="hc-flex-1 hc-flex-column"
                             style="height: 100%"
@@ -188,6 +205,33 @@
                                     />
                                 </item-list>
                             </template>
+
+                            <!-- User groups -->
+                            <template #5>
+                                <!-- Title -->
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'import.process.tab.relations.affected_user_groups'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+
+                                <item-list padding="12px" class="hc-flex-1">
+                                    <relation-user-group-row
+                                        v-for="group in filteredRelationUserGroups"
+                                        :key="group.id"
+                                        :group="group"
+                                        :is-checked="
+                                            isRelationUserGroupChecked(group)
+                                        "
+                                    />
+                                </item-list>
+                            </template>
                         </frame-layout>
                     </div>
                 </template>
@@ -204,6 +248,7 @@ import RelationLabelRow from "./relation/RelationLabelRow.vue";
 import RelationGroupRow from "./relation/RelationGroupRow.vue";
 import RelationUserRow from "./relation/RelationUserRow.vue";
 import RelationRoleRow from "./relation/RelationRoleRow.vue";
+import RelationUserGroupRow from "./relation/RelationUserGroupRow.vue";
 
 export default {
     components: {
@@ -213,6 +258,7 @@ export default {
         RelationGroupRow,
         RelationUserRow,
         RelationRoleRow,
+        RelationUserGroupRow,
     },
 
     data() {
@@ -272,6 +318,18 @@ export default {
                 this.prospectImport.roles.indexOf(role.id) >= 0
             );
         },
+
+        /**
+         * User group checked
+         * @param {*} group
+         */
+        isRelationUserGroupChecked(group) {
+            return (
+                this.prospectImport &&
+                this.prospectImport.user_groups &&
+                this.prospectImport.user_groups.indexOf(group.id) >= 0
+            );
+        },
     },
 
     computed: {
@@ -319,6 +377,20 @@ export default {
          *
          */
         filteredRelationGroups() {
+            const keyword = removeStringAccent(this.relationKeyword);
+
+            return this.groups.filter(
+                (group) => removeStringAccent(group.name).indexOf(keyword) >= 0
+            );
+        },
+
+        /**
+         * Same underlying groups as filteredRelationGroups (a Group can
+         * hold both prospects and users) — listed separately here because
+         * this section picks a group for its member *users* (assignment
+         * pool), not to tag the imported prospects.
+         */
+        filteredRelationUserGroups() {
             const keyword = removeStringAccent(this.relationKeyword);
 
             return this.groups.filter(
