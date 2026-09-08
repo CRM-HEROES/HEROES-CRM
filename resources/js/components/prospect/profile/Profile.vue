@@ -27,7 +27,7 @@
                 />
                 <icon
                     tag="a"
-                    class="fa fa-message icon-green"
+                    class="fa fa-envelope icon-green"
                     v-tooltip="$t('prospect.profile.menus.message')"
                     :icon-size="16"
                     @click.prevent.stop="manageMessages"

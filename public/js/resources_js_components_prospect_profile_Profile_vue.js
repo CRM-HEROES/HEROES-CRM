@@ -6192,7 +6192,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageInteractions, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.call')]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
     tag: "a",
-    "class": "fa fa-message icon-green",
+    "class": "fa fa-envelope icon-green",
     "icon-size": 16,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageMessages, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.message')]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
