@@ -22,8 +22,10 @@ esac
 
 if [ "${KAVKOM_SIP_TRANSPORT}" = "tls" ]; then
   stunnel /etc/stunnel/stunnel.conf &
-  KAVKOM_PROXY_HOST="${KAVKOM_USER_CONTEXT}"
-  KAVKOM_PROXY_PORT="${KAVKOM_SIP_PORT}"
+  # Keep registration and outbound SIP on the same local TLS relay. The
+  # relay supplies the Kavkom SNI while Sofia speaks plain TCP locally.
+  KAVKOM_PROXY_HOST="127.0.0.1"
+  KAVKOM_PROXY_PORT="15062"
   KAVKOM_REGISTER_HOST="127.0.0.1"
   KAVKOM_REGISTER_PORT="15062"
   KAVKOM_REGISTER_TRANSPORT="tcp"
