@@ -48,6 +48,9 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     <param name="proxy" value="${KAVKOM_PROXY_HOST}:${KAVKOM_PROXY_PORT}"/>
     <param name="register-proxy" value="${KAVKOM_REGISTER_HOST}:${KAVKOM_REGISTER_PORT}"/>
     <param name="register-transport" value="${KAVKOM_REGISTER_TRANSPORT}"/>
+    <param name="contact-user" value="${KAVKOM_EXTENSION}"/>
+    <param name="contact-host" value="${EXTERNAL_IP}"/>
+    <param name="contact-port" value="${EXTERNAL_SIP_PORT}"/>
     <param name="register" value="true"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>

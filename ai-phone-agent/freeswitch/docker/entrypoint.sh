@@ -45,6 +45,8 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
         <param name="username" value="${KAVKOM_EXTENSION}"/>
         <param name="password" value="${KAVKOM_PASSWORD}"/>
         <param name="realm" value="${KAVKOM_USER_CONTEXT}"/>
+        <param name="from-user" value="${KAVKOM_EXTENSION}"/>
+        <param name="from-domain" value="${KAVKOM_USER_CONTEXT}"/>
         <param name="proxy" value="127.0.0.1:15062"/>
         <param name="register-proxy" value="127.0.0.1:15062"/>
         <param name="register-transport" value="tcp"/>
@@ -52,6 +54,9 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
         <param name="expire-seconds" value="600"/>
         <param name="retry-seconds" value="30"/>
         <param name="caller-id-in-from" value="true"/>
+        <param name="contact-user" value="${KAVKOM_EXTENSION}"/>
+        <param name="contact-host" value="${EXTERNAL_IP}"/>
+        <param name="contact-port" value="${EXTERNAL_SIP_PORT}"/>
     </gateway>
 </include>
 EOF
