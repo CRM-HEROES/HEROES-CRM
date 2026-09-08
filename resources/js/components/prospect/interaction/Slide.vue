@@ -433,10 +433,6 @@
                                         )
                                     "
                                 ></div>
-                                <icon
-                                    class="fa fa-cog"
-                                    @click.stop="ringoverSetting"
-                                />
                             </item>
                             <div
                                 style="
@@ -492,11 +488,6 @@
                                         )
                                     "
                                 ></div>
-                                <icon
-                                    class="fa fa-cog hc-kavkom-settings-btn"
-                                    @click.stop.prevent="kavkomSetting"
-                                    title="Paramètres Kavkom"
-                                />
                             </item>
                             <div class="hc-kavkom-call-panel">
                                 <div class="hc-kavkom-call-card">
@@ -818,12 +809,6 @@
     background: #0d6efd !important;
     border-color: #0d6efd !important;
 }
-.hc-kavkom-settings-btn {
-    position: relative;
-    z-index: 20;
-    cursor: pointer;
-    pointer-events: auto !important;
-}
 </style>
 
 <script>
@@ -832,10 +817,8 @@ import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
 import ApiService from "@/apis/api.service";
 
-import { OPEN_MODAL } from "@/actions/modal";
 import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
-import { GET_USER_SETTING } from "@/actions/user/setting";
 import {
     FETCH_PROSPECT_INTERACTIONS,
     ADD_PROSPECT_INTERACTION,
@@ -877,7 +860,6 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
-            ringoverConfigured: false,
             twilioConfigured: false,
             callingViaKavkom: false,
             kavkomCallMessage: "",
@@ -907,12 +889,7 @@ export default {
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
     },
 
-    mounted() {
-        window.addEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
-    },
-
     beforeDestroy() {
-        window.removeEventListener("hc:kavkom-settings-saved", this.openKavkomAfterSave);
         this.stopKavkomDebugPolling();
     },
 
@@ -950,21 +927,11 @@ export default {
         },
 
         /**
-         * Fetch each telephony operator's configuration so the call
-         * menu can mark the ones that are ready to use.
+         * Kavkom/Ringover readiness comes from the "Lignes" configured for
+         * this project (see kavkomConfigured/ringoverConfigured); only
+         * Twilio has no per-line concept and still needs its own check.
          */
         async fetchOperatorsConfigStatus() {
-            store.dispatch(GET_USER_SETTING, "kavkom");
-
-            try {
-                const { data } = await ApiService.get(
-                    `project/${this.project.slug}/setting/ringover/check`
-                );
-                this.ringoverConfigured = !!data;
-            } catch (error) {
-                this.ringoverConfigured = false;
-            }
-
             try {
                 const { data } = await ApiService.get("settings/twilio/status");
                 this.twilioConfigured = !!data.configured;
@@ -1031,10 +998,6 @@ export default {
                 return;
             }
             this.triggerKavkomCall(number);
-        },
-
-        kavkomSetting() {
-            store.commit(OPEN_MODAL, "setting-kavkom");
         },
 
         interactionViaTwilio(number) {
@@ -1296,23 +1259,6 @@ export default {
                 : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
         },
 
-        openKavkomAfterSave() {
-            this.tab = 1;
-            this.frameTab = 2;
-
-            // The diagnostic can test unsaved fields. After saving, replace
-            // the old SIP registration with the extension just persisted.
-            this.kavkomReady = false;
-
-            if (this.interaction && this.interaction.number) {
-                this.triggerKavkomCall(this.interaction.number);
-            }
-
-            this.$nextTick(() => {
-                this.$refs.kavkomWebphone?.refreshWebphone();
-            });
-        },
-
         /**
          *
          */
@@ -1452,10 +1398,6 @@ export default {
                 duration: 5000,
             });
         },
-
-        ringoverSetting() {
-            store.commit(OPEN_MODAL, "setting-ringover");
-        },
     },
 
     watch: {
@@ -1508,22 +1450,28 @@ export default {
             "prospectsSelected",
             "leftSlideOpen",
             "can",
-            "userSettings",
+            "lines",
         ]),
 
         /**
-         *
+         * A configured Kavkom "Line" requires all fields, enforced by
+         * LineController's validation — its mere existence, assigned to
+         * this agent, is enough to know the SIP identity is ready.
          */
         kavkomConfigured() {
-            const setting = this.userSettings.kavkom;
-
-            return !!(
-                setting &&
-                setting.api_token &&
-                setting.domain_uuid &&
-                setting.phone_number &&
-                setting.extension
+            return this.lines.some(
+                (line) => line.operator === "kavkom" && line.user_id === this.user.id
             );
+        },
+
+        /**
+         * Ringover's live widget authenticates itself (Ringover's own
+         * browser SSO) rather than using the CRM-stored config, so any
+         * configured Ringover line in the project is enough — it isn't
+         * tied to a specific agent the way Kavkom's SIP identity is.
+         */
+        ringoverConfigured() {
+            return this.lines.some((line) => line.operator === "ringover");
         },
 
         currentProspect() {

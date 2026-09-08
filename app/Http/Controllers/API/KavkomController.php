@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Models\UserSetting;
+use App\Models\Line;
 use App\Models\KavkomCall;
 use App\Services\KavkomService;
 use Illuminate\Http\Request;
@@ -361,15 +361,20 @@ class KavkomController extends Controller
     }
 }
 
+    /**
+     * A Kavkom "Line" (project setting > Lignes) assigned to this agent
+     * holds their SIP identity. An agent has one Kavkom identity regardless
+     * of which project they're calling from, so this is intentionally not
+     * scoped by project — matching the previous per-user setting it replaces.
+     */
     protected function getUserKavkomConfig(Request $request): ?array
     {
-        $setting = UserSetting::query()
-            ->whereNull('project_id')
+        $line = Line::query()
+            ->where('operator', 'kavkom')
             ->where('user_id', $request->user()->id)
-            ->where('key', 'kavkom')
             ->first();
 
-        $config = $setting ? (array) $setting->value : [];
+        $config = $line ? (array) $line->config : [];
 
         if (empty($config['api_token']) || empty($config['domain_uuid'])) {
             return null;

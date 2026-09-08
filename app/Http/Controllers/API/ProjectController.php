@@ -107,7 +107,7 @@ class ProjectController extends Controller
                 // (API tokens, etc.) and must not be broadcast
                 // to every project member on page load.
                 $query
-                    ->select('id', 'project_id', 'name', 'operator')
+                    ->select('id', 'project_id', 'name', 'operator', 'user_id')
                     ->orderBy('name');
             },
             'menus' => function($query) {

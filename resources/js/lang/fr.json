@@ -1842,6 +1842,10 @@
         },
         "configuration": {
             "title": "Configuration"
+        },
+        "assign_to": {
+            "title": "Assigner à {user}",
+            "pick_title": "Assigner à un agent"
         }
     },
 
