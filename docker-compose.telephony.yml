@@ -13,10 +13,6 @@ services:
     container_name: telephony-freeswitch
     restart: unless-stopped
     network_mode: host
-    volumes:
-      - ./docker/telephony/freeswitch/entrypoint.sh:/entrypoint.sh:ro
-      - ./docker/telephony/freeswitch/kavkom-register.py:/usr/local/bin/kavkom-register.py:ro
-      - ./docker/telephony/freeswitch/stunnel/stunnel.conf:/etc/stunnel/stunnel.conf:ro
     environment:
       KAVKOM_EXTENSION: ${KAVKOM_EXTENSION}
       KAVKOM_PASSWORD: ${KAVKOM_PASSWORD}
