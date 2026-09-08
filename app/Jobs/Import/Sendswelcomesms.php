@@ -46,7 +46,12 @@ trait SendsWelcomeSms
         $query = $import
             ->prospects()
             ->whereNotNull('mobile_phone_number')
-            ->where('mobile_phone_number', '!=', '');
+            ->where('mobile_phone_number', '!=', '')
+            // Rows flagged as duplicates of an already-existing prospect
+            // (see ImportProspects::findExistingDuplicate) are, by
+            // definition, someone already known to the CRM — sending them
+            // a "welcome" SMS as if newly acquired would be wrong.
+            ->whereNull('duplicate_group_id');
 
         // Batches of 50 concurrent requests at a time: enough to get
         // a big speedup without overwhelming the provider's API

@@ -81,7 +81,8 @@ class ImportProspects implements ShouldQueue
     protected $existingEmails = [];
     protected $existingMobiles = [];
     protected $suspiciousRowsCount = 0;
-    protected $updatedDuplicatesCount = 0;
+    protected $flaggedDuplicatesCount = 0;
+    protected $duplicateGroupCache = [];
     protected $incremental = false;
 
     /**
@@ -90,10 +91,17 @@ class ImportProspects implements ShouldQueue
      * @param  bool  $incremental  When true (auto-sync of a Google Sheets
      *   import): don't wipe and recreate the import's own prospects on
      *   every run — instead recognise them as "already imported" so a row
-     *   already present is skipped (or its meta merged if it changed) and
-     *   only genuinely new rows are inserted. False (default) preserves
+     *   already present (matched by email/mobile against a prospect this
+     *   same import already created on a previous sync) is simply skipped,
+     *   and only genuinely new rows are inserted. False (default) preserves
      *   the existing "start fresh from this file" behaviour used by
      *   manual/file imports and the "Re importer" button.
+     *
+     *   Either way, a row matching a prospect that belongs to a *different*
+     *   import (or a manually created one) is a real duplicate against
+     *   existing CRM data: the existing prospect is never modified, but the
+     *   row is still imported and flagged as a duplicate of it — see
+     *   findExistingDuplicate() / linkDuplicateGroup().
      *
      * @return void
      */
@@ -406,16 +414,38 @@ class ImportProspects implements ShouldQueue
                     continue;
                 }
 
-                // Skip if prospect is a duplicate (by email or phone) —
-                // but still refresh the existing prospect's meta answers
-                // (e.g. the recontact date) instead of silently dropping
-                // the new data, see updateExistingDuplicateProspect().
-                if ($this->isDuplicateProspect($prospect)) {
-                    if ($this->updateExistingDuplicateProspect($prospect)) {
-                        ++$this->updatedDuplicatesCount;
+                // Skip rows that repeat an earlier row within this same
+                // sync run (e.g. the same lead pasted twice in the source
+                // spreadsheet) — not a mismatch with the database, just an
+                // accidental repeat in this one file, so only the first
+                // occurrence is kept.
+                if ($this->isRepeatedWithinFile($prospect)) {
+                    continue;
+                }
+
+                // Compare the row to prospects already present in the
+                // database (by email or mobile number).
+                $duplicate = $this->findExistingDuplicate($prospect);
+
+                if ($duplicate) {
+                    // Matches a prospect this same import already synced on
+                    // a previous run: the same lead reappearing in the
+                    // sheet, already accounted for — nothing to do.
+                    if ($duplicate['sameImport']) {
+                        continue;
                     }
 
-                    continue;
+                    // Matches a prospect from elsewhere (another import, a
+                    // manually created lead, ...): a real duplicate against
+                    // existing CRM data. The existing record is never
+                    // modified — it stays the authoritative version — but
+                    // the incoming row is still imported so no data from
+                    // the sheet is lost, flagged so it surfaces at the top
+                    // of the duplicates list for manual review.
+                    $prospect['duplicate_id'] = $duplicate['id'];
+                    $prospect['duplicate_group_id'] = $this->linkDuplicateGroup($duplicate['id'], $duplicate['fields']);
+                    $prospect['duplicate_fields'] = $duplicate['fields'];
+                    ++$this->flaggedDuplicatesCount;
                 }
 
                 // Add prospect to the array of prospects to create
@@ -487,8 +517,9 @@ class ImportProspects implements ShouldQueue
         ]);
 
         // Notifier SMS de bienvenue :
-        // envoyé une fois l'import terminé et les doublons
-        // écartés (cf. isDuplicateProspect ci-dessus).
+        // envoyé une fois l'import terminé — les prospects flagués comme
+        // doublons (cf. findExistingDuplicate ci-dessus) sont exclus de cet
+        // envoi par sendWelcomeSms() elle-même (ils existent déjà en base).
         $this->sendWelcomeSms($this->import);
 
         ImportFinished::dispatch($this->import->refresh());
@@ -498,7 +529,7 @@ class ImportProspects implements ShouldQueue
             'project_id' => $this->import->project_id,
             'rows_count' => $rowsCount,
             'suspicious_rows_count' => $this->suspiciousRowsCount,
-            'updated_duplicates_count' => $this->updatedDuplicatesCount,
+            'flagged_duplicates_count' => $this->flaggedDuplicatesCount,
         ]);
 
         // Send notification to the import's creator
@@ -844,11 +875,11 @@ class ImportProspects implements ShouldQueue
             ->whereNull('deleted_at')
             ->whereNotNull('email')
             ->where('email', '<>', '')
-            ->select('id', 'email')
+            ->select('id', 'email', 'import_id')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$emails) {
                 foreach ($rows as $p) {
-                    $emails[strtolower(trim($p->email))] = $p->id;
+                    $emails[strtolower(trim($p->email))] = ['id' => $p->id, 'import_id' => $p->import_id];
                 }
             });
 
@@ -875,13 +906,13 @@ class ImportProspects implements ShouldQueue
             ->whereNull('deleted_at')
             ->whereNotNull('mobile_phone_number')
             ->where('mobile_phone_number', '<>', '')
-            ->select('id', 'mobile_phone_number')
+            ->select('id', 'mobile_phone_number', 'import_id')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$mobiles) {
                 foreach ($rows as $p) {
                     $key = $this->normalizePhone($p->mobile_phone_number);
                     if ($key !== '') {
-                        $mobiles[$key] = $p->id;
+                        $mobiles[$key] = ['id' => $p->id, 'import_id' => $p->import_id];
                     }
                 }
             });
@@ -936,30 +967,18 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
-     * Check if prospect is a duplicate by email or phone number
-     * Tracks seen values to prevent duplicates within the import
+     * Rows repeated within this same sync/import run (e.g. the same lead
+     * pasted twice in the source spreadsheet) — not a comparison against
+     * the database, just an accidental repeat in this one file, so only
+     * the first occurrence is kept. Tracks seen values as it goes.
      */
-    protected function isDuplicateProspect($prospect)
+    protected function isRepeatedWithinFile($prospect)
     {
-        // Email déjà présent en base → on ignore la ligne
-        if (!empty($prospect['email'])
-            && isset($this->existingEmails[strtolower(trim($prospect['email']))])) {
-            return true;
-        }
-
-        // Mobile déjà présent en base → on ignore la ligne
-        if (!empty($prospect['mobile_phone_number'])) {
-            $mobile = $this->normalizePhone($prospect['mobile_phone_number']);
-            if ($mobile !== '' && isset($this->existingMobiles[$mobile])) {
-                return true;
-            }
-        }
-
         // Check email
         if (!empty($prospect['email'])) {
             $email = strtolower(trim($prospect['email']));
             if (in_array($email, $this->seenDuplicates['email'])) {
-                return true; // Duplicate found
+                return true;
             }
             $this->seenDuplicates['email'][] = $email;
         }
@@ -968,7 +987,7 @@ class ImportProspects implements ShouldQueue
         if (!empty($prospect['phone_number'])) {
             $phone = trim($prospect['phone_number']);
             if (in_array($phone, $this->seenDuplicates['phone'])) {
-                return true; // Duplicate found
+                return true;
             }
             $this->seenDuplicates['phone'][] = $phone;
         }
@@ -977,84 +996,109 @@ class ImportProspects implements ShouldQueue
         if (!empty($prospect['mobile_phone_number'])) {
             $mobile = trim($prospect['mobile_phone_number']);
             if (in_array($mobile, $this->seenDuplicates['mobile'])) {
-                return true; // Duplicate found
+                return true;
             }
             $this->seenDuplicates['mobile'][] = $mobile;
         }
 
-        return false; // Not a duplicate
+        return false;
     }
 
     /**
-     * A lead that already exists in the CRM (matched by email or mobile)
-     * is never re-created, but re-importing it must still refresh its
-     * answers — e.g. "quand souhaitez-vous être recontacté" — otherwise a
-     * corrected/updated sheet silently stops updating known leads, which
-     * has caused missed appointments in production. Only meta fields are
-     * merged in (never email/phone/name) to avoid the identity fields
-     * themselves being touched, and suspicious (likely column-shifted)
-     * rows are never merged in, to avoid corrupting an already-good
-     * existing prospect with garbled data.
+     * Compares the row being imported to prospects already present in the
+     * database (email or mobile match) — this is the actual "duplicate vs.
+     * existing CRM data" check the pre-import control is built on.
      *
-     * The existing prospect is also reattributed to this import
-     * (import_id) so it is treated as a fresh lead from this import —
-     * visible under its "with this import" filter, and picked up by the
-     * end-of-job automatic assignment sweep (assignUnassignedProspects)
-     * if it currently has no assigned user, instead of only being
-     * caught by the next 5-minute scheduled sweep.
+     * Returns null when nothing matches. Otherwise returns the id of the
+     * matching existing prospect, which field(s) matched, and whether that
+     * existing prospect belongs to this very import — meaning the "match"
+     * is simply this same lead reappearing on a later sync, not a
+     * duplicate to flag (see the caller in handle()).
      */
-    protected function updateExistingDuplicateProspect($prospect)
+    protected function findExistingDuplicate($prospect)
     {
-        if ($this->isSuspiciousProspect($prospect)) {
-            return false;
-        }
-
-        $existingId = null;
+        $existing = null;
+        $matchedFields = [];
 
         if (!empty($prospect['email'])) {
-            $existingId = $this->existingEmails[strtolower(trim($prospect['email']))] ?? null;
+            $email = strtolower(trim($prospect['email']));
+            if (isset($this->existingEmails[$email])) {
+                $existing = $this->existingEmails[$email];
+                $matchedFields[] = 'email';
+            }
         }
 
-        if (!$existingId && !empty($prospect['mobile_phone_number'])) {
+        if (!empty($prospect['mobile_phone_number'])) {
             $mobile = $this->normalizePhone($prospect['mobile_phone_number']);
-            $existingId = $mobile !== '' ? ($this->existingMobiles[$mobile] ?? null) : null;
+            if ($mobile !== '' && isset($this->existingMobiles[$mobile])) {
+                $mobileMatch = $this->existingMobiles[$mobile];
+
+                if ($existing === null) {
+                    $existing = $mobileMatch;
+                }
+
+                // Only credit the mobile match to duplicate_fields if it
+                // points at the same existing prospect as the email match
+                // (the rare case where email and mobile match two
+                // different existing prospects is left as an email-only
+                // match against the first one found).
+                if ($existing['id'] === $mobileMatch['id']) {
+                    $matchedFields[] = 'mobile_phone_number';
+                }
+            }
         }
 
-        if (!$existingId) {
-            return false;
+        if ($existing === null) {
+            return null;
         }
 
-        $existing = DB::table('prospects')->where('id', $existingId)->first(['meta', 'import_id']);
+        return [
+            'id' => $existing['id'],
+            'fields' => $matchedFields,
+            'sameImport' => (int) $existing['import_id'] === (int) $this->import->id,
+        ];
+    }
 
-        if (!$existing) {
-            return false;
+    /**
+     * Links a row that duplicates an already-existing prospect into that
+     * prospect's duplicate cluster, WITHOUT touching any of the existing
+     * prospect's business data (name, email, phone, meta) — the existing
+     * record stays fully authoritative. Only the bookkeeping columns that
+     * drive the "duplicates first" list ordering (duplicate_group_id) and
+     * per-cell highlighting (duplicate_fields) are updated, mirroring the
+     * convention already used by App\Services\ProspectDuplicateChecker for
+     * manually created/edited prospects: the group id is the lowest id in
+     * the cluster, i.e. the existing prospect's own id the first time it
+     * is flagged (it is always older/lower than the row being inserted).
+     *
+     * @return int the duplicate_group_id to store on the new row
+     */
+    protected function linkDuplicateGroup($existingId, array $matchedFields)
+    {
+        $firstTimeThisRun = !isset($this->duplicateGroupCache[$existingId]);
+
+        if ($firstTimeThisRun) {
+            $existing = DB::table('prospects')->where('id', $existingId)->first(['duplicate_group_id', 'duplicate_fields']);
+
+            $this->duplicateGroupCache[$existingId] = [
+                'group_id' => ($existing && $existing->duplicate_group_id) ? (int) $existing->duplicate_group_id : $existingId,
+                'fields' => $existing ? (json_decode($existing->duplicate_fields ?: '[]', true) ?: []) : [],
+            ];
         }
 
-        $newMeta = array_filter($prospect['meta'] ?? [], function ($value) {
-            return $value !== null && $value !== '';
-        });
+        $cache = &$this->duplicateGroupCache[$existingId];
+        $mergedFields = array_values(array_unique(array_merge($cache['fields'], $matchedFields)));
 
-        $existingMeta = json_decode($existing->meta ?: '{}', true) ?: [];
-        $mergedMeta = array_merge($existingMeta, $newMeta);
-
-        $update = ['updated_at' => $this->date];
-
-        if ($mergedMeta != $existingMeta) {
-            $update['meta'] = json_encode($mergedMeta);
+        if ($firstTimeThisRun || $mergedFields != $cache['fields']) {
+            DB::table('prospects')->where('id', $existingId)->update([
+                'duplicate_group_id' => $cache['group_id'],
+                'duplicate_fields' => json_encode($mergedFields),
+            ]);
         }
 
-        if ((int) $existing->import_id !== (int) $this->import->id) {
-            $update['import_id'] = $this->import->id;
-        }
+        $cache['fields'] = $mergedFields;
 
-        if (count($update) === 1) {
-            // Neither meta nor import attribution actually changed.
-            return false;
-        }
-
-        DB::table('prospects')->where('id', $existingId)->update($update);
-
-        return true;
+        return $cache['group_id'];
     }
 
     /**
@@ -1160,12 +1204,22 @@ class ImportProspects implements ShouldQueue
     protected function newProspect()
     {
         $prospect = [
-            'meta'           => [],
-            'import_id'      => $this->import->id,
-            'project_id'     => $this->import->project_id,
-            'creator_id'     => $this->import->creator_id,
-            'created_at'     => $this->date,
-            'updated_at'     => $this->date,
+            'meta'               => [],
+            'import_id'          => $this->import->id,
+            'project_id'         => $this->import->project_id,
+            'creator_id'         => $this->import->creator_id,
+            // Default to "not a duplicate" — set by findExistingDuplicate()
+            // / linkDuplicateGroup() below when the row matches a prospect
+            // already present in the database. Declared here (rather than
+            // only when a duplicate is found) so every row in a batch
+            // insert has the exact same set of columns — DB::table()
+            // ->insert() aligns values positionally per row, so rows with
+            // different keys would silently corrupt the batch.
+            'duplicate_id'       => null,
+            'duplicate_group_id' => null,
+            'duplicate_fields'   => null,
+            'created_at'         => $this->date,
+            'updated_at'         => $this->date,
         ];
 
         foreach ($this->prospectRelationsHandlers as $key => $handler) {
@@ -1353,6 +1407,9 @@ class ImportProspects implements ShouldQueue
         // Get prospects data
         $prospects = array_map(function($prospect) {
             $prospect['meta'] = json_encode($prospect['meta']);
+            $prospect['duplicate_fields'] = $prospect['duplicate_fields'] !== null
+                ? json_encode($prospect['duplicate_fields'])
+                : null;
 
             foreach ($this->prospectRelationsHandlers as $key => $handler) {
                 unset($prospect[$key]);
