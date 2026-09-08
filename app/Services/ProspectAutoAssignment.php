@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\ProspectUserAttached;
 use App\Models\Group;
 use App\Models\Import;
+use App\Models\Interaction;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\User;
@@ -132,6 +133,7 @@ class ProspectAutoAssignment
             // whole batch.
             $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
             $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
             $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
             if (!$this->assignIfStillUnassigned($prospect, $candidate)) {
@@ -175,6 +177,7 @@ class ProspectAutoAssignment
         $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
         $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
         $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+        $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
         $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
         return $this->assignIfStillUnassigned($prospect, $candidate);
@@ -444,6 +447,43 @@ class ProspectAutoAssignment
     }
 
     /**
+     * Third and last filter in the pool: agents currently on a phone call
+     * are deprioritized in favor of a free colleague. "On a call" means an
+     * Interaction they created hasn't reached a terminal status yet — no
+     * scheduled job reconciles a call whose tab crashed or lost network
+     * before reporting hangup, so an interaction is only treated as "still
+     * ongoing" within a 15-minute window; past that it's assumed abandoned
+     * rather than leaving the agent permanently marked busy. As with the
+     * country filter, a lead is never left unassigned for lack of a free
+     * agent: if everyone in the pool is busy, the full pool is returned
+     * unfiltered and the normal load-based pick decides instead.
+     */
+    protected function filterAvailableUsers($users)
+    {
+        if ($users->isEmpty()) {
+            return $users;
+        }
+
+        $busyUserIds = Interaction::query()
+            ->whereIn('creator_id', $users->pluck('id')->all())
+            ->whereNotIn('status', ['hangup', 'ended'])
+            ->where('created_at', '>=', Carbon::now()->subMinutes(15))
+            ->pluck('creator_id')
+            ->unique()
+            ->all();
+
+        if (empty($busyUserIds)) {
+            return $users;
+        }
+
+        $available = $users->reject(function (User $user) use ($busyUserIds) {
+            return in_array($user->id, $busyUserIds, true);
+        })->values();
+
+        return $available->isEmpty() ? $users : $available;
+    }
+
+    /**
      * IDs of users currently "off" — not just in any ongoing RDV, but in an
      * ongoing event that is either longer than 1 day (an absence/leave
      * rather than a short appointment) or booked on the "Off" calendar.
@@ -537,6 +577,7 @@ class ProspectAutoAssignment
             $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
             $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
             $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
             $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
             DB::table('prospect_user')
