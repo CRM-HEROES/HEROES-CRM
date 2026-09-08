@@ -37,6 +37,12 @@ else
   KAVKOM_REGISTER_TRANSPORT="${KAVKOM_SIP_TRANSPORT}"
 fi
 
+# FreeSWITCH's native gateway registration is broken against this Kavkom tenant
+# because it forces the synthetic gateway contact name (gw+kavkom). We therefore
+# disable the native Sofia registration and run the proven Digest REGISTER flow
+# from a dedicated Python process that matches the working raw test.
+KAVKOM_REGISTER_ENABLED="${KAVKOM_REGISTER_ENABLED:-false}"
+
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
 <include>
   <gateway name="kavkom">
@@ -51,7 +57,7 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     <param name="contact-user" value="${KAVKOM_EXTENSION}"/>
     <param name="contact-host" value="${EXTERNAL_IP}"/>
     <param name="contact-port" value="${EXTERNAL_SIP_PORT}"/>
-    <param name="register" value="true"/>
+    <param name="register" value="${KAVKOM_REGISTER_ENABLED}"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>
     <param name="caller-id-in-from" value="true"/>
@@ -101,6 +107,11 @@ if ! grep -q 'profile name="ai-agent"' "$CONF_FILE"; then
       <param name="caller-controls" value="none"/>\
       <param name="moderator-controls" value="none"/>\
     </profile>' "$CONF_FILE"
+fi
+
+if [ "${KAVKOM_REGISTER_ENABLED:-false}" = "true" ]; then
+  echo "[KAVKOM] Starting standalone registrar process"
+  python3 -u /usr/local/bin/kavkom-register.py >> /var/log/kavkom-register.log 2>&1 &
 fi
 
 exec "$@"
