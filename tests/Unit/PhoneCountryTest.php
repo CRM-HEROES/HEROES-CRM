@@ -47,4 +47,18 @@ class PhoneCountryTest extends TestCase
         $this->assertNull(PhoneCountry::detect('+15551234567'));
         $this->assertNull(PhoneCountry::detect('12345'));
     }
+
+    public function test_it_detects_countries_worldwide_from_an_explicit_country_code(): void
+    {
+        $this->assertSame('US', PhoneCountry::detect('+12025551234'));
+        $this->assertSame('MA', PhoneCountry::detect('+212612345678'));
+        $this->assertSame('DE', PhoneCountry::detect('+491512345678'));
+        $this->assertSame('CI', PhoneCountry::detect('+2250102030405'));
+    }
+
+    public function test_it_returns_null_for_a_local_number_outside_belgium_or_france(): void
+    {
+        // No country code and not a 9/10-digit BE/FR shape: undecidable.
+        $this->assertNull(PhoneCountry::detect('020 7946 0958'));
+    }
 }

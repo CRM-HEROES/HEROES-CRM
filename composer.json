@@ -14,6 +14,7 @@
         "box/spout": "^3.3",
         "cesargb/laravel-magiclink": "^2.20",
         "docusign/esign-client": "^6.17",
+        "giggsey/libphonenumber-for-php": "^8.13",
         "google/apiclient": "^2.15",
         "guzzlehttp/guzzle": "^7.2",
         "jenssegers/agent": "^2.6",

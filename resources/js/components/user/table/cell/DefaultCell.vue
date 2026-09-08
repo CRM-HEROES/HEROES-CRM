@@ -26,21 +26,11 @@
         />
         <span v-text="label"></span>
     </label>
-    <select
+    <phone-country-select
         v-else-if="field == 'phone_country'"
-        class="hc-default-cell-input"
-        :value="value || ''"
+        v-model="value"
         :disabled="disabled"
-        @change="value = $event.target.value"
-    >
-        <option value="">—</option>
-        <option
-            v-for="phoneCountry in phoneCountries"
-            :key="phoneCountry.code"
-            :value="phoneCountry.code"
-            v-text="`${phoneCountry.flag} ${phoneCountry.label} (+${phoneCountry.dial_code})`"
-        ></option>
-    </select>
+    />
     <label v-else-if="field == 'email'" class="hc-default-cell-label">
         <input
             type="email"
@@ -109,9 +99,13 @@ import ProjectUserService from "@/apis/project/user";
 
 import { UPDATE_USER } from "@/actions/project/user";
 
-import phoneCountries from "@/constants/phoneCountries";
+import PhoneCountrySelect from "@/components/PhoneCountrySelect.vue";
 
 export default {
+    components: {
+        PhoneCountrySelect,
+    },
+
     props: {
         /**
          * Project
@@ -276,10 +270,6 @@ export default {
 
     computed: {
         ...mapGetters(["project"]),
-
-        phoneCountries() {
-            return phoneCountries;
-        },
 
         /**
          * When value is updated

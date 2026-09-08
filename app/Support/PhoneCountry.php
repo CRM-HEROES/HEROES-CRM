@@ -2,26 +2,25 @@
 
 namespace App\Support;
 
+use libphonenumber\NumberParseException;
+use libphonenumber\PhoneNumberUtil;
+
 /**
- * Detects whether a phone number is Belgian or French, to route imported
- * leads to agents configured for that country (ProspectAutoAssignment).
- * A bare local number (no country code) is only classifiable because
- * Belgium and France don't overlap on every prefix: France has no 9-digit
- * numbers, and Belgium's only 10-digit prefix is mobile "04" — everything
- * else 10-digit is unambiguously French. The exception is 10-digit numbers
- * starting with "04" (Belgian mobile vs. French Provence landline), which
- * is genuinely undecidable without the country code and is reported as
- * unknown rather than guessed.
+ * Detects which country a phone number belongs to, to route imported leads
+ * to agents configured for that country (ProspectAutoAssignment). Only a
+ * number written with an explicit country code (+33..., 0033..., etc.) can
+ * be classified worldwide — libphonenumber has no way to guess a country
+ * from a bare local number without already assuming one, and most countries'
+ * local formats overlap with at least one other country's. A small,
+ * hand-verified fallback covers Belgium/France local numbers only, since
+ * this CRM's leads were historically BE/FR before going international and
+ * those two happen not to overlap (barring one genuinely ambiguous prefix).
  */
 class PhoneCountry
 {
-    public const COUNTRIES = [
-        'BE' => ['flag' => '🇧🇪', 'label' => 'Belgique', 'dial_code' => '32'],
-        'FR' => ['flag' => '🇫🇷', 'label' => 'France', 'dial_code' => '33'],
-    ];
-
     /**
-     * Returns 'BE', 'FR', or null if the country can't be determined.
+     * Returns an ISO 3166-1 alpha-2 country code, or null if it can't be
+     * determined.
      */
     public static function detect(?string $number): ?string
     {
@@ -30,20 +29,35 @@ class PhoneCountry
             return null;
         }
 
-        $value = preg_replace('/[\s.\-()]+/', '', $value);
+        $normalized = preg_replace('/[\s.\-()]+/', '', $value);
 
-        if (str_starts_with($value, '+32') || str_starts_with($value, '0032')) {
-            return 'BE';
+        if (!str_starts_with($normalized, '+') && !str_starts_with($normalized, '00')) {
+            return self::detectFromBelgianOrFrenchLocalFormat($normalized);
         }
 
-        if (str_starts_with($value, '+33') || str_starts_with($value, '0033')) {
-            return 'FR';
-        }
+        $e164 = str_starts_with($normalized, '00')
+            ? '+' . substr($normalized, 2)
+            : $normalized;
 
-        if (str_starts_with($value, '+') || str_starts_with($value, '00')) {
+        try {
+            $util = PhoneNumberUtil::getInstance();
+            $parsed = $util->parse($e164, null);
+
+            return $util->getRegionCodeForNumber($parsed) ?: null;
+        } catch (NumberParseException $exception) {
             return null;
         }
+    }
 
+    /**
+     * France has no 9-digit numbers, and Belgium's only 10-digit prefix is
+     * mobile "04" — everything else 10-digit is unambiguously French. The
+     * exception is 10-digit numbers starting with "04" (Belgian mobile vs.
+     * French Provence landline), which is genuinely undecidable without the
+     * country code and is reported as unknown rather than guessed.
+     */
+    protected static function detectFromBelgianOrFrenchLocalFormat(string $value): ?string
+    {
         $digits = preg_replace('/\D+/', '', $value);
 
         if (strlen($digits) === 9) {
