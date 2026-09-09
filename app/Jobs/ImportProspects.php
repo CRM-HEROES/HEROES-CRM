@@ -79,11 +79,13 @@ class ImportProspects implements ShouldQueue
     protected $emptyProspect;
     protected $seenDuplicates = ['email' => [], 'phone' => [], 'mobile' => []];
     protected $existingEmails = [];
+    protected $existingPhones = [];
     protected $existingMobiles = [];
     protected $suspiciousRowsCount = 0;
     protected $flaggedDuplicatesCount = 0;
     protected $duplicateGroupCache = [];
     protected $incremental = false;
+    protected $acceptedProspectIndexes = [];
 
     /**
      * Create a new job instance.
@@ -91,17 +93,14 @@ class ImportProspects implements ShouldQueue
      * @param  bool  $incremental  When true (auto-sync of a Google Sheets
      *   import): don't wipe and recreate the import's own prospects on
      *   every run — instead recognise them as "already imported" so a row
-     *   already present (matched by email/mobile against a prospect this
-     *   same import already created on a previous sync) is simply skipped,
+        *   already present (matched by email/phone/mobile against a prospect this
+        *   same import already created on a previous sync) is simply skipped,
      *   and only genuinely new rows are inserted. False (default) preserves
      *   the existing "start fresh from this file" behaviour used by
      *   manual/file imports and the "Re importer" button.
      *
-     *   Either way, a row matching a prospect that belongs to a *different*
-     *   import (or a manually created one) is a real duplicate against
-     *   existing CRM data: the existing prospect is never modified, but the
-     *   row is still imported and flagged as a duplicate of it — see
-     *   findExistingDuplicate() / linkDuplicateGroup().
+    *   Either way, a row matching any existing prospect is ignored so the
+    *   database remains authoritative and no duplicate is created.
      *
      * @return void
      */
@@ -121,8 +120,9 @@ class ImportProspects implements ShouldQueue
 
         $this->emptyProspect = $this->newProspect();
 
-        // Emails / mobiles déjà présents en base (pour éviter les répétitions)
+        // Contact details already present in the database (to avoid duplicates)
         $this->existingEmails = $this->getExistingEmails();
+        $this->existingPhones = $this->getExistingPhones();
         $this->existingMobiles = $this->getExistingMobiles();
     }
 
@@ -389,6 +389,7 @@ class ImportProspects implements ShouldQueue
 
                 // Convert import row to prospect data
                 $prospect = $this->importRowToProspect($row, $rowsCount);
+                $this->normalizeProspectPhones($prospect);
 
                 // Skip rows whose email/phone don't look like an email/phone
                 // at all (columns shifted in the source spreadsheet) instead
@@ -424,28 +425,18 @@ class ImportProspects implements ShouldQueue
                 }
 
                 // Compare the row to prospects already present in the
-                // database (by email or mobile number).
+                // database (by email, phone, or mobile number). The database is
+                // authoritative: never create an incoming copy of an
+                // existing prospect, regardless of which import owns it.
                 $duplicate = $this->findExistingDuplicate($prospect);
 
                 if ($duplicate) {
-                    // Matches a prospect this same import already synced on
-                    // a previous run: the same lead reappearing in the
-                    // sheet, already accounted for — nothing to do.
-                    if ($duplicate['sameImport']) {
-                        continue;
-                    }
-
-                    // Matches a prospect from elsewhere (another import, a
-                    // manually created lead, ...): a real duplicate against
-                    // existing CRM data. The existing record is never
-                    // modified — it stays the authoritative version — but
-                    // the incoming row is still imported so no data from
-                    // the sheet is lost, flagged so it surfaces at the top
-                    // of the duplicates list for manual review.
-                    $prospect['duplicate_id'] = $duplicate['id'];
-                    $prospect['duplicate_group_id'] = $this->linkDuplicateGroup($duplicate['id'], $duplicate['fields']);
-                    $prospect['duplicate_fields'] = $duplicate['fields'];
-                    ++$this->flaggedDuplicatesCount;
+                    // This applies both to the same import during an
+                    // incremental Google Sheets sync and to prospects owned
+                    // by another import or created manually. Keep the
+                    // existing database record authoritative and ignore the
+                    // incoming row completely.
+                    continue;
                 }
 
                 // Add prospect to the array of prospects to create
@@ -887,6 +878,38 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
+     * Preload phone numbers already present in the project so they cannot be
+     * recreated by a file import or an incremental Google Sheets sync.
+     */
+    protected function getExistingPhones()
+    {
+        $phones = [];
+
+        DB::table('prospects')
+            ->where('project_id', $this->import->project_id)
+            ->when(!$this->incremental, function ($q) {
+                $q->where(function ($q) {
+                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
+                });
+            })
+            ->whereNull('deleted_at')
+            ->whereNotNull('phone_number')
+            ->where('phone_number', '<>', '')
+            ->select('id', 'phone_number', 'import_id')
+            ->orderBy('id')
+            ->chunk(5000, function ($rows) use (&$phones) {
+                foreach ($rows as $p) {
+                    $key = $this->normalizePhone($p->phone_number);
+                    if ($key !== '') {
+                        $phones[$key] = ['id' => $p->id, 'import_id' => $p->import_id];
+                    }
+                }
+            });
+
+        return $phones;
+    }
+
+    /**
      * Précharge les numéros mobiles des prospects déjà présents en base
      * (même projet) afin de ne pas ré-importer une personne existante.
      */
@@ -926,7 +949,56 @@ class ImportProspects implements ShouldQueue
      */
     protected function normalizePhone($value)
     {
-        return preg_replace('/\D+/', '', (string) $value);
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        // Lead exports may prefix phone values with "p:" or "tel:".
+        $value = preg_replace('/^(?:p:|tel:)\s*/i', '', $value);
+        $value = preg_replace('/\s*(?:ext|x|poste)\.?\s*\d+$/i', '', $value);
+
+        if (class_exists('libphonenumber\\PhoneNumberUtil')) {
+            $util = \libphonenumber\PhoneNumberUtil::getInstance();
+
+            try {
+                $number = $util->parse($value, 'ZZ');
+
+                if ($util->isPossibleNumber($number) && $util->isValidNumber($number)) {
+                    return $util->format($number, \libphonenumber\PhoneNumberFormat::E164);
+                }
+            } catch (\Throwable $exception) {
+                // Fall through to a conservative key when the number is
+                // malformed or its country cannot be inferred safely.
+            }
+        }
+
+        $digits = preg_replace('/\D+/', '', $value);
+
+        // Keep an explicit international prefix even when the optional
+        // phone metadata package is unavailable. Local numbers remain
+        // intentionally unresolved because their country is unknown.
+        if (str_starts_with($value, '+')) {
+            return '+' . $digits;
+        }
+
+        if (str_starts_with($digits, '00')) {
+            return '+' . substr($digits, 2);
+        }
+
+        return $digits;
+    }
+
+    /**
+     * Store the same international representation that is used for matching.
+     */
+    protected function normalizeProspectPhones(array &$prospect): void
+    {
+        foreach (['phone_number', 'mobile_phone_number'] as $field) {
+            if (!empty($prospect[$field])) {
+                $prospect[$field] = $this->normalizePhone($prospect[$field]);
+            }
+        }
     }
 
     /**
@@ -983,22 +1055,31 @@ class ImportProspects implements ShouldQueue
             $this->seenDuplicates['email'][] = $email;
         }
 
-        // Check phone_number
-        if (!empty($prospect['phone_number'])) {
-            $phone = trim($prospect['phone_number']);
-            if (in_array($phone, $this->seenDuplicates['phone'])) {
-                return true;
+        // Phone and mobile share the same duplicate pool. Build the current
+        // row's values first so phone_number and mobile_phone_number cannot
+        // falsely match each other within that same row.
+        $phoneValues = [];
+        foreach (['phone_number', 'mobile_phone_number'] as $field) {
+            if (!empty($prospect[$field])) {
+                $phone = $this->normalizePhone($prospect[$field]);
+                if ($phone !== '') {
+                    $phoneValues[$phone] = true;
+                }
             }
-            $this->seenDuplicates['phone'][] = $phone;
         }
 
-        // Check mobile_phone_number
-        if (!empty($prospect['mobile_phone_number'])) {
-            $mobile = trim($prospect['mobile_phone_number']);
-            if (in_array($mobile, $this->seenDuplicates['mobile'])) {
+        foreach (array_keys($phoneValues) as $phone) {
+            if (
+                in_array($phone, $this->seenDuplicates['phone'])
+                || in_array($phone, $this->seenDuplicates['mobile'])
+            ) {
                 return true;
             }
-            $this->seenDuplicates['mobile'][] = $mobile;
+        }
+
+        foreach (array_keys($phoneValues) as $phone) {
+            $this->seenDuplicates['phone'][] = $phone;
+            $this->seenDuplicates['mobile'][] = $phone;
         }
 
         return false;
@@ -1006,8 +1087,8 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Compares the row being imported to prospects already present in the
-     * database (email or mobile match) — this is the actual "duplicate vs.
-     * existing CRM data" check the pre-import control is built on.
+    * database (email, phone, or mobile match) — this is the actual duplicate
+    * check against existing CRM data.
      *
      * Returns null when nothing matches. Otherwise returns the id of the
      * matching existing prospect, which field(s) matched, and whether that
@@ -1028,10 +1109,31 @@ class ImportProspects implements ShouldQueue
             }
         }
 
+        if (!empty($prospect['phone_number'])) {
+            $phone = $this->normalizePhone($prospect['phone_number']);
+            $phoneMatch = $this->existingPhones[$phone]
+                ?? $this->existingMobiles[$phone]
+                ?? null;
+
+            if ($phoneMatch) {
+
+                if ($existing === null) {
+                    $existing = $phoneMatch;
+                }
+
+                if ($existing['id'] === $phoneMatch['id']) {
+                    $matchedFields[] = 'phone_number';
+                }
+            }
+        }
+
         if (!empty($prospect['mobile_phone_number'])) {
             $mobile = $this->normalizePhone($prospect['mobile_phone_number']);
-            if ($mobile !== '' && isset($this->existingMobiles[$mobile])) {
-                $mobileMatch = $this->existingMobiles[$mobile];
+            $mobileMatch = $this->existingMobiles[$mobile]
+                ?? $this->existingPhones[$mobile]
+                ?? null;
+
+            if ($mobileMatch) {
 
                 if ($existing === null) {
                     $existing = $mobileMatch;
@@ -1266,26 +1368,67 @@ class ImportProspects implements ShouldQueue
      */
     protected function createProspects(&$prospects)
     {
-        // Create prospects into DB
-        DB::table('prospects')->insert($prospects);
+        $lockName = 'heroes-crm-prospect-project-' . $this->import->project_id;
+        $lockAcquired = false;
 
-        // Get prospects ids
-        $prospectsIds = DB::table('prospects')
-            ->where('import_id', $this->import->id)
-            ->orderBy('id', 'desc')
-            ->limit(count($prospects))
-            ->get(['id'])
-            ->toArray();
+        try {
+            // The in-memory check above is not enough when two imports for
+            // the same project run at the same time. Serialize the final
+            // check and insert at database level so the first committed row
+            // always wins and the later row is ignored.
+            if (DB::getDriverName() === 'mysql') {
+                $lock = DB::selectOne('SELECT GET_LOCK(?, 60) AS acquired', [$lockName]);
+                $lockAcquired = (int) ($lock->acquired ?? 0) === 1;
 
-        // Retrieve only ids
-        $prospectsIds = array_map(function($data) {
-            return $data->id;
-        }, $prospectsIds);
+                if (!$lockAcquired) {
+                    throw new \RuntimeException('Unable to acquire the prospect deduplication lock.');
+                }
+            }
 
-        // Reverse array
-        // because it was ordered by id desc
-        // in previous query
-        return array_reverse($prospectsIds);
+            // Refresh under the lock: another import may have inserted a
+            // matching prospect after this job loaded its initial indexes.
+            $this->existingEmails = $this->getExistingEmails();
+            $this->existingPhones = $this->getExistingPhones();
+            $this->existingMobiles = $this->getExistingMobiles();
+
+            $accepted = [];
+            $this->acceptedProspectIndexes = [];
+
+            foreach ($prospects as $index => $prospect) {
+                if ($this->findExistingDuplicate($prospect)) {
+                    continue;
+                }
+
+                $accepted[$index] = $prospect;
+                $this->acceptedProspectIndexes[] = $index;
+            }
+
+            if (empty($accepted)) {
+                return [];
+            }
+
+            DB::table('prospects')->insert(array_values($accepted));
+
+            // Get prospects ids
+            $prospectsIds = DB::table('prospects')
+                ->where('import_id', $this->import->id)
+                ->orderBy('id', 'desc')
+                ->limit(count($accepted))
+                ->get(['id'])
+                ->toArray();
+
+            // Retrieve only ids
+            $prospectsIds = array_map(function($data) {
+                return $data->id;
+            }, $prospectsIds);
+
+            // Reverse array because it was ordered by id desc above.
+            return array_reverse($prospectsIds);
+        } finally {
+            if ($lockAcquired) {
+                DB::selectOne('SELECT RELEASE_LOCK(?) AS released', [$lockName]);
+            }
+        }
     }
 
     /**
@@ -1420,6 +1563,18 @@ class ImportProspects implements ShouldQueue
 
         // Create prospects
         $prospectsIds = $this->createProspects($prospects);
+
+        if (empty($prospectsIds)) {
+            return;
+        }
+
+        if (count($this->acceptedProspectIndexes) !== count($prospects)) {
+            $acceptedIndexes = array_flip($this->acceptedProspectIndexes);
+
+            foreach ($prospectsItems as $key => $items) {
+                $prospectsItems[$key] = array_values(array_intersect_key($items, $acceptedIndexes));
+            }
+        }
 
         // Create prospects associated items
         foreach ($this->prospectRelationsHandlers as $key => $handler) {
