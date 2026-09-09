@@ -15,7 +15,7 @@ return new class extends Migration
             // The source URL (e.g. Google Sheets share link), persisted so
             // it can be re-downloaded periodically instead of only being
             // used once at creation time.
-            $table->string('url')->nullable()->after('path');
+            $table->string('source_url')->nullable()->after('path');
             // Whether this import should be periodically re-downloaded and
             // re-processed automatically (currently only meaningful for
             // source = google_sheets).
@@ -31,7 +31,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('imports', function (Blueprint $table) {
-            $table->dropColumn(['url', 'sync_enabled', 'sync_interval_minutes', 'last_synced_at']);
+            $table->dropColumn(['source_url', 'sync_enabled', 'sync_interval_minutes', 'last_synced_at']);
         });
     }
 };
