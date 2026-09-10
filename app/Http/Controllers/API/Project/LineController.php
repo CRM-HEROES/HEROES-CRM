@@ -17,7 +17,6 @@ class LineController extends Controller
     protected $operatorConfigFields = [
         'kavkom' => ['api_token', 'domain_uuid', 'phone_number', 'extension'],
         'ringover' => ['api_token'],
-        'twilio' => ['account_sid', 'auth_token', 'api_key_sid', 'api_key_secret', 'twiml_app_sid', 'caller_id_number'],
     ];
 
     /**

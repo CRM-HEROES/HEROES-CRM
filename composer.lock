@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1eefaf3241f2d194fb3bea7ee579c20f",
+    "content-hash": "d5b992f01285a0b2daac95ec4f1410ed",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1101,12 +1101,12 @@
             "version": "v6.8.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/firebase/php-jwt.git",
+                "url": "https://github.com/googleapis/php-jwt.git",
                 "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/5dbc8959427416b8ee09a100d7a8588c00fb2e26",
+                "url": "https://api.github.com/repos/googleapis/php-jwt/zipball/5dbc8959427416b8ee09a100d7a8588c00fb2e26",
                 "reference": "5dbc8959427416b8ee09a100d7a8588c00fb2e26",
                 "shasum": ""
             },
@@ -3729,12 +3729,12 @@
             "version": "2.68.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/briannesbitt/Carbon.git",
+                "url": "https://github.com/CarbonPHP/carbon.git",
                 "reference": "4f991ed2a403c85efbc4f23eb4030063fdbe01da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/briannesbitt/Carbon/zipball/4f991ed2a403c85efbc4f23eb4030063fdbe01da",
+                "url": "https://api.github.com/repos/CarbonPHP/carbon/zipball/4f991ed2a403c85efbc4f23eb4030063fdbe01da",
                 "reference": "4f991ed2a403c85efbc4f23eb4030063fdbe01da",
                 "shasum": ""
             },
@@ -5591,12 +5591,12 @@
             "version": "8.4.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/sabberworm/PHP-CSS-Parser.git",
+                "url": "https://github.com/MyIntervals/PHP-CSS-Parser.git",
                 "reference": "e41d2140031d533348b2192a83f02d8dd8a71d30"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sabberworm/PHP-CSS-Parser/zipball/e41d2140031d533348b2192a83f02d8dd8a71d30",
+                "url": "https://api.github.com/repos/MyIntervals/PHP-CSS-Parser/zipball/e41d2140031d533348b2192a83f02d8dd8a71d30",
                 "reference": "e41d2140031d533348b2192a83f02d8dd8a71d30",
                 "shasum": ""
             },
@@ -8404,56 +8404,6 @@
             "time": "2023-02-21T14:02:27+00:00"
         },
         {
-            "name": "twilio/sdk",
-            "version": "8.12.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/twilio/twilio-php",
-                "reference": "ba0784ba0095eb4cea6f7f1e8e3201f6ff6f3404"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/twilio/twilio-php/zipball/ba0784ba0095eb4cea6f7f1e8e3201f6ff6f3404",
-                "reference": "ba0784ba0095eb4cea6f7f1e8e3201f6ff6f3404",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.1.0"
-            },
-            "require-dev": {
-                "friendsofphp/php-cs-fixer": "3.94.2",
-                "guzzlehttp/guzzle": "7.15.3",
-                "phpunit/phpunit": "9.6.34"
-            },
-            "suggest": {
-                "guzzlehttp/guzzle": "An HTTP client to execute the API requests"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Twilio\\": "src/Twilio/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Twilio API Team",
-                    "email": "api@twilio.com"
-                }
-            ],
-            "description": "A PHP wrapper for Twilio's API",
-            "homepage": "https://github.com/twilio/twilio-php",
-            "keywords": [
-                "api",
-                "sms",
-                "twilio"
-            ],
-            "time": "2026-08-17T05:36:02+00:00"
-        },
-        {
             "name": "venturecraft/revisionable",
             "version": "1.40.0",
             "source": {
@@ -8740,12 +8690,12 @@
             "version": "v3.8.1",
             "source": {
                 "type": "git",
-                "url": "https://github.com/barryvdh/laravel-debugbar.git",
+                "url": "https://github.com/fruitcake/laravel-debugbar.git",
                 "reference": "aff3235fecb4104203b1e62c32239c56530eee32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/aff3235fecb4104203b1e62c32239c56530eee32",
+                "url": "https://api.github.com/repos/fruitcake/laravel-debugbar/zipball/aff3235fecb4104203b1e62c32239c56530eee32",
                 "reference": "aff3235fecb4104203b1e62c32239c56530eee32",
                 "shasum": ""
             },
