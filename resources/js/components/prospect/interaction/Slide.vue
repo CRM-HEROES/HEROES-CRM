@@ -199,35 +199,6 @@
                                 <icon class="fa fa-caret-right" />
                             </item>
 
-                            <!-- Twilio -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaTwilio(number)"
-                            >
-                                <icon class="fa fa-phone" color="#F22F46" />
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_twilio'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <icon
-                                    v-if="twilioConfigured"
-                                    class="fa fa-check-circle"
-                                    color="#09be0c"
-                                    v-tooltip="$t('line.operator.configured')"
-                                />
-                                <icon class="fa fa-caret-right" />
-                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -669,42 +640,6 @@
                                     padding: 16px;
                                 "
                             >
-                                <twilio
-                                    id="twilio-phone"
-                                    :number="interaction.number"
-                                    style="flex: 1; width: 100%; height: 100%"
-                                    @outgoing-call="
-                                        (callInfo) => {
-                                            interaction.status = 'initiated';
-                                            interaction.data = {
-                                                id: callInfo.call_sid,
-                                            };
-                                            updateInteraction();
-                                        }
-                                    "
-                                    @ringing-call="
-                                        (interaction.status = 'ringing'),
-                                            updateInteraction()
-                                    "
-                                    @answered-call="
-                                        (interaction.status = 'answered'),
-                                            updateInteraction()
-                                    "
-                                    @hangup-call="
-                                        () => {
-                                            interaction.status = 'hangup';
-                                            updateInteraction();
-                                            nextInteraction();
-                                        }
-                                    "
-                                    @call-error="
-                                        (message) =>
-                                            console.error(
-                                                '[Twilio] Erreur',
-                                                message
-                                            )
-                                    "
-                                />
                             </div>
                         </div>
                     </template>
@@ -831,7 +766,6 @@ import {
 import Ringover from "@/components/utils/Ringover.vue";
 import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
-import Twilio from "@/components/utils/Twilio.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
 
@@ -840,7 +774,6 @@ export default {
         Ringover,
         Kavkom,
         Aircall,
-        Twilio,
         InteractionRow,
         SelectProspect,
     },
@@ -860,7 +793,6 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
-            twilioConfigured: false,
             callingViaKavkom: false,
             kavkomCallMessage: "",
             kavkomCallSuccess: false,
@@ -926,18 +858,9 @@ export default {
             }
         },
 
-        /**
-         * Kavkom/Ringover readiness comes from the "Lignes" configured for
-         * this project (see kavkomConfigured/ringoverConfigured); only
-         * Twilio has no per-line concept and still needs its own check.
-         */
         async fetchOperatorsConfigStatus() {
-            try {
-                const { data } = await ApiService.get("settings/twilio/status");
-                this.twilioConfigured = !!data.configured;
-            } catch (error) {
-                this.twilioConfigured = false;
-            }
+            // No custom Twilio status check remains; the prospect interaction
+            // panel only exposes the operators still supported by this project.
         },
 
         addHistory() {
@@ -998,15 +921,6 @@ export default {
                 return;
             }
             this.triggerKavkomCall(number);
-        },
-
-        interactionViaTwilio(number) {
-            this.tab = 1;
-            this.frameTab = 6;
-            this.interaction = this.newInteraction();
-            this.interaction.source = "twilio";
-            this.interaction.number = number;
-            this.addInteraction();
         },
 
         /**
