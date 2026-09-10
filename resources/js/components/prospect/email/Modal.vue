@@ -41,7 +41,13 @@ export default {
 
     methods: {
         emptyDraft() {
-            return { prospect: null, to: "", subject: "", body: "" };
+            return {
+                prospect: null,
+                to: "",
+                category: "Message",
+                subject: "",
+                body: "",
+            };
         },
 
         loadDraft() {

@@ -31,7 +31,12 @@ class MessageController extends Controller
 
         abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
 
-        Mail::html($request->input('body'), function ($message) use ($request) {
+        Mail::send('emails.prospect-message', [
+            'body' => $request->input('body'),
+            'category' => $request->input('category', 'Message'),
+            'project' => $project,
+            'subject' => $request->input('subject'),
+        ], function ($message) use ($request) {
             $message->to($request->input('to'))
                 ->subject($request->input('subject'));
         });

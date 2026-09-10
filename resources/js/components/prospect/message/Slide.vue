@@ -739,6 +739,7 @@ export default {
             store.commit("SET_PROSPECT_EMAIL_DRAFT", {
                 prospect: this.prospect.id,
                 to: this.prospect.email,
+                category: reason.label,
                 subject: reason.subject,
                 body: `Bonjour ${this.prospect.first_name || ""},\n\n`,
             });

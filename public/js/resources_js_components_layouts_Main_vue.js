@@ -21354,6 +21354,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       return {
         prospect: null,
         to: "",
+        category: "Message",
         subject: "",
         body: ""
       };
@@ -32391,6 +32392,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_PROSPECT_EMAIL_DRAFT", {
         prospect: this.prospect.id,
         to: this.prospect.email,
+        category: reason.label,
         subject: reason.subject,
         body: "Bonjour ".concat(this.prospect.first_name || "", ",\n\n")
       });
