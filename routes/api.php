@@ -564,6 +564,7 @@ Route::group([
             // Log
             Route::get('log', [ProspectLogController::class, 'index']);
             // Message
+            Route::post('email', [ProspectMessageController::class, 'email']);
             Route::apiResource('thread.message', ProspectMessageController::class);
             // Message User
             Route::match(['PUT', 'PATCH'], 'thread/{thread}/message/{message}/user/{user}', [ProspectMessageUserController::class, 'update']);
@@ -621,6 +622,7 @@ Route::group([
         Route::get('/setting/{setting}/check', [ProjectSettingController::class, 'check']);
         Route::get('/setting/{setting}', [ProjectSettingController::class, 'show']);
         Route::match(['PUT', 'PATCH'], '/setting/{setting}', [ProjectSettingController::class, 'update']);
+        Route::post('/setting/{setting}/test', [ProjectSettingController::class, 'testEmail']);
         Route::delete('/setting/{setting}', [ProjectSettingController::class, 'destroy']);
 
         // Sms Template

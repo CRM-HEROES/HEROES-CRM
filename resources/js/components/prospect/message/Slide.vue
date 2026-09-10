@@ -1,7 +1,7 @@
 <template>
     <slide
         :name="name"
-        @open="fetchThreads(), fetchSelectedProspects()"
+        @open="open"
         :title="$t('prospect.message.title', { prospect: prospectFullName })"
         :url="
             prospect
@@ -38,6 +38,21 @@
                                 class="hc-item-main-content"
                                 v-text="$t('prospect.message.email_setting')"
                             ></div>
+                            <icon
+                                v-if="emailSettingValidated"
+                                class="fa fa-check icon-green"
+                                v-tooltip="'Configuration Brevo validée'"
+                            />
+                        </item>
+                        <item
+                            v-if="prospect && prospect.email"
+                            v-for="reason in emailReasons"
+                            :key="reason.key"
+                            tag="a"
+                            @click.prevent="openEmailComposer(reason)"
+                        >
+                            <icon class="fa fa-paper-plane icon-blue" />
+                            <div class="hc-item-main-content" v-text="reason.label"></div>
                         </item>
                         <thread-row
                             v-for="c in filteredThreads"
@@ -404,6 +419,7 @@ import {
 } from "@/actions/project/prospect/message";
 import { FETCH_THREADS } from "@/actions/project/thread";
 import { OPEN_MODAL } from "@/actions/modal";
+import { GET_SETTING } from "@/actions/project/setting";
 import { FETCH_MESSAGE_TEMPLATES } from "@/actions/project/message-template";
 
 // Components
@@ -449,6 +465,11 @@ export default {
 
             addingMessage: false,
             fetchingMessages: false,
+            emailReasons: [
+                { key: "feedback", label: "Feedback prospect", subject: "Votre feedback nous intéresse" },
+                { key: "appointment", label: "Rendez-vous commerciaux", subject: "Échangeons au sujet de votre projet" },
+                { key: "follow-up", label: "Suivi prospect", subject: "Suivi de notre échange" },
+            ],
         };
     },
 
@@ -708,6 +729,23 @@ export default {
             store.commit(OPEN_MODAL, "setting-email");
         },
 
+        async open() {
+            this.fetchThreads();
+            this.fetchSelectedProspects();
+            await store.dispatch(GET_SETTING, "email");
+        },
+
+        openEmailComposer(reason) {
+            store.commit("SET_PROSPECT_EMAIL_DRAFT", {
+                prospect: this.prospect.id,
+                to: this.prospect.email,
+                category: reason.label,
+                subject: reason.subject,
+                body: `Bonjour ${this.prospect.first_name || ""},\n\n`,
+            });
+            store.commit(OPEN_MODAL, "prospect-email");
+        },
+
         /**
          *
          */
@@ -836,6 +874,7 @@ export default {
             "slideOpen",
             "waitingUserMessage",
             "can",
+            "settingsGet",
         ]),
 
         /**
@@ -845,6 +884,10 @@ export default {
             return this.prospect
                 ? this.prospectFullName
                 : this.prospectsSelected.length + " prospects";
+        },
+
+        emailSettingValidated() {
+            return Boolean(this.settingsGet("email")?.validated_at);
         },
 
         /**
