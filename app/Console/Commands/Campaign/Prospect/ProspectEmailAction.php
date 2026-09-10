@@ -4,6 +4,7 @@ namespace App\Console\Commands\Campaign\Prospect;
 
 use App\Console\Commands\Campaign\Action;
 use App\Mail\CampaignMail;
+use App\Utils\ProjectMail;
 use App\Models\Prospect;
 use App\Utils\Field\Renderer\ProjectFieldRenderer;
 use App\Utils\Field\Renderer\ProspectFieldRenderer;
@@ -58,6 +59,7 @@ class ProspectEmailAction extends Action
             return $renderer->render($carry);
         }, $this->action->value['body']);
 
+        ProjectMail::configure($this->model->project);
         Mail::to($this->model->email)->queue(new CampaignMail($subject, $body));
     }
 }

@@ -1,46 +1,16 @@
 <template>
-    <modal :name="name" title="Email" @open="showSetting">
+    <modal :name="name" title="Email via Brevo" @open="showSetting">
         <form
             class="hc-flex-column"
             style="height: 100%"
             @submit.prevent="update"
         >
             <item-list gap="5px" class="hc-flex-1" padding="10px 0">
-                <v-field label="Hôte" required v-slot="{ label }"
-                    ><input
-                        :placeholder="'smtp.example.com'"
-                        v-model="setting.host"
-                        required
-                /></v-field>
-                <v-field label="Port" required v-slot="{ label }"
-                    ><input
-                        :placeholder="'587, 443, ...'"
-                        v-model="setting.port"
-                        required
-                /></v-field>
-                <v-field label="Driver" required v-slot="{ label }"
-                    ><input
-                        :placeholder="'SMTP, ...'"
-                        v-model="setting.driver"
-                        required
-                /></v-field>
-                <v-field label="Username" required v-slot="{ label }"
+                <v-field label="Clé API Brevo" required v-slot="{ label }"
                     ><input
                         :placeholder="label + ' ...'"
-                        v-model="setting.username"
-                        required
-                /></v-field>
-                <v-field label="Mot de passe" required v-slot="{ label }"
-                    ><input
-                        :placeholder="label + ' ...'"
-                        v-model="setting.password"
+                        v-model="setting.api_key"
                         type="password"
-                        required
-                /></v-field>
-                <v-field label="Encryption" required v-slot="{ label }"
-                    ><input
-                        :placeholder="'ssl, tsl, ...'"
-                        v-model="setting.encryption"
                         required
                 /></v-field>
                 <v-field label="Nom expéditeur" required v-slot="{ label }"
@@ -95,13 +65,8 @@ export default {
     methods: {
         newSetting() {
             return {
+                api_key: "",
                 from: { name: "", address: "" },
-                host: "",
-                port: "",
-                driver: "SMTP",
-                password: "",
-                username: "",
-                encryption: "ssl",
             };
         },
 

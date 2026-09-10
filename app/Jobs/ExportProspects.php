@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Exports\ProspectExport;
 use App\Models\Export;
+use App\Utils\ProjectMail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -59,6 +60,7 @@ class ExportProspects implements ShouldQueue
      */
     protected function notifyExportFinished()
     {
+        ProjectMail::configure($this->export->project);
         Mail::to($this->export->email ? $this->export->email : $this->export->creator->email)->send(new \App\Notifications\ExportFinished($this->export));
     	/*$this->export->creator->notify(
     		new \App\Notifications\ExportFinished($this->export)
