@@ -4,6 +4,7 @@ import {
     ADD_SETTING,
     GET_SETTING,
     UPDATE_SETTING,
+    TEST_SETTING,
     REMOVE_SETTING,
 } from "@/actions/project/setting";
 
@@ -44,6 +45,21 @@ const actions = {
     async [UPDATE_SETTING](context, { key, value }) {
         context.commit(UPDATE_SETTING, { key, value });
         await SettingService.update(context.state.project.slug, key, value);
+    },
+
+    async [TEST_SETTING](context, key) {
+        const { data } = await SettingService.test(
+            context.state.project.slug,
+            key
+        );
+        context.commit(UPDATE_SETTING, {
+            key,
+            value: {
+                ...context.state.project.settings[key],
+                validated_at: data.validated_at,
+            },
+        });
+        return data;
     },
 
     /**

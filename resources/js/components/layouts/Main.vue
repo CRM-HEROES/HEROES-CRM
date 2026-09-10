@@ -200,6 +200,7 @@
 
             <protected-content>
                 <setting-email-modal />
+                <prospect-email-modal />
                 <setting-smsbox-modal />
                 <setting-ultramsg-modal />
                 <setting-m-target-modal />
@@ -407,6 +408,7 @@ import ManageProspectBulkFieldModal from "@/components/prospect/bulk/field/Modal
 import ManageProspectBulkProjectModal from "@/components/prospect/bulk/project/Modal.vue";
 
 import SettingEmailModal from "@/components/settings/Email.vue";
+import ProspectEmailModal from "@/components/prospect/email/Modal.vue";
 import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
 import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
 import SettingMTargetModal from "@/components/settings/MTarget.vue";
@@ -580,6 +582,7 @@ export default {
         ManageProspectBulkProjectModal,
 
         SettingEmailModal,
+        ProspectEmailModal,
         SettingSmsboxModal,
         SettingUltramsgModal,
         SettingMTargetModal,

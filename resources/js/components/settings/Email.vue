@@ -47,6 +47,7 @@ import store from "@/store";
 import { CLOSE_MODAL } from "@/actions/modal";
 import {
     UPDATE_SETTING,
+    TEST_SETTING,
     REMOVE_SETTING,
     GET_SETTING,
 } from "@/actions/project/setting";
@@ -81,6 +82,7 @@ export default {
                     key: this.key,
                     value: this.setting,
                 });
+                store.dispatch(TEST_SETTING, this.key).catch(() => {});
             } finally {
                 this.updatingSetting = false;
                 store.commit(CLOSE_MODAL);
