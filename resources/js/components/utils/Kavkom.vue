@@ -75,6 +75,10 @@ export default {
             type: Boolean,
             default: true,
         },
+        projectId: {
+            type: [Number, String],
+            default: null,
+        },
     },
 
     data() {
@@ -121,7 +125,8 @@ export default {
 
             try {
                 const { data } = await ApiService.get(
-                    "settings/kavkom/credentials"
+                    "settings/kavkom/credentials",
+                    { params: { project_id: this.projectId } }
                 );
 
                 if (!data.success) {
