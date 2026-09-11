@@ -526,6 +526,7 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
+        Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 

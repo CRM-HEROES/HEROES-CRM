@@ -45,7 +45,7 @@
                             />
                         </item>
                         <item
-                            v-if="prospect && prospect.email"
+                            v-if="(prospect && prospect.email) || selectedProspects.length"
                             v-for="reason in emailReasons"
                             :key="reason.key"
                             tag="a"
@@ -283,10 +283,24 @@
                     </template>
 
                     <template #2>
-                        <select-prospect
-                            @back="tab = 0"
-                            @prospect-selected="setMessageProspect"
-                        />
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item-list v-if="selectedProspects.length" padding="5px">
+                                <item
+                                    v-for="reason in emailReasons"
+                                    :key="'bulk-' + reason.key"
+                                    tag="a"
+                                    @click.prevent="openEmailComposer(reason)"
+                                >
+                                    <icon class="fa fa-paper-plane icon-blue" />
+                                    <div class="hc-item-main-content" v-text="reason.label"></div>
+                                </item>
+                            </item-list>
+                            <select-prospect
+                                class="hc-flex-1"
+                                @back="tab = 0"
+                                @prospect-selected="setMessageProspect"
+                            />
+                        </div>
                     </template>
                 </frame-layout>
             </template>
@@ -523,7 +537,7 @@ export default {
                         filters: JSON.stringify({
                             ids: this.prospectsSelected,
                         }),
-                        fields: "first_name,last_name",
+                        fields: "first_name,last_name,email",
                     },
                 });
                 this.selectedProspects = data.data;
@@ -736,12 +750,21 @@ export default {
         },
 
         openEmailComposer(reason) {
+            const prospects = this.prospect
+                ? [this.prospect]
+                : this.selectedProspects;
+            const recipients = prospects.filter((item) => item.email);
+            const firstName = this.prospect
+                ? this.prospect.first_name || ""
+                : "";
+
             store.commit("SET_PROSPECT_EMAIL_DRAFT", {
-                prospect: this.prospect.id,
-                to: this.prospect.email,
+                prospect: this.prospect ? this.prospect.id : null,
+                prospects: this.prospect ? null : recipients.map((item) => item.id),
+                to: recipients.map((item) => item.email).join(", "),
                 category: reason.label,
                 subject: reason.subject,
-                body: `Bonjour ${this.prospect.first_name || ""},\n\n`,
+                body: `Bonjour ${firstName},\n\n`,
             });
             store.commit(OPEN_MODAL, "prospect-email");
         },

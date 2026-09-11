@@ -21370,20 +21370,30 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
             case 0:
               _this.sending = true;
               _context.prev = 1;
-              _context.next = 4;
+              if (!_this.draft.prospects) {
+                _context.next = 7;
+                break;
+              }
+              _context.next = 5;
+              return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].sendBulk(_this.project.slug, _this.draft);
+            case 5:
+              _context.next = 9;
+              break;
+            case 7:
+              _context.next = 9;
               return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].send(_this.project.slug, _this.draft.prospect, _this.draft);
-            case 4:
+            case 9:
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("CLEAR_PROSPECT_EMAIL_DRAFT");
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-            case 6:
-              _context.prev = 6;
+            case 11:
+              _context.prev = 11;
               _this.sending = false;
-              return _context.finish(6);
-            case 9:
+              return _context.finish(11);
+            case 14:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[1,, 6, 9]]);
+        }, _callee, null, [[1,, 11, 14]]);
       }))();
     }
   }
@@ -32121,7 +32131,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   filters: JSON.stringify({
                     ids: _this.prospectsSelected
                   }),
-                  fields: "first_name,last_name"
+                  fields: "first_name,last_name,email"
                 }
               });
             case 6:
@@ -32389,12 +32399,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     openEmailComposer: function openEmailComposer(reason) {
+      var prospects = this.prospect ? [this.prospect] : this.selectedProspects;
+      var recipients = prospects.filter(function (item) {
+        return item.email;
+      });
+      var firstName = this.prospect ? this.prospect.first_name || "" : "";
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_PROSPECT_EMAIL_DRAFT", {
-        prospect: this.prospect.id,
-        to: this.prospect.email,
+        prospect: this.prospect ? this.prospect.id : null,
+        prospects: this.prospect ? null : recipients.map(function (item) {
+          return item.id;
+        }),
+        to: recipients.map(function (item) {
+          return item.email;
+        }).join(", "),
         category: reason.label,
         subject: reason.subject,
-        body: "Bonjour ".concat(this.prospect.first_name || "", ",\n\n")
+        body: "Bonjour ".concat(firstName, ",\n\n")
       });
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_5__.OPEN_MODAL, "prospect-email");
     },
@@ -72881,7 +72901,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-var _hoisted_1 = ["placeholder"];
+var _hoisted_1 = ["placeholder", "required"];
 var _hoisted_2 = ["placeholder"];
 var _hoisted_3 = ["placeholder"];
 var _hoisted_4 = ["textContent"];
@@ -72923,7 +72943,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 }),
                 placeholder: label + ' ...',
                 type: "email",
-                required: ""
+                required: !$data.draft.prospects
               }, null, 8 /* PROPS */, _hoisted_1), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.to]])];
             }),
             _: 1 /* STABLE */
@@ -81951,19 +81971,26 @@ var _hoisted_12 = {
 };
 var _hoisted_13 = ["textContent"];
 var _hoisted_14 = {
-  "class": "hc-flex-column hc-flex-1",
-  style: {
-    "overflow": "auto"
-  }
-};
-var _hoisted_15 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_16 = ["textContent"];
-var _hoisted_17 = ["textContent"];
+var _hoisted_15 = ["textContent"];
+var _hoisted_16 = {
+  "class": "hc-flex-column hc-flex-1",
+  style: {
+    "overflow": "auto"
+  }
+};
+var _hoisted_17 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_search = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("search");
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
@@ -82041,7 +82068,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 name: 'Prospect - Message - Paramètre email',
                 body: 'Avant d\'envoyer un message dans une discussion externe, paramétrez ici l\'envoi d\'email dans votre projet.',
                 timeout: 500
-              }]]), _ctx.prospect && _ctx.prospect.email ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+              }]]), _ctx.prospect && _ctx.prospect.email || $data.selectedProspects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                 key: 0
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.emailReasons, function (reason) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
@@ -82094,12 +82121,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "hc-flex-1"
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [$data.selectedProspects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item_list, {
+                key: 0,
+                padding: "5px"
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.emailReasons, function (reason) {
+                    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                      key: 'bulk-' + reason.key,
+                      tag: "a",
+                      onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                        return $options.openEmailComposer(reason);
+                      }, ["prevent"])
+                    }, {
+                      "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                        return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                          "class": "fa fa-paper-plane icon-blue"
+                        }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                          "class": "hc-item-main-content",
+                          textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(reason.label)
+                        }, null, 8 /* PROPS */, _hoisted_13)];
+                      }),
+                      _: 2 /* DYNAMIC */
+                    }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]);
+                  }), 128 /* KEYED_FRAGMENT */))];
+                }),
+                _: 1 /* STABLE */
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
+                "class": "hc-flex-1",
                 onBack: _cache[17] || (_cache[17] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setMessageProspect
-              }, null, 8 /* PROPS */, ["onProspectSelected"])];
+              }, null, 8 /* PROPS */, ["onProspectSelected"])])];
             }),
             _: 2 /* DYNAMIC */
           }, [_ctx.prospect || _ctx.prospectsSelected.length > 0 ? {
@@ -82289,7 +82343,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "hc-flex-1"
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[20] || (_cache[20] = function ($event) {
                   return $data.tab = 1;
                 }),
@@ -82301,7 +82355,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.message.templates.title'))
-                  }, null, 8 /* PROPS */, _hoisted_16)];
+                  }, null, 8 /* PROPS */, _hoisted_18)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
@@ -82340,7 +82394,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return $options.addMessageTemplate && $options.addMessageTemplate.apply($options, arguments);
                     }, ["prevent"])),
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-                  }, null, 8 /* PROPS */, _hoisted_17)];
+                  }, null, 8 /* PROPS */, _hoisted_19)];
                 }),
                 _: 1 /* STABLE */
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
@@ -82349,7 +82403,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.waitingUserMessage ? {
             name: "1",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[18] || (_cache[18] = function ($event) {
                   return $options.setWaitingUserMessage(null);
                 }),
@@ -82361,10 +82415,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.messageThread.name)
-                  }, null, 8 /* PROPS */, _hoisted_13)];
+                  }, null, 8 /* PROPS */, _hoisted_15)];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
                 modelValue: $data.userKeyword,
                 "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
                   return $data.userKeyword = $event;
@@ -99863,6 +99917,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   send: function send(project, prospect, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/prospect/").concat(prospect, "/email"), params);
+  },
+  sendBulk: function sendBulk(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/prospect/email/bulk"), params);
   }
 });
 
