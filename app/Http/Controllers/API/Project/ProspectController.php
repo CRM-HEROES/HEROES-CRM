@@ -628,7 +628,7 @@ class ProspectController extends Controller
         $count = min($request->input('count', 50), 500);
 
         // Sort By
-        $sortBy = $request->input('sortBy', "id");
+        $sortBy = $request->input('sortBy', "created_at");
 
         if ($sortBy == "null") {
             $sortBy = null;
