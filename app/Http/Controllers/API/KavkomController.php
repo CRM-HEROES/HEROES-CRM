@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Line;
 use App\Models\KavkomCall;
+use App\Models\Prospect;
 use App\Services\KavkomService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -29,9 +30,13 @@ class KavkomController extends Controller
         $data = $request->validate([
             'destination' => ['required', 'string'],
             'prospect_id' => ['nullable', 'integer', 'exists:prospects,id'],
+            'project_id' => ['nullable', 'integer', 'exists:projects,id'],
         ]);
 
-        $config = $this->getUserKavkomConfig($request);
+        $projectId = $data['project_id'] ?? ($data['prospect_id']
+            ? Prospect::query()->whereKey($data['prospect_id'])->value('project_id')
+            : null);
+        $config = $this->getUserKavkomConfig($request, $projectId);
 
         if (!$config) {
             return response()->json([
@@ -117,7 +122,10 @@ class KavkomController extends Controller
      */
     public function credentials(Request $request, KavkomService $service)
     {
-        $config = $this->getUserKavkomConfig($request);
+        $data = $request->validate([
+            'project_id' => ['nullable', 'integer', 'exists:projects,id'],
+        ]);
+        $config = $this->getUserKavkomConfig($request, $data['project_id'] ?? null);
 
         if (!$config) {
             return response()->json([
@@ -367,12 +375,17 @@ class KavkomController extends Controller
      * of which project they're calling from, so this is intentionally not
      * scoped by project — matching the previous per-user setting it replaces.
      */
-    protected function getUserKavkomConfig(Request $request): ?array
+    protected function getUserKavkomConfig(Request $request, ?int $projectId = null): ?array
     {
-        $line = Line::query()
+        $query = Line::query()
             ->where('operator', 'kavkom')
-            ->where('user_id', $request->user()->id)
-            ->first();
+            ->where('user_id', $request->user()->id);
+
+        if ($projectId) {
+            $query->where('project_id', $projectId);
+        }
+
+        $line = $query->first();
 
         $config = $line ? (array) $line->config : [];
 

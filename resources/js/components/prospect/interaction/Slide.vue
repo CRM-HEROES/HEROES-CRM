@@ -472,6 +472,15 @@
                                                 {{ interaction.number }}
                                             </div>
                                         </div>
+                                        <span
+                                            :class="[
+                                                'hc-kavkom-call-ready',
+                                                kavkomReady ? 'is-ready' : 'is-loading',
+                                            ]"
+                                        >
+                                            <i class="fa fa-circle"></i>
+                                            {{ kavkomReady ? "Prêt" : "Connexion" }}
+                                        </span>
                                     </div>
 
                                     <!--
@@ -484,6 +493,7 @@
                                     <kavkom
                                         ref="kavkomWebphone"
                                         id="kavkom-webphone"
+                                        :project-id="project.id"
                                         :auto-answer="true"
                                         @ready="onKavkomReady"
                                         @connection-error="onKavkomConnectionError"
@@ -508,10 +518,11 @@
 
                                 <button
                                     type="button"
-                                    class="hc-button-secondary"
-                                    :disabled="callingViaKavkom || callingViaAi || !kavkomReady"
+                                    class="hc-button-secondary hc-kavkom-call-action"
+                                    :disabled="callingViaKavkom || !kavkomReady"
                                     @click="triggerKavkomCall(interaction.number)"
                                 >
+                                    <i class="fa fa-phone"></i>
                                     {{
                                         callingViaKavkom
                                             ? "Appel en cours..."
@@ -519,30 +530,6 @@
                                     }}
                                 </button>
 
-                                <div
-                                    v-if="aiCallMessage"
-                                    :class="[
-                                        'hc-kavkom-call-status',
-                                        aiCallSuccess ? 'success' : 'error',
-                                    ]"
-                                >
-                                    {{ aiCallMessage }}
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="hc-button-secondary hc-ai-call-button"
-                                    :disabled="callingViaKavkom || callingViaAi || !kavkomReady"
-                                    title="L'IA parle au prospect, vous restez en ligne"
-                                    @click="triggerAiCall(interaction.number)"
-                                >
-                                    <i class="fas fa-robot"></i>
-                                    {{
-                                        callingViaAi
-                                            ? "Appel IA en cours..."
-                                            : "Appeler avec l'IA"
-                                    }}
-                                </button>
                             </div>
                         </div>
                     </template>
@@ -711,6 +698,28 @@
     font-weight: 600;
     color: #343a40;
 }
+.hc-kavkom-call-ready {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 4px 7px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.hc-kavkom-call-ready i {
+    font-size: 7px;
+}
+.hc-kavkom-call-ready.is-ready {
+    color: #16794a;
+    background: #e7f7ef;
+}
+.hc-kavkom-call-ready.is-loading {
+    color: #896b16;
+    background: #fff6d8;
+}
 .hc-kavkom-call-status {
     display: flex;
     align-items: center;
@@ -732,17 +741,15 @@
     background: #8e24aa;
     border-color: #8e24aa;
 }
-.hc-kavkom-call-panel > .hc-button-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-.hc-ai-call-button {
+.hc-kavkom-call-action {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background: #0d6efd !important;
-    border-color: #0d6efd !important;
+}
+.hc-kavkom-call-panel > .hc-button-secondary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 </style>
 
@@ -800,12 +807,6 @@ export default {
             kavkomCallUuid: null,
             kavkomDebugTimer: null,
             kavkomDebugLastStatus: null,
-            // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
-            // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
-            // au prospect une fois la conférence à 3 établie côté serveur.
-            callingViaAi: false,
-            aiCallMessage: "",
-            aiCallSuccess: false,
             // Softphone prêt = enregistré en SIP côté navigateur, capable
             // de recevoir/auto-répondre au leg agent envoyé par le PBX.
             kavkomReady: false,
@@ -963,6 +964,7 @@ export default {
                 const { data } = await ApiService.post("settings/kavkom/call", {
                     destination: number,
                     prospect_id: this.interactionProspect?.id,
+                    project_id: this.project?.id,
                 });
 
                 if (!data.success) {
@@ -1061,57 +1063,6 @@ export default {
             if (this.kavkomDebugTimer) {
                 window.clearInterval(this.kavkomDebugTimer);
                 this.kavkomDebugTimer = null;
-            }
-        },
-
-        /**
-         * "Appeler avec l'IA" : votre poste Kavkom sonne exactement comme un
-         * clic-à-appeler classique (même softphone ci-dessus), mais côté
-         * serveur le prospect est mis en conférence avec vous ET l'agent
-         * vocal Gemini Live, qui mène la conversation. Voir
-         * AiPhoneAgentController::trigger().
-         */
-        async triggerAiCall(number) {
-            if (!number) {
-                console.warn("[AI Call] Appel ignoré : aucun numéro fourni.");
-                return;
-            }
-            if (!this.interactionProspect?.id) {
-                console.warn("[AI Call] Appel ignoré : aucun prospect en contexte.");
-                return;
-            }
-
-            this.callingViaAi = true;
-            this.aiCallMessage = "";
-
-            try {
-                const { data } = await ApiService.post("settings/ai-phone-agent/call", {
-                    prospect_id: this.interactionProspect.id,
-                    destination: number,
-                });
-
-                if (!data.success) {
-                    console.warn("[AI Call] L'API a refusé le lancement de l'appel.", { message: data.message });
-                    this.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
-                    this.aiCallSuccess = false;
-                    return;
-                }
-
-                this.aiCallMessage =
-                    "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
-                this.aiCallSuccess = true;
-                console.log("[AI Call] Appel lancé.", { prospectId: this.interactionProspect.id });
-            } catch (error) {
-                console.error("[AI Call] Erreur lors du lancement de l'appel IA.", {
-                    status: error.response?.status,
-                    message: error.response?.data?.message || error.message,
-                });
-                this.aiCallMessage =
-                    error.response?.data?.message ||
-                    "Erreur inattendue lors du lancement de l'appel avec l'IA.";
-                this.aiCallSuccess = false;
-            } finally {
-                this.callingViaAi = false;
             }
         },
 
@@ -1374,7 +1325,9 @@ export default {
          */
         kavkomConfigured() {
             return this.lines.some(
-                (line) => line.operator === "kavkom" && line.user_id === this.user.id
+                (line) =>
+                    line.operator === "kavkom" &&
+                    String(line.user_id) === String(this.user.id)
             );
         },
 
