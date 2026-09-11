@@ -526,6 +526,7 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
+        Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 
@@ -622,7 +623,7 @@ Route::group([
         Route::get('/setting/{setting}/check', [ProjectSettingController::class, 'check']);
         Route::get('/setting/{setting}', [ProjectSettingController::class, 'show']);
         Route::match(['PUT', 'PATCH'], '/setting/{setting}', [ProjectSettingController::class, 'update']);
-        Route::post('/setting/{setting}/test', [ProjectSettingController::class, 'testEmail']);
+        Route::post('/setting/{setting}/test', [ProjectSettingController::class, 'test']);
         Route::delete('/setting/{setting}', [ProjectSettingController::class, 'destroy']);
 
         // Sms Template

@@ -7,4 +7,7 @@ export default {
             params
         );
     },
+    sendBulk(project, params) {
+        return ApiService.post(`project/${project}/prospect/email/bulk`, params);
+    },
 };

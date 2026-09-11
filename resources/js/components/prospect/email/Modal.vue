@@ -3,7 +3,7 @@
         <form class="hc-flex-column" style="height: 100%" @submit.prevent="send">
             <item-list gap="8px" class="hc-flex-1" padding="10px 0">
                 <v-field label="Destinataire" required v-slot="{ label }">
-                    <input v-model="draft.to" :placeholder="label + ' ...'" type="email" required />
+                    <input v-model="draft.to" :placeholder="label + ' ...'" type="email" :required="!draft.prospects" />
                 </v-field>
                 <v-field label="Objet" required v-slot="{ label }">
                     <input v-model="draft.subject" :placeholder="label + ' ...'" required />
@@ -60,11 +60,11 @@ export default {
             this.sending = true;
 
             try {
-                await ProspectEmailService.send(
-                    this.project.slug,
-                    this.draft.prospect,
-                    this.draft
-                );
+                if (this.draft.prospects) {
+                    await ProspectEmailService.sendBulk(this.project.slug, this.draft);
+                } else {
+                    await ProspectEmailService.send(this.project.slug, this.draft.prospect, this.draft);
+                }
                 store.commit("CLEAR_PROSPECT_EMAIL_DRAFT");
                 store.commit(CLOSE_MODAL);
             } finally {
