@@ -33,7 +33,11 @@ import store from "@/store";
 
 // Actions
 import { CLOSE_MODAL } from "@/actions/modal";
-import { UPDATE_SETTING, GET_SETTING } from "@/actions/project/setting";
+import {
+    UPDATE_SETTING,
+    TEST_SETTING,
+    GET_SETTING,
+} from "@/actions/project/setting";
 
 export default {
     data() {
@@ -59,8 +63,9 @@ export default {
             try {
                 await store.dispatch(UPDATE_SETTING, {
                     key: this.key,
-                    value: this.setting,
+                    value: { ...this.setting, validated_at: null },
                 });
+                store.dispatch(TEST_SETTING, this.key).catch(() => {});
             } finally {
                 this.updatingSetting = false;
                 store.commit(CLOSE_MODAL);

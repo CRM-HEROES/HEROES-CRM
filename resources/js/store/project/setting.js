@@ -48,18 +48,29 @@ const actions = {
     },
 
     async [TEST_SETTING](context, key) {
-        const { data } = await SettingService.test(
-            context.state.project.slug,
-            key
-        );
-        context.commit(UPDATE_SETTING, {
-            key,
-            value: {
-                ...context.state.project.settings[key],
-                validated_at: data.validated_at,
-            },
-        });
-        return data;
+        try {
+            const { data } = await SettingService.test(
+                context.state.project.slug,
+                key
+            );
+            context.commit(UPDATE_SETTING, {
+                key,
+                value: {
+                    ...context.state.project.settings[key],
+                    validated_at: data.validated_at,
+                },
+            });
+            return data;
+        } catch (error) {
+            context.commit(UPDATE_SETTING, {
+                key,
+                value: {
+                    ...context.state.project.settings[key],
+                    validated_at: null,
+                },
+            });
+            throw error;
+        }
     },
 
     /**

@@ -255,6 +255,12 @@
                                 v-text="prospect.mobile_phone_number"
                             ></span>
                         </div>
+                        <icon
+                            v-if="brevoSettingValidated"
+                            class="fa fa-check"
+                            color="#489f1f"
+                            v-tooltip="'Configuration Brevo validée'"
+                        />
                         <icon class="fa fa-caret-right" />
                     </item>
                 </item-list>
@@ -849,6 +855,7 @@ export default {
             "slideOpen",
             "smsTemplates",
             "can",
+            "settingsGet",
         ]),
 
         /**
@@ -904,6 +911,10 @@ export default {
          */
         smss() {
             return this.prospect ? this.prospectSms : this.bulkSms;
+        },
+
+        brevoSettingValidated() {
+            return Boolean(this.settingsGet("brevo")?.validated_at);
         },
     },
 };
