@@ -81,7 +81,9 @@ def parse_digest_challenge(response: str):
     return {
         "realm": realm.group(1),
         "nonce": nonce.group(1),
-        "qop": qop.group(1) if qop else None,
+        # Servers may advertise a list such as "auth,auth-int". RFC 7616
+        # requires selecting one supported token, not hashing the whole list.
+        "qop": next((item.strip() for item in qop.group(1).split(",") if item.strip().lower() == "auth"), None) if qop else None,
         "algorithm": (algorithm.group(1) if algorithm else "MD5").upper(),
     }
 

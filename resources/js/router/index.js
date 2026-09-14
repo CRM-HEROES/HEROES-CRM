@@ -33,6 +33,7 @@ const ProspectProfile = () =>
 // Project
 const ProjectTable = () => import("@/components/project/table/Layout.vue");
 const ProjectProfile = () => import("@/components/project/profile/Profile.vue");
+const AiAgentLayout = () => import("@/components/ai-agent/Layout.vue");
 // User
 const UserTable = () => import("@/components/user/table/Layout.vue");
 const UserProfile = () => import("@/components/user/profile/Profile.vue");
@@ -136,6 +137,15 @@ const routes = [
                 meta: {
                     title: `Projet`,
                     page: "project.show",
+                },
+            },
+            {
+                name: "project.ai-agent",
+                path: "ai-agent",
+                component: AiAgentLayout,
+                meta: {
+                    title: `Agents IA`,
+                    page: "project.ai-agent.index",
                 },
             },
             {

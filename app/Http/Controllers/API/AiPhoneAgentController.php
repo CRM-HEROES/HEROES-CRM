@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\AiAgent;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
@@ -29,6 +30,7 @@ class AiPhoneAgentController extends Controller
 
         $data = $request->validate([
             'call_uuid' => ['nullable', 'string'],
+            'agent_id' => ['nullable', 'integer'],
             'prospect_id' => ['nullable', 'integer', 'exists:prospects,id'],
             'caller_number' => ['nullable', 'string', 'required_without:prospect_id'],
             'destination_number' => ['nullable', 'string'],
@@ -88,6 +90,7 @@ class AiPhoneAgentController extends Controller
             'size' => 0,
             'data' => [
                 'call_uuid' => $data['call_uuid'] ?? null,
+                'agent_id' => $data['agent_id'] ?? null,
                 'transcript' => $data['transcript'] ?? null,
                 'analysis' => $analysis,
             ],
@@ -95,6 +98,7 @@ class AiPhoneAgentController extends Controller
 
         Log::channel('ai-phone-agent')->info('AI phone agent call ingested.', [
             'call_uuid' => $data['call_uuid'] ?? null,
+            'agent_id' => $data['agent_id'] ?? null,
             'project_id' => $prospect->project_id,
             'prospect_id' => $prospect->id,
             'interaction_id' => $interaction->id,
@@ -116,12 +120,31 @@ class AiPhoneAgentController extends Controller
      */
     public function trigger(Request $request, KavkomService $kavkomService)
     {
+        Log::channel('ai-phone-agent')->info('AI phone call trigger received.', [
+            'user_id' => $request->user()?->id,
+            'prospect_id' => $request->input('prospect_id'),
+        ]);
+
         $data = $request->validate([
             'prospect_id' => ['required', 'integer', 'exists:prospects,id'],
             'destination' => ['nullable', 'string'],
+            'agent_id' => ['nullable', 'integer'],
         ]);
 
         $prospect = Prospect::findOrFail($data['prospect_id']);
+        $agent = $this->resolveAgent($prospect->project_id, $data['agent_id'] ?? null);
+        if (!$agent) {
+            Log::channel('ai-phone-agent')->warning('AI call rejected: no active agent configured.', [
+                'prospect_id' => $prospect->id,
+                'project_id' => $prospect->project_id,
+                'requested_agent_id' => $data['agent_id'] ?? null,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => "Aucun agent IA actif n'est configuré pour ce projet.",
+            ], 200);
+        }
         $destination = ($data['destination'] ?? null) ?: ($prospect->mobile_phone_number ?: $prospect->phone_number);
         if (empty($destination)) {
             return response()->json([
@@ -139,27 +162,50 @@ class AiPhoneAgentController extends Controller
             ], 200);
         }
 
-        $config = $this->getUserKavkomConfig($request);
-        if (!$config) {
+        $kavkomConfig = $agent->kavkom_config ?: [];
+        if (empty($kavkomConfig['extension']) || empty($kavkomConfig['password']) || empty($kavkomConfig['user_context'])) {
             return response()->json([
                 'success' => false,
-                'message' => 'Configuration Kavkom manquante : renseignez le jeton API et le domain_uuid dans les paramètres.',
+                'message' => "La configuration Kavkom de l'agent est incomplète : extension, contexte SIP et mot de passe sont requis.",
             ], 200);
         }
 
-        $extension = $kavkomService->resolveExtension($config['api_token'], $config['domain_uuid'], $config['extension'] ?? null);
-        if (!$extension['success']) {
-            return response()->json($extension, 200);
+        $userExtension = $this->getUserKavkomExtension($request);
+        if (!$userExtension) {
+            return response()->json([
+                'success' => false,
+                'message' => "Configuration Kavkom utilisateur manquante : impossible de joindre l'extension CRM.",
+            ], 200);
         }
 
         try {
+            Log::channel('ai-phone-agent')->info('Calling AI bridge.', [
+                'prospect_id' => $prospect->id,
+                'agent_id' => $agent->id,
+                'agent_extension' => $kavkomConfig['extension'],
+                'user_extension' => $userExtension,
+                'destination_digits' => preg_replace('/\D+/', '', $destination),
+            ]);
             $response = Http::withHeaders(['X-AI-Agent-Secret' => $secret])
                 ->timeout(15)
                 ->post(rtrim($bridgeUrl, '/').'/calls', [
                     'prospect_id' => $prospect->id,
                     'destination_number' => $destination,
-                    'user_extension' => $extension['extension'],
-                    'user_domain_uuid' => $config['domain_uuid'],
+                    'user_extension' => $userExtension,
+                    'agent_id' => $agent->id,
+                    'kavkom_config' => [
+                        'extension' => $kavkomConfig['extension'],
+                        'password' => $kavkomConfig['password'],
+                        'user_context' => $kavkomConfig['user_context'],
+                        'transport' => $kavkomConfig['transport'] ?? 'tls',
+                        'sip_port' => (int) ($kavkomConfig['sip_port'] ?? (($kavkomConfig['transport'] ?? 'tls') === 'tls' ? 5061 : 5060)),
+                    ],
+                    'agent' => [
+                        'name' => $agent->name,
+                        'script' => $agent->script,
+                        'instructions' => $agent->instructions,
+                        'config' => $agent->config ?: [],
+                    ],
                 ]);
         } catch (\Throwable $exception) {
             Log::channel('ai-phone-agent')->warning('AI phone agent bridge unreachable.', ['error' => $exception->getMessage()]);
@@ -180,11 +226,17 @@ class AiPhoneAgentController extends Controller
             ], 200);
         }
 
+        Log::channel('ai-phone-agent')->info('AI bridge accepted call.', [
+            'prospect_id' => $prospect->id,
+            'agent_id' => $agent->id,
+            'bridge_status' => $response->status(),
+            'call_uuid' => data_get($response->json(), 'call_uuid'),
+        ]);
+
         return response()->json($response->json() ?: ['success' => true], 200);
     }
 
-    /** Same lookup as KavkomController::getUserKavkomConfig(). */
-    private function getUserKavkomConfig(Request $request): ?array
+    private function getUserKavkomExtension(Request $request): ?string
     {
         $setting = UserSetting::query()
             ->whereNull('project_id')
@@ -198,7 +250,24 @@ class AiPhoneAgentController extends Controller
             return null;
         }
 
-        return $config;
+        $extension = app(KavkomService::class)->resolveExtension(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $config['extension'] ?? null
+        );
+
+        return $extension['success'] ? (string) $extension['extension'] : null;
+    }
+
+    private function resolveAgent(int $projectId, ?int $agentId): ?AiAgent
+    {
+        $query = AiAgent::query()
+            ->where('project_id', $projectId)
+            ->where('is_active', true);
+
+        return $agentId
+            ? $query->whereKey($agentId)->first()
+            : $query->latest('id')->first();
     }
 
     private function isAuthorized(Request $request): bool

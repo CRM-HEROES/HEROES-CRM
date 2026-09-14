@@ -24,6 +24,7 @@ use App\Http\Controllers\API\Project\CategoryController as ProjectCategoryContro
 use App\Http\Controllers\API\Project\CommissionController as ProjectCommissionController;
 
 use App\Http\Controllers\API\Project\CampaignController as ProjectCampaignController;
+use App\Http\Controllers\API\Project\AiAgentController as ProjectAiAgentController;
 use App\Http\Controllers\API\Project\Campaign\ActionController as ProjectCampaignActionController;
 use App\Http\Controllers\API\Project\Campaign\CampaignActionController as ProjectCampaignCampaignActionController;
 use App\Http\Controllers\API\Project\Campaign\CampaignOperatorController as ProjectCampaignCampaignOperatorController;
@@ -354,6 +355,7 @@ Route::group([
         Route::delete('user/{user}/product/{product}/action/{action}/commission', [ProjectCommissionController::class, 'destroy'])->name('commission.user-product-action.destroy');
 
         // Campaign
+        Route::apiResource('ai-agent', ProjectAiAgentController::class);
         Route::get('campaign/{campaign}/check-rules', [ProjectCampaignController::class, 'checkRules'])->name('campaign.check-rules');
         Route::apiResource('campaign', ProjectCampaignController::class);
         Route::apiResource('campaign-action', ProjectCampaignActionController::class);

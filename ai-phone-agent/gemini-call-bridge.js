@@ -76,7 +76,7 @@ ne convertis pas un âge en date de naissance).`;
  * still be checked once FreeSWITCH is in place.
  */
 class GeminiCallBridge {
-    constructor({ callUuid, prospectId, systemContext = "" }) {
+    constructor({ callUuid, prospectId, systemContext = "", agent = {}, agentId = null }) {
         this.callUuid = callUuid;
         this.prospectId = prospectId;
         this.ws = null;
@@ -85,6 +85,8 @@ class GeminiCallBridge {
         this.transcript = [];
         this.archive = new CallArchive(callUuid);
         this.systemContext = systemContext;
+        this.agent = agent || {};
+        this.agentId = agentId;
         this.paused = false;
         this.closedByUs = false;
         this.reconnects = 0;
@@ -107,13 +109,17 @@ class GeminiCallBridge {
         this.ws = new WebSocket(url);
 
         this.ws.on("open", () => {
-            console.log(`[Gemini ${this.callUuid}] WebSocket open.`);
+                console.log(`[Gemini ${this.callUuid}] WebSocket open; sending setup.`, {
+                    model: this.agent.config?.model || config.gemini.model,
+                    apiVersion: this.agent.config?.api_version || config.gemini.apiVersion,
+                    hasSystemContext: Boolean(this.systemContext),
+                });
             this.ws.send(
                 JSON.stringify({
                     setup: {
-                        model: config.gemini.model,
+                        model: this.agent.config?.model || config.gemini.model,
                         generationConfig: { responseModalities: ["AUDIO"] },
-                        systemInstruction: { parts: [{ text: `${SYSTEM_INSTRUCTION}\n\nContexte CRM de cet appel : ${this.systemContext}` }] },
+                        systemInstruction: { parts: [{ text: this.buildSystemInstruction() }] },
                         tools: [{ functionDeclarations: [RECORD_PROSPECT_INFO_TOOL] }],
                         inputAudioTranscription: {},
                         outputAudioTranscription: {},
@@ -133,6 +139,16 @@ class GeminiCallBridge {
                 setTimeout(() => { this.systemContext += `\nConversation déjà tenue:\n${this.transcript.slice(-40).join("\n")}`; this.connect(); }, 500 * this.reconnects);
             }
         });
+    }
+
+    buildSystemInstruction() {
+        const agentInstructions = [
+            this.agent.name ? `Nom de l'agent : ${this.agent.name}` : "",
+            this.agent.script ? `Script de l'agent :\n${this.agent.script}` : "",
+            this.agent.instructions ? `Instructions comportementales :\n${this.agent.instructions}` : "",
+        ].filter(Boolean).join("\n\n");
+
+        return `${SYSTEM_INSTRUCTION}\n\nConfiguration de l'agent IA :\n${agentInstructions || "Aucune configuration spécifique."}\n\nContexte CRM de cet appel : ${this.systemContext}`;
     }
 
     /** @param {Buffer} pcm16kBuffer Raw L16 PCM at 16kHz, as received from FreeSWITCH. */
@@ -187,6 +203,9 @@ class GeminiCallBridge {
         }
 
         if (message.toolCall) {
+            console.log(`[Gemini ${this.callUuid}] Tool call received.`, {
+                count: message.toolCall.functionCalls?.length || 0,
+            });
             this._handleToolCall(message.toolCall);
             return;
         }
@@ -275,6 +294,10 @@ class GeminiCallBridge {
 
     async finalize() {
         this.closedByUs = true;
+        console.log(`[Gemini ${this.callUuid}] Finalizing call.`, {
+            transcriptEntries: this.transcript.length,
+            collectedFields: Object.keys(this.collected),
+        });
         if (this.ws && this.ws.readyState === WebSocket.OPEN) {
             try {
                 this.ws.close();
@@ -302,6 +325,7 @@ class GeminiCallBridge {
         }
         const body = {
             call_uuid: this.callUuid,
+            agent_id: this.agentId,
             prospect_id: this.prospectId,
             transcript,
             analysis,

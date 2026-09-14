@@ -147,6 +147,14 @@ class Project extends Model
     }
 
     /**
+     * AI phone agents configured for this project.
+     */
+    public function aiAgents()
+    {
+        return $this->hasMany(AiAgent::class);
+    }
+
+    /**
      * Calendars
      */
     public function calendars()

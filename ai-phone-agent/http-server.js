@@ -2,7 +2,7 @@ const express = require("express");
 const crypto = require("crypto");
 const config = require("./config");
 const eslClient = require("./esl-client");
-const { getBridge } = require("./ws-server");
+const { getBridge, registerCallContext } = require("./ws-server");
 
 function checkSecret(req, res, next) {
     const provided = req.header("X-AI-Agent-Secret") || "";
@@ -27,12 +27,15 @@ function createHttpServer() {
             prospect_id: prospectId,
             destination_number: destination,
             user_extension: userExtension,
+            agent_id: agentId,
+            agent,
+            kavkom_config: kavkomConfig,
         } = req.body || {};
 
-        if (!prospectId || !destination || !userExtension) {
+        if (!prospectId || !destination || !userExtension || !agentId || !agent || !kavkomConfig) {
             return res.status(422).json({
                 success: false,
-                message: "prospect_id, destination_number et user_extension sont requis.",
+                message: "prospect_id, destination_number, user_extension, agent_id et agent sont requis.",
             });
         }
         const normalizedDestination = String(destination).replace(/\D/g, "");
@@ -43,11 +46,22 @@ function createHttpServer() {
         const callUuid = crypto.randomUUID();
         const room = `ai-call-${callUuid}`;
 
+        console.log(`[HTTP] Starting AI call ${callUuid}.`, {
+            prospectId,
+            agentId,
+            agentName: agent.name,
+            userExtension,
+            destination: normalizedDestination,
+        });
+
         try {
             // 1. The AI tap first, so Gemini is already listening before
             // anyone starts talking.
             const aiChannel = await eslClient.originateIntoConference(config.freeswitch.loopbackTarget, room);
+            console.log(`[HTTP] ${callUuid}: AI tap originated (${aiChannel}).`);
             await eslClient.waitForAnswer(aiChannel);
+            console.log(`[HTTP] ${callUuid}: AI tap answered.`);
+            registerCallContext(callUuid, { agent, agentId });
             await eslClient.startAudioStream(aiChannel, config.wsPublicUrl, {
                 call_uuid: callUuid,
                 prospect_id: prospectId,
@@ -57,8 +71,9 @@ function createHttpServer() {
             // 2. Ring the CRM user's own Kavkom extension — their browser
             // softphone (Kavkom.vue) answers automatically, exactly like
             // the existing click-to-call flow.
-            const userDialTarget = `${config.freeswitch.dialPrefixInternal}${userExtension}`;
-            const userChannel = await eslClient.originateIntoConference(userDialTarget, room);
+            const userDialTarget = buildKavkomTarget(userExtension, kavkomConfig);
+            const userChannel = await eslClient.originateIntoConference(userDialTarget, room, { sipAuth: kavkomConfig });
+            console.log(`[HTTP] ${callUuid}: CRM user leg originated (${userChannel}).`);
 
             // Respond now: don't make the CRM's HTTP request wait on the
             // user's phone actually ringing (same reasoning as Kavkom's own
@@ -70,8 +85,9 @@ function createHttpServer() {
             eslClient
                 .waitForAnswer(userChannel)
                 .then(() => {
-                    const prospectDialTarget = `${config.freeswitch.dialPrefixExternal}${destination}`;
-                    return eslClient.originateIntoConference(prospectDialTarget, room);
+                    console.log(`[HTTP] ${callUuid}: CRM user answered; dialing prospect.`);
+                    const prospectDialTarget = buildKavkomTarget(destination, kavkomConfig);
+                    return eslClient.originateIntoConference(prospectDialTarget, room, { sipAuth: kavkomConfig });
                 })
                 .catch((error) => {
                     console.error(`[HTTP] Call ${callUuid}: user did not answer or prospect dial failed.`, error);
@@ -123,6 +139,17 @@ function createHttpServer() {
     });
 
     return app;
+}
+
+function buildKavkomTarget(destination, kavkomConfig) {
+    const number = String(destination).replace(/\D/g, "");
+    const domain = String(kavkomConfig.user_context || "").trim();
+    const transport = String(kavkomConfig.transport || "tls").toLowerCase();
+    const port = Number(kavkomConfig.sip_port || (transport === "tls" ? 5061 : 5060));
+    if (!number || !domain || !["udp", "tcp", "tls"].includes(transport) || !Number.isInteger(port) || port < 1 || port > 65535) {
+        throw new Error("Agent Kavkom config must contain a destination, user_context and a valid transport.");
+    }
+    return `sofia/external/sip:${number}@${domain}:${port};transport=${transport}`;
 }
 
 module.exports = { createHttpServer };
