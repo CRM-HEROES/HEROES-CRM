@@ -77,6 +77,7 @@
                         ></div>
                     </label>
                     <user-bloc />
+                    <ai-agent-bloc />
                     <role-bloc />
                     <group-bloc />
                     <menu-bloc />
@@ -254,6 +255,7 @@ import ProductBloc from "./blocs/product/Bloc.vue";
 import RoleBloc from "./blocs/role/Bloc.vue";
 import ThreadBloc from "./blocs/thread/Bloc.vue";
 import UserBloc from "./blocs/user/Bloc.vue";
+import AiAgentBloc from "./blocs/ai-agent/Bloc.vue";
 
 export default {
     components: {
@@ -275,6 +277,7 @@ export default {
         RoleBloc,
         ThreadBloc,
         UserBloc,
+        AiAgentBloc,
     },
 
     data() {

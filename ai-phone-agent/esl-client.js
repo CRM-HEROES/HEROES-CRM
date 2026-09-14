@@ -63,7 +63,7 @@ class EslClient {
      * `origination_uuid`), without waiting for the leg to actually answer.
      * Use `waitForAnswer`/`waitForHangup` to react to what happens next.
      */
-    async originateIntoConference(dialTarget, room, { callerIdNumber, callerIdName } = {}) {
+    async originateIntoConference(dialTarget, room, { callerIdNumber, callerIdName, sipAuth } = {}) {
         await this.connect();
 
         const uuid = crypto.randomUUID();
@@ -72,6 +72,9 @@ class EslClient {
             origination_caller_id_number: callerIdNumber || config.freeswitch.callerIdNumber,
             origination_caller_id_name: callerIdName || config.freeswitch.callerIdName,
             ignore_early_media: "true",
+            sip_auth_username: sipAuth?.extension,
+            sip_auth_password: sipAuth?.password,
+            sip_auth_realm: sipAuth?.user_context,
         };
         const varString = Object.entries(vars)
             .filter(([, value]) => value !== undefined && value !== null && value !== "")

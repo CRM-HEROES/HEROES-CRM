@@ -51,9 +51,9 @@ services:
     env_file:
       - ./ai-phone-agent/.env
     environment:
-      # FreeSWITCH uses host networking, so its ESL endpoint is reached
-      # through the Docker host gateway from this bridge-network container.
-      FS_ESL_HOST: host.docker.internal
+      # FreeSWITCH uses host networking. On Docker Desktop, use the host-side
+      # address reachable from the bridge network; keep it configurable per OS.
+      FS_ESL_HOST: ${FREESWITCH_ESL_HOST:-192.168.65.3}
       FS_ESL_PORT: 8021
       WS_PUBLIC_URL: ws://127.0.0.1:14001/
     extra_hosts:

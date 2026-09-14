@@ -3,6 +3,12 @@ const config = require("./config");
 const { GeminiCallBridge } = require("./gemini-call-bridge");
 const transcriptHub = require("./transcript-hub");
 const activeBridges = new Map();
+const pendingCallContexts = new Map();
+
+function registerCallContext(callUuid, context) {
+    pendingCallContexts.set(callUuid, context);
+    setTimeout(() => pendingCallContexts.delete(callUuid), 10 * 60 * 1000).unref();
+}
 
 /**
  * Accepts the WebSocket connections opened by FreeSWITCH's
@@ -31,10 +37,15 @@ function startWsServer() {
                     console.warn("[WS] Invalid metadata frame from FreeSWITCH.", data.toString().slice(0, 200));
                 }
 
+                const callContext = pendingCallContexts.get(metadata.call_uuid) || {};
+                pendingCallContexts.delete(metadata.call_uuid);
+
                 bridge = new GeminiCallBridge({
                     callUuid: metadata.call_uuid || `unknown-${Date.now()}`,
                     prospectId: metadata.prospect_id,
                     systemContext: metadata.context || "",
+                    agent: callContext.agent || {},
+                    agentId: callContext.agentId,
                 });
                 activeBridges.set(bridge.callUuid, bridge);
                 bridge.onAudio = (base64Pcm24k) => {
@@ -83,4 +94,4 @@ function startWsServer() {
 }
 
 function getBridge(callUuid) { return activeBridges.get(callUuid); }
-module.exports = { startWsServer, getBridge };
+module.exports = { startWsServer, getBridge, registerCallContext };

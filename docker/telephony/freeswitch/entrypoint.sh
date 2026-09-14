@@ -21,6 +21,9 @@ case "$KAVKOM_SIP_TRANSPORT" in
 esac
 
 if [ "${KAVKOM_SIP_TRANSPORT}" = "tls" ]; then
+  # Keep the TLS destination and SNI aligned with the tenant returned as
+  # user_context. The image cannot interpolate shell variables in stunnel.conf.
+  sed -i "s#^connect = .*#connect = ${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}#; s#^sni = .*#sni = ${KAVKOM_USER_CONTEXT}#" /etc/stunnel/stunnel.conf
   stunnel /etc/stunnel/stunnel.conf &
   # Keep the SIP identity and request URI on Kavkom's domain. Only the
   # registration socket uses the local relay that supplies the SNI.
