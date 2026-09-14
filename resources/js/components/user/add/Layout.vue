@@ -62,6 +62,10 @@
                             :placeholder="label + ' ...'"
                             v-model="userToCreate.email"
                     /></v-field>
+                    <v-field :label="$t('phone_country')"
+                        ><phone-country-select
+                            v-model="userToCreate.phone_country"
+                    /></v-field>
                     <v-field
                         :label="$t('password')"
                         required
@@ -134,10 +138,6 @@
                                 type="text"
                                 :placeholder="label + ' ...'"
                                 v-model="userToCreate.mobile_phone_number"
-                        /></v-field>
-                        <v-field :label="$t('phone_country')"
-                            ><phone-country-select
-                                v-model="userToCreate.phone_country"
                         /></v-field>
                         <v-field :label="$t('street')" v-slot="{ label }">
                             <google-map-input
@@ -271,6 +271,7 @@ export default {
                 postal_code: "",
                 city: "",
                 country: "",
+                phone_country: [],
                 default_projects: [],
             };
         },

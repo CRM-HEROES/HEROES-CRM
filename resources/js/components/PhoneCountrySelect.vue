@@ -1,15 +1,29 @@
 <template>
     <div class="hc-phone-country-select" ref="wrapper">
-        <div
-            class="hc-phone-country-trigger"
-            :class="{ disabled }"
-            @click.stop="!disabled && toggle()"
-        >
-            <span
-                v-if="selected"
-                v-text="`${selected.flag} ${selected.label} (+${selected.dial_code})`"
-            ></span>
-            <span v-else class="hc-phone-country-placeholder">—</span>
+        <div class="hc-phone-country-trigger" :class="{ disabled }">
+            <div class="hc-phone-country-selected-list">
+                <div
+                    v-for="dialCode in selectedDialCodes"
+                    :key="dialCode"
+                    class="hc-phone-country-tag"
+                >
+                    <span v-text="formatCountryTag(dialCode)"></span>
+                    <icon
+                        v-if="!disabled"
+                        class="fa fa-times"
+                        @click.stop="removeCountry(dialCode)"
+                        style="cursor: pointer; margin-left: 4px"
+                    />
+                </div>
+                <input
+                    v-if="!disabled"
+                    type="text"
+                    class="hc-phone-country-input"
+                    :placeholder="selectedDialCodes.length === 0 ? '—' : ''"
+                    @click.stop="!disabled && toggle()"
+                    readonly
+                />
+            </div>
         </div>
 
         <teleport to="body">
@@ -26,14 +40,12 @@
                     :placeholder="$t('search') + ' ...'"
                 />
                 <div class="hc-phone-country-list">
-                    <div class="hc-phone-country-option" @click="select(null)">
-                        {{ $t("none") }}
-                    </div>
                     <div
                         v-for="country in filteredCountries"
                         :key="country.code"
                         class="hc-phone-country-option"
-                        @click="select(country)"
+                        :class="{ selected: isSelected(`+${country.dial_code}`) }"
+                        @click="toggleCountry(country)"
                         v-text="`${country.flag} ${country.label} (+${country.dial_code})`"
                     ></div>
                 </div>
@@ -50,13 +62,16 @@
 }
 
 .hc-phone-country-trigger {
-    display: block;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
     width: 100%;
     box-sizing: border-box;
     padding: 2px 4px;
     font-size: 12px;
     line-height: 21px;
     cursor: pointer;
+    align-items: center;
 }
 
 .hc-phone-country-trigger:hover {
@@ -66,6 +81,38 @@
 .hc-phone-country-trigger.disabled {
     cursor: not-allowed;
     opacity: 0.6;
+}
+
+.hc-phone-country-selected-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    align-items: center;
+}
+
+.hc-phone-country-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background-color: #e3f2fd;
+    border: 1px solid #1e88e5;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    color: #1e88e5;
+    white-space: nowrap;
+}
+
+.hc-phone-country-input {
+    flex: 1;
+    min-width: 100px;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
 }
 
 .hc-phone-country-placeholder {
@@ -115,6 +162,12 @@
     background-color: #1e88e5;
     color: white;
 }
+
+.hc-phone-country-option.selected {
+    background-color: #1e88e5;
+    color: white;
+    font-weight: bold;
+}
 </style>
 
 <script>
@@ -123,8 +176,8 @@ import phoneCountries from "@/constants/phoneCountries";
 export default {
     props: {
         modelValue: {
-            type: String,
-            default: "",
+            type: [String, Array],
+            default: () => [],
         },
 
         disabled: {
@@ -148,6 +201,52 @@ export default {
     },
 
     methods: {
+        /**
+         * Format country tag display
+         */
+        formatCountryTag(dialCode) {
+            const country = phoneCountries.find((c) => c.dial_code === dialCode.replace(/^\+/, ''));
+            if (!country) return dialCode;
+            return `${country.flag} +${country.dial_code}`;
+        },
+
+        /**
+         * Check if dial_code is selected
+         */
+        isSelected(dialCode) {
+            return this.selectedDialCodes.includes(dialCode);
+        },
+
+        /**
+         * Toggle dial_code selection (add or remove)
+         */
+        toggleCountry(country) {
+            const dialCode = `+${country.dial_code}`;
+            if (this.isSelected(dialCode)) {
+                this.removeCountry(dialCode);
+            } else {
+                this.addCountry(dialCode);
+            }
+        },
+
+        /**
+         * Add dial_code to selection
+         */
+        addCountry(dialCode) {
+            const newSelection = [...this.selectedDialCodes, dialCode];
+            this.$emit("update:modelValue", newSelection);
+        },
+
+        /**
+         * Remove dial_code from selection
+         */
+        removeCountry(dialCode) {
+            const newSelection = this.selectedDialCodes.filter(
+                (code) => code !== dialCode
+            );
+            this.$emit("update:modelValue", newSelection);
+        },
+
         /**
          *
          */
@@ -199,14 +298,6 @@ export default {
         /**
          *
          */
-        select(country) {
-            this.$emit("update:modelValue", country ? country.code : "");
-            this.close();
-        },
-
-        /**
-         *
-         */
         handleClickOutside(event) {
             if (
                 this.$refs.wrapper &&
@@ -220,10 +311,24 @@ export default {
 
     computed: {
         /**
-         *
+         * Get selected dial codes as array
+         */
+        selectedDialCodes() {
+            if (Array.isArray(this.modelValue)) {
+                return this.modelValue;
+            }
+            return this.modelValue ? [this.modelValue] : [];
+        },
+
+        /**
+         * Get the first selected dial code for backward compatibility
          */
         selected() {
-            return phoneCountries.find((c) => c.code === this.modelValue);
+            const firstDialCode = this.selectedDialCodes[0];
+            if (!firstDialCode) return null;
+            
+            const cleanDialCode = firstDialCode.replace(/^\+/, '');
+            return phoneCountries.find((c) => c.dial_code === cleanDialCode) || null;
         },
 
         /**
