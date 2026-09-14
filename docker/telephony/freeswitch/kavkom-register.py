@@ -19,7 +19,10 @@ TRANSPORT = os.environ.get("KAVKOM_SIP_TRANSPORT", "tls")
 KAVKOM_PROXY_PORT = os.environ.get("KAVKOM_SIP_PORT", "5061")
 
 CONTACT = f"<sip:{USER}@{EXTERNAL_IP}:{EXTERNAL_SIP_PORT};transport=tcp>"
-REQUEST_URI = f"sip:{DOMAIN}:{KAVKOM_PROXY_PORT};transport=tcp"
+# URI pour Digest (simplifié)
+REQUEST_URI_DIGEST = f"sip:{DOMAIN}"
+# URI pour la ligne REGISTER (avec port)
+REQUEST_URI_LINE = f"sip:{DOMAIN}"
 
 
 def md5_hex(value: str) -> str:
@@ -48,7 +51,7 @@ def build_register(
     tag = tag or uuid.uuid4().hex[:12]
     branch = f"z9hG4bK-{uuid.uuid4().hex[:12]}"
     lines = [
-        f"REGISTER {REQUEST_URI} SIP/2.0",
+        f"REGISTER {REQUEST_URI_LINE} SIP/2.0",
         "Via: SIP/2.0/TCP " + f"{EXTERNAL_IP}:{EXTERNAL_SIP_PORT};rport;branch={branch}",
         "Max-Forwards: 70",
         f"From: <sip:{USER}@{REALM}>;tag={tag}",
@@ -96,12 +99,18 @@ def build_authorization_header(challenge, cseq: int, call_id: str) -> str:
 
     nc = "00000001"
     cnonce = uuid.uuid4().hex
-    uri = REQUEST_URI
+    uri = REQUEST_URI_DIGEST  # Utilise URI simplifié pour Digest
 
     ha1 = md5_hex(f"{USER}:{realm}:{PASSWORD}")
     ha2 = md5_hex(f"REGISTER:{uri}")
+    print(f"[DEBUG] USER={USER}, REALM={realm}")
+    print(f"[DEBUG] PASSWORD={PASSWORD}")
+    print(f"[DEBUG] HA1={ha1}")
+    print(f"[DEBUG] HA2={ha2}")
+    print(f"[DEBUG] uri={uri}")
     if qop and qop.lower() == "auth":
         response = md5_hex(f"{ha1}:{nonce}:{nc}:{cnonce}:{qop}:{ha2}")
+        print(f"[DEBUG] response={response}")
         auth = (
             f'username="{USER}", realm="{realm}", nonce="{nonce}", uri="{uri}", '
             f'response="{response}", algorithm={algorithm}, qop={qop}, '
@@ -120,6 +129,9 @@ def perform_registration() -> bool:
     call_id = str(uuid.uuid4())
     tag = uuid.uuid4().hex[:12]
     initial = build_register(call_id=call_id, tag=tag)
+    print(f"[DEBUG] REQUEST_URI_LINE: {REQUEST_URI_LINE}")
+    print(f"[DEBUG] REQUEST_URI_DIGEST: {REQUEST_URI_DIGEST}")
+    print(f"[DEBUG] CONTACT: {CONTACT}")
     with socket.create_connection((TARGET_HOST, TARGET_PORT), timeout=10) as sock:
         sock.sendall(initial)
         response = read_sip_response(sock)
@@ -130,7 +142,10 @@ def perform_registration() -> bool:
         if not challenge:
             print(f"[KAVKOM] Could not parse digest challenge: {response[:500]}")
             return False
+        print(f"[DEBUG] Challenge realm: {challenge.get('realm')}, nonce: {challenge.get('nonce')[:20]}...")
+        print(f"[DEBUG] Challenge qop: {challenge.get('qop')}, algorithm: {challenge.get('algorithm')}")
         auth_header = build_authorization_header(challenge, 2, call_id)
+        print(f"[DEBUG] Full Auth header:\n{auth_header}")
         follow_up = build_register(auth_header=auth_header, cseq=2, call_id=call_id, tag=tag)
         sock.sendall(follow_up)
         response2 = read_sip_response(sock)

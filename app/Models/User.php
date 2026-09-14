@@ -91,6 +91,7 @@ class User extends Authenticatable // implements MustVerifyEmail
         'last_activity' => 'datetime',
         'email_verified_at' => 'datetime',
         'default_projects' => 'json',
+        'phone_country' => 'json',
     ];
 
 
