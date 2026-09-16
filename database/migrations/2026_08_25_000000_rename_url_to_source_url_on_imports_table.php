@@ -16,9 +16,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('imports', function (Blueprint $table) {
-            $table->renameColumn('url', 'source_url');
-        });
+        // No migration in this repo's history actually creates a "url"
+        // column anymore (it was dropped/squashed at some point), so a
+        // fresh `migrate` never has one to rename. Guard so this migration
+        // is a no-op there instead of failing every clean install.
+        if (Schema::hasColumn('imports', 'url')) {
+            Schema::table('imports', function (Blueprint $table) {
+                $table->renameColumn('url', 'source_url');
+            });
+        }
     }
 
     /**
@@ -26,8 +32,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('imports', function (Blueprint $table) {
-            $table->renameColumn('source_url', 'url');
-        });
+        if (Schema::hasColumn('imports', 'source_url') && !Schema::hasColumn('imports', 'url')) {
+            Schema::table('imports', function (Blueprint $table) {
+                $table->renameColumn('source_url', 'url');
+            });
+        }
     }
 };

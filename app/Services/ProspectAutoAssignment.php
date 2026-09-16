@@ -131,8 +131,8 @@ class ProspectAutoAssignment
             // Each prospect in the batch may have a different phone country,
             // so the pool is narrowed per-prospect rather than once for the
             // whole batch.
-            $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
-            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $dialCode);
             $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
             $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
@@ -175,8 +175,8 @@ class ProspectAutoAssignment
 
         $orderedUsers = $users->sortBy('id')->values();
         $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
-        $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
-        $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+        $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+        $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $dialCode);
         $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
         $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 
@@ -429,18 +429,25 @@ class ProspectAutoAssignment
     /**
      * Narrows eligible users to those configured for the prospect's phone
      * country (or with no country preference at all). A lead is never left
-     * unassigned for lack of a country match: if the country can't be
+     * unassigned for lack of a country match: if the dial code can't be
      * detected, or no eligible user matches it, the full pool is returned
      * unfiltered and the normal load-based pick decides instead.
+     *
+     * $dialCode is a dialing code such as "+33"/"+32" (see
+     * PhoneCountry::detectDialCode()) — the same format User::phone_country
+     * stores (a JSON array, one or more dial codes per user), since a user
+     * can be configured for several countries at once.
      */
-    protected function filterUsersByCountry($users, ?string $country)
+    protected function filterUsersByCountry($users, ?string $dialCode)
     {
-        if (!$country) {
+        if (!$dialCode) {
             return $users;
         }
 
-        $matching = $users->filter(function (User $user) use ($country) {
-            return !$user->phone_country || $user->phone_country === $country;
+        $matching = $users->filter(function (User $user) use ($dialCode) {
+            $configuredDialCodes = $user->phone_country;
+
+            return empty($configuredDialCodes) || in_array($dialCode, $configuredDialCodes, true);
         })->values();
 
         return $matching->isEmpty() ? $users : $matching;
@@ -575,8 +582,8 @@ class ProspectAutoAssignment
 
             $orderedUsers = $availableUsers->sortBy('id')->values();
             $loadMap = $this->getUserLoadCounts($project, $orderedUsers->pluck('id')->all());
-            $country = PhoneCountry::detect($prospect->phone_number ?: $prospect->mobile_phone_number);
-            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $country);
+            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = $this->filterUsersByCountry($orderedUsers, $dialCode);
             $eligibleUsers = $this->filterAvailableUsers($eligibleUsers);
             $candidate = $this->pickLeastLoadedUser($eligibleUsers, $loadMap);
 

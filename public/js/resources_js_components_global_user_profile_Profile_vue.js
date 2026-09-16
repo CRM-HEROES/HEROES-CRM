@@ -12,12 +12,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/constants/phoneCountries */ "./resources/js/constants/phoneCountries.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modelValue: {
-      type: String,
-      "default": ""
+      type: [String, Array],
+      "default": function _default() {
+        return [];
+      }
     },
     disabled: {
       type: Boolean,
@@ -37,6 +45,49 @@ __webpack_require__.r(__webpack_exports__);
     window.removeEventListener("resize", this.close);
   },
   methods: {
+    /**
+     * Format country tag display
+     */
+    formatCountryTag: function formatCountryTag(dialCode) {
+      var country = _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
+        return c.dial_code === dialCode.replace(/^\+/, '');
+      });
+      if (!country) return dialCode;
+      return "".concat(country.flag, " +").concat(country.dial_code);
+    },
+    /**
+     * Check if dial_code is selected
+     */
+    isSelected: function isSelected(dialCode) {
+      return this.selectedDialCodes.includes(dialCode);
+    },
+    /**
+     * Toggle dial_code selection (add or remove)
+     */
+    toggleCountry: function toggleCountry(country) {
+      var dialCode = "+".concat(country.dial_code);
+      if (this.isSelected(dialCode)) {
+        this.removeCountry(dialCode);
+      } else {
+        this.addCountry(dialCode);
+      }
+    },
+    /**
+     * Add dial_code to selection
+     */
+    addCountry: function addCountry(dialCode) {
+      var newSelection = [].concat(_toConsumableArray(this.selectedDialCodes), [dialCode]);
+      this.$emit("update:modelValue", newSelection);
+    },
+    /**
+     * Remove dial_code from selection
+     */
+    removeCountry: function removeCountry(dialCode) {
+      var newSelection = this.selectedDialCodes.filter(function (code) {
+        return code !== dialCode;
+      });
+      this.$emit("update:modelValue", newSelection);
+    },
     /**
      *
      */
@@ -85,13 +136,6 @@ __webpack_require__.r(__webpack_exports__);
     /**
      *
      */
-    select: function select(country) {
-      this.$emit("update:modelValue", country ? country.code : "");
-      this.close();
-    },
-    /**
-     *
-     */
     handleClickOutside: function handleClickOutside(event) {
       if (this.$refs.wrapper && !this.$refs.wrapper.contains(event.target) && !event.target.closest(".hc-phone-country-panel")) {
         this.close();
@@ -100,13 +144,24 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     /**
-     *
+     * Get selected dial codes as array
+     */
+    selectedDialCodes: function selectedDialCodes() {
+      if (Array.isArray(this.modelValue)) {
+        return this.modelValue;
+      }
+      return this.modelValue ? [this.modelValue] : [];
+    },
+    /**
+     * Get the first selected dial code for backward compatibility
      */
     selected: function selected() {
-      var _this2 = this;
+      var firstDialCode = this.selectedDialCodes[0];
+      if (!firstDialCode) return null;
+      var cleanDialCode = firstDialCode.replace(/^\+/, '');
       return _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
-        return c.code === _this2.modelValue;
-      });
+        return c.dial_code === cleanDialCode;
+      }) || null;
     },
     /**
      *
@@ -2629,28 +2684,49 @@ var _hoisted_1 = {
   "class": "hc-phone-country-select",
   ref: "wrapper"
 };
-var _hoisted_2 = ["textContent"];
-var _hoisted_3 = {
-  key: 1,
-  "class": "hc-phone-country-placeholder"
+var _hoisted_2 = {
+  "class": "hc-phone-country-selected-list"
 };
+var _hoisted_3 = ["textContent"];
 var _hoisted_4 = ["placeholder"];
-var _hoisted_5 = {
+var _hoisted_5 = ["placeholder"];
+var _hoisted_6 = {
   "class": "hc-phone-country-list"
 };
-var _hoisted_6 = ["onClick", "textContent"];
+var _hoisted_7 = ["onClick", "textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-trigger", {
       disabled: $props.disabled
-    }]),
+    }])
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.selectedDialCodes, function (dialCode) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      key: dialCode,
+      "class": "hc-phone-country-tag"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCountryTag(dialCode))
+    }, null, 8 /* PROPS */, _hoisted_3), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      key: 0,
+      "class": "fa fa-times",
+      onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+        return $options.removeCountry(dialCode);
+      }, ["stop"]),
+      style: {
+        "cursor": "pointer",
+        "margin-left": "4px"
+      }
+    }, null, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }), 128 /* KEYED_FRAGMENT */)), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 0,
+    type: "text",
+    "class": "hc-phone-country-input",
+    placeholder: $options.selectedDialCodes.length === 0 ? '—' : '',
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return !$props.disabled && $options.toggle();
-    }, ["stop"]))
-  }, [$options.selected ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-    key: 0,
-    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("".concat($options.selected.flag, " ").concat($options.selected.label, " (+").concat($options.selected.dial_code, ")"))
-  }, null, 8 /* PROPS */, _hoisted_2)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, "—"))], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
+    }, ["stop"])),
+    readonly: ""
+  }, null, 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
     to: "body"
   }, [$data.open && !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 0,
@@ -2664,20 +2740,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.keyword = $event;
     }),
     placeholder: _ctx.$t('search') + ' ...'
-  }, null, 8 /* PROPS */, _hoisted_4), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.keyword]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "hc-phone-country-option",
-    onClick: _cache[2] || (_cache[2] = function ($event) {
-      return $options.select(null);
-    })
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("none")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredCountries, function (country) {
+  }, null, 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.keyword]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredCountries, function (country) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: country.code,
-      "class": "hc-phone-country-option",
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-option", {
+        selected: $options.isSelected("+".concat(country.dial_code))
+      }]),
       onClick: function onClick($event) {
-        return $options.select(country);
+        return $options.toggleCountry(country);
       },
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("".concat(country.flag, " ").concat(country.label, " (+").concat(country.dial_code, ")"))
-    }, null, 8 /* PROPS */, _hoisted_6);
+    }, null, 10 /* CLASS, PROPS */, _hoisted_7);
   }), 128 /* KEYED_FRAGMENT */))])], 4 /* STYLE */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]))], 512 /* NEED_PATCH */);
 }
 
@@ -5529,7 +5602,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-select[data-v-3ca985e2] {\n    position: relative;\n    display: block;\n    width: 100%;\n}\n.hc-phone-country-trigger[data-v-3ca985e2] {\n    display: block;\n    width: 100%;\n    box-sizing: border-box;\n    padding: 2px 4px;\n    font-size: 12px;\n    line-height: 21px;\n    cursor: pointer;\n}\n.hc-phone-country-trigger[data-v-3ca985e2]:hover {\n    background-color: #00000011;\n}\n.hc-phone-country-trigger.disabled[data-v-3ca985e2] {\n    cursor: not-allowed;\n    opacity: 0.6;\n}\n.hc-phone-country-placeholder[data-v-3ca985e2] {\n    color: #999;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-select[data-v-3ca985e2] {\n    position: relative;\n    display: block;\n    width: 100%;\n}\n.hc-phone-country-trigger[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    box-sizing: border-box;\n    padding: 2px 4px;\n    font-size: 12px;\n    line-height: 21px;\n    cursor: pointer;\n    align-items: center;\n}\n.hc-phone-country-trigger[data-v-3ca985e2]:hover {\n    background-color: #00000011;\n}\n.hc-phone-country-trigger.disabled[data-v-3ca985e2] {\n    cursor: not-allowed;\n    opacity: 0.6;\n}\n.hc-phone-country-selected-list[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    align-items: center;\n}\n.hc-phone-country-tag[data-v-3ca985e2] {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    background-color: #e3f2fd;\n    border: 1px solid #1e88e5;\n    border-radius: 3px;\n    padding: 2px 6px;\n    font-size: 11px;\n    color: #1e88e5;\n    white-space: nowrap;\n}\n.hc-phone-country-input[data-v-3ca985e2] {\n    flex: 1;\n    min-width: 100px;\n    border: none;\n    outline: none;\n    background: transparent;\n    font-size: 12px;\n    cursor: pointer;\n    padding: 0;\n}\n.hc-phone-country-placeholder[data-v-3ca985e2] {\n    color: #999;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5552,7 +5625,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-panel {\n    position: fixed;\n    z-index: 9999;\n    width: 280px;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n    padding: 6px;\n    box-sizing: border-box;\n}\n.hc-phone-country-search {\n    width: 100%;\n    height: 26px;\n    padding: 0 6px;\n    margin-bottom: 4px;\n    font-size: 12px;\n    border: 1px solid #ddd;\n    border-radius: 3px;\n    box-sizing: border-box;\n}\n.hc-phone-country-list {\n    max-height: 260px;\n    overflow-y: auto;\n}\n.hc-phone-country-option {\n    padding: 5px 8px;\n    font-size: 12px;\n    cursor: pointer;\n    border-radius: 3px;\n    white-space: nowrap;\n    color: #333;\n}\n.hc-phone-country-option:hover {\n    background-color: #1e88e5;\n    color: white;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-panel {\n    position: fixed;\n    z-index: 9999;\n    width: 280px;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n    padding: 6px;\n    box-sizing: border-box;\n}\n.hc-phone-country-search {\n    width: 100%;\n    height: 26px;\n    padding: 0 6px;\n    margin-bottom: 4px;\n    font-size: 12px;\n    border: 1px solid #ddd;\n    border-radius: 3px;\n    box-sizing: border-box;\n}\n.hc-phone-country-list {\n    max-height: 260px;\n    overflow-y: auto;\n}\n.hc-phone-country-option {\n    padding: 5px 8px;\n    font-size: 12px;\n    cursor: pointer;\n    border-radius: 3px;\n    white-space: nowrap;\n    color: #333;\n}\n.hc-phone-country-option:hover {\n    background-color: #1e88e5;\n    color: white;\n}\n.hc-phone-country-option.selected {\n    background-color: #1e88e5;\n    color: white;\n    font-weight: bold;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
