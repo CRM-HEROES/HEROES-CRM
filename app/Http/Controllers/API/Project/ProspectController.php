@@ -912,6 +912,10 @@ class ProspectController extends Controller
 
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder);
+
+                if ($sortBy === 'created_at') {
+                    $query->orderBy('id', 'desc');
+                }
             })
             ->skip(($request->input('page', 1) - 1) * $count)
             ->paginate($count);
