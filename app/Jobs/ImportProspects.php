@@ -30,6 +30,7 @@ use App\Models\Import;
 use App\Models\User;
 use App\Services\ProspectAutoAssignment;
 use App\Support\ImportHeaderAliases;
+use App\Support\PhoneCountry;
 // The trait file is named Sendswelcomesms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
 use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
@@ -1463,6 +1464,14 @@ class ImportProspects implements ShouldQueue
      * Associate the import users to each prospect in the import
      * Only assign to prospects that don't already have users assigned.
      *
+     * MODIFIÉ (demande client, 2026-09-16) : un utilisateur coché dans
+     * "Utilisateurs affectés" ne reçoit plus systématiquement tous les
+     * leads de l'import — le prospect n'est attaché qu'aux users marqués
+     * dont l'indicatif configuré (User::phone_country) correspond au
+     * numéro du prospect. Un prospect sans numéro, ou dont aucun user
+     * marqué ne correspond à son indicatif, reste attaché à tous les
+     * users marqués (voir filterMarkedUsersByCountry).
+     *
      * @param  {array}  $prospectsIds list of prospects ids
      */
     protected function handleProspectsImportUsers(&$prospectsIds)
@@ -1487,13 +1496,26 @@ class ImportProspects implements ShouldQueue
             return; // All prospects already have users assigned
         }
 
+        $markedUsers = User::whereIn('id', $this->import->users)->get(['id', 'phone_country']);
+
+        $prospectsById = DB::table('prospects')
+            ->whereIn('id', $unassignedProspectIds)
+            ->select('id', 'phone_number', 'mobile_phone_number')
+            ->get()
+            ->keyBy('id');
+
         $data = [];
 
-        foreach ($this->import->users as $userId) {
-            foreach ($unassignedProspectIds as $prospectId) {
+        foreach ($unassignedProspectIds as $prospectId) {
+            $prospect = $prospectsById->get($prospectId);
+            $dialCode = $prospect
+                ? PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number)
+                : null;
+
+            foreach ($this->filterMarkedUsersByCountry($markedUsers, $dialCode) as $user) {
                 $data[] = [
                     'prospect_id' => $prospectId,
-                    'user_id'     => $userId,
+                    'user_id'     => $user->id,
                     'creator_id'     => $this->import->creator_id,
                     'created_at'  => $this->date,
                     'updated_at'  => $this->date,
@@ -1504,6 +1526,31 @@ class ImportProspects implements ShouldQueue
         if (!empty($data)) {
             DB::table('prospect_user')->insert($data);
         }
+    }
+
+    /**
+     * Narrows the "Utilisateurs affectés" pool marked on the import to
+     * those configured for the prospect's dial code (e.g. "+33"), or with
+     * no country preference at all. A prospect is never left without an
+     * owner for lack of a match: without a detectable dial code, or if
+     * none of the marked users match it, the full marked pool is returned
+     * unfiltered.
+     *
+     * @param  \Illuminate\Support\Collection  $markedUsers
+     */
+    protected function filterMarkedUsersByCountry($markedUsers, ?string $dialCode)
+    {
+        if (!$dialCode) {
+            return $markedUsers;
+        }
+
+        $matching = $markedUsers->filter(function (User $user) use ($dialCode) {
+            $configuredDialCodes = $user->phone_country;
+
+            return empty($configuredDialCodes) || in_array($dialCode, $configuredDialCodes, true);
+        })->values();
+
+        return $matching->isEmpty() ? $markedUsers : $matching;
     }
 
     /**
@@ -1583,17 +1630,18 @@ class ImportProspects implements ShouldQueue
 
         // Import relations
         $this->handleProspectsImportLabels($prospectsIds);
-        // RÉACTIVÉ (demande client, 2026-09-04) : un utilisateur coché dans
-        // "Utilisateurs affectés" doit recevoir TOUS les leads de l'import,
-        // pas une part répartie équitablement — chaque prospect est donc
-        // attaché à chacun des utilisateurs sélectionnés ici, avant même
-        // que ProspectAutoAssignment ne s'exécute en fin de job. Comme ce
-        // dernier ne traite que les prospects sans utilisateur
-        // (Prospect::doesntHave('users')), un import avec des "Utilisateurs
-        // affectés" non vides n'a donc plus rien à répartir : la
-        // répartition équitable (least-loaded) reste inchangée pour les
-        // pools "Rôles effectués" et "Groupes utilisateurs effectués", qui
-        // ne passent pas par ici.
+        // Un utilisateur coché dans "Utilisateurs affectés" ne reçoit un
+        // prospect que si son indicatif configuré (User::phone_country)
+        // correspond au numéro du prospect (ou si le prospect n'a pas de
+        // numéro, ou qu'aucun user marqué ne correspond — voir
+        // handleProspectsImportUsers/filterMarkedUsersByCountry). Ceci
+        // s'exécute avant ProspectAutoAssignment en fin de job, qui ne
+        // traite que les prospects encore sans utilisateur
+        // (Prospect::doesntHave('users')) : un import avec des
+        // "Utilisateurs affectés" non vides n'a donc plus rien à répartir
+        // pour les prospects déjà couverts ici. La répartition equitable
+        // (least-loaded) reste inchangée pour les pools "Rôles effectués"
+        // et "Groupes utilisateurs effectués", qui ne passent pas par ici.
         $this->handleProspectsImportUsers($prospectsIds);
         $this->handleProspectsImportGroups($prospectsIds);
     }

@@ -61,4 +61,26 @@ class PhoneCountryTest extends TestCase
         // No country code and not a 9/10-digit BE/FR shape: undecidable.
         $this->assertNull(PhoneCountry::detect('020 7946 0958'));
     }
+
+    public function test_it_detects_the_dial_code_for_belgium_and_france(): void
+    {
+        $this->assertSame('+32', PhoneCountry::detectDialCode('+32470123456'));
+        $this->assertSame('+33', PhoneCountry::detectDialCode('+33612345678'));
+        $this->assertSame('+33', PhoneCountry::detectDialCode('0612345678'));
+    }
+
+    public function test_it_returns_null_dial_code_when_the_number_is_unrecognized(): void
+    {
+        $this->assertNull(PhoneCountry::detectDialCode(null));
+        $this->assertNull(PhoneCountry::detectDialCode(''));
+        $this->assertNull(PhoneCountry::detectDialCode('0470123456'));
+    }
+
+    public function test_it_converts_a_region_code_to_its_dial_code(): void
+    {
+        $this->assertSame('+33', PhoneCountry::dialCodeForRegion('FR'));
+        $this->assertSame('+32', PhoneCountry::dialCodeForRegion('BE'));
+        $this->assertSame('+1', PhoneCountry::dialCodeForRegion('US'));
+        $this->assertNull(PhoneCountry::dialCodeForRegion(null));
+    }
 }

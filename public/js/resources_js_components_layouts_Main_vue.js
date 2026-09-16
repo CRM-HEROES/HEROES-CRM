@@ -117,12 +117,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/constants/phoneCountries */ "./resources/js/constants/phoneCountries.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     modelValue: {
-      type: String,
-      "default": ""
+      type: [String, Array],
+      "default": function _default() {
+        return [];
+      }
     },
     disabled: {
       type: Boolean,
@@ -142,6 +150,49 @@ __webpack_require__.r(__webpack_exports__);
     window.removeEventListener("resize", this.close);
   },
   methods: {
+    /**
+     * Format country tag display
+     */
+    formatCountryTag: function formatCountryTag(dialCode) {
+      var country = _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
+        return c.dial_code === dialCode.replace(/^\+/, '');
+      });
+      if (!country) return dialCode;
+      return "".concat(country.flag, " +").concat(country.dial_code);
+    },
+    /**
+     * Check if dial_code is selected
+     */
+    isSelected: function isSelected(dialCode) {
+      return this.selectedDialCodes.includes(dialCode);
+    },
+    /**
+     * Toggle dial_code selection (add or remove)
+     */
+    toggleCountry: function toggleCountry(country) {
+      var dialCode = "+".concat(country.dial_code);
+      if (this.isSelected(dialCode)) {
+        this.removeCountry(dialCode);
+      } else {
+        this.addCountry(dialCode);
+      }
+    },
+    /**
+     * Add dial_code to selection
+     */
+    addCountry: function addCountry(dialCode) {
+      var newSelection = [].concat(_toConsumableArray(this.selectedDialCodes), [dialCode]);
+      this.$emit("update:modelValue", newSelection);
+    },
+    /**
+     * Remove dial_code from selection
+     */
+    removeCountry: function removeCountry(dialCode) {
+      var newSelection = this.selectedDialCodes.filter(function (code) {
+        return code !== dialCode;
+      });
+      this.$emit("update:modelValue", newSelection);
+    },
     /**
      *
      */
@@ -190,13 +241,6 @@ __webpack_require__.r(__webpack_exports__);
     /**
      *
      */
-    select: function select(country) {
-      this.$emit("update:modelValue", country ? country.code : "");
-      this.close();
-    },
-    /**
-     *
-     */
     handleClickOutside: function handleClickOutside(event) {
       if (this.$refs.wrapper && !this.$refs.wrapper.contains(event.target) && !event.target.closest(".hc-phone-country-panel")) {
         this.close();
@@ -205,13 +249,24 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     /**
-     *
+     * Get selected dial codes as array
+     */
+    selectedDialCodes: function selectedDialCodes() {
+      if (Array.isArray(this.modelValue)) {
+        return this.modelValue;
+      }
+      return this.modelValue ? [this.modelValue] : [];
+    },
+    /**
+     * Get the first selected dial code for backward compatibility
      */
     selected: function selected() {
-      var _this2 = this;
+      var firstDialCode = this.selectedDialCodes[0];
+      if (!firstDialCode) return null;
+      var cleanDialCode = firstDialCode.replace(/^\+/, '');
       return _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
-        return c.code === _this2.modelValue;
-      });
+        return c.dial_code === cleanDialCode;
+      }) || null;
     },
     /**
      *
@@ -30047,12 +30102,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       kavkomCallUuid: null,
       kavkomDebugTimer: null,
       kavkomDebugLastStatus: null,
-      // "Appeler avec l'IA" : Kavkom sonne quand même votre poste (même
-      // softphone ci-dessous), mais c'est l'agent Gemini Live qui parle
-      // au prospect une fois la conférence à 3 établie côté serveur.
-      callingViaAi: false,
-      aiCallMessage: "",
-      aiCallSuccess: false,
       // Softphone prêt = enregistré en SIP côté navigateur, capable
       // de recevoir/auto-répondre au leg agent envoyé par le PBX.
       kavkomReady: false,
@@ -30210,7 +30259,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var _this4$interactionPro;
-        var _this4$interactionPro2, _yield$ApiService$pos, data, _error$response, _error$response2, _error$response3;
+        var _this4$interactionPro2, _this4$project, _yield$ApiService$pos, data, _error$response, _error$response2, _error$response3;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -30247,7 +30296,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context4.next = 16;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/kavkom/call", {
                 destination: number,
-                prospect_id: (_this4$interactionPro2 = _this4.interactionProspect) === null || _this4$interactionPro2 === void 0 ? void 0 : _this4$interactionPro2.id
+                prospect_id: (_this4$interactionPro2 = _this4.interactionProspect) === null || _this4$interactionPro2 === void 0 ? void 0 : _this4$interactionPro2.id,
+                project_id: (_this4$project = _this4.project) === null || _this4$project === void 0 ? void 0 : _this4$project.id
               });
             case 16:
               _yield$ApiService$pos = _context4.sent;
@@ -30379,84 +30429,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.kavkomDebugTimer = null;
       }
     },
-    /**
-     * "Appeler avec l'IA" : votre poste Kavkom sonne exactement comme un
-     * clic-à-appeler classique (même softphone ci-dessus), mais côté
-     * serveur le prospect est mis en conférence avec vous ET l'agent
-     * vocal Gemini Live, qui mène la conversation. Voir
-     * AiPhoneAgentController::trigger().
-     */
-    triggerAiCall: function triggerAiCall(number) {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var _this6$interactionPro;
-        var _yield$ApiService$pos2, data, _error$response5, _error$response6, _error$response7;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              if (number) {
-                _context6.next = 3;
-                break;
-              }
-              console.warn("[AI Call] Appel ignoré : aucun numéro fourni.");
-              return _context6.abrupt("return");
-            case 3:
-              if ((_this6$interactionPro = _this6.interactionProspect) !== null && _this6$interactionPro !== void 0 && _this6$interactionPro.id) {
-                _context6.next = 6;
-                break;
-              }
-              console.warn("[AI Call] Appel ignoré : aucun prospect en contexte.");
-              return _context6.abrupt("return");
-            case 6:
-              _this6.callingViaAi = true;
-              _this6.aiCallMessage = "";
-              _context6.prev = 8;
-              _context6.next = 11;
-              return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/ai-phone-agent/call", {
-                prospect_id: _this6.interactionProspect.id,
-                destination: number
-              });
-            case 11:
-              _yield$ApiService$pos2 = _context6.sent;
-              data = _yield$ApiService$pos2.data;
-              if (data.success) {
-                _context6.next = 18;
-                break;
-              }
-              console.warn("[AI Call] L'API a refusé le lancement de l'appel.", {
-                message: data.message
-              });
-              _this6.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'IA.";
-              _this6.aiCallSuccess = false;
-              return _context6.abrupt("return");
-            case 18:
-              _this6.aiCallMessage = "Appel IA lancé. Votre poste va sonner pour vous mettre en relation avec le prospect et l'IA.";
-              _this6.aiCallSuccess = true;
-              console.log("[AI Call] Appel lancé.", {
-                prospectId: _this6.interactionProspect.id
-              });
-              _context6.next = 28;
-              break;
-            case 23:
-              _context6.prev = 23;
-              _context6.t0 = _context6["catch"](8);
-              console.error("[AI Call] Erreur lors du lancement de l'appel IA.", {
-                status: (_error$response5 = _context6.t0.response) === null || _error$response5 === void 0 ? void 0 : _error$response5.status,
-                message: ((_error$response6 = _context6.t0.response) === null || _error$response6 === void 0 || (_error$response6 = _error$response6.data) === null || _error$response6 === void 0 ? void 0 : _error$response6.message) || _context6.t0.message
-              });
-              _this6.aiCallMessage = ((_error$response7 = _context6.t0.response) === null || _error$response7 === void 0 || (_error$response7 = _error$response7.data) === null || _error$response7 === void 0 ? void 0 : _error$response7.message) || "Erreur inattendue lors du lancement de l'appel avec l'IA.";
-              _this6.aiCallSuccess = false;
-            case 28:
-              _context6.prev = 28;
-              _this6.callingViaAi = false;
-              return _context6.finish(28);
-            case 31:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, null, [[8, 23, 28, 31]]);
-      }))();
-    },
     onKavkomReady: function onKavkomReady() {
       this.kavkomReady = true;
       console.log("[Kavkom][Debug] SIP softphone ready.");
@@ -30519,85 +30491,85 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     addInteraction: function addInteraction() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _this7.addingInteraction = true;
-              _context7.prev = 1;
-              _context7.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this7.interaction);
+              _this6.addingInteraction = true;
+              _context6.prev = 1;
+              _context6.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this6.interaction);
             case 4:
-              _this7.interaction = _context7.sent;
+              _this6.interaction = _context6.sent;
             case 5:
-              _context7.prev = 5;
-              _this7.addingInteraction = false;
-              return _context7.finish(5);
+              _context6.prev = 5;
+              _this6.addingInteraction = false;
+              return _context6.finish(5);
             case 8:
             case "end":
-              return _context7.stop();
+              return _context6.stop();
           }
-        }, _callee7, null, [[1,, 5, 8]]);
+        }, _callee6, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var _this8$interactionPro;
-        var _this8$logKavkomWarn;
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) switch (_context8.prev = _context8.next) {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        var _this7$interactionPro;
+        var _this7$logKavkomWarn;
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (!(!_this8.interaction || !((_this8$interactionPro = _this8.interactionProspect) !== null && _this8$interactionPro !== void 0 && _this8$interactionPro.id))) {
-                _context8.next = 2;
+              if (!(!_this7.interaction || !((_this7$interactionPro = _this7.interactionProspect) !== null && _this7$interactionPro !== void 0 && _this7$interactionPro.id))) {
+                _context7.next = 2;
                 break;
               }
-              return _context8.abrupt("return");
+              return _context7.abrupt("return");
             case 2:
-              if (_this8.interactionProspect) {
-                _context8.next = 5;
+              if (_this7.interactionProspect) {
+                _context7.next = 5;
                 break;
               }
-              (_this8$logKavkomWarn = _this8.logKavkomWarn) === null || _this8$logKavkomWarn === void 0 ? void 0 : _this8$logKavkomWarn.call(_this8, "updateInteraction ignoré : aucun prospect actif");
-              return _context8.abrupt("return");
+              (_this7$logKavkomWarn = _this7.logKavkomWarn) === null || _this7$logKavkomWarn === void 0 ? void 0 : _this7$logKavkomWarn.call(_this7, "updateInteraction ignoré : aucun prospect actif");
+              return _context7.abrupt("return");
             case 5:
-              if (_this8.interaction.id) {
-                _context8.next = 16;
+              if (_this7.interaction.id) {
+                _context7.next = 16;
                 break;
               }
-              _context8.prev = 6;
-              _context8.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this8.interaction);
+              _context7.prev = 6;
+              _context7.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this7.interaction);
             case 9:
-              _this8.interaction = _context8.sent;
-              _context8.next = 15;
+              _this7.interaction = _context7.sent;
+              _context7.next = 15;
               break;
             case 12:
-              _context8.prev = 12;
-              _context8.t0 = _context8["catch"](6);
-              console.error("Échec création interaction", _context8.t0);
+              _context7.prev = 12;
+              _context7.t0 = _context7["catch"](6);
+              console.error("Échec création interaction", _context7.t0);
             case 15:
-              return _context8.abrupt("return");
+              return _context7.abrupt("return");
             case 16:
-              _context8.prev = 16;
-              _context8.next = 19;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this8.interaction);
+              _context7.prev = 16;
+              _context7.next = 19;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this7.interaction);
             case 19:
-              _context8.next = 24;
+              _context7.next = 24;
               break;
             case 21:
-              _context8.prev = 21;
-              _context8.t1 = _context8["catch"](16);
-              console.error("Échec mise à jour interaction", _context8.t1);
+              _context7.prev = 21;
+              _context7.t1 = _context7["catch"](16);
+              console.error("Échec mise à jour interaction", _context7.t1);
             case 24:
             case "end":
-              return _context8.stop();
+              return _context7.stop();
           }
-        }, _callee8, null, [[6, 12], [16, 21]]);
+        }, _callee7, null, [[6, 12], [16, 21]]);
       }))();
     },
     /**
@@ -30618,21 +30590,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
+            case 0:
+              _this8.updatingPhoneNumber = true;
+              _context8.prev = 1;
+              _context8.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
+                id: _this8.interactionProspect.id,
+                phone_number: _this8.phoneNumber
+              });
+            case 4:
+              _context8.prev = 4;
+              _this8.updatingPhoneNumber = false;
+              _this8.tab = 0;
+              return _context8.finish(4);
+            case 8:
+            case "end":
+              return _context8.stop();
+          }
+        }, _callee8, null, [[1,, 4, 8]]);
+      }))();
+    },
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this9 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              _this9.updatingPhoneNumber = true;
+              _this9.updatingMobilePhoneNumber = true;
               _context9.prev = 1;
               _context9.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
                 id: _this9.interactionProspect.id,
-                phone_number: _this9.phoneNumber
+                mobile_phone_number: _this9.mobilePhoneNumber
               });
             case 4:
               _context9.prev = 4;
-              _this9.updatingPhoneNumber = false;
+              _this9.updatingMobilePhoneNumber = false;
               _this9.tab = 0;
               return _context9.finish(4);
             case 8:
@@ -30642,70 +30639,45 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee9, null, [[1,, 4, 8]]);
       }))();
     },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
+    fetchSelectedProspects: function fetchSelectedProspects() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) switch (_context10.prev = _context10.next) {
             case 0:
-              _this10.updatingMobilePhoneNumber = true;
-              _context10.prev = 1;
-              _context10.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this10.interactionProspect.id,
-                mobile_phone_number: _this10.mobilePhoneNumber
-              });
-            case 4:
-              _context10.prev = 4;
-              _this10.updatingMobilePhoneNumber = false;
-              _this10.tab = 0;
-              return _context10.finish(4);
-            case 8:
-            case "end":
-              return _context10.stop();
-          }
-        }, _callee10, null, [[1,, 4, 8]]);
-      }))();
-    },
-    fetchSelectedProspects: function fetchSelectedProspects() {
-      var _this11 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        var _yield$ProspectServic, data;
-        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
-          while (1) switch (_context11.prev = _context11.next) {
-            case 0:
-              if (!(_this11.prospectsSelected.length == 0)) {
-                _context11.next = 3;
+              if (!(_this10.prospectsSelected.length == 0)) {
+                _context10.next = 3;
                 break;
               }
-              _this11.selectedProspects = [];
-              return _context11.abrupt("return");
+              _this10.selectedProspects = [];
+              return _context10.abrupt("return");
             case 3:
-              _context11.prev = 3;
-              _context11.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this11.project.slug, {
+              _context10.prev = 3;
+              _context10.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this10.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this11.prospectsSelected
+                    ids: _this10.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context11.sent;
+              _yield$ProspectServic = _context10.sent;
               data = _yield$ProspectServic.data;
-              _this11.selectedProspects = data.data.filter(function (prospect) {
+              _this10.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context11.prev = 9;
-              _this11.fetchingProspect = false;
-              return _context11.finish(9);
+              _context10.prev = 9;
+              _this10.fetchingProspect = false;
+              return _context10.finish(9);
             case 12:
             case "end":
-              return _context11.stop();
+              return _context10.stop();
           }
-        }, _callee11, null, [[3,, 9, 12]]);
+        }, _callee10, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -30722,24 +30694,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this12 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
-        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
-          while (1) switch (_context12.prev = _context12.next) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
             case 0:
-              if (newValue && _this12.leftSlideOpen(_this12.name)) {
-                _this12.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this12.interaction.number)) {
-                  _this12.interaction.number = newValue.phone_number;
+              if (newValue && _this11.leftSlideOpen(_this11.name)) {
+                _this11.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this11.interaction.number)) {
+                  _this11.interaction.number = newValue.phone_number;
                 } else {
-                  _this12.interaction.number = newValue.mobile_phone_number;
+                  _this11.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context12.stop();
+              return _context11.stop();
           }
-        }, _callee12);
+        }, _callee11);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -30766,9 +30738,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * this agent, is enough to know the SIP identity is ready.
      */
     kavkomConfigured: function kavkomConfigured() {
-      var _this13 = this;
+      var _this12 = this;
       return this.lines.some(function (line) {
-        return line.operator === "kavkom" && line.user_id === _this13.user.id;
+        return line.operator === "kavkom" && String(line.user_id) === String(_this12.user.id);
       });
     },
     /**
@@ -46755,6 +46727,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         postal_code: "",
         city: "",
         country: "",
+        phone_country: [],
         default_projects: []
       };
     },
@@ -52636,6 +52609,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     autoAnswer: {
       type: Boolean,
       "default": true
+    },
+    projectId: {
+      type: [Number, String],
+      "default": null
     }
   },
   data: function data() {
@@ -52708,7 +52685,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this3.sipErrorDetails = "";
               _context3.prev = 4;
               _context3.next = 7;
-              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("settings/kavkom/credentials");
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("settings/kavkom/credentials", {
+                params: {
+                  project_id: _this3.projectId
+                }
+              });
             case 7:
               _yield$ApiService$get = _context3.sent;
               data = _yield$ApiService$get.data;
@@ -54127,28 +54108,49 @@ var _hoisted_1 = {
   "class": "hc-phone-country-select",
   ref: "wrapper"
 };
-var _hoisted_2 = ["textContent"];
-var _hoisted_3 = {
-  key: 1,
-  "class": "hc-phone-country-placeholder"
+var _hoisted_2 = {
+  "class": "hc-phone-country-selected-list"
 };
+var _hoisted_3 = ["textContent"];
 var _hoisted_4 = ["placeholder"];
-var _hoisted_5 = {
+var _hoisted_5 = ["placeholder"];
+var _hoisted_6 = {
   "class": "hc-phone-country-list"
 };
-var _hoisted_6 = ["onClick", "textContent"];
+var _hoisted_7 = ["onClick", "textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-trigger", {
       disabled: $props.disabled
-    }]),
+    }])
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.selectedDialCodes, function (dialCode) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      key: dialCode,
+      "class": "hc-phone-country-tag"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCountryTag(dialCode))
+    }, null, 8 /* PROPS */, _hoisted_3), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      key: 0,
+      "class": "fa fa-times",
+      onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+        return $options.removeCountry(dialCode);
+      }, ["stop"]),
+      style: {
+        "cursor": "pointer",
+        "margin-left": "4px"
+      }
+    }, null, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }), 128 /* KEYED_FRAGMENT */)), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 0,
+    type: "text",
+    "class": "hc-phone-country-input",
+    placeholder: $options.selectedDialCodes.length === 0 ? '—' : '',
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return !$props.disabled && $options.toggle();
-    }, ["stop"]))
-  }, [$options.selected ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-    key: 0,
-    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("".concat($options.selected.flag, " ").concat($options.selected.label, " (+").concat($options.selected.dial_code, ")"))
-  }, null, 8 /* PROPS */, _hoisted_2)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, "—"))], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
+    }, ["stop"])),
+    readonly: ""
+  }, null, 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
     to: "body"
   }, [$data.open && !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 0,
@@ -54162,20 +54164,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $data.keyword = $event;
     }),
     placeholder: _ctx.$t('search') + ' ...'
-  }, null, 8 /* PROPS */, _hoisted_4), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.keyword]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "hc-phone-country-option",
-    onClick: _cache[2] || (_cache[2] = function ($event) {
-      return $options.select(null);
-    })
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("none")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredCountries, function (country) {
+  }, null, 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.keyword]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredCountries, function (country) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: country.code,
-      "class": "hc-phone-country-option",
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-option", {
+        selected: $options.isSelected("+".concat(country.dial_code))
+      }]),
       onClick: function onClick($event) {
-        return $options.select(country);
+        return $options.toggleCountry(country);
       },
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("".concat(country.flag, " ").concat(country.label, " (+").concat(country.dial_code, ")"))
-    }, null, 8 /* PROPS */, _hoisted_6);
+    }, null, 10 /* CLASS, PROPS */, _hoisted_7);
   }), 128 /* KEYED_FRAGMENT */))])], 4 /* STYLE */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]))], 512 /* NEED_PATCH */);
 }
 
@@ -80297,10 +80296,12 @@ var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_38 = {
   "class": "hc-kavkom-call-number"
 };
-var _hoisted_39 = ["disabled"];
+var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-circle"
+}, null, -1 /* HOISTED */);
 var _hoisted_40 = ["disabled"];
 var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fas fa-robot"
+  "class": "fa fa-phone"
 }, null, -1 /* HOISTED */);
 var _hoisted_42 = ["textContent"];
 var _hoisted_43 = ["textContent"];
@@ -80340,7 +80341,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[24] || (_cache[24] = function ($event) {
+    onOpen: _cache[23] || (_cache[23] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects(), $options.fetchOperatorsConfigStatus();
     }),
     title: _ctx.$t('prospect.interaction.title', {
@@ -80373,7 +80374,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "4": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[16] || (_cache[16] = function ($event) {
+                onBack: _cache[15] || (_cache[15] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setInteractionProspect
@@ -80385,11 +80386,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 style: {
                   "height": "100%"
                 },
-                onSubmit: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onSubmit: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.updateProspectPhoneNumber && $options.updateProspectPhoneNumber.apply($options, arguments);
                 }, ["prevent"]))
               }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[17] || (_cache[17] = function ($event) {
+                onClick: _cache[16] || (_cache[16] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -80416,7 +80417,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "tel",
-                        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+                        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
                           return $data.phoneNumber = $event;
                         })
                       }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.phoneNumber, void 0, {
@@ -80444,11 +80445,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 style: {
                   "height": "100%"
                 },
-                onSubmit: _cache[22] || (_cache[22] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onSubmit: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.updateProspectMobilePhoneNumber && $options.updateProspectMobilePhoneNumber.apply($options, arguments);
                 }, ["prevent"]))
               }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[20] || (_cache[20] = function ($event) {
+                onClick: _cache[19] || (_cache[19] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -80475,7 +80476,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "tel",
-                        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+                        "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
                           return $data.mobilePhoneNumber = $event;
                         })
                       }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.mobilePhoneNumber, void 0, {
@@ -80695,9 +80696,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                 "class": "fa fa-phone"
-              })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Le softphone ne compose plus le numéro de\n                                        destination lui-même : il ne fait qu'auto-\n                                        répondre au leg agent renvoyé par le PBX\n                                        Kavkom une fois l'appel déclenché via\n                                        l'API REST (triggerKavkomCall ci-dessous).\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
+              })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-ready', $data.kavkomReady ? 'is-ready' : 'is-loading'])
+              }, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Le softphone ne compose plus le numéro de\n                                        destination lui-même : il ne fait qu'auto-\n                                        répondre au leg agent renvoyé par le PBX\n                                        Kavkom une fois l'appel déclenché via\n                                        l'API REST (triggerKavkomCall ci-dessous).\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
                 ref: "kavkomWebphone",
                 id: "kavkom-webphone",
+                "project-id": _ctx.project.id,
                 "auto-answer": true,
                 onReady: $options.onKavkomReady,
                 onConnectionError: $options.onKavkomConnectionError,
@@ -80705,35 +80709,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 onRingingCall: $options.onKavkomCallRinging,
                 onAnsweredCall: $options.onKavkomCallAnswered,
                 onHangupCall: $options.onKavkomCallHangup
-              }, null, 8 /* PROPS */, ["onReady", "onConnectionError", "onCallFailed", "onRingingCall", "onAnsweredCall", "onHangupCall"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+              }, null, 8 /* PROPS */, ["project-id", "onReady", "onConnectionError", "onCallFailed", "onRingingCall", "onAnsweredCall", "onHangupCall"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
                 key: 0,
                 "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.kavkomCallSuccess ? 'success' : 'error'])
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                 type: "button",
-                "class": "hc-button-secondary",
-                disabled: $data.callingViaKavkom || $data.callingViaAi || !$data.kavkomReady,
+                "class": "hc-button-secondary hc-kavkom-call-action",
+                disabled: $data.callingViaKavkom || !$data.kavkomReady,
                 onClick: _cache[14] || (_cache[14] = function ($event) {
                   return $options.triggerKavkomCall($data.interaction.number);
                 })
-              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 9 /* TEXT, PROPS */, _hoisted_39), $data.aiCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-                key: 1,
-                "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.aiCallSuccess ? 'success' : 'error'])
-              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.aiCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-                type: "button",
-                "class": "hc-button-secondary hc-ai-call-button",
-                disabled: $data.callingViaKavkom || $data.callingViaAi || !$data.kavkomReady,
-                title: "L'IA parle au prospect, vous restez en ligne",
-                onClick: _cache[15] || (_cache[15] = function ($event) {
-                  return $options.triggerAiCall($data.interaction.number);
-                })
-              }, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaAi ? "Appel IA en cours..." : "Appeler avec l'IA"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_40)])])];
+              }, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_40)])])];
             }),
             key: "2"
           } : undefined, _ctx.interactionProspect ? {
             name: "7",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[23] || (_cache[23] = function ($event) {
+                onClick: _cache[22] || (_cache[22] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -94691,8 +94684,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
-  var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
   var _component_phone_country_select = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("phone-country-select");
+  var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
   var _component_google_map_input = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("google-map-input");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
   var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
@@ -94817,6 +94810,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             _: 1 /* STABLE */
           }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+            label: _ctx.$t('phone_country')
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_phone_country_select, {
+                modelValue: $data.userToCreate.phone_country,
+                "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+                  return $data.userToCreate.phone_country = $event;
+                })
+              }, null, 8 /* PROPS */, ["modelValue"])];
+            }),
+            _: 1 /* STABLE */
+          }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
             label: _ctx.$t('password'),
             required: ""
           }, {
@@ -94827,11 +94832,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 type: $data.showPassword ? 'text' : 'password',
                 placeholder: label + ' ...',
                 "class": "hc-flex-1",
-                "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+                "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
                   return $data.userToCreate.password = $event;
                 })
               }, null, 8 /* PROPS */, _hoisted_11), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $data.userToCreate.password]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                   return $data.showPassword = !$data.showPassword;
                 }, ["prevent"])),
                 tag: "a",
@@ -94852,7 +94857,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 value: "professional",
                 modelValue: $data.userToCreate.default_projects,
-                "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+                "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
                   return $data.userToCreate.default_projects = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"])];
@@ -94870,7 +94875,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 value: "personal",
                 modelValue: $data.userToCreate.default_projects,
-                "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
                   return $data.userToCreate.default_projects = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"])];
@@ -94888,7 +94893,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 value: "demo",
                 modelValue: $data.userToCreate.default_projects,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
                   return $data.userToCreate.default_projects = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"])];
@@ -94904,7 +94909,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                 type: "text",
                 placeholder: label + ' ...',
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                   return $data.userToCreate.phone_number = $event;
                 })
               }, null, 8 /* PROPS */, _hoisted_15), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.userToCreate.phone_number]])];
@@ -94918,22 +94923,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                 type: "text",
                 placeholder: label + ' ...',
-                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
                   return $data.userToCreate.mobile_phone_number = $event;
                 })
               }, null, 8 /* PROPS */, _hoisted_16), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.userToCreate.mobile_phone_number]])];
-            }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-            label: _ctx.$t('phone_country')
-          }, {
-            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_phone_country_select, {
-                modelValue: $data.userToCreate.phone_country,
-                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
-                  return $data.userToCreate.phone_country = $event;
-                })
-              }, null, 8 /* PROPS */, ["modelValue"])];
             }),
             _: 1 /* STABLE */
           }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
@@ -102398,7 +102391,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-select[data-v-3ca985e2] {\n    position: relative;\n    display: block;\n    width: 100%;\n}\n.hc-phone-country-trigger[data-v-3ca985e2] {\n    display: block;\n    width: 100%;\n    box-sizing: border-box;\n    padding: 2px 4px;\n    font-size: 12px;\n    line-height: 21px;\n    cursor: pointer;\n}\n.hc-phone-country-trigger[data-v-3ca985e2]:hover {\n    background-color: #00000011;\n}\n.hc-phone-country-trigger.disabled[data-v-3ca985e2] {\n    cursor: not-allowed;\n    opacity: 0.6;\n}\n.hc-phone-country-placeholder[data-v-3ca985e2] {\n    color: #999;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-select[data-v-3ca985e2] {\n    position: relative;\n    display: block;\n    width: 100%;\n}\n.hc-phone-country-trigger[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    box-sizing: border-box;\n    padding: 2px 4px;\n    font-size: 12px;\n    line-height: 21px;\n    cursor: pointer;\n    align-items: center;\n}\n.hc-phone-country-trigger[data-v-3ca985e2]:hover {\n    background-color: #00000011;\n}\n.hc-phone-country-trigger.disabled[data-v-3ca985e2] {\n    cursor: not-allowed;\n    opacity: 0.6;\n}\n.hc-phone-country-selected-list[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    align-items: center;\n}\n.hc-phone-country-tag[data-v-3ca985e2] {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    background-color: #e3f2fd;\n    border: 1px solid #1e88e5;\n    border-radius: 3px;\n    padding: 2px 6px;\n    font-size: 11px;\n    color: #1e88e5;\n    white-space: nowrap;\n}\n.hc-phone-country-input[data-v-3ca985e2] {\n    flex: 1;\n    min-width: 100px;\n    border: none;\n    outline: none;\n    background: transparent;\n    font-size: 12px;\n    cursor: pointer;\n    padding: 0;\n}\n.hc-phone-country-placeholder[data-v-3ca985e2] {\n    color: #999;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -102422,7 +102415,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-panel {\n    position: fixed;\n    z-index: 9999;\n    width: 280px;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n    padding: 6px;\n    box-sizing: border-box;\n}\n.hc-phone-country-search {\n    width: 100%;\n    height: 26px;\n    padding: 0 6px;\n    margin-bottom: 4px;\n    font-size: 12px;\n    border: 1px solid #ddd;\n    border-radius: 3px;\n    box-sizing: border-box;\n}\n.hc-phone-country-list {\n    max-height: 260px;\n    overflow-y: auto;\n}\n.hc-phone-country-option {\n    padding: 5px 8px;\n    font-size: 12px;\n    cursor: pointer;\n    border-radius: 3px;\n    white-space: nowrap;\n    color: #333;\n}\n.hc-phone-country-option:hover {\n    background-color: #1e88e5;\n    color: white;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-panel {\n    position: fixed;\n    z-index: 9999;\n    width: 280px;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n    padding: 6px;\n    box-sizing: border-box;\n}\n.hc-phone-country-search {\n    width: 100%;\n    height: 26px;\n    padding: 0 6px;\n    margin-bottom: 4px;\n    font-size: 12px;\n    border: 1px solid #ddd;\n    border-radius: 3px;\n    box-sizing: border-box;\n}\n.hc-phone-country-list {\n    max-height: 260px;\n    overflow-y: auto;\n}\n.hc-phone-country-option {\n    padding: 5px 8px;\n    font-size: 12px;\n    cursor: pointer;\n    border-radius: 3px;\n    white-space: nowrap;\n    color: #333;\n}\n.hc-phone-country-option:hover {\n    background-color: #1e88e5;\n    color: white;\n}\n.hc-phone-country-option.selected {\n    background-color: #1e88e5;\n    color: white;\n    font-weight: bold;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -103190,7 +103183,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n.hc-ai-call-button {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    background: #0d6efd !important;\n    border-color: #0d6efd !important;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-ready {\n    display: inline-flex;\n    align-items: center;\n    gap: 5px;\n    margin-left: auto;\n    padding: 4px 7px;\n    border-radius: 999px;\n    font-size: 11px;\n    font-weight: 600;\n    white-space: nowrap;\n}\n.hc-kavkom-call-ready i {\n    font-size: 7px;\n}\n.hc-kavkom-call-ready.is-ready {\n    color: #16794a;\n    background: #e7f7ef;\n}\n.hc-kavkom-call-ready.is-loading {\n    color: #896b16;\n    background: #fff6d8;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-action {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

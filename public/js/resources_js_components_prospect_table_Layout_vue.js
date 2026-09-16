@@ -5104,9 +5104,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       var _this = this;
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.INIT_PROSPECT_PARAMS);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_FIELDS, null);
-      // store.commit(SET_PROSPECTS_SORT_BY, "id");
-      // store.commit(SET_PROSPECTS_SORT_ORDER, "desc");
-
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_SORT_BY, "created_at");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_SORT_ORDER, "desc");
       var url = new URL(window.location.href);
       var searchParams = new URLSearchParams(url.search);
       var filters = {};

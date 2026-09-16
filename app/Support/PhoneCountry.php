@@ -19,6 +19,33 @@ use libphonenumber\PhoneNumberUtil;
 class PhoneCountry
 {
     /**
+     * Returns the dialing code (e.g. "+33", "+32") a phone number belongs
+     * to, or null if it can't be determined. This is the format
+     * User::phone_country is stored in (see PhoneCountrySelect.vue), unlike
+     * detect() which returns an ISO region code — the two are not
+     * interchangeable despite both describing "a country".
+     */
+    public static function detectDialCode(?string $number): ?string
+    {
+        return self::dialCodeForRegion(self::detect($number));
+    }
+
+    /**
+     * Converts an ISO 3166-1 alpha-2 region code (as returned by detect())
+     * into its dialing code, e.g. "FR" -> "+33".
+     */
+    public static function dialCodeForRegion(?string $regionCode): ?string
+    {
+        if (!$regionCode) {
+            return null;
+        }
+
+        $callingCode = PhoneNumberUtil::getInstance()->getCountryCodeForRegion($regionCode);
+
+        return $callingCode ? '+' . $callingCode : null;
+    }
+
+    /**
      * Returns an ISO 3166-1 alpha-2 country code, or null if it can't be
      * determined.
      */
