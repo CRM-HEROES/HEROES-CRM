@@ -64580,7 +64580,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tooltip");
   var _component_tutorial_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tutorial-tooltip");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
-  var _component_voice_assistant = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("voice-assistant");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     id: "hc-main-layout",
     onKeydown: _cache[0] || (_cache[0] = function () {
@@ -64711,7 +64710,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 2
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Kavkom softphone: registered once for the whole session so\n             incoming calls ring on every page of the CRM. "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom_incoming_call), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_user_sessions_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_locale_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_tutorial_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_confirm), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tutorial_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: _ctx.changing
-  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_voice_assistant)], 32 /* HYDRATE_EVENTS */);
+  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <voice-assistant /> ")], 32 /* HYDRATE_EVENTS */);
 }
 
 /***/ }),
