@@ -52,7 +52,11 @@ class WebserviceController extends Controller
         }
 
         if ($import->is_processing) {
-            return response()->json(['message' => 'Une synchronisation est déjà en cours.'], 202);
+            $syncer->queueRetryIfBusy($import, 15);
+
+            return response()->json([
+                'message' => 'Une synchronisation est déjà en cours. Une nouvelle tentative est planifiée dans 15 secondes.',
+            ], 202);
         }
 
         // Debounce: a paste of many cells, or a burst of quick edits, fires
@@ -75,7 +79,11 @@ class WebserviceController extends Controller
         }
 
         if ($cache->has($cooldownKey)) {
-            return response()->json(['message' => 'Synchronisation déjà déclenchée récemment, réessayez dans quelques secondes.'], 202);
+            $syncer->queueRetryIfBusy($import, 15);
+
+            return response()->json([
+                'message' => 'Synchronisation déjà déclenchée récemment. Une nouvelle tentative est planifiée dans 15 secondes.',
+            ], 202);
         }
 
         $cache->put($cooldownKey, true, 10);

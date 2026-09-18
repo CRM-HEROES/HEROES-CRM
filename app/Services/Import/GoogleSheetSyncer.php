@@ -2,9 +2,11 @@
 
 namespace App\Services\Import;
 
+use App\Jobs\GoogleSheetSyncRequest;
 use App\Jobs\ImportProspects;
 use App\Models\Import;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -86,5 +88,33 @@ class GoogleSheetSyncer
         ImportProspects::dispatch($import, true)->onQueue('imports');
 
         return true;
+    }
+
+    /**
+     * Schedule a retry when a sync is already running or a burst of edits
+     * triggered multiple webhook calls in a short window. This prevents a
+     * rapid spreadsheet edit storm from silently dropping the latest data
+     * while the import worker is still processing the previous snapshot.
+     */
+    public function queueRetryIfBusy(Import $import, int $delaySeconds = 15): void
+    {
+        try {
+            $store = Cache::store('redis');
+            $store->get('google-sheet-sync-retry-probe');
+        } catch (\Throwable $e) {
+            $store = Cache::store();
+        }
+
+        $retryKey = 'google-sheet-sync-retry-queued-' . $import->id;
+
+        if ($store->has($retryKey)) {
+            return;
+        }
+
+        $store->put($retryKey, true, 180);
+
+        GoogleSheetSyncRequest::dispatch($import)
+            ->onQueue('imports')
+            ->delay(now()->addSeconds($delaySeconds));
     }
 }
