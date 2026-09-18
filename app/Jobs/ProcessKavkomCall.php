@@ -158,7 +158,27 @@ PROMPT;
         $analysis['qualification'] = $score['qualification'];
         $analysis['conversion_probability'] = $score['conversion_probability'];
         $interaction = $call->interaction ?: $call->prospect->interactions()->make();
-        $interaction->fill(['creator_id' => $call->user_id, 'from_user' => true, 'number' => $call->destination, 'source' => 'kavkom', 'status' => 'completed', 'ended_at' => $call->completed_at ?: now(), 'path' => null, 'size' => 0, 'data' => ['call_uuid' => $call->call_uuid, 'transcript' => $transcript, 'analysis' => $analysis, 'recording_deleted_at' => now()->toIso8601String()]])->save();
+        // An inbound call is already logged by the softphone while it rings
+        // (see KavkomController::incoming): complete that interaction and
+        // keep its direction instead of overwriting it.
+        $existingData = (array) $interaction->data;
+        $interaction->fill([
+            'creator_id' => $call->user_id,
+            'from_user' => $call->isInbound() ? false : true,
+            'number' => $call->destination,
+            'source' => 'kavkom',
+            'status' => 'completed',
+            'ended_at' => $call->completed_at ?: now(),
+            'path' => null,
+            'size' => 0,
+            'data' => array_merge($existingData, [
+                'call_uuid' => $call->call_uuid,
+                'direction' => $call->isInbound() ? 'inbound' : 'outbound',
+                'transcript' => $transcript,
+                'analysis' => $analysis,
+                'recording_deleted_at' => now()->toIso8601String(),
+            ]),
+        ])->save();
 
         $updates = $merger->buildProspectUpdates($call->prospect, $analysis);
         $meta = $merger->buildMeta($call->prospect, $analysis, 'kavkom_last_analysis');

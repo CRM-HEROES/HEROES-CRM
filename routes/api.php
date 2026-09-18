@@ -285,6 +285,9 @@ Route::group([
     Route::post('/settings/kavkom/call', [KavkomController::class, 'call'])->name('settings.kavkom.call');
     Route::get('/settings/kavkom/call/{callUuid}/status', [KavkomController::class, 'callStatus'])->name('settings.kavkom.call.status');
     Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
+    // Inbound calls: the global softphone identifies the caller and logs the
+    // call in the prospect history as it rings, is answered and ends.
+    Route::post('/settings/kavkom/incoming', [KavkomController::class, 'incoming'])->name('settings.kavkom.incoming');
     Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
 
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
