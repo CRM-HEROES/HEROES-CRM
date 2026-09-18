@@ -229,7 +229,7 @@
         <tutorial-tooltip />
         <loading :loading="changing" />
 
-        <voice-assistant />
+        <!-- <voice-assistant /> -->
     </div>
 </template>
 
