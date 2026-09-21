@@ -121,7 +121,10 @@ secrets:
     # The authenticated FreeSWITCH package repository requires a SignalWire
     # Personal Access Token (PAT), not a project REST API token. Docker
     # injects it only while building and never saves it in an image layer.
-    environment: "SIGNALWIRE_PERSONAL_ACCESS_TOKEN=${SIGNALWIRE_PERSONAL_ACCESS_TOKEN:?SIGNALWIRE_PERSONAL_ACCESS_TOKEN must be set to a valid SignalWire PAT before building}"
+    # `environment` expects the name of the host environment variable, not an
+    # interpolated NAME=value pair. Compose loads this variable from .env and
+    # BuildKit mounts its value only for the image build.
+    environment: SIGNALWIRE_PERSONAL_ACCESS_TOKEN
 
 networks:
   telephony-network:
