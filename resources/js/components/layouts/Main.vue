@@ -216,6 +216,10 @@
 
         <layout-footer v-if="impersonating" />
 
+        <!-- Kavkom softphone: registered once for the whole session so
+             incoming calls ring on every page of the CRM. -->
+        <kavkom-incoming-call />
+
         <manage-user-sessions-slide />
         <manage-locale-slide />
         <manage-tutorial-slide />
@@ -425,6 +429,7 @@ import LayoutFooter from "./Footer.vue";
 
 import Confirm from "@/components/Confirm.vue";
 import VoiceAssistant from "@/components/utils/VoiceAssistant.vue";
+import KavkomIncomingCall from "@/components/utils/KavkomIncomingCall.vue";
 
 export default {
     name: "main",
@@ -596,6 +601,7 @@ export default {
 
         Confirm,
         VoiceAssistant,
+        KavkomIncomingCall,
     },
 
     data() {

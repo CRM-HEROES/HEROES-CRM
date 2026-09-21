@@ -6,11 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class KavkomCall extends Model
 {
-    protected $fillable = ['call_uuid', 'prospect_id', 'interaction_id', 'user_id', 'domain_uuid', 'destination', 'status', 'recording_url', 'webhook_payload', 'error', 'completed_at', 'processed_at'];
+    protected $fillable = ['call_uuid', 'prospect_id', 'interaction_id', 'user_id', 'domain_uuid', 'direction', 'destination', 'status', 'recording_url', 'webhook_payload', 'error', 'completed_at', 'processed_at'];
 
     protected $casts = ['webhook_payload' => 'array', 'completed_at' => 'datetime', 'processed_at' => 'datetime'];
 
     public function prospect() { return $this->belongsTo(Prospect::class); }
     public function interaction() { return $this->belongsTo(Interaction::class); }
     public function qualification() { return $this->hasOne(ProspectCallQualification::class); }
+
+    /** An incoming call: the prospect is the caller, not the dialled number. */
+    public function isInbound(): bool
+    {
+        return strtolower((string) $this->direction) === 'inbound';
+    }
 }

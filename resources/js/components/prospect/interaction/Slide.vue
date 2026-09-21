@@ -484,25 +484,23 @@
                                     </div>
 
                                     <!--
-                                        Le softphone ne compose plus le numéro de
-                                        destination lui-même : il ne fait qu'auto-
-                                        répondre au leg agent renvoyé par le PBX
-                                        Kavkom une fois l'appel déclenché via
-                                        l'API REST (triggerKavkomCall ci-dessous).
+                                        Panneau d'affichage du softphone
+                                        partagé : il ne compose pas lui-même le
+                                        numéro de destination, il auto-répond
+                                        au leg agent renvoyé par le PBX Kavkom
+                                        après l'API REST (triggerKavkomCall) et
+                                        affiche l'état de l'enregistrement SIP
+                                        et des appels. L'enregistrement et les
+                                        événements viennent du widget global
+                                        (voir @/utils/kavkom-phone et
+                                        KavkomIncomingCall.vue), ce qui permet
+                                        aussi de recevoir les appels entrants
+                                        quand cet onglet est fermé.
                                     -->
                                     <kavkom
                                         ref="kavkomWebphone"
                                         id="kavkom-webphone"
                                         :project-id="project.id"
-                                        :auto-answer="true"
-                                        @ready="onKavkomReady"
-                                        @connection-error="onKavkomConnectionError"
-                                        @call-failed="onKavkomCallFailed"
-                                        @ringing-call="onKavkomCallRinging"
-                                        @answered-call="onKavkomCallAnswered"
-                                        @hangup-call="
-                                            onKavkomCallHangup
-                                        "
                                     />
                                 </div>
 
@@ -769,6 +767,12 @@ import {
     SET_PROSPECT_INTERACTION_FRAME_TAB,
 } from "@/actions/project/prospect/interaction";
 
+// Kavkom softphone events (see @/utils/kavkom-phone): the SIP registration
+// is shared by the whole session, so the call events are received here even
+// when the Kavkom tab of this slide is not open.
+import EventBus from "@/utils/event-bus";
+import kavkomPhone, { KAVKOM_EVENTS } from "@/utils/kavkom-phone";
+
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
 import Kavkom from "@/components/utils/Kavkom.vue";
@@ -820,13 +824,16 @@ export default {
     created() {
         store.commit(SET_PROSPECT_INTERACTION_TAB, 0);
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+        this.subscribeKavkomEvents();
     },
 
     beforeDestroy() {
+        this.unsubscribeKavkomEvents();
         this.stopKavkomDebugPolling();
     },
 
     beforeUnmount() {
+        this.unsubscribeKavkomEvents();
         this.stopKavkomDebugPolling();
     },
 
@@ -960,6 +967,11 @@ export default {
             this.kavkomCallMessage = "";
             this.kavkomCallState = "requesting";
 
+            // Kavkom rappelle notre extension (le "leg agent") : le
+            // softphone doit l'accepter immédiatement, avant même que cette
+            // requête REST ne réponde.
+            kavkomPhone.expectAgentLeg();
+
             try {
                 const { data } = await ApiService.post("settings/kavkom/call", {
                     destination: number,
@@ -969,6 +981,9 @@ export default {
 
                 if (!data.success) {
                     console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", { message: data.message });
+                    // Refusé avant que Kavkom ne fasse sonner l'extension :
+                    // le prochain INVITE n'est plus un leg agent.
+                    kavkomPhone.forgetAgentLeg();
                     this.kavkomCallMessage =
                         data.message || "Impossible de lancer l'appel Kavkom.";
                     this.kavkomCallSuccess = false;
@@ -1066,6 +1081,36 @@ export default {
             }
         },
 
+        subscribeKavkomEvents() {
+            EventBus.on(KAVKOM_EVENTS.READY, this.onKavkomReady);
+            EventBus.on(KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
+            EventBus.on(KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
+            EventBus.on(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+            EventBus.on(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+            EventBus.on(
+                KAVKOM_EVENTS.CONNECTION_ERROR,
+                this.onKavkomConnectionError
+            );
+        },
+
+        unsubscribeKavkomEvents() {
+            EventBus.off(KAVKOM_EVENTS.READY, this.onKavkomReady);
+            EventBus.off(
+                KAVKOM_EVENTS.INCOMING_CALL,
+                this.onKavkomIncomingCall
+            );
+            EventBus.off(
+                KAVKOM_EVENTS.CALL_ANSWERED,
+                this.onKavkomCallAnswered
+            );
+            EventBus.off(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+            EventBus.off(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+            EventBus.off(
+                KAVKOM_EVENTS.CONNECTION_ERROR,
+                this.onKavkomConnectionError
+            );
+        },
+
         onKavkomReady() {
             this.kavkomReady = true;
             console.log("[Kavkom][Debug] SIP softphone ready.");
@@ -1077,8 +1122,23 @@ export default {
             }
         },
 
-        onKavkomCallRinging() {
-            console.log("[Kavkom][Debug] Agent leg ringing.");
+        /**
+         * Le softphone partagé distingue le leg agent d'un clic-à-appeler
+         * (auto-répondu, il alimente l'interaction de cette slide) d'un vrai
+         * appel entrant (l'agent décide, le widget global historise).
+         */
+        onKavkomIncomingCall({ direction, number, automatic } = {}) {
+            if (direction === "inbound") {
+                console.log("[Kavkom][Debug] Incoming call.", { number });
+                this.kavkomCallState = "ringing";
+                this.kavkomCallSuccess = true;
+                this.kavkomCallMessage = `Appel entrant${
+                    number ? " de " + number : ""
+                } — répondez depuis la fenêtre d'appel.`;
+                return;
+            }
+
+            console.log("[Kavkom][Debug] Agent leg ringing.", { automatic });
             this.interaction.status = "ringing";
             this.updateInteraction();
             this.kavkomCallState = "ringing";
@@ -1086,7 +1146,14 @@ export default {
             this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
         },
 
-        onKavkomCallAnswered() {
+        onKavkomCallAnswered({ direction } = {}) {
+            if (direction === "inbound") {
+                this.kavkomCallState = "active";
+                this.kavkomCallSuccess = true;
+                this.kavkomCallMessage = "Appel entrant en cours.";
+                return;
+            }
+
             console.log("[Kavkom][Debug] Call answered; media bridge active.");
             this.interaction.status = "answered";
             this.updateInteraction();
@@ -1104,15 +1171,29 @@ export default {
             this.kavkomCallMessage = message;
         },
 
-        onKavkomCallFailed(message) {
-            console.warn("[Kavkom][Debug] Call failed.", { message });
+        onKavkomCallFailed({ message, direction } = {}) {
+            console.warn("[Kavkom][Debug] Call failed.", { message, direction });
             this.callingViaKavkom = false;
             this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;
         },
 
-        onKavkomCallHangup({ durationMs = null } = {}) {
+        onKavkomCallHangup({ durationMs = null, direction = null, missed = false } = {}) {
+            if (direction === "inbound") {
+                console.log("[Kavkom][Debug] Incoming call hangup.", {
+                    durationMs,
+                    missed,
+                });
+                this.kavkomCallState = missed ? "failed" : "completed";
+                this.kavkomCallSuccess = !missed;
+                this.kavkomCallMessage = missed
+                    ? "Appel entrant manqué."
+                    : "Appel entrant terminé.";
+                this.callingViaKavkom = false;
+                return;
+            }
+
             console.log("[Kavkom][Debug] Call hangup.", { durationMs });
             this.interaction.status = "hangup";
             this.updateInteraction();

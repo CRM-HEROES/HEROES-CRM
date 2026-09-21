@@ -3,11 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Interaction;
 use App\Models\Line;
 use App\Models\KavkomCall;
 use App\Models\Prospect;
 use App\Services\KavkomService;
+use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -95,6 +98,7 @@ class KavkomController extends Controller
                 'prospect_id' => $call->prospect_id ?: ($data['prospect_id'] ?? null),
                 'user_id' => $call->user_id ?: $request->user()->id,
                 'domain_uuid' => $call->domain_uuid ?: $config['domain_uuid'],
+                'direction' => $call->direction ?: 'outbound',
                 'destination' => $call->destination ?: $data['destination'],
                 'status' => $call->status ?: 'initiated',
             ])->save();
@@ -141,6 +145,100 @@ class KavkomController extends Controller
         );
 
         return response()->json($result, 200);
+    }
+
+    /**
+     * Log an inbound call in the prospect history.
+     *
+     * Called by the global softphone on ringing, answer and hangup. The
+     * interaction is opened on the first event and reused for the following
+     * ones (the browser sends back the id it received), so a single call
+     * produces a single interaction whose status follows the call.
+     */
+    public function incoming(Request $request)
+    {
+        $data = $request->validate([
+            'number' => ['required', 'string'],
+            'status' => ['required', 'string', 'in:ringing,answered,hangup,missed'],
+            'interaction_id' => ['nullable', 'integer', 'exists:interactions,id'],
+            'project_id' => ['nullable', 'integer', 'exists:projects,id'],
+        ]);
+
+        $line = $this->getUserKavkomLine($request, $data['project_id'] ?? null);
+        $projectId = $line?->project_id ?? ($data['project_id'] ?? null);
+        $prospect = $this->findProspectByNumber($data['number'], $projectId);
+
+        // An unknown caller can still be answered: there is simply no
+        // prospect file to attach the interaction to.
+        if (!$prospect) {
+            return response()->json([
+                'success' => true,
+                'prospect' => null,
+                'interaction_id' => null,
+                'message' => "Aucun prospect ne correspond à ce numéro : l'appel entrant n'est pas historisé.",
+            ], 200);
+        }
+
+        if (!$request->user()->can('prospectInteractionAdd', $prospect->project)) {
+            return response()->json([
+                'success' => false,
+                'prospect' => $this->prospectPayload($prospect),
+                'interaction_id' => null,
+                'message' => "Vous n'avez pas la permission d'historiser cet appel entrant.",
+            ], 200);
+        }
+
+        $number = PhoneNumber::digits($data['number']);
+        $ended = in_array($data['status'], ['hangup', 'missed'], true);
+
+        $interaction = null;
+        if (!empty($data['interaction_id'])) {
+            $interaction = Interaction::query()
+                ->whereKey($data['interaction_id'])
+                ->where('prospect_id', $prospect->id)
+                ->first();
+        }
+
+        // Retried request, or the answer/hangup that follows the initial
+        // ringing: continue the interaction already opened for this call
+        // instead of stacking a new one per SIP event.
+        $interaction = $interaction ?: $this->findOpenInboundInteraction($prospect->id, $number);
+
+        if (!$interaction) {
+            $interaction = new Interaction();
+            $interaction->prospect_id = $prospect->id;
+        }
+
+        $callerId = preg_replace('/\D+/', '', (string) data_get($line?->config, 'phone_number', ''));
+
+        $interaction->fill([
+            'creator_id' => $interaction->creator_id ?: $request->user()->id,
+            'from_user' => false,
+            'number' => $number,
+            'from_number' => $interaction->from_number ?: ($callerId !== '' ? $callerId : null),
+            'source' => 'kavkom',
+            'status' => $data['status'],
+            'started_at' => $interaction->started_at ?: now(),
+            'ended_at' => $ended ? now() : null,
+        ]);
+        $interaction->data = array_merge(
+            (array) $interaction->data,
+            ['direction' => 'inbound']
+        );
+        $interaction->save();
+
+        Log::channel('kavkom')->info('Kavkom inbound call interaction saved.', [
+            'interaction_id' => $interaction->id,
+            'prospect_id' => $prospect->id,
+            'status' => $data['status'],
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'prospect' => $this->prospectPayload($prospect),
+            'project' => $this->projectPayload($prospect),
+            'interaction_id' => $interaction->id,
+        ], 200);
     }
 
     /** Lightweight, authenticated status endpoint used by the call UI debug log. */
@@ -377,6 +475,17 @@ class KavkomController extends Controller
      */
     protected function getUserKavkomConfig(Request $request, ?int $projectId = null): ?array
     {
+        $line = $this->getUserKavkomLine($request, $projectId);
+
+        return $line ? (array) $line->config : null;
+    }
+
+    /**
+     * The user's Kavkom line, i.e. their SIP identity and (for the inbound
+     * call history) the project that DID belongs to.
+     */
+    protected function getUserKavkomLine(Request $request, ?int $projectId = null): ?Line
+    {
         $query = Line::query()
             ->where('operator', 'kavkom')
             ->where('user_id', $request->user()->id);
@@ -393,6 +502,74 @@ class KavkomController extends Controller
             return null;
         }
 
-        return $config;
+        return $line;
+    }
+
+    /**
+     * Match a caller number to a prospect. Both the local (0688753390) and
+     * international (33688753390) forms of a number are tried, since the
+     * PBX and the CRM do not store phone numbers the same way.
+     */
+    protected function findProspectByNumber(string $number, ?int $projectId = null): ?Prospect
+    {
+        $candidates = PhoneNumber::candidates($number);
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        $query = Prospect::withoutGlobalScopes()
+            ->whereNull('deleted_at')
+            ->where(function ($query) use ($candidates) {
+                foreach (['phone_number', 'mobile_phone_number'] as $column) {
+                    $query->orWhereIn(
+                        DB::raw(PhoneNumber::digitsExpression($column)),
+                        $candidates
+                    );
+                }
+            });
+
+        if ($projectId) {
+            $query->where('project_id', $projectId);
+        }
+
+        return $query->orderBy('id')->first();
+    }
+
+    /** The inbound interaction already opened for this caller, if any. */
+    protected function findOpenInboundInteraction(int $prospectId, string $number): ?Interaction
+    {
+        return Interaction::query()
+            ->where('prospect_id', $prospectId)
+            ->where('source', 'kavkom')
+            ->whereIn('status', ['ringing', 'answered'])
+            ->where('created_at', '>=', now()->subMinutes(30))
+            ->where('data->direction', 'inbound')
+            ->whereIn('number', PhoneNumber::candidates($number))
+            ->latest('id')
+            ->first();
+    }
+
+    protected function prospectPayload(Prospect $prospect): array
+    {
+        return [
+            'id' => $prospect->id,
+            'full_name' => $prospect->full_name,
+            'first_name' => $prospect->first_name,
+            'last_name' => $prospect->last_name,
+            'phone_number' => $prospect->phone_number,
+            'mobile_phone_number' => $prospect->mobile_phone_number,
+        ];
+    }
+
+    protected function projectPayload(Prospect $prospect): ?array
+    {
+        $project = $prospect->project;
+
+        return $project ? [
+            'id' => $project->id,
+            'slug' => $project->slug,
+            'name' => $project->name,
+        ] : null;
     }
 }

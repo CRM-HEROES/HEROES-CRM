@@ -10972,7 +10972,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dayjs/locale/fr */ "./node_modules/dayjs/locale/fr.js");
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_153__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_154__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_permission__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/permission */ "./resources/js/actions/permission.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
@@ -11124,6 +11124,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Footer_vue__WEBPACK_IMPORTED_MODULE_150__ = __webpack_require__(/*! ./Footer.vue */ "./resources/js/components/layouts/Footer.vue");
 /* harmony import */ var _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_151__ = __webpack_require__(/*! @/components/Confirm.vue */ "./resources/js/components/Confirm.vue");
 /* harmony import */ var _components_utils_VoiceAssistant_vue__WEBPACK_IMPORTED_MODULE_152__ = __webpack_require__(/*! @/components/utils/VoiceAssistant.vue */ "./resources/js/components/utils/VoiceAssistant.vue");
+/* harmony import */ var _components_utils_KavkomIncomingCall_vue__WEBPACK_IMPORTED_MODULE_153__ = __webpack_require__(/*! @/components/utils/KavkomIncomingCall.vue */ "./resources/js/components/utils/KavkomIncomingCall.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -11145,6 +11146,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 // Slides and Modals
+
 
 
 
@@ -11440,7 +11442,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     TrashSlide: _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_147__["default"],
     ApiPappersSlide: _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_148__["default"],
     Confirm: _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_151__["default"],
-    VoiceAssistant: _components_utils_VoiceAssistant_vue__WEBPACK_IMPORTED_MODULE_152__["default"]
+    VoiceAssistant: _components_utils_VoiceAssistant_vue__WEBPACK_IMPORTED_MODULE_152__["default"],
+    KavkomIncomingCall: _components_utils_KavkomIncomingCall_vue__WEBPACK_IMPORTED_MODULE_153__["default"]
   },
   data: function data() {
     return {
@@ -11452,7 +11455,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     dayjs.locale(this.locale);
   },
-  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapActions)({
+  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapActions)({
     signOut: "auth/logout"
   })), {}, {
     logout: function logout() {
@@ -11489,7 +11492,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)(["project", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)(["project", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
     projectSlug: function projectSlug() {
       return this.project ? this.project.slug : null;
     }
@@ -30038,17 +30041,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
 /* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
 /* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
 /* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
-/* harmony import */ var _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/components/utils/Ringover.vue */ "./resources/js/components/utils/Ringover.vue");
-/* harmony import */ var _components_utils_Kavkom_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/components/utils/Kavkom.vue */ "./resources/js/components/utils/Kavkom.vue");
-/* harmony import */ var _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/utils/Aircall.vue */ "./resources/js/components/utils/Aircall.vue");
-/* harmony import */ var _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./InteractionRow.vue */ "./resources/js/components/prospect/interaction/InteractionRow.vue");
-/* harmony import */ var _select_Select_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../select/Select.vue */ "./resources/js/components/prospect/select/Select.vue");
+/* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
+/* harmony import */ var _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/utils/kavkom-phone */ "./resources/js/utils/kavkom-phone.js");
+/* harmony import */ var _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/utils/Ringover.vue */ "./resources/js/components/utils/Ringover.vue");
+/* harmony import */ var _components_utils_Kavkom_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/components/utils/Kavkom.vue */ "./resources/js/components/utils/Kavkom.vue");
+/* harmony import */ var _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/components/utils/Aircall.vue */ "./resources/js/components/utils/Aircall.vue");
+/* harmony import */ var _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./InteractionRow.vue */ "./resources/js/components/prospect/interaction/InteractionRow.vue");
+/* harmony import */ var _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../select/Select.vue */ "./resources/js/components/prospect/select/Select.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -30066,6 +30071,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+// Kavkom softphone events (see @/utils/kavkom-phone): the SIP registration
+// is shared by the whole session, so the call events are received here even
+// when the Kavkom tab of this slide is not open.
+
+
+
 // Components
 
 
@@ -30074,11 +30085,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Ringover: _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    Kavkom: _components_utils_Kavkom_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
-    Aircall: _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-    InteractionRow: _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
-    SelectProspect: _select_Select_vue__WEBPACK_IMPORTED_MODULE_9__["default"]
+    Ringover: _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
+    Kavkom: _components_utils_Kavkom_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    Aircall: _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    InteractionRow: _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+    SelectProspect: _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__["default"]
   },
   data: function data() {
     return {
@@ -30114,11 +30125,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   created: function created() {
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_TAB, 0);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+    this.subscribeKavkomEvents();
   },
   beforeDestroy: function beforeDestroy() {
+    this.unsubscribeKavkomEvents();
     this.stopKavkomDebugPolling();
   },
   beforeUnmount: function beforeUnmount() {
+    this.unsubscribeKavkomEvents();
     this.stopKavkomDebugPolling();
   },
   methods: {
@@ -30292,27 +30306,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this4.callingViaKavkom = true;
               _this4.kavkomCallMessage = "";
               _this4.kavkomCallState = "requesting";
-              _context4.prev = 13;
-              _context4.next = 16;
+
+              // Kavkom rappelle notre extension (le "leg agent") : le
+              // softphone doit l'accepter immédiatement, avant même que cette
+              // requête REST ne réponde.
+              _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__["default"].expectAgentLeg();
+              _context4.prev = 14;
+              _context4.next = 17;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/kavkom/call", {
                 destination: number,
                 prospect_id: (_this4$interactionPro2 = _this4.interactionProspect) === null || _this4$interactionPro2 === void 0 ? void 0 : _this4$interactionPro2.id,
                 project_id: (_this4$project = _this4.project) === null || _this4$project === void 0 ? void 0 : _this4$project.id
               });
-            case 16:
+            case 17:
               _yield$ApiService$pos = _context4.sent;
               data = _yield$ApiService$pos.data;
               if (data.success) {
-                _context4.next = 23;
+                _context4.next = 25;
                 break;
               }
               console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", {
                 message: data.message
               });
+              // Refusé avant que Kavkom ne fasse sonner l'extension :
+              // le prochain INVITE n'est plus un leg agent.
+              _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__["default"].forgetAgentLeg();
               _this4.kavkomCallMessage = data.message || "Impossible de lancer l'appel Kavkom.";
               _this4.kavkomCallSuccess = false;
               return _context4.abrupt("return");
-            case 23:
+            case 25:
               // Kavkom may complete the agent leg before its REST response
               // returns. Never overwrite a newer SIP result with this
               // asynchronous acknowledgement.
@@ -30329,11 +30351,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.kavkomCallUuid = data.call_uuid;
                 _this4.startKavkomDebugPolling(data.call_uuid);
               }
-              _context4.next = 32;
+              _context4.next = 34;
               break;
-            case 28:
-              _context4.prev = 28;
-              _context4.t0 = _context4["catch"](13);
+            case 30:
+              _context4.prev = 30;
+              _context4.t0 = _context4["catch"](14);
               console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
                 status: (_error$response = _context4.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
                 message: ((_error$response2 = _context4.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _context4.t0.message
@@ -30346,15 +30368,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _this4.kavkomCallSuccess = false;
                 _this4.kavkomCallState = "failed";
               }
-            case 32:
-              _context4.prev = 32;
+            case 34:
+              _context4.prev = 34;
               _this4.callingViaKavkom = false;
-              return _context4.finish(32);
-            case 35:
+              return _context4.finish(34);
+            case 37:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[13, 28, 32, 35]]);
+        }, _callee4, null, [[14, 30, 34, 37]]);
       }))();
     },
     startKavkomDebugPolling: function startKavkomDebugPolling(callUuid) {
@@ -30429,6 +30451,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.kavkomDebugTimer = null;
       }
     },
+    subscribeKavkomEvents: function subscribeKavkomEvents() {
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.READY, this.onKavkomReady);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CONNECTION_ERROR, this.onKavkomConnectionError);
+    },
+    unsubscribeKavkomEvents: function unsubscribeKavkomEvents() {
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.READY, this.onKavkomReady);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.CONNECTION_ERROR, this.onKavkomConnectionError);
+    },
     onKavkomReady: function onKavkomReady() {
       this.kavkomReady = true;
       console.log("[Kavkom][Debug] SIP softphone ready.");
@@ -30438,8 +30476,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.triggerKavkomCall(number);
       }
     },
-    onKavkomCallRinging: function onKavkomCallRinging() {
-      console.log("[Kavkom][Debug] Agent leg ringing.");
+    /**
+     * Le softphone partagé distingue le leg agent d'un clic-à-appeler
+     * (auto-répondu, il alimente l'interaction de cette slide) d'un vrai
+     * appel entrant (l'agent décide, le widget global historise).
+     */
+    onKavkomIncomingCall: function onKavkomIncomingCall() {
+      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        direction = _ref2.direction,
+        number = _ref2.number,
+        automatic = _ref2.automatic;
+      if (direction === "inbound") {
+        console.log("[Kavkom][Debug] Incoming call.", {
+          number: number
+        });
+        this.kavkomCallState = "ringing";
+        this.kavkomCallSuccess = true;
+        this.kavkomCallMessage = "Appel entrant".concat(number ? " de " + number : "", " \u2014 r\xE9pondez depuis la fen\xEAtre d'appel.");
+        return;
+      }
+      console.log("[Kavkom][Debug] Agent leg ringing.", {
+        automatic: automatic
+      });
       this.interaction.status = "ringing";
       this.updateInteraction();
       this.kavkomCallState = "ringing";
@@ -30447,6 +30505,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
     },
     onKavkomCallAnswered: function onKavkomCallAnswered() {
+      var _ref3 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        direction = _ref3.direction;
+      if (direction === "inbound") {
+        this.kavkomCallState = "active";
+        this.kavkomCallSuccess = true;
+        this.kavkomCallMessage = "Appel entrant en cours.";
+        return;
+      }
       console.log("[Kavkom][Debug] Call answered; media bridge active.");
       this.interaction.status = "answered";
       this.updateInteraction();
@@ -30464,9 +30530,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
     },
-    onKavkomCallFailed: function onKavkomCallFailed(message) {
+    onKavkomCallFailed: function onKavkomCallFailed() {
+      var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        message = _ref4.message,
+        direction = _ref4.direction;
       console.warn("[Kavkom][Debug] Call failed.", {
-        message: message
+        message: message,
+        direction: direction
       });
       this.callingViaKavkom = false;
       this.kavkomCallState = "failed";
@@ -30474,9 +30544,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.kavkomCallMessage = message;
     },
     onKavkomCallHangup: function onKavkomCallHangup() {
-      var _ref2 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref2$durationMs = _ref2.durationMs,
-        durationMs = _ref2$durationMs === void 0 ? null : _ref2$durationMs;
+      var _ref5 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref5$durationMs = _ref5.durationMs,
+        durationMs = _ref5$durationMs === void 0 ? null : _ref5$durationMs,
+        _ref5$direction = _ref5.direction,
+        direction = _ref5$direction === void 0 ? null : _ref5$direction,
+        _ref5$missed = _ref5.missed,
+        missed = _ref5$missed === void 0 ? false : _ref5$missed;
+      if (direction === "inbound") {
+        console.log("[Kavkom][Debug] Incoming call hangup.", {
+          durationMs: durationMs,
+          missed: missed
+        });
+        this.kavkomCallState = missed ? "failed" : "completed";
+        this.kavkomCallSuccess = !missed;
+        this.kavkomCallMessage = missed ? "Appel entrant manqué." : "Appel entrant terminé.";
+        this.callingViaKavkom = false;
+        return;
+      }
       console.log("[Kavkom][Debug] Call hangup.", {
         durationMs: durationMs
       });
@@ -30731,7 +30816,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)(["project", "interactionProspect", "prospectFullName", "prospectInteractions", "interactionTab", "interactionFrameTab", "prospectsSelected", "leftSlideOpen", "can", "lines"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)(["project", "interactionProspect", "prospectFullName", "prospectInteractions", "interactionTab", "interactionFrameTab", "prospectsSelected", "leftSlideOpen", "can", "lines"])), {}, {
     /**
      * A configured Kavkom "Line" requires all fields, enforced by
      * LineController's validation — its mere existence, assigned to
@@ -52590,398 +52675,429 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var sip_js_lib_platform_web__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! sip.js/lib/platform/web */ "./node_modules/sip.js/lib/platform/web/simple-user/simple-user.js");
-/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+/* harmony import */ var _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/utils/kavkom-phone */ "./resources/js/utils/kavkom-phone.js");
 
 
+/**
+ * Kavkom softphone panel, shown in the "Kavkom" tab of the prospect
+ * interaction slide.
+ *
+ * It owns no SIP connection: the single registration lives in
+ * resources/js/utils/kavkom-phone.js and is started once for the whole
+ * session by the global softphone widget, so incoming calls also ring when
+ * this panel is closed. This component only renders the shared state and
+ * forwards the agent's actions, which keeps a single SIP contact per
+ * browser and avoids the PBX forking a call to two dialogs.
+ */
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     id: {
       type: String
     },
-    // This component is only mounted from the CRM click-to-call screen.
-    // Answer the agent leg immediately so the PBX does not time it out
-    // while the user is looking for an "Accept" button.
-    autoAnswer: {
-      type: Boolean,
-      "default": true
-    },
+    // Only used as a fallback if this panel is mounted without the
+    // global widget: the SIP identity is resolved per user.
     projectId: {
       type: [Number, String],
       "default": null
     }
   },
-  data: function data() {
-    return {
-      simpleUser: null,
-      status: "connecting",
-      errorMessage: "",
-      extension: "",
-      userContext: "",
-      isRegistered: false,
-      sipErrorDetails: "",
-      connectionAttempts: 0,
-      maxConnectionAttempts: 2,
-      pcDiagnosticInterval: null,
-      ringtoneContext: null,
-      ringtoneTimer: null,
-      ringtoneOscillators: [],
-      callEstablishedAt: null
-    };
+  computed: {
+    status: function status() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.status;
+    },
+    errorMessage: function errorMessage() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.errorMessage;
+    },
+    sipErrorDetails: function sipErrorDetails() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.sipErrorDetails;
+    },
+    extension: function extension() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.extension;
+    },
+    callNumber: function callNumber() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.callNumber;
+    },
+    isInboundCall: function isInboundCall() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.callDirection === "inbound";
+    },
+    autoAnswered: function autoAnswered() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].state.callAutoAnswered;
+    }
   },
   mounted: function mounted() {
-    var _this = this;
-    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-      return _regeneratorRuntime().wrap(function _callee$(_context) {
-        while (1) switch (_context.prev = _context.next) {
-          case 0:
-            _context.next = 2;
-            return _this.registerWebphone();
-          case 2:
-          case "end":
-            return _context.stop();
+    console.log("------------------------------------------------------");
+    _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].bootstrap({
+      projectId: this.projectId
+    });
+  },
+  methods: {
+    answer: function answer() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].answer();
+    },
+    decline: function decline() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].decline();
+    },
+    hangup: function hangup() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_0__["default"].hangup();
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js":
+/*!******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js ***!
+  \******************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+/* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
+/* harmony import */ var _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils/kavkom-phone */ "./resources/js/utils/kavkom-phone.js");
+/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+
+
+
+
+
+
+/**
+ * Global Kavkom softphone widget.
+ *
+ * Mounted once in the main layout, it starts the single SIP registration of
+ * the session (see resources/js/utils/kavkom-phone.js) and shows every
+ * incoming call, whichever page the agent is on. It also identifies the
+ * caller (CRM prospect lookup by phone number) and writes the call in the
+ * prospect history as it rings, is answered and ends.
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      /** Prospect matched by the incoming caller number. */
+      prospect: null,
+      /** Interaction opened for the ongoing inbound call. */
+      interactionId: null,
+      /**
+       * Number of the call the lookup/logging results belong to. Only
+       * replaced by the next incoming call, so a late response of a
+       * finished call can never be applied to the current one.
+       */
+      activeCallNumber: "",
+      connectedAt: null,
+      now: Date.now(),
+      timer: null,
+      errorMessage: "",
+      errorTimer: null,
+      ringtoneContext: null,
+      ringtoneTimer: null,
+      ringtoneOscillators: []
+    };
+  },
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["lines"])), {}, {
+    phone: function phone() {
+      return _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].state;
+    },
+    /**
+     * A configured Kavkom "Line" assigned to this agent is enough to
+     * know the SIP identity is ready (same rule as the interaction
+     * slide). Nothing is registered for the other users.
+     */
+    kavkomConfigured: function kavkomConfigured() {
+      var _this = this;
+      return this.lines.some(function (line) {
+        var _this$user;
+        return line.operator === "kavkom" && String(line.user_id) === String((_this$user = _this.user) === null || _this$user === void 0 ? void 0 : _this$user.id);
+      });
+    },
+    isInCall: function isInCall() {
+      return this.phone.status === "in-call";
+    },
+    isInboundCall: function isInboundCall() {
+      return this.phone.callDirection === "inbound";
+    },
+    /** A ringing call the CRM did not start itself. */incomingCall: function incomingCall() {
+      return this.phone.status === "ringing" && this.isInboundCall && !this.phone.callAutoAnswered;
+    },
+    callerName: function callerName() {
+      var _this$prospect;
+      return ((_this$prospect = this.prospect) === null || _this$prospect === void 0 ? void 0 : _this$prospect.full_name) || this.phone.callDisplayName || "";
+    },
+    duration: function duration() {
+      var startedAt = this.connectedAt || this.phone.callStartedAt;
+      if (!startedAt) {
+        return "00:00";
+      }
+      var seconds = Math.max(0, Math.floor((this.now - startedAt) / 1000));
+      return "".concat(String(Math.floor(seconds / 60)).padStart(2, "0"), ":").concat(String(seconds % 60).padStart(2, "0"));
+    }
+  }),
+  watch: {
+    kavkomConfigured: {
+      immediate: true,
+      handler: function handler(configured) {
+        if (configured) {
+          _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].bootstrap();
         }
-      }, _callee);
-    }))();
+      }
+    },
+    incomingCall: function incomingCall(ringing) {
+      ringing ? this.playRingtone() : this.stopRingtone();
+    },
+    isInCall: function isInCall(active) {
+      if (active) {
+        this.connectedAt = this.phone.callStartedAt || Date.now();
+        this.startDurationTimer();
+      } else {
+        this.stopDurationTimer();
+      }
+    }
+  },
+  created: function created() {
+    // The history events of a call are posted one after the other, so
+    // the answer/hangup always update the interaction the ringing event
+    // opened, even when the agent answers within milliseconds.
+    this.logChain = Promise.resolve();
+  },
+  mounted: function mounted() {
+    _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].setRemoteAudio(this.$refs.remoteAudio);
+    this.subscribe();
   },
   beforeUnmount: function beforeUnmount() {
     this.stopRingtone();
-    this.teardown();
+    this.stopDurationTimer();
+    this.unsubscribe();
   },
   methods: {
-    /** Reconnect with the credentials saved after the component mounted. */refreshWebphone: function refreshWebphone() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              _this2.connectionAttempts = 0;
-              _context2.next = 3;
-              return _this2.teardown();
-            case 3:
-              _context2.next = 5;
-              return _this2.registerWebphone();
-            case 5:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2);
-      }))();
+    subscribe: function subscribe() {
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.INCOMING_CALL, this.onIncomingCall);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_ANSWERED, this.onCallAnswered);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_HANGUP, this.onCallHangup);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_FAILED, this.onCallFailed);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CONNECTION_ERROR, this.onConnectionError);
     },
-    registerWebphone: function registerWebphone() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var _yield$ApiService$get, data, _error$response;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              _this3.status = "connecting";
-              _this3.isRegistered = false;
-              _this3.errorMessage = "";
-              _this3.sipErrorDetails = "";
-              _context3.prev = 4;
-              _context3.next = 7;
-              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("settings/kavkom/credentials", {
-                params: {
-                  project_id: _this3.projectId
-                }
-              });
-            case 7:
-              _yield$ApiService$get = _context3.sent;
-              data = _yield$ApiService$get.data;
-              if (data.success) {
-                _context3.next = 14;
-                break;
-              }
-              _this3.status = "not-configured";
-              _this3.errorMessage = data.message;
-              _this3.logError("Credentials fetch failed", {
-                response: data
-              });
-              return _context3.abrupt("return");
-            case 14:
-              _this3.extension = data.extension;
-              _this3.userContext = data.user_context;
-              _this3.logInfo("Credentials received", {
-                extension: _this3.extension,
-                userContext: data.user_context
-              });
-              _this3.connectSip(data);
-              _context3.next = 25;
-              break;
-            case 20:
-              _context3.prev = 20;
-              _context3.t0 = _context3["catch"](4);
-              _this3.status = "error";
-              _this3.errorMessage = ((_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context3.t0.message || "Erreur inattendue lors de la connexion à Kavkom.";
-              _this3.logError("Credentials fetch error", {
-                error: _context3.t0
-              });
-            case 25:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3, null, [[4, 20]]);
-      }))();
+    unsubscribe: function unsubscribe() {
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.INCOMING_CALL, this.onIncomingCall);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_ANSWERED, this.onCallAnswered);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_HANGUP, this.onCallHangup);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CALL_FAILED, this.onCallFailed);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].off(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__.KAVKOM_EVENTS.CONNECTION_ERROR, this.onConnectionError);
     },
-    connectSip: function connectSip(_ref) {
-      var _this4 = this;
-      var extension = _ref.extension,
-        password = _ref.password,
-        user_context = _ref.user_context;
-      var server = "wss://".concat(user_context, "/");
-      var aor = "sip:".concat(extension, "@").concat(user_context);
-      this.logInfo("Connecting to SIP", {
-        server: server,
-        aor: aor,
-        extension: extension
-      });
-      this.simpleUser = new sip_js_lib_platform_web__WEBPACK_IMPORTED_MODULE_1__.SimpleUser(server, {
-        aor: aor,
-        userAgentOptions: {
-          authorizationUsername: extension,
-          authorizationPassword: password,
-          logBuiltinEnabled: true,
-          logLevel: "debug",
-          logConnector: this.createSipLogger(),
-          transportOptions: {
-            // SimpleUser ne renseigne `server` dans
-            // transportOptions que si on ne fournit pas nous-
-            // mêmes cet objet ; on doit donc le redéfinir ici.
-            server: server,
-            // Sans ping périodique, le proxy WSS de Kavkom coupe
-            // la connexion pour inactivité (fermeture code 1006
-            // observée toutes les ~2 minutes), désenregistrant
-            // l'extension entre deux appels.
-            keepAliveInterval: 30
-          }
-        },
-        media: {
-          constraints: {
-            audio: true,
-            video: false
-          },
-          remote: {
-            audio: this.$refs.remoteAudio
-          }
-        }
-      });
-      this.simpleUser.delegate = {
-        onRegistered: function onRegistered() {
-          _this4.isRegistered = true;
-          _this4.status = "registered";
-          _this4.logInfo("SIP registration succeeded", {
-            extension: _this4.extension
-          });
-          _this4.$emit("ready");
-        },
-        onUnregistered: function onUnregistered() {
-          _this4.isRegistered = false;
-        },
-        onServerDisconnect: function onServerDisconnect(error) {
-          _this4.isRegistered = false;
-          if (error) {
-            _this4.status = "error";
-            _this4.errorMessage = "La connexion au softphone Kavkom a été interrompue.";
-            _this4.$emit("connection-error", _this4.errorMessage);
-          }
-        },
-        /** The PBX calls the WebRTC extension after the REST request.
-         * The user explicitly accepts this agent leg before Kavkom
-         * connects the prospect. */
-        onCallReceived: function onCallReceived() {
-          _this4.status = "ringing";
-          _this4.logInfo("Appel entrant du PBX Kavkom (leg agent)", {
-            autoAnswer: _this4.autoAnswer
-          });
-          _this4.$emit("ringing-call");
-          if (_this4.autoAnswer) {
-            // The former local ringtone was the repeated "beep"
-            // heard while waiting for a manual response. It also
-            // made it easy to exceed the PBX agent-leg timeout.
-            _this4.stopRingtone();
-            void _this4.answer(true);
-          } else {
-            _this4.playRingtone();
-          }
-        },
-        onCallAnswered: function onCallAnswered() {
-          var _this4$$refs$remoteAu, _this4$$refs$remoteAu2;
-          _this4.stopRingtone();
-          _this4.status = "in-call";
-          _this4.callEstablishedAt = Date.now();
-          _this4.playRemoteAudio();
-          _this4.logInfo("Appel établi (leg agent connecté)", {
-            remoteAudioPaused: (_this4$$refs$remoteAu = _this4.$refs.remoteAudio) === null || _this4$$refs$remoteAu === void 0 ? void 0 : _this4$$refs$remoteAu.paused,
-            remoteAudioMuted: (_this4$$refs$remoteAu2 = _this4.$refs.remoteAudio) === null || _this4$$refs$remoteAu2 === void 0 ? void 0 : _this4$$refs$remoteAu2.muted
-          });
-          _this4.$emit("answered-call");
-        },
-        onCallHangup: function onCallHangup() {
-          var durationMs = _this4.callEstablishedAt ? Date.now() - _this4.callEstablishedAt : null;
-          _this4.callEstablishedAt = null;
-          _this4.stopRingtone();
-          _this4.status = "registered";
-          _this4.logInfo("Appel terminé");
-          _this4.$emit("hangup-call", {
-            durationMs: durationMs
-          });
-        }
-      };
-      this.simpleUser.connect().then(function () {
-        _this4.logInfo("SIP connection established");
-        return _this4.simpleUser.register();
-      })["catch"](function (error) {
-        _this4.isRegistered = false;
-        _this4.status = "error";
-        var errorMsg = _this4.extractSipErrorMessage(error);
-        _this4.errorMessage = errorMsg;
-        _this4.sipErrorDetails = _this4.extractSipErrorDetails(error);
-        _this4.logError("SIP connection or registration failed", {
-          error: errorMsg,
-          details: _this4.sipErrorDetails,
-          originalError: error
+    onIncomingCall: function onIncomingCall(_ref) {
+      var direction = _ref.direction,
+        number = _ref.number;
+      this.clearError();
+      this.prospect = null;
+      this.interactionId = null;
+      this.connectedAt = null;
+      this.activeCallNumber = number || "";
+      if (direction !== "inbound") {
+        return;
+      }
+
+      // The 'ringing' event is also the caller identification: the
+      // response carries the matching prospect, if any.
+      this.logCall("ringing", number);
+    },
+    onCallAnswered: function onCallAnswered(_ref2) {
+      var direction = _ref2.direction,
+        number = _ref2.number;
+      if (direction === "inbound") {
+        this.logCall("answered", number);
+      }
+    },
+    onCallHangup: function onCallHangup(_ref3) {
+      var direction = _ref3.direction,
+        number = _ref3.number,
+        missed = _ref3.missed,
+        declined = _ref3.declined,
+        durationMs = _ref3.durationMs;
+      if (direction !== "inbound") {
+        return;
+      }
+      this.logCall(missed ? "missed" : "hangup", number);
+
+      // A rejected call is a missed call for the prospect history,
+      // but the agent knows he rejected it: no alert for that one.
+      if (missed && !declined) {
+        flashWarning({
+          title: "Kavkom",
+          body: "Appel manqu\xE9".concat(number ? " de " + number : "", "."),
+          duration: 8000
         });
-        _this4.$emit("connection-error", _this4.errorMessage);
-        if (_this4.connectionAttempts < _this4.maxConnectionAttempts) {
-          _this4.connectionAttempts++;
-          _this4.logWarn("Retrying SIP connection", {
-            attempt: _this4.connectionAttempts,
-            maxAttempts: _this4.maxConnectionAttempts
-          });
-          setTimeout(function () {
-            _this4.registerWebphone();
-          }, 2000);
-        }
+      }
+
+      // The call is closed in the history: refresh the open prospect
+      // file so the agent sees it immediately.
+      this.refreshOpenProspectInteractions(this.prospect);
+      console.log("[Kavkom][Debug] Inbound call ended.", {
+        number: number,
+        missed: missed,
+        durationMs: durationMs
       });
     },
-    hangup: function hangup() {
-      var _this$simpleUser,
-        _this5 = this;
-      (_this$simpleUser = this.simpleUser) === null || _this$simpleUser === void 0 ? void 0 : _this$simpleUser.hangup()["catch"](function (error) {
-        _this5.logError("Failed to hang up call", {
-          error: error
-        });
-      });
+    onCallFailed: function onCallFailed() {
+      var _ref4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        message = _ref4.message;
+      this.showError(message);
     },
-    answer: function answer() {
-      var _arguments = arguments,
-        _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var automatic, _this6$simpleUser;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
-            case 0:
-              automatic = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : false;
-              _context4.prev = 1;
-              _context4.next = 4;
-              return (_this6$simpleUser = _this6.simpleUser) === null || _this6$simpleUser === void 0 ? void 0 : _this6$simpleUser.answer();
-            case 4:
-              _this6.logInfo("Leg agent accepté", {
-                automatic: automatic
-              });
-              _context4.next = 13;
-              break;
-            case 7:
-              _context4.prev = 7;
-              _context4.t0 = _context4["catch"](1);
-              _this6.stopRingtone();
-              _this6.status = "registered";
-              _this6.logError("Échec de l'acceptation de l'appel Kavkom", {
-                error: _context4.t0
-              });
-              _this6.$emit("call-failed", "Impossible d'accepter l'appel Kavkom.");
-            case 13:
-            case "end":
-              return _context4.stop();
-          }
-        }, _callee4, null, [[1, 7]]);
-      }))();
-    },
-    playRemoteAudio: function playRemoteAudio() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var audio, _stream$getAudioTrack, stream;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              audio = _this7.$refs.remoteAudio;
-              if (audio) {
-                _context5.next = 4;
-                break;
-              }
-              _this7.logWarn("Élément audio distant introuvable.");
-              return _context5.abrupt("return");
-            case 4:
-              _context5.prev = 4;
-              _context5.next = 7;
-              return audio.play();
-            case 7:
-              stream = audio.srcObject;
-              _this7.logInfo("Lecture audio distante démarrée", {
-                hasStream: !!stream,
-                audioTracks: (stream === null || stream === void 0 || (_stream$getAudioTrack = stream.getAudioTracks) === null || _stream$getAudioTrack === void 0 ? void 0 : _stream$getAudioTrack.call(stream).length) || 0
-              });
-              _context5.next = 15;
-              break;
-            case 11:
-              _context5.prev = 11;
-              _context5.t0 = _context5["catch"](4);
-              _this7.logError("Lecture audio distante bloquée par le navigateur", {
-                error: _context5.t0
-              });
-              _this7.$emit("connection-error", "Le navigateur a bloqué le son de l'appel. Autorisez l'audio et le microphone pour ce site.");
-            case 15:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5, null, [[4, 11]]);
-      }))();
-    },
-    decline: function decline() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        var _this8$simpleUser;
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              _context6.prev = 0;
-              _context6.next = 3;
-              return (_this8$simpleUser = _this8.simpleUser) === null || _this8$simpleUser === void 0 ? void 0 : _this8$simpleUser.decline();
-            case 3:
-              _this8.logInfo("Leg agent refusé par l'utilisateur");
-              _context6.next = 9;
-              break;
-            case 6:
-              _context6.prev = 6;
-              _context6.t0 = _context6["catch"](0);
-              _this8.logError("Échec du refus de l'appel Kavkom", {
-                error: _context6.t0
-              });
-            case 9:
-              _context6.prev = 9;
-              _this8.stopRingtone();
-              _this8.status = "registered";
-              _this8.$emit("call-failed", "Appel Kavkom refusé.");
-              return _context6.finish(9);
-            case 14:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, null, [[0, 6, 9, 14]]);
-      }))();
+    onConnectionError: function onConnectionError(message) {
+      this.showError(message);
     },
     /**
-     * Sonnerie locale pour signaler le leg entrant envoyé par Kavkom.
-     * Elle est synthétisée afin de ne pas dépendre d'un fichier audio et
-     * est arrêtée dès que le softphone répond ou que l'appel se termine.
+     * History one step of the call in the prospect file. The backend
+     * answers with the matched prospect (first call) and with the
+     * interaction id, which is sent back on every following event so a
+     * single call produces a single interaction.
+     */
+    logCall: function logCall(status, number) {
+      var _this2 = this;
+      if (!number) {
+        return;
+      }
+      this.logChain = this.logChain["catch"](function () {}).then(function () {
+        return _this2.postCallStatus(status, number);
+      });
+    },
+    postCallStatus: function postCallStatus(status, number) {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var isCurrentCall, _yield$ApiService$pos, data, _this3$prospect, _error$response;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              isCurrentCall = function isCurrentCall() {
+                return number === _this3.activeCallNumber;
+              };
+              _context.prev = 1;
+              _context.next = 4;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_1__["default"].post("settings/kavkom/incoming", {
+                number: number,
+                status: status,
+                interaction_id: isCurrentCall() ? _this3.interactionId : null
+              });
+            case 4:
+              _yield$ApiService$pos = _context.sent;
+              data = _yield$ApiService$pos.data;
+              if (isCurrentCall()) {
+                _context.next = 8;
+                break;
+              }
+              return _context.abrupt("return");
+            case 8:
+              if (data.interaction_id) {
+                _this3.interactionId = data.interaction_id;
+              }
+              if (data.prospect) {
+                _this3.prospect = _objectSpread(_objectSpread({}, data.prospect), {}, {
+                  project: data.project || ((_this3$prospect = _this3.prospect) === null || _this3$prospect === void 0 ? void 0 : _this3$prospect.project)
+                });
+              }
+              if (!data.success && data.message) {
+                console.warn("[Kavkom]", data.message);
+              }
+              _context.next = 16;
+              break;
+            case 13:
+              _context.prev = 13;
+              _context.t0 = _context["catch"](1);
+              console.warn("[Kavkom] Impossible d'historiser l'appel entrant.", ((_error$response = _context.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context.t0.message);
+            case 16:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[1, 13]]);
+      }))();
+    },
+    refreshOpenProspectInteractions: function refreshOpenProspectInteractions(prospect) {
+      var opened = _store__WEBPACK_IMPORTED_MODULE_0__["default"].getters["interactionProspect"];
+      if (!prospect || !opened || opened.id !== prospect.id) {
+        return;
+      }
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECT_INTERACTIONS);
+    },
+    openProspect: function openProspect() {
+      var _this$prospect2;
+      var slug = (_this$prospect2 = this.prospect) === null || _this$prospect2 === void 0 || (_this$prospect2 = _this$prospect2.project) === null || _this$prospect2 === void 0 ? void 0 : _this$prospect2.slug;
+      if (!slug) {
+        return;
+      }
+      this.$router.push({
+        name: "prospect.show",
+        params: {
+          project: slug,
+          prospect: this.prospect.id
+        }
+      });
+    },
+    /** Retry the SIP registration after a connection failure. */reconnect: function reconnect() {
+      this.clearError();
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].refresh();
+    },
+    answer: function answer() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].answer();
+    },
+    decline: function decline() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].decline();
+    },
+    hangup: function hangup() {
+      _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_3__["default"].hangup();
+    },
+    showError: function showError(message) {
+      var _this4 = this;
+      this.errorMessage = message;
+      if (this.errorTimer) {
+        window.clearTimeout(this.errorTimer);
+      }
+      this.errorTimer = window.setTimeout(function () {
+        _this4.errorMessage = "";
+        _this4.errorTimer = null;
+      }, 8000);
+    },
+    clearError: function clearError() {
+      if (this.errorTimer) {
+        window.clearTimeout(this.errorTimer);
+        this.errorTimer = null;
+      }
+      this.errorMessage = "";
+    },
+    startDurationTimer: function startDurationTimer() {
+      var _this5 = this;
+      this.stopDurationTimer();
+      this.now = Date.now();
+      this.timer = window.setInterval(function () {
+        _this5.now = Date.now();
+      }, 1000);
+    },
+    stopDurationTimer: function stopDurationTimer() {
+      if (this.timer) {
+        window.clearInterval(this.timer);
+        this.timer = null;
+      }
+    },
+    /**
+     * Ringtone of an incoming call. Synthesized so no audio file is
+     * needed, and stopped as soon as the agent answers, declines or the
+     * caller hangs up.
      */
     playRingtone: function playRingtone() {
-      var _this9 = this;
+      var _this6 = this;
       this.stopRingtone();
       var AudioContext = window.AudioContext || window.webkitAudioContext;
       if (!AudioContext) {
@@ -52992,30 +53108,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.ringtoneContext = new AudioContext();
         (_this$ringtoneContext = (_this$ringtoneContext2 = this.ringtoneContext).resume) === null || _this$ringtoneContext === void 0 ? void 0 : _this$ringtoneContext.call(_this$ringtoneContext2);
         var ring = function ring() {
-          if (!_this9.ringtoneContext || _this9.status !== "ringing") {
+          if (!_this6.ringtoneContext || !_this6.incomingCall) {
             return;
           }
-          var now = _this9.ringtoneContext.currentTime;
-          var gain = _this9.ringtoneContext.createGain();
+          var now = _this6.ringtoneContext.currentTime;
+          var gain = _this6.ringtoneContext.createGain();
           gain.gain.setValueAtTime(0.0001, now);
           gain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.7);
-          gain.connect(_this9.ringtoneContext.destination);
+          gain.connect(_this6.ringtoneContext.destination);
           [440, 480].forEach(function (frequency) {
-            var oscillator = _this9.ringtoneContext.createOscillator();
+            var oscillator = _this6.ringtoneContext.createOscillator();
             oscillator.frequency.value = frequency;
             oscillator.connect(gain);
             oscillator.start(now);
             oscillator.stop(now + 0.7);
-            _this9.ringtoneOscillators.push(oscillator);
+            _this6.ringtoneOscillators.push(oscillator);
           });
         };
         ring();
         this.ringtoneTimer = window.setInterval(ring, 2000);
       } catch (error) {
-        this.logWarn("Impossible de jouer la sonnerie locale", {
-          error: error
-        });
+        console.warn("[Kavkom] Impossible de jouer la sonnerie locale", error);
         this.stopRingtone();
       }
     },
@@ -53036,110 +53150,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.ringtoneContext.close()["catch"](function () {});
         this.ringtoneContext = null;
       }
-    },
-    teardown: function teardown() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var simpleUser;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
-            case 0:
-              simpleUser = _this10.simpleUser;
-              _this10.simpleUser = null;
-              _this10.isRegistered = false;
-              if (!simpleUser) {
-                _context7.next = 11;
-                break;
-              }
-              _context7.prev = 4;
-              _context7.next = 7;
-              return simpleUser.disconnect();
-            case 7:
-              _context7.next = 11;
-              break;
-            case 9:
-              _context7.prev = 9;
-              _context7.t0 = _context7["catch"](4);
-            case 11:
-            case "end":
-              return _context7.stop();
-          }
-        }, _callee7, null, [[4, 9]]);
-      }))();
-    },
-    /**
-     * Extract a user-friendly error message from SIP errors
-     */
-    extractSipErrorMessage: function extractSipErrorMessage(error) {
-      if (error instanceof TypeError) {
-        if (error.message.includes("WebSocket")) {
-          return "Impossible de se connecter au serveur SIP WebSocket (problème de certificat SSL, DNS, ou firewall).";
-        }
-        return "Erreur de connexion SIP : " + error.message;
-      }
-      if (error && _typeof(error) === "object") {
-        if (error.statusCode === 401 || error.statusCode === 407) {
-          return "Erreur d'authentification SIP (identifiants incorrects ou extension désactivée dans Kavkom).";
-        }
-        if (error.statusCode === 404) {
-          return "Extension SIP non trouvée sur le serveur Kavkom.";
-        }
-        if (error.reasonPhrase && error.reasonPhrase.includes("NOT_REGISTERED")) {
-          return "L'extension n'a pas pu s'enregistrer auprès du serveur SIP. Le serveur WebSocket n'est peut-être pas joignable.";
-        }
-        if (error.message) {
-          return "Erreur SIP : " + error.message;
-        }
-        if (error.statusCode) {
-          return "Erreur SIP (HTTP " + error.statusCode + ").";
-        }
-      }
-      return "Impossible de connecter le softphone à l'extension Kavkom.";
-    },
-    /**
-     * Extract detailed error information for debugging
-     */
-    extractSipErrorDetails: function extractSipErrorDetails(error) {
-      var details = [];
-      if (error && _typeof(error) === "object") {
-        if (error.statusCode) {
-          details.push("Status: ".concat(error.statusCode));
-        }
-        if (error.reasonPhrase) {
-          details.push("Reason: ".concat(error.reasonPhrase));
-        }
-        if (error.cause) {
-          details.push("Cause: ".concat(error.cause));
-        }
-        if (error.message) {
-          details.push("Message: ".concat(error.message));
-        }
-      }
-      return details.join(" | ");
-    },
-    createSipLogger: function createSipLogger() {
-      var _this11 = this;
-      return function (message) {
-        _this11.logDebug("SIP.js", {
-          message: message
-        });
-      };
-    },
-    logInfo: function logInfo(message) {
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.log("[Kavkom ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
-    },
-    logDebug: function logDebug(message) {
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.debug("[Kavkom DEBUG ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
-    },
-    logWarn: function logWarn(message) {
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.warn("[Kavkom WARNING ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
-    },
-    logError: function logError(message) {
-      var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-      console.error("[Kavkom ERROR ".concat(new Date().toISOString(), "] ").concat(message), Object.keys(data).length > 0 ? data : "");
     }
   }
 });
@@ -64561,6 +64571,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_trash_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("trash-slide");
   var _component_api_pappers_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("api-pappers-slide");
   var _component_layout_footer = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("layout-footer");
+  var _component_kavkom_incoming_call = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("kavkom-incoming-call");
   var _component_manage_user_sessions_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("manage-user-sessions-slide");
   var _component_manage_locale_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("manage-locale-slide");
   var _component_manage_tutorial_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("manage-tutorial-slide");
@@ -64569,7 +64580,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tooltip");
   var _component_tutorial_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tutorial-tooltip");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
-  var _component_voice_assistant = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("voice-assistant");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     id: "hc-main-layout",
     onKeydown: _cache[0] || (_cache[0] = function () {
@@ -64698,9 +64708,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     _: 1 /* STABLE */
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_menu_icon_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_trash_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_api_pappers_slide)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.impersonating ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_layout_footer, {
     key: 2
-  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_user_sessions_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_locale_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_tutorial_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_confirm), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tutorial_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Kavkom softphone: registered once for the whole session so\n             incoming calls ring on every page of the CRM. "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom_incoming_call), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_user_sessions_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_locale_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_tutorial_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_confirm), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tutorial_tooltip), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: _ctx.changing
-  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_voice_assistant)], 32 /* HYDRATE_EVENTS */);
+  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <voice-assistant /> ")], 32 /* HYDRATE_EVENTS */);
 }
 
 /***/ }),
@@ -80698,18 +80708,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "class": "fa fa-phone"
               })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                 "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-ready', $data.kavkomReady ? 'is-ready' : 'is-loading'])
-              }, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Le softphone ne compose plus le numéro de\n                                        destination lui-même : il ne fait qu'auto-\n                                        répondre au leg agent renvoyé par le PBX\n                                        Kavkom une fois l'appel déclenché via\n                                        l'API REST (triggerKavkomCall ci-dessous).\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
+              }, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Panneau d'affichage du softphone\n                                        partagé : il ne compose pas lui-même le\n                                        numéro de destination, il auto-répond\n                                        au leg agent renvoyé par le PBX Kavkom\n                                        après l'API REST (triggerKavkomCall) et\n                                        affiche l'état de l'enregistrement SIP\n                                        et des appels. L'enregistrement et les\n                                        événements viennent du widget global\n                                        (voir @/utils/kavkom-phone et\n                                        KavkomIncomingCall.vue), ce qui permet\n                                        aussi de recevoir les appels entrants\n                                        quand cet onglet est fermé.\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
                 ref: "kavkomWebphone",
                 id: "kavkom-webphone",
-                "project-id": _ctx.project.id,
-                "auto-answer": true,
-                onReady: $options.onKavkomReady,
-                onConnectionError: $options.onKavkomConnectionError,
-                onCallFailed: $options.onKavkomCallFailed,
-                onRingingCall: $options.onKavkomCallRinging,
-                onAnsweredCall: $options.onKavkomCallAnswered,
-                onHangupCall: $options.onKavkomCallHangup
-              }, null, 8 /* PROPS */, ["project-id", "onReady", "onConnectionError", "onCallFailed", "onRingingCall", "onAnsweredCall", "onHangupCall"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                "project-id": _ctx.project.id
+              }, null, 8 /* PROPS */, ["project-id"])]), $data.kavkomCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
                 key: 0,
                 "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.kavkomCallSuccess ? 'success' : 'error'])
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -99313,28 +99316,21 @@ var _withScopeId = function _withScopeId(n) {
 };
 var _hoisted_1 = ["id"];
 var _hoisted_2 = {
-  ref: "remoteAudio",
-  autoplay: "",
-  style: {
-    "display": "none"
-  }
-};
-var _hoisted_3 = {
   "class": "hc-kavkom-webphone-status"
 };
-var _hoisted_4 = {
+var _hoisted_3 = {
   key: 0
 };
-var _hoisted_5 = {
+var _hoisted_4 = {
   key: 1
 };
-var _hoisted_6 = {
+var _hoisted_5 = {
   style: {
     "color": "#dc3545",
     "margin-bottom": "4px"
   }
 };
-var _hoisted_7 = {
+var _hoisted_6 = {
   key: 0,
   style: {
     "font-size": "11px",
@@ -99342,26 +99338,23 @@ var _hoisted_7 = {
     "opacity": "0.85"
   }
 };
-var _hoisted_8 = {
+var _hoisted_7 = {
   key: 2
 };
-var _hoisted_9 = {
+var _hoisted_8 = {
   key: 3
 };
-var _hoisted_10 = {
+var _hoisted_9 = {
   key: 4
 };
-var _hoisted_11 = {
+var _hoisted_10 = {
   key: 5
 };
-var _hoisted_12 = {
-  key: 6
-};
-var _hoisted_13 = {
+var _hoisted_11 = {
   key: 0,
   "class": "hc-kavkom-webphone-controls"
 };
-var _hoisted_14 = {
+var _hoisted_12 = {
   key: 1,
   "class": "hc-kavkom-webphone-controls"
 };
@@ -99369,7 +99362,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     id: $props.id,
     "class": "hc-kavkom-webphone"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", _hoisted_2, null, 512 /* NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [$data.status === 'not-configured' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_4, " Configurez le jeton Kavkom et le domain UUID dans les paramètres pour activer le softphone. ")) : $data.status === 'error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.errorMessage || "Erreur de connexion au softphone Kavkom."), 1 /* TEXT */), $data.sipErrorDetails ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sipErrorDetails), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : $data.status === 'connecting' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_8, " Connexion du softphone à l'extension Kavkom… ")) : $data.status === 'registered' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_9, " Softphone Kavkom prêt (extension " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.extension) + "). ", 1 /* TEXT */)) : $data.status === 'calling' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_10, "Appel en cours de connexion…")) : $data.status === 'ringing' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_11, " Votre poste sonne (mise en relation Kavkom)… ")) : $data.status === 'in-call' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_12, "Appel en cours.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.status === 'ringing' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [$options.status === 'not-configured' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_3, " Configurez le jeton Kavkom et le domain UUID dans les paramètres pour activer le softphone. ")) : $options.status === 'error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.errorMessage || "Erreur de connexion au softphone Kavkom."), 1 /* TEXT */), $options.sipErrorDetails ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.sipErrorDetails), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : $options.status === 'connecting' || $options.status === 'idle' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_7, " Connexion du softphone à l'extension Kavkom… ")) : $options.status === 'registered' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_8, " Softphone Kavkom prêt (extension " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.extension) + "). ", 1 /* TEXT */)) : $options.status === 'ringing' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_9, [$options.isInboundCall ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Appel entrant de " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.callNumber || "numéro inconnu") + "… ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Votre poste sonne (mise en relation Kavkom)… ")], 64 /* STABLE_FRAGMENT */))])) : $options.status === 'in-call' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_10, [$options.isInboundCall ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Appel entrant en cours" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.callNumber ? " (" + $options.callNumber + ")" : "") + ". ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Appel en cours" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.callNumber ? " (" + $options.callNumber + ")" : "") + ". ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The agent leg of a CRM click-to-call is already answered, only\n             a real incoming call waits for the agent's decision. "), $options.status === 'ringing' && !$options.autoAnswered ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "hc-button-secondary",
     onClick: _cache[0] || (_cache[0] = function () {
@@ -99381,13 +99382,196 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.decline && $options.decline.apply($options, arguments);
     })
-  }, " Refuser ")])) : $data.status === 'in-call' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Refuser ")])) : $options.status === 'in-call' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "hc-button-danger",
     onClick: _cache[2] || (_cache[2] = function () {
       return $options.hangup && $options.hangup.apply($options, arguments);
     })
   }, " Raccrocher ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_1);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-8a100814"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
+var _hoisted_1 = {
+  "class": "hc-kavkom-widget"
+};
+var _hoisted_2 = {
+  ref: "remoteAudio",
+  autoplay: "",
+  style: {
+    "display": "none"
+  }
+};
+var _hoisted_3 = {
+  key: 0,
+  "class": "hc-kavkom-popup hc-kavkom-popup-incoming"
+};
+var _hoisted_4 = {
+  "class": "hc-kavkom-popup-header"
+};
+var _hoisted_5 = {
+  "class": "hc-kavkom-popup-icon"
+};
+var _hoisted_6 = {
+  "class": "hc-kavkom-popup-identity"
+};
+var _hoisted_7 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-kavkom-popup-label"
+  }, "Appel entrant", -1 /* HOISTED */);
+});
+var _hoisted_8 = {
+  "class": "hc-kavkom-popup-name"
+};
+var _hoisted_9 = {
+  key: 0,
+  "class": "hc-kavkom-popup-number"
+};
+var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "hc-kavkom-popup-pulse"
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_11 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Fiche prospect reconnue", -1 /* HOISTED */);
+});
+var _hoisted_12 = {
+  key: 1,
+  "class": "hc-kavkom-popup-prospect is-unknown"
+};
+var _hoisted_13 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Aucun prospect ne correspond à ce numéro", -1 /* HOISTED */);
+});
+var _hoisted_14 = {
+  "class": "hc-kavkom-popup-actions"
+};
+var _hoisted_15 = {
+  "class": "hc-kavkom-popup hc-kavkom-popup-incall"
+};
+var _hoisted_16 = {
+  "class": "hc-kavkom-popup-header"
+};
+var _hoisted_17 = {
+  "class": "hc-kavkom-popup-icon is-active"
+};
+var _hoisted_18 = {
+  "class": "hc-kavkom-popup-identity"
+};
+var _hoisted_19 = {
+  "class": "hc-kavkom-popup-label"
+};
+var _hoisted_20 = {
+  "class": "hc-kavkom-popup-name"
+};
+var _hoisted_21 = {
+  "class": "hc-kavkom-popup-duration"
+};
+var _hoisted_22 = {
+  "class": "hc-kavkom-popup-actions"
+};
+var _hoisted_23 = {
+  "class": "hc-kavkom-popup hc-kavkom-popup-error"
+};
+var _hoisted_24 = {
+  "class": "hc-kavkom-popup-header"
+};
+var _hoisted_25 = {
+  "class": "hc-kavkom-popup-icon is-error"
+};
+var _hoisted_26 = {
+  "class": "hc-kavkom-popup-identity"
+};
+var _hoisted_27 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-kavkom-popup-label"
+  }, "Softphone Kavkom", -1 /* HOISTED */);
+});
+var _hoisted_28 = {
+  "class": "hc-kavkom-popup-error-message"
+};
+var _hoisted_29 = {
+  key: 0,
+  "class": "hc-kavkom-popup-actions"
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The remote audio lives here, not in the slide: an ongoing call\n             keeps its audio when the agent navigates or closes the slide. "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("audio", _hoisted_2, null, 512 /* NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Incoming call, waiting for the agent "), $options.incomingCall ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.callerName || $options.phone.callNumber || "Numéro inconnu"), 1 /* TEXT */), $options.callerName && $options.phone.callNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.phone.callNumber), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _hoisted_10]), $data.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 0,
+    "class": "hc-kavkom-popup-prospect",
+    onClick: _cache[0] || (_cache[0] = function () {
+      return $options.openProspect && $options.openProspect.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-address-card"
+  }), _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-caret-right"
+  })])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-user-slash"
+  }), _hoisted_13])), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-button-secondary hc-kavkom-accept",
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $options.answer && $options.answer.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Accepter ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-button-danger",
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $options.decline && $options.decline.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone-slash"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Refuser ")])])])) : $options.isInCall ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ongoing call (incoming or outgoing), so the agent can hang up\n             from anywhere in the CRM "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.isInboundCall ? "Appel entrant" : "Appel sortant"), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                            Pour un sortant, le numéro de l'INVITE est\n                            celui de la ligne elle-même : le nom du prospect\n                            appelé n'est affiché que pour un entrant.\n                        "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.callerName || ($options.isInboundCall ? $options.phone.callNumber : "") || "Kavkom"), 1 /* TEXT */)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.duration), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-button-danger",
+    onClick: _cache[3] || (_cache[3] = function () {
+      return $options.hangup && $options.hangup.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone-slash"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Raccrocher ")])])])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $data.errorMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 2
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Connection problem, only when no call is in progress "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-exclamation-triangle"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.errorMessage), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-times hc-kavkom-popup-close",
+    onClick: _cache[4] || (_cache[4] = function ($event) {
+      return $data.errorMessage = '';
+    })
+  })]), $options.phone.status === 'error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-button-secondary",
+    onClick: _cache[5] || (_cache[5] = function () {
+      return $options.reconnect && $options.reconnect.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-sync"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Reconnecter le softphone ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -101029,6 +101213,767 @@ var PALETTE = ["#7939b8",
 function duplicateColor(groupId) {
   return PALETTE[groupId % PALETTE.length];
 }
+
+/***/ }),
+
+/***/ "./resources/js/utils/kavkom-phone.js":
+/*!********************************************!*\
+  !*** ./resources/js/utils/kavkom-phone.js ***!
+  \********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   KAVKOM_EVENTS: () => (/* binding */ KAVKOM_EVENTS),
+/* harmony export */   answer: () => (/* binding */ answer),
+/* harmony export */   bootstrap: () => (/* binding */ bootstrap),
+/* harmony export */   decline: () => (/* binding */ decline),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   expectAgentLeg: () => (/* binding */ expectAgentLeg),
+/* harmony export */   forgetAgentLeg: () => (/* binding */ forgetAgentLeg),
+/* harmony export */   hangup: () => (/* binding */ hangup),
+/* harmony export */   refresh: () => (/* binding */ refresh),
+/* harmony export */   setRemoteAudio: () => (/* binding */ setRemoteAudio),
+/* harmony export */   state: () => (/* binding */ state),
+/* harmony export */   teardown: () => (/* binding */ teardown)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var sip_js_lib_platform_web__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! sip.js/lib/platform/web */ "./node_modules/sip.js/lib/platform/web/simple-user/simple-user.js");
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+/* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+
+
+
+/**
+ * Single Kavkom softphone for the whole application.
+ *
+ * The SIP registration used to live inside the "Kavkom" tab of the prospect
+ * interaction slide, which meant an incoming call could only be received
+ * while that tab was open. The extension is now registered once, for the
+ * whole session (see KavkomIncomingCall.vue, mounted in the main layout),
+ * and every UI component reads this shared state instead of connecting.
+ *
+ * A softphone extension must never be registered twice from the same
+ * browser: two AOR contacts would make the PBX fork an incoming call to two
+ * dialogs, ringing twice and attaching the media to only one of them.
+ */
+
+/** Events published on the app-wide EventBus. */
+var KAVKOM_EVENTS = {
+  READY: "kavkom:ready",
+  INCOMING_CALL: "kavkom:incoming-call",
+  CALL_ANSWERED: "kavkom:call-answered",
+  CALL_HANGUP: "kavkom:call-hangup",
+  CALL_FAILED: "kavkom:call-failed",
+  CONNECTION_ERROR: "kavkom:connection-error"
+};
+
+/**
+ * Outbound calls made from the CRM work in two steps: the REST API asks the
+ * PBX to call our extension (the "agent leg"), then the PBX bridges it to
+ * the prospect. The agent leg must be answered immediately or Kavkom drops
+ * it, so it is auto-answered — but only when the CRM is the one that just
+ * triggered a call, never for a call coming from outside. The window is
+ * wide enough to cover the REST request itself (Kavkom can take tens of
+ * seconds to acknowledge it) yet short enough not to swallow a genuine
+ * incoming call arriving a minute later.
+ */
+var AGENT_LEG_TIMEOUT_MS = 60000;
+var state = (0,vue__WEBPACK_IMPORTED_MODULE_0__.reactive)({
+  /** idle | connecting | not-configured | registered | ringing | in-call | error */
+  status: "idle",
+  errorMessage: "",
+  sipErrorDetails: "",
+  extension: "",
+  isRegistered: false,
+  /** null | 'inbound' | 'outbound' */
+  callDirection: null,
+  callNumber: "",
+  callDisplayName: "",
+  callAnswered: false,
+  callStartedAt: null,
+  /** True when the CRM answered the call itself (its own agent leg). */
+  callAutoAnswered: false
+});
+var simpleUser = null;
+var remoteAudio = null;
+var bootstrapping = false;
+var connectionAttempts = 0;
+var expectedAgentLegUntil = 0;
+var declinedCall = false;
+var MAX_CONNECTION_ATTEMPTS = 2;
+
+/**
+ * The element the remote media is attached to. The global softphone widget
+ * owns it: it outlives the slides, so an ongoing call keeps its audio when
+ * the agent navigates.
+ */
+function setRemoteAudio(element) {
+  if (element) {
+    remoteAudio = element;
+  }
+}
+
+/**
+ * Register the extension for the current user, if a Kavkom line is
+ * configured. Safe to call repeatedly (layout mount, reconnection...).
+ */
+function bootstrap() {
+  return _bootstrap.apply(this, arguments);
+}
+
+/** Reconnect with the credentials saved since the last attempt. */
+function _bootstrap() {
+  _bootstrap = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+    var _ref,
+      _ref$projectId,
+      projectId,
+      _args = arguments;
+    return _regeneratorRuntime().wrap(function _callee$(_context) {
+      while (1) switch (_context.prev = _context.next) {
+        case 0:
+          _ref = _args.length > 0 && _args[0] !== undefined ? _args[0] : {}, _ref$projectId = _ref.projectId, projectId = _ref$projectId === void 0 ? null : _ref$projectId;
+          if (!(bootstrapping || simpleUser || state.status === "registered")) {
+            _context.next = 3;
+            break;
+          }
+          return _context.abrupt("return");
+        case 3:
+          bootstrapping = true;
+          _context.prev = 4;
+          _context.next = 7;
+          return registerWebphone(projectId);
+        case 7:
+          _context.prev = 7;
+          bootstrapping = false;
+          return _context.finish(7);
+        case 10:
+        case "end":
+          return _context.stop();
+      }
+    }, _callee, null, [[4,, 7, 10]]);
+  }));
+  return _bootstrap.apply(this, arguments);
+}
+function refresh() {
+  return _refresh.apply(this, arguments);
+}
+
+/**
+ * Tell the softphone that the CRM has just asked Kavkom to call this
+ * extension: the next incoming INVITE is the agent leg of a click-to-call
+ * and must be answered automatically.
+ */
+function _refresh() {
+  _refresh = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
+        case 0:
+          connectionAttempts = 0;
+          _context2.next = 3;
+          return teardown();
+        case 3:
+          _context2.next = 5;
+          return bootstrap();
+        case 5:
+        case "end":
+          return _context2.stop();
+      }
+    }, _callee2);
+  }));
+  return _refresh.apply(this, arguments);
+}
+function expectAgentLeg() {
+  var timeoutMs = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : AGENT_LEG_TIMEOUT_MS;
+  expectedAgentLegUntil = Date.now() + timeoutMs;
+}
+
+/**
+ * Give up on an expected agent leg: the call request was refused before
+ * Kavkom could ring this extension (missing configuration, refused caller
+ * ID...), so the next INVITE is a genuine incoming call again.
+ */
+function forgetAgentLeg() {
+  expectedAgentLegUntil = 0;
+}
+function registerWebphone() {
+  return _registerWebphone.apply(this, arguments);
+}
+function _registerWebphone() {
+  _registerWebphone = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+    var projectId,
+      _yield$ApiService$get,
+      data,
+      _error$response,
+      _args3 = arguments;
+    return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+      while (1) switch (_context3.prev = _context3.next) {
+        case 0:
+          projectId = _args3.length > 0 && _args3[0] !== undefined ? _args3[0] : null;
+          state.status = "connecting";
+          state.isRegistered = false;
+          state.errorMessage = "";
+          state.sipErrorDetails = "";
+          _context3.prev = 5;
+          _context3.next = 8;
+          return _apis_api_service__WEBPACK_IMPORTED_MODULE_1__["default"].get("settings/kavkom/credentials", {
+            params: {
+              project_id: projectId
+            }
+          });
+        case 8:
+          _yield$ApiService$get = _context3.sent;
+          data = _yield$ApiService$get.data;
+          if (data.success) {
+            _context3.next = 15;
+            break;
+          }
+          state.status = "not-configured";
+          state.errorMessage = data.message;
+          logError("Credentials fetch failed", {
+            response: data
+          });
+          return _context3.abrupt("return");
+        case 15:
+          state.extension = data.extension;
+          logInfo("Credentials received", {
+            extension: state.extension,
+            userContext: data.user_context
+          });
+          connectSip(data);
+          _context3.next = 26;
+          break;
+        case 20:
+          _context3.prev = 20;
+          _context3.t0 = _context3["catch"](5);
+          state.status = "error";
+          state.errorMessage = ((_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || _context3.t0.message || "Erreur inattendue lors de la connexion à Kavkom.";
+          logError("Credentials fetch error", {
+            error: _context3.t0
+          });
+          _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CONNECTION_ERROR, state.errorMessage);
+        case 26:
+        case "end":
+          return _context3.stop();
+      }
+    }, _callee3, null, [[5, 20]]);
+  }));
+  return _registerWebphone.apply(this, arguments);
+}
+function connectSip(_ref2) {
+  var extension = _ref2.extension,
+    password = _ref2.password,
+    user_context = _ref2.user_context;
+  var server = "wss://".concat(user_context, "/");
+  var aor = "sip:".concat(extension, "@").concat(user_context);
+  logInfo("Connecting to SIP", {
+    server: server,
+    aor: aor,
+    extension: extension
+  });
+  simpleUser = new sip_js_lib_platform_web__WEBPACK_IMPORTED_MODULE_3__.SimpleUser(server, {
+    aor: aor,
+    userAgentOptions: {
+      authorizationUsername: extension,
+      authorizationPassword: password,
+      logBuiltinEnabled: true,
+      logLevel: "debug",
+      logConnector: createSipLogger(),
+      transportOptions: {
+        // SimpleUser ne renseigne `server` dans transportOptions que
+        // si on ne fournit pas nous-mêmes cet objet ; on doit donc le
+        // redéfinir ici.
+        server: server,
+        // Sans ping périodique, le proxy WSS de Kavkom coupe la
+        // connexion pour inactivité (fermeture code 1006 observée
+        // toutes les ~2 minutes), désenregistrant l'extension entre
+        // deux appels.
+        keepAliveInterval: 30
+      }
+    },
+    media: {
+      constraints: {
+        audio: true,
+        video: false
+      },
+      remote: {
+        audio: remoteAudio
+      }
+    }
+  });
+  simpleUser.delegate = {
+    onRegistered: function onRegistered() {
+      state.isRegistered = true;
+      state.status = "registered";
+      connectionAttempts = 0;
+      logInfo("SIP registration succeeded", {
+        extension: state.extension
+      });
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.READY, {
+        extension: state.extension
+      });
+    },
+    onUnregistered: function onUnregistered() {
+      state.isRegistered = false;
+    },
+    onServerDisconnect: function onServerDisconnect(error) {
+      state.isRegistered = false;
+      if (error) {
+        state.status = "error";
+        state.errorMessage = "La connexion au softphone Kavkom a été interrompue.";
+        _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CONNECTION_ERROR, state.errorMessage);
+      }
+    },
+    /**
+     * An incoming INVITE is either the agent leg of a click-to-call the
+     * CRM has just triggered (answered automatically) or a call coming
+     * from outside on the agent's Kavkom number (the agent decides).
+     */
+    onCallReceived: function onCallReceived() {
+      var caller = extractCaller();
+      var automatic = isAgentLegExpected();
+      declinedCall = false;
+      state.status = "ringing";
+      state.callDirection = automatic ? "outbound" : "inbound";
+      state.callNumber = caller.number;
+      state.callDisplayName = caller.displayName;
+      state.callAnswered = false;
+      state.callAutoAnswered = automatic;
+      state.callStartedAt = null;
+      logInfo("Incoming call received", {
+        direction: state.callDirection,
+        caller: state.callNumber,
+        automatic: automatic
+      });
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.INCOMING_CALL, {
+        direction: state.callDirection,
+        number: state.callNumber,
+        displayName: state.callDisplayName,
+        automatic: automatic
+      });
+      if (automatic) {
+        void answer(true);
+      }
+    },
+    onCallAnswered: function onCallAnswered() {
+      state.status = "in-call";
+      state.callAnswered = true;
+      state.callStartedAt = Date.now();
+      playRemoteAudio();
+      logInfo("Call established", {
+        direction: state.callDirection,
+        number: state.callNumber
+      });
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CALL_ANSWERED, callSnapshot());
+    },
+    onCallHangup: function onCallHangup() {
+      var snapshot = callSnapshot();
+      resetCall();
+      // A lost registration during the call (server disconnect) must
+      // not leave the UI stuck on "in-call".
+      state.status = state.isRegistered ? "registered" : "idle";
+      logInfo("Call ended", snapshot);
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CALL_HANGUP, snapshot);
+    }
+  };
+  simpleUser.connect().then(function () {
+    logInfo("SIP connection established");
+    return simpleUser.register();
+  })["catch"](function (error) {
+    state.isRegistered = false;
+    state.status = "error";
+    var errorMsg = extractSipErrorMessage(error);
+    state.errorMessage = errorMsg;
+    state.sipErrorDetails = extractSipErrorDetails(error);
+    logError("SIP connection or registration failed", {
+      error: errorMsg,
+      details: state.sipErrorDetails,
+      originalError: error
+    });
+    _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CONNECTION_ERROR, errorMsg);
+    if (connectionAttempts < MAX_CONNECTION_ATTEMPTS) {
+      connectionAttempts++;
+      logWarn("Retrying SIP connection", {
+        attempt: connectionAttempts,
+        maxAttempts: MAX_CONNECTION_ATTEMPTS
+      });
+      setTimeout(function () {
+        teardown().then(function () {
+          return registerWebphone();
+        });
+      }, 2000);
+    }
+  });
+}
+
+/** Accept the call. `automatic` is true for the agent leg of a click-to-call. */
+function answer() {
+  return _answer.apply(this, arguments);
+}
+
+/**
+ * Reject the ringing call. A deliberately rejected call is not a missed
+ * one: it is reported as such to the history without alerting the agent.
+ */
+function _answer() {
+  _answer = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var _simpleUser3;
+    var automatic,
+      direction,
+      _args4 = arguments;
+    return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+      while (1) switch (_context4.prev = _context4.next) {
+        case 0:
+          automatic = _args4.length > 0 && _args4[0] !== undefined ? _args4[0] : false;
+          if ((_simpleUser3 = simpleUser) !== null && _simpleUser3 !== void 0 && _simpleUser3.session) {
+            _context4.next = 3;
+            break;
+          }
+          return _context4.abrupt("return");
+        case 3:
+          direction = state.callDirection;
+          _context4.prev = 4;
+          _context4.next = 7;
+          return simpleUser.answer();
+        case 7:
+          logInfo("Call accepted", {
+            automatic: automatic
+          });
+          _context4.next = 16;
+          break;
+        case 10:
+          _context4.prev = 10;
+          _context4.t0 = _context4["catch"](4);
+          resetCall();
+          state.status = state.isRegistered ? "registered" : "idle";
+          logError("Failed to accept the Kavkom call", {
+            error: _context4.t0
+          });
+          _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CALL_FAILED, {
+            message: "Impossible d'accepter l'appel Kavkom.",
+            direction: direction,
+            automatic: automatic
+          });
+        case 16:
+        case "end":
+          return _context4.stop();
+      }
+    }, _callee4, null, [[4, 10]]);
+  }));
+  return _answer.apply(this, arguments);
+}
+function decline() {
+  return _decline.apply(this, arguments);
+}
+
+/** Hang up the ongoing call. */
+function _decline() {
+  _decline = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var _simpleUser4, _simpleUser5;
+    return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+      while (1) switch (_context5.prev = _context5.next) {
+        case 0:
+          declinedCall = true;
+          _context5.prev = 1;
+          _context5.next = 4;
+          return (_simpleUser4 = simpleUser) === null || _simpleUser4 === void 0 ? void 0 : _simpleUser4.decline();
+        case 4:
+          logInfo("Call declined");
+          _context5.next = 10;
+          break;
+        case 7:
+          _context5.prev = 7;
+          _context5.t0 = _context5["catch"](1);
+          logError("Failed to decline the Kavkom call", {
+            error: _context5.t0
+          });
+        case 10:
+          _context5.prev = 10;
+          // Rejecting the INVITE terminates the session and the delegate's
+          // onCallHangup resets the call state, keeping its details
+          // (direction, missed...) for the call history. Only clear here when
+          // there is no session left to end.
+          if (!((_simpleUser5 = simpleUser) !== null && _simpleUser5 !== void 0 && _simpleUser5.session)) {
+            resetCall();
+            state.status = state.isRegistered ? "registered" : "idle";
+          }
+          return _context5.finish(10);
+        case 13:
+        case "end":
+          return _context5.stop();
+      }
+    }, _callee5, null, [[1, 7, 10, 13]]);
+  }));
+  return _decline.apply(this, arguments);
+}
+function hangup() {
+  var _simpleUser;
+  (_simpleUser = simpleUser) === null || _simpleUser === void 0 ? void 0 : _simpleUser.hangup()["catch"](function (error) {
+    logError("Failed to hang up call", {
+      error: error
+    });
+  });
+}
+
+/** Close the SIP transport (logout, or before a fresh registration). */
+function teardown() {
+  return _teardown.apply(this, arguments);
+}
+function _teardown() {
+  _teardown = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    var user;
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
+        case 0:
+          user = simpleUser;
+          simpleUser = null;
+          state.isRegistered = false;
+          resetCall();
+          if (!user) {
+            _context6.next = 12;
+            break;
+          }
+          _context6.prev = 5;
+          _context6.next = 8;
+          return user.disconnect();
+        case 8:
+          _context6.next = 12;
+          break;
+        case 10:
+          _context6.prev = 10;
+          _context6.t0 = _context6["catch"](5);
+        case 12:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6, null, [[5, 10]]);
+  }));
+  return _teardown.apply(this, arguments);
+}
+function resetCall() {
+  state.callDirection = null;
+  state.callNumber = "";
+  state.callDisplayName = "";
+  state.callAnswered = false;
+  state.callAutoAnswered = false;
+  state.callStartedAt = null;
+}
+function callSnapshot() {
+  return {
+    direction: state.callDirection,
+    number: state.callNumber,
+    displayName: state.callDisplayName,
+    answered: state.callAnswered,
+    durationMs: state.callStartedAt ? Date.now() - state.callStartedAt : null,
+    // A ringing inbound call that ends without being answered is a
+    // missed call, not a completed one.
+    missed: state.callDirection === "inbound" && !state.callAnswered,
+    declined: declinedCall
+  };
+}
+function isAgentLegExpected() {
+  if (expectedAgentLegUntil === 0) {
+    return false;
+  }
+  var expected = Date.now() <= expectedAgentLegUntil;
+  expectedAgentLegUntil = 0;
+  return expected;
+}
+
+/**
+ * Caller number and name, as advertised by the PBX in the INVITE. Kavkom
+ * may only expose the caller through P-Asserted-Identity or the From header
+ * depending on the trunk, so both are inspected.
+ */
+function extractCaller() {
+  var _simpleUser2;
+  var session = (_simpleUser2 = simpleUser) === null || _simpleUser2 === void 0 ? void 0 : _simpleUser2.session;
+  var number = "";
+  var displayName = "";
+  try {
+    var _session$remoteIdenti, _session$remoteIdenti2;
+    number = ((session === null || session === void 0 || (_session$remoteIdenti = session.remoteIdentity) === null || _session$remoteIdenti === void 0 || (_session$remoteIdenti = _session$remoteIdenti.uri) === null || _session$remoteIdenti === void 0 ? void 0 : _session$remoteIdenti.user) || "").trim();
+    displayName = ((session === null || session === void 0 || (_session$remoteIdenti2 = session.remoteIdentity) === null || _session$remoteIdenti2 === void 0 ? void 0 : _session$remoteIdenti2.displayName) || "").trim();
+  } catch (_) {
+    // Not an incoming invitation: no remote identity to read.
+  }
+  var assertIdentity = "";
+  try {
+    var _session$request, _session$request$getH;
+    assertIdentity = ((session === null || session === void 0 || (_session$request = session.request) === null || _session$request === void 0 || (_session$request$getH = _session$request.getHeader) === null || _session$request$getH === void 0 ? void 0 : _session$request$getH.call(_session$request, "P-Asserted-Identity")) || "").trim();
+  } catch (_) {
+    assertIdentity = "";
+  }
+  if (assertIdentity) {
+    // Both the number and the display name can be present:
+    // "Nicolas" <sip:+33688753390@client.kavkom.com>
+    var match = assertIdentity.match(/sip:([^@;>]+)@/i);
+    if (match) {
+      number = match[1].replace(/[^\d+]/g, "") || number;
+    }
+    if (!displayName) {
+      displayName = assertIdentity.replace(/<[^>]*>/g, "").replace(/"/g, "").trim();
+    }
+  }
+  return {
+    number: displayableNumber(number),
+    displayName: displayName
+  };
+}
+
+/** Keep the digits and a leading + so the number reads like a phone number. */
+function displayableNumber(number) {
+  var trimmed = (number || "").replace(/[^\d+]/g, "");
+  return trimmed ? trimmed.startsWith("+") ? trimmed : "+".concat(trimmed) : "";
+}
+function playRemoteAudio() {
+  return _playRemoteAudio.apply(this, arguments);
+}
+/**
+ * Extract a user-friendly error message from SIP errors
+ */
+function _playRemoteAudio() {
+  _playRemoteAudio = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+    var _simpleUser6;
+    var stream, _remoteAudio$srcObjec, _remoteAudio$srcObjec2;
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
+        case 0:
+          if (remoteAudio) {
+            _context7.next = 3;
+            break;
+          }
+          logWarn("Remote audio element not available.");
+          return _context7.abrupt("return");
+        case 3:
+          // The stream is attached when the call is answered rather than at
+          // construction time: the remote audio element belongs to the global
+          // widget, which may not be mounted yet when the registration starts.
+          stream = (_simpleUser6 = simpleUser) === null || _simpleUser6 === void 0 ? void 0 : _simpleUser6.remoteMediaStream;
+          if (stream && remoteAudio.srcObject !== stream) {
+            remoteAudio.srcObject = stream;
+          }
+          _context7.prev = 5;
+          _context7.next = 8;
+          return remoteAudio.play();
+        case 8:
+          logInfo("Remote audio playback started", {
+            hasStream: !!remoteAudio.srcObject,
+            audioTracks: ((_remoteAudio$srcObjec = remoteAudio.srcObject) === null || _remoteAudio$srcObjec === void 0 || (_remoteAudio$srcObjec2 = _remoteAudio$srcObjec.getAudioTracks) === null || _remoteAudio$srcObjec2 === void 0 ? void 0 : _remoteAudio$srcObjec2.call(_remoteAudio$srcObjec).length) || 0
+          });
+          _context7.next = 15;
+          break;
+        case 11:
+          _context7.prev = 11;
+          _context7.t0 = _context7["catch"](5);
+          logError("Remote audio playback blocked by the browser", {
+            error: _context7.t0
+          });
+          _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].emit(KAVKOM_EVENTS.CONNECTION_ERROR, "Le navigateur a bloqué le son de l'appel. Autorisez l'audio et le microphone pour ce site.");
+        case 15:
+        case "end":
+          return _context7.stop();
+      }
+    }, _callee7, null, [[5, 11]]);
+  }));
+  return _playRemoteAudio.apply(this, arguments);
+}
+function extractSipErrorMessage(error) {
+  if (error instanceof TypeError) {
+    if (error.message.includes("WebSocket")) {
+      return "Impossible de se connecter au serveur SIP WebSocket (problème de certificat SSL, DNS, ou firewall).";
+    }
+    return "Erreur de connexion SIP : " + error.message;
+  }
+  if (error && _typeof(error) === "object") {
+    if (error.statusCode === 401 || error.statusCode === 407) {
+      return "Erreur d'authentification SIP (identifiants incorrects ou extension désactivée dans Kavkom).";
+    }
+    if (error.statusCode === 404) {
+      return "Extension SIP non trouvée sur le serveur Kavkom.";
+    }
+    if (error.reasonPhrase && error.reasonPhrase.includes("NOT_REGISTERED")) {
+      return "L'extension n'a pas pu s'enregistrer auprès du serveur SIP. Le serveur WebSocket n'est peut-être pas joignable.";
+    }
+    if (error.message) {
+      return "Erreur SIP : " + error.message;
+    }
+    if (error.statusCode) {
+      return "Erreur SIP (HTTP " + error.statusCode + ").";
+    }
+  }
+  return "Impossible de connecter le softphone à l'extension Kavkom.";
+}
+
+/**
+ * Extract detailed error information for debugging
+ */
+function extractSipErrorDetails(error) {
+  var details = [];
+  if (error && _typeof(error) === "object") {
+    if (error.statusCode) {
+      details.push("Status: ".concat(error.statusCode));
+    }
+    if (error.reasonPhrase) {
+      details.push("Reason: ".concat(error.reasonPhrase));
+    }
+    if (error.cause) {
+      details.push("Cause: ".concat(error.cause));
+    }
+    if (error.message) {
+      details.push("Message: ".concat(error.message));
+    }
+  }
+  return details.join(" | ");
+}
+function createSipLogger() {
+  return function (message) {
+    logDebug("SIP.js", {
+      message: message
+    });
+  };
+}
+function logInfo(message) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  console.log("[Kavkom ".concat(new Date().toISOString(), "] ").concat(message), data);
+}
+function logDebug(message) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  console.debug("[Kavkom DEBUG ".concat(new Date().toISOString(), "] ").concat(message), data);
+}
+function logWarn(message) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  console.warn("[Kavkom WARNING ".concat(new Date().toISOString(), "] ").concat(message), data);
+}
+function logError(message) {
+  var data = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  console.error("[Kavkom ERROR ".concat(new Date().toISOString(), "] ").concat(message), data);
+}
+
+/**
+ * The softphone belongs to the session: it stops with the app (logout,
+ * impersonation change...).
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  state: state,
+  KAVKOM_EVENTS: KAVKOM_EVENTS,
+  setRemoteAudio: setRemoteAudio,
+  bootstrap: bootstrap,
+  refresh: refresh,
+  expectAgentLeg: expectAgentLeg,
+  forgetAgentLeg: forgetAgentLeg,
+  answer: answer,
+  decline: decline,
+  hangup: hangup,
+  teardown: teardown
+});
 
 /***/ }),
 
@@ -104246,6 +105191,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-kavkom-webphone[data-v-09a0459c]
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-kavkom-popup[data-v-8a100814] {\n    position: fixed;\n    right: 18px;\n    bottom: 18px;\n    z-index: 3000;\n    width: 330px;\n    max-width: calc(100vw - 36px);\n    padding: 14px;\n    background: #ffffff;\n    border: 1px solid #e4e6eb;\n    border-radius: 14px;\n    box-shadow: 0 14px 34px rgba(31, 41, 55, 0.18);\n    animation: hc-kavkom-popup-in-8a100814 0.18s ease-out;\n}\n.hc-kavkom-popup-incoming[data-v-8a100814] {\n    border-color: #cfe3d0;\n}\n.hc-kavkom-popup-error[data-v-8a100814] {\n    border-color: #f2d3cc;\n}\n@keyframes hc-kavkom-popup-in-8a100814 {\nfrom {\n        opacity: 0;\n        transform: translateY(12px);\n}\nto {\n        opacity: 1;\n        transform: translateY(0);\n}\n}\n.hc-kavkom-popup-header[data-v-8a100814] {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n}\n.hc-kavkom-popup-icon[data-v-8a100814] {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    flex: none;\n    width: 38px;\n    height: 38px;\n    color: #ffffff;\n    background: #489f1f;\n    border-radius: 10px;\n}\n.hc-kavkom-popup-icon.is-active[data-v-8a100814] {\n    background: #8e24aa;\n}\n.hc-kavkom-popup-icon.is-error[data-v-8a100814] {\n    background: #c62828;\n}\n.hc-kavkom-popup-identity[data-v-8a100814] {\n    flex: 1;\n    min-width: 0;\n}\n.hc-kavkom-popup-label[data-v-8a100814] {\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.03em;\n    text-transform: uppercase;\n    color: #8a8f98;\n}\n.hc-kavkom-popup-name[data-v-8a100814] {\n    overflow: hidden;\n    font-size: 15px;\n    font-weight: 600;\n    color: #2f3237;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-kavkom-popup-number[data-v-8a100814],\n.hc-kavkom-popup-duration[data-v-8a100814] {\n    font-size: 12px;\n    color: #6c757d;\n}\n.hc-kavkom-popup-duration[data-v-8a100814] {\n    flex: none;\n    font-variant-numeric: tabular-nums;\n    font-weight: 600;\n    color: #8e24aa;\n}\n.hc-kavkom-popup-error-message[data-v-8a100814] {\n    font-size: 12px;\n    color: #c62828;\n}\n.hc-kavkom-popup-close[data-v-8a100814] {\n    flex: none;\n    cursor: pointer;\n    color: #adb5bd;\n}\n.hc-kavkom-popup-pulse[data-v-8a100814] {\n    flex: none;\n    width: 9px;\n    height: 9px;\n    background: #489f1f;\n    border-radius: 50%;\n    animation: hc-kavkom-pulse-8a100814 1.2s infinite;\n}\n@keyframes hc-kavkom-pulse-8a100814 {\n0%,\n    100% {\n        opacity: 1;\n        transform: scale(1);\n}\n50% {\n        opacity: 0.35;\n        transform: scale(1.5);\n}\n}\n.hc-kavkom-popup-prospect[data-v-8a100814] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin-top: 12px;\n    padding: 8px 10px;\n    font-size: 12px;\n    color: #6d28d9;\n    background: #f7f2fd;\n    border-radius: 9px;\n    cursor: pointer;\n}\n.hc-kavkom-popup-prospect > span[data-v-8a100814] {\n    flex: 1;\n}\n.hc-kavkom-popup-prospect.is-unknown[data-v-8a100814] {\n    color: #6c757d;\n    background: #f4f5f7;\n    cursor: default;\n}\n.hc-kavkom-popup-actions[data-v-8a100814] {\n    display: flex;\n    gap: 8px;\n    margin-top: 12px;\n}\n.hc-kavkom-popup-actions > button[data-v-8a100814] {\n    display: flex;\n    flex: 1;\n    align-items: center;\n    justify-content: center;\n    gap: 7px;\n    min-height: 38px;\n}\n.hc-kavkom-accept[data-v-8a100814] {\n    color: #ffffff;\n    background: #489f1f;\n    border-color: #489f1f;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/Ringover.vue?vue&type=style&index=0&id=11eb78cd&lang=css":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/Ringover.vue?vue&type=style&index=0&id=11eb78cd&lang=css ***!
@@ -106651,6 +107620,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Kavkom_vue_vue_type_style_index_0_id_09a0459c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_style_index_0_id_8a100814_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_style_index_0_id_8a100814_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_style_index_0_id_8a100814_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -121087,6 +122086,37 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/KavkomIncomingCall.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/utils/KavkomIncomingCall.vue ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _KavkomIncomingCall_vue_vue_type_template_id_8a100814_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true */ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true");
+/* harmony import */ var _KavkomIncomingCall_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./KavkomIncomingCall.vue?vue&type=script&lang=js */ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js");
+/* harmony import */ var _KavkomIncomingCall_vue_vue_type_style_index_0_id_8a100814_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css */ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_KavkomIncomingCall_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_KavkomIncomingCall_vue_vue_type_template_id_8a100814_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-8a100814"],['__file',"resources/js/components/utils/KavkomIncomingCall.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/utils/Ringover.vue":
 /*!****************************************************!*\
   !*** ./resources/js/components/utils/Ringover.vue ***!
@@ -129313,6 +130343,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./KavkomIncomingCall.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/utils/Ringover.vue?vue&type=script&lang=js":
 /*!****************************************************************************!*\
   !*** ./resources/js/components/utils/Ringover.vue?vue&type=script&lang=js ***!
@@ -137473,6 +138519,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true":
+/*!********************************************************************************************************!*\
+  !*** ./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true ***!
+  \********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_template_id_8a100814_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_template_id_8a100814_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=template&id=8a100814&scoped=true");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/utils/Ringover.vue?vue&type=template&id=11eb78cd":
 /*!**********************************************************************************!*\
   !*** ./resources/js/components/utils/Ringover.vue?vue&type=template&id=11eb78cd ***!
@@ -138563,6 +139625,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Kavkom_vue_vue_type_style_index_0_id_09a0459c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Kavkom.vue?vue&type=style&index=0&id=09a0459c&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/Kavkom.vue?vue&type=style&index=0&id=09a0459c&scoped=true&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css":
+/*!**********************************************************************************************************************!*\
+  !*** ./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css ***!
+  \**********************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_KavkomIncomingCall_vue_vue_type_style_index_0_id_8a100814_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/utils/KavkomIncomingCall.vue?vue&type=style&index=0&id=8a100814&scoped=true&lang=css");
 
 
 /***/ }),

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ProcessKavkomCall;
+use App\Models\Interaction;
 use App\Models\KavkomCall;
 use App\Models\Prospect;
 use App\Models\UserSetting;
+use App\Support\PhoneNumber;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -52,19 +54,37 @@ class KavkomWebhookController extends Controller
 
         $recordingUrl = $this->recordingUrl($recordingUrl);
 
+        // Kavkom sends a CDR for inbound calls too. `destination` always
+        // holds the other end of the call — the caller for an inbound call,
+        // the dialled number for an outbound one — so the prospect lookup
+        // and the transcript interaction stay correct in both directions.
+        $direction = $this->direction($payload);
+        $remoteNumber = $this->remoteNumber($payload, $direction);
+
         $call = KavkomCall::firstOrNew(['call_uuid' => $callUuid]);
         $alreadyProcessed = (bool) $call->processed_at;
         $beingProcessed = $call->status === 'processing';
         if (!$call->exists) {
-            $call->prospect_id = $this->findProspectId($payload);
+            $call->prospect_id = $this->findProspectId($remoteNumber);
         }
         $call->fill([
             'domain_uuid' => data_get($payload, 'domainUuid') ?: data_get($payload, 'domain_uuid') ?: data_get($payload, 'cdr.domain_uuid') ?: $call->domain_uuid,
-            'destination' => data_get($payload, 'number') ?: data_get($payload, 'destination') ?: data_get($payload, 'cdr.destination') ?: $call->destination,
+            'direction' => $direction ?: $call->direction,
+            'destination' => $remoteNumber ?: $call->destination,
             'recording_url' => $recordingUrl ?: $call->recording_url,
             'webhook_payload' => $payload,
             'completed_at' => now(),
-        ])->save();
+        ]);
+
+        // The browser softphone already opened an interaction while the
+        // call was ringing. Link it to the CDR so the post-call pipeline
+        // completes that one (transcript, analysis, qualification) instead
+        // of creating a second interaction for the same call.
+        if ($direction === 'inbound' && !$call->interaction_id && $call->prospect_id) {
+            $call->interaction_id = $this->pendingInboundInteractionId($call->prospect_id, $remoteNumber);
+        }
+
+        $call->save();
 
         if (!$alreadyProcessed && !$beingProcessed) {
             $call->update(['status' => 'cdr_received']);
@@ -74,7 +94,7 @@ class KavkomWebhookController extends Controller
             'call_uuid' => $callUuid,
             'prospect_id' => $call->prospect_id,
             'has_recording_url' => (bool) $call->recording_url,
-            'direction' => data_get($payload, 'direction') ?: data_get($payload, 'cdr.direction'),
+            'direction' => $direction,
             'duration_seconds' => data_get($payload, 'duration') ?: data_get($payload, 'cdr.duration'),
             'provider_status' => data_get($payload, 'status') ?: data_get($payload, 'cdr.status'),
         ]);
@@ -108,26 +128,97 @@ class KavkomWebhookController extends Controller
         return $secret !== '' && $provided !== '' && hash_equals($secret, $provided);
     }
 
-    private function findProspectId(array $payload): ?int
+    /**
+     * Normalized call direction, or null when the CDR leaves it out.
+     */
+    private function direction(array $payload): ?string
     {
-        $number = data_get($payload, 'destination') ?: data_get($payload, 'destination_number')
-            ?: data_get($payload, 'data.destination') ?: data_get($payload, 'cdr.destination')
-            ?: data_get($payload, 'cdr.destination_number');
-        if (!is_string($number)) {
-            return null;
+        $direction = strtolower((string) (
+            data_get($payload, 'direction')
+            ?: data_get($payload, 'cdr.direction')
+            ?: data_get($payload, 'data.direction')
+        ));
+
+        if (in_array($direction, ['inbound', 'in', 'incoming', 'entrant'], true)) {
+            return 'inbound';
         }
 
-        $digits = preg_replace('/\D+/', '', $number);
-        if ($digits === '') {
+        if (in_array($direction, ['outbound', 'out', 'outgoing', 'sortant'], true)) {
+            return 'outbound';
+        }
+
+        return null;
+    }
+
+    /**
+     * The external party of the call: the caller for an inbound CDR, the
+     * dialled number for an outbound one.
+     */
+    private function remoteNumber(array $payload, ?string $direction): ?string
+    {
+        $keys = $direction === 'inbound'
+            ? [
+                'caller_id_number', 'callerIdNumber', 'from', 'caller_id', 'from_number',
+                'data.caller_id_number', 'data.from', 'cdr.caller_id_number', 'cdr.from',
+            ]
+            : [
+                'number', 'destination', 'destination_number',
+                'data.destination', 'data.destination_number',
+                'cdr.destination', 'cdr.destination_number',
+            ];
+
+        foreach ($keys as $key) {
+            $number = data_get($payload, $key);
+
+            if (is_string($number) && trim($number) !== '') {
+                return $number;
+            }
+        }
+
+        return null;
+    }
+
+    private function findProspectId(?string $number): ?int
+    {
+        // A PBX presents French numbers internationally (33688753390) while
+        // the CRM stores them locally (0688753390): try every equivalent form.
+        $candidates = PhoneNumber::candidates($number);
+
+        if (empty($candidates)) {
             return null;
         }
 
         return Prospect::withoutGlobalScopes()
             ->whereRaw(
-                "REPLACE(REPLACE(REPLACE(REPLACE(phone_number, ' ', ''), '-', ''), '.', ''), '+', '') = ?
-                 OR REPLACE(REPLACE(REPLACE(REPLACE(mobile_phone_number, ' ', ''), '-', ''), '.', ''), '+', '') = ?",
-                [$digits, $digits]
+                PhoneNumber::digitsExpression('phone_number').' IN ('.implode(',', array_fill(0, count($candidates), '?')).')
+                 OR '.PhoneNumber::digitsExpression('mobile_phone_number').' IN ('.implode(',', array_fill(0, count($candidates), '?')).')',
+                array_merge($candidates, $candidates)
             )
+            ->orderBy('id')
+            ->value('id');
+    }
+
+    /**
+     * The inbound interaction opened by the softphone while the call was
+     * ringing (see KavkomController::incoming), still waiting for its
+     * recording and transcript.
+     */
+    private function pendingInboundInteractionId(int $prospectId, ?string $number): ?int
+    {
+        $candidates = PhoneNumber::candidates($number);
+
+        if (empty($candidates)) {
+            return null;
+        }
+
+        return Interaction::query()
+            ->where('prospect_id', $prospectId)
+            ->where('source', 'kavkom')
+            ->whereIn('status', ['ringing', 'answered', 'hangup'])
+            ->where('data->direction', 'inbound')
+            ->whereIn('number', $candidates)
+            ->where('created_at', '>=', now()->subHours(2))
+            ->latest('id')
             ->value('id');
     }
 
