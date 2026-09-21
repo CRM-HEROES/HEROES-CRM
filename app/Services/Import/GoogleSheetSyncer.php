@@ -58,6 +58,12 @@ class GoogleSheetSyncer
      */
     public function sync(Import $import): bool
     {
+        Log::info('GoogleSheetSyncer: sync started', [
+            'import_id' => $import->id,
+            'project_id' => $import->project_id,
+            'source_url' => $import->source_url,
+        ]);
+
         try {
             $spreadsheetId = $this->downloader->extractSpreadsheetId($import->source_url);
             $file = $this->downloader->download($spreadsheetId, $import->project->slug);
@@ -69,6 +75,12 @@ class GoogleSheetSyncer
 
             return false;
         }
+
+        Log::info('GoogleSheetSyncer: spreadsheet downloaded successfully, dispatching import job', [
+            'import_id' => $import->id,
+            'file_path' => $file['path'],
+            'file_size' => $file['size'],
+        ]);
 
         // Bypass ImportObserver here: flipping is_processing through a
         // normal update() would make it dispatch its own *non-incremental*

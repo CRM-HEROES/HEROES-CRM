@@ -11,6 +11,7 @@ use App\Services\Import\GoogleSheetSyncer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class WebserviceController extends Controller
@@ -43,15 +44,41 @@ class WebserviceController extends Controller
     {
         $import->makeVisible('token');
 
+        Log::info('Google Sheets sync webhook received', [
+            'import_id' => $import->id,
+            'project_id' => $import->project_id,
+            'source' => $import->source,
+            'sync_enabled' => (bool) $import->sync_enabled,
+            'is_processing' => (bool) $import->is_processing,
+            'request_method' => $request->method(),
+            'request_ip' => $request->ip(),
+            'token_present' => $request->has('token'),
+        ]);
+
         if ($import->token != $request->input('token', '')) {
+            Log::warning('Google Sheets sync webhook rejected: invalid token', [
+                'import_id' => $import->id,
+                'ip' => $request->ip(),
+            ]);
+
             return response()->json(['message' => "Vous n'avez pas le droit de synchroniser cet import."], 403);
         }
 
         if ($import->source !== 'google_sheets' || !$import->sync_enabled) {
+            Log::warning('Google Sheets sync webhook rejected: import not eligible', [
+                'import_id' => $import->id,
+                'source' => $import->source,
+                'sync_enabled' => (bool) $import->sync_enabled,
+            ]);
+
             return response()->json(['message' => "La synchronisation automatique n'est pas activée pour cet import."], 400);
         }
 
         if ($import->is_processing) {
+            Log::info('Google Sheets sync webhook skipped because import is already processing', [
+                'import_id' => $import->id,
+            ]);
+
             $syncer->queueRetryIfBusy($import, 15);
 
             return response()->json([
