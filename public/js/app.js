@@ -27951,6 +27951,7 @@ var REMOVE_GROUP = "removeGroup";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ADD_IMPORT: () => (/* binding */ ADD_IMPORT),
+/* harmony export */   ADD_IMPORT_AI_AGENT: () => (/* binding */ ADD_IMPORT_AI_AGENT),
 /* harmony export */   ADD_IMPORT_GROUP: () => (/* binding */ ADD_IMPORT_GROUP),
 /* harmony export */   ADD_IMPORT_LABEL: () => (/* binding */ ADD_IMPORT_LABEL),
 /* harmony export */   ADD_IMPORT_MAPPING_CATEGORY: () => (/* binding */ ADD_IMPORT_MAPPING_CATEGORY),
@@ -27968,6 +27969,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ADD_IMPORT_USER_GROUP: () => (/* binding */ ADD_IMPORT_USER_GROUP),
 /* harmony export */   FETCH_IMPORTS: () => (/* binding */ FETCH_IMPORTS),
 /* harmony export */   REMOVE_IMPORT: () => (/* binding */ REMOVE_IMPORT),
+/* harmony export */   REMOVE_IMPORT_AI_AGENT: () => (/* binding */ REMOVE_IMPORT_AI_AGENT),
 /* harmony export */   REMOVE_IMPORT_GROUP: () => (/* binding */ REMOVE_IMPORT_GROUP),
 /* harmony export */   REMOVE_IMPORT_LABEL: () => (/* binding */ REMOVE_IMPORT_LABEL),
 /* harmony export */   REMOVE_IMPORT_MAPPING: () => (/* binding */ REMOVE_IMPORT_MAPPING),
@@ -28007,6 +28009,8 @@ var ADD_IMPORT_ROLE = "addImportRole";
 var REMOVE_IMPORT_ROLE = "removeImportRole";
 var ADD_IMPORT_USER_GROUP = "addImportUserGroup";
 var REMOVE_IMPORT_USER_GROUP = "removeImportUserGroup";
+var ADD_IMPORT_AI_AGENT = "addImportAiAgent";
+var REMOVE_IMPORT_AI_AGENT = "removeImportAiAgent";
 
 /***/ }),
 
@@ -31110,6 +31114,33 @@ __webpack_require__.r(__webpack_exports__);
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/import/").concat(projectImport), {
       data: params
     });
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/apis/project/import/aiAgent.js":
+/*!*****************************************************!*\
+  !*** ./resources/js/apis/project/import/aiAgent.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  get: function get(project, projectImport) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/import/").concat(projectImport, "/ai-agent"));
+  },
+  update: function update(project, projectImport, agent) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/import/").concat(projectImport, "/ai-agent/").concat(agent));
+  },
+  destroy: function destroy(project, projectImport, agent) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/import/").concat(projectImport, "/ai-agent/").concat(agent));
   }
 });
 
@@ -40687,7 +40718,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/apis/project/import/mapping */ "./resources/js/apis/project/import/mapping.js");
 /* harmony import */ var _apis_project_import_role__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/apis/project/import/role */ "./resources/js/apis/project/import/role.js");
 /* harmony import */ var _apis_project_import_userGroup__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/apis/project/import/userGroup */ "./resources/js/apis/project/import/userGroup.js");
-/* harmony import */ var _actions_project_import__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/import */ "./resources/js/actions/project/import.js");
+/* harmony import */ var _apis_project_import_aiAgent__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/apis/project/import/aiAgent */ "./resources/js/apis/project/import/aiAgent.js");
+/* harmony import */ var _actions_project_import__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/import */ "./resources/js/actions/project/import.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 var _actions, _mutations;
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
@@ -40713,6 +40745,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /**
  * import Store state
  */
@@ -40724,7 +40757,7 @@ var state = {
 /**
  * import Store Actions
  */
-var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.FETCH_IMPORTS, function (context, params) {
+var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.FETCH_IMPORTS, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
     var _yield$importService$, data;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -40735,7 +40768,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
         case 2:
           _yield$importService$ = _context.sent;
           data = _yield$importService$.data;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.SET_IMPORTS, data);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.SET_IMPORTS, data);
           return _context.abrupt("return", data);
         case 6:
         case "end":
@@ -40743,7 +40776,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.SHOW_IMPORT, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.SHOW_IMPORT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
     var _yield$importService$2, data;
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
@@ -40754,7 +40787,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
         case 2:
           _yield$importService$2 = _context2.sent;
           data = _yield$importService$2.data;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.SET_IMPORT, data);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.SET_IMPORT, data);
           return _context2.abrupt("return", data);
         case 6:
         case "end":
@@ -40762,7 +40795,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee2);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
     var _yield$importService$3, data;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -40773,7 +40806,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
         case 2:
           _yield$importService$3 = _context3.sent;
           data = _yield$importService$3.data;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT, data);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT, data);
           return _context3.abrupt("return", data);
         case 6:
         case "end":
@@ -40781,12 +40814,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee3);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.UPDATE_IMPORT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.UPDATE_IMPORT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.UPDATE_IMPORT, params);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.UPDATE_IMPORT, params);
           _context4.next = 3;
           return _apis_project_import__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 3:
@@ -40795,7 +40828,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT, function (context, _ref) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT, function (context, _ref) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var slug, params;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
@@ -40805,19 +40838,19 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
           _context5.next = 3;
           return _apis_project_import__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug, params);
         case 3:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT, slug);
         case 4:
         case "end":
           return _context5.stop();
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_GROUP, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_GROUP, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_GROUP, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_GROUP, slug);
           _context6.next = 3;
           return _apis_project_import_group__WEBPACK_IMPORTED_MODULE_1__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40826,12 +40859,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee6);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_GROUP, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_GROUP, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_GROUP, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_GROUP, slug);
           _context7.next = 3;
           return _apis_project_import_group__WEBPACK_IMPORTED_MODULE_1__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40840,12 +40873,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee7);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_LABEL, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_LABEL, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
     return _regeneratorRuntime().wrap(function _callee8$(_context8) {
       while (1) switch (_context8.prev = _context8.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_LABEL, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_LABEL, slug);
           _context8.next = 3;
           return _apis_project_import_label__WEBPACK_IMPORTED_MODULE_2__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40854,12 +40887,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee8);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_LABEL, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_LABEL, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
     return _regeneratorRuntime().wrap(function _callee9$(_context9) {
       while (1) switch (_context9.prev = _context9.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_LABEL, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_LABEL, slug);
           _context9.next = 3;
           return _apis_project_import_label__WEBPACK_IMPORTED_MODULE_2__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40868,12 +40901,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee9);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
     return _regeneratorRuntime().wrap(function _callee10$(_context10) {
       while (1) switch (_context10.prev = _context10.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER, slug);
           _context10.next = 3;
           return _apis_project_import_user__WEBPACK_IMPORTED_MODULE_3__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40882,12 +40915,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee10);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
     return _regeneratorRuntime().wrap(function _callee11$(_context11) {
       while (1) switch (_context11.prev = _context11.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER, slug);
           _context11.next = 3;
           return _apis_project_import_user__WEBPACK_IMPORTED_MODULE_3__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40896,12 +40929,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee11);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_ROLE, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_ROLE, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
     return _regeneratorRuntime().wrap(function _callee12$(_context12) {
       while (1) switch (_context12.prev = _context12.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_ROLE, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_ROLE, slug);
           _context12.next = 3;
           return _apis_project_import_role__WEBPACK_IMPORTED_MODULE_5__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40910,12 +40943,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee12);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_ROLE, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_ROLE, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
     return _regeneratorRuntime().wrap(function _callee13$(_context13) {
       while (1) switch (_context13.prev = _context13.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_ROLE, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_ROLE, slug);
           _context13.next = 3;
           return _apis_project_import_role__WEBPACK_IMPORTED_MODULE_5__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40924,12 +40957,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee13);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER_GROUP, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER_GROUP, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee14() {
     return _regeneratorRuntime().wrap(function _callee14$(_context14) {
       while (1) switch (_context14.prev = _context14.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER_GROUP, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER_GROUP, slug);
           _context14.next = 3;
           return _apis_project_import_userGroup__WEBPACK_IMPORTED_MODULE_6__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40938,12 +40971,12 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee14);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER_GROUP, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER_GROUP, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee15() {
     return _regeneratorRuntime().wrap(function _callee15$(_context15) {
       while (1) switch (_context15.prev = _context15.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER_GROUP, slug);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER_GROUP, slug);
           _context15.next = 3;
           return _apis_project_import_userGroup__WEBPACK_IMPORTED_MODULE_6__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
         case 3:
@@ -40952,239 +40985,275 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_import_
       }
     }, _callee15);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_FIELD, function (context, _ref2) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_AI_AGENT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee16() {
-    var column, field;
     return _regeneratorRuntime().wrap(function _callee16$(_context16) {
       while (1) switch (_context16.prev = _context16.next) {
         case 0:
-          column = _ref2.column, field = _ref2.field;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_FIELD, {
-            column: column,
-            field: field
-          });
-          _context16.next = 4;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateField(context.state.project.slug, context.state.project["import"].id, column, field);
-        case 4:
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_AI_AGENT, slug);
+          _context16.next = 3;
+          return _apis_project_import_aiAgent__WEBPACK_IMPORTED_MODULE_7__["default"].update(context.state.project.slug, context.state.project["import"].id, slug);
+        case 3:
         case "end":
           return _context16.stop();
       }
     }, _callee16);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_META, function (context, _ref3) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_AI_AGENT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee17() {
-    var column, meta;
     return _regeneratorRuntime().wrap(function _callee17$(_context17) {
       while (1) switch (_context17.prev = _context17.next) {
         case 0:
-          column = _ref3.column, meta = _ref3.meta;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_META, {
-            column: column,
-            meta: meta
-          });
-          _context17.next = 4;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateMeta(context.state.project.slug, context.state.project["import"].id, column, meta);
-        case 4:
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_AI_AGENT, slug);
+          _context17.next = 3;
+          return _apis_project_import_aiAgent__WEBPACK_IMPORTED_MODULE_7__["default"].destroy(context.state.project.slug, context.state.project["import"].id, slug);
+        case 3:
         case "end":
           return _context17.stop();
       }
     }, _callee17);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_CATEGORY, function (context, _ref4) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_FIELD, function (context, _ref2) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee18() {
-    var column, category;
+    var column, field;
     return _regeneratorRuntime().wrap(function _callee18$(_context18) {
       while (1) switch (_context18.prev = _context18.next) {
         case 0:
-          column = _ref4.column, category = _ref4.category;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_CATEGORY, {
+          column = _ref2.column, field = _ref2.field;
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_FIELD, {
             column: column,
-            category: category
+            field: field
           });
           _context18.next = 4;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateCategory(context.state.project.slug, context.state.project["import"].id, column, category);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateField(context.state.project.slug, context.state.project["import"].id, column, field);
         case 4:
         case "end":
           return _context18.stop();
       }
     }, _callee18);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_THREAD, function (context, _ref5) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_META, function (context, _ref3) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee19() {
-    var column, thread;
+    var column, meta;
     return _regeneratorRuntime().wrap(function _callee19$(_context19) {
       while (1) switch (_context19.prev = _context19.next) {
         case 0:
-          column = _ref5.column, thread = _ref5.thread;
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_THREAD, {
+          column = _ref3.column, meta = _ref3.meta;
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_META, {
             column: column,
-            thread: thread
+            meta: meta
           });
           _context19.next = 4;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateThread(context.state.project.slug, context.state.project["import"].id, column, thread);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateMeta(context.state.project.slug, context.state.project["import"].id, column, meta);
         case 4:
         case "end":
           return _context19.stop();
       }
     }, _callee19);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_EVENT, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_CATEGORY, function (context, _ref4) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee20() {
+    var column, category;
     return _regeneratorRuntime().wrap(function _callee20$(_context20) {
       while (1) switch (_context20.prev = _context20.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_EVENT, column);
-          _context20.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateEvent(context.state.project.slug, context.state.project["import"].id, column);
-        case 3:
+          column = _ref4.column, category = _ref4.category;
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_CATEGORY, {
+            column: column,
+            category: category
+          });
+          _context20.next = 4;
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateCategory(context.state.project.slug, context.state.project["import"].id, column, category);
+        case 4:
         case "end":
           return _context20.stop();
       }
     }, _callee20);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_ORDER, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_THREAD, function (context, _ref5) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee21() {
+    var column, thread;
     return _regeneratorRuntime().wrap(function _callee21$(_context21) {
       while (1) switch (_context21.prev = _context21.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_ORDER, column);
-          _context21.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateOrder(context.state.project.slug, context.state.project["import"].id, column);
-        case 3:
+          column = _ref5.column, thread = _ref5.thread;
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_THREAD, {
+            column: column,
+            thread: thread
+          });
+          _context21.next = 4;
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateThread(context.state.project.slug, context.state.project["import"].id, column, thread);
+        case 4:
         case "end":
           return _context21.stop();
       }
     }, _callee21);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_SMS, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_EVENT, function (context, column) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee22() {
     return _regeneratorRuntime().wrap(function _callee22$(_context22) {
       while (1) switch (_context22.prev = _context22.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_SMS, column);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_EVENT, column);
           _context22.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateSms(context.state.project.slug, context.state.project["import"].id, column);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateEvent(context.state.project.slug, context.state.project["import"].id, column);
         case 3:
         case "end":
           return _context22.stop();
       }
     }, _callee22);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_INTERACTION, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_ORDER, function (context, column) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee23() {
     return _regeneratorRuntime().wrap(function _callee23$(_context23) {
       while (1) switch (_context23.prev = _context23.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_INTERACTION, column);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_ORDER, column);
           _context23.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateInteraction(context.state.project.slug, context.state.project["import"].id, column);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateOrder(context.state.project.slug, context.state.project["import"].id, column);
         case 3:
         case "end":
           return _context23.stop();
       }
     }, _callee23);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_LINK, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_SMS, function (context, column) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee24() {
     return _regeneratorRuntime().wrap(function _callee24$(_context24) {
       while (1) switch (_context24.prev = _context24.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_LINK, column);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_SMS, column);
           _context24.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateLink(context.state.project.slug, context.state.project["import"].id, column);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateSms(context.state.project.slug, context.state.project["import"].id, column);
         case 3:
         case "end":
           return _context24.stop();
       }
     }, _callee24);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_USER, function (context, column) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_INTERACTION, function (context, column) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee25() {
     return _regeneratorRuntime().wrap(function _callee25$(_context25) {
       while (1) switch (_context25.prev = _context25.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_USER, column);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_INTERACTION, column);
           _context25.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateUser(context.state.project.slug, context.state.project["import"].id, column);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateInteraction(context.state.project.slug, context.state.project["import"].id, column);
         case 3:
         case "end":
           return _context25.stop();
       }
     }, _callee25);
   }))();
-}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_MAPPING, function (context, mapping) {
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_LINK, function (context, column) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee26() {
     return _regeneratorRuntime().wrap(function _callee26$(_context26) {
       while (1) switch (_context26.prev = _context26.next) {
         case 0:
-          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_MAPPING, mapping);
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_LINK, column);
           _context26.next = 3;
-          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].destroy(context.state.project.slug, context.state.project["import"].id, mapping);
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateLink(context.state.project.slug, context.state.project["import"].id, column);
         case 3:
         case "end":
           return _context26.stop();
       }
     }, _callee26);
   }))();
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_USER, function (context, column) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee27() {
+    return _regeneratorRuntime().wrap(function _callee27$(_context27) {
+      while (1) switch (_context27.prev = _context27.next) {
+        case 0:
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_USER, column);
+          _context27.next = 3;
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].updateUser(context.state.project.slug, context.state.project["import"].id, column);
+        case 3:
+        case "end":
+          return _context27.stop();
+      }
+    }, _callee27);
+  }))();
+}), _defineProperty(_actions, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_MAPPING, function (context, mapping) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee28() {
+    return _regeneratorRuntime().wrap(function _callee28$(_context28) {
+      while (1) switch (_context28.prev = _context28.next) {
+        case 0:
+          context.commit(_actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_MAPPING, mapping);
+          _context28.next = 3;
+          return _apis_project_import_mapping__WEBPACK_IMPORTED_MODULE_4__["default"].destroy(context.state.project.slug, context.state.project["import"].id, mapping);
+        case 3:
+        case "end":
+          return _context28.stop();
+      }
+    }, _callee28);
+  }))();
 }), _actions);
 
 /**
  * import Store Mutations
  */
-var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.SET_IMPORTS, function (state, imports) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.SET_IMPORTS, function (state, imports) {
   state.project.imports = _toConsumableArray(imports);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.SET_IMPORT, function (state, prospectImport) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.SET_IMPORT, function (state, prospectImport) {
   state.project["import"] = prospectImport;
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT, function (state, prospectImport) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT, function (state, prospectImport) {
   var _state$project$import;
   state.project.imports = [].concat(_toConsumableArray((_state$project$import = state.project.imports) !== null && _state$project$import !== void 0 ? _state$project$import : []), [prospectImport]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.UPDATE_IMPORT, function (state, params) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.UPDATE_IMPORT, function (state, params) {
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == params.id ? _objectSpread(_objectSpread({}, o), params) : o;
   });
   if (state.project["import"].id == params.id) {
     state.project["import"] = _objectSpread(_objectSpread({}, state.project["import"]), params);
   }
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT, function (state, slug) {
   state.project.imports = state.project.imports.filter(function (o) {
     return o.id != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_GROUP, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_GROUP, function (state, slug) {
   var _state$project$import2;
   state.project["import"].groups = [].concat(_toConsumableArray((_state$project$import2 = state.project["import"].groups) !== null && _state$project$import2 !== void 0 ? _state$project$import2 : []), [slug]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_GROUP, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_GROUP, function (state, slug) {
   state.project["import"].groups = state.project["import"].groups.filter(function (o) {
     return o != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_LABEL, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_LABEL, function (state, slug) {
   var _state$project$import3;
   state.project["import"].labels = [].concat(_toConsumableArray((_state$project$import3 = state.project["import"].labels) !== null && _state$project$import3 !== void 0 ? _state$project$import3 : []), [slug]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_LABEL, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_LABEL, function (state, slug) {
   state.project["import"].labels = state.project["import"].labels.filter(function (o) {
     return o != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER, function (state, slug) {
   var _state$project$import4;
   state.project["import"].users = [].concat(_toConsumableArray((_state$project$import4 = state.project["import"].users) !== null && _state$project$import4 !== void 0 ? _state$project$import4 : []), [slug]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER, function (state, slug) {
   state.project["import"].users = state.project["import"].users.filter(function (o) {
     return o != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_ROLE, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_ROLE, function (state, slug) {
   var _state$project$import5;
   state.project["import"].roles = [].concat(_toConsumableArray((_state$project$import5 = state.project["import"].roles) !== null && _state$project$import5 !== void 0 ? _state$project$import5 : []), [slug]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_ROLE, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_ROLE, function (state, slug) {
   state.project["import"].roles = state.project["import"].roles.filter(function (o) {
     return o != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_USER_GROUP, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_USER_GROUP, function (state, slug) {
   var _state$project$import6;
   state.project["import"].user_groups = [].concat(_toConsumableArray((_state$project$import6 = state.project["import"].user_groups) !== null && _state$project$import6 !== void 0 ? _state$project$import6 : []), [slug]);
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_USER_GROUP, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_USER_GROUP, function (state, slug) {
   state.project["import"].user_groups = state.project["import"].user_groups.filter(function (o) {
     return o != slug;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_FIELD, function (state, _ref6) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_AI_AGENT, function (state, slug) {
+  var _state$project$import7;
+  state.project["import"].ai_agents = [].concat(_toConsumableArray((_state$project$import7 = state.project["import"].ai_agents) !== null && _state$project$import7 !== void 0 ? _state$project$import7 : []), [slug]);
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_AI_AGENT, function (state, slug) {
+  var _state$project$import8;
+  state.project["import"].ai_agents = ((_state$project$import8 = state.project["import"].ai_agents) !== null && _state$project$import8 !== void 0 ? _state$project$import8 : []).filter(function (o) {
+    return o != slug;
+  });
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_FIELD, function (state, _ref6) {
   var column = _ref6.column,
     field = _ref6.field;
   if (!state.project["import"].mapping) {
@@ -41196,7 +41265,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_META, function (state, _ref7) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_META, function (state, _ref7) {
   var column = _ref7.column,
     meta = _ref7.meta;
   if (!state.project["import"].mapping) {
@@ -41208,7 +41277,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_CATEGORY, function (state, _ref8) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_CATEGORY, function (state, _ref8) {
   var column = _ref8.column,
     category = _ref8.category;
   if (!state.project["import"].mapping) {
@@ -41220,7 +41289,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_THREAD, function (state, _ref9) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_THREAD, function (state, _ref9) {
   var column = _ref9.column,
     thread = _ref9.thread;
   if (!state.project["import"].mapping) {
@@ -41232,7 +41301,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_EVENT, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_EVENT, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41242,7 +41311,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_ORDER, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_ORDER, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41252,7 +41321,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_SMS, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_SMS, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41262,7 +41331,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_INTERACTION, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_INTERACTION, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41272,7 +41341,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_LINK, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_LINK, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41282,7 +41351,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.ADD_IMPORT_MAPPING_USER, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.ADD_IMPORT_MAPPING_USER, function (state, column) {
   if (!state.project["import"].mapping) {
     state.project["import"].mapping = new Array(state.project["import"].headers.length).fill(null);
   }
@@ -41292,7 +41361,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_i
   state.project.imports = state.project.imports.map(function (o) {
     return o.id == state.project["import"].id ? state.project["import"] : o;
   });
-}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_7__.REMOVE_IMPORT_MAPPING, function (state, index) {
+}), _defineProperty(_mutations, _actions_project_import__WEBPACK_IMPORTED_MODULE_8__.REMOVE_IMPORT_MAPPING, function (state, index) {
   state.project["import"].mapping = state.project["import"].mapping.map(function (o, i) {
     return i == index ? null : o;
   });

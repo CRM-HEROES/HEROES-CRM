@@ -441,6 +441,10 @@ Route::group([
         Route::apiResource('import.user-group', \App\Http\Controllers\API\Project\Import\UserGroupController::class)
             ->parameters(['user-group' => 'group'])
             ->only('index', 'update', 'destroy');
+        // Import Relation AI Agent (AI phone agents assigned to the import's prospects)
+        Route::apiResource('import.ai-agent', \App\Http\Controllers\API\Project\Import\AiAgentController::class)
+            ->parameters(['ai-agent' => 'aiAgent'])
+            ->only('index', 'update', 'destroy');
         // Import Relation Label
         Route::apiResource('import.label', ProjectImportLabelController::class)->only('index', 'update', 'destroy');
         // Import Relation User
