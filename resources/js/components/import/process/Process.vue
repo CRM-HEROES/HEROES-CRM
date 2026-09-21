@@ -1041,14 +1041,25 @@ export default {
                 '// 2. Dans le menu déroulant des fonctions (en haut), choisis "setup", clique sur "Exécuter", puis autorise l\'accès.\n' +
                 '// 3. C\'est fait : chaque modification de cette feuille prévient le CRM automatiquement.\n\n' +
                 'var SYNC_URL = "' + this.googleSheetSyncWebhookUrl + '";\n\n' +
+                'function debugLog(message) {\n' +
+                '  Logger.log(new Date().toISOString() + " | " + message);\n' +
+                '}\n\n' +
                 'function onEditInstallable(e) {\n' +
-                '  UrlFetchApp.fetch(SYNC_URL, { method: "post", muteHttpExceptions: true });\n' +
+                '  Logger.log("Trigger fired");\n' +
+                '  var response = UrlFetchApp.fetch(SYNC_URL, {\n' +
+                '    method: "post",\n' +
+                '    muteHttpExceptions: true\n' +
+                '  });\n' +
+                '  Logger.log("HTTP " + response.getResponseCode());\n' +
+                '  Logger.log(response.getContentText());\n' +
                 '}\n\n' +
                 'function setup() {\n' +
+                '  debugLog("Installing Google Sheets trigger");\n' +
                 '  ScriptApp.newTrigger("onEditInstallable")\n' +
                 '    .forSpreadsheet(SpreadsheetApp.getActive())\n' +
                 '    .onEdit()\n' +
                 '    .create();\n' +
+                '  debugLog("Trigger installed successfully");\n' +
                 '}\n'
             );
         },
