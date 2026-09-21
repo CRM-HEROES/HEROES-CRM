@@ -1038,28 +1038,48 @@ export default {
             return (
                 '// HEROES CRM — synchronisation en temps réel\n' +
                 '// 1. Ouvre ce Google Sheet > Extensions > Apps Script, colle ce script (remplace le contenu existant).\n' +
-                '// 2. Dans le menu déroulant des fonctions (en haut), choisis "setup", clique sur "Exécuter", puis autorise l\'accès.\n' +
-                '// 3. C\'est fait : chaque modification de cette feuille prévient le CRM automatiquement.\n\n' +
+                '// 2. Dans le menu déroulant des fonctions (en haut), choisis "createSyncTrigger", clique sur "Exécuter", puis autorise l\'accès.\n' +
+                '// 3. C\'est fait : chaque modification de cette feuille prévient le CRM automatiquement, sans créer de trigger dupliqué.\n\n' +
                 'var SYNC_URL = "' + this.googleSheetSyncWebhookUrl + '";\n\n' +
                 'function debugLog(message) {\n' +
                 '  Logger.log(new Date().toISOString() + " | " + message);\n' +
                 '}\n\n' +
                 'function onEditInstallable(e) {\n' +
-                '  Logger.log("Trigger fired");\n' +
-                '  var response = UrlFetchApp.fetch(SYNC_URL, {\n' +
-                '    method: "post",\n' +
-                '    muteHttpExceptions: true\n' +
-                '  });\n' +
-                '  Logger.log("HTTP " + response.getResponseCode());\n' +
-                '  Logger.log(response.getContentText());\n' +
+                '  try {\n' +
+                '    Logger.log("Trigger fired");\n' +
+                '    var response = UrlFetchApp.fetch(SYNC_URL, {\n' +
+                '      method: "post",\n' +
+                '      muteHttpExceptions: false\n' +
+                '    });\n' +
+                '    Logger.log("HTTP " + response.getResponseCode());\n' +
+                '    Logger.log(response.getContentText());\n' +
+                '  } catch (err) {\n' +
+                '    Logger.log("SYNC ERROR: " + err.toString());\n' +
+                '  }\n' +
+                '}\n\n' +
+                'function createSyncTrigger() {\n' +
+                '  var triggers = ScriptApp.getProjectTriggers();\n' +
+                '  var existing = false;\n\n' +
+                '  for (var i = 0; i < triggers.length; i++) {\n' +
+                '    if (triggers[i].getHandlerFunction() === "onEditInstallable") {\n' +
+                '      existing = true;\n' +
+                '      if (triggers.length > 1) {\n' +
+                '        ScriptApp.deleteTrigger(triggers[i]);\n' +
+                '      }\n' +
+                '    }\n' +
+                '  }\n\n' +
+                '  if (!existing) {\n' +
+                '    ScriptApp.newTrigger("onEditInstallable")\n' +
+                '      .forSpreadsheet(SpreadsheetApp.getActive())\n' +
+                '      .onEdit()\n' +
+                '      .create();\n' +
+                '    debugLog("Trigger installed successfully");\n' +
+                '  } else {\n' +
+                '    debugLog("Trigger already exists; keeping a single active trigger");\n' +
+                '  }\n' +
                 '}\n\n' +
                 'function setup() {\n' +
-                '  debugLog("Installing Google Sheets trigger");\n' +
-                '  ScriptApp.newTrigger("onEditInstallable")\n' +
-                '    .forSpreadsheet(SpreadsheetApp.getActive())\n' +
-                '    .onEdit()\n' +
-                '    .create();\n' +
-                '  debugLog("Trigger installed successfully");\n' +
+                '  createSyncTrigger();\n' +
                 '}\n'
             );
         },
