@@ -41,10 +41,11 @@ else
 fi
 
 # FreeSWITCH's native gateway registration is broken against this Kavkom tenant
-# because it forces the synthetic gateway contact name (gw+kavkom). We therefore
-# disable the native Sofia registration and run the proven Digest REGISTER flow
-# from a dedicated Python process that matches the working raw test.
-KAVKOM_REGISTER_ENABLED="${KAVKOM_REGISTER_ENABLED:-false}"
+# because it forces the synthetic gateway contact name (gw+kavkom). Keep its
+# state distinct from the standalone registrar: the latter must be enabled
+# while Sofia's own REGISTER requests stay disabled.
+KAVKOM_NATIVE_REGISTER_ENABLED="${KAVKOM_NATIVE_REGISTER_ENABLED:-false}"
+KAVKOM_REGISTER_ENABLED="${KAVKOM_REGISTER_ENABLED:-true}"
 
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
 <include>
@@ -60,7 +61,7 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     <param name="contact-user" value="${KAVKOM_EXTENSION}"/>
     <param name="contact-host" value="${EXTERNAL_IP}"/>
     <param name="contact-port" value="${EXTERNAL_SIP_PORT}"/>
-    <param name="register" value="${KAVKOM_REGISTER_ENABLED}"/>
+    <param name="register" value="${KAVKOM_NATIVE_REGISTER_ENABLED}"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>
     <param name="caller-id-in-from" value="true"/>

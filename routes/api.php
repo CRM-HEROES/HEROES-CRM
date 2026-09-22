@@ -532,6 +532,7 @@ Route::group([
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
         Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
+        Route::put('prospect/{prospect}/ai-agent', [\App\Http\Controllers\API\Project\ProspectAiAgentController::class, 'update']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 

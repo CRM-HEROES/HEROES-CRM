@@ -61,6 +61,10 @@ return [
     'ai_phone_agent' => [
         'secret' => env('AI_PHONE_AGENT_SHARED_SECRET'),
         'bridge_url' => env('AI_PHONE_AGENT_BRIDGE_URL'),
+        // Local-only fallback used when the CRM user has not yet been
+        // assigned a Kavkom Line. This must be a different extension from
+        // the FreeSWITCH/AI agent extension.
+        'test_user_extension' => env('AI_PHONE_AGENT_TEST_USER_EXTENSION'),
     ],
 
     'ai_quote' => [

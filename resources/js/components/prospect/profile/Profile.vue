@@ -10,6 +10,7 @@
                     <search />
                 </div>
             </div>
+            <ai-phone-agent-call :project="project" :prospect="prospect" />
             <div id="hc-prospect-profile-menus">
                 <icon
                     tag="a"
@@ -390,12 +391,14 @@ import {
 import Search from "./Search.vue";
 import ProfileBloc from "./ProfileBloc.vue";
 import ProspectProfileSettingSlide from "./slides/setting/Slide.vue";
+import AiPhoneAgentCall from "./AiPhoneAgentCall.vue";
 
 export default {
     components: {
         Search,
         ProfileBloc,
         ProspectProfileSettingSlide,
+        AiPhoneAgentCall,
     },
 
     created() {
