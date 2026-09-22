@@ -440,17 +440,7 @@ class ProspectAutoAssignment
      */
     protected function filterUsersByCountry($users, ?string $dialCode)
     {
-        if (!$dialCode) {
-            return $users;
-        }
-
-        $matching = $users->filter(function (User $user) use ($dialCode) {
-            $configuredDialCodes = $user->phone_country;
-
-            return empty($configuredDialCodes) || in_array($dialCode, $configuredDialCodes, true);
-        })->values();
-
-        return $matching->isEmpty() ? $users : $matching;
+        return PhoneCountry::filterUsersByDialCode($users, $dialCode);
     }
 
     /**

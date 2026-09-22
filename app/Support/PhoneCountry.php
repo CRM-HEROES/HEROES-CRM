@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Collection;
 use libphonenumber\NumberParseException;
 use libphonenumber\PhoneNumberUtil;
 
@@ -43,6 +44,38 @@ class PhoneCountry
         $callingCode = PhoneNumberUtil::getInstance()->getCountryCodeForRegion($regionCode);
 
         return $callingCode ? '+' . $callingCode : null;
+    }
+
+    /**
+     * Narrows $users (anything iterable of objects exposing ->phone_country,
+     * a JSON array of dial codes such as ["+33", "+32"]) to those configured
+     * for $dialCode, or with no country preference at all. Every caller that
+     * routes a lead to a set of users by phone indicatif — ProspectAutoAssignment,
+     * ImportProspects's "Utilisateurs affectés" step, the coregistration
+     * webservice — must go through this single place: it's already been
+     * reimplemented ad hoc once for a new prospect-creation path and quietly
+     * skipped the country rule entirely, so a second copy is exactly the bug
+     * to avoid.
+     *
+     * A user is never left without a candidate for lack of a match: if
+     * $dialCode can't be determined, or no user matches it, the input is
+     * returned unfiltered instead of coming back empty.
+     */
+    public static function filterUsersByDialCode($users, ?string $dialCode): Collection
+    {
+        $users = $users instanceof Collection ? $users : collect($users);
+
+        if (!$dialCode) {
+            return $users;
+        }
+
+        $matching = $users->filter(function ($user) use ($dialCode) {
+            $configuredDialCodes = $user->phone_country;
+
+            return empty($configuredDialCodes) || in_array($dialCode, $configuredDialCodes, true);
+        })->values();
+
+        return $matching->isEmpty() ? $users : $matching;
     }
 
     /**

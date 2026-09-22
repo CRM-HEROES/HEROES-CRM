@@ -3,6 +3,8 @@
 namespace App\Jobs;
 
 use App\Models\Import;
+use App\Models\User;
+use App\Support\PhoneCountry;
 // The trait file is named Sendswelcomesms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
 use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
@@ -202,19 +204,28 @@ class ImportHandleDuplicatedProspects implements ShouldQueue
         }
         
         if ($this->import->users) {
+            // Same "Utilisateurs affectés" indicatif routing as
+            // ImportProspects::handleProspectsImportUsers(): only the
+            // marked users configured for this prospect's dial code
+            // receive it, falling back to every marked user when the
+            // prospect has no number or none of them match.
+            $markedUsers = User::whereIn('id', $this->import->users)->get(['id', 'phone_country']);
+            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
+
             $prospect
                 ->users()
                 ->syncWithoutDetaching(
-                    $this->import->users
-                );    
+                    $eligibleUsers->pluck('id')
+                );
         }
-        
+
         if ($this->import->groups) {
             $prospect
-                ->users()
+                ->groups()
                 ->syncWithoutDetaching(
                     $this->import->groups
-                );    
+                );
         }
         
         $prospect->save();
