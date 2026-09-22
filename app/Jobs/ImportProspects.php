@@ -1540,17 +1540,7 @@ class ImportProspects implements ShouldQueue
      */
     protected function filterMarkedUsersByCountry($markedUsers, ?string $dialCode)
     {
-        if (!$dialCode) {
-            return $markedUsers;
-        }
-
-        $matching = $markedUsers->filter(function (User $user) use ($dialCode) {
-            $configuredDialCodes = $user->phone_country;
-
-            return empty($configuredDialCodes) || in_array($dialCode, $configuredDialCodes, true);
-        })->values();
-
-        return $matching->isEmpty() ? $markedUsers : $matching;
+        return PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
     }
 
     /**

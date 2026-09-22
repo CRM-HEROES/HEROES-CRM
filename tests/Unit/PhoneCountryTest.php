@@ -83,4 +83,52 @@ class PhoneCountryTest extends TestCase
         $this->assertSame('+1', PhoneCountry::dialCodeForRegion('US'));
         $this->assertNull(PhoneCountry::dialCodeForRegion(null));
     }
+
+    protected function userWithDialCodes(int $id, ?array $dialCodes): \App\Models\User
+    {
+        $user = new \App\Models\User(['phone_country' => $dialCodes]);
+        $user->id = $id;
+
+        return $user;
+    }
+
+    public function test_filter_users_by_dial_code_keeps_only_matching_users(): void
+    {
+        $france = $this->userWithDialCodes(1, ['+33']);
+        $belgium = $this->userWithDialCodes(2, ['+32']);
+
+        $result = PhoneCountry::filterUsersByDialCode(collect([$france, $belgium]), '+33');
+
+        $this->assertSame([1], $result->pluck('id')->all());
+    }
+
+    public function test_filter_users_by_dial_code_keeps_users_with_no_country_configured(): void
+    {
+        $unconfigured = $this->userWithDialCodes(1, null);
+        $franceOnly = $this->userWithDialCodes(2, ['+33']);
+
+        $result = PhoneCountry::filterUsersByDialCode(collect([$unconfigured, $franceOnly]), '+32');
+
+        $this->assertSame([1], $result->pluck('id')->all());
+    }
+
+    public function test_filter_users_by_dial_code_returns_everyone_when_dial_code_is_unknown(): void
+    {
+        $france = $this->userWithDialCodes(1, ['+33']);
+        $belgium = $this->userWithDialCodes(2, ['+32']);
+
+        $result = PhoneCountry::filterUsersByDialCode(collect([$france, $belgium]), null);
+
+        $this->assertSame([1, 2], $result->pluck('id')->all());
+    }
+
+    public function test_filter_users_by_dial_code_falls_back_to_everyone_when_nobody_matches(): void
+    {
+        $franceA = $this->userWithDialCodes(1, ['+33']);
+        $franceB = $this->userWithDialCodes(2, ['+33']);
+
+        $result = PhoneCountry::filterUsersByDialCode(collect([$franceA, $franceB]), '+32');
+
+        $this->assertSame([1, 2], $result->pluck('id')->all());
+    }
 }
