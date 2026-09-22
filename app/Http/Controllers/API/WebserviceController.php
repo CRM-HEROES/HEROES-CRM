@@ -7,7 +7,9 @@ use App\Models\Category;
 use App\Models\Import;
 use App\Models\Label;
 use App\Models\Prospect;
+use App\Models\User;
 use App\Services\Import\GoogleSheetSyncer;
+use App\Support\PhoneCountry;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -193,7 +195,16 @@ class WebserviceController extends Controller
         $prospect->save();
 
         if ($import->users) {
-            $prospect->users()->attach($import->users);
+            // Same "Utilisateurs affectés" indicatif routing as
+            // ImportProspects::handleProspectsImportUsers(): only the
+            // marked users configured for this prospect's dial code
+            // receive it, falling back to every marked user when the
+            // prospect has no number or none of them match.
+            $markedUsers = User::whereIn('id', $import->users)->get(['id', 'phone_country']);
+            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
+
+            $prospect->users()->attach($eligibleUsers->pluck('id'));
         }
 
         if ($import->groups) {

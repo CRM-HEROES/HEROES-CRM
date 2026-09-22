@@ -6,6 +6,8 @@ use App\Models\Category;
 use App\Models\Label;
 use App\Models\Ocr;
 use App\Models\Prospect;
+use App\Models\User;
+use App\Support\PhoneCountry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -140,7 +142,16 @@ class ProspectImportOCR implements ShouldQueue
         $prospect->save();
 
         if ($import->users) {
-            $prospect->users()->attach($import->users);
+            // Same "Utilisateurs affectés" indicatif routing as
+            // ImportProspects::handleProspectsImportUsers(): only the
+            // marked users configured for this prospect's dial code
+            // receive it, falling back to every marked user when the
+            // prospect has no number or none of them match.
+            $markedUsers = User::whereIn('id', $import->users)->get(['id', 'phone_country']);
+            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+            $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
+
+            $prospect->users()->attach($eligibleUsers->pluck('id'));
         }
 
         if ($import->groups) {
