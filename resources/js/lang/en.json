@@ -206,7 +206,8 @@
                     "import": "Import",
                     "creator": "Created by",
                     "groups": "Groups",
-                    "users": "Users"
+                    "users": "Users",
+                    "ai_agents": "AI agents"
                 },
                 "import": {
                     "use": "Use import columns...",

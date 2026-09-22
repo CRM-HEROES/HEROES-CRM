@@ -5235,6 +5235,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         // Users
         if (key == "users") {
           name = _this4.$t("prospect.table.column.others.affected_users");
+          // AI agents
+        } else if (key == "ai-agents") {
+          category = "ai-agents";
+          name = _this4.$t("prospect.table.column.others.ai_agents");
           // Groups
         } else if (key == "groups") {
           name = _this4.$t("prospect.table.column.others.affected_groups");
@@ -9933,6 +9937,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         columnId: "users",
         headerId: "hc-prospects-table-header-users-users"
       },
+      // AI agents
+      {
+        type: "other",
+        name: this.$t("prospect.table.column.others.ai_agents"),
+        icon: "fa fa-robot icon-brown",
+        columnId: "ai-agents",
+        headerId: "hc-prospects-table-header-ai-agents-ai-agents"
+      },
       // Groups
       {
         type: "other",
@@ -11782,13 +11794,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         prospect: $props.prospect,
         items: $props.prospect.users ? $props.prospect.users : [],
         onClick: $options.manageUsers
-      }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
+      }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'ai-agents' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
         key: 11,
+        prospect: $props.prospect,
+        items: $props.prospect.ai_agents ? $props.prospect.ai_agents : []
+      }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
+        key: 12,
         prospect: $props.prospect,
         items: $props.prospect.groups ? $props.prospect.groups : [],
         onClick: $options.manageGroups
       }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'orders' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 12,
+        key: 13,
         prospect: $props.prospect,
         items: $props.prospect.orders ? $props.prospect.orders.map(function (order) {
           return _objectSpread(_objectSpread({}, order.status ? order.status : {}), order);
@@ -11796,15 +11812,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "item-clicked": $options.showOrder,
         onClick: $options.manageOrders
       }, null, 8 /* PROPS */, ["prospect", "items", "item-clicked", "onClick"])) : $options.category == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 13,
+        key: 14,
         prospect: $props.prospect,
         items: $props.prospect["import"] ? [$props.prospect["import"]] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'pipedrive-accounts' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 14,
+        key: 15,
         prospect: $props.prospect,
         items: $props.prospect.pipedrive_accounts ? $props.prospect.pipedrive_accounts : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'creator' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 15,
+        key: 16,
         prospect: $props.prospect,
         items: $props.prospect.creator ? [$props.prospect.creator] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
@@ -12132,66 +12148,70 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 0,
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterUser, ["stop"])
-      }, null, 8 /* PROPS */, ["column", "onClick"])) : $props.column.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      }, null, 8 /* PROPS */, ["column", "onClick"])) : $props.column.category == 'ai-agents' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 1
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" AI agents "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
+        column: $props.column
+      }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 2
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Groups "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterGroup, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'orders' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 2
+        key: 3
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Orders "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterOrder, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 3
+        key: 4
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Import "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterImport, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'pipedrive-accounts' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 4
+        key: 5
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Pipedrive accounts "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterPipedriveAccount, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'creator' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 5
+        key: 6
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Creator "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCreator, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'category' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 6
+        key: 7
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Labels "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCategory, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'events' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 7
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Events "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_event_header_cell, {
-        column: $props.column,
-        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterEvent, ["stop"])
-      }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'event-field' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 8
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Events "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_event_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterEvent, ["stop"])
-      }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'interactions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'event-field' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 9
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Events "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_event_header_cell, {
+        column: $props.column,
+        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterEvent, ["stop"])
+      }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'interactions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 10
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Interactions "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_interaction_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterInteraction, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'sms' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 10
+        key: 11
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_sms_header_cell, {
         column: $props.column
       }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 11
+        key: 12
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Thread "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_thread_header_cell, {
         column: $props.column
       }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'default' && $props.column.id == 'created_at' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 12
+        key: 13
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Created at field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_created_at_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCreatedAt, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 13
+        key: 14
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Meta field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Default field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_default_header_cell, {
         onFocus: _cache[0] || (_cache[0] = function ($event) {
           return _ctx.$emit('focus');

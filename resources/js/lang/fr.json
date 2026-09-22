@@ -206,7 +206,8 @@
                     "import": "Import",
                     "creator": "Créé par",
                     "groups": "Groupes",
-                    "users": "Utilisateurs"
+                    "users": "Utilisateurs",
+                    "ai_agents": "Agents IA"
                 },
                 "import": {
                     "use": "Utiliser les colonnes de l'import ...",

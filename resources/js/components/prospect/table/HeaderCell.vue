@@ -16,6 +16,12 @@
             @click.stop="filterUser"
         />
 
+        <!-- AI agents -->
+        <relation-header-cell
+            v-else-if="column.category == 'ai-agents'"
+            :column="column"
+        />
+
         <!-- Groups -->
         <relation-header-cell
             v-else-if="column.category == 'groups'"

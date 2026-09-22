@@ -89,6 +89,8 @@ return [
         ['key' => "postal_code"],
         ['key' => "city"],
         ['key' => "country"],
+        ['key' => "users"],
+        ['key' => "ai-agents"],
     ],
 
     'users-table' => [

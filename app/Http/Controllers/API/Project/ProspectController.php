@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Project;
 use App\Filters\EventFilters;
 use App\Filters\ProspectRequestFilters;
 use App\Http\Controllers\Controller;
+use App\Models\AiAgent;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
@@ -219,6 +220,9 @@ class ProspectController extends Controller
                 $query->select('id', 'name', 'prospect_user.created_at', 'prospect_user.creator_id');
             },
         ]);
+
+        // AI agents assigned through the prospect's import
+        $this->resolveImportAiAgents([$prospect]);
 
         return $prospect;
     }
@@ -670,6 +674,9 @@ class ProspectController extends Controller
                     'longitude',
                     'meta',
                     'prospects.creator_id',
+                    // Needed to resolve each prospect's AI agents
+                    // from imports.ai_agents
+                    'prospects.import_id',
                 ],
                 $request->has('fields') ? [] : [
                     'valid_address',
@@ -682,10 +689,6 @@ class ProspectController extends Controller
                     'duplicate_fields'
                 ]
         );
-
-        if (in_array('import', $fields)) {
-            $defaultFields[] = "import_id";
-        }
 
         // Categories in which we select labels associated to prospects
         $categories = array_map(function($field) {
@@ -938,6 +941,56 @@ class ProspectController extends Controller
             })
         );
 
+        // AI agents of each prospect (from its import)
+        $this->resolveImportAiAgents($data->getCollection());
+
         return $data;
+    }
+
+    /**
+     * Attach the AI agents of each prospect, resolved from the import that
+     * created it (imports.ai_agents JSON of agent ids — the "Relations"
+     * step of the import), under the `ai_agents` attribute expected by the
+     * prospects table. Same shape as the former ai_agent_prospect pivot
+     * (id, name, is_active), with two batch queries for the whole page.
+     *
+     * The imports table is read directly (not through the Import relation)
+     * so ImportScope never hides an import that is simply not owned by the
+     * requesting user: the agents are still the ones that were applied to
+     * these prospects at import time.
+     *
+     * @param  iterable  $prospects list of Prospect models
+     */
+    protected function resolveImportAiAgents($prospects)
+    {
+        $prospects = collect($prospects);
+
+        $importIds = $prospects->pluck('import_id')->filter()->unique()->values();
+
+        $importAgents = $importIds->isEmpty()
+            ? collect()
+            : DB::table('imports')
+                ->whereIn('id', $importIds)
+                ->pluck('ai_agents', 'id')
+                ->map(function ($aiAgents) {
+                    return json_decode($aiAgents, true) ?: [];
+                });
+
+        $agentIds = $importAgents->flatten()->filter()->unique()->values();
+
+        $agents = $agentIds->isEmpty()
+            ? collect()
+            : AiAgent::whereIn('id', $agentIds)
+                ->get(['id', 'name', 'is_active'])
+                ->keyBy('id');
+
+        foreach ($prospects as $prospect) {
+            $prospect->ai_agents = collect($importAgents->get($prospect->import_id) ?: [])
+                ->map(function ($aiAgentId) use ($agents) {
+                    return $agents->get($aiAgentId);
+                })
+                ->filter()
+                ->values();
+        }
     }
 }

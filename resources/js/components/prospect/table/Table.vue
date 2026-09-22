@@ -270,6 +270,12 @@ export default {
                         name = this.$t(
                             "prospect.table.column.others.affected_users"
                         );
+                        // AI agents
+                    } else if (key == "ai-agents") {
+                        category = "ai-agents";
+                        name = this.$t(
+                            "prospect.table.column.others.ai_agents"
+                        );
                         // Groups
                     } else if (key == "groups") {
                         name = this.$t(
