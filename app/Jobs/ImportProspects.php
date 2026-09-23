@@ -31,9 +31,9 @@ use App\Models\User;
 use App\Services\ProspectAutoAssignment;
 use App\Support\ImportHeaderAliases;
 use App\Support\PhoneCountry;
-// The trait file is named Sendswelcomesms.php. Keep the import spelling in
+// The trait file is named SendsWelcomeSms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
+use App\Jobs\Import\SendsWelcomeSms as SendsWelcomeSms;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;
