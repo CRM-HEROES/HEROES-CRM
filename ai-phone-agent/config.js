@@ -35,6 +35,9 @@ module.exports = {
         loopbackTarget: required("FS_LOOPBACK_TARGET", "loopback/ai-agent-tap/default"),
         callerIdNumber: required("FS_CALLER_ID_NUMBER", ""),
         callerIdName: required("FS_CALLER_ID_NAME", "Heroes CRM"),
+        // Host-networked FreeSWITCH sends Kavkom TLS signalling through the
+        // local stunnel relay. The SIP Request-URI remains the tenant host.
+        kavkomRelayUrl: process.env.FS_KAVKOM_RELAY_URL || "sip:127.0.0.1:15062;transport=tcp",
     },
     kavkom: {
         callsWsEnabled: process.env.KAVKOM_CALLS_WS_ENABLED !== "false",

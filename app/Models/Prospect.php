@@ -30,6 +30,7 @@ class Prospect extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'ai_agent_id',
         'company_name',
         'country',
         'city',
@@ -187,6 +188,12 @@ class Prospect extends Authenticatable
 
 
     // Relationships
+
+    /** AI voice agent explicitly assigned to this prospect. */
+    public function aiAgent()
+    {
+        return $this->belongsTo(AiAgent::class);
+    }
 
     /**
      * Available events

@@ -19,6 +19,9 @@ services:
       KAVKOM_USER_CONTEXT: ${KAVKOM_USER_CONTEXT}
       KAVKOM_SIP_TRANSPORT: ${KAVKOM_SIP_TRANSPORT:-tls}
       KAVKOM_SIP_PORT: ${KAVKOM_SIP_PORT:-5061}
+      # Sofia's native gateway registration is incompatible with this Kavkom
+      # tenant; the entrypoint starts the dedicated Digest registrar instead.
+      KAVKOM_NATIVE_REGISTER_ENABLED: ${KAVKOM_NATIVE_REGISTER_ENABLED:-false}
       KAVKOM_REGISTER_ENABLED: ${KAVKOM_REGISTER_ENABLED:-true}
       LOCAL_TEST_SIP_PASSWORD: ${LOCAL_TEST_SIP_PASSWORD}
       ESL_PASSWORD: ${FS_ESL_PASSWORD}
