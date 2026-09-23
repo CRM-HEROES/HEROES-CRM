@@ -83,7 +83,7 @@ export default {
         updateParamsFromUrl() {
             store.commit(INIT_PROSPECT_PARAMS);
             store.commit(SET_PROSPECTS_FIELDS, null);
-            store.commit(SET_PROSPECTS_SORT_BY, "created_at");
+            store.commit(SET_PROSPECTS_SORT_BY, "updated_at");
             store.commit(SET_PROSPECTS_SORT_ORDER, "desc");
 
             const url = new URL(window.location.href);

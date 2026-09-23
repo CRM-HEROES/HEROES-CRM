@@ -197,7 +197,7 @@ export default {
                             query: encodeURI(this.prospectKeyword),
                         }),
                         fields: this.searchFields.join(","),
-                        sortBy: "created_at",
+                        sortBy: "updated_at",
                         sortOrder: "desc",
                     },
                 });
