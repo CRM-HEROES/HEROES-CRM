@@ -628,10 +628,8 @@ class ProspectController extends Controller
         $count = min($request->input('count', 50), 500);
 
         // Sort By.
-        // Default to the most recently updated prospects so a fresh Google
-        // Sheets sync lands at the top of the list, even though the import
-        // remains non-destructive and duplicate-safe.
-        $sortBy = $request->input('sortBy', "updated_at");
+        // Default to the prospects created most recently in the project view.
+        $sortBy = $request->input('sortBy', "created_at");
 
         if ($sortBy == "null") {
             $sortBy = null;
@@ -640,14 +638,14 @@ class ProspectController extends Controller
             $sortBy != 'interactions_created_at' &&
             $sortBy != 'sms_created_at' &&
             $sortBy != 'messages_created_at' &&
-            $sortBy != 'updated_at' &&
+            $sortBy != 'created_at' &&
             !$project
                 ->fields()
                 ->where('slug', Str::replace('meta->', '', $sortBy))
                 ->where('meta', Str::startsWith($sortBy, 'meta->'))
                 ->first()
         ) {
-            $sortBy = "updated_at";
+            $sortBy = "created_at";
         }
 
         // Sort Order
