@@ -20,37 +20,90 @@ class EslClient {
         this.answeredChannels = new Set();
     }
 
+    /**
+     * modesl nulls out Connection.socket as soon as the TCP stream ends (e.g.
+     * FreeSWITCH restart), and every later send() then blows up with
+     * "Cannot read properties of null (reading 'write')". Treat a connection
+     * without a writable socket as dead so connect() rebuilds it instead of
+     * handing out a zombie.
+     */
+    _isAlive() {
+        const conn = this.conn;
+        return Boolean(conn && conn.socket && conn.socket.writable && conn.authed);
+    }
+
+    _teardown(reason) {
+        const conn = this.conn;
+        this.conn = null;
+        this.ready = null;
+        this.answeredChannels.clear();
+        if (conn) {
+            try {
+                conn.removeAllListeners();
+            } catch (_) {
+                // Already torn down.
+            }
+            try {
+                conn.end();
+            } catch (_) {
+                // Socket may already be gone.
+            }
+        }
+        if (reason) {
+            console.warn(`[ESL] Dropping ESL connection (${reason}); it will be re-established on demand.`);
+        }
+    }
+
     connect() {
-        if (this.ready) {
+        if (this.ready && this._isAlive()) {
             return this.ready;
+        }
+        if (this.conn) {
+            this._teardown("stale connection");
         }
 
         this.ready = new Promise((resolve, reject) => {
+            let settled = false;
             const timeout = setTimeout(() => {
-                this.ready = null;
+                if (settled) return;
+                settled = true;
+                this._teardown("connect timed out");
                 reject(new Error("Timed out connecting to FreeSWITCH ESL."));
             }, 10000);
-            this.conn = new esl.Connection(
+            const conn = new esl.Connection(
                 config.freeswitch.eslHost,
                 config.freeswitch.eslPort,
                 config.freeswitch.eslPassword,
                 () => {
+                    if (settled) return;
+                    settled = true;
                     clearTimeout(timeout);
                     console.log("[ESL] Connected to FreeSWITCH.");
-                    this.conn.subscribe(["CHANNEL_ANSWER", "CHANNEL_HANGUP", "BACKGROUND_JOB"]);
-                    this.conn.on("esl::event::CHANNEL_ANSWER::*", (event) => {
+                    conn.subscribe(["CHANNEL_ANSWER", "CHANNEL_HANGUP", "BACKGROUND_JOB"]);
+                    conn.on("esl::event::CHANNEL_ANSWER::*", (event) => {
                         const channelUuid = event.getHeader("Unique-ID");
                         if (channelUuid) this.answeredChannels.add(channelUuid);
                     });
-                    resolve(this.conn);
+                    conn.on("esl::end", () => {
+                        // FreeSWITCH closed the socket (restart, network drop).
+                        this._teardown("connection ended");
+                    });
+                    resolve(conn);
                 }
             );
+            this.conn = conn;
 
-            this.conn.on("error", (error) => {
-                clearTimeout(timeout);
-                console.error("[ESL] Connection error.", error);
-                this.ready = null;
-                reject(error);
+            conn.on("error", (error) => {
+                if (!settled) {
+                    settled = true;
+                    clearTimeout(timeout);
+                    this._teardown("connection error during boot");
+                    console.error("[ESL] Connection error.", error);
+                    reject(error);
+                } else {
+                    console.error("[ESL] Connection error.", error);
+                    this._teardown("connection error");
+                }
             });
         });
 
@@ -65,6 +118,9 @@ class EslClient {
      */
     async originateIntoConference(dialTarget, room, { callerIdNumber, callerIdName, sipAuth } = {}) {
         await this.connect();
+        if (!this._isAlive()) {
+            throw new Error("FreeSWITCH ESL connection is unavailable; cannot originate.");
+        }
 
         const uuid = crypto.randomUUID();
         const vars = {
@@ -116,21 +172,36 @@ class EslClient {
 
     _waitForEvent(eventName, channelUuid, timeoutMs) {
         return new Promise((resolve, reject) => {
+            const conn = this.conn;
+            if (!conn) {
+                reject(new Error(`Cannot wait for ${eventName}: ESL connection is down.`));
+                return;
+            }
             let timer = null;
+            let done = false;
+            const finish = (settle, value) => {
+                if (done) return;
+                done = true;
+                if (timer) clearTimeout(timer);
+                conn.removeListener(`esl::event::${eventName}::*`, handler);
+                conn.removeListener("esl::end", onEnd);
+                settle(value);
+            };
             const handler = (event) => {
                 if (event.getHeader("Unique-ID") !== channelUuid) {
                     return;
                 }
-                if (timer) clearTimeout(timer);
-                this.conn.removeListener(`esl::event::${eventName}::*`, handler);
-                resolve(event);
+                finish(resolve, event);
             };
-            this.conn.on(`esl::event::${eventName}::*`, handler);
+            const onEnd = () => {
+                finish(reject, new Error(`ESL connection dropped while waiting for ${eventName} on ${channelUuid}.`));
+            };
+            conn.on(`esl::event::${eventName}::*`, handler);
+            conn.on("esl::end", onEnd);
 
             if (timeoutMs > 0) {
                 timer = setTimeout(() => {
-                    this.conn.removeListener(`esl::event::${eventName}::*`, handler);
-                    reject(new Error(`Timed out waiting for ${eventName} on ${channelUuid}`));
+                    finish(reject, new Error(`Timed out waiting for ${eventName} on ${channelUuid}`));
                 }, timeoutMs);
             }
         });
@@ -149,6 +220,9 @@ class EslClient {
     }
 
     _api(command) {
+        if (!this._isAlive()) {
+            return Promise.reject(new Error(`FreeSWITCH ESL connection is down; cannot run "${command}".`));
+        }
         return new Promise((resolve, reject) => {
             this.conn.api(command, (response) => {
                 const body = response && response.getBody ? response.getBody() : "";

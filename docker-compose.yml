@@ -26,6 +26,11 @@ services:
     command: php-fpm
     networks:
       - heroes-network
+      # Le bridge d'appels IA (ai-phone-agent) vit sur ce réseau : Laravel
+      # doit l'atteindre par son nom de conteneur, le port 14000 n'étant
+      # publié que sur 127.0.0.1 de l'hôte (voir docker-compose.telephony.yml).
+      # Réseau externe : la stack téléphonie doit démarrer avant le CRM.
+      - telephony-network
 
   # Redis Service
   redis:
@@ -159,3 +164,6 @@ secrets:
 networks:
   heroes-network:
     driver: bridge
+  telephony-network:
+    external: true
+    name: heroes-telephony-network

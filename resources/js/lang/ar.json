@@ -348,6 +348,7 @@
             "call_by_aircall": "الاتصال عن طريق Aircall",
             "call_by_ringover": "الاتصال عن طريق Ringover",
             "call_by_kavkom": "الاتصال عبر Kavkom",
+            "call_by_kavkom_ai": "الاتصال عبر Kavkom مع الذكاء الاصطناعي",
             "history": "تاريخ"
         },
         "message": {

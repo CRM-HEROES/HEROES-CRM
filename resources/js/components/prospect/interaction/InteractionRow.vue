@@ -28,6 +28,12 @@
                 ></path>
             </svg>
         </icon>
+        <!-- Appel passé par l'agent vocal IA (voir ai-phone-agent/). -->
+        <icon
+            v-else-if="interaction.source == 'ai_phone_agent'"
+            class="fa fa-robot"
+            color="#3f51b5"
+        />
         <icon v-else class="fa fa-phone" />
 
         <div class="hc-item-main-content hc-flex-column">

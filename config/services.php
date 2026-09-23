@@ -59,8 +59,26 @@ return [
     ],
 
     'ai_phone_agent' => [
-        'secret' => env('AI_PHONE_AGENT_SHARED_SECRET'),
+        'secret'     => env('AI_PHONE_AGENT_SHARED_SECRET'),
         'bridge_url' => env('AI_PHONE_AGENT_BRIDGE_URL'),
+
+        // --- Static / demo agent (used when no AiAgent row exists in DB) ---
+        // Set these in .env to run the full AI-call flow without back-office setup.
+        'demo_agent_name'         => env('AI_PHONE_AGENT_DEMO_AGENT_NAME', 'Assistant IA Heroes CRM'),
+        'demo_agent_script'       => env('AI_PHONE_AGENT_DEMO_SCRIPT', ''),
+        'demo_agent_instructions' => env('AI_PHONE_AGENT_DEMO_INSTRUCTIONS', ''),
+
+        // Kavkom SIP credentials for the agent leg (the AI channel that joins
+        // the 3-way FreeSWITCH conference and bridges audio to Gemini Live).
+        'demo_kavkom_extension'   => env('AI_PHONE_AGENT_DEMO_KAVKOM_EXTENSION'),
+        'demo_kavkom_password'    => env('AI_PHONE_AGENT_DEMO_KAVKOM_PASSWORD'),
+        'demo_kavkom_context'     => env('AI_PHONE_AGENT_DEMO_KAVKOM_CONTEXT'),
+        'demo_kavkom_transport'   => env('AI_PHONE_AGENT_DEMO_KAVKOM_TRANSPORT', 'tls'),
+        'demo_kavkom_sip_port'    => env('AI_PHONE_AGENT_DEMO_KAVKOM_SIP_PORT', 5061),
+
+        // Fallback extension for the CRM user (conseiller) when their personal
+        // Kavkom settings are not yet configured in the interface.
+        'demo_user_extension'     => env('AI_PHONE_AGENT_DEMO_USER_EXTENSION'),
     ],
 
     'ai_quote' => [

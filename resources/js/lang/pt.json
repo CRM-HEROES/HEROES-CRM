@@ -377,6 +377,7 @@
             "call_by_aircall": "Chamada por Aircall",
             "call_by_ringover": "Chamada por Ringover",
             "call_by_kavkom": "Chamada por Kavkom",
+            "call_by_kavkom_ai": "Chamada por Kavkom com IA",
             "history": "História"
         },
         "message": {

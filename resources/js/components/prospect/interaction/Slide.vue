@@ -199,6 +199,36 @@
                                 <icon class="fa fa-caret-right" />
                             </item>
 
+                            <!-- Kavkom avec IA (ai-phone-agent) -->
+                            <item
+                                class="hc-prospect-interaction-item"
+                                @click="interactionViaKavkomAI(number)"
+                            >
+                                <icon class="fa fa-robot" color="#3f51b5" />
+                                <div
+                                    class="hc-item-main-content hc-flex-column"
+                                >
+                                    <span
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_kavkom_ai'
+                                            )
+                                        "
+                                    ></span>
+                                    <span
+                                        class="hc-prospect-interaction-number"
+                                        v-text="number"
+                                    ></span>
+                                </div>
+                                <icon
+                                    v-if="kavkomConfigured"
+                                    class="fa fa-check-circle"
+                                    color="#09be0c"
+                                    v-tooltip="$t('line.operator.configured')"
+                                />
+                                <icon class="fa fa-caret-right" />
+                            </item>
+
                         </template>
 
                         <!-- Add history -->
@@ -240,7 +270,7 @@
 
             <!-- List of interaction -->
             <template #2>
-                <frame-layout :count="7" :tab="frameTab" class="hc-flex-1">
+                <frame-layout :count="8" :tab="frameTab" class="hc-flex-1">
                     <template #1 v-if="interactionProspect">
                         <tab-layout
                             :count="2"
@@ -628,6 +658,138 @@
                             </div>
                         </div>
                     </template>
+
+                    <!--
+                        Appel piloté par l'agent vocal IA (Gemini Live).
+                        Le service Node (ai-phone-agent/) n'est pas encore
+                        déployé : le panneau prépare l'intégration en
+                        appelant l'API Laravel qui le sollicitera.
+                    -->
+                    <template #8 v-if="interactionProspect">
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item @click="tab = 0" class="bordered">
+                                <icon class="fa fa-caret-left" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'prospect.interaction.call_by_kavkom_ai'
+                                        )
+                                    "
+                                ></div>
+                            </item>
+                            <div class="hc-kavkom-call-panel">
+                                <div
+                                    class="hc-kavkom-call-card hc-kavkom-call-card-ai"
+                                >
+                                    <div class="hc-kavkom-call-card-header">
+                                        <span
+                                            class="hc-kavkom-call-icon hc-kavkom-call-icon-ai"
+                                        >
+                                            <icon class="fa fa-robot" />
+                                        </span>
+                                        <div>
+                                            <div class="hc-kavkom-call-label">
+                                                Appel Kavkom avec IA
+                                            </div>
+                                            <div
+                                                class="hc-kavkom-call-number"
+                                            >
+                                                {{ interaction.number }}
+                                            </div>
+                                        </div>
+                                        <span
+                                            :class="[
+                                                'hc-kavkom-call-ready',
+                                                kavkomReady
+                                                    ? 'is-ready'
+                                                    : 'is-loading',
+                                            ]"
+                                        >
+                                            <i class="fa fa-circle"></i>
+                                            {{
+                                                kavkomReady
+                                                    ? "Prêt"
+                                                    : "Connexion"
+                                            }}
+                                        </span>
+                                    </div>
+
+                                    <!--
+                                        Même softphone partagé que l'onglet
+                                        Kavkom : l'agent IA rejoint une
+                                        conférence FreeSWITCH à trois et
+                                        fait sonner l'extension de
+                                        l'utilisateur, que ce panneau
+                                        auto-répond via kavkom-phone.
+                                    -->
+                                    <kavkom
+                                        ref="kavkomWebphoneAI"
+                                        id="kavkom-webphone-ai"
+                                        :project-id="project.id"
+                                    />
+                                </div>
+
+                                <div
+                                    v-if="aiCallMessage"
+                                    :class="[
+                                        'hc-kavkom-call-status',
+                                        aiCallSuccess ? 'success' : 'error',
+                                    ]"
+                                >
+                                    {{ aiCallMessage }}
+                                </div>
+
+                                <!-- Transcription live Gemini -->
+                                <div
+                                    v-if="aiCallTranscript.length > 0"
+                                    ref="aiTranscriptBox"
+                                    class="hc-ai-transcript-box"
+                                >
+                                    <div
+                                        v-for="(line, i) in aiCallTranscript"
+                                        :key="i"
+                                        :class="[
+                                            'hc-ai-transcript-line',
+                                            line.speaker === 'assistant'
+                                                ? 'hc-ai-transcript-line--ai'
+                                                : 'hc-ai-transcript-line--caller',
+                                        ]"
+                                    >
+                                        <span class="hc-ai-transcript-speaker">{{
+                                            line.speaker === "assistant" ? "IA" : "Prospect"
+                                        }}</span>
+                                        <span class="hc-ai-transcript-text">{{ line.text }}</span>
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="button"
+                                    class="hc-button-secondary hc-kavkom-call-action"
+                                    :disabled="
+                                        callingViaAIAgent || !kavkomReady
+                                    "
+                                    @click="
+                                        triggerAIAgentCall(interaction.number)
+                                    "
+                                >
+                                    <i class="fa fa-robot"></i>
+                                    {{
+                                        callingViaAIAgent
+                                            ? "Connexion de l'IA..."
+                                            : "Appeler avec l'IA"
+                                    }}
+                                </button>
+
+                                <p class="hc-kavkom-call-help">
+                                    L'agent vocal IA (Gemini Live) rejoint
+                                    la conférence et échange avec le
+                                    prospect. Décrochez votre poste Kavkom
+                                    pour participer ou écouter l'appel.
+                                </p>
+                            </div>
+                        </div>
+                    </template>
                 </frame-layout>
             </template>
         </tab-layout>
@@ -678,6 +840,14 @@
     color: #fff;
     background: #8e24aa;
     border-radius: 10px;
+}
+/* IA : même panneau que Kavkom, avec un accent visuel distinct. */
+.hc-kavkom-call-icon.hc-kavkom-call-icon-ai {
+    background: #3f51b5;
+}
+.hc-kavkom-call-card-ai {
+    border-color: #d5d9f5;
+    box-shadow: 0 8px 20px rgba(63, 81, 181, 0.08);
 }
 .hc-kavkom-call-label {
     color: #7b7284;
@@ -749,6 +919,45 @@
     opacity: 0.6;
     cursor: not-allowed;
 }
+/* Boîte de transcription live Gemini */
+.hc-ai-transcript-box {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: #f7f5ff;
+    border: 1px solid #e0d6f7;
+    border-radius: 8px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: left;
+}
+.hc-ai-transcript-line {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+}
+.hc-ai-transcript-speaker {
+    flex-shrink: 0;
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding-top: 2px;
+    min-width: 48px;
+}
+.hc-ai-transcript-line--ai .hc-ai-transcript-speaker {
+    color: #3f51b5;
+}
+.hc-ai-transcript-line--caller .hc-ai-transcript-speaker {
+    color: #6c757d;
+}
+.hc-ai-transcript-text {
+    color: #343a40;
+}
 </style>
 
 <script>
@@ -818,6 +1027,23 @@ export default {
             // soit encore enregistré, on mémorise le numéro pour le lancer
             // dès que le softphone devient prêt (onKavkomReady).
             pendingKavkomNumber: "",
+
+            // Appel piloté par l'agent vocal IA (voir ai-phone-agent/) :
+            // le bridge monte une conférence FreeSWITCH à trois
+            // (poste du conseiller + prospect + agent Gemini Live).
+            callingViaAIAgent: false,
+            aiCallMessage: "",
+            aiCallSuccess: false,
+            aiCallUuid: null,
+            // Numéro mémorisé si l'appel IA est lancé avant que le
+            // softphone Kavkom ne soit enregistré (voir onKavkomReady).
+            pendingAINumber: "",
+
+            // Transcription live de l'appel IA : reçue via WebSocket depuis
+            // le service ai-phone-agent (port 14002 → TRANSCRIPT_WS_PORT).
+            aiCallTranscript: [],
+            aiCallWs: null,
+            aiCallWsActive: false,
         };
     },
 
@@ -830,11 +1056,13 @@ export default {
     beforeDestroy() {
         this.unsubscribeKavkomEvents();
         this.stopKavkomDebugPolling();
+        this.closeTranscriptWs();
     },
 
     beforeUnmount() {
         this.unsubscribeKavkomEvents();
         this.stopKavkomDebugPolling();
+        this.closeTranscriptWs();
     },
 
     methods: {
@@ -909,6 +1137,26 @@ export default {
             this.interaction.source = "ringover";
             this.interaction.number = number;
             this.addInteraction();
+        },
+
+        /**
+         * Ouvre le panneau "Appeler via Kavkom avec IA". Contrairement au
+         * clic-à-appeler classique, l'appel n'est pas lancé immédiatement :
+         * le conseiller le démarre depuis le panneau, pour pouvoir se
+         * préparer et pour ne pas solliciter le service IA tant que le
+         * bridge ai-phone-agent n'est pas déployé.
+         */
+        interactionViaKavkomAI(number) {
+            this.tab = 1;
+            this.frameTab = 7;
+            this.interaction = this.newInteraction();
+            this.interaction.source = "ai_phone_agent";
+            this.interaction.number = number;
+            this.aiCallMessage = "";
+            this.aiCallSuccess = false;
+            this.pendingAINumber = "";
+            this.aiCallTranscript = [];
+            this.closeTranscriptWs();
         },
 
         async interactionViaKavkom(number) {
@@ -1027,6 +1275,96 @@ export default {
             }
         },
 
+        /**
+         * Lance un appel piloté par l'agent vocal IA ("Appeler avec l'IA").
+         *
+         * La requête part vers AiPhoneAgentController::trigger
+         * (POST settings/ai-phone-agent/call), qui résout l'agent IA actif
+         * du projet et l'extension Kavkom du conseiller, puis demande au
+         * bridge Node ai-phone-agent de monter la conférence FreeSWITCH à
+         * trois. Le bridge fait sonner l'extension du conseiller : le
+         * softphone partagé doit donc auto-accepter ce leg, exactement
+         * comme pour le clic-à-appeler Kavkom classique.
+         *
+         * Le service Node n'est pas encore déployé (projet démo) : en
+         * attendant, le backend répond avec un message d'erreur explicite
+         * que ce panneau affiche tel quel — rien à changer côté CRM le
+         * jour où le bridge sera disponible.
+         */
+        async triggerAIAgentCall(number) {
+            if (!number) {
+                console.warn("[IA] Appel ignoré : aucun numéro fourni.");
+                return;
+            }
+
+            if (!this.kavkomReady) {
+                this.pendingAINumber = number;
+                this.aiCallMessage = "Connexion du softphone Kavkom…";
+                this.aiCallSuccess = false;
+                return;
+            }
+
+            this.callingViaAIAgent = true;
+            this.aiCallMessage = "";
+            this.aiCallSuccess = false;
+
+            kavkomPhone.expectAgentLeg();
+
+            try {
+                // L'interaction est enregistrée avant la requête : les
+                // événements SIP du leg conseiller peuvent arriver avant
+                // la réponse HTTP et doivent mettre à jour une interaction
+                // déjà existante.
+                this.interaction = this.newInteraction();
+                this.interaction.source = "ai_phone_agent";
+                this.interaction.number = number;
+                await this.addInteraction();
+
+                const { data } = await ApiService.post(
+                    "settings/ai-phone-agent/call",
+                    {
+                        prospect_id: this.interactionProspect?.id,
+                        destination: number,
+                    }
+                );
+
+                if (!data.success) {
+                    // Refusé avant que le bridge ne sonne le poste : le
+                    // prochain INVITE n'est plus un leg agent.
+                    kavkomPhone.forgetAgentLeg();
+                    this.aiCallMessage =
+                        data.message ||
+                        "Impossible de lancer l'appel avec l'agent IA.";
+                    this.aiCallSuccess = false;
+                    return;
+                }
+
+                this.aiCallUuid = data.call_uuid || null;
+                this.aiCallMessage =
+                    "Agent IA en cours de connexion. Décrochez votre poste Kavkom pour rejoindre la conférence avec le prospect.";
+                this.aiCallSuccess = true;
+                console.log("[IA] Appel lancé.", {
+                    callUuid: this.aiCallUuid,
+                    prospectId: this.interactionProspect?.id,
+                });
+
+                // Ouvre le WebSocket de transcription live pour afficher
+                // les échanges Gemini en temps réel dans le panneau.
+                this.openTranscriptWs(this.aiCallUuid);
+            } catch (error) {
+                console.error("[IA] Erreur lors du lancement de l'appel.", {
+                    status: error.response?.status,
+                    message: error.response?.data?.message || error.message,
+                });
+                this.aiCallMessage =
+                    error.response?.data?.message ||
+                    "Impossible de joindre le service de l'agent vocal IA (ai-phone-agent).";
+                this.aiCallSuccess = false;
+            } finally {
+                this.callingViaAIAgent = false;
+            }
+        },
+
         startKavkomDebugPolling(callUuid) {
             this.stopKavkomDebugPolling();
             this.kavkomDebugLastStatus = null;
@@ -1081,6 +1419,64 @@ export default {
             }
         },
 
+        /**
+         * Ouvre le WebSocket de transcription live (port 14002) pour
+         * recevoir les messages texte de Gemini en temps réel pendant
+         * l'appel IA. Filtre par call_uuid pour n'afficher que les
+         * messages de l'appel courant.
+         */
+        openTranscriptWs(callUuid) {
+            this.closeTranscriptWs();
+            this.aiCallTranscript = [];
+
+            const wsUrl = `ws://${window.location.hostname}:14002`;
+            const ws = new WebSocket(wsUrl);
+            this.aiCallWs = ws;
+
+            ws.onopen = () => {
+                this.aiCallWsActive = true;
+                console.log("[IA] Transcript WebSocket connected.", { callUuid });
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const msg = JSON.parse(event.data);
+                    if (msg.type === "transcript" && (!callUuid || msg.call_uuid === callUuid)) {
+                        this.aiCallTranscript.push({
+                            speaker: msg.speaker,
+                            text: msg.text,
+                            at: msg.at,
+                        });
+                        // Auto-scroll : on laisse le DOM se mettre à jour
+                        // avant de scroller en bas.
+                        this.$nextTick(() => {
+                            const el = this.$refs.aiTranscriptBox;
+                            if (el) el.scrollTop = el.scrollHeight;
+                        });
+                    }
+                } catch (_) {
+                    // Message non-JSON (ping, etc.) ignoré.
+                }
+            };
+
+            ws.onerror = (err) => {
+                console.warn("[IA] Transcript WebSocket error.", err);
+            };
+
+            ws.onclose = () => {
+                this.aiCallWsActive = false;
+                console.log("[IA] Transcript WebSocket closed.");
+            };
+        },
+
+        closeTranscriptWs() {
+            if (this.aiCallWs) {
+                try { this.aiCallWs.close(); } catch (_) {}
+                this.aiCallWs = null;
+            }
+            this.aiCallWsActive = false;
+        },
+
         subscribeKavkomEvents() {
             EventBus.on(KAVKOM_EVENTS.READY, this.onKavkomReady);
             EventBus.on(KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
@@ -1119,6 +1515,12 @@ export default {
                 const number = this.pendingKavkomNumber;
                 this.pendingKavkomNumber = "";
                 this.triggerKavkomCall(number);
+            }
+
+            if (this.pendingAINumber) {
+                const number = this.pendingAINumber;
+                this.pendingAINumber = "";
+                this.triggerAIAgentCall(number);
             }
         },
 
@@ -1166,6 +1568,7 @@ export default {
             console.error("[Kavkom][Debug] SIP connection error.", { message });
             this.kavkomReady = false;
             this.callingViaKavkom = false;
+            this.callingViaAIAgent = false;
             this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;
@@ -1174,6 +1577,7 @@ export default {
         onKavkomCallFailed({ message, direction } = {}) {
             console.warn("[Kavkom][Debug] Call failed.", { message, direction });
             this.callingViaKavkom = false;
+            this.callingViaAIAgent = false;
             this.kavkomCallState = "failed";
             this.kavkomCallSuccess = false;
             this.kavkomCallMessage = message;

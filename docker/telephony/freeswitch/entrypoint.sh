@@ -41,9 +41,11 @@ else
 fi
 
 # FreeSWITCH's native gateway registration is broken against this Kavkom tenant
-# because it forces the synthetic gateway contact name (gw+kavkom). We therefore
-# disable the native Sofia registration and run the proven Digest REGISTER flow
-# from a dedicated Python process that matches the working raw test.
+# because it forces the synthetic gateway contact name (gw+kavkom) — it times
+# out with [408] forever. The registration itself is therefore ALWAYS done by
+# the dedicated Python process below (Digest REGISTER with a real contact),
+# which matches the working raw test. KAVKOM_REGISTER_ENABLED only gates that
+# Python registrar; it must never be passed to Sofia's `register` param.
 KAVKOM_REGISTER_ENABLED="${KAVKOM_REGISTER_ENABLED:-false}"
 
 cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
@@ -60,7 +62,9 @@ cat > /etc/freeswitch/sip_profiles/external/kavkom.xml <<EOF
     <param name="contact-user" value="${KAVKOM_EXTENSION}"/>
     <param name="contact-host" value="${EXTERNAL_IP}"/>
     <param name="contact-port" value="${EXTERNAL_SIP_PORT}"/>
-    <param name="register" value="${KAVKOM_REGISTER_ENABLED}"/>
+    <!-- Always false: Sofia cannot register against this tenant (gw+kavkom
+         contact). kavkom-register.py owns the registration instead. -->
+    <param name="register" value="false"/>
     <param name="expire-seconds" value="600"/>
     <param name="retry-seconds" value="30"/>
     <param name="caller-id-in-from" value="true"/>
@@ -72,6 +76,14 @@ EXT_SIP_IP="${EXT_SIP_IP:-$EXTERNAL_IP}"
 EXT_RTP_IP="${EXT_RTP_IP:-$EXTERNAL_IP}"
 sed -i "s#<param name=\"ext-rtp-ip\".*#<param name=\"ext-rtp-ip\" value=\"${EXT_RTP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
 sed -i "s#<param name=\"ext-sip-ip\".*#<param name=\"ext-sip-ip\" value=\"${EXT_SIP_IP}\"/>#" /etc/freeswitch/sip_profiles/external.xml
+# The stock vars.xml resolves external_rtp_ip/external_sip_ip with STUN
+# (stun:stun.freeswitch.org). If STUN is unreachable at boot the variables
+# stay empty, the internal profile aborts with "Invalid ext-rtp-ip" and the
+# WHOLE mod_sofia module fails to load — every sofia/... originate then dies
+# with CHAN_NOT_IMPLEMENTED. Pin the values statically instead; they are the
+# same ones already applied to the external profile above.
+sed -i "s#cmd=\"stun-set\" data=\"external_rtp_ip=.*\"/>#cmd=\"set\" data=\"external_rtp_ip=${EXT_RTP_IP}\"/>#" /etc/freeswitch/vars.xml
+sed -i "s#cmd=\"stun-set\" data=\"external_sip_ip=.*\"/>#cmd=\"set\" data=\"external_sip_ip=${EXT_SIP_IP}\"/>#" /etc/freeswitch/vars.xml
 sed -i "s#external_sip_port=[0-9]*#external_sip_port=${EXTERNAL_SIP_PORT}#" /etc/freeswitch/vars.xml
 sed -i "s#external_tls_port=[0-9]*#external_tls_port=${EXTERNAL_TLS_PORT}#" /etc/freeswitch/vars.xml
 if [ "$KAVKOM_SIP_TRANSPORT" = "tls" ]; then

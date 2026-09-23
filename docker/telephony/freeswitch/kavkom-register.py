@@ -103,14 +103,8 @@ def build_authorization_header(challenge, cseq: int, call_id: str) -> str:
 
     ha1 = md5_hex(f"{USER}:{realm}:{PASSWORD}")
     ha2 = md5_hex(f"REGISTER:{uri}")
-    print(f"[DEBUG] USER={USER}, REALM={realm}")
-    print(f"[DEBUG] PASSWORD={PASSWORD}")
-    print(f"[DEBUG] HA1={ha1}")
-    print(f"[DEBUG] HA2={ha2}")
-    print(f"[DEBUG] uri={uri}")
     if qop and qop.lower() == "auth":
         response = md5_hex(f"{ha1}:{nonce}:{nc}:{cnonce}:{qop}:{ha2}")
-        print(f"[DEBUG] response={response}")
         auth = (
             f'username="{USER}", realm="{realm}", nonce="{nonce}", uri="{uri}", '
             f'response="{response}", algorithm={algorithm}, qop={qop}, '

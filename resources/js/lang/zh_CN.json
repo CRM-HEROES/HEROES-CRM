@@ -348,6 +348,7 @@
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
             "call_by_kavkom": "通过 Kavkom 拨打",
+            "call_by_kavkom_ai": "通过 Kavkom 与 AI 通话",
             "history": "历史"
         },
         "message": {

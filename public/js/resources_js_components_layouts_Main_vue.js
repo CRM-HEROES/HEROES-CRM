@@ -30119,7 +30119,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       // Si l'utilisateur clique "Appeler" avant que le softphone ne
       // soit encore enregistré, on mémorise le numéro pour le lancer
       // dès que le softphone devient prêt (onKavkomReady).
-      pendingKavkomNumber: ""
+      pendingKavkomNumber: "",
+      // Appel piloté par l'agent vocal IA (voir ai-phone-agent/) :
+      // le bridge monte une conférence FreeSWITCH à trois
+      // (poste du conseiller + prospect + agent Gemini Live).
+      callingViaAIAgent: false,
+      aiCallMessage: "",
+      aiCallSuccess: false,
+      aiCallUuid: null,
+      // Numéro mémorisé si l'appel IA est lancé avant que le
+      // softphone Kavkom ne soit enregistré (voir onKavkomReady).
+      pendingAINumber: "",
+      // Transcription live de l'appel IA : reçue via WebSocket depuis
+      // le service ai-phone-agent (port 14002 → TRANSCRIPT_WS_PORT).
+      aiCallTranscript: [],
+      aiCallWs: null,
+      aiCallWsActive: false
     };
   },
   created: function created() {
@@ -30130,10 +30145,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   beforeDestroy: function beforeDestroy() {
     this.unsubscribeKavkomEvents();
     this.stopKavkomDebugPolling();
+    this.closeTranscriptWs();
   },
   beforeUnmount: function beforeUnmount() {
     this.unsubscribeKavkomEvents();
     this.stopKavkomDebugPolling();
+    this.closeTranscriptWs();
   },
   methods: {
     newInteraction: function newInteraction() {
@@ -30224,6 +30241,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.interaction.source = "ringover";
       this.interaction.number = number;
       this.addInteraction();
+    },
+    /**
+     * Ouvre le panneau "Appeler via Kavkom avec IA". Contrairement au
+     * clic-à-appeler classique, l'appel n'est pas lancé immédiatement :
+     * le conseiller le démarre depuis le panneau, pour pouvoir se
+     * préparer et pour ne pas solliciter le service IA tant que le
+     * bridge ai-phone-agent n'est pas déployé.
+     */
+    interactionViaKavkomAI: function interactionViaKavkomAI(number) {
+      this.tab = 1;
+      this.frameTab = 7;
+      this.interaction = this.newInteraction();
+      this.interaction.source = "ai_phone_agent";
+      this.interaction.number = number;
+      this.aiCallMessage = "";
+      this.aiCallSuccess = false;
+      this.pendingAINumber = "";
+      this.aiCallTranscript = [];
+      this.closeTranscriptWs();
     },
     interactionViaKavkom: function interactionViaKavkom(number) {
       var _this3 = this;
@@ -30379,41 +30415,147 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4, null, [[14, 30, 34, 37]]);
       }))();
     },
-    startKavkomDebugPolling: function startKavkomDebugPolling(callUuid) {
+    /**
+     * Lance un appel piloté par l'agent vocal IA ("Appeler avec l'IA").
+     *
+     * La requête part vers AiPhoneAgentController::trigger
+     * (POST settings/ai-phone-agent/call), qui résout l'agent IA actif
+     * du projet et l'extension Kavkom du conseiller, puis demande au
+     * bridge Node ai-phone-agent de monter la conférence FreeSWITCH à
+     * trois. Le bridge fait sonner l'extension du conseiller : le
+     * softphone partagé doit donc auto-accepter ce leg, exactement
+     * comme pour le clic-à-appeler Kavkom classique.
+     *
+     * Le service Node n'est pas encore déployé (projet démo) : en
+     * attendant, le backend répond avec un message d'erreur explicite
+     * que ce panneau affiche tel quel — rien à changer côté CRM le
+     * jour où le bridge sera disponible.
+     */
+    triggerAIAgentCall: function triggerAIAgentCall(number) {
       var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var _this5$interactionPro, _this5$interactionPro2, _yield$ApiService$pos2, data, _error$response4, _error$response5, _error$response6;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (number) {
+                _context5.next = 3;
+                break;
+              }
+              console.warn("[IA] Appel ignoré : aucun numéro fourni.");
+              return _context5.abrupt("return");
+            case 3:
+              if (_this5.kavkomReady) {
+                _context5.next = 8;
+                break;
+              }
+              _this5.pendingAINumber = number;
+              _this5.aiCallMessage = "Connexion du softphone Kavkom…";
+              _this5.aiCallSuccess = false;
+              return _context5.abrupt("return");
+            case 8:
+              _this5.callingViaAIAgent = true;
+              _this5.aiCallMessage = "";
+              _this5.aiCallSuccess = false;
+              _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__["default"].expectAgentLeg();
+              _context5.prev = 12;
+              // L'interaction est enregistrée avant la requête : les
+              // événements SIP du leg conseiller peuvent arriver avant
+              // la réponse HTTP et doivent mettre à jour une interaction
+              // déjà existante.
+              _this5.interaction = _this5.newInteraction();
+              _this5.interaction.source = "ai_phone_agent";
+              _this5.interaction.number = number;
+              _context5.next = 18;
+              return _this5.addInteraction();
+            case 18:
+              _context5.next = 20;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].post("settings/ai-phone-agent/call", {
+                prospect_id: (_this5$interactionPro = _this5.interactionProspect) === null || _this5$interactionPro === void 0 ? void 0 : _this5$interactionPro.id,
+                destination: number
+              });
+            case 20:
+              _yield$ApiService$pos2 = _context5.sent;
+              data = _yield$ApiService$pos2.data;
+              if (data.success) {
+                _context5.next = 27;
+                break;
+              }
+              // Refusé avant que le bridge ne sonne le poste : le
+              // prochain INVITE n'est plus un leg agent.
+              _utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__["default"].forgetAgentLeg();
+              _this5.aiCallMessage = data.message || "Impossible de lancer l'appel avec l'agent IA.";
+              _this5.aiCallSuccess = false;
+              return _context5.abrupt("return");
+            case 27:
+              _this5.aiCallUuid = data.call_uuid || null;
+              _this5.aiCallMessage = "Agent IA en cours de connexion. Décrochez votre poste Kavkom pour rejoindre la conférence avec le prospect.";
+              _this5.aiCallSuccess = true;
+              console.log("[IA] Appel lancé.", {
+                callUuid: _this5.aiCallUuid,
+                prospectId: (_this5$interactionPro2 = _this5.interactionProspect) === null || _this5$interactionPro2 === void 0 ? void 0 : _this5$interactionPro2.id
+              });
+
+              // Ouvre le WebSocket de transcription live pour afficher
+              // les échanges Gemini en temps réel dans le panneau.
+              _this5.openTranscriptWs(_this5.aiCallUuid);
+              _context5.next = 39;
+              break;
+            case 34:
+              _context5.prev = 34;
+              _context5.t0 = _context5["catch"](12);
+              console.error("[IA] Erreur lors du lancement de l'appel.", {
+                status: (_error$response4 = _context5.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status,
+                message: ((_error$response5 = _context5.t0.response) === null || _error$response5 === void 0 || (_error$response5 = _error$response5.data) === null || _error$response5 === void 0 ? void 0 : _error$response5.message) || _context5.t0.message
+              });
+              _this5.aiCallMessage = ((_error$response6 = _context5.t0.response) === null || _error$response6 === void 0 || (_error$response6 = _error$response6.data) === null || _error$response6 === void 0 ? void 0 : _error$response6.message) || "Impossible de joindre le service de l'agent vocal IA (ai-phone-agent).";
+              _this5.aiCallSuccess = false;
+            case 39:
+              _context5.prev = 39;
+              _this5.callingViaAIAgent = false;
+              return _context5.finish(39);
+            case 42:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[12, 34, 39, 42]]);
+      }))();
+    },
+    startKavkomDebugPolling: function startKavkomDebugPolling(callUuid) {
+      var _this6 = this;
       this.stopKavkomDebugPolling();
       this.kavkomDebugLastStatus = null;
       var polls = 0;
       console.log("[Kavkom][Debug] Server-side processing tracking enabled.", {
         callUuid: callUuid
       });
-      this.kavkomDebugTimer = window.setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var _yield$ApiService$get, data, signature, _error$response4;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      this.kavkomDebugTimer = window.setInterval(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var _yield$ApiService$get, data, signature, _error$response7;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
               polls += 1;
-              if (!(_this5.kavkomCallUuid !== callUuid)) {
-                _context5.next = 3;
+              if (!(_this6.kavkomCallUuid !== callUuid)) {
+                _context6.next = 3;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 3:
-              _context5.prev = 3;
-              _context5.next = 6;
+              _context6.prev = 3;
+              _context6.next = 6;
               return _apis_api_service__WEBPACK_IMPORTED_MODULE_2__["default"].get("settings/kavkom/call/".concat(encodeURIComponent(callUuid), "/status"));
             case 6:
-              _yield$ApiService$get = _context5.sent;
+              _yield$ApiService$get = _context6.sent;
               data = _yield$ApiService$get.data;
-              if (!(_this5.kavkomCallUuid !== callUuid)) {
-                _context5.next = 10;
+              if (!(_this6.kavkomCallUuid !== callUuid)) {
+                _context6.next = 10;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 10:
               signature = "".concat(data.status, "|").concat(data.has_recording, "|").concat(data.processed_at, "|").concat(data.error || "");
-              if (signature !== _this5.kavkomDebugLastStatus) {
-                _this5.kavkomDebugLastStatus = signature;
+              if (signature !== _this6.kavkomDebugLastStatus) {
+                _this6.kavkomDebugLastStatus = signature;
                 console.log("[Kavkom][Debug] Server processing status.", {
                   callUuid: data.call_uuid,
                   status: data.status,
@@ -30424,25 +30566,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 });
               }
               if (["processed", "ignored"].includes(data.status) || polls >= 60) {
-                _this5.stopKavkomDebugPolling();
+                _this6.stopKavkomDebugPolling();
               }
-              _context5.next = 18;
+              _context6.next = 18;
               break;
             case 15:
-              _context5.prev = 15;
-              _context5.t0 = _context5["catch"](3);
+              _context6.prev = 15;
+              _context6.t0 = _context6["catch"](3);
               // A 404 is normal until Kavkom has posted the CDR.
               if (polls === 1 || polls % 6 === 0) {
                 console.debug("[Kavkom][Debug] CDR not received yet.", {
                   callUuid: callUuid,
-                  status: (_error$response4 = _context5.t0.response) === null || _error$response4 === void 0 ? void 0 : _error$response4.status
+                  status: (_error$response7 = _context6.t0.response) === null || _error$response7 === void 0 ? void 0 : _error$response7.status
                 });
               }
             case 18:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5, null, [[3, 15]]);
+        }, _callee6, null, [[3, 15]]);
       })), 5000);
     },
     stopKavkomDebugPolling: function stopKavkomDebugPolling() {
@@ -30450,6 +30592,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         window.clearInterval(this.kavkomDebugTimer);
         this.kavkomDebugTimer = null;
       }
+    },
+    /**
+     * Ouvre le WebSocket de transcription live (port 14002) pour
+     * recevoir les messages texte de Gemini en temps réel pendant
+     * l'appel IA. Filtre par call_uuid pour n'afficher que les
+     * messages de l'appel courant.
+     */
+    openTranscriptWs: function openTranscriptWs(callUuid) {
+      var _this7 = this;
+      this.closeTranscriptWs();
+      this.aiCallTranscript = [];
+      var wsUrl = "ws://".concat(window.location.hostname, ":14002");
+      var ws = new WebSocket(wsUrl);
+      this.aiCallWs = ws;
+      ws.onopen = function () {
+        _this7.aiCallWsActive = true;
+        console.log("[IA] Transcript WebSocket connected.", {
+          callUuid: callUuid
+        });
+      };
+      ws.onmessage = function (event) {
+        try {
+          var msg = JSON.parse(event.data);
+          if (msg.type === "transcript" && (!callUuid || msg.call_uuid === callUuid)) {
+            _this7.aiCallTranscript.push({
+              speaker: msg.speaker,
+              text: msg.text,
+              at: msg.at
+            });
+            // Auto-scroll : on laisse le DOM se mettre à jour
+            // avant de scroller en bas.
+            _this7.$nextTick(function () {
+              var el = _this7.$refs.aiTranscriptBox;
+              if (el) el.scrollTop = el.scrollHeight;
+            });
+          }
+        } catch (_) {
+          // Message non-JSON (ping, etc.) ignoré.
+        }
+      };
+      ws.onerror = function (err) {
+        console.warn("[IA] Transcript WebSocket error.", err);
+      };
+      ws.onclose = function () {
+        _this7.aiCallWsActive = false;
+        console.log("[IA] Transcript WebSocket closed.");
+      };
+    },
+    closeTranscriptWs: function closeTranscriptWs() {
+      if (this.aiCallWs) {
+        try {
+          this.aiCallWs.close();
+        } catch (_) {}
+        this.aiCallWs = null;
+      }
+      this.aiCallWsActive = false;
     },
     subscribeKavkomEvents: function subscribeKavkomEvents() {
       _utils_event_bus__WEBPACK_IMPORTED_MODULE_5__["default"].on(_utils_kavkom_phone__WEBPACK_IMPORTED_MODULE_6__.KAVKOM_EVENTS.READY, this.onKavkomReady);
@@ -30474,6 +30672,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         var number = this.pendingKavkomNumber;
         this.pendingKavkomNumber = "";
         this.triggerKavkomCall(number);
+      }
+      if (this.pendingAINumber) {
+        var _number = this.pendingAINumber;
+        this.pendingAINumber = "";
+        this.triggerAIAgentCall(_number);
       }
     },
     /**
@@ -30526,6 +30729,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
       this.kavkomReady = false;
       this.callingViaKavkom = false;
+      this.callingViaAIAgent = false;
       this.kavkomCallState = "failed";
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
@@ -30539,6 +30743,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         direction: direction
       });
       this.callingViaKavkom = false;
+      this.callingViaAIAgent = false;
       this.kavkomCallState = "failed";
       this.kavkomCallSuccess = false;
       this.kavkomCallMessage = message;
@@ -30576,85 +30781,85 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     addInteraction: function addInteraction() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _this6.addingInteraction = true;
-              _context6.prev = 1;
-              _context6.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this6.interaction);
+              _this8.addingInteraction = true;
+              _context7.prev = 1;
+              _context7.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this8.interaction);
             case 4:
-              _this6.interaction = _context6.sent;
+              _this8.interaction = _context7.sent;
             case 5:
-              _context6.prev = 5;
-              _this6.addingInteraction = false;
-              return _context6.finish(5);
+              _context7.prev = 5;
+              _this8.addingInteraction = false;
+              return _context7.finish(5);
             case 8:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
-        }, _callee6, null, [[1,, 5, 8]]);
+        }, _callee7, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var _this7$interactionPro;
-        var _this7$logKavkomWarn;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        var _this9$interactionPro;
+        var _this9$logKavkomWarn;
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              if (!(!_this7.interaction || !((_this7$interactionPro = _this7.interactionProspect) !== null && _this7$interactionPro !== void 0 && _this7$interactionPro.id))) {
-                _context7.next = 2;
+              if (!(!_this9.interaction || !((_this9$interactionPro = _this9.interactionProspect) !== null && _this9$interactionPro !== void 0 && _this9$interactionPro.id))) {
+                _context8.next = 2;
                 break;
               }
-              return _context7.abrupt("return");
+              return _context8.abrupt("return");
             case 2:
-              if (_this7.interactionProspect) {
-                _context7.next = 5;
+              if (_this9.interactionProspect) {
+                _context8.next = 5;
                 break;
               }
-              (_this7$logKavkomWarn = _this7.logKavkomWarn) === null || _this7$logKavkomWarn === void 0 ? void 0 : _this7$logKavkomWarn.call(_this7, "updateInteraction ignoré : aucun prospect actif");
-              return _context7.abrupt("return");
+              (_this9$logKavkomWarn = _this9.logKavkomWarn) === null || _this9$logKavkomWarn === void 0 ? void 0 : _this9$logKavkomWarn.call(_this9, "updateInteraction ignoré : aucun prospect actif");
+              return _context8.abrupt("return");
             case 5:
-              if (_this7.interaction.id) {
-                _context7.next = 16;
+              if (_this9.interaction.id) {
+                _context8.next = 16;
                 break;
               }
-              _context7.prev = 6;
-              _context7.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this7.interaction);
+              _context8.prev = 6;
+              _context8.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this9.interaction);
             case 9:
-              _this7.interaction = _context7.sent;
-              _context7.next = 15;
+              _this9.interaction = _context8.sent;
+              _context8.next = 15;
               break;
             case 12:
-              _context7.prev = 12;
-              _context7.t0 = _context7["catch"](6);
-              console.error("Échec création interaction", _context7.t0);
+              _context8.prev = 12;
+              _context8.t0 = _context8["catch"](6);
+              console.error("Échec création interaction", _context8.t0);
             case 15:
-              return _context7.abrupt("return");
+              return _context8.abrupt("return");
             case 16:
-              _context7.prev = 16;
-              _context7.next = 19;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this7.interaction);
+              _context8.prev = 16;
+              _context8.next = 19;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this9.interaction);
             case 19:
-              _context7.next = 24;
+              _context8.next = 24;
               break;
             case 21:
-              _context7.prev = 21;
-              _context7.t1 = _context7["catch"](16);
-              console.error("Échec mise à jour interaction", _context7.t1);
+              _context8.prev = 21;
+              _context8.t1 = _context8["catch"](16);
+              console.error("Échec mise à jour interaction", _context8.t1);
             case 24:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
-        }, _callee7, null, [[6, 12], [16, 21]]);
+        }, _callee8, null, [[6, 12], [16, 21]]);
       }))();
     },
     /**
@@ -30675,47 +30880,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) switch (_context8.prev = _context8.next) {
-            case 0:
-              _this8.updatingPhoneNumber = true;
-              _context8.prev = 1;
-              _context8.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this8.interactionProspect.id,
-                phone_number: _this8.phoneNumber
-              });
-            case 4:
-              _context8.prev = 4;
-              _this8.updatingPhoneNumber = false;
-              _this8.tab = 0;
-              return _context8.finish(4);
-            case 8:
-            case "end":
-              return _context8.stop();
-          }
-        }, _callee8, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
-      var _this9 = this;
+      var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              _this9.updatingMobilePhoneNumber = true;
+              _this10.updatingPhoneNumber = true;
               _context9.prev = 1;
               _context9.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this9.interactionProspect.id,
-                mobile_phone_number: _this9.mobilePhoneNumber
+                id: _this10.interactionProspect.id,
+                phone_number: _this10.phoneNumber
               });
             case 4:
               _context9.prev = 4;
-              _this9.updatingMobilePhoneNumber = false;
-              _this9.tab = 0;
+              _this10.updatingPhoneNumber = false;
+              _this10.tab = 0;
               return _context9.finish(4);
             case 8:
             case "end":
@@ -30724,45 +30904,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee9, null, [[1,, 4, 8]]);
       }))();
     },
-    fetchSelectedProspects: function fetchSelectedProspects() {
-      var _this10 = this;
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
+      var _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
           while (1) switch (_context10.prev = _context10.next) {
             case 0:
-              if (!(_this10.prospectsSelected.length == 0)) {
-                _context10.next = 3;
+              _this11.updatingMobilePhoneNumber = true;
+              _context10.prev = 1;
+              _context10.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
+                id: _this11.interactionProspect.id,
+                mobile_phone_number: _this11.mobilePhoneNumber
+              });
+            case 4:
+              _context10.prev = 4;
+              _this11.updatingMobilePhoneNumber = false;
+              _this11.tab = 0;
+              return _context10.finish(4);
+            case 8:
+            case "end":
+              return _context10.stop();
+          }
+        }, _callee10, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
+            case 0:
+              if (!(_this12.prospectsSelected.length == 0)) {
+                _context11.next = 3;
                 break;
               }
-              _this10.selectedProspects = [];
-              return _context10.abrupt("return");
+              _this12.selectedProspects = [];
+              return _context11.abrupt("return");
             case 3:
-              _context10.prev = 3;
-              _context10.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this10.project.slug, {
+              _context11.prev = 3;
+              _context11.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this12.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this10.prospectsSelected
+                    ids: _this12.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context10.sent;
+              _yield$ProspectServic = _context11.sent;
               data = _yield$ProspectServic.data;
-              _this10.selectedProspects = data.data.filter(function (prospect) {
+              _this12.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context10.prev = 9;
-              _this10.fetchingProspect = false;
-              return _context10.finish(9);
+              _context11.prev = 9;
+              _this12.fetchingProspect = false;
+              return _context11.finish(9);
             case 12:
             case "end":
-              return _context10.stop();
+              return _context11.stop();
           }
-        }, _callee10, null, [[3,, 9, 12]]);
+        }, _callee11, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -30779,24 +30984,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this11 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
-        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
-          while (1) switch (_context11.prev = _context11.next) {
+      var _this13 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+          while (1) switch (_context12.prev = _context12.next) {
             case 0:
-              if (newValue && _this11.leftSlideOpen(_this11.name)) {
-                _this11.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this11.interaction.number)) {
-                  _this11.interaction.number = newValue.phone_number;
+              if (newValue && _this13.leftSlideOpen(_this13.name)) {
+                _this13.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this13.interaction.number)) {
+                  _this13.interaction.number = newValue.phone_number;
                 } else {
-                  _this11.interaction.number = newValue.mobile_phone_number;
+                  _this13.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context11.stop();
+              return _context12.stop();
           }
-        }, _callee11);
+        }, _callee12);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -30823,9 +31028,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * this agent, is enough to know the SIP identity is ready.
      */
     kavkomConfigured: function kavkomConfigured() {
-      var _this12 = this;
+      var _this14 = this;
       return this.lines.some(function (line) {
-        return line.operator === "kavkom" && String(line.user_id) === String(_this12.user.id);
+        return line.operator === "kavkom" && String(line.user_id) === String(_this14.user.id);
       });
     },
     /**
@@ -80142,8 +80347,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [_hoisted_2];
         }),
         _: 1 /* STABLE */
-      })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-        key: 2,
+      })) : $props.interaction.source == 'ai_phone_agent' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 2
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Appel passé par l'agent vocal IA (voir ai-phone-agent/). "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-robot",
+        color: "#3f51b5"
+      })], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+        key: 3,
         "class": "fa fa-phone"
       })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-prospect-interaction-creator",
@@ -80160,7 +80370,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "hc-prospect-interaction-from-number",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.from_number)
       }, null, 8 /* PROPS */, _hoisted_8)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-        key: 3,
+        key: 4,
         tag: "a",
         href: $props.interaction.audio,
         target: "_blank",
@@ -80227,16 +80437,21 @@ var _hoisted_14 = {
 };
 var _hoisted_15 = ["textContent"];
 var _hoisted_16 = ["textContent"];
-var _hoisted_17 = ["textContent"];
+var _hoisted_17 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
 var _hoisted_18 = ["textContent"];
-var _hoisted_19 = {
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = {
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = {
   style: {
     "flex": "1",
     "width": "100%",
@@ -80245,42 +80460,26 @@ var _hoisted_21 = {
     "overflow": "auto"
   }
 };
-var _hoisted_22 = {
+var _hoisted_25 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Paramètre Aircall Webhook'
 }, null, -1 /* HOISTED */);
-var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Rendez-vous sur la page webhook d\'aircall'
 }, null, -1 /* HOISTED */);
-var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Enfin cliquer sur "Ajouter webhook"'
 }, null, -1 /* HOISTED */);
-var _hoisted_28 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = {
-  style: {
-    "flex": "1",
-    "width": "100%",
-    "height": "100%",
-    "overflow": "auto",
-    "padding": "16px"
-  }
-};
 var _hoisted_31 = {
   "class": "hc-flex-column",
   style: {
@@ -80289,42 +80488,58 @@ var _hoisted_31 = {
 };
 var _hoisted_32 = ["textContent"];
 var _hoisted_33 = {
-  "class": "hc-kavkom-call-panel"
+  style: {
+    "flex": "1",
+    "width": "100%",
+    "height": "100%",
+    "overflow": "auto",
+    "padding": "16px"
+  }
 };
 var _hoisted_34 = {
-  "class": "hc-kavkom-call-card"
-};
-var _hoisted_35 = {
-  "class": "hc-kavkom-call-card-header"
-};
-var _hoisted_36 = {
-  "class": "hc-kavkom-call-icon"
-};
-var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "hc-kavkom-call-label"
-}, "Appel Kavkom", -1 /* HOISTED */);
-var _hoisted_38 = {
-  "class": "hc-kavkom-call-number"
-};
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fa fa-circle"
-}, null, -1 /* HOISTED */);
-var _hoisted_40 = ["disabled"];
-var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-  "class": "fa fa-phone"
-}, null, -1 /* HOISTED */);
-var _hoisted_42 = ["textContent"];
-var _hoisted_43 = ["textContent"];
-var _hoisted_44 = ["textContent"];
-var _hoisted_45 = ["textContent"];
-var _hoisted_46 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = {
+  "class": "hc-kavkom-call-panel"
+};
+var _hoisted_37 = {
+  "class": "hc-kavkom-call-card"
+};
+var _hoisted_38 = {
+  "class": "hc-kavkom-call-card-header"
+};
+var _hoisted_39 = {
+  "class": "hc-kavkom-call-icon"
+};
+var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-kavkom-call-label"
+}, "Appel Kavkom", -1 /* HOISTED */);
+var _hoisted_41 = {
+  "class": "hc-kavkom-call-number"
+};
+var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-circle"
+}, null, -1 /* HOISTED */);
+var _hoisted_43 = ["disabled"];
+var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-phone"
+}, null, -1 /* HOISTED */);
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = ["textContent"];
 var _hoisted_47 = ["textContent"];
-var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_48 = ["textContent"];
+var _hoisted_49 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_50 = ["textContent"];
+var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   style: {
     "flex": "1",
     "width": "100%",
@@ -80333,6 +80548,52 @@ var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
     "padding": "16px"
   }
 }, null, -1 /* HOISTED */);
+var _hoisted_52 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_53 = ["textContent"];
+var _hoisted_54 = {
+  "class": "hc-kavkom-call-panel"
+};
+var _hoisted_55 = {
+  "class": "hc-kavkom-call-card hc-kavkom-call-card-ai"
+};
+var _hoisted_56 = {
+  "class": "hc-kavkom-call-card-header"
+};
+var _hoisted_57 = {
+  "class": "hc-kavkom-call-icon hc-kavkom-call-icon-ai"
+};
+var _hoisted_58 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-kavkom-call-label"
+}, " Appel Kavkom avec IA ", -1 /* HOISTED */);
+var _hoisted_59 = {
+  "class": "hc-kavkom-call-number"
+};
+var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-circle"
+}, null, -1 /* HOISTED */);
+var _hoisted_61 = {
+  key: 1,
+  ref: "aiTranscriptBox",
+  "class": "hc-ai-transcript-box"
+};
+var _hoisted_62 = {
+  "class": "hc-ai-transcript-speaker"
+};
+var _hoisted_63 = {
+  "class": "hc-ai-transcript-text"
+};
+var _hoisted_64 = ["disabled"];
+var _hoisted_65 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-robot"
+}, null, -1 /* HOISTED */);
+var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-kavkom-call-help"
+}, " L'agent vocal IA (Gemini Live) rejoint la conférence et échange avec le prospect. Décrochez votre poste Kavkom pour participer ou écouter l'appel. ", -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -80351,7 +80612,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[23] || (_cache[23] = function ($event) {
+    onOpen: _cache[25] || (_cache[25] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects(), $options.fetchOperatorsConfigStatus();
     }),
     title: _ctx.$t('prospect.interaction.title', {
@@ -80378,7 +80639,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_frame_layout, {
-            count: 7,
+            count: 8,
             tab: $data.frameTab,
             "class": "hc-flex-1"
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
@@ -80411,7 +80672,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_42)];
+                  }, null, 8 /* PROPS */, _hoisted_45)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -80442,7 +80703,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_43)];
+                  }, null, 8 /* PROPS */, _hoisted_46)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -80470,7 +80731,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_44)];
+                  }, null, 8 /* PROPS */, _hoisted_47)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -80501,7 +80762,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_45)];
+                  }, null, 8 /* PROPS */, _hoisted_48)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -80518,7 +80779,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "class": "hc-flex-1"
               }, {
                 "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                     onClick: _cache[4] || (_cache[4] = function ($event) {
                       return $data.tab = 0;
                     }),
@@ -80530,7 +80791,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
-                      }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-cog",
                         onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                           return $data.aircallTab = 1;
@@ -80538,7 +80799,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       })];
                     }),
                     _: 1 /* STABLE */
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
+                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
                     id: "aircall-phone",
                     number: $data.interaction.number,
                     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
@@ -80567,7 +80828,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, null, 8 /* PROPS */, ["number", "style"])])])];
                 }),
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                     onClick: _cache[8] || (_cache[8] = function ($event) {
                       return $data.aircallTab = 0;
                     }),
@@ -80576,7 +80837,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-caret-left"
-                      }), _hoisted_23];
+                      }), _hoisted_26];
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -80595,7 +80856,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-wifi"
-                          }), _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                          }), _hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-caret-right"
                           })];
                         }),
@@ -80610,7 +80871,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                             "class": "hc-item-main-content",
                             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Mettre ' + $options.aircallWebhookURL + ' comme URL')
-                          }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                          }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-copy"
                           })];
                         }),
@@ -80622,14 +80883,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                             "class": "hc-item-main-content",
                             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Cocher "call.ended" dans la section Appel')
-                          }, null, 8 /* PROPS */, _hoisted_26)];
+                          }, null, 8 /* PROPS */, _hoisted_29)];
                         }),
                         _: 1 /* STABLE */
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
                         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-check"
-                          }), _hoisted_27];
+                          }), _hoisted_30];
                         }),
                         _: 1 /* STABLE */
                       })];
@@ -80644,7 +80905,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined, _ctx.interactionProspect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[9] || (_cache[9] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -80656,10 +80917,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
-                  }, null, 8 /* PROPS */, _hoisted_29)];
+                  }, null, 8 /* PROPS */, _hoisted_32)];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
                 id: "ringover-phone",
                 number: $data.interaction.number,
                 tab: "phone",
@@ -80689,7 +80950,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined, _ctx.interactionProspect ? {
             name: "3",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[13] || (_cache[13] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -80701,14 +80962,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_kavkom'))
-                  }, null, 8 /* PROPS */, _hoisted_32)];
+                  }, null, 8 /* PROPS */, _hoisted_35)];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                 "class": "fa fa-phone"
-              })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                 "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-ready', $data.kavkomReady ? 'is-ready' : 'is-loading'])
-              }, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Panneau d'affichage du softphone\n                                        partagé : il ne compose pas lui-même le\n                                        numéro de destination, il auto-répond\n                                        au leg agent renvoyé par le PBX Kavkom\n                                        après l'API REST (triggerKavkomCall) et\n                                        affiche l'état de l'enregistrement SIP\n                                        et des appels. L'enregistrement et les\n                                        événements viennent du widget global\n                                        (voir @/utils/kavkom-phone et\n                                        KavkomIncomingCall.vue), ce qui permet\n                                        aussi de recevoir les appels entrants\n                                        quand cet onglet est fermé.\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
+              }, [_hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Panneau d'affichage du softphone\n                                        partagé : il ne compose pas lui-même le\n                                        numéro de destination, il auto-répond\n                                        au leg agent renvoyé par le PBX Kavkom\n                                        après l'API REST (triggerKavkomCall) et\n                                        affiche l'état de l'enregistrement SIP\n                                        et des appels. L'enregistrement et les\n                                        événements viennent du widget global\n                                        (voir @/utils/kavkom-phone et\n                                        KavkomIncomingCall.vue), ce qui permet\n                                        aussi de recevoir les appels entrants\n                                        quand cet onglet est fermé.\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
                 ref: "kavkomWebphone",
                 id: "kavkom-webphone",
                 "project-id": _ctx.project.id
@@ -80722,13 +80983,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 onClick: _cache[14] || (_cache[14] = function ($event) {
                   return $options.triggerKavkomCall($data.interaction.number);
                 })
-              }, [_hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_40)])])];
+              }, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaKavkom ? "Appel en cours..." : "Appeler"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_43)])])];
             }),
             key: "2"
           } : undefined, _ctx.interactionProspect ? {
             name: "7",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[22] || (_cache[22] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -80740,12 +81001,56 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_twilio'))
-                  }, null, 8 /* PROPS */, _hoisted_47)];
+                  }, null, 8 /* PROPS */, _hoisted_50)];
                 }),
                 _: 1 /* STABLE */
-              }), _hoisted_48])];
+              }), _hoisted_51])];
             }),
             key: "3"
+          } : undefined, _ctx.interactionProspect ? {
+            name: "8",
+            fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[23] || (_cache[23] = function ($event) {
+                  return $data.tab = 0;
+                }),
+                "class": "bordered"
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    "class": "fa fa-caret-left"
+                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                    "class": "hc-item-main-content",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_kavkom_ai'))
+                  }, null, 8 /* PROPS */, _hoisted_53)];
+                }),
+                _: 1 /* STABLE */
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_55, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-robot"
+              })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.interaction.number), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-ready', $data.kavkomReady ? 'is-ready' : 'is-loading'])
+              }, [_hoisted_60, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.kavkomReady ? "Prêt" : "Connexion"), 1 /* TEXT */)], 2 /* CLASS */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                                        Même softphone partagé que l'onglet\n                                        Kavkom : l'agent IA rejoint une\n                                        conférence FreeSWITCH à trois et\n                                        fait sonner l'extension de\n                                        l'utilisateur, que ce panneau\n                                        auto-répond via kavkom-phone.\n                                    "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_kavkom, {
+                ref: "kavkomWebphoneAI",
+                id: "kavkom-webphone-ai",
+                "project-id": _ctx.project.id
+              }, null, 8 /* PROPS */, ["project-id"])]), $data.aiCallMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                key: 0,
+                "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-kavkom-call-status', $data.aiCallSuccess ? 'success' : 'error'])
+              }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.aiCallMessage), 3 /* TEXT, CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Transcription live Gemini "), $data.aiCallTranscript.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_61, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.aiCallTranscript, function (line, i) {
+                return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                  key: i,
+                  "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-ai-transcript-line', line.speaker === 'assistant' ? 'hc-ai-transcript-line--ai' : 'hc-ai-transcript-line--caller'])
+                }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(line.speaker === "assistant" ? "IA" : "Prospect"), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_63, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(line.text), 1 /* TEXT */)], 2 /* CLASS */);
+              }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+                type: "button",
+                "class": "hc-button-secondary hc-kavkom-call-action",
+                disabled: $data.callingViaAIAgent || !$data.kavkomReady,
+                onClick: _cache[24] || (_cache[24] = function ($event) {
+                  return $options.triggerAIAgentCall($data.interaction.number);
+                })
+              }, [_hoisted_65, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.callingViaAIAgent ? "Connexion de l'IA..." : "Appeler avec l'IA"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_64), _hoisted_66])])];
+            }),
+            key: "4"
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         _: 2 /* DYNAMIC */
@@ -80893,6 +81198,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     })];
                   }),
                   _: 2 /* DYNAMIC */
+                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Kavkom avec IA (ai-phone-agent) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  "class": "hc-prospect-interaction-item",
+                  onClick: function onClick($event) {
+                    return $options.interactionViaKavkomAI(number);
+                  }
+                }, {
+                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      "class": "fa fa-robot",
+                      color: "#3f51b5"
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_kavkom_ai'))
+                    }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      "class": "hc-prospect-interaction-number",
+                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
+                    }, null, 8 /* PROPS */, _hoisted_19)]), $options.kavkomConfigured ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                      key: 0,
+                      "class": "fa fa-check-circle",
+                      color: "#09be0c"
+                    }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, _ctx.$t('line.operator.configured')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      "class": "fa fa-caret-right"
+                    })];
+                  }),
+                  _: 2 /* DYNAMIC */
                 }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"])], 64 /* STABLE_FRAGMENT */);
               }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add history "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 tag: "a",
@@ -80907,7 +81236,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.add_history'))
-                  }, null, 8 /* PROPS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+                  }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
                     loading: $data.addingHistory
                   }, null, 8 /* PROPS */, ["loading"])];
                 }),
@@ -80928,7 +81257,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.history'))
-                  }, null, 8 /* PROPS */, _hoisted_18)];
+                  }, null, 8 /* PROPS */, _hoisted_21)];
                 }),
                 _: 1 /* STABLE */
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.prospectInteractions, function (c) {
@@ -104128,7 +104457,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-ready {\n    display: inline-flex;\n    align-items: center;\n    gap: 5px;\n    margin-left: auto;\n    padding: 4px 7px;\n    border-radius: 999px;\n    font-size: 11px;\n    font-weight: 600;\n    white-space: nowrap;\n}\n.hc-kavkom-call-ready i {\n    font-size: 7px;\n}\n.hc-kavkom-call-ready.is-ready {\n    color: #16794a;\n    background: #e7f7ef;\n}\n.hc-kavkom-call-ready.is-loading {\n    color: #896b16;\n    background: #fff6d8;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-action {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-kavkom-call-panel {\n    flex: 1;\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 14px;\n    padding: 18px;\n    text-align: center;\n    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);\n}\n.hc-kavkom-call-card {\n    width: 100%;\n    padding: 16px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #eadcf7;\n    border-radius: 12px;\n    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);\n}\n.hc-kavkom-call-card-header {\n    display: flex;\n    align-items: center;\n    gap: 11px;\n    margin-bottom: 14px;\n}\n.hc-kavkom-call-icon {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 36px;\n    height: 36px;\n    color: #fff;\n    background: #8e24aa;\n    border-radius: 10px;\n}\n/* IA : même panneau que Kavkom, avec un accent visuel distinct. */\n.hc-kavkom-call-icon.hc-kavkom-call-icon-ai {\n    background: #3f51b5;\n}\n.hc-kavkom-call-card-ai {\n    border-color: #d5d9f5;\n    box-shadow: 0 8px 20px rgba(63, 81, 181, 0.08);\n}\n.hc-kavkom-call-label {\n    color: #7b7284;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-kavkom-call-help {\n    font-size: 12px;\n    color: #6c757d;\n    line-height: 1.5;\n    max-width: 320px;\n}\n.hc-kavkom-call-number {\n    margin-top: 2px;\n    font-size: 18px;\n    font-weight: 600;\n    color: #343a40;\n}\n.hc-kavkom-call-ready {\n    display: inline-flex;\n    align-items: center;\n    gap: 5px;\n    margin-left: auto;\n    padding: 4px 7px;\n    border-radius: 999px;\n    font-size: 11px;\n    font-weight: 600;\n    white-space: nowrap;\n}\n.hc-kavkom-call-ready i {\n    font-size: 7px;\n}\n.hc-kavkom-call-ready.is-ready {\n    color: #16794a;\n    background: #e7f7ef;\n}\n.hc-kavkom-call-ready.is-loading {\n    color: #896b16;\n    background: #fff6d8;\n}\n.hc-kavkom-call-status {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    font-size: 13px;\n    color: #6c757d;\n    pointer-events: none;\n}\n.hc-kavkom-call-status.success {\n    color: #2e7d32;\n}\n.hc-kavkom-call-status.error {\n    color: #c62828;\n}\n.hc-kavkom-call-panel > .hc-button-secondary {\n    width: 100%;\n    min-height: 40px;\n    color: #fff;\n    background: #8e24aa;\n    border-color: #8e24aa;\n}\n.hc-kavkom-call-action {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n}\n.hc-kavkom-call-panel > .hc-button-secondary:disabled {\n    opacity: 0.6;\n    cursor: not-allowed;\n}\n/* Boîte de transcription live Gemini */\n.hc-ai-transcript-box {\n    width: 100%;\n    max-height: 200px;\n    overflow-y: auto;\n    background: #f7f5ff;\n    border: 1px solid #e0d6f7;\n    border-radius: 8px;\n    padding: 10px 12px;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    font-size: 12px;\n    line-height: 1.5;\n    text-align: left;\n}\n.hc-ai-transcript-line {\n    display: flex;\n    gap: 6px;\n    align-items: flex-start;\n}\n.hc-ai-transcript-speaker {\n    flex-shrink: 0;\n    font-weight: 700;\n    font-size: 10px;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    padding-top: 2px;\n    min-width: 48px;\n}\n.hc-ai-transcript-line--ai .hc-ai-transcript-speaker {\n    color: #3f51b5;\n}\n.hc-ai-transcript-line--caller .hc-ai-transcript-speaker {\n    color: #6c757d;\n}\n.hc-ai-transcript-text {\n    color: #343a40;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

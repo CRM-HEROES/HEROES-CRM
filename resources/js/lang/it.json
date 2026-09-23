@@ -348,6 +348,7 @@
             "call_by_aircall": "Chiama tramite Aircall",
             "call_by_ringover": "Chiama tramite Ringover",
             "call_by_kavkom": "Chiama tramite Kavkom",
+            "call_by_kavkom_ai": "Chiama tramite Kavkom con IA",
             "history": "Storia"
         },
         "message": {
