@@ -27,9 +27,11 @@ class GoogleSheetSyncRequest implements ShouldQueue
         }
 
         if ($freshImport->is_processing) {
-            $syncer->queueRetryIfBusy($freshImport, 15);
-
-            return;
+            $staleReset = $syncer->clearStaleProcessingLockIfNeeded($freshImport);
+            if (!$staleReset) {
+                $syncer->queueRetryIfBusy($freshImport);
+                return;
+            }
         }
 
         $syncer->sync($freshImport);

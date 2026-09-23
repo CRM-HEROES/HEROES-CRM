@@ -23,6 +23,8 @@ class SyncGoogleSheetImports extends Command
         $synced = 0;
 
         foreach ($imports as $import) {
+            $syncer->clearStaleProcessingLockIfNeeded($import);
+
             if (!$syncer->isDue($import)) {
                 continue;
             }

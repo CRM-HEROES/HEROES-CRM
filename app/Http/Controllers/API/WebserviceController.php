@@ -77,45 +77,37 @@ class WebserviceController extends Controller
         }
 
         if ($import->is_processing) {
-            Log::info('Google Sheets sync webhook skipped because import is already processing', [
-                'import_id' => $import->id,
-            ]);
+            $staleReset = $syncer->clearStaleProcessingLockIfNeeded($import);
 
-            $syncer->queueRetryIfBusy($import, 15);
+            if ($staleReset) {
+                Log::warning('Google Sheets sync webhook recovered a stale processing lock', [
+                    'import_id' => $import->id,
+                ]);
+            } else {
+                Log::info('Google Sheets sync webhook skipped because import is already processing', [
+                    'import_id' => $import->id,
+                ]);
+
+                $syncer->queueRetryIfBusy($import);
+
+                return response()->json([
+                    'message' => 'Une synchronisation est déjà en cours. Une nouvelle tentative est déclenchée immédiatement.',
+                ], 202);
+            }
+        }
+
+        // Coalesce a burst of near-simultaneous spreadsheet edits so the
+        // trigger fires only once within a short window, instead of
+        // re-downloading and reprocessing the same Google Sheet multiple
+        // times in a row. The lock is intentionally short-lived to keep the
+        // sync near real-time while still absorbing quick edit storms.
+        if (!$syncer->claimSyncRequest($import, 15)) {
+            $syncer->queueRetryIfBusy($import);
 
             return response()->json([
-                'message' => 'Une synchronisation est déjà en cours. Une nouvelle tentative est planifiée dans 15 secondes.',
+                'message' => 'Synchronisation déjà déclenchée récemment. Une nouvelle tentative est déclenchée immédiatement.',
             ], 202);
         }
-
-        // Debounce: a paste of many cells, or a burst of quick edits, fires
-        // the Apps Script trigger once per edit — without this, that would
-        // re-download and re-process the whole sheet on every single one.
-        // Explicitly on the redis store (same fallback pattern as
-        // ImportProspects's processing lock): the default cache store is
-        // "array" in local/dev, which doesn't persist across requests and
-        // would make this cooldown a silent no-op there.
-        $cooldownKey = 'google-sheet-sync-webhook-cooldown-' . $import->id;
-
-        try {
-            $cache = Cache::store('redis');
-            // Cache store connections are lazy: Cache::store('redis') alone
-            // never throws, the actual connection attempt (and failure)
-            // only happens on first real operation below.
-            $cache->has('google-sheet-sync-webhook-cooldown-probe');
-        } catch (\Throwable $e) {
-            $cache = Cache::store();
-        }
-
-        if ($cache->has($cooldownKey)) {
-            $syncer->queueRetryIfBusy($import, 15);
-
-            return response()->json([
-                'message' => 'Synchronisation déjà déclenchée récemment. Une nouvelle tentative est planifiée dans 15 secondes.',
-            ], 202);
-        }
-
-        $cache->put($cooldownKey, true, 10);
 
         $synced = $syncer->sync($import);
 

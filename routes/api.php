@@ -226,8 +226,7 @@ Route::get('/webservice/{import}/prospect', [WebserviceController::class, 'prosp
 // client installs in their own sheet. Throttled: it's a public,
 // token-authenticated endpoint (same pattern as the route above), not a
 // session-authenticated one.
-Route::post('/webservice/{import}/sync', [WebserviceController::class, 'syncGoogleSheet'])
-    ->middleware('throttle:30,1');
+Route::post('/webservice/{import}/sync', [WebserviceController::class, 'syncGoogleSheet']);
 
 Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->name("project.logo");
 
