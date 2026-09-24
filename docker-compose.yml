@@ -125,37 +125,65 @@ services:
     networks:
       - heroes-network
 
-  # FreeSWITCH Service (ai-phone-agent / Kavkom bridge)
-  # Uses network_mode: host, NOT heroes-network: SIP/RTP need the host's
-  # real IP to talk to Kavkom, which a bridge network + port mapping cannot
-  # provide reliably (see ai-phone-agent/freeswitch/docker/entrypoint.sh).
-  # A service on network_mode: host cannot also join a custom network, so
-  # it reaches/is reached by the other services via 127.0.0.1, not by
-  # container name.
-  freeswitch:
+  # ia-phone-call Service
+  ia-phone-call:
     build:
-      context: ./ai-phone-agent/freeswitch/docker
+      context: ./ia-phone-call
       dockerfile: Dockerfile
-      secrets:
-        - signalwire_token
-    image: heroescrm-freeswitch:latest
-    container_name: freeswitch
+      target: production
+    container_name: ia-phone-call
     restart: unless-stopped
-    network_mode: host
-    environment:
-      KAVKOM_EXTENSION: ${KAVKOM_EXTENSION}
-      KAVKOM_PASSWORD: ${KAVKOM_PASSWORD}
-      KAVKOM_USER_CONTEXT: ${KAVKOM_USER_CONTEXT}
-      ESL_PASSWORD: ${FS_ESL_PASSWORD}
-      EXTERNAL_IP: ${FREESWITCH_EXTERNAL_IP}
+    env_file:
+      - ./ia-phone-call/.env
+    ports:
+      - "${AUDIOSOCKET_PORT:-9701}:${PORT:-9701}"
+      - "${API_PORT:-3000}:3000"
+    volumes:
+      - ./ia-phone-call/recordings:/app/recordings
+      - calls_data:/data/calls
+    networks:
+      - heroes-network
+      - ia-phone-net
+    depends_on:
+      asterisk:
+        condition: service_healthy
 
-secrets:
-  signalwire_token:
-    # FreeSWITCH package downloads need a SignalWire Personal Access Token.
-    # Docker exposes it only at build time; it is not copied into an image.
-    environment: SIGNALWIRE_PERSONAL_ACCESS_TOKEN
+  # Asterisk Service (remplace la stack FreeSWITCH / ai-phone-agent)
+  asterisk:
+    build:
+      context: ./ia-phone-call/asterisk
+      dockerfile: Dockerfile.asterisk
+    container_name: ia-asterisk
+    restart: unless-stopped
+    env_file:
+      - ./ia-phone-call/.env
+    environment:
+      - TZ=${TZ:-Europe/Paris}
+    ports:
+      - "${SIP_PORT:-5060}:5060/udp"
+      - "${SIP_TLS_PORT:-5061}:5061/udp"
+      - "${SIP_TLS_PORT:-5061}:5061/tcp"
+      - "10000-10099:10000-10099/udp"
+      - "5038:5038/tcp"
+    volumes:
+      - ./ia-phone-call/asterisk/pjsip.conf.template:/etc/asterisk/pjsip.conf.template:ro
+      - ./ia-phone-call/asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
+      - ./ia-phone-call/asterisk/manager.conf:/etc/asterisk/manager.conf:ro
+      - calls_data:/var/spool/asterisk/monitor
+    networks:
+      - ia-phone-net
+    healthcheck:
+      test: ["CMD", "asterisk", "-rx", "core show version"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 #Docker Networks
 networks:
   heroes-network:
     driver: bridge
+  ia-phone-net:
+    driver: bridge
+
+volumes:
+  calls_data:

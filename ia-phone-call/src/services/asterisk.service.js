@@ -3,6 +3,7 @@ import { createGeminiSession } from './gemini.service.js';
 import {
     RECORDINGS_DIR,
     createPcmRecorder,
+    createMixedPcmRecorder,
     writeAudioSocketPacket
 } from '../utils/audio.util.js';
 
@@ -61,7 +62,7 @@ function logCallStart(callStartTime, recordingPath) {
     console.log(`${'='.repeat(70)}\n`);
 }
 
-function logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceived, wavPath }) {
+function logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceived, wavPath, mixedWavPath }) {
     const elapsed = ((Date.now() - callStartTime.getTime()) / 1000).toFixed(2);
 
     console.log(`\n${'='.repeat(70)}`);
@@ -70,7 +71,8 @@ function logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceive
     console.log(`   Paquets reçus: ${totalPacketsReceived}`);
     console.log(`   Bytes total: ${totalBytesReceived}`);
     console.log(`   Débit moyen: ${(totalBytesReceived / parseFloat(elapsed) / 1024).toFixed(1)} KB/s`);
-    console.log(`   Fichier WAV: ${wavPath || 'non généré'}`);
+    console.log(`   Fichier WAV (appelant): ${wavPath || 'non généré'}`);
+    console.log(`   Fichier WAV (mixé): ${mixedWavPath || 'non généré'}`);
     console.log(`${'='.repeat(70)}\n`);
 }
 
@@ -87,6 +89,11 @@ export function handleAsteriskConnection(asteriskSocket) {
         `call-${callStartTime.toISOString().replace(/[:.]/g, '-')}.pcm`
     );
     const recorder = createPcmRecorder({ filePath: recordingPath, sampleRate: ASTERISK_SAMPLE_RATE });
+    // Enregistrement unique contenant les deux voix mixées (appelant + IA).
+    const mixedRecorder = createMixedPcmRecorder({
+        filePath: recordingPath.replace(/\.pcm$/i, '-mixed.pcm'),
+        sampleRate: ASTERISK_SAMPLE_RATE
+    });
 
     let audioBuffer = Buffer.alloc(0);
     let totalBytesReceived = 0;
@@ -107,6 +114,7 @@ export function handleAsteriskConnection(asteriskSocket) {
     const stopCall = () => {
         clearInterval(silenceKeepAlive);
         recorder.end();
+        mixedRecorder.end();
     };
 
     logCallStart(callStartTime, recordingPath);
@@ -116,6 +124,7 @@ export function handleAsteriskConnection(asteriskSocket) {
         onAudioData: (pcmBuffer) => {
             console.log(`🎵 [Gemini -> Asterisk] Réception de ${pcmBuffer.length} bytes depuis Gemini`);
             console.log(`📤 [Asterisk -> Kavkom] Envoi vers le trunk de ${pcmBuffer.length} bytes audio`);
+            mixedRecorder.write(pcmBuffer, 'gemini');
             sendToAsterisk(pcmBuffer);
         },
         onClose: () => {
@@ -133,6 +142,7 @@ export function handleAsteriskConnection(asteriskSocket) {
             totalBytesReceived += payload.length;
             totalPacketsReceived++;
             recorder.write(payload);
+            mixedRecorder.write(payload, 'caller');
 
             if (totalPacketsReceived % PROGRESS_LOG_EVERY_N_PACKETS === 0) {
                 const elapsed = ((Date.now() - callStartTime.getTime()) / 1000).toFixed(1);
@@ -153,8 +163,8 @@ export function handleAsteriskConnection(asteriskSocket) {
     asteriskSocket.on('close', async () => {
         clearInterval(silenceKeepAlive);
 
-        const wavPath = await recorder.end();
-        logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceived, wavPath });
+        const [wavPath, mixedWavPath] = await Promise.all([recorder.end(), mixedRecorder.end()]);
+        logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceived, wavPath, mixedWavPath });
 
         geminiSession.close();
     });
