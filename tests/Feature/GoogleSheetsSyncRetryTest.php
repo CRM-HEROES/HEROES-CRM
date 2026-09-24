@@ -163,6 +163,44 @@ class GoogleSheetsSyncRetryTest extends TestCase
         $this->assertSame(0, $syncer->consumeCoalescedBurstCount($import));
     }
 
+    public function test_it_matches_duplicate_phone_values_after_normalization_even_when_selected_fields_are_phone_based(): void
+    {
+        $job = (new ReflectionClass(ImportProspects::class))->newInstanceWithoutConstructor();
+
+        $setProperty = function (string $name, mixed $value) use ($job): void {
+            $property = (new ReflectionClass($job))->getProperty($name);
+            $property->setAccessible(true);
+            $property->setValue($job, $value);
+        };
+
+        $setProperty('import', new Import([
+            'id' => 42,
+            'project_id' => 1,
+            'duplicates_fields' => [12],
+        ]));
+        $setProperty('duplicateFieldDescriptors', [
+            ['id' => 12, 'slug' => 'phone_number', 'meta' => false],
+        ]);
+        $setProperty('existingDuplicateFieldValues', [
+            'phone_number' => [
+                '+33612345678' => ['id' => 99, 'import_id' => 7],
+            ],
+        ]);
+
+        $method = (new ReflectionClass($job))->getMethod('findExistingDuplicate');
+        $method->setAccessible(true);
+
+        $duplicate = $method->invoke($job, [
+            'phone_number' => '06 12 34 56 78',
+            'mobile_phone_number' => '',
+            'email' => '',
+        ]);
+
+        $this->assertNotNull($duplicate);
+        $this->assertSame(99, $duplicate['id']);
+        $this->assertSame(['phone_number'], $duplicate['fields']);
+    }
+
     public function test_it_uses_selected_duplicate_fields_instead_of_email_or_phone_when_scanning_import_rows(): void
     {
         $job = (new ReflectionClass(ImportProspects::class))->newInstanceWithoutConstructor();
