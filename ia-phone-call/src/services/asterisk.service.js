@@ -1,4 +1,37 @@
+import fs from 'fs';
+import path from 'path';
 import { createGeminiSession } from './gemini.service.js';
+
+const RECORDINGS_DIR = path.resolve(process.cwd(), 'recordings');
+fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
+
+function pcmToWavFile(rawFilePath) {
+    if (!fs.existsSync(rawFilePath)) return null;
+
+    const pcmBuffer = fs.readFileSync(rawFilePath);
+    if (!pcmBuffer.length) return null;
+
+    const wavFilePath = rawFilePath.replace(/\.pcm$/i, '.wav');
+    const wavBuffer = Buffer.alloc(44 + pcmBuffer.length);
+
+    wavBuffer.write('RIFF', 0, 4, 'ascii');
+    wavBuffer.writeUInt32LE(36 + pcmBuffer.length, 4);
+    wavBuffer.write('WAVE', 8, 4, 'ascii');
+    wavBuffer.write('fmt ', 12, 4, 'ascii');
+    wavBuffer.writeUInt32LE(16, 16);
+    wavBuffer.writeUInt16LE(1, 20);
+    wavBuffer.writeUInt16LE(1, 22);
+    wavBuffer.writeUInt32LE(8000, 24);
+    wavBuffer.writeUInt32LE(8000 * 2, 28);
+    wavBuffer.writeUInt16LE(2, 32);
+    wavBuffer.writeUInt16LE(16, 34);
+    wavBuffer.write('data', 36, 4, 'ascii');
+    wavBuffer.writeUInt32LE(pcmBuffer.length, 40);
+    pcmBuffer.copy(wavBuffer, 44);
+
+    fs.writeFileSync(wavFilePath, wavBuffer);
+    return wavFilePath;
+}
 
 /**
  * Traite une connexion entrante TCP venant du module AudioSocket d'Asterisk.
@@ -14,6 +47,9 @@ export function handleAsteriskConnection(asteriskSocket) {
     let totalBytesReceived = 0;
     let totalPacketsReceived = 0;
     const callStartTime = new Date();
+    const recordingTimestamp = callStartTime.toISOString().replace(/[:.]/g, '-');
+    const rawRecordingPath = path.join(RECORDINGS_DIR, `call-${recordingTimestamp}.pcm`);
+    const recordingStream = fs.createWriteStream(rawRecordingPath, { flags: 'w' });
 
     // app_audiosocket.c interrompt la connexion si AUCUNE activité (frame venant
     // du canal OU du socket) n'a lieu pendant MAX_WAIT_TIMEOUT_MSEC (2000 ms).
@@ -35,13 +71,15 @@ export function handleAsteriskConnection(asteriskSocket) {
     console.log(`📞 [APPEL] Nouvel appel entrant depuis Asterisk (AudioSocket)`);
     console.log(`⏰ Début: ${callStartTime.toLocaleTimeString('fr-FR')}`);
     console.log(`📍 Distance: Asterisk → ia-phone-call → Gemini`);
+    console.log(`💾 Enregistrement: ${rawRecordingPath}`);
     console.log(`${'='.repeat(70)}\n`);
 
     // Initialisation de la session Gemini
     const geminiSession = createGeminiSession({
         // Réception de l'audio produit par Gemini -> Réinjection dans Asterisk
         onAudioData: (pcmBuffer) => {
-            console.log(`🎵 [Gemini] Envoi de ${pcmBuffer.length} bytes vers Asterisk`);
+            console.log(`🎵 [Gemini -> Asterisk] Réception de ${pcmBuffer.length} bytes depuis Gemini`);
+            console.log(`📤 [Asterisk -> Kavkom] Envoi vers le trunk de ${pcmBuffer.length} bytes audio`);
             lastAudioSentAt = Date.now();
             writeAudioToAsterisk(asteriskSocket, pcmBuffer);
         },
@@ -76,13 +114,13 @@ export function handleAsteriskConnection(asteriskSocket) {
             if (messageType === 0x10) {
                 totalBytesReceived += payloadLength;
                 totalPacketsReceived++;
-                
-                // Log tous les 10 paquets pour ne pas spammer
+                recordingStream.write(packetPayload);
+
                 if (totalPacketsReceived % 10 === 0) {
                     const elapsed = ((Date.now() - callStartTime.getTime()) / 1000).toFixed(1);
                     console.log(`🎤 [Asterisk] Paquet #${totalPacketsReceived} (${payloadLength} bytes) - Total: ${totalBytesReceived} bytes - Élapsé: ${elapsed}s`);
                 }
-                
+
                 geminiSession.sendAudioChunk(packetPayload);
             }
         }
@@ -91,19 +129,24 @@ export function handleAsteriskConnection(asteriskSocket) {
     asteriskSocket.on('error', (err) => {
         console.error(`\n❌ [Asterisk] Erreur Socket: ${err.message}`);
         clearInterval(silenceKeepAlive);
+        recordingStream.end();
         geminiSession.close();
     });
 
     asteriskSocket.on('close', () => {
         clearInterval(silenceKeepAlive);
-        const elapsed = ((Date.now() - callStartTime.getTime()) / 1000).toFixed(2);
-        console.log(`\n${'='.repeat(70)}`);
-        console.log(`📊 [APPEL] Appel terminé`);
-        console.log(`   Durée: ${elapsed}s`);
-        console.log(`   Paquets reçus: ${totalPacketsReceived}`);
-        console.log(`   Bytes total: ${totalBytesReceived}`);
-        console.log(`   Débit moyen: ${(totalBytesReceived / parseFloat(elapsed) / 1024).toFixed(1)} KB/s`);
-        console.log(`${'='.repeat(70)}\n`);
+        recordingStream.end(() => {
+            const wavPath = pcmToWavFile(rawRecordingPath);
+            const elapsed = ((Date.now() - callStartTime.getTime()) / 1000).toFixed(2);
+            console.log(`\n${'='.repeat(70)}`);
+            console.log(`📊 [APPEL] Appel terminé`);
+            console.log(`   Durée: ${elapsed}s`);
+            console.log(`   Paquets reçus: ${totalPacketsReceived}`);
+            console.log(`   Bytes total: ${totalBytesReceived}`);
+            console.log(`   Débit moyen: ${(totalBytesReceived / parseFloat(elapsed) / 1024).toFixed(1)} KB/s`);
+            console.log(`   Fichier WAV: ${wavPath || 'non généré'}`);
+            console.log(`${'='.repeat(70)}\n`);
+        });
         geminiSession.close();
     });
 }

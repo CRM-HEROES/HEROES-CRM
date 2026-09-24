@@ -159,7 +159,7 @@ apiServer.listen(API_PORT, () => {
     console.log(`${'═'.repeat(70)}`);
     console.log(`🌐 API REST DÉMARRÉE`);
     console.log(`   Port: ${API_PORT}`);
-    console.log(`   Documentation: curl http://localhost:${API_PORT}/`);
+    console.log(`   Documentation -> curl http://localhost:${API_PORT}/`);
     console.log(`${'═'.repeat(70)}\n`);
 });
 
