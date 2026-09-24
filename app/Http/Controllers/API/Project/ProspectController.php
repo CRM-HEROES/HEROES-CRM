@@ -631,7 +631,8 @@ class ProspectController extends Controller
         // Count
         $count = min($request->input('count', 50), 500);
 
-        // Sort By
+        // Sort By.
+        // Default to the prospects created most recently in the project view.
         $sortBy = $request->input('sortBy', "created_at");
 
         if ($sortBy == "null") {
@@ -641,6 +642,7 @@ class ProspectController extends Controller
             $sortBy != 'interactions_created_at' &&
             $sortBy != 'sms_created_at' &&
             $sortBy != 'messages_created_at' &&
+            $sortBy != 'created_at' &&
             !$project
                 ->fields()
                 ->where('slug', Str::replace('meta->', '', $sortBy))
@@ -916,7 +918,7 @@ class ProspectController extends Controller
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder);
 
-                if ($sortBy === 'created_at') {
+                if (in_array($sortBy, ['created_at', 'updated_at'], true)) {
                     $query->orderBy('id', 'desc');
                 }
             })

@@ -5,9 +5,9 @@ namespace App\Jobs;
 use App\Models\Import;
 use App\Models\User;
 use App\Support\PhoneCountry;
-// The trait file is named Sendswelcomesms.php. Keep the import spelling in
+// The trait file is named SendsWelcomeSms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
+use App\Jobs\Import\SendsWelcomeSms as SendsWelcomeSms;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;

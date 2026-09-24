@@ -31,9 +31,9 @@ use App\Models\User;
 use App\Services\ProspectAutoAssignment;
 use App\Support\ImportHeaderAliases;
 use App\Support\PhoneCountry;
-// The trait file is named Sendswelcomesms.php. Keep the import spelling in
+// The trait file is named SendsWelcomeSms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\Sendswelcomesms as SendsWelcomeSms;
+use App\Jobs\Import\SendsWelcomeSms as SendsWelcomeSms;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;
@@ -85,6 +85,9 @@ class ImportProspects implements ShouldQueue
     protected $suspiciousRowsCount = 0;
     protected $flaggedDuplicatesCount = 0;
     protected $duplicateGroupCache = [];
+    protected $duplicateFieldDescriptors = [];
+    protected $existingDuplicateFieldValues = [];
+    protected $seenDuplicateFieldValues = [];
     protected $incremental = false;
     protected $acceptedProspectIndexes = [];
 
@@ -125,6 +128,8 @@ class ImportProspects implements ShouldQueue
         $this->existingEmails = $this->getExistingEmails();
         $this->existingPhones = $this->getExistingPhones();
         $this->existingMobiles = $this->getExistingMobiles();
+        $this->duplicateFieldDescriptors = $this->getDuplicateFieldDescriptors();
+        $this->existingDuplicateFieldValues = $this->getExistingDuplicateFieldValues();
     }
 
     /**
@@ -309,7 +314,11 @@ class ImportProspects implements ShouldQueue
             // and are recognised via existingEmails/existingMobiles below,
             // so re-running never duplicates them and any manual edits
             // made to them in the CRM between two syncs aren't wiped out.
-            if (!$this->incremental) {
+            // Google Sheets auto-sync is always treated as incremental for
+            // safety: we must never delete or overwrite already imported
+            // database data from a re-sync, even if a stale or duplicate
+            // job reaches this codepath.
+            if (!$this->incremental && $this->import->source !== 'google_sheets') {
                 $this->removePreviousImportProspects();
             }
 
@@ -557,6 +566,20 @@ class ImportProspects implements ShouldQueue
      */
     protected function removePreviousImportProspects()
     {
+        // Safety guard: Google Sheets auto-sync must never wipe an
+        // existing import's prospects or overwrite CRM data that was
+        // already created by a previous sync. A stale duplicate run must
+        // simply exit without deleting rows.
+        if ($this->import->source === 'google_sheets' || $this->import->sync_enabled) {
+            Log::warning('ImportProspects: refusing to delete existing prospects for auto-sync import', [
+                'import_id' => $this->import->id,
+                'project_id' => $this->import->project_id,
+                'source' => $this->import->source,
+            ]);
+
+            return;
+        }
+
         DB::table('prospects')
             ->where('import_id', $this->import->id)
             ->delete();
@@ -959,11 +982,20 @@ class ImportProspects implements ShouldQueue
         $value = preg_replace('/^(?:p:|tel:)\s*/i', '', $value);
         $value = preg_replace('/\s*(?:ext|x|poste)\.?\s*\d+$/i', '', $value);
 
+        $digits = preg_replace('/\D+/', '', $value);
+
         if (class_exists('libphonenumber\\PhoneNumberUtil')) {
             $util = \libphonenumber\PhoneNumberUtil::getInstance();
+            $defaultRegion = null;
+
+            // French local numbers like "06 12 34 56 78" are common in this
+            // project and should match the stored E.164 form "+33612345678".
+            if (preg_match('/^0[1-9]\d{8}$/', $digits)) {
+                $defaultRegion = 'FR';
+            }
 
             try {
-                $number = $util->parse($value, 'ZZ');
+                $number = $util->parse($value, $defaultRegion ?? 'ZZ');
 
                 if ($util->isPossibleNumber($number) && $util->isValidNumber($number)) {
                     return $util->format($number, \libphonenumber\PhoneNumberFormat::E164);
@@ -974,17 +1006,19 @@ class ImportProspects implements ShouldQueue
             }
         }
 
-        $digits = preg_replace('/\D+/', '', $value);
-
         // Keep an explicit international prefix even when the optional
-        // phone metadata package is unavailable. Local numbers remain
-        // intentionally unresolved because their country is unknown.
+        // phone metadata package is unavailable. Local French numbers are
+        // converted to their canonical E.164 value when they have a leading 0.
         if (str_starts_with($value, '+')) {
             return '+' . $digits;
         }
 
         if (str_starts_with($digits, '00')) {
             return '+' . substr($digits, 2);
+        }
+
+        if (preg_match('/^0[1-9]\d{8}$/', $digits)) {
+            return '+33' . substr($digits, 1);
         }
 
         return $digits;
@@ -1011,6 +1045,139 @@ class ImportProspects implements ShouldQueue
         return empty($prospect['email'])
             && empty($prospect['phone_number'])
             && empty($prospect['mobile_phone_number']);
+    }
+
+    /**
+     * Duplicate detection can be configured per import with a set of
+     * selected project fields. When that list is populated, it takes
+     * precedence over email/phone-only matching; otherwise we keep the
+     * historical fallback used elsewhere in the importer.
+     */
+    protected function getDuplicateFieldDescriptors(): array
+    {
+        if (empty($this->import->duplicates_fields)) {
+            return [];
+        }
+
+        $selectedIds = array_values(array_unique(array_filter(array_map('intval', (array) $this->import->duplicates_fields))));
+        if (empty($selectedIds)) {
+            return [];
+        }
+
+        $project = $this->import->project;
+        if (!$project) {
+            return [];
+        }
+
+        return $project
+            ->fields()
+            ->whereIn('id', $selectedIds)
+            ->get(['id', 'slug', 'meta'])
+            ->filter(fn ($field) => !empty($field->slug))
+            ->map(fn ($field) => [
+                'id' => (int) $field->id,
+                'slug' => (string) $field->slug,
+                'meta' => (bool) $field->meta,
+            ])
+            ->values()
+            ->all();
+    }
+
+    protected function getExistingDuplicateFieldValues(): array
+    {
+        $fields = $this->duplicateFieldDescriptors ?: $this->getDuplicateFieldDescriptors();
+        if (empty($fields)) {
+            return [];
+        }
+
+        $query = DB::table('prospects')
+            ->where('project_id', $this->import->project_id)
+            ->when(!$this->incremental, function ($q) {
+                $q->where(function ($q) {
+                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
+                });
+            })
+            ->whereNull('deleted_at')
+            ->select(['id', 'import_id', 'meta']);
+
+        foreach ($fields as $field) {
+            if (!$field['meta']) {
+                $query->addSelect($field['slug']);
+            }
+        }
+
+        $values = [];
+
+        foreach ($query->cursor() as $row) {
+            foreach ($fields as $field) {
+                $sourceValue = $field['meta']
+                    ? data_get(json_decode($row->meta ?: '[]', true) ?: [], $field['slug'])
+                    : $row->{$field['slug']} ?? null;
+
+                if ($sourceValue === null || $sourceValue === '') {
+                    continue;
+                }
+
+                $key = $this->normalizeDuplicateComparisonValue($sourceValue, $field['slug']);
+                if ($key === '') {
+                    continue;
+                }
+
+                $values[$field['slug']][$key] = ['id' => (int) $row->id, 'import_id' => $row->import_id];
+            }
+        }
+
+        return $values;
+    }
+
+    protected function normalizeDuplicateComparisonValue($value, ?string $fieldSlug = null): string
+    {
+        if (is_array($value)) {
+            $value = json_encode($value);
+        }
+
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        if ($fieldSlug !== null) {
+            $fieldSlug = strtolower((string) $fieldSlug);
+
+            if (str_contains($fieldSlug, 'phone') || str_contains($fieldSlug, 'mobile')) {
+                return $this->normalizePhone($value);
+            }
+
+            if (str_contains($fieldSlug, 'email')) {
+                return strtolower($value);
+            }
+        }
+
+        return strtolower($value);
+    }
+
+    protected function getDuplicateComparisonValuesForProspect($prospect, array $fields): array
+    {
+        $values = [];
+
+        foreach ($fields as $field) {
+            $sourceValue = $field['meta']
+                ? data_get($prospect['meta'] ?? [], $field['slug'])
+                : ($prospect[$field['slug']] ?? null);
+
+            if ($sourceValue === null || $sourceValue === '') {
+                continue;
+            }
+
+            $key = $this->normalizeDuplicateComparisonValue($sourceValue, $field['slug']);
+            if ($key === '') {
+                continue;
+            }
+
+            $values[$field['slug']] = $key;
+        }
+
+        return $values;
     }
 
     /**
@@ -1047,6 +1214,18 @@ class ImportProspects implements ShouldQueue
      */
     protected function isRepeatedWithinFile($prospect)
     {
+        if (!empty($this->duplicateFieldDescriptors)) {
+            foreach ($this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors) as $field => $value) {
+                if (isset($this->seenDuplicateFieldValues[$field]) && in_array($value, $this->seenDuplicateFieldValues[$field], true)) {
+                    return true;
+                }
+
+                $this->seenDuplicateFieldValues[$field][] = $value;
+            }
+
+            return false;
+        }
+
         // Check email
         if (!empty($prospect['email'])) {
             $email = strtolower(trim($prospect['email']));
@@ -1099,6 +1278,36 @@ class ImportProspects implements ShouldQueue
      */
     protected function findExistingDuplicate($prospect)
     {
+        if (!empty($this->duplicateFieldDescriptors)) {
+            $existing = null;
+            $matchedFields = [];
+
+            foreach ($this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors) as $field => $value) {
+                $match = $this->existingDuplicateFieldValues[$field][$value] ?? null;
+                if (!$match) {
+                    continue;
+                }
+
+                if ($existing === null) {
+                    $existing = $match;
+                }
+
+                if ($existing['id'] === $match['id']) {
+                    $matchedFields[] = $field;
+                }
+            }
+
+            if ($existing === null) {
+                return null;
+            }
+
+            return [
+                'id' => $existing['id'],
+                'fields' => $matchedFields,
+                'sameImport' => (int) $existing['import_id'] === (int) $this->import->id,
+            ];
+        }
+
         $existing = null;
         $matchedFields = [];
 

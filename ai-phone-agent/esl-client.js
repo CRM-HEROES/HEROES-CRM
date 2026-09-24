@@ -63,7 +63,7 @@ class EslClient {
      * `origination_uuid`), without waiting for the leg to actually answer.
      * Use `waitForAnswer`/`waitForHangup` to react to what happens next.
      */
-    async originateIntoConference(dialTarget, room, { callerIdNumber, callerIdName, sipAuth } = {}) {
+    async originateIntoConference(dialTarget, room, { callerIdNumber, callerIdName, sipAuth, sipRouteUri } = {}) {
         await this.connect();
 
         const uuid = crypto.randomUUID();
@@ -75,6 +75,11 @@ class EslClient {
             sip_auth_username: sipAuth?.extension,
             sip_auth_password: sipAuth?.password,
             sip_auth_realm: sipAuth?.user_context,
+            sip_route_uri: sipRouteUri,
+            // stunnel carries this TCP hop as TLS to Kavkom. Keep the SIP
+            // Via/Contact transport semantically TLS, matching the real
+            // connection seen by Kavkom (and the standalone registrar).
+            sip_transport: sipRouteUri ? "tls" : undefined,
         };
         const varString = Object.entries(vars)
             .filter(([, value]) => value !== undefined && value !== null && value !== "")
@@ -83,22 +88,21 @@ class EslClient {
 
         const command = `originate {${varString}}${dialTarget} &conference(${room}@${config.freeswitch.conferenceProfile})`;
 
-        return new Promise((resolve, reject) => {
-            const jobUuid = crypto.randomUUID();
-            const timer = setTimeout(() => {
-                reject(new Error(`Timed out waiting for BACKGROUND_JOB ${jobUuid}`));
-            }, 10000);
-            const onJob = (event) => {
-                clearTimeout(timer);
-                const body = (event.getBody() || "").trim();
-                if (body.startsWith("-ERR")) {
-                    reject(new Error(`FreeSWITCH originate failed: ${body}`));
-                } else {
-                    resolve(uuid);
-                }
-            };
-            this.conn.bgapi(command, "", jobUuid, onJob);
+        // `BACKGROUND_JOB` is delivered when the entire originate has
+        // finished (answered, failed, or timed out), not when FreeSWITCH has
+        // accepted it. Waiting for it here made the HTTP call fail after ten
+        // seconds before the user had a chance to answer their phone. The
+        // caller already owns `origination_uuid`, so launch asynchronously
+        // and follow CHANNEL_ANSWER/CHANNEL_HANGUP independently.
+        const jobUuid = crypto.randomUUID();
+        this.conn.bgapi(command, "", jobUuid, (event) => {
+            const body = (event.getBody() || "").trim();
+            if (body.startsWith("-ERR")) {
+                console.error("[ESL] Asynchronous originate failed.", { uuid, jobUuid, body });
+            }
         });
+
+        return uuid;
     }
 
     waitForAnswer(channelUuid, timeoutMs = 45000) {

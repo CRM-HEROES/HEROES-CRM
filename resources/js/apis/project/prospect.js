@@ -24,6 +24,11 @@ export default {
             params
         );
     },
+    assignAiAgent(project, prospect, aiAgentId) {
+        return ApiService.put(`project/${project}/prospect/${prospect}/ai-agent`, {
+            ai_agent_id: aiAgentId || null,
+        });
+    },
     destroy(project, prospect) {
         return ApiService.delete(`project/${project}/prospect/${prospect}`);
     },

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\AiAgent;
+use App\Models\Line;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
@@ -132,7 +133,10 @@ class AiPhoneAgentController extends Controller
         ]);
 
         $prospect = Prospect::findOrFail($data['prospect_id']);
-        $agent = $this->resolveAgent($prospect->project_id, $data['agent_id'] ?? null);
+        $agent = $this->resolveAgent(
+            $prospect->project_id,
+            $data['agent_id'] ?? $prospect->ai_agent_id
+        );
         if (!$agent) {
             Log::channel('ai-phone-agent')->warning('AI call rejected: no active agent configured.', [
                 'prospect_id' => $prospect->id,
@@ -170,7 +174,26 @@ class AiPhoneAgentController extends Controller
             ], 200);
         }
 
-        $userExtension = $this->getUserKavkomExtension($request);
+        $userExtension = $this->getUserKavkomExtension($request, $prospect->project_id);
+        $extensionSource = 'user_line';
+
+        // In a local test, the dedicated extension configured on the AI
+        // agent is not the user extension. Use an explicitly configured
+        // Linphone/CRM extension before falling back to the agent extension.
+        // Production still requires a line assigned to the current user.
+        if (!$userExtension && app()->environment(['local', 'testing'])) {
+            $userExtension = (string) (config('services.ai_phone_agent.test_user_extension') ?: $kavkomConfig['extension']);
+            $extensionSource = config('services.ai_phone_agent.test_user_extension')
+                ? 'configured_local_test_extension'
+                : 'agent_extension_local_fallback';
+            Log::channel('ai-phone-agent')->warning('No Kavkom line assigned to CRM user; using local test extension for AI call test.', [
+                'user_id' => $request->user()?->id,
+                'prospect_id' => $prospect->id,
+                'agent_id' => $agent->id,
+                'extension' => $userExtension,
+            ]);
+        }
+
         if (!$userExtension) {
             return response()->json([
                 'success' => false,
@@ -183,7 +206,11 @@ class AiPhoneAgentController extends Controller
                 'prospect_id' => $prospect->id,
                 'agent_id' => $agent->id,
                 'agent_extension' => $kavkomConfig['extension'],
+                'agent_user_context' => $kavkomConfig['user_context'],
+                'agent_transport' => $kavkomConfig['transport'] ?? 'tls',
+                'agent_sip_port' => (int) ($kavkomConfig['sip_port'] ?? (($kavkomConfig['transport'] ?? 'tls') === 'tls' ? 5061 : 5060)),
                 'user_extension' => $userExtension,
+                'user_extension_source' => $extensionSource,
                 'destination_digits' => preg_replace('/\D+/', '', $destination),
             ]);
             $response = Http::withHeaders(['X-AI-Agent-Secret' => $secret])
@@ -236,15 +263,27 @@ class AiPhoneAgentController extends Controller
         return response()->json($response->json() ?: ['success' => true], 200);
     }
 
-    private function getUserKavkomExtension(Request $request): ?string
+    private function getUserKavkomExtension(Request $request, ?int $projectId = null): ?string
     {
-        $setting = UserSetting::query()
-            ->whereNull('project_id')
+        // Kavkom credentials are now managed in Project > Lignes. Resolve
+        // the same line as the normal CRM softphone. The old user setting is
+        // only retained for backwards compatibility.
+        $line = Line::query()
+            ->where('operator', 'kavkom')
             ->where('user_id', $request->user()->id)
-            ->where('key', 'kavkom')
+            ->when($projectId, fn ($query) => $query->where('project_id', $projectId))
             ->first();
 
-        $config = $setting ? (array) $setting->value : [];
+        $config = $line ? (array) $line->config : [];
+
+        if (empty($config['api_token']) || empty($config['domain_uuid'])) {
+            $setting = UserSetting::query()
+                ->whereNull('project_id')
+                ->where('user_id', $request->user()->id)
+                ->where('key', 'kavkom')
+                ->first();
+            $config = $setting ? (array) $setting->value : [];
+        }
 
         if (empty($config['api_token']) || empty($config['domain_uuid'])) {
             return null;

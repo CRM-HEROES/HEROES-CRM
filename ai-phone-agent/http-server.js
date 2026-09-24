@@ -72,7 +72,14 @@ function createHttpServer() {
             // softphone (Kavkom.vue) answers automatically, exactly like
             // the existing click-to-call flow.
             const userDialTarget = buildKavkomTarget(userExtension, kavkomConfig);
-            const userChannel = await eslClient.originateIntoConference(userDialTarget, room, { sipAuth: kavkomConfig });
+            console.log(`[HTTP] ${callUuid}: ringing CRM extension through Kavkom SIP target.`, {
+                dialTarget: userDialTarget,
+            });
+            const sipRouteUri = String(kavkomConfig.transport || "tls").toLowerCase() === "tls"
+                ? config.freeswitch.kavkomRelayUrl
+                : undefined;
+            console.log(`[HTTP] ${callUuid}: Kavkom signaling route.`, { sipRouteUri: sipRouteUri || "direct" });
+            const userChannel = await eslClient.originateIntoConference(userDialTarget, room, { sipAuth: kavkomConfig, sipRouteUri });
             console.log(`[HTTP] ${callUuid}: CRM user leg originated (${userChannel}).`);
 
             // Respond now: don't make the CRM's HTTP request wait on the
@@ -87,7 +94,10 @@ function createHttpServer() {
                 .then(() => {
                     console.log(`[HTTP] ${callUuid}: CRM user answered; dialing prospect.`);
                     const prospectDialTarget = buildKavkomTarget(destination, kavkomConfig);
-                    return eslClient.originateIntoConference(prospectDialTarget, room, { sipAuth: kavkomConfig });
+                    console.log(`[HTTP] ${callUuid}: dialing prospect through Kavkom SIP target.`, {
+                        dialTarget: prospectDialTarget,
+                    });
+                    return eslClient.originateIntoConference(prospectDialTarget, room, { sipAuth: kavkomConfig, sipRouteUri });
                 })
                 .catch((error) => {
                     console.error(`[HTTP] Call ${callUuid}: user did not answer or prospect dial failed.`, error);
@@ -149,6 +159,9 @@ function buildKavkomTarget(destination, kavkomConfig) {
     if (!number || !domain || !["udp", "tcp", "tls"].includes(transport) || !Number.isInteger(port) || port < 1 || port > 65535) {
         throw new Error("Agent Kavkom config must contain a destination, user_context and a valid transport.");
     }
+    // The gateway deliberately stays NOREG because registration is handled
+    // by the dedicated Digest registrar.  FreeSWITCH cannot originate via a
+    // NOREG gateway, so the outgoing leg uses the configured SIP identity.
     return `sofia/external/sip:${number}@${domain}:${port};transport=${transport}`;
 }
 
