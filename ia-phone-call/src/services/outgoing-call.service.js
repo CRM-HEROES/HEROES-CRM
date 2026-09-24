@@ -9,6 +9,7 @@ const AMI_PORT = parseInt(process.env.ASTERISK_AMI_PORT || '5038', 10);
 const AMI_USERNAME = process.env.ASTERISK_AMI_USERNAME || 'default';
 // Doit correspondre à `secret` de [default] dans asterisk/manager.conf
 const AMI_SECRET = process.env.ASTERISK_AMI_SECRET || 'HeroesAmi2026!';
+const AMI_TIMEOUT_MS = parseInt(process.env.ASTERISK_AMI_TIMEOUT_MS || '10000', 10);
 
 // Asterisk 21+ n'embarque plus chan_sip : le trunk s'appelle "PJSIP" et non "SIP"
 // ("SIP/..." échoue avec "Unable to create channel of type 'SIP'").
@@ -18,16 +19,62 @@ const AMI_SECRET = process.env.ASTERISK_AMI_SECRET || 'HeroesAmi2026!';
 // "Could not create dialog to invalid URI '<numero>'" (cf. Asterisk 22 / chan_pjsip).
 const AMI_TRUNK_ENDPOINT = process.env.ASTERISK_TRUNK_ENDPOINT || 'kavkom-trunk';
 
-// Durée maximale du dialogue de test : 10s pour toute la phase de mise en relation
-const AMI_TIMEOUT_MS = parseInt(process.env.ASTERISK_AMI_TIMEOUT_MS || '10000', 10);
+const AMI_LINE_END = '\r\n';
+const AMI_BLOCK_END = '\r\n\r\n';
+const AMI_GREETING_MARKER = 'Asterisk Call Manager';
+const CHANNELS_END_MARKER = 'CoreShowChannelsComplete';
+const CHANNELS_TIMEOUT_MS = 4000;
+
+const CALL_CONTEXT = 'outgoing-call';
+const CALL_EXTEN = 's';
 
 /**
- * Convertit un bloc de réponse AMI ("Header: valeur\r\n...) en objet.
+ * Assemble les lignes d'une action AMI (terminées par \r\n, bloc clos par \r\n\r\n).
+ */
+function formatAmiAction(lines) {
+    return lines.map(line => line + AMI_LINE_END).join('') + AMI_LINE_END;
+}
+
+function buildLoginAction() {
+    return formatAmiAction([
+        'Action: Login',
+        `Username: ${AMI_USERNAME}`,
+        `Secret: ${AMI_SECRET}`,
+        'ActionID: login'
+    ]);
+}
+
+function buildOriginateAction({ channel, callUuid, callId }) {
+    return formatAmiAction([
+        'Action: Originate',
+        `Channel: ${channel}`,
+        `Context: ${CALL_CONTEXT}`,
+        `Exten: ${CALL_EXTEN}`,
+        'Priority: 1',
+        `Variable: CALLID=${callUuid}`,
+        'Async: true',
+        `ActionID: ${callId}`
+    ]);
+}
+
+function buildHangupAction(channelName) {
+    return formatAmiAction([
+        'Action: Hangup',
+        `Channel: ${channelName}`,
+        `ActionID: hangup-${Date.now()}`
+    ]);
+}
+
+/**
+ * Convertit un bloc de réponse AMI ("Header: valeur\r\n...") en objet.
+ *
+ * @param {string} block
+ * @returns {Record<string, string>}
  */
 function parseAmiBlock(block) {
     const fields = {};
 
-    for (const line of block.split('\r\n')) {
+    for (const line of block.split(AMI_LINE_END)) {
         const separator = line.indexOf(':');
         if (separator > 0) {
             fields[line.slice(0, separator).trim()] = line.slice(separator + 1).trim();
@@ -41,7 +88,7 @@ function parseAmiBlock(block) {
  * Ouvre une session AMI : greeting -> Login -> action, et résout dès que la
  * réponse complète est reçue.
  *
- * @param {string} action - Action AMI déjà formatée (lignes terminées par \r\n)
+ * @param {string} action - Action AMI déjà formatée
  * @param {Object} [options]
  * @param {string} [options.host]
  * @param {number} [options.port]
@@ -53,7 +100,7 @@ function parseAmiBlock(block) {
 function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIMEOUT_MS, until = null } = {}) {
     return new Promise((resolve, reject) => {
         const socket = new net.Socket();
-        // `buffer` = données non encore consommées, `response` = réponse de l'action
+        // `buffer` = données non encore consommées, `response` = réponse cumulée de l'action
         let buffer = '';
         let response = '';
         let phase = 'greeting'; // greeting -> login -> action
@@ -68,10 +115,57 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
             else resolve(result);
         };
 
+        /** Consomme le premier bloc complet du buffer (le buffer est vidé). */
+        const takeBlock = () => {
+            const block = buffer.slice(0, buffer.indexOf(AMI_BLOCK_END));
+            buffer = '';
+            return block;
+        };
+
         const guard = setTimeout(() => {
             if (until && response.includes(until)) return finish(null, response);
             finish(new Error(`Timeout AMI après ${timeout} ms`));
         }, timeout);
+
+        const onGreeting = () => {
+            // Le greeting tient sur UNE SEULE ligne ("Asterisk Call Manager/22.0.0\r\n"),
+            // il ne faut donc surtout pas attendre un \r\n\r\n ici.
+            if (!buffer.includes(AMI_GREETING_MARKER)) return false;
+
+            console.log('✅ Identifié par Asterisk Manager');
+            buffer = '';
+            phase = 'login';
+            socket.write(buildLoginAction());
+            return true;
+        };
+
+        const onLogin = () => {
+            if (!buffer.includes(AMI_BLOCK_END)) return false;
+
+            const block = takeBlock();
+            response = '';
+
+            if (!block.includes('Response: Success')) {
+                finish(new Error(`Authentification AMI refusée (${block.replace(/\r\n/g, ' | ')})`));
+                return true;
+            }
+
+            console.log('✅ Authentifié auprès d\'Asterisk (AMI)');
+            phase = 'action';
+            socket.write(action);
+            return true;
+        };
+
+        const onActionResponse = (chunk) => {
+            response += chunk;
+
+            if (until) {
+                if (response.includes(until)) finish(null, response);
+                return;
+            }
+
+            if (buffer.includes(AMI_BLOCK_END)) finish(null, takeBlock());
+        };
 
         socket.connect(port, host, () => {
             console.log(`✅ Connecté à Asterisk AMI sur ${host}:${port}`);
@@ -86,55 +180,37 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
             const chunk = data.toString();
             buffer += chunk;
 
-            // 1) Greeting : une SEULE ligne ("Asterisk Call Manager/22.0.0\r\n"),
-            //    il ne faut donc surtout pas attendre un \r\n\r\n ici.
-            if (phase === 'greeting' && buffer.includes('Asterisk Call Manager')) {
-                console.log('✅ Identifié par Asterisk Manager');
-                buffer = '';
-                phase = 'login';
-                socket.write(
-                    `Action: Login\r\n` +
-                    `Username: ${AMI_USERNAME}\r\n` +
-                    `Secret: ${AMI_SECRET}\r\n` +
-                    `ActionID: login\r\n\r\n`
-                );
-                return;
-            }
-
-            // 2) Réponse au Login
-            if (phase === 'login' && buffer.includes('\r\n\r\n')) {
-                const block = buffer.slice(0, buffer.indexOf('\r\n\r\n'));
-                buffer = '';
-                response = '';
-
-                if (!block.includes('Response: Success')) {
-                    return finish(new Error(`Authentification AMI refusée (${block.replace(/\r\n/g, ' | ')})`));
-                }
-
-                console.log('✅ Authentifié auprès d\'Asterisk (AMI)');
-                phase = 'action';
-                socket.write(action);
-                return;
-            }
-
-            // 3) Réponse à l'action
-            if (phase === 'action') {
-                response += chunk;
-                if (until) {
-                    if (response.includes(until)) finish(null, response);
-                    return;
-                }
-                if (buffer.includes('\r\n\r\n')) {
-                    finish(null, buffer.slice(0, buffer.indexOf('\r\n\r\n')));
-                }
-            }
+            if (phase === 'greeting' && onGreeting()) return;
+            if (phase === 'login' && onLogin()) return;
+            if (phase === 'action') onActionResponse(chunk);
         });
     });
 }
 
+function buildCallFailure({ callId, channel, targetNumber, message }) {
+    return {
+        success: false,
+        callId,
+        channel,
+        targetNumber,
+        message,
+        timestamp: new Date().toISOString()
+    };
+}
+
+function logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort }) {
+    console.log(`\n${'═'.repeat(70)}`);
+    console.log('📞 [APPEL SORTANT] Placement d\'un appel via AMI');
+    console.log(`   Numéro cible: ${targetNumber}`);
+    console.log(`   Canal: ${channel}`);
+    console.log(`   ID d'appel: ${callId}`);
+    console.log(`   Serveur Asterisk: ${asteriskHost}:${asteriskPort}`);
+    console.log(`${'═'.repeat(70)}\n`);
+}
+
 /**
- * Service pour placer des appels sortants via Asterisk AMI (Asterisk Manager Interface).
- * Utilise une socket TCP directe au lieu de CLI qui n'existe pas dans le conteneur Node.js.
+ * Place un appel sortant via Asterisk AMI (Asterisk Manager Interface).
+ * Utilise une socket TCP directe au lieu de la CLI, absente du conteneur Node.js.
  *
  * @param {string} targetNumber - Numéro à appeler (ex: "33612345678")
  * @param {string} asteriskHost - Hôte du conteneur Asterisk (ex: "ia-asterisk")
@@ -142,69 +218,48 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
  * @returns {Promise<Object>} Résultat de l'appel {success, callId, message}
  */
 export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, asteriskPort = AMI_PORT) {
-    const callId = `call-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const callId = `call-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
     const channel = `PJSIP/${targetNumber}@${AMI_TRUNK_ENDPOINT}`;
     // AudioSocket(uuid,service) exige un UUID valide : on le transmet au dialplan
     // via la variable CALLID (utilisée dans [outgoing-call] de extensions.conf).
     const callUuid = crypto.randomUUID();
 
-    console.log(`\n${'═'.repeat(70)}`);
-    console.log(`📞 [APPEL SORTANT] Placement d'un appel via AMI`);
-    console.log(`   Numéro cible: ${targetNumber}`);
-    console.log(`   Canal: ${channel}`);
-    console.log(`   ID d'appel: ${callId}`);
-    console.log(`   Serveur Asterisk: ${asteriskHost}:${asteriskPort}`);
-    console.log(`${'═'.repeat(70)}\n`);
-
-    const originateCmd =
-        `Action: Originate\r\n` +
-        `Channel: ${channel}\r\n` +
-        `Context: outgoing-call\r\n` +
-        `Exten: s\r\n` +
-        `Priority: 1\r\n` +
-        `Variable: CALLID=${callUuid}\r\n` +
-        `Async: true\r\n` +
-        `ActionID: ${callId}\r\n` +
-        `\r\n`;
+    logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort });
 
     try {
-        const block = await amiAction(originateCmd, { host: asteriskHost, port: asteriskPort });
+        const block = await amiAction(
+            buildOriginateAction({ channel, callUuid, callId }),
+            { host: asteriskHost, port: asteriskPort }
+        );
         const fields = parseAmiBlock(block);
 
-        if (fields.Response === 'Success') {
-            console.log(`✅ Appel sortant placé avec succès via AMI`);
-            console.log(`   Attente de la connexion SIP vers Kavkom...\n`);
-            return {
-                success: true,
-                callId,
-                callUuid,
-                channel,
-                targetNumber,
-                message: 'Appel sortant en cours de placement',
-                timestamp: new Date().toISOString()
-            };
+        if (fields.Response !== 'Success') {
+            const errorMsg = fields.Message || 'Erreur inconnue';
+            console.error(`❌ Erreur AMI: ${errorMsg}`);
+            return buildCallFailure({
+                callId, channel, targetNumber,
+                message: `Erreur AMI: ${errorMsg}`
+            });
         }
 
-        const errorMsg = fields.Message || 'Erreur inconnue';
-        console.error(`❌ Erreur AMI: ${errorMsg}`);
+        console.log('✅ Appel sortant placé avec succès via AMI');
+        console.log('   Attente de la connexion SIP vers Kavkom...\n');
+
         return {
-            success: false,
+            success: true,
             callId,
+            callUuid,
             channel,
             targetNumber,
-            message: `Erreur AMI: ${errorMsg}`,
+            message: 'Appel sortant en cours de placement',
             timestamp: new Date().toISOString()
         };
     } catch (err) {
         console.error(`❌ Échec du placement de l'appel: ${err.message}`);
-        return {
-            success: false,
-            callId,
-            channel,
-            targetNumber,
-            message: `Erreur: ${err.message}`,
-            timestamp: new Date().toISOString()
-        };
+        return buildCallFailure({
+            callId, channel, targetNumber,
+            message: `Erreur: ${err.message}`
+        });
     }
 }
 
@@ -218,15 +273,16 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
 export async function listAsteriskChannels(asteriskHost = AMI_HOST, asteriskPort = AMI_PORT) {
     try {
         const raw = await amiAction(
-            `Action: CoreShowChannels\r\nActionID: channels\r\n\r\n`,
-            { host: asteriskHost, port: asteriskPort, timeout: 4000, until: 'CoreShowChannelsComplete' }
+            formatAmiAction(['Action: CoreShowChannels', 'ActionID: channels']),
+            { host: asteriskHost, port: asteriskPort, timeout: CHANNELS_TIMEOUT_MS, until: CHANNELS_END_MARKER }
         );
 
         const channels = [];
-        for (const block of raw.split('\r\n\r\n')) {
+        for (const block of raw.split(AMI_BLOCK_END)) {
             // Attention : "Event: CoreShowChannelsComplete" contient aussi la
             // sous-chaîne "Event: CoreShowChannel" -> comparer la ligne entière.
-            if (!block.startsWith('Event: CoreShowChannel\r\n')) continue;
+            if (!block.startsWith(`Event: CoreShowChannel${AMI_LINE_END}`)) continue;
+
             const fields = parseAmiBlock(block);
             channels.push(
                 `${fields.Channel || '?'}  ${fields.ChannelStateDesc || '?'}  ${fields.Application || '-'}  ${fields.ApplicationData || ''}`
@@ -251,7 +307,7 @@ export async function listAsteriskChannels(asteriskHost = AMI_HOST, asteriskPort
 export async function hangupCall(channelName, asteriskHost = AMI_HOST, asteriskPort = AMI_PORT) {
     try {
         const block = await amiAction(
-            `Action: Hangup\r\nChannel: ${channelName}\r\nActionID: hangup-${Date.now()}\r\n\r\n`,
+            buildHangupAction(channelName),
             { host: asteriskHost, port: asteriskPort }
         );
         const success = parseAmiBlock(block).Response === 'Success';

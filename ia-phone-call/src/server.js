@@ -1,172 +1,195 @@
 import 'dotenv/config';
 import net from 'net';
 import http from 'http';
-import url from 'url';
 import { handleAsteriskConnection } from './services/asterisk.service.js';
 import { placeOutgoingCall, listAsteriskChannels, hangupCall } from './services/outgoing-call.service.js';
+import { sendJson, readJsonBody, HttpError } from './utils/http.util.js';
 
-const AUDIO_PORT = process.env.PORT || 9701;
-const API_PORT = process.env.API_PORT || 3000;
+const AUDIO_PORT = Number(process.env.PORT || 9701);
+const API_PORT = Number(process.env.API_PORT || 3000);
 
-// ─────────────────────────────────────────────────────────────────
-// 1. Serveur TCP pour recevoir le flux audio brut d'Asterisk (AudioSocket)
-// ─────────────────────────────────────────────────────────────────
-const audioServer = net.createServer((socket) => {
-    console.log('📞 Nouvel appel entrant depuis Asterisk/Kavkom');
-    handleAsteriskConnection(socket);
-});
+const AUDIO_FORMAT = 'PCM 16-bit 8kHz';
+const BANNER_WIDTH = 70;
 
-audioServer.listen(AUDIO_PORT, () => {
-    console.log(`\n${'═'.repeat(70)}`);
-    console.log(`🚀 Passerelle IA Kavkom/Gemini DÉMARRÉE`);
-    console.log(`   Port AudioSocket (TCP): ${AUDIO_PORT}`);
-    console.log(`   Format: PCM 16-bit 8kHz`);
-    console.log(`   Prête à recevoir des appels depuis Asterisk...`);
-    console.log(`${'═'.repeat(70)}\n`);
-});
-
-// ─────────────────────────────────────────────────────────────────
-// 2. Serveur HTTP pour l'API de contrôle (appels sortants, etc.)
-// ─────────────────────────────────────────────────────────────────
-const apiServer = http.createServer(async (req, res) => {
-    const parsedUrl = url.parse(req.url, true);
-    const pathname = parsedUrl.pathname;
-    const query = parsedUrl.query;
-
-    // En-têtes CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.setHeader('Content-Type', 'application/json');
-
-    // Répondre aux requêtes OPTIONS
-    if (req.method === 'OPTIONS') {
-        res.writeHead(200);
-        res.end();
-        return;
-    }
-
-    try {
-        // 📞 POST /call - Placement d'appel sortant
-        if (pathname === '/call' && req.method === 'POST') {
-            let body = '';
-            req.on('data', chunk => { body += chunk; });
-            req.on('end', async () => {
-                try {
-                    const data = JSON.parse(body);
-                    const phoneNumber = data.phoneNumber || data.number;
-                    
-                    if (!phoneNumber) {
-                        res.writeHead(400);
-                        res.end(JSON.stringify({ error: 'phoneNumber requis' }));
-                        return;
-                    }
-
-                    const result = await placeOutgoingCall(phoneNumber);
-                    res.writeHead(result.success ? 200 : 500);
-                    res.end(JSON.stringify(result));
-                } catch (err) {
-                    res.writeHead(400);
-                    res.end(JSON.stringify({ error: err.message }));
-                }
-            });
-            return;
+function buildDocumentation() {
+    return {
+        name: 'IA Kavkom Gateway API',
+        version: '1.0.0',
+        endpoints: {
+            'GET /status': 'Statut du serveur',
+            'GET /channels': 'Liste des appels actifs',
+            'POST /call': 'Placer un appel sortant (body: {phoneNumber: "33..."})',
+            'POST /hangup': 'Raccrocher un appel (body: {channelName: "PJSIP/..."})'
+        },
+        audioSocket: {
+            port: AUDIO_PORT,
+            format: AUDIO_FORMAT
+        },
+        examples: {
+            callOutgoing: `curl -X POST http://localhost:${API_PORT}/call -H "Content-Type: application/json" -d '{"phoneNumber":"33612345678"}'`,
+            checkChannels: `curl http://localhost:${API_PORT}/channels`,
+            checkStatus: `curl http://localhost:${API_PORT}/status`
         }
+    };
+}
 
-        // 📊 GET /channels - Liste les canaux actifs
-        if (pathname === '/channels' && req.method === 'GET') {
-            const output = await listAsteriskChannels();
-            res.writeHead(200);
-            res.end(JSON.stringify({ channels: output }));
-            return;
-        }
-
-        // 📋 GET /status - Statut du serveur
-        if (pathname === '/status' && req.method === 'GET') {
-            res.writeHead(200);
-            res.end(JSON.stringify({
+// ─────────────────────────────────────────────────────────────────
+// Routes de l'API REST (chaque handler renvoie { statusCode, payload })
+// ─────────────────────────────────────────────────────────────────
+const ROUTES = [
+    {
+        method: 'GET',
+        path: '/',
+        handler: async () => ({ statusCode: 200, payload: buildDocumentation() })
+    },
+    {
+        method: 'GET',
+        path: '/status',
+        handler: async () => ({
+            statusCode: 200,
+            payload: {
                 status: 'ok',
                 service: 'IA Kavkom Gateway',
                 audioPort: AUDIO_PORT,
                 apiPort: API_PORT,
                 timestamp: new Date().toISOString()
-            }));
-            return;
+            }
+        })
+    },
+    {
+        method: 'GET',
+        path: '/channels',
+        handler: async () => ({
+            statusCode: 200,
+            payload: { channels: await listAsteriskChannels() }
+        })
+    },
+    {
+        method: 'POST',
+        path: '/call',
+        handler: async (req) => {
+            const data = await readJsonBody(req);
+            const phoneNumber = data.phoneNumber || data.number;
+
+            if (!phoneNumber) throw new HttpError(400, 'phoneNumber requis');
+
+            const result = await placeOutgoingCall(phoneNumber);
+            return { statusCode: result.success ? 200 : 500, payload: result };
         }
+    },
+    {
+        method: 'POST',
+        path: '/hangup',
+        handler: async (req) => {
+            const data = await readJsonBody(req);
+            const channelName = data.channelName || data.channel;
 
-        // 🔴 POST /hangup - Raccrocher un appel
-        if (pathname === '/hangup' && req.method === 'POST') {
-            let body = '';
-            req.on('data', chunk => { body += chunk; });
-            req.on('end', async () => {
-                try {
-                    const data = JSON.parse(body);
-                    const channelName = data.channelName || data.channel;
-                    
-                    if (!channelName) {
-                        res.writeHead(400);
-                        res.end(JSON.stringify({ error: 'channelName requis' }));
-                        return;
-                    }
+            if (!channelName) throw new HttpError(400, 'channelName requis');
 
-                    const success = await hangupCall(channelName);
-                    res.writeHead(success ? 200 : 500);
-                    res.end(JSON.stringify({ success, channelName }));
-                } catch (err) {
-                    res.writeHead(400);
-                    res.end(JSON.stringify({ error: err.message }));
-                }
-            });
-            return;
+            const success = await hangupCall(channelName);
+            return { statusCode: success ? 200 : 500, payload: { success, channelName } };
         }
+    }
+];
 
-        // 📖 GET / - Documentation
-        if (pathname === '/' && req.method === 'GET') {
-            res.writeHead(200);
-            res.end(JSON.stringify({
-                name: 'IA Kavkom Gateway API',
-                version: '1.0.0',
-                endpoints: {
-                    'GET /status': 'Statut du serveur',
-                    'GET /channels': 'Liste des appels actifs',
-                    'POST /call': 'Placer un appel sortant (body: {phoneNumber: "33..."})',
-                    'POST /hangup': 'Raccrocher un appel (body: {channelName: "PJSIP/..."})'
-                },
-                audioSocket: {
-                    port: AUDIO_PORT,
-                    format: 'PCM 16-bit 8kHz'
-                },
-                examples: {
-                    callOutgoing: 'curl -X POST http://localhost:3000/call -H "Content-Type: application/json" -d \'{"phoneNumber":"33612345678"}\'',
-                    checkChannels: 'curl http://localhost:3000/channels',
-                    checkStatus: 'curl http://localhost:3000/status'
-                }
-            }));
-            return;
-        }
+function findRoute(method, pathname) {
+    return ROUTES.find(route => route.method === method && route.path === pathname);
+}
 
-        // 404
-        res.writeHead(404);
-        res.end(JSON.stringify({ error: 'Route not found' }));
+function setCorsHeaders(res) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    res.setHeader('Content-Type', 'application/json');
+}
 
+async function handleApiRequest(req, res) {
+    setCorsHeaders(res);
+
+    if (req.method === 'OPTIONS') {
+        res.writeHead(204);
+        res.end();
+        return;
+    }
+
+    const { pathname } = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+    const route = findRoute(req.method, pathname);
+
+    if (!route) {
+        sendJson(res, 404, { error: 'Route not found' });
+        return;
+    }
+
+    try {
+        const { statusCode, payload } = await route.handler(req);
+        sendJson(res, statusCode, payload);
     } catch (err) {
-        console.error('❌ Erreur API:', err);
-        res.writeHead(500);
-        res.end(JSON.stringify({ error: err.message }));
+        const statusCode = err.statusCode || 500;
+        if (statusCode >= 500) console.error('❌ Erreur API:', err);
+        sendJson(res, statusCode, { error: err.message });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// 1. Serveur TCP pour recevoir le flux audio brut d'Asterisk (AudioSocket)
+// ─────────────────────────────────────────────────────────────────
+const audioServer = net.createServer((socket) => {
+    try {
+        console.log('📞 Nouvel appel entrant depuis Asterisk/Kavkom');
+        handleAsteriskConnection(socket);
+    } catch (err) {
+        console.error('❌ Impossible de traiter la connexion AudioSocket:', err);
+        socket.destroy();
     }
 });
 
-apiServer.listen(API_PORT, () => {
-    console.log(`${'═'.repeat(70)}`);
-    console.log(`🌐 API REST DÉMARRÉE`);
-    console.log(`   Port: ${API_PORT}`);
-    console.log(`   Documentation -> curl http://localhost:${API_PORT}/`);
-    console.log(`${'═'.repeat(70)}\n`);
+// ─────────────────────────────────────────────────────────────────
+// 2. Serveur HTTP pour l'API de contrôle (appels sortants, etc.)
+// ─────────────────────────────────────────────────────────────────
+const apiServer = http.createServer(handleApiRequest);
+
+audioServer.listen(AUDIO_PORT, () => {
+    console.log(`\n${'═'.repeat(BANNER_WIDTH)}`);
+    console.log('🚀 Passerelle IA Kavkom/Gemini DÉMARRÉE');
+    console.log(`   Port AudioSocket (TCP): ${AUDIO_PORT}`);
+    console.log(`   Format: ${AUDIO_FORMAT}`);
+    console.log('   Prête à recevoir des appels depuis Asterisk...');
+    console.log(`${'═'.repeat(BANNER_WIDTH)}\n`);
 });
 
-// Gestion propre de l'arrêt
-process.on('SIGINT', () => {
-    console.log('\n🛑 Arrêt du serveur...');
-    audioServer.close(() => console.log('✅ Serveur AudioSocket arrêté'));
-    apiServer.close(() => console.log('✅ Serveur API arrêté'));
-    process.exit(0);
+apiServer.listen(API_PORT, () => {
+    console.log(`${'═'.repeat(BANNER_WIDTH)}`);
+    console.log('🌐 API REST DÉMARRÉE');
+    console.log(`   Port: ${API_PORT}`);
+    console.log(`   Documentation -> curl http://localhost:${API_PORT}/`);
+    console.log(`${'═'.repeat(BANNER_WIDTH)}\n`);
 });
+
+// ─────────────────────────────────────────────────────────────────
+// Arrêt propre
+// ─────────────────────────────────────────────────────────────────
+const managedServers = [
+    { server: audioServer, label: 'AudioSocket' },
+    { server: apiServer, label: 'API' }
+];
+let shuttingDown = false;
+
+function shutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    console.log(`\n🛑 Arrêt du serveur (${signal})...`);
+
+    // Un appel en cours peut maintenir une connexion ouverte : on force la sortie.
+    const forceExit = setTimeout(() => process.exit(0), 5000);
+    forceExit.unref();
+
+    Promise.all(managedServers.map(({ server, label }) => new Promise((resolve) => {
+        server.close(() => {
+            console.log(`✅ Serveur ${label} arrêté`);
+            resolve();
+        });
+    }))).then(() => process.exit(0));
+}
+
+process.on('SIGINT', () => shutdown('SIGINT'));
+process.on('SIGTERM', () => shutdown('SIGTERM'));
