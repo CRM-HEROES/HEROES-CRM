@@ -28,6 +28,7 @@ RUN apt update && apt install -y \
         exiftool \
         libmagickwand-dev \
         imagemagick \
+        default-mysql-client \
           \
         supervisor \
     && docker-php-ext-install -j$(nproc) gd \
