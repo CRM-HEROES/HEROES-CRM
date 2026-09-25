@@ -46,24 +46,31 @@
                 <label>Script / scénario<textarea v-model="form.script" rows="7" placeholder="Déroulement, étapes et questions de l'appel"></textarea></label>
                 <label>Instructions comportementales<textarea v-model="form.instructions" rows="6" placeholder="Ton, langue, règles, informations à collecter"></textarea></label>
 
-                <h3>Configuration Gemini</h3>
-                <div class="hc-ai-agent-grid">
-                    <label>Modèle<input v-model="form.config.model" placeholder="Modèle par défaut du service" /></label>
-                    <label>Version API<input v-model="form.config.api_version" placeholder="v1alpha" /></label>
-                </div>
+                <button type="button" class="hc-ai-agent-toggle" @click="showAdvanced = !showAdvanced">
+                    <i :class="showAdvanced ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
+                    {{ showAdvanced ? 'Moins d’options' : 'Plus d’options' }}
+                </button>
+                <div v-if="showAdvanced">
+                    <div class="hc-ai-agent-advanced">
+                        <h3>Configuration Gemini</h3>
+                        <div class="hc-ai-agent-grid">
+                            <label>Modèle<input v-model="form.config.model" placeholder="Modèle par défaut du service" /></label>
+                            <label>Version API<input v-model="form.config.api_version" placeholder="v1alpha" /></label>
+                        </div>
+                    </div>
 
-                <h3>Configuration Kavkom</h3>
-                <div class="hc-ai-agent-grid">
-                    <label>Extension<input v-model="form.kavkom_config.extension" /></label>
-                    <label>Domaine UUID<input v-model="form.kavkom_config.domain_uuid" /></label>
-                    <label>Contexte SIP<input v-model="form.kavkom_config.user_context" /></label>
-                    <label>Transport<select v-model="form.kavkom_config.transport"><option value="tls">TLS</option><option value="tcp">TCP</option><option value="udp">UDP</option></select></label>
-                    <label>Port SIP<input v-model.number="form.kavkom_config.sip_port" type="number" min="1" max="65535" /></label>
-                    <label>Token API<input v-model="form.kavkom_config.api_token" type="password" placeholder="Laisser vide pour conserver" /></label>
-                    <label>Mot de passe SIP<input v-model="form.kavkom_config.password" type="password" placeholder="Laisser vide pour conserver" /></label>
-                    <label>Refresh token<input v-model="form.kavkom_config.refresh_access_token" type="password" placeholder="Laisser vide pour conserver" /></label>
+                    <h3>Configuration Kavkom</h3>
+                    <div class="hc-ai-agent-grid">
+                        <label>Extension<input v-model="form.kavkom_config.extension" /></label>
+                        <label>Domaine UUID<input v-model="form.kavkom_config.domain_uuid" /></label>
+                        <label>Contexte SIP<input v-model="form.kavkom_config.user_context" /></label>
+                        <label>Transport<select v-model="form.kavkom_config.transport"><option value="tls">TLS</option><option value="tcp">TCP</option><option value="udp">UDP</option></select></label>
+                        <label>Port SIP<input v-model.number="form.kavkom_config.sip_port" type="number" min="1" max="65535" /></label>
+                        <label>Token API<input v-model="form.kavkom_config.api_token" type="password" placeholder="Laisser vide pour conserver" /></label>
+                        <label>Mot de passe SIP<input v-model="form.kavkom_config.password" type="password" placeholder="Laisser vide pour conserver" /></label>
+                        <label>Refresh token<input v-model="form.kavkom_config.refresh_access_token" type="password" placeholder="Laisser vide pour conserver" /></label>
+                    </div>
                 </div>
-
                 <div class="hc-ai-agent-actions">
                     <button v-if="form.id" type="button" class="hc-ai-agent-danger" @click="remove">Supprimer</button>
                     <span></span>
@@ -102,6 +109,8 @@
 .hc-ai-agent-form textarea { resize: vertical; }
 .hc-ai-agent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .hc-ai-agent-switch { flex-direction: row !important; align-items: center; font-weight: 400 !important; }
+.hc-ai-agent-toggle { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 8px 12px; border: 1px solid #d8dce3; background: #f8fafc; color: #1f2937; border-radius: 4px; cursor: pointer; }
+.hc-ai-agent-advanced { display: flex; flex-direction: column; gap: 12px; }
 .hc-ai-agent-actions { margin-top: 8px; }
 .hc-ai-agent-actions span { flex: 1; }
 .hc-ai-agent-error { max-width: 1100px; margin: auto auto 16px; padding: 10px; color: #8a1c1c; background: #fde8e8; }
@@ -113,7 +122,7 @@ import AiAgentService from "@/apis/project/ai-agent";
 
 export default {
     data() {
-        return { agents: [], selected: null, form: this.emptyForm(), loading: false, saving: false, error: "" };
+        return { agents: [], selected: null, form: this.emptyForm(), loading: false, saving: false, error: "", showAdvanced: false };
     },
     created() {
         this.fetchAgents();

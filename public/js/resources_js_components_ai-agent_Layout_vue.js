@@ -30,7 +30,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       form: this.emptyForm(),
       loading: false,
       saving: false,
-      error: ""
+      error: "",
+      showAdvanced: false
     };
   },
   created: function created() {
@@ -258,42 +259,48 @@ var _hoisted_13 = {
 var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Agent actif", -1 /* HOISTED */);
 });
-var _hoisted_15 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Gemini", -1 /* HOISTED */);
-});
+var _hoisted_15 = {
+  key: 0
+};
 var _hoisted_16 = {
-  "class": "hc-ai-agent-grid"
+  "class": "hc-ai-agent-advanced"
 };
 var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Kavkom", -1 /* HOISTED */);
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Gemini", -1 /* HOISTED */);
 });
 var _hoisted_18 = {
   "class": "hc-ai-agent-grid"
 };
 var _hoisted_19 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Kavkom", -1 /* HOISTED */);
+});
+var _hoisted_20 = {
+  "class": "hc-ai-agent-grid"
+};
+var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "tls"
   }, "TLS", -1 /* HOISTED */);
 });
-var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "tcp"
   }, "TCP", -1 /* HOISTED */);
 });
-var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "udp"
   }, "UDP", -1 /* HOISTED */);
 });
-var _hoisted_22 = [_hoisted_19, _hoisted_20, _hoisted_21];
-var _hoisted_23 = {
+var _hoisted_24 = [_hoisted_21, _hoisted_22, _hoisted_23];
+var _hoisted_25 = {
   "class": "hc-ai-agent-actions"
 };
-var _hoisted_24 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, null, -1 /* HOISTED */);
 });
-var _hoisted_25 = ["disabled"];
-var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_27 = ["disabled"];
+var _hoisted_28 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "fa fa-save"
   }, null, -1 /* HOISTED */);
@@ -324,7 +331,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(agent.name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(agent.is_active ? "Actif" : "Inactif"), 1 /* TEXT */)], 10 /* CLASS, PROPS */, _hoisted_10);
   }), 128 /* KEYED_FRAGMENT */)), !$data.agents.length && !$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_11, " Aucun agent IA configuré. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     "class": "hc-ai-agent-form",
-    onSubmit: _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onSubmit: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.save && $options.save.apply($options, arguments);
     }, ["prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.id ? "Modifier l'agent" : "Créer un agent IA"), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -352,34 +359,42 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     rows: "6",
     placeholder: "Ton, langue, règles, informations à collecter"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.instructions]])]), _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Modèle"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.instructions]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-ai-agent-toggle",
+    onClick: _cache[6] || (_cache[6] = function ($event) {
+      return $data.showAdvanced = !$data.showAdvanced;
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.showAdvanced ? 'fa fa-chevron-up' : 'fa fa-chevron-down')
+  }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.showAdvanced ? 'Moins d’options' : 'Plus d’options'), 1 /* TEXT */)]), $data.showAdvanced ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Modèle"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
       return $data.form.config.model = $event;
     }),
     placeholder: "Modèle par défaut du service"
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.model]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Version API"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
       return $data.form.config.api_version = $event;
     }),
     placeholder: "v1alpha"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.api_version]])])]), _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Extension"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.api_version]])])])]), _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Extension"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
       return $data.form.kavkom_config.extension = $event;
     })
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.extension]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Domaine UUID"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
       return $data.form.kavkom_config.domain_uuid = $event;
     })
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.domain_uuid]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Contexte SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
       return $data.form.kavkom_config.user_context = $event;
     })
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.user_context]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Transport"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
       return $data.form.kavkom_config.transport = $event;
     })
-  }, _hoisted_22, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.kavkom_config.transport]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Port SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+  }, _hoisted_24, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.kavkom_config.transport]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Port SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
       return $data.form.kavkom_config.sip_port = $event;
     }),
     type: "number",
@@ -388,35 +403,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.sip_port, void 0, {
     number: true
   }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Token API"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
       return $data.form.kavkom_config.api_token = $event;
     }),
     type: "password",
     placeholder: "Laisser vide pour conserver"
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.api_token]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Mot de passe SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+    "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
       return $data.form.kavkom_config.password = $event;
     }),
     type: "password",
     placeholder: "Laisser vide pour conserver"
   }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.password]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Refresh token"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
       return $data.form.kavkom_config.refresh_access_token = $event;
     }),
     type: "password",
     placeholder: "Laisser vide pour conserver"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.refresh_access_token]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [$data.form.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.refresh_access_token]])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.form.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "hc-ai-agent-danger",
-    onClick: _cache[16] || (_cache[16] = function () {
+    onClick: _cache[17] || (_cache[17] = function () {
       return $options.remove && $options.remove.apply($options, arguments);
     })
-  }, "Supprimer")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Supprimer")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "submit",
     "class": "hc-ai-agent-primary",
     disabled: $data.saving
-  }, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.saving ? "Enregistrement..." : "Enregistrer"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_25)])], 32 /* HYDRATE_EVENTS */)])]);
+  }, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.saving ? "Enregistrement..." : "Enregistrer"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_27)])], 32 /* HYDRATE_EVENTS */)])]);
 }
 
 /***/ }),
@@ -469,7 +484,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-page[data-v-93f3a1c4] { padding: 24px; height: 100%; overflow: auto; background: #f5f6f8;\n}\n.hc-ai-agent-header[data-v-93f3a1c4], .hc-ai-agent-form-header[data-v-93f3a1c4], .hc-ai-agent-actions[data-v-93f3a1c4] { display: flex; align-items: center; gap: 16px;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { margin: 0 auto 20px; max-width: 1100px;\n}\n.hc-ai-agent-header > div[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-header h1[data-v-93f3a1c4] { margin: 0; font-size: 22px;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { margin: 6px 0 0; color: #6b7280;\n}\n.hc-ai-agent-back[data-v-93f3a1c4], .hc-ai-agent-primary[data-v-93f3a1c4], .hc-ai-agent-danger[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4] { border: 0; cursor: pointer;\n}\n.hc-ai-agent-back[data-v-93f3a1c4] { background: transparent; font-size: 18px;\n}\n.hc-ai-agent-primary[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #1e6ee5;\n}\n.hc-ai-agent-danger[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #c0392b;\n}\n.hc-ai-agent-content[data-v-93f3a1c4] { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; max-width: 1100px; margin: auto;\n}\n.hc-ai-agent-list[data-v-93f3a1c4], .hc-ai-agent-form[data-v-93f3a1c4] { background: #fff; border: 1px solid #e4e7ec; border-radius: 6px; padding: 16px;\n}\n.hc-ai-agent-list[data-v-93f3a1c4] { align-self: start; padding: 8px;\n}\n.hc-ai-agent-list-item[data-v-93f3a1c4] { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 12px; background: transparent; text-align: left; border-radius: 4px;\n}\n.hc-ai-agent-list-item.selected[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4]:hover { background: #edf4ff;\n}\n.hc-ai-agent-list-item span[data-v-93f3a1c4] { margin-top: 4px; color: #6b7280; font-size: 12px;\n}\n.hc-ai-agent-empty[data-v-93f3a1c4] { padding: 12px; color: #6b7280; font-size: 13px;\n}\n.hc-ai-agent-form[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 14px;\n}\n.hc-ai-agent-form h2[data-v-93f3a1c4] { flex: 1; margin: 0; font-size: 18px;\n}\n.hc-ai-agent-form h3[data-v-93f3a1c4] { margin: 8px 0 -4px; font-size: 14px;\n}\n.hc-ai-agent-form label[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600;\n}\n.hc-ai-agent-form input[data-v-93f3a1c4], .hc-ai-agent-form textarea[data-v-93f3a1c4] { width: 100%; padding: 9px; border: 1px solid #d8dce3; border-radius: 4px; font: inherit; font-weight: 400; box-sizing: border-box;\n}\n.hc-ai-agent-form textarea[data-v-93f3a1c4] { resize: vertical;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;\n}\n.hc-ai-agent-switch[data-v-93f3a1c4] { flex-direction: row !important; align-items: center; font-weight: 400 !important;\n}\n.hc-ai-agent-actions[data-v-93f3a1c4] { margin-top: 8px;\n}\n.hc-ai-agent-actions span[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-error[data-v-93f3a1c4] { max-width: 1100px; margin: auto auto 16px; padding: 10px; color: #8a1c1c; background: #fde8e8;\n}\n@media (max-width: 760px) {\n.hc-ai-agent-content[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { align-items: flex-start;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { display: none;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-page[data-v-93f3a1c4] { padding: 24px; height: 100%; overflow: auto; background: #f5f6f8;\n}\n.hc-ai-agent-header[data-v-93f3a1c4], .hc-ai-agent-form-header[data-v-93f3a1c4], .hc-ai-agent-actions[data-v-93f3a1c4] { display: flex; align-items: center; gap: 16px;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { margin: 0 auto 20px; max-width: 1100px;\n}\n.hc-ai-agent-header > div[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-header h1[data-v-93f3a1c4] { margin: 0; font-size: 22px;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { margin: 6px 0 0; color: #6b7280;\n}\n.hc-ai-agent-back[data-v-93f3a1c4], .hc-ai-agent-primary[data-v-93f3a1c4], .hc-ai-agent-danger[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4] { border: 0; cursor: pointer;\n}\n.hc-ai-agent-back[data-v-93f3a1c4] { background: transparent; font-size: 18px;\n}\n.hc-ai-agent-primary[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #1e6ee5;\n}\n.hc-ai-agent-danger[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #c0392b;\n}\n.hc-ai-agent-content[data-v-93f3a1c4] { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; max-width: 1100px; margin: auto;\n}\n.hc-ai-agent-list[data-v-93f3a1c4], .hc-ai-agent-form[data-v-93f3a1c4] { background: #fff; border: 1px solid #e4e7ec; border-radius: 6px; padding: 16px;\n}\n.hc-ai-agent-list[data-v-93f3a1c4] { align-self: start; padding: 8px;\n}\n.hc-ai-agent-list-item[data-v-93f3a1c4] { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 12px; background: transparent; text-align: left; border-radius: 4px;\n}\n.hc-ai-agent-list-item.selected[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4]:hover { background: #edf4ff;\n}\n.hc-ai-agent-list-item span[data-v-93f3a1c4] { margin-top: 4px; color: #6b7280; font-size: 12px;\n}\n.hc-ai-agent-empty[data-v-93f3a1c4] { padding: 12px; color: #6b7280; font-size: 13px;\n}\n.hc-ai-agent-form[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 14px;\n}\n.hc-ai-agent-form h2[data-v-93f3a1c4] { flex: 1; margin: 0; font-size: 18px;\n}\n.hc-ai-agent-form h3[data-v-93f3a1c4] { margin: 8px 0 -4px; font-size: 14px;\n}\n.hc-ai-agent-form label[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600;\n}\n.hc-ai-agent-form input[data-v-93f3a1c4], .hc-ai-agent-form textarea[data-v-93f3a1c4] { width: 100%; padding: 9px; border: 1px solid #d8dce3; border-radius: 4px; font: inherit; font-weight: 400; box-sizing: border-box;\n}\n.hc-ai-agent-form textarea[data-v-93f3a1c4] { resize: vertical;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;\n}\n.hc-ai-agent-switch[data-v-93f3a1c4] { flex-direction: row !important; align-items: center; font-weight: 400 !important;\n}\n.hc-ai-agent-toggle[data-v-93f3a1c4] { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 8px 12px; border: 1px solid #d8dce3; background: #f8fafc; color: #1f2937; border-radius: 4px; cursor: pointer;\n}\n.hc-ai-agent-advanced[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 12px;\n}\n.hc-ai-agent-actions[data-v-93f3a1c4] { margin-top: 8px;\n}\n.hc-ai-agent-actions span[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-error[data-v-93f3a1c4] { max-width: 1100px; margin: auto auto 16px; padding: 10px; color: #8a1c1c; background: #fde8e8;\n}\n@media (max-width: 760px) {\n.hc-ai-agent-content[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { align-items: flex-start;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { display: none;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

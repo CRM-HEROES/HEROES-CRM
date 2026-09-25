@@ -69,7 +69,7 @@ const ROUTES = [
         path: '/call',
         handler: async (req) => {
             const data = await readJsonBody(req);
-            const phoneNumber = data.phoneNumber || data.number;
+            const phoneNumber = (data.phoneNumber || data.number || '').replace(/\D/g, '');;
             const prospectId = data.prospectId ?? data.prospect_id ?? null;
             const projectId = data.projectId ?? data.project_id ?? null;
             const projectSlug = data.projectSlug ?? data.project_slug ?? null;
