@@ -1,8 +1,10 @@
 <template>
     <item-list style="height: 100%; overflow: auto" padding="12px" gap="2px">
-        <!-- Notifier SMS de bienvenue -->
+        <!-- Notifier SMS de bienvenue : option masquée de l'écran d'import
+             (les imports qui l'avaient déjà activée gardent leur réglage).
+             Pour la réafficher, retirer "false &&" dans les deux v-if. -->
         <item
-            v-if="!prospectImport.is_processing"
+            v-if="false && !prospectImport.is_processing"
             tag="label"
             class="hc-import-notify-welcome-sms"
             style="cursor: pointer"
@@ -20,7 +22,7 @@
         </item>
 
         <item-list
-            v-if="notifyWelcomeSms && !prospectImport.is_processing"
+            v-if="false && notifyWelcomeSms && !prospectImport.is_processing"
             padding="0 12px 10px 12px"
             gap="5px"
         >

@@ -61664,75 +61664,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     gap: "2px"
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Notifier SMS de bienvenue "), !_ctx.prospectImport.is_processing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-        key: 0,
-        tag: "label",
-        "class": "hc-import-notify-welcome-sms",
-        style: {
-          "cursor": "pointer"
-        }
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-            type: "checkbox",
-            "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
-              return $data.notifyWelcomeSms = $event;
-            }),
-            onChange: _cache[1] || (_cache[1] = function () {
-              return $options.onToggleNotifyWelcomeSms && $options.onToggleNotifyWelcomeSms.apply($options, arguments);
-            })
-          }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.notifyWelcomeSms]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-            "class": "hc-item-main-content",
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('import.process.tab.import.notify_welcome_sms'))
-          }, null, 8 /* PROPS */, _hoisted_1), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-            loading: $data.checkingSmsSourceSetting
-          }, null, 8 /* PROPS */, ["loading"])];
-        }),
-        _: 1 /* STABLE */
-      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.notifyWelcomeSms && !_ctx.prospectImport.is_processing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item_list, {
-        key: 1,
-        padding: "0 12px 10px 12px",
-        gap: "5px"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-            label: _ctx.$t('import.process.tab.import.welcome_sms_source')
-          }, {
-            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
-              var label = _ref.label;
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-                  return $data.welcomeSmsSource = $event;
-                }),
-                onChange: _cache[3] || (_cache[3] = function () {
-                  return $options.onChangeWelcomeSmsSource && $options.onChangeWelcomeSmsSource.apply($options, arguments);
-                })
-              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("prospect.sms.via_brevo")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("prospect.sms.via_smsbox")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("prospect.sms.via_ultramsg")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("prospect.sms.via_mtarget")), 1 /* TEXT */)], 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.welcomeSmsSource]])];
-            }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-            label: _ctx.$t('import.process.tab.import.welcome_sms_message'),
-            required: ""
-          }, {
-            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref2) {
-              var label = _ref2.label;
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
-                placeholder: label + ' ...',
-                "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
-                  return $options.welcomeSmsMessage = $event;
-                }),
-                onChange: _cache[5] || (_cache[5] = function () {
-                  return $options.saveWelcomeSmsSettings && $options.saveWelcomeSmsSettings.apply($options, arguments);
-                }),
-                required: "",
-                rows: "3"
-              }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.welcomeSmsMessage]])];
-            }),
-            _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["label"])];
-        }),
-        _: 1 /* STABLE */
-      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.source == 'google_sheets' && _ctx.prospectImport.sync_enabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Notifier SMS de bienvenue : option masquée de l'écran d'import\n             (les imports qui l'avaient déjà activée gardent leur réglage).\n             Pour la réafficher, retirer \"false &&\" dans les deux v-if. "),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectImport.source == 'google_sheets' && _ctx.prospectImport.sync_enabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
         key: 2,
         style: {
           "color": "#075985 !important",
