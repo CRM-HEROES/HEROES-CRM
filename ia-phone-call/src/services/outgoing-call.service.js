@@ -10,6 +10,8 @@ const AMI_USERNAME = process.env.ASTERISK_AMI_USERNAME || 'default';
 // Doit correspondre à `secret` de [default] dans asterisk/manager.conf
 const AMI_SECRET = process.env.ASTERISK_AMI_SECRET || 'HeroesAmi2026!';
 const AMI_TIMEOUT_MS = parseInt(process.env.ASTERISK_AMI_TIMEOUT_MS || '10000', 10);
+const OUTGOING_DIAL_TIMEOUT_MS = parseInt(process.env.OUTGOING_DIAL_TIMEOUT_MS || '45000', 10);
+const ORIGINATE_TRACK_TIMEOUT_MS = parseInt(process.env.ASTERISK_ORIGINATE_TRACK_TIMEOUT_MS || '60000', 10);
 
 // Asterisk 21+ n'embarque plus chan_sip : le trunk s'appelle "PJSIP" et non "SIP"
 // ("SIP/..." échoue avec "Unable to create channel of type 'SIP'").
@@ -52,6 +54,7 @@ function buildOriginateAction({ channel, callUuid, callId }) {
         `Exten: ${CALL_EXTEN}`,
         'Priority: 1',
         `Variable: CALLID=${callUuid}`,
+        `Timeout: ${OUTGOING_DIAL_TIMEOUT_MS}`,
         'Async: true',
         `ActionID: ${callId}`
     ]);
@@ -115,10 +118,11 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
             else resolve(result);
         };
 
-        /** Consomme le premier bloc complet du buffer (le buffer est vidé). */
+        /** Consomme le premier bloc complet du buffer. */
         const takeBlock = () => {
-            const block = buffer.slice(0, buffer.indexOf(AMI_BLOCK_END));
-            buffer = '';
+            const boundary = buffer.indexOf(AMI_BLOCK_END);
+            const block = buffer.slice(0, boundary);
+            buffer = buffer.slice(boundary + AMI_BLOCK_END.length);
             return block;
         };
 
@@ -185,6 +189,165 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
             if (phase === 'action') onActionResponse(chunk);
         });
     });
+}
+
+function describeOriginateResponse(fields) {
+    const response = fields.Response || 'Unknown';
+    const reasonLabels = {
+        3: 'ringing/no-answer-before-timeout',
+        4: 'answered',
+        5: 'busy',
+        8: 'congestion'
+    };
+    const reasonValue = fields.Reason ? Number(fields.Reason) : null;
+    const reasonLabel = reasonLabels[reasonValue] ? ` (${reasonLabels[reasonValue]})` : '';
+    const reason = fields.Reason ? ` reason=${fields.Reason}${reasonLabel}` : '';
+    const channel = fields.Channel ? ` channel=${fields.Channel}` : '';
+    const message = fields.Message ? ` message="${fields.Message}"` : '';
+    return `${response}${reason}${channel}${message}`;
+}
+
+function trackOriginate(action, actionId, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIMEOUT_MS } = {}) {
+    return new Promise((resolve, reject) => {
+        const socket = new net.Socket();
+        let buffer = '';
+        let phase = 'greeting';
+        let settled = false;
+        let trackingTimer = null;
+
+        const cleanup = () => {
+            clearTimeout(guard);
+            clearTimeout(trackingTimer);
+        };
+
+        const closeTracking = () => {
+            cleanup();
+            socket.destroy();
+        };
+
+        const resolveQueued = (block) => {
+            if (settled) return;
+            settled = true;
+            clearTimeout(guard);
+            resolve(block);
+
+            trackingTimer = setTimeout(() => {
+                console.warn(`⚠️  Aucun résultat final AMI Originate après ${ORIGINATE_TRACK_TIMEOUT_MS} ms (${actionId})`);
+                socket.destroy();
+            }, ORIGINATE_TRACK_TIMEOUT_MS);
+            trackingTimer.unref?.();
+        };
+
+        const fail = (error) => {
+            if (settled) {
+                console.error(`❌ Erreur AMI pendant le suivi Originate: ${error.message}`);
+                socket.destroy();
+                return;
+            }
+
+            settled = true;
+            cleanup();
+            socket.destroy();
+            reject(error);
+        };
+
+        const takeBlock = () => {
+            const boundary = buffer.indexOf(AMI_BLOCK_END);
+            const block = buffer.slice(0, boundary);
+            buffer = buffer.slice(boundary + AMI_BLOCK_END.length);
+            return block;
+        };
+
+        const handleEvent = (fields) => {
+            switch (fields.Event) {
+                case 'DialBegin':
+                    if (fields.DestChannel || fields.Channel) {
+                        console.log(`📡 DialBegin: ${fields.Channel || '?'} -> ${fields.DestChannel || '?'}`);
+                    }
+                    break;
+                case 'DialEnd':
+                    console.log(`📡 DialEnd: status=${fields.DialStatus || '?'} cause=${fields.Cause || '?'}`);
+                    break;
+                case 'Hangup':
+                    if (fields.Channel?.includes('PJSIP/kavkom-trunk')) {
+                        console.log(`📴 Hangup: ${fields.Channel} cause=${fields.Cause || '?'} ${fields['Cause-txt'] || ''}`.trim());
+                    }
+                    break;
+                case 'OriginateResponse':
+                    if (!fields.ActionID || fields.ActionID === actionId) {
+                        console.log(`📞 Résultat AMI Originate: ${describeOriginateResponse(fields)}`);
+                        closeTracking();
+                    }
+                    break;
+                default:
+                    break;
+            }
+        };
+
+        const handleActionBlock = (block) => {
+            const fields = parseAmiBlock(block);
+
+            if (fields.Event) {
+                handleEvent(fields);
+                return;
+            }
+
+            if (fields.Response) {
+                if (fields.Response === 'Success') {
+                    resolveQueued(block);
+                } else {
+                    fail(new Error(fields.Message || 'Erreur AMI Originate'));
+                }
+            }
+        };
+
+        const guard = setTimeout(() => {
+            fail(new Error(`Timeout AMI après ${timeout} ms`));
+        }, timeout);
+
+        socket.connect(port, host, () => {
+            console.log(`✅ Connecté à Asterisk AMI sur ${host}:${port}`);
+        });
+
+        socket.on('error', fail);
+
+        socket.on('data', (data) => {
+            buffer += data.toString();
+
+            if (phase === 'greeting') {
+                if (!buffer.includes(AMI_GREETING_MARKER)) return;
+                console.log('✅ Identifié par Asterisk Manager');
+                buffer = '';
+                phase = 'login';
+                socket.write(buildLoginAction());
+                return;
+            }
+
+            while (buffer.includes(AMI_BLOCK_END)) {
+                const block = takeBlock();
+
+                if (phase === 'login') {
+                    const fields = parseAmiBlock(block);
+                    if (fields.Response !== 'Success') {
+                        fail(new Error(`Authentification AMI refusée (${block.replace(/\r\n/g, ' | ')})`));
+                        return;
+                    }
+
+                    console.log('✅ Authentifié auprès d\'Asterisk (AMI)');
+                    phase = 'action';
+                    socket.write(action);
+                    continue;
+                }
+
+                handleActionBlock(block);
+            }
+        });
+    });
+}
+
+function promptPreview(prompt, maxLength = 220) {
+    if (!prompt || prompt.length <= maxLength) return prompt;
+    return `${prompt.slice(0, maxLength)}... [tronqué ${prompt.length - maxLength} caractères]`;
 }
 
 function buildCallFailure({ callId, channel, targetNumber, message }) {
@@ -273,8 +436,9 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
     logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort });
 
     try {
-        const block = await amiAction(
+        const block = await trackOriginate(
             buildOriginateAction({ channel, callUuid, callId }),
+            callId,
             { host: asteriskHost, port: asteriskPort }
         );
         const fields = parseAmiBlock(block);
@@ -292,7 +456,7 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
         console.log('   Attente de la connexion SIP vers Kavkom...\n');
 
         if (openingPrompt) {
-            console.log('🧠 [calling][prompt] Opening prompt fourni pour la session Gemini:', openingPrompt.slice(0, 220));
+            console.log('🧠 [calling][prompt] Opening prompt fourni pour la session Gemini:', promptPreview(openingPrompt));
         }
 
         return {

@@ -153,7 +153,8 @@ docker exec ia-asterisk asterisk -rx "manager show connected"
 | `ASTERISK_AMI_PORT` | `5038` | port AMI |
 | `ASTERISK_AMI_USERNAME` / `ASTERISK_AMI_SECRET` | `default` / `HeroesAmi2026!` | compte AMI (doit correspondre à `asterisk/manager.conf`) |
 | `ASTERISK_TRUNK_ENDPOINT` | `kavkom-trunk` | endpoint PJSIP de sortie → canal `PJSIP/<numéro>@<endpoint>` |
-| `GEMINI_API_KEY`, `GEMINI_LIVE_MODEL`, `GEMINI_OPENING_PROMPT` | — | session Gemini Live |
+| `GEMINI_API_KEY`, `GEMINI_LIVE_MODEL`, `GEMINI_SUMMARY_MODEL`, `GEMINI_OPENING_PROMPT` | — | session Gemini Live + résumé post-appel |
+| `LARAVEL_BASE_URL` | `http://webserver` | URL interne Docker du CRM pour le webhook de résumé |
 
 Côté conteneur Asterisk (générées depuis `.env` dans `pjsip.conf` par
 `asterisk/docker-entrypoint.sh`) : `KAVKOM_EXTENSION`, `KAVKOM_PASSWORD`,
@@ -171,7 +172,9 @@ silencieusement toute requête dont le `User-Agent` contient « Asterisk »).
 
 | Symptôme | Cause | Solution |
 |---|---|---|
-| `Rejected` dans `pjsip show registrations` | User-Agent contenant « Asterisk » ignoré par Kavkom | laisser `KAVKOM_USER_AGENT` neutre (`HeroesCRM-Phone/1.0`) |
+| `No response received` après `REGISTER` | pas de sortie TCP/TLS depuis le conteneur ou filtrage vers Kavkom | tester l'egress Docker puis ouvrir la sortie vers `aria-madacom.kavkom.com:5061/tcp` |
+| `403 Forbidden` après `REGISTER` | mot de passe SIP incorrect ou `realm` différent du `user_context` Kavkom | vérifier `KAVKOM_PASSWORD` et `KAVKOM_USER_CONTEXT` |
+| `Rejected` dans `pjsip show registrations` avec `User-Agent: Asterisk...` | User-Agent contenant « Asterisk » ignoré par Kavkom | laisser `KAVKOM_USER_AGENT` neutre (`HeroesCRM-Phone/1.0`) |
 | `Could not create dialog to invalid URI '<num>'` | mauvais format de canal | utiliser `PJSIP/<num>@kavkom-trunk`, pas `PJSIP/kavkom-trunk/<num>` |
 | `Unable to create channel of type 'SIP'` | `chan_sip` supprimé depuis Asterisk 21 | préfixer par `PJSIP/` |
 | `Message: Permission denied` (AMI) | action sans `Login` | `secret` dans `manager.conf` + Login dans `outgoing-call.service.js` |

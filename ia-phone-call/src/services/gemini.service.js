@@ -251,22 +251,27 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
                 const summary = await summarizeCallTranscript({
                     transcript,
                     apiKey,
-                    model: process.env.GEMINI_SUMMARY_MODEL || 'models/gemini-2.5-flash'
+                    model: process.env.GEMINI_SUMMARY_MODEL || 'models/gemini-3.8-flash'
                 });
 
                 console.log('\n📄 [Résumé final de conversation]\n' + summary + '\n');
 
-                const crmResult = await sendCallSummaryToLaravel({
-                    summary,
-                    transcript,
-                    prospectId: resolvedCallContext.prospectId ?? null,
-                    callUuid: resolvedCallContext.callUuid ?? null,
-                    agentId: resolvedCallContext.agentId ?? null,
-                    callerNumber: resolvedCallContext.callerNumber ?? null,
-                    destinationNumber: resolvedCallContext.destinationNumber ?? null,
-                    projectSlug: resolvedCallContext.projectSlug ?? null,
-                    analysis: { summary },
-                });
+                let crmResult = null;
+                try {
+                    crmResult = await sendCallSummaryToLaravel({
+                        summary,
+                        transcript,
+                        prospectId: resolvedCallContext.prospectId ?? null,
+                        callUuid: resolvedCallContext.callUuid ?? null,
+                        agentId: resolvedCallContext.agentId ?? null,
+                        callerNumber: resolvedCallContext.callerNumber ?? null,
+                        destinationNumber: resolvedCallContext.destinationNumber ?? null,
+                        projectSlug: resolvedCallContext.projectSlug ?? null,
+                        analysis: { summary },
+                    });
+                } catch (err) {
+                    console.warn('[Summary] Impossible d’envoyer le résumé au CRM Laravel:', err.message);
+                }
 
                 if (onSummary) {
                     onSummary({ summary, transcript: transcript.toJSON(), crmResult });

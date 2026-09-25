@@ -19,6 +19,7 @@ function buildDocumentation() {
             'GET /status': 'Statut du serveur',
             'GET /channels': 'Liste des appels actifs',
             'POST /call': 'Placer un appel sortant (body: {phoneNumber: "33..."})',
+            'POST /calls': 'Alias CRM pour placer un appel sortant (body: {destination_number: "33..."})',
             'POST /hangup': 'Raccrocher un appel (body: {channelName: "PJSIP/..."})'
         },
         audioSocket: {
@@ -69,7 +70,7 @@ const ROUTES = [
         path: '/call',
         handler: async (req) => {
             const data = await readJsonBody(req);
-            const phoneNumber = (data.phoneNumber || data.number || '').replace(/\D/g, '');;
+            const phoneNumber = (data.phoneNumber || data.number || data.destinationNumber || data.destination_number || '').replace(/\D/g, '');
             const prospectId = data.prospectId ?? data.prospect_id ?? null;
             const projectId = data.projectId ?? data.project_id ?? null;
             const projectSlug = data.projectSlug ?? data.project_slug ?? null;
@@ -90,6 +91,11 @@ const ROUTES = [
             });
             return { statusCode: result.success ? 200 : 500, payload: result };
         }
+    },
+    {
+        method: 'POST',
+        path: '/calls',
+        handler: async (req) => findRoute('POST', '/call').handler(req)
     },
     {
         method: 'POST',

@@ -17,11 +17,15 @@ user_agent=${KAVKOM_USER_AGENT}
 type=transport
 protocol=udp
 bind=0.0.0.0:5060
+external_signaling_address=${KAVKOM_EXTERNAL_ADDRESS}
+external_media_address=${KAVKOM_EXTERNAL_ADDRESS}
 
 [transport-tls]
 type=transport
 protocol=tls
 bind=0.0.0.0:5061
+external_signaling_address=${KAVKOM_EXTERNAL_ADDRESS}
+external_media_address=${KAVKOM_EXTERNAL_ADDRESS}
 cert_file=/etc/asterisk/keys/asterisk.pem
 ca_list_file=/etc/asterisk/keys/ca.pem
 method=tlsv1_2
@@ -33,10 +37,12 @@ allow_wildcard_certs=yes
 type=registration
 outbound_auth=kavkom-auth
 transport=transport-${KAVKOM_SIP_TRANSPORT}
-server_uri=sip:${KAVKOM_USER_CONTEXT}
+server_uri=sip:${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}
 client_uri=sip:${KAVKOM_EXTENSION}@${KAVKOM_USER_CONTEXT}
 retry_interval=60
 expiration=3600
+user_agent=${KAVKOM_USER_AGENT}
+contact_user=${KAVKOM_EXTENSION}
 ; Continuer à réessayer même après un rejet d'authentification : sans cela
 ; Asterisk abandonne définitivement et reste bloqué en "Rejected".
 auth_rejection_permanent=no
@@ -75,4 +81,3 @@ contact=sip:${KAVKOM_USER_CONTEXT}:${KAVKOM_SIP_PORT}
 type=identify
 endpoint=kavkom-trunk
 match=${KAVKOM_USER_CONTEXT}
-

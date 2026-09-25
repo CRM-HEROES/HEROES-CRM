@@ -23,16 +23,17 @@ echo "Génération de pjsip.conf depuis les variables d'environnement..."
 : "${KAVKOM_USER_CONTEXT:?Variable KAVKOM_USER_CONTEXT non définie dans .env}"
 : "${KAVKOM_SIP_TRANSPORT:?Variable KAVKOM_SIP_TRANSPORT non définie dans .env}"
 : "${KAVKOM_SIP_PORT:?Variable KAVKOM_SIP_PORT non définie dans .env}"
+: "${KAVKOM_EXTERNAL_ADDRESS:?Variable KAVKOM_EXTERNAL_ADDRESS non définie dans .env}"
 
 # User-Agent : le SBC de Kavkom ignore silencieusement toute requête SIP dont
 # le User-Agent contient "Asterisk" (d'où un enregistrement en "Rejected").
 # Une valeur neutre est donc imposée par défaut, surchargeable via .env.
 : "${KAVKOM_USER_AGENT:=HeroesCRM-Phone/1.0}"
 # envsubst (processus séparé) ne voit que les variables exportées
-export KAVKOM_USER_AGENT
+export KAVKOM_USER_AGENT KAVKOM_EXTERNAL_ADDRESS
 
 # Substitution des variables dans le template -> pjsip.conf final
-envsubst '${KAVKOM_EXTENSION} ${KAVKOM_PASSWORD} ${KAVKOM_USER_CONTEXT} ${KAVKOM_SIP_TRANSPORT} ${KAVKOM_SIP_PORT} ${KAVKOM_USER_AGENT}' \
+envsubst '${KAVKOM_EXTENSION} ${KAVKOM_PASSWORD} ${KAVKOM_USER_CONTEXT} ${KAVKOM_SIP_TRANSPORT} ${KAVKOM_SIP_PORT} ${KAVKOM_USER_AGENT} ${KAVKOM_EXTERNAL_ADDRESS}' \
   < /etc/asterisk/pjsip.conf.template \
   > /etc/asterisk/pjsip.conf
 
@@ -45,4 +46,3 @@ cp /etc/ssl/certs/ca-certificates.crt /etc/asterisk/keys/ca.pem
 echo "Démarrage d'Asterisk..."
 # Démarrer Asterisk directement avec les options verboses
 exec /usr/sbin/asterisk -vvvdddf
-

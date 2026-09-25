@@ -1,4 +1,4 @@
-const DEFAULT_SUMMARY_MODEL = 'models/gemini-2.5-flash';
+const DEFAULT_SUMMARY_MODEL = 'models/gemini-3.8-flash';
 
 export function createCallTranscript({ callId = null, phoneNumber = null } = {}) {
     const turns = [];
@@ -178,6 +178,7 @@ export async function sendCallSummaryToLaravel({
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
             ...(secret ? { 'X-AI-Agent-Secret': secret } : {}),
         },
         body: JSON.stringify(payload),

@@ -135,6 +135,8 @@ services:
     restart: unless-stopped
     env_file:
       - ./ia-phone-call/.env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "${AUDIOSOCKET_PORT:-9701}:${PORT:-9701}"
       - "${API_PORT:-3000}:3000"
@@ -184,6 +186,9 @@ networks:
     driver: bridge
   ia-phone-net:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.210.0.0/24
 
 volumes:
   calls_data:
