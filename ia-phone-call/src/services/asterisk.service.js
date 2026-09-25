@@ -6,6 +6,7 @@ import {
     createMixedPcmRecorder,
     writeAudioSocketPacket
 } from '../utils/audio.util.js';
+import { getCurrentOutgoingPrompt, getCurrentOutgoingContext } from './outgoing-call.service.js';
 
 // Asterisk AudioSocket transporte du PCM 8 kHz 16 bits (slin).
 const ASTERISK_SAMPLE_RATE = 8000;
@@ -131,7 +132,9 @@ export function handleAsteriskConnection(asteriskSocket) {
             console.log('[Gemini] ⚠️  Fermeture de Gemini - Fermeture du socket Asterisk');
             stopCall();
             asteriskSocket.end();
-        }
+        },
+        openingPrompt: getCurrentOutgoingPrompt(),
+        callContext: getCurrentOutgoingContext(),
     });
 
     asteriskSocket.on('data', (chunk) => {

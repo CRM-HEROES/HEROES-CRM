@@ -70,10 +70,24 @@ const ROUTES = [
         handler: async (req) => {
             const data = await readJsonBody(req);
             const phoneNumber = data.phoneNumber || data.number;
+            const prospectId = data.prospectId ?? data.prospect_id ?? null;
+            const projectId = data.projectId ?? data.project_id ?? null;
+            const projectSlug = data.projectSlug ?? data.project_slug ?? null;
+            const agentId = data.agentId ?? data.agent_id ?? null;
+            const callerNumber = data.callerNumber ?? data.caller_number ?? null;
+            const destinationNumber = data.destinationNumber ?? data.destination_number ?? phoneNumber ?? null;
+            const openingPrompt = data.openingPrompt || data.prompt || data.script || data.instructions || null;
 
             if (!phoneNumber) throw new HttpError(400, 'phoneNumber requis');
 
-            const result = await placeOutgoingCall(phoneNumber);
+            const result = await placeOutgoingCall(phoneNumber, undefined, undefined, openingPrompt, {
+                prospectId,
+                projectId,
+                projectSlug,
+                agentId,
+                callerNumber,
+                destinationNumber,
+            });
             return { statusCode: result.success ? 200 : 500, payload: result };
         }
     },

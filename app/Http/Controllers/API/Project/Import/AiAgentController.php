@@ -32,17 +32,16 @@ class AiAgentController extends Controller
         abort_unless($project->id == $aiAgent->project_id, 404);
         abort_if($import->is_processing, 404);
 
-        // Same lost-update race as UserGroupController::update() — the
-        // "Relations" step fires one PUT per agent checkbox ticked, often
-        // near-simultaneously, so reading+writing the already-loaded
-        // $import->ai_agents array lets concurrent requests overwrite each
-        // other. Lock the row for the read+write to serialize them.
         DB::transaction(function () use ($import, $aiAgent) {
             $current = Import::whereKey($import->id)->lockForUpdate()->value('ai_agents') ?: [];
+            $updated = array_unique(array_values(array_merge($current, [$aiAgent->id])));
 
-            Import::whereKey($import->id)->update([
-                'ai_agents' => array_unique(array_values(array_merge($current, [$aiAgent->id]))),
+            // Save via the model so Eloquent observers fire, which in turn
+            // dispatch the ImportAiAgentObserver and LaunchImportAiCallsJob.
+            $import->forceFill([
+                'ai_agents' => $updated,
             ]);
+            $import->save();
         });
 
         return ['message' => trans('common.success.updated_resource')];
@@ -59,12 +58,14 @@ class AiAgentController extends Controller
 
         DB::transaction(function () use ($import, $aiAgent) {
             $current = Import::whereKey($import->id)->lockForUpdate()->value('ai_agents') ?: [];
+            $updated = array_values(array_filter($current, function ($agentId) use ($aiAgent) {
+                return (int) $agentId !== (int) $aiAgent->id;
+            }));
 
-            Import::whereKey($import->id)->update([
-                'ai_agents' => array_values(array_filter($current, function ($agentId) use ($aiAgent) {
-                    return $agentId != $aiAgent->id;
-                })),
+            $import->forceFill([
+                'ai_agents' => $updated,
             ]);
+            $import->save();
         });
 
         return ['message' => trans('common.success.deleted_resource')];

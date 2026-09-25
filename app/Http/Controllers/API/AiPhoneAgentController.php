@@ -36,10 +36,14 @@ class AiPhoneAgentController extends Controller
             'caller_number' => ['nullable', 'string', 'required_without:prospect_id'],
             'destination_number' => ['nullable', 'string'],
             'project_slug' => ['nullable', 'string'],
+            'summary' => ['nullable', 'string'],
             'transcript' => ['nullable', 'string'],
             'analysis' => ['required', 'array'],
             'test_mode' => ['nullable', 'boolean'],
         ]);
+
+        $summary = (string) ($data['summary'] ?? data_get($data, 'analysis.summary') ?? '');
+        $summary = trim($summary) !== '' ? $summary : null;
 
         if (!empty($data['prospect_id'])) {
             // Outbound AI call: the prospect is already known from the
@@ -94,6 +98,7 @@ class AiPhoneAgentController extends Controller
                 'agent_id' => $data['agent_id'] ?? null,
                 'transcript' => $data['transcript'] ?? null,
                 'analysis' => $analysis,
+                'summary' => $summary,
             ],
         ]);
 

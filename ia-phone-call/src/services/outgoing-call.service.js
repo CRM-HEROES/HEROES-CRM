@@ -215,15 +215,61 @@ function logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asterisk
  * @param {string} targetNumber - Numéro à appeler (ex: "33612345678")
  * @param {string} asteriskHost - Hôte du conteneur Asterisk (ex: "ia-asterisk")
  * @param {number} asteriskPort - Port AMI (défaut: 5038)
+ * @param {string} openingPrompt - Prompt à injecter dans la session Gemini
  * @returns {Promise<Object>} Résultat de l'appel {success, callId, message}
  */
-export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, asteriskPort = AMI_PORT) {
+const OUTGOING_PROMPT_STORE = {
+    current: null
+};
+
+export function getCurrentOutgoingPrompt() {
+    return OUTGOING_PROMPT_STORE.current;
+}
+
+export function setCurrentOutgoingPrompt(prompt) {
+    const next = typeof prompt === 'string' ? prompt.trim() : null;
+    OUTGOING_PROMPT_STORE.current = next && next.length > 0 ? next : null;
+}
+
+const OUTGOING_CALL_CONTEXT = {
+    prospectId: null,
+    projectId: null,
+    projectSlug: null,
+    agentId: null,
+    callerNumber: null,
+    destinationNumber: null,
+    callUuid: null,
+};
+
+export function getCurrentOutgoingContext() {
+    return { ...OUTGOING_CALL_CONTEXT };
+}
+
+export function setCurrentOutgoingContext(context = {}) {
+    Object.assign(OUTGOING_CALL_CONTEXT, {
+        prospectId: context.prospectId ?? null,
+        projectId: context.projectId ?? null,
+        projectSlug: context.projectSlug ?? null,
+        agentId: context.agentId ?? null,
+        callerNumber: context.callerNumber ?? null,
+        destinationNumber: context.destinationNumber ?? null,
+        callUuid: context.callUuid ?? null,
+    });
+}
+
+export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, asteriskPort = AMI_PORT, openingPrompt = null, callContext = {}) {
     const callId = `call-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
     const channel = `PJSIP/${targetNumber}@${AMI_TRUNK_ENDPOINT}`;
     // AudioSocket(uuid,service) exige un UUID valide : on le transmet au dialplan
     // via la variable CALLID (utilisée dans [outgoing-call] de extensions.conf).
     const callUuid = crypto.randomUUID();
 
+    setCurrentOutgoingContext({
+        ...callContext,
+        callUuid,
+        destinationNumber: callContext.destinationNumber ?? targetNumber,
+    });
+    setCurrentOutgoingPrompt(openingPrompt);
     logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort });
 
     try {
@@ -245,12 +291,23 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
         console.log('✅ Appel sortant placé avec succès via AMI');
         console.log('   Attente de la connexion SIP vers Kavkom...\n');
 
+        if (openingPrompt) {
+            console.log('🧠 [calling][prompt] Opening prompt fourni pour la session Gemini:', openingPrompt.slice(0, 220));
+        }
+
         return {
             success: true,
             callId,
             callUuid,
             channel,
             targetNumber,
+            prospectId: OUTGOING_CALL_CONTEXT.prospectId,
+            projectId: OUTGOING_CALL_CONTEXT.projectId,
+            projectSlug: OUTGOING_CALL_CONTEXT.projectSlug,
+            agentId: OUTGOING_CALL_CONTEXT.agentId,
+            callerNumber: OUTGOING_CALL_CONTEXT.callerNumber,
+            destinationNumber: OUTGOING_CALL_CONTEXT.destinationNumber,
+            openingPrompt,
             message: 'Appel sortant en cours de placement',
             timestamp: new Date().toISOString()
         };

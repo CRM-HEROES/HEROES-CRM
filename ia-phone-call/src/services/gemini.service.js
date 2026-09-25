@@ -1,6 +1,8 @@
 import path from 'path';
 import WebSocket from 'ws';
 import { RECORDINGS_DIR, createPcmRecorder } from '../utils/audio.util.js';
+import { createCallTranscript, summarizeCallTranscript, sendCallSummaryToLaravel } from './call-transcript.service.js';
+import { getCurrentOutgoingContext } from './outgoing-call.service.js';
 
 // Asterisk AudioSocket envoie du PCM 16-bit à 8 kHz (slin), alors que la Live
 // API de Gemini attend du 16 kHz en entrée et produit du 24 kHz en sortie.
@@ -111,10 +113,14 @@ function resample24kTo8k(input) {
  * @param {Function} [options.onClose] - Callback exécuté à la fermeture de la connexion.
  * @returns {Object} Interface de contrôle du service Gemini.
  */
-export function createGeminiSession({ onAudioData, onClose } = {}) {
+export function createGeminiSession({ onAudioData, onClose, openingPrompt: customOpeningPrompt, onSummary, callContext } = {}) {
     const apiKey = process.env.GEMINI_API_KEY;
     const model = process.env.GEMINI_LIVE_MODEL || DEFAULT_MODEL;
-    const openingPrompt = process.env.GEMINI_OPENING_PROMPT || DEFAULT_OPENING_PROMPT;
+    const resolvedCallContext = callContext || getCurrentOutgoingContext();
+    const openingPrompt = customOpeningPrompt || process.env.GEMINI_OPENING_PROMPT || DEFAULT_OPENING_PROMPT;
+    const transcript = createCallTranscript();
+
+    transcript.appendSystem('Session Gemini démarrée.');
 
     const ws = new WebSocket(`${GEMINI_WS_URL}?key=${apiKey}`);
     const recordingPath = path.join(RECORDINGS_DIR, `gemini-${Date.now()}.pcm`);
@@ -181,6 +187,10 @@ export function createGeminiSession({ onAudioData, onClose } = {}) {
         if (!parts) return;
 
         for (const part of parts) {
+            if (part.text) {
+                transcript.appendAi(part.text);
+            }
+
             const inlineData = part.inlineData;
             if (inlineData?.mimeType?.startsWith('audio/pcm')) {
                 handleModelAudio(Buffer.from(inlineData.data, 'base64'));
@@ -205,9 +215,11 @@ export function createGeminiSession({ onAudioData, onClose } = {}) {
 
         if (response.setupComplete) {
             setupComplete = true;
+            transcript.appendSystem('L’appel est pris en charge et la session est prête à parler.');
             console.log('[Gemini] Setup terminé. Déclenchement de la salutation (l\'IA parle en premier)...');
 
             if (openingPrompt) {
+                transcript.appendAi(openingPrompt, { source: 'opening_prompt' });
                 ws.send(JSON.stringify(buildUserTurn(openingPrompt)));
             }
 
@@ -232,13 +244,47 @@ export function createGeminiSession({ onAudioData, onClose } = {}) {
     ws.on('close', (code, reason) => {
         console.log(`[Gemini] Connexion fermée (${code}: ${reason})`);
 
+        const finalizeSummary = async () => {
+            if (!transcript.hasContent()) return;
+
+            try {
+                const summary = await summarizeCallTranscript({
+                    transcript,
+                    apiKey,
+                    model: process.env.GEMINI_SUMMARY_MODEL || 'models/gemini-2.5-flash'
+                });
+
+                console.log('\n📄 [Résumé final de conversation]\n' + summary + '\n');
+
+                const crmResult = await sendCallSummaryToLaravel({
+                    summary,
+                    transcript,
+                    prospectId: resolvedCallContext.prospectId ?? null,
+                    callUuid: resolvedCallContext.callUuid ?? null,
+                    agentId: resolvedCallContext.agentId ?? null,
+                    callerNumber: resolvedCallContext.callerNumber ?? null,
+                    destinationNumber: resolvedCallContext.destinationNumber ?? null,
+                    projectSlug: resolvedCallContext.projectSlug ?? null,
+                    analysis: { summary },
+                });
+
+                if (onSummary) {
+                    onSummary({ summary, transcript: transcript.toJSON(), crmResult });
+                }
+            } catch (err) {
+                console.warn('[Gemini] Impossible de générer le résumé final:', err.message);
+            }
+        };
+
         recorder.end()
             .then((wavPath) => {
                 if (wavPath) console.log(`💾 Audio Gemini enregistré: ${wavPath}`);
                 else console.log(`⚠️ Aucun audio Gemini reçu, fichier non généré: ${recordingPath}`);
+                return finalizeSummary();
             })
             .catch((err) => {
                 console.warn('[Gemini] Impossible de finaliser l\'enregistrement:', err.message);
+                return finalizeSummary();
             });
 
         if (onClose) onClose();
