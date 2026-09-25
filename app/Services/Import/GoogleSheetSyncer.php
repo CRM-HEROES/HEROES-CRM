@@ -8,6 +8,7 @@ use App\Models\Import;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Re-downloads a Google Sheets import's source file and runs an
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\Log;
  */
 class GoogleSheetSyncer
 {
+    const FALLBACK_POLL_MINUTES = 2;
+
     public function __construct(protected GoogleSheetDownloader $downloader)
     {
     }
@@ -30,8 +33,23 @@ class GoogleSheetSyncer
      * immediately (it has its own short cooldown instead, see
      * WebserviceController::syncGoogleSheet).
      */
+    /**
+     * An import that has never been processed nor synced is still waiting
+     * for the user to check the mapping and click "Importer". Auto-syncing
+     * it before that would import the rows behind the user's back, and the
+     * user's own first run would then insert them all a second time.
+     */
+    public function hasBeenImportedOnce(Import $import): bool
+    {
+        return (bool) ($import->processed_at || $import->last_synced_at);
+    }
+
     public function isDue(Import $import): bool
     {
+        if (!$this->hasBeenImportedOnce($import)) {
+            return false;
+        }
+
         // last_synced_at is cast to Carbon, but processed_at isn't (kept as
         // a plain string by the model), so it must be parsed explicitly.
         $reference = $import->last_synced_at ?: (
@@ -42,9 +60,14 @@ class GoogleSheetSyncer
             return true;
         }
 
-        $intervalMinutes = $import->sync_interval_minutes ?: 30;
+        // This poll is only the safety net for edits the real-time webhook
+        // didn't report (Apps Script "onEdit" doesn't fire for changes made
+        // by an API/automation). An unchanged sheet costs almost nothing
+        // now (row fingerprints), so it is capped at a couple of minutes
+        // whatever interval the import was saved with.
+        $intervalMinutes = min($import->sync_interval_minutes ?: self::FALLBACK_POLL_MINUTES, self::FALLBACK_POLL_MINUTES);
 
-        return $reference->addMinutes($intervalMinutes)->isPast();
+        return $reference->copy()->addMinutes($intervalMinutes)->isPast();
     }
 
     /**
@@ -186,6 +209,8 @@ class GoogleSheetSyncer
         // ImportProspects run (ImportObserver::launchOrStop), which wipes
         // and recreates every prospect of the import on every sync. The
         // incremental run is dispatched explicitly below instead.
+        $previousPath = $import->path;
+
         Import::withoutEvents(function () use ($import, $file) {
             $import->update([
                 'path' => $file['path'],
@@ -196,9 +221,38 @@ class GoogleSheetSyncer
             ]);
         });
 
+        // Every sync downloads a fresh copy; the previous one is never read
+        // again (nothing is processing, see the callers), so don't let them
+        // pile up on disk.
+        if ($previousPath && $previousPath !== $file['path']) {
+            try {
+                Storage::disk('imports')->delete($previousPath);
+            } catch (\Throwable $e) {
+                Log::warning('GoogleSheetSyncer: could not delete previous sheet copy', [
+                    'import_id' => $import->id,
+                    'message' => $e->getMessage(),
+                ]);
+            }
+        }
+
         $this->releaseSyncRequestClaim($import);
 
-        ImportProspects::dispatch($import, true)->onQueue('imports');
+        try {
+            ImportProspects::dispatch($import, true)->onQueue('imports');
+        } catch (\Throwable $e) {
+            // The import was already flagged as processing above: without
+            // this it would stay locked until the stale-lock timeout.
+            Import::withoutEvents(function () use ($import) {
+                $import->forceFill(['is_processing' => false])->saveQuietly();
+            });
+
+            Log::error('GoogleSheetSyncer: could not dispatch the import job', [
+                'import_id' => $import->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return false;
+        }
 
         return true;
     }
@@ -209,6 +263,18 @@ class GoogleSheetSyncer
      * rapid spreadsheet edit storm from silently dropping the latest data
      * while the import worker is still processing the previous snapshot.
      */
+    public function clearRetryQueued(Import $import): void
+    {
+        try {
+            $store = Cache::store('redis');
+            $store->get('google-sheet-sync-retry-probe');
+        } catch (\Throwable $e) {
+            $store = Cache::store();
+        }
+
+        $store->forget('google-sheet-sync-retry-queued-' . $import->id);
+    }
+
     public function queueRetryIfBusy(Import $import, int $delaySeconds = 0): void
     {
         try {
@@ -224,7 +290,9 @@ class GoogleSheetSyncer
             return;
         }
 
-        $store->put($retryKey, true, 60);
+        // Cleared by GoogleSheetSyncRequest as soon as it starts syncing;
+        // the TTL is only a safety net if that job is lost.
+        $store->put($retryKey, true, 900);
 
         $dispatch = GoogleSheetSyncRequest::dispatch($import)
             ->onQueue('imports');

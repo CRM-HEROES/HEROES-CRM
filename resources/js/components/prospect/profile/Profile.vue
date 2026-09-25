@@ -10,7 +10,8 @@
                     <search />
                 </div>
             </div>
-            <ai-phone-agent-call :project="project" :prospect="prospect" />
+            <!-- Masqué : sélecteur d'agent IA + bouton "Appeler avec l'IA" -->
+            <ai-phone-agent-call v-if="false" :project="project" :prospect="prospect" />
             <div id="hc-prospect-profile-menus">
                 <icon
                     tag="a"

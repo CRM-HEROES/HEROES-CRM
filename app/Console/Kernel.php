@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
         // Google Sheets auto-sync: re-download and re-import sheets that
         // opted into periodic sync. Runs often; each import's own
         // sync_interval_minutes decides whether it is actually due.
-        $schedule->command('app:sync-google-sheets-imports')->everyFiveMinutes()->withoutOverlapping();
+        $schedule->command('app:sync-google-sheets-imports')->everyMinute()->withoutOverlapping();
 
         // ARCHER (P6): nightly prospect enrichment. Rank runs an hour after
         // enrich to give the queue time to work through the batch.

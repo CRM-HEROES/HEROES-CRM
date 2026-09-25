@@ -73,7 +73,11 @@ class ImportObserver
         $import->processed_at = null;
         $import->save();
 
-        if ($import->duplicates_fields && count($import->duplicates_fields) > 0) {
+        // Google Sheets imports never run the "replace duplicates" chain:
+        // ImportProspects already ignores every row matching a prospect that
+        // exists in the database, and the database must stay authoritative
+        // (never overwritten, never deleted by an import).
+        if ($import->source !== 'google_sheets' && $import->duplicates_fields && count($import->duplicates_fields) > 0) {
             $chain = [
                 // Check duplicates
                 new ImportCheckDuplicatedProspects(

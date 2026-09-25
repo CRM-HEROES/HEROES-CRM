@@ -16,14 +16,19 @@ class SyncGoogleSheetImports extends Command
         $imports = Import::query()
             ->where('source', 'google_sheets')
             ->where('sync_enabled', true)
-            ->where('is_processing', false)
             ->whereNotNull('source_url')
             ->get();
 
         $synced = 0;
 
         foreach ($imports as $import) {
+            // A run that died (worker killed, dispatch failure...) leaves
+            // is_processing on forever; this is what unblocks it, on its own.
             $syncer->clearStaleProcessingLockIfNeeded($import);
+
+            if ($import->is_processing) {
+                continue;
+            }
 
             if (!$syncer->isDue($import)) {
                 continue;

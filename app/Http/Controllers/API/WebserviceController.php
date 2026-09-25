@@ -76,6 +76,16 @@ class WebserviceController extends Controller
             return response()->json(['message' => "La synchronisation automatique n'est pas activée pour cet import."], 400);
         }
 
+        if (!$import->is_processing && !$syncer->hasBeenImportedOnce($import)) {
+            Log::info('Google Sheets sync webhook ignored: import not launched manually yet', [
+                'import_id' => $import->id,
+            ]);
+
+            return response()->json([
+                'message' => "Lancez d'abord l'import depuis le CRM : la synchronisation automatique démarre ensuite.",
+            ], 202);
+        }
+
         if ($import->is_processing) {
             $staleReset = $syncer->clearStaleProcessingLockIfNeeded($import);
 
