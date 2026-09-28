@@ -28,6 +28,7 @@ class Import extends Model
      * @var array<int, string>
      */
     protected $fillable = [
+        'ai_agents',
         'cols_count',
         'creator_id',
         'field_delimiter',
@@ -87,6 +88,7 @@ class Import extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'ai_agents' => 'json',
         'duplicates_fields' => 'json',
         'groups'    => 'json',
         'headers'   => 'json',

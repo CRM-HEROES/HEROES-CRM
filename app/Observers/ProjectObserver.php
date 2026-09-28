@@ -198,7 +198,8 @@ class ProjectObserver
             ], 
             $setting,
             [
-                ['key' => 'users']
+                ['key' => 'users'],
+                ['key' => 'ai-agents']
             ], 
         );
 

@@ -982,11 +982,20 @@ class ImportProspects implements ShouldQueue
         $value = preg_replace('/^(?:p:|tel:)\s*/i', '', $value);
         $value = preg_replace('/\s*(?:ext|x|poste)\.?\s*\d+$/i', '', $value);
 
+        $digits = preg_replace('/\D+/', '', $value);
+
         if (class_exists('libphonenumber\\PhoneNumberUtil')) {
             $util = \libphonenumber\PhoneNumberUtil::getInstance();
+            $defaultRegion = null;
+
+            // French local numbers like "06 12 34 56 78" are common in this
+            // project and should match the stored E.164 form "+33612345678".
+            if (preg_match('/^0[1-9]\d{8}$/', $digits)) {
+                $defaultRegion = 'FR';
+            }
 
             try {
-                $number = $util->parse($value, 'ZZ');
+                $number = $util->parse($value, $defaultRegion ?? 'ZZ');
 
                 if ($util->isPossibleNumber($number) && $util->isValidNumber($number)) {
                     return $util->format($number, \libphonenumber\PhoneNumberFormat::E164);
@@ -997,17 +1006,19 @@ class ImportProspects implements ShouldQueue
             }
         }
 
-        $digits = preg_replace('/\D+/', '', $value);
-
         // Keep an explicit international prefix even when the optional
-        // phone metadata package is unavailable. Local numbers remain
-        // intentionally unresolved because their country is unknown.
+        // phone metadata package is unavailable. Local French numbers are
+        // converted to their canonical E.164 value when they have a leading 0.
         if (str_starts_with($value, '+')) {
             return '+' . $digits;
         }
 
         if (str_starts_with($digits, '00')) {
             return '+' . substr($digits, 2);
+        }
+
+        if (preg_match('/^0[1-9]\d{8}$/', $digits)) {
+            return '+33' . substr($digits, 1);
         }
 
         return $digits;
@@ -1107,7 +1118,7 @@ class ImportProspects implements ShouldQueue
                     continue;
                 }
 
-                $key = $this->normalizeDuplicateComparisonValue($sourceValue);
+                $key = $this->normalizeDuplicateComparisonValue($sourceValue, $field['slug']);
                 if ($key === '') {
                     continue;
                 }
@@ -1119,13 +1130,30 @@ class ImportProspects implements ShouldQueue
         return $values;
     }
 
-    protected function normalizeDuplicateComparisonValue($value): string
+    protected function normalizeDuplicateComparisonValue($value, ?string $fieldSlug = null): string
     {
         if (is_array($value)) {
             $value = json_encode($value);
         }
 
-        return strtolower(trim((string) $value));
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        if ($fieldSlug !== null) {
+            $fieldSlug = strtolower((string) $fieldSlug);
+
+            if (str_contains($fieldSlug, 'phone') || str_contains($fieldSlug, 'mobile')) {
+                return $this->normalizePhone($value);
+            }
+
+            if (str_contains($fieldSlug, 'email')) {
+                return strtolower($value);
+            }
+        }
+
+        return strtolower($value);
     }
 
     protected function getDuplicateComparisonValuesForProspect($prospect, array $fields): array
@@ -1141,7 +1169,7 @@ class ImportProspects implements ShouldQueue
                 continue;
             }
 
-            $key = $this->normalizeDuplicateComparisonValue($sourceValue);
+            $key = $this->normalizeDuplicateComparisonValue($sourceValue, $field['slug']);
             if ($key === '') {
                 continue;
             }

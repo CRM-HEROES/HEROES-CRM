@@ -181,8 +181,8 @@ const getters = {
             return Object.values(setting);
         }
 
-        return !setting || !Array.isArray(setting)
-            ? [
+        if (!setting || !Array.isArray(setting)) {
+            return [
                   { key: "first_name" },
                   { key: "last_name" },
                   { key: "email" },
@@ -193,8 +193,12 @@ const getters = {
                   { key: "postal_code" },
                   { key: "city" },
                   { key: "country" },
-              ]
-            : setting;
+                  { key: "users" },
+                  { key: "ai-agents" },
+            ];
+        }
+
+        return setting;
     },
 
     /**

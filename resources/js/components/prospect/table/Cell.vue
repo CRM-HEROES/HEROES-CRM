@@ -78,6 +78,11 @@
             @click="manageUsers"
         />
         <relation-cell
+            v-else-if="category == 'ai-agents'"
+            :prospect="prospect"
+            :items="prospect.ai_agents ? prospect.ai_agents : []"
+        />
+        <relation-cell
             v-else-if="category == 'groups'"
             :prospect="prospect"
             :items="prospect.groups ? prospect.groups : []"

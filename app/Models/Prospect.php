@@ -370,4 +370,6 @@ class Prospect extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'prospect_user');
     }
+
+
 }

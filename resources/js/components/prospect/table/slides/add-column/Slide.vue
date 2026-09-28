@@ -1120,6 +1120,15 @@ export default {
                     columnId: "users",
                     headerId: "hc-prospects-table-header-users-users",
                 },
+                // AI agents
+                {
+                    type: "other",
+                    name: this.$t("prospect.table.column.others.ai_agents"),
+                    icon: "fa fa-robot icon-brown",
+                    columnId: "ai-agents",
+                    headerId:
+                        "hc-prospects-table-header-ai-agents-ai-agents",
+                },
                 // Groups
                 {
                     type: "other",

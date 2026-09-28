@@ -131,7 +131,6 @@ export default {
     },
 
     mounted() {
-        console.log("------------------------------------------------------")
         kavkomPhone.bootstrap({ projectId: this.projectId });
     },
 

@@ -79,6 +79,23 @@
                                 <icon class="fa fa-caret-right" />
                             </item>
 
+                            <!-- AI agents -->
+                            <item
+                                @click="(tab = 1), (itemsTab = 5)"
+                                v-if="filteredRelationAiAgents.length > 0"
+                            >
+                                <icon class="fa fa-robot" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'Agents IA'
+                                        )
+                                    "
+                                ></div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
+
                             <!-- Categories -->
                             <relation-category-row
                                 v-for="c in filteredRelationCategories"
@@ -97,7 +114,7 @@
                 <template #2>
                     <div class="hc-flex-column" style="height: 100%">
                         <frame-layout
-                            :count="5"
+                            :count="6"
                             :tab="itemsTab"
                             class="hc-flex-1 hc-flex-column"
                             style="height: 100%"
@@ -232,6 +249,33 @@
                                     />
                                 </item-list>
                             </template>
+
+                            <!-- AI agents -->
+                            <template #6>
+                                <!-- Title -->
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'Agents IA'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+
+                                <item-list padding="12px" class="hc-flex-1">
+                                    <relation-ai-agent-row
+                                        v-for="agent in filteredRelationAiAgents"
+                                        :key="agent.id"
+                                        :agent="agent"
+                                        :is-checked="
+                                            isRelationAiAgentChecked(agent)
+                                        "
+                                    />
+                                </item-list>
+                            </template>
                         </frame-layout>
                     </div>
                 </template>
@@ -249,6 +293,9 @@ import RelationGroupRow from "./relation/RelationGroupRow.vue";
 import RelationUserRow from "./relation/RelationUserRow.vue";
 import RelationRoleRow from "./relation/RelationRoleRow.vue";
 import RelationUserGroupRow from "./relation/RelationUserGroupRow.vue";
+import RelationAiAgentRow from "./relation/RelationAiAgentRow.vue";
+
+import AiAgentService from "@/apis/project/ai-agent";
 
 export default {
     components: {
@@ -259,6 +306,7 @@ export default {
         RelationUserRow,
         RelationRoleRow,
         RelationUserGroupRow,
+        RelationAiAgentRow,
     },
 
     data() {
@@ -267,10 +315,36 @@ export default {
             itemsTab: 0,
             relationCategory: null,
             relationKeyword: "",
+            aiAgents: [],
         };
     },
 
+    created() {
+        this.fetchAiAgents();
+    },
+
     methods: {
+        /**
+         * Fetch project AI agents
+         */
+        async fetchAiAgents() {
+            if (!this.project) {
+                return;
+            }
+
+            try {
+                const { data } = await AiAgentService.index(
+                    this.project.slug
+                );
+                this.aiAgents = data;
+            } catch (error) {
+                console.error(
+                    "[AI Agent] Échec du chargement des agents IA",
+                    error
+                );
+            }
+        },
+
         /**
          * Group checked
          * @param {*} group
@@ -320,6 +394,18 @@ export default {
         },
 
         /**
+         * AI agent checked
+         * @param {*} agent
+         */
+        isRelationAiAgentChecked(agent) {
+            return (
+                this.prospectImport &&
+                this.prospectImport.ai_agents &&
+                this.prospectImport.ai_agents.indexOf(agent.id) >= 0
+            );
+        },
+
+        /**
          * User group checked
          * @param {*} group
          */
@@ -333,7 +419,14 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["categories", "groups", "users", "roles", "prospectImport"]),
+        ...mapGetters([
+            "project",
+            "categories",
+            "groups",
+            "users",
+            "roles",
+            "prospectImport",
+        ]),
 
         /**
          *
@@ -427,6 +520,17 @@ export default {
 
             return (this.roles || []).filter(
                 (role) => removeStringAccent(role.name).indexOf(keyword) >= 0
+            );
+        },
+
+        /**
+         *
+         */
+        filteredRelationAiAgents() {
+            const keyword = removeStringAccent(this.relationKeyword);
+
+            return (this.aiAgents || []).filter(
+                (agent) => removeStringAccent(agent.name).indexOf(keyword) >= 0
             );
         },
     },

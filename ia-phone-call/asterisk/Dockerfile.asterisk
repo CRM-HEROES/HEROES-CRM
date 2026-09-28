@@ -1,0 +1,12 @@
+FROM andrius/asterisk:latest
+
+# gettext-base fournit envsubst pour la substitution des variables dans pjsip.conf
+RUN apt-get update && apt-get install -y --no-install-recommends gettext-base \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copier le script d'entrée
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
+

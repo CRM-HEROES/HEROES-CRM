@@ -443,6 +443,13 @@ export default {
                     icon: "fa fa-user icon-brown",
                     columnId: "users",
                 },
+                // AI agents
+                {
+                    type: "other",
+                    name: this.$t("prospect.table.column.others.ai_agents"),
+                    icon: "fa fa-robot icon-brown",
+                    columnId: "ai-agents",
+                },
                 // Groups
                 {
                     type: "other",

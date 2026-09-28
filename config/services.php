@@ -58,6 +58,13 @@ return [
         'api_version' => env('GEMINI_API_VERSION', 'v1alpha'),
     ],
 
+    // Local AI telephony gateway (ia-phone-call container): outgoing call
+    // control API used by the AI call jobs. Reachable between containers via
+    // the compose service name, not localhost.
+    'ia_gateway' => [
+        'base_url' => env('IA_GATEWAY_URL', 'http://ia-phone-call:3000'),
+    ],
+
     'ai_phone_agent' => [
         'secret' => env('AI_PHONE_AGENT_SHARED_SECRET'),
         'bridge_url' => env('AI_PHONE_AGENT_BRIDGE_URL'),

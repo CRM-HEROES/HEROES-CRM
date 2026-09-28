@@ -5131,7 +5131,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-summary[data-v-31f6487c] { display: flex; gap: 8px; align-items: baseline; padding: 14px; cursor: pointer;\n}\n.hc-ai-agent-summary strong[data-v-31f6487c] { font-size: 22px; color: #1e6ee5;\n}\n.hc-ai-agent-summary span[data-v-31f6487c] { color: #6b7280; font-size: 13px;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-summary[data-v-31f6487c] { display: flex; gap: 8px; align-items: baseline; padding: 14px; cursor: pointer;\n}\n.hc-ai-agent-summary strong[data-v-31f6487c] { font-size: 22px; color: #1e6ee5;\n}\n.hc-ai-agent-summary span[data-v-31f6487c] { color: #6b7280; font-size: 13px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

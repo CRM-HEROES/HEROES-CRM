@@ -52,4 +52,15 @@ class AiAgent extends Model
 
         return $config;
     }
+
+    public function getPublicConfigAttribute(): array
+    {
+        $config = $this->config ?: [];
+
+        if (array_key_exists('gemini_api_key', $config)) {
+            $config['gemini_api_key'] = $config['gemini_api_key'] ? '********' : null;
+        }
+
+        return $config;
+    }
 }
