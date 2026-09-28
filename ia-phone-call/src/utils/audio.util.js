@@ -1,9 +1,16 @@
 import fs from 'fs';
 import path from 'path';
 
+// Activation de l'enregistrement via .env (true|false). Par défaut: true.
+const CALL_RECORDING_ENABLED = (process.env.CALL_RECORDING_ENABLED ?? 'true').toString().toLowerCase() === 'true';
+
 /** Dossier où sont déposés les enregistrements PCM/WAV des appels. */
-export const RECORDINGS_DIR = path.resolve(process.cwd(), 'recordings');
-fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
+export const RECORDINGS_DIR = process.env.CALL_RECORDING_DIR
+    ? path.resolve(process.env.CALL_RECORDING_DIR)
+    : path.resolve(process.cwd(), 'recordings');
+if (CALL_RECORDING_ENABLED) {
+    fs.mkdirSync(RECORDINGS_DIR, { recursive: true });
+}
 
 const WAV_HEADER_SIZE = 44;
 const BYTES_PER_SAMPLE = 2; // PCM 16 bits
@@ -21,6 +28,7 @@ const AUDIO_SOCKET_CHUNK_SIZE = 320;
  * @returns {string|null} Chemin du WAV généré, ou null si aucun audio exploitable
  */
 export function pcmToWavFile(rawFilePath, sampleRate) {
+    if (!CALL_RECORDING_ENABLED) return null;
     if (!fs.existsSync(rawFilePath)) return null;
 
     const pcmBuffer = fs.readFileSync(rawFilePath);
@@ -57,6 +65,27 @@ export function pcmToWavFile(rawFilePath, sampleRate) {
  * @returns {{ write(buf: Buffer): void, bytesWritten: number, end(): Promise<string|null> }}
  */
 export function createPcmRecorder({ filePath, sampleRate }) {
+    // Si l'enregistrement est désactivé, fournir un enregistreur no-op en mémoire.
+    if (!CALL_RECORDING_ENABLED) {
+        let bytesWritten = 0;
+        let finalized = false;
+        let resolveFinalize;
+        const wavPathPromise = new Promise((resolve) => { resolveFinalize = resolve; });
+
+        const stream = {
+            writableEnded: false,
+            write(buf) { bytesWritten += (buf?.length || 0); },
+            end() { if (!this.writableEnded) { this.writableEnded = true; finalized = true; resolveFinalize(null); } },
+            on() { /* noop */ }
+        };
+
+        return {
+            get bytesWritten() { return bytesWritten; },
+            write(buffer) { bytesWritten += buffer.length; stream.write(buffer); },
+            end() { stream.end(); return wavPathPromise; },
+        };
+    }
+
     const stream = fs.createWriteStream(filePath, { flags: 'w' });
     let bytesWritten = 0;
     let finalized = false;
@@ -73,18 +102,9 @@ export function createPcmRecorder({ filePath, sampleRate }) {
     stream.on('close', finalize);
 
     return {
-        get bytesWritten() {
-            return bytesWritten;
-        },
-        write(buffer) {
-            bytesWritten += buffer.length;
-            stream.write(buffer);
-        },
-        /** Ferme le flux et résout avec le chemin du WAV généré (ou null). */
-        end() {
-            if (!stream.writableEnded) stream.end();
-            return wavPathPromise;
-        },
+        get bytesWritten() { return bytesWritten; },
+        write(buffer) { bytesWritten += buffer.length; stream.write(buffer); },
+        end() { if (!stream.writableEnded) stream.end(); return wavPathPromise; },
     };
 }
 
