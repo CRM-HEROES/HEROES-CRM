@@ -1,5 +1,7 @@
 import net from 'net';
 import crypto from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Paramètres AMI (surchargeables via .env)
@@ -11,7 +13,8 @@ const AMI_USERNAME = process.env.ASTERISK_AMI_USERNAME || 'default';
 const AMI_SECRET = process.env.ASTERISK_AMI_SECRET || 'HeroesAmi2026!';
 const AMI_TIMEOUT_MS = parseInt(process.env.ASTERISK_AMI_TIMEOUT_MS || '10000', 10);
 const OUTGOING_DIAL_TIMEOUT_MS = parseInt(process.env.OUTGOING_DIAL_TIMEOUT_MS || '45000', 10);
-const ORIGINATE_TRACK_TIMEOUT_MS = parseInt(process.env.ASTERISK_ORIGINATE_TRACK_TIMEOUT_MS || '60000', 10);
+const ORIGINATE_IMMEDIATE_FAILURE_GRACE_MS = parseInt(process.env.ASTERISK_ORIGINATE_IMMEDIATE_FAILURE_GRACE_MS || '3000', 10);
+const PJSIP_ENDPOINT_READY_TIMEOUT_MS = parseInt(process.env.ASTERISK_PJSIP_ENDPOINT_READY_TIMEOUT_MS || '15000', 10);
 
 // Asterisk 21+ n'embarque plus chan_sip : le trunk s'appelle "PJSIP" et non "SIP"
 // ("SIP/..." échoue avec "Unable to create channel of type 'SIP'").
@@ -20,6 +23,7 @@ const ORIGINATE_TRACK_TIMEOUT_MS = parseInt(process.env.ASTERISK_ORIGINATE_TRACK
 // "PJSIP/kavkom-trunk/<numero>" échoue avec
 // "Could not create dialog to invalid URI '<numero>'" (cf. Asterisk 22 / chan_pjsip).
 const AMI_TRUNK_ENDPOINT = process.env.ASTERISK_TRUNK_ENDPOINT || 'kavkom-trunk';
+const DYNAMIC_PJSIP_CONFIG_FILE = process.env.ASTERISK_DYNAMIC_CONFIG_FILE || '/data/asterisk/ai-agents.conf';
 
 const AMI_LINE_END = '\r\n';
 const AMI_BLOCK_END = '\r\n\r\n';
@@ -29,6 +33,9 @@ const CHANNELS_TIMEOUT_MS = 4000;
 
 const CALL_CONTEXT = 'outgoing-call';
 const CALL_EXTEN = 's';
+const MANAGED_BLOCK_PREFIX = '; BEGIN HEROES AI AGENT';
+const MANAGED_BLOCK_SUFFIX = '; END HEROES AI AGENT';
+let pjsipConfigQueue = Promise.resolve();
 
 /**
  * Assemble les lignes d'une action AMI (terminées par \r\n, bloc clos par \r\n\r\n).
@@ -46,18 +53,27 @@ function buildLoginAction() {
     ]);
 }
 
-function buildOriginateAction({ channel, callUuid, callId }) {
-    return formatAmiAction([
+function buildOriginateAction({ channel, callUuid, callId, callerIdNumber }) {
+    const lines = [
         'Action: Originate',
         `Channel: ${channel}`,
         `Context: ${CALL_CONTEXT}`,
         `Exten: ${CALL_EXTEN}`,
         'Priority: 1',
         `Variable: CALLID=${callUuid}`,
+    ];
+
+    if (callerIdNumber) {
+        lines.push(`CallerID: ${callerIdNumber}`);
+    }
+
+    lines.push(
         `Timeout: ${OUTGOING_DIAL_TIMEOUT_MS}`,
         'Async: true',
         `ActionID: ${callId}`
-    ]);
+    );
+
+    return formatAmiAction(lines);
 }
 
 function buildHangupAction(channelName) {
@@ -65,6 +81,14 @@ function buildHangupAction(channelName) {
         'Action: Hangup',
         `Channel: ${channelName}`,
         `ActionID: hangup-${Date.now()}`
+    ]);
+}
+
+function buildCommandAction(command) {
+    return formatAmiAction([
+        'Action: Command',
+        `Command: ${command}`,
+        `ActionID: command-${Date.now()}`
     ]);
 }
 
@@ -168,7 +192,17 @@ function amiAction(action, { host = AMI_HOST, port = AMI_PORT, timeout = AMI_TIM
                 return;
             }
 
-            if (buffer.includes(AMI_BLOCK_END)) finish(null, takeBlock());
+            while (buffer.includes(AMI_BLOCK_END)) {
+                const block = takeBlock();
+                const fields = parseAmiBlock(block);
+
+                if (fields.Event && !fields.Response) {
+                    continue;
+                }
+
+                finish(null, block);
+                return;
+            }
         };
 
         socket.connect(port, host, () => {
@@ -214,27 +248,29 @@ function trackOriginate(action, actionId, { host = AMI_HOST, port = AMI_PORT, ti
         let phase = 'greeting';
         let settled = false;
         let trackingTimer = null;
+        let queuedBlock = null;
 
         const cleanup = () => {
             clearTimeout(guard);
             clearTimeout(trackingTimer);
         };
 
-        const closeTracking = () => {
+        const closeTracking = (block = queuedBlock) => {
+            if (settled) return;
+            settled = true;
             cleanup();
             socket.destroy();
+            resolve(block);
         };
 
         const resolveQueued = (block) => {
             if (settled) return;
-            settled = true;
+            queuedBlock = block;
             clearTimeout(guard);
-            resolve(block);
 
             trackingTimer = setTimeout(() => {
-                console.warn(`⚠️  Aucun résultat final AMI Originate après ${ORIGINATE_TRACK_TIMEOUT_MS} ms (${actionId})`);
-                socket.destroy();
-            }, ORIGINATE_TRACK_TIMEOUT_MS);
+                closeTracking(block);
+            }, ORIGINATE_IMMEDIATE_FAILURE_GRACE_MS);
             trackingTimer.unref?.();
         };
 
@@ -269,14 +305,19 @@ function trackOriginate(action, actionId, { host = AMI_HOST, port = AMI_PORT, ti
                     console.log(`📡 DialEnd: status=${fields.DialStatus || '?'} cause=${fields.Cause || '?'}`);
                     break;
                 case 'Hangup':
-                    if (fields.Channel?.includes('PJSIP/kavkom-trunk')) {
+                    if (fields.Channel?.includes('PJSIP/')) {
                         console.log(`📴 Hangup: ${fields.Channel} cause=${fields.Cause || '?'} ${fields['Cause-txt'] || ''}`.trim());
                     }
                     break;
                 case 'OriginateResponse':
                     if (!fields.ActionID || fields.ActionID === actionId) {
                         console.log(`📞 Résultat AMI Originate: ${describeOriginateResponse(fields)}`);
-                        closeTracking();
+                        if (fields.Response && fields.Response !== 'Success') {
+                            fail(new Error(`Originate refusé: ${describeOriginateResponse(fields)}`));
+                            return;
+                        }
+
+                        closeTracking(queuedBlock || formatAmiAction(Object.entries(fields).map(([key, value]) => `${key}: ${value}`)));
                     }
                     break;
                 default:
@@ -385,6 +426,8 @@ const OUTGOING_PROMPT_STORE = {
     current: null
 };
 
+const OUTGOING_CALLS = new Map();
+
 export function getCurrentOutgoingPrompt() {
     return OUTGOING_PROMPT_STORE.current;
 }
@@ -402,6 +445,8 @@ const OUTGOING_CALL_CONTEXT = {
     callerNumber: null,
     destinationNumber: null,
     callUuid: null,
+    geminiConfig: {},
+    kavkomConfig: {},
 };
 
 export function getCurrentOutgoingContext() {
@@ -417,27 +462,303 @@ export function setCurrentOutgoingContext(context = {}) {
         callerNumber: context.callerNumber ?? null,
         destinationNumber: context.destinationNumber ?? null,
         callUuid: context.callUuid ?? null,
+        geminiConfig: normalizeGeminiConfig(context.geminiConfig ?? context.gemini_config ?? {}),
+        kavkomConfig: normalizeKavkomConfig(context.kavkomConfig ?? context.kavkom_config ?? {}),
     });
+}
+
+export function getOutgoingCallContext(callUuid = null) {
+    if (callUuid && OUTGOING_CALLS.has(callUuid)) {
+        return { ...OUTGOING_CALLS.get(callUuid) };
+    }
+
+    if (callUuid) {
+        return {
+            prospectId: null,
+            projectId: null,
+            projectSlug: null,
+            agentId: null,
+            callerNumber: null,
+            destinationNumber: null,
+            callUuid,
+            openingPrompt: null,
+            geminiConfig: {},
+            kavkomConfig: {},
+        };
+    }
+
+    return getCurrentOutgoingContext();
+}
+
+export function releaseOutgoingCallContext(callUuid = null) {
+    if (callUuid) OUTGOING_CALLS.delete(callUuid);
+}
+
+function registerOutgoingCallContext(callUuid, context = {}) {
+    const next = {
+        prospectId: context.prospectId ?? null,
+        projectId: context.projectId ?? null,
+        projectSlug: context.projectSlug ?? null,
+        agentId: context.agentId ?? null,
+        callerNumber: context.callerNumber ?? null,
+        destinationNumber: context.destinationNumber ?? null,
+        callUuid,
+        openingPrompt: context.openingPrompt ?? null,
+        geminiConfig: normalizeGeminiConfig(context.geminiConfig ?? context.gemini_config ?? {}),
+        kavkomConfig: normalizeKavkomConfig(context.kavkomConfig ?? context.kavkom_config ?? {}),
+    };
+
+    OUTGOING_CALLS.set(callUuid, next);
+    setCurrentOutgoingContext(next);
+    setCurrentOutgoingPrompt(next.openingPrompt);
+
+    return next;
+}
+
+function normalizeGeminiConfig(config = {}) {
+    return {
+        gemini_api_key: config.gemini_api_key ?? config.api_key ?? null,
+        gemini_live_model: config.gemini_live_model ?? config.live_model ?? config.model ?? null,
+        gemini_summary_model: config.gemini_summary_model ?? config.summary_model ?? null,
+    };
+}
+
+function normalizeKavkomConfig(config = {}) {
+    return {
+        extension: config.extension ?? null,
+        password: config.password ?? null,
+        caller_id_number: config.caller_id_number ?? config.callerIdNumber ?? config.phone_number ?? null,
+        user_context: config.user_context ?? process.env.KAVKOM_USER_CONTEXT ?? null,
+        transport: (config.transport ?? process.env.KAVKOM_SIP_TRANSPORT ?? 'udp').toLowerCase(),
+        sip_port: Number(config.sip_port ?? process.env.KAVKOM_SIP_PORT ?? 5060),
+    };
+}
+
+function sanitizeEndpointPart(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 48);
+}
+
+function assertSafePjsipValue(label, value) {
+    if (String(value ?? '').match(/[\r\n]/)) {
+        throw new Error(`Configuration SIP invalide: ${label} contient un saut de ligne.`);
+    }
+}
+
+function managedEndpointName(context = {}) {
+    const base = context.agentId
+        ? `ai-agent-${context.agentId}`
+        : `ai-agent-${crypto.createHash('sha1').update(String(context.kavkomConfig?.extension || Date.now())).digest('hex').slice(0, 10)}`;
+
+    return sanitizeEndpointPart(base) || `ai-agent-${crypto.randomBytes(4).toString('hex')}`;
+}
+
+function buildAgentPjsipBlock(endpointName, kavkomConfig) {
+    const extension = String(kavkomConfig.extension || '').trim();
+    const password = String(kavkomConfig.password || '');
+    const userContext = String(kavkomConfig.user_context || '').trim();
+    const transport = ['udp', 'tcp', 'tls'].includes(kavkomConfig.transport) ? kavkomConfig.transport : 'udp';
+    const sipPort = Number(kavkomConfig.sip_port || (transport === 'tls' ? 5061 : 5060));
+    const callerIdNumber = String(kavkomConfig.caller_id_number || extension).replace(/[^\d+]/g, '');
+
+    for (const [label, value] of Object.entries({ extension, password, userContext, transport, sipPort, callerIdNumber })) {
+        assertSafePjsipValue(label, value);
+    }
+
+    if (!extension || !password || !userContext) {
+        throw new Error("Configuration Kavkom de l'agent IA incomplète: extension, mot de passe et KAVKOM_USER_CONTEXT sont requis.");
+    }
+
+    return `${MANAGED_BLOCK_PREFIX} ${endpointName}
+[${endpointName}-reg]
+type=registration
+outbound_auth=${endpointName}-auth
+transport=transport-${transport}
+server_uri=sip:${userContext}:${sipPort}
+client_uri=sip:${extension}@${userContext}
+retry_interval=60
+expiration=3600
+contact_user=${extension}
+auth_rejection_permanent=no
+
+[${endpointName}-auth]
+type=auth
+auth_type=userpass
+username=${extension}
+password=${password}
+realm=${userContext}
+
+[${endpointName}]
+type=endpoint
+context=from-kavkom
+transport=transport-${transport}
+disallow=all
+allow=alaw,ulaw
+outbound_auth=${endpointName}-auth
+aors=${endpointName}-aor
+direct_media=no
+from_user=${extension}
+from_domain=${userContext}
+callerid=${callerIdNumber}
+
+[${endpointName}-aor]
+type=aor
+contact=sip:${userContext}:${sipPort}
+${MANAGED_BLOCK_SUFFIX} ${endpointName}`;
+}
+
+async function reloadPjsipConfig(asteriskHost, asteriskPort) {
+    const response = await amiAction(
+        buildCommandAction('pjsip reload'),
+        { host: asteriskHost, port: asteriskPort, timeout: AMI_TIMEOUT_MS }
+    );
+
+    if (!response.includes('Response: Follows') && !response.includes('Response: Success')) {
+        console.warn('[Asterisk] Réponse inattendue au rechargement PJSIP:', response.replace(/\r\n/g, ' | '));
+    }
+}
+
+async function amiCommand(command, asteriskHost, asteriskPort, timeout = AMI_TIMEOUT_MS) {
+    return amiAction(
+        buildCommandAction(command),
+        { host: asteriskHost, port: asteriskPort, timeout }
+    );
+}
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function escapeRegExp(value) {
+    return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function waitForPjsipEndpointReady(endpointName, asteriskHost, asteriskPort) {
+    const deadline = Date.now() + PJSIP_ENDPOINT_READY_TIMEOUT_MS;
+    let lastEndpointOutput = '';
+    let lastRegistrationOutput = '';
+
+    while (Date.now() < deadline) {
+        lastEndpointOutput = await amiCommand(`pjsip show endpoint ${endpointName}`, asteriskHost, asteriskPort, 3000)
+            .catch((error) => error.message);
+        const endpointLoaded = lastEndpointOutput.includes(`Endpoint:  ${endpointName}/`)
+            || lastEndpointOutput.includes(`Endpoint:  ${endpointName} `);
+
+        lastRegistrationOutput = await amiCommand('pjsip show registrations', asteriskHost, asteriskPort, 3000)
+            .catch((error) => error.message);
+        const registrationReady = new RegExp(`${escapeRegExp(endpointName)}-reg/[^\\r\\n]*Registered`).test(lastRegistrationOutput);
+
+        if (endpointLoaded && registrationReady) {
+            return;
+        }
+
+        await sleep(500);
+    }
+
+    throw new Error(
+        `Endpoint PJSIP ${endpointName} non prêt après ${PJSIP_ENDPOINT_READY_TIMEOUT_MS} ms. `
+        + `Endpoint: ${lastEndpointOutput.replace(/\s+/g, ' ').slice(0, 220)} `
+        + `Registrations: ${lastRegistrationOutput.replace(/\s+/g, ' ').slice(0, 220)}`
+    );
+}
+
+async function withPjsipConfigLock(task) {
+    const previous = pjsipConfigQueue;
+    let release;
+    pjsipConfigQueue = new Promise((resolve) => {
+        release = resolve;
+    });
+
+    await previous.catch(() => {});
+
+    try {
+        return await task();
+    } finally {
+        release();
+    }
+}
+
+async function upsertManagedPjsipBlock(endpointName, block, asteriskHost, asteriskPort) {
+    await fs.mkdir(path.dirname(DYNAMIC_PJSIP_CONFIG_FILE), { recursive: true });
+
+    let current = '';
+    try {
+        current = await fs.readFile(DYNAMIC_PJSIP_CONFIG_FILE, 'utf8');
+    } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+    }
+
+    const pattern = new RegExp(`${MANAGED_BLOCK_PREFIX} ${endpointName}[\\s\\S]*?${MANAGED_BLOCK_SUFFIX} ${endpointName}`, 'm');
+    const next = pattern.test(current)
+        ? current.replace(pattern, block)
+        : `${current.trim() ? `${current.trim()}\n\n` : ''}${block}\n`;
+
+    if (next === current) {
+        return false;
+    }
+
+    await fs.writeFile(DYNAMIC_PJSIP_CONFIG_FILE, next, 'utf8');
+    await reloadPjsipConfig(asteriskHost, asteriskPort);
+
+    return true;
+}
+
+async function resolveAsteriskEndpoint(context, asteriskHost, asteriskPort) {
+    const kavkomConfig = normalizeKavkomConfig(context.kavkomConfig || {});
+
+    if (!kavkomConfig.extension && !kavkomConfig.password) {
+        return {
+            endpointName: AMI_TRUNK_ENDPOINT,
+            callerIdNumber: kavkomConfig.caller_id_number || null,
+        };
+    }
+
+    const endpointName = managedEndpointName({ ...context, kavkomConfig });
+    const block = buildAgentPjsipBlock(endpointName, kavkomConfig);
+
+    await withPjsipConfigLock(async () => {
+        const configChanged = await upsertManagedPjsipBlock(endpointName, block, asteriskHost, asteriskPort);
+
+        try {
+            await waitForPjsipEndpointReady(endpointName, asteriskHost, asteriskPort);
+        } catch (error) {
+            if (configChanged) throw error;
+
+            await reloadPjsipConfig(asteriskHost, asteriskPort);
+            await waitForPjsipEndpointReady(endpointName, asteriskHost, asteriskPort);
+        }
+    });
+
+    return {
+        endpointName,
+        callerIdNumber: kavkomConfig.caller_id_number || null,
+    };
 }
 
 export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, asteriskPort = AMI_PORT, openingPrompt = null, callContext = {}) {
     const callId = `call-${Date.now()}-${crypto.randomBytes(6).toString('hex')}`;
-    const channel = `PJSIP/${targetNumber}@${AMI_TRUNK_ENDPOINT}`;
     // AudioSocket(uuid,service) exige un UUID valide : on le transmet au dialplan
     // via la variable CALLID (utilisée dans [outgoing-call] de extensions.conf).
     const callUuid = crypto.randomUUID();
-
-    setCurrentOutgoingContext({
+    const context = registerOutgoingCallContext(callUuid, {
         ...callContext,
+        openingPrompt,
         callUuid,
         destinationNumber: callContext.destinationNumber ?? targetNumber,
     });
-    setCurrentOutgoingPrompt(openingPrompt);
-    logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort });
+
+    let channel = null;
 
     try {
+        const { endpointName, callerIdNumber } = await resolveAsteriskEndpoint(context, asteriskHost, asteriskPort);
+        channel = `PJSIP/${targetNumber}@${endpointName}`;
+        logOutgoingCall({ targetNumber, channel, callId, asteriskHost, asteriskPort });
+
         const block = await trackOriginate(
-            buildOriginateAction({ channel, callUuid, callId }),
+            buildOriginateAction({ channel, callUuid, callId, callerIdNumber }),
             callId,
             { host: asteriskHost, port: asteriskPort }
         );
@@ -446,6 +767,7 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
         if (fields.Response !== 'Success') {
             const errorMsg = fields.Message || 'Erreur inconnue';
             console.error(`❌ Erreur AMI: ${errorMsg}`);
+            releaseOutgoingCallContext(callUuid);
             return buildCallFailure({
                 callId, channel, targetNumber,
                 message: `Erreur AMI: ${errorMsg}`
@@ -465,17 +787,20 @@ export async function placeOutgoingCall(targetNumber, asteriskHost = AMI_HOST, a
             callUuid,
             channel,
             targetNumber,
-            prospectId: OUTGOING_CALL_CONTEXT.prospectId,
-            projectId: OUTGOING_CALL_CONTEXT.projectId,
-            projectSlug: OUTGOING_CALL_CONTEXT.projectSlug,
-            agentId: OUTGOING_CALL_CONTEXT.agentId,
-            callerNumber: OUTGOING_CALL_CONTEXT.callerNumber,
-            destinationNumber: OUTGOING_CALL_CONTEXT.destinationNumber,
+            prospectId: context.prospectId,
+            projectId: context.projectId,
+            projectSlug: context.projectSlug,
+            agentId: context.agentId,
+            callerNumber: context.callerNumber,
+            destinationNumber: context.destinationNumber,
+            callerIdNumber,
+            endpointName,
             openingPrompt,
             message: 'Appel sortant en cours de placement',
             timestamp: new Date().toISOString()
         };
     } catch (err) {
+        releaseOutgoingCallContext(callUuid);
         console.error(`❌ Échec du placement de l'appel: ${err.message}`);
         return buildCallFailure({
             callId, channel, targetNumber,

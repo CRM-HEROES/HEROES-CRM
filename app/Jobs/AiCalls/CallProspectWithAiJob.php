@@ -59,6 +59,13 @@ class CallProspectWithAiJob implements ShouldQueue
             return;
         }
 
+        $geminiConfig = $agent->config ?: [];
+        $kavkomConfig = $agent->kavkom_config ?: [];
+
+        if (!$this->agentHasCallablePhone($agent, $geminiConfig, $kavkomConfig)) {
+            return;
+        }
+
         $this->waitForAvailableChannel();
 
         $openingPrompt = trim((string) (($agent->script ?? '') . "\n" . ($agent->instructions ?? '')));
@@ -73,6 +80,16 @@ class CallProspectWithAiJob implements ShouldQueue
             'destinationNumber' => $destination,
             'openingPrompt' => $openingPrompt !== '' ? $openingPrompt : null,
             'prompt' => $openingPrompt !== '' ? $openingPrompt : null,
+            'gemini_config' => [
+                'gemini_api_key' => $geminiConfig['gemini_api_key'] ?? null,
+                'gemini_live_model' => $geminiConfig['gemini_live_model'] ?? null,
+                'gemini_summary_model' => $geminiConfig['gemini_summary_model'] ?? null,
+            ],
+            'kavkom_config' => [
+                'extension' => $kavkomConfig['extension'] ?? null,
+                'password' => $kavkomConfig['password'] ?? null,
+                'caller_id_number' => $kavkomConfig['caller_id_number'] ?? null,
+            ],
         ];
 
         $response = Http::timeout(20)->post(config('services.ia_gateway.base_url') . '/call', $payload);
@@ -128,6 +145,36 @@ class CallProspectWithAiJob implements ShouldQueue
             ->where('is_active', true)
             ->orderBy('id')
             ->first();
+    }
+
+    protected function agentHasCallablePhone(AiAgent $agent, array $geminiConfig, array $kavkomConfig): bool
+    {
+        $missing = [];
+
+        foreach ([
+            'gemini_api_key' => $geminiConfig['gemini_api_key'] ?? null,
+            'gemini_live_model' => $geminiConfig['gemini_live_model'] ?? null,
+            'gemini_summary_model' => $geminiConfig['gemini_summary_model'] ?? null,
+            'extension' => $kavkomConfig['extension'] ?? null,
+            'password' => $kavkomConfig['password'] ?? null,
+            'caller_id_number' => $kavkomConfig['caller_id_number'] ?? null,
+        ] as $field => $value) {
+            if (trim((string) $value) === '') {
+                $missing[] = $field;
+            }
+        }
+
+        if (empty($missing)) {
+            return true;
+        }
+
+        Log::warning('AI call job skipped: AI agent phone configuration incomplete.', [
+            'agent_id' => $agent->id,
+            'project_id' => $agent->project_id,
+            'missing_fields' => $missing,
+        ]);
+
+        return false;
     }
 
     protected function waitForAvailableChannel(): void

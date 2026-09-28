@@ -143,6 +143,7 @@ services:
     volumes:
       - ./ia-phone-call/recordings:/app/recordings
       - calls_data:/data/calls
+      - asterisk_dynamic_config:/data/asterisk
     networks:
       - heroes-network
       - ia-phone-net
@@ -163,6 +164,7 @@ services:
       - TZ=${TZ:-Europe/Paris}
     ports:
       - "${SIP_PORT:-5060}:5060/udp"
+      - "${SIP_PORT:-5060}:5060/tcp"
       - "${SIP_TLS_PORT:-5061}:5061/udp"
       - "${SIP_TLS_PORT:-5061}:5061/tcp"
       - "10000-10099:10000-10099/udp"
@@ -172,6 +174,7 @@ services:
       - ./ia-phone-call/asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
       - ./ia-phone-call/asterisk/manager.conf:/etc/asterisk/manager.conf:ro
       - calls_data:/var/spool/asterisk/monitor
+      - asterisk_dynamic_config:/etc/asterisk/dynamic
     networks:
       - ia-phone-net
     healthcheck:
@@ -192,3 +195,4 @@ networks:
 
 volumes:
   calls_data:
+  asterisk_dynamic_config:

@@ -18,6 +18,8 @@ const DEFAULT_VOICE = 'Puck';
 const DEFAULT_OPENING_PROMPT =
     "L'appel vient de démarrer. Tu dois parler en premier : salue l'appelant et demande-lui comment tu peux l'aider.";
 const SYSTEM_INSTRUCTION = 'Tu es un assistant téléphonique. Sois fluide et concis.';
+const GEMINI_WS_CONNECT_RETRIES = parseInt(process.env.GEMINI_WS_CONNECT_RETRIES || '3', 10);
+const GEMINI_WS_RETRY_DELAY_MS = parseInt(process.env.GEMINI_WS_RETRY_DELAY_MS || '1000', 10);
 
 // Champs de réponse Gemini traités explicitement (sert à détecter les messages
 // non gérés sans confondre avec une réponse audio).
@@ -114,21 +116,25 @@ function resample24kTo8k(input) {
  * @returns {Object} Interface de contrôle du service Gemini.
  */
 export function createGeminiSession({ onAudioData, onClose, openingPrompt: customOpeningPrompt, onSummary, callContext } = {}) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    const model = process.env.GEMINI_LIVE_MODEL || DEFAULT_MODEL;
     const resolvedCallContext = callContext || getCurrentOutgoingContext();
+    const geminiConfig = resolvedCallContext.geminiConfig || resolvedCallContext.gemini_config || {};
+    const apiKey = geminiConfig.gemini_api_key || process.env.GEMINI_API_KEY;
+    const model = geminiConfig.gemini_live_model || geminiConfig.model || process.env.GEMINI_LIVE_MODEL || DEFAULT_MODEL;
+    const summaryModel = geminiConfig.gemini_summary_model || process.env.GEMINI_SUMMARY_MODEL || 'models/gemini-3.8-flash';
     const openingPrompt = customOpeningPrompt || process.env.GEMINI_OPENING_PROMPT || DEFAULT_OPENING_PROMPT;
     const transcript = createCallTranscript();
 
     transcript.appendSystem('Session Gemini démarrée.');
 
-    const ws = new WebSocket(`${GEMINI_WS_URL}?key=${apiKey}`);
     const recordingPath = path.join(RECORDINGS_DIR, `gemini-${Date.now()}.pcm`);
     const recorder = createPcmRecorder({
         filePath: recordingPath,
         sampleRate: GEMINI_OUTPUT_SAMPLE_RATE
     });
 
+    let ws = null;
+    let wsAttempt = 0;
+    let lastSocketError = null;
     let setupComplete = false;
     let closed = false;
     const pendingChunks = [];
@@ -141,8 +147,8 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
 
     /** Envoie un buffer PCM déjà redimensionné à Gemini (ou le met en file d'attente). */
     function transmitAudio(pcmBuffer) {
-        if (ws.readyState !== WebSocket.OPEN) {
-            console.warn(`[Gemini] ⚠️  WebSocket non OPEN (état: ${ws.readyState}), audio non envoyé`);
+        if (!ws || ws.readyState !== WebSocket.OPEN) {
+            console.warn(`[Gemini] ⚠️  WebSocket non OPEN (état: ${ws?.readyState ?? 'absent'}), audio non envoyé`);
             return;
         }
 
@@ -198,13 +204,13 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
         }
     }
 
-    ws.on('open', () => {
+    function handleOpen() {
         sessionStartTime = Date.now();
-        console.log('🤖 [Gemini] ✅ Connecté au serveur Gemini Live API');
+        console.log(`🤖 [Gemini] ✅ Connecté au serveur Gemini Live API (tentative ${wsAttempt})`);
         ws.send(JSON.stringify(buildSetupMessage(model)));
-    });
+    }
 
-    ws.on('message', (rawMessage) => {
+    function handleMessage(rawMessage) {
         let response;
         try {
             response = JSON.parse(rawMessage);
@@ -235,14 +241,31 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
         if (unknownKeys.length > 0) {
             console.log('[Gemini] Message non géré:', JSON.stringify(response).slice(0, 300));
         }
-    });
+    }
 
-    ws.on('error', (err) => {
+    function handleError(err) {
+        lastSocketError = err;
         console.error('[Gemini] Erreur WebSocket:', err.message);
-    });
+    }
 
-    ws.on('close', (code, reason) => {
+    function shouldRetryConnection(code) {
+        const transientErrorCodes = ['EAI_AGAIN', 'ETIMEDOUT', 'ECONNRESET', 'ENOTFOUND', 'ECONNREFUSED'];
+
+        return !closed
+            && !setupComplete
+            && wsAttempt < GEMINI_WS_CONNECT_RETRIES
+            && (code === 1006 || transientErrorCodes.includes(lastSocketError?.code));
+    }
+
+    function handleClose(code, reason) {
         console.log(`[Gemini] Connexion fermée (${code}: ${reason})`);
+
+        if (shouldRetryConnection(code)) {
+            const delay = GEMINI_WS_RETRY_DELAY_MS * wsAttempt;
+            console.warn(`[Gemini] Reconnexion dans ${delay} ms après erreur temporaire (${lastSocketError?.code || code}).`);
+            setTimeout(connectWebSocket, delay);
+            return;
+        }
 
         const finalizeSummary = async () => {
             if (!transcript.hasContent()) return;
@@ -251,7 +274,7 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
                 const summary = await summarizeCallTranscript({
                     transcript,
                     apiKey,
-                    model: process.env.GEMINI_SUMMARY_MODEL || 'models/gemini-3.8-flash'
+                    model: summaryModel
                 });
 
                 console.log('\n📄 [Résumé final de conversation]\n' + summary + '\n');
@@ -293,7 +316,21 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
             });
 
         if (onClose) onClose();
-    });
+    }
+
+    function connectWebSocket() {
+        if (closed) return;
+
+        wsAttempt++;
+        lastSocketError = null;
+        ws = new WebSocket(`${GEMINI_WS_URL}?key=${apiKey}`);
+        ws.on('open', handleOpen);
+        ws.on('message', handleMessage);
+        ws.on('error', handleError);
+        ws.on('close', handleClose);
+    }
+
+    connectWebSocket();
 
     /** Transmet un chunk PCM 8 kHz d'Asterisk vers Gemini (avec mise en attente avant setup). */
     function sendAudioChunk(pcmBuffer) {
@@ -319,7 +356,7 @@ export function createGeminiSession({ onAudioData, onClose, openingPrompt: custo
         console.log(`   Audio envoyé: ${totalAudioSent} bytes`);
         console.log(`   Audio reçu: ${totalAudioReceived} bytes\n`);
 
-        if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
             ws.close();
         }
     }

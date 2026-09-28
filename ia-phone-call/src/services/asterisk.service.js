@@ -6,10 +6,16 @@ import {
     createMixedPcmRecorder,
     writeAudioSocketPacket
 } from '../utils/audio.util.js';
-import { getCurrentOutgoingPrompt, getCurrentOutgoingContext } from './outgoing-call.service.js';
+import {
+    getCurrentOutgoingContext,
+    getCurrentOutgoingPrompt,
+    getOutgoingCallContext,
+    releaseOutgoingCallContext
+} from './outgoing-call.service.js';
 
 // Asterisk AudioSocket transporte du PCM 8 kHz 16 bits (slin).
 const ASTERISK_SAMPLE_RATE = 8000;
+const UUID_PACKET_TYPE = 0x01;
 const AUDIO_PACKET_TYPE = 0x10;
 const PACKET_HEADER_SIZE = 3;
 
@@ -33,7 +39,17 @@ const PROGRESS_LOG_EVERY_N_PACKETS = 10;
  * @returns {{ payloads: Buffer[], remaining: Buffer }} Payloads complets + reste partiel à conserver
  */
 export function extractAudioPayloads(buffer) {
-    const payloads = [];
+    const { packets, remaining } = extractAudioSocketPackets(buffer);
+    return {
+        payloads: packets
+            .filter((packet) => packet.type === AUDIO_PACKET_TYPE)
+            .map((packet) => packet.payload),
+        remaining
+    };
+}
+
+export function extractAudioSocketPackets(buffer) {
+    const packets = [];
     let remaining = buffer;
 
     while (remaining.length >= PACKET_HEADER_SIZE) {
@@ -41,17 +57,27 @@ export function extractAudioPayloads(buffer) {
         const payloadLength = remaining.readUInt16BE(1);
         const packetLength = PACKET_HEADER_SIZE + payloadLength;
 
-        // Paquet incomplet : on attend le prochain chunk du socket.
         if (remaining.length < packetLength) break;
 
-        if (messageType === AUDIO_PACKET_TYPE) {
-            payloads.push(remaining.subarray(PACKET_HEADER_SIZE, packetLength));
-        }
+        packets.push({
+            type: messageType,
+            payload: remaining.subarray(PACKET_HEADER_SIZE, packetLength)
+        });
 
         remaining = remaining.subarray(packetLength);
     }
 
-    return { payloads, remaining };
+    return { packets, remaining };
+}
+
+function decodeAudioSocketUuid(payload) {
+    if (payload.length === 16) {
+        const hex = payload.toString('hex');
+        return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+    }
+
+    const value = payload.toString('utf8').replace(/\0/g, '').trim();
+    return value || null;
 }
 
 function logCallStart(callStartTime, recordingPath) {
@@ -100,6 +126,9 @@ export function handleAsteriskConnection(asteriskSocket) {
     let totalBytesReceived = 0;
     let totalPacketsReceived = 0;
     let lastAudioSentAt = Date.now();
+    let callUuid = null;
+    let callContext = null;
+    let geminiSession = null;
 
     const sendToAsterisk = (pcmBuffer) => {
         lastAudioSentAt = Date.now();
@@ -120,28 +149,49 @@ export function handleAsteriskConnection(asteriskSocket) {
 
     logCallStart(callStartTime, recordingPath);
 
-    const geminiSession = createGeminiSession({
-        // Audio produit par Gemini -> réinjection dans le canal Asterisk.
-        onAudioData: (pcmBuffer) => {
-            console.log(`🎵 [Gemini -> Asterisk] Réception de ${pcmBuffer.length} bytes depuis Gemini`);
-            console.log(`📤 [Asterisk -> Kavkom] Envoi vers le trunk de ${pcmBuffer.length} bytes audio`);
-            mixedRecorder.write(pcmBuffer, 'gemini');
-            sendToAsterisk(pcmBuffer);
-        },
-        onClose: () => {
-            console.log('[Gemini] ⚠️  Fermeture de Gemini - Fermeture du socket Asterisk');
-            stopCall();
-            asteriskSocket.end();
-        },
-        openingPrompt: getCurrentOutgoingPrompt(),
-        callContext: getCurrentOutgoingContext(),
-    });
+    const ensureGeminiSession = () => {
+        if (geminiSession) return geminiSession;
+
+        callContext = callUuid
+            ? getOutgoingCallContext(callUuid)
+            : getCurrentOutgoingContext();
+
+        geminiSession = createGeminiSession({
+            // Audio produit par Gemini -> réinjection dans le canal Asterisk.
+            onAudioData: (pcmBuffer) => {
+                console.log(`🎵 [Gemini -> Asterisk] Réception de ${pcmBuffer.length} bytes depuis Gemini`);
+                console.log(`📤 [Asterisk -> Kavkom] Envoi vers le trunk de ${pcmBuffer.length} bytes audio`);
+                mixedRecorder.write(pcmBuffer, 'gemini');
+                sendToAsterisk(pcmBuffer);
+            },
+            onClose: () => {
+                console.log('[Gemini] ⚠️  Fermeture de Gemini - Fermeture du socket Asterisk');
+                stopCall();
+                asteriskSocket.end();
+            },
+            openingPrompt: callContext.openingPrompt || getCurrentOutgoingPrompt(),
+            callContext,
+        });
+
+        return geminiSession;
+    };
 
     asteriskSocket.on('data', (chunk) => {
-        const { payloads, remaining } = extractAudioPayloads(Buffer.concat([audioBuffer, chunk]));
+        const { packets, remaining } = extractAudioSocketPackets(Buffer.concat([audioBuffer, chunk]));
         audioBuffer = remaining;
 
-        for (const payload of payloads) {
+        for (const packet of packets) {
+            if (packet.type === UUID_PACKET_TYPE) {
+                callUuid = decodeAudioSocketUuid(packet.payload);
+                console.log(`[Asterisk] AudioSocket UUID: ${callUuid || 'inconnu'}`);
+                continue;
+            }
+
+            if (packet.type !== AUDIO_PACKET_TYPE) {
+                continue;
+            }
+
+            const payload = packet.payload;
             totalBytesReceived += payload.length;
             totalPacketsReceived++;
             recorder.write(payload);
@@ -153,14 +203,15 @@ export function handleAsteriskConnection(asteriskSocket) {
             }
 
             // Le service Gemini gère lui-même le resampling 8 kHz -> 16 kHz.
-            geminiSession.sendAudioChunk(payload);
+            ensureGeminiSession().sendAudioChunk(payload);
         }
     });
 
     asteriskSocket.on('error', (err) => {
         console.error(`\n❌ [Asterisk] Erreur Socket: ${err.message}`);
         stopCall();
-        geminiSession.close();
+        if (geminiSession) geminiSession.close();
+        releaseOutgoingCallContext(callUuid);
     });
 
     asteriskSocket.on('close', async () => {
@@ -169,6 +220,7 @@ export function handleAsteriskConnection(asteriskSocket) {
         const [wavPath, mixedWavPath] = await Promise.all([recorder.end(), mixedRecorder.end()]);
         logCallSummary({ callStartTime, totalPacketsReceived, totalBytesReceived, wavPath, mixedWavPath });
 
-        geminiSession.close();
+        if (geminiSession) geminiSession.close();
+        releaseOutgoingCallContext(callUuid);
     });
 }

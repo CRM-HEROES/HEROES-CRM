@@ -78,6 +78,8 @@ const ROUTES = [
             const callerNumber = data.callerNumber ?? data.caller_number ?? null;
             const destinationNumber = data.destinationNumber ?? data.destination_number ?? phoneNumber ?? null;
             const openingPrompt = data.openingPrompt || data.prompt || data.script || data.instructions || null;
+            const geminiConfig = data.geminiConfig || data.gemini_config || data.agent?.config || {};
+            const kavkomConfig = data.kavkomConfig || data.kavkom_config || {};
 
             if (!phoneNumber) throw new HttpError(400, 'phoneNumber requis');
 
@@ -88,6 +90,8 @@ const ROUTES = [
                 agentId,
                 callerNumber,
                 destinationNumber,
+                geminiConfig,
+                kavkomConfig,
             });
             return { statusCode: result.success ? 200 : 500, payload: result };
         }

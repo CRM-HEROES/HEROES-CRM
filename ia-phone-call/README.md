@@ -152,15 +152,23 @@ docker exec ia-asterisk asterisk -rx "manager show connected"
 | `ASTERISK_AMI_HOST` | `ia-asterisk` | hôte AMI |
 | `ASTERISK_AMI_PORT` | `5038` | port AMI |
 | `ASTERISK_AMI_USERNAME` / `ASTERISK_AMI_SECRET` | `default` / `HeroesAmi2026!` | compte AMI (doit correspondre à `asterisk/manager.conf`) |
-| `ASTERISK_TRUNK_ENDPOINT` | `kavkom-trunk` | endpoint PJSIP de sortie → canal `PJSIP/<numéro>@<endpoint>` |
-| `GEMINI_API_KEY`, `GEMINI_LIVE_MODEL`, `GEMINI_SUMMARY_MODEL`, `GEMINI_OPENING_PROMPT` | — | session Gemini Live + résumé post-appel |
+| `ASTERISK_TRUNK_ENDPOINT` | `kavkom-trunk` | endpoint PJSIP de fallback si aucun agent IA ne fournit de téléphone |
+| `ASTERISK_DYNAMIC_CONFIG_FILE` | `/data/asterisk/ai-agents.conf` | fichier partagé où Node écrit les endpoints PJSIP des agents IA |
+| `GEMINI_API_KEY`, `GEMINI_LIVE_MODEL`, `GEMINI_SUMMARY_MODEL`, `GEMINI_OPENING_PROMPT` | — | fallback Gemini si l'appel ne fournit pas de config agent IA |
 | `LARAVEL_BASE_URL` | `http://webserver` | URL interne Docker du CRM pour le webhook de résumé |
 
-Côté conteneur Asterisk (générées depuis `.env` dans `pjsip.conf` par
-`asterisk/docker-entrypoint.sh`) : `KAVKOM_EXTENSION`, `KAVKOM_PASSWORD`,
-`KAVKOM_USER_CONTEXT`, `KAVKOM_SIP_TRANSPORT`, `KAVKOM_SIP_PORT` et
-`KAVKOM_USER_AGENT` (⚠️ doit rester **neutre** : le SBC de Kavkom abandonne
-silencieusement toute requête dont le `User-Agent` contient « Asterisk »).
+Côté conteneur Asterisk, `pjsip.conf` contient seulement les transports et
+inclut `dynamic/ai-agents.conf`. À chaque appel CRM, Node crée ou met à jour un
+endpoint PJSIP dédié à l'agent IA avec `kavkom_config.extension`,
+`kavkom_config.password` et `kavkom_config.caller_id_number`, puis lance
+`pjsip reload` via AMI. `KAVKOM_EXTENSION` et `KAVKOM_PASSWORD` restent
+optionnels uniquement pour l'ancien trunk unique de fallback.
+
+`KAVKOM_USER_CONTEXT`, `KAVKOM_SIP_TRANSPORT`, `KAVKOM_SIP_PORT`,
+`KAVKOM_EXTERNAL_ADDRESS` et `KAVKOM_USER_AGENT` restent des paramètres communs
+au service Asterisk. Le `User-Agent` doit rester neutre : le SBC de Kavkom
+abandonne silencieusement toute requête dont le `User-Agent` contient
+« Asterisk ».
 
 > `HTTP_PORT=4000`, `WS_PORT`, `TRANSCRIPT_WS_PORT`, `TEST_MODE`,
 > `TEST_ALLOWED_NUMBERS`, `CALL_RECORDING_DIR` présents dans `.env` appartiennent à

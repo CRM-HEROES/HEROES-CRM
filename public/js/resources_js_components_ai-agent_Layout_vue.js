@@ -31,7 +31,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loading: false,
       saving: false,
       error: "",
-      showAdvanced: false
+      geminiLiveModels: ["models/gemini-2.5-flash-native-audio-preview-09-2025"],
+      geminiSummaryModels: ["models/gemini-3.8-flash"]
     };
   },
   created: function created() {
@@ -46,18 +47,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         script: "",
         instructions: "",
         config: {
-          model: "",
-          api_version: ""
+          gemini_api_key: "",
+          gemini_live_model: "models/gemini-2.5-flash-native-audio-preview-09-2025",
+          gemini_summary_model: "models/gemini-3.8-flash"
         },
         kavkom_config: {
           extension: "",
-          domain_uuid: "",
-          user_context: "",
-          transport: "tls",
-          sip_port: 5061,
-          api_token: "",
           password: "",
-          refresh_access_token: ""
+          caller_id_number: ""
         }
       };
     },
@@ -100,8 +97,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     selectAgent: function selectAgent(agent) {
       this.selected = agent;
       this.form = _objectSpread(_objectSpread(_objectSpread({}, this.emptyForm()), agent), {}, {
-        config: _objectSpread(_objectSpread({}, this.emptyForm().config), agent.config || {}),
-        kavkom_config: _objectSpread(_objectSpread({}, this.emptyForm().kavkom_config), agent.kavkom_config || {})
+        config: this.normalizeConfig(agent.config || {}),
+        kavkom_config: this.normalizeKavkomConfig(agent.kavkom_config || {})
       });
       console.log("[AI Agent UI] Agent sélectionné", agent.id);
     },
@@ -109,6 +106,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.selected = null;
       this.form = this.emptyForm();
       console.log("[AI Agent UI] Création d'un agent");
+    },
+    normalizeConfig: function normalizeConfig(config) {
+      return _objectSpread(_objectSpread({}, this.emptyForm().config), {}, {
+        gemini_api_key: config.gemini_api_key || "",
+        gemini_live_model: config.gemini_live_model || config.model || this.emptyForm().config.gemini_live_model,
+        gemini_summary_model: config.gemini_summary_model || this.emptyForm().config.gemini_summary_model
+      });
+    },
+    normalizeKavkomConfig: function normalizeKavkomConfig(config) {
+      return _objectSpread(_objectSpread({}, this.emptyForm().kavkom_config), {}, {
+        extension: config.extension || "",
+        password: config.password || "",
+        caller_id_number: config.caller_id_number || config.phone_number || ""
+      });
+    },
+    savePayload: function savePayload() {
+      return {
+        name: this.form.name,
+        is_active: this.form.is_active,
+        script: this.form.script,
+        instructions: this.form.instructions,
+        config: this.normalizeConfig(this.form.config),
+        kavkom_config: this.normalizeKavkomConfig(this.form.kavkom_config)
+      };
+    },
+    normalizeDigits: function normalizeDigits(value) {
+      return String(value || "").replace(/\D+/g, "");
     },
     save: function save() {
       var _this2 = this;
@@ -119,29 +143,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this2.saving = true;
               _this2.error = "";
-              payload = _objectSpread({}, _this2.form);
-              delete payload.id;
+              payload = _this2.savePayload();
               console.log("[AI Agent UI] Enregistrement de l'agent", {
                 name: payload.name,
                 active: payload.is_active
               });
-              _context2.prev = 5;
+              _context2.prev = 4;
               if (!_this2.form.id) {
-                _context2.next = 12;
+                _context2.next = 11;
                 break;
               }
-              _context2.next = 9;
+              _context2.next = 8;
               return _apis_project_ai_agent__WEBPACK_IMPORTED_MODULE_0__["default"].update(_this2.$route.params.project, _this2.form.id, payload);
-            case 9:
+            case 8:
               _context2.t0 = _context2.sent;
-              _context2.next = 15;
-              break;
-            case 12:
               _context2.next = 14;
+              break;
+            case 11:
+              _context2.next = 13;
               return _apis_project_ai_agent__WEBPACK_IMPORTED_MODULE_0__["default"].create(_this2.$route.params.project, payload);
-            case 14:
+            case 13:
               _context2.t0 = _context2.sent;
-            case 15:
+            case 14:
               response = _context2.t0;
               agent = response.data;
               index = _this2.agents.findIndex(function (item) {
@@ -150,22 +173,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (index === -1) _this2.agents.push(agent);else _this2.agents.splice(index, 1, agent);
               _this2.selectAgent(agent);
               console.log("[AI Agent UI] Agent enregistré", agent.id);
-              _context2.next = 27;
+              _context2.next = 26;
               break;
-            case 23:
-              _context2.prev = 23;
-              _context2.t1 = _context2["catch"](5);
+            case 22:
+              _context2.prev = 22;
+              _context2.t1 = _context2["catch"](4);
               console.error("[AI Agent UI] Échec de l'enregistrement", _context2.t1);
               _this2.error = ((_error$response2 = _context2.t1.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || "Impossible d'enregistrer l'agent IA.";
-            case 27:
-              _context2.prev = 27;
+            case 26:
+              _context2.prev = 26;
               _this2.saving = false;
-              return _context2.finish(27);
-            case 30:
+              return _context2.finish(26);
+            case 29:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[5, 23, 27, 30]]);
+        }, _callee2, null, [[4, 22, 26, 29]]);
       }))();
     },
     remove: function remove() {
@@ -194,6 +217,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }, _callee3);
       }))();
+    }
+  },
+  computed: {
+    phoneConflict: function phoneConflict() {
+      var _this4 = this;
+      var phone = this.normalizeDigits(this.form.kavkom_config.caller_id_number);
+      if (!phone) return null;
+      return this.agents.find(function (agent) {
+        var _agent$kavkom_config, _agent$kavkom_config2;
+        if (_this4.form.id && agent.id === _this4.form.id) return false;
+        return _this4.normalizeDigits(((_agent$kavkom_config = agent.kavkom_config) === null || _agent$kavkom_config === void 0 ? void 0 : _agent$kavkom_config.caller_id_number) || ((_agent$kavkom_config2 = agent.kavkom_config) === null || _agent$kavkom_config2 === void 0 ? void 0 : _agent$kavkom_config2.phone_number)) === phone;
+      }) || null;
+    },
+    extensionConflict: function extensionConflict() {
+      var _this5 = this;
+      var extension = String(this.form.kavkom_config.extension || "").trim().toLowerCase();
+      if (!extension) return null;
+      return this.agents.find(function (agent) {
+        var _agent$kavkom_config3;
+        if (_this5.form.id && agent.id === _this5.form.id) return false;
+        return String(((_agent$kavkom_config3 = agent.kavkom_config) === null || _agent$kavkom_config3 === void 0 ? void 0 : _agent$kavkom_config3.extension) || "").trim().toLowerCase() === extension;
+      }) || null;
+    },
+    hasPhoneConflict: function hasPhoneConflict() {
+      return Boolean(this.phoneConflict || this.extensionConflict);
     }
   }
 });
@@ -260,39 +308,33 @@ var _hoisted_14 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Agent actif", -1 /* HOISTED */);
 });
 var _hoisted_15 = {
-  key: 0
-};
-var _hoisted_16 = {
   "class": "hc-ai-agent-advanced"
 };
-var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Gemini", -1 /* HOISTED */);
 });
-var _hoisted_18 = {
+var _hoisted_17 = {
   "class": "hc-ai-agent-grid"
 };
-var _hoisted_19 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Configuration Kavkom", -1 /* HOISTED */);
-});
+var _hoisted_18 = ["value"];
+var _hoisted_19 = ["value"];
 var _hoisted_20 = {
-  "class": "hc-ai-agent-grid"
+  "class": "hc-ai-agent-advanced"
 };
 var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-    value: "tls"
-  }, "TLS", -1 /* HOISTED */);
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h3", null, "Téléphone Kavkom de l'agent IA", -1 /* HOISTED */);
 });
-var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-    value: "tcp"
-  }, "TCP", -1 /* HOISTED */);
-});
-var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-    value: "udp"
-  }, "UDP", -1 /* HOISTED */);
-});
-var _hoisted_24 = [_hoisted_21, _hoisted_22, _hoisted_23];
+var _hoisted_22 = {
+  "class": "hc-ai-agent-grid"
+};
+var _hoisted_23 = {
+  key: 0,
+  "class": "hc-ai-agent-warning"
+};
+var _hoisted_24 = {
+  key: 1,
+  "class": "hc-ai-agent-warning"
+};
 var _hoisted_25 = {
   "class": "hc-ai-agent-actions"
 };
@@ -331,7 +373,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(agent.name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(agent.is_active ? "Actif" : "Inactif"), 1 /* TEXT */)], 10 /* CLASS, PROPS */, _hoisted_10);
   }), 128 /* KEYED_FRAGMENT */)), !$data.agents.length && !$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_11, " Aucun agent IA configuré. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
     "class": "hc-ai-agent-form",
-    onSubmit: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onSubmit: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.save && $options.save.apply($options, arguments);
     }, ["prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h2", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.id ? "Modifier l'agent" : "Créer un agent IA"), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -359,78 +401,67 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     rows: "6",
     placeholder: "Ton, langue, règles, informations à collecter"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.instructions]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "hc-ai-agent-toggle",
-    onClick: _cache[6] || (_cache[6] = function ($event) {
-      return $data.showAdvanced = !$data.showAdvanced;
-    })
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.showAdvanced ? 'fa fa-chevron-up' : 'fa fa-chevron-down')
-  }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.showAdvanced ? 'Moins d’options' : 'Plus d’options'), 1 /* TEXT */)]), $data.showAdvanced ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Modèle"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
-      return $data.form.config.model = $event;
-    }),
-    placeholder: "Modèle par défaut du service"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.model]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Version API"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
-      return $data.form.config.api_version = $event;
-    }),
-    placeholder: "v1alpha"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.api_version]])])])]), _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Extension"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
-      return $data.form.kavkom_config.extension = $event;
-    })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.extension]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Domaine UUID"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
-      return $data.form.kavkom_config.domain_uuid = $event;
-    })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.domain_uuid]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Contexte SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
-      return $data.form.kavkom_config.user_context = $event;
-    })
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.user_context]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Transport"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
-      return $data.form.kavkom_config.transport = $event;
-    })
-  }, _hoisted_24, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.kavkom_config.transport]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Port SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
-      return $data.form.kavkom_config.sip_port = $event;
-    }),
-    type: "number",
-    min: "1",
-    max: "65535"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.sip_port, void 0, {
-    number: true
-  }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Token API"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
-      return $data.form.kavkom_config.api_token = $event;
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.instructions]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [_hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Clé API Gemini"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+      return $data.form.config.gemini_api_key = $event;
     }),
     type: "password",
-    placeholder: "Laisser vide pour conserver"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.api_token]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Mot de passe SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+    required: "",
+    placeholder: "Clé Google AI Studio"
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.config.gemini_api_key]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Modèle Gemini Live"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+      return $data.form.config.gemini_live_model = $event;
+    }),
+    required: ""
+  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.geminiLiveModels, function (model) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: model,
+      value: model
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(model), 9 /* TEXT, PROPS */, _hoisted_18);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.config.gemini_live_model]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Modèle résumé"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+      return $data.form.config.gemini_summary_model = $event;
+    }),
+    required: ""
+  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.geminiSummaryModels, function (model) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: model,
+      value: model
+    }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(model), 9 /* TEXT, PROPS */, _hoisted_19);
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.form.config.gemini_summary_model]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Extension"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+      return $data.form.kavkom_config.extension = $event;
+    }),
+    required: ""
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.extension, void 0, {
+    trim: true
+  }]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Mot de passe SIP"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
       return $data.form.kavkom_config.password = $event;
     }),
     type: "password",
-    placeholder: "Laisser vide pour conserver"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.password]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Refresh token"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
-      return $data.form.kavkom_config.refresh_access_token = $event;
+    required: "",
+    placeholder: "Mot de passe de l'extension"
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.password]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Numéro appelant"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+      return $data.form.kavkom_config.caller_id_number = $event;
     }),
-    type: "password",
-    placeholder: "Laisser vide pour conserver"
-  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.refresh_access_token]])])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.form.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    type: "tel",
+    required: "",
+    placeholder: "33379580627"
+  }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.kavkom_config.caller_id_number, void 0, {
+    trim: true
+  }]])])]), $options.phoneConflict ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_23, " Ce téléphone est déjà utilisé par l'agent IA \"" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.phoneConflict.name) + "\". ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.extensionConflict ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_24, " Cette extension est déjà utilisée par l'agent IA \"" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.extensionConflict.name) + "\". ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [$data.form.id ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "hc-ai-agent-danger",
-    onClick: _cache[17] || (_cache[17] = function () {
+    onClick: _cache[12] || (_cache[12] = function () {
       return $options.remove && $options.remove.apply($options, arguments);
     })
   }, "Supprimer")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "submit",
     "class": "hc-ai-agent-primary",
-    disabled: $data.saving
+    disabled: $data.saving || $options.hasPhoneConflict
   }, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.saving ? "Enregistrement..." : "Enregistrer"), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_27)])], 32 /* HYDRATE_EVENTS */)])]);
 }
 
@@ -484,7 +515,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-page[data-v-93f3a1c4] { padding: 24px; height: 100%; overflow: auto; background: #f5f6f8;\n}\n.hc-ai-agent-header[data-v-93f3a1c4], .hc-ai-agent-form-header[data-v-93f3a1c4], .hc-ai-agent-actions[data-v-93f3a1c4] { display: flex; align-items: center; gap: 16px;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { margin: 0 auto 20px; max-width: 1100px;\n}\n.hc-ai-agent-header > div[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-header h1[data-v-93f3a1c4] { margin: 0; font-size: 22px;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { margin: 6px 0 0; color: #6b7280;\n}\n.hc-ai-agent-back[data-v-93f3a1c4], .hc-ai-agent-primary[data-v-93f3a1c4], .hc-ai-agent-danger[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4] { border: 0; cursor: pointer;\n}\n.hc-ai-agent-back[data-v-93f3a1c4] { background: transparent; font-size: 18px;\n}\n.hc-ai-agent-primary[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #1e6ee5;\n}\n.hc-ai-agent-danger[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #c0392b;\n}\n.hc-ai-agent-content[data-v-93f3a1c4] { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; max-width: 1100px; margin: auto;\n}\n.hc-ai-agent-list[data-v-93f3a1c4], .hc-ai-agent-form[data-v-93f3a1c4] { background: #fff; border: 1px solid #e4e7ec; border-radius: 6px; padding: 16px;\n}\n.hc-ai-agent-list[data-v-93f3a1c4] { align-self: start; padding: 8px;\n}\n.hc-ai-agent-list-item[data-v-93f3a1c4] { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 12px; background: transparent; text-align: left; border-radius: 4px;\n}\n.hc-ai-agent-list-item.selected[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4]:hover { background: #edf4ff;\n}\n.hc-ai-agent-list-item span[data-v-93f3a1c4] { margin-top: 4px; color: #6b7280; font-size: 12px;\n}\n.hc-ai-agent-empty[data-v-93f3a1c4] { padding: 12px; color: #6b7280; font-size: 13px;\n}\n.hc-ai-agent-form[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 14px;\n}\n.hc-ai-agent-form h2[data-v-93f3a1c4] { flex: 1; margin: 0; font-size: 18px;\n}\n.hc-ai-agent-form h3[data-v-93f3a1c4] { margin: 8px 0 -4px; font-size: 14px;\n}\n.hc-ai-agent-form label[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600;\n}\n.hc-ai-agent-form input[data-v-93f3a1c4], .hc-ai-agent-form textarea[data-v-93f3a1c4] { width: 100%; padding: 9px; border: 1px solid #d8dce3; border-radius: 4px; font: inherit; font-weight: 400; box-sizing: border-box;\n}\n.hc-ai-agent-form textarea[data-v-93f3a1c4] { resize: vertical;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;\n}\n.hc-ai-agent-switch[data-v-93f3a1c4] { flex-direction: row !important; align-items: center; font-weight: 400 !important;\n}\n.hc-ai-agent-toggle[data-v-93f3a1c4] { display: inline-flex; align-items: center; gap: 8px; align-self: flex-start; padding: 8px 12px; border: 1px solid #d8dce3; background: #f8fafc; color: #1f2937; border-radius: 4px; cursor: pointer;\n}\n.hc-ai-agent-advanced[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 12px;\n}\n.hc-ai-agent-actions[data-v-93f3a1c4] { margin-top: 8px;\n}\n.hc-ai-agent-actions span[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-error[data-v-93f3a1c4] { max-width: 1100px; margin: auto auto 16px; padding: 10px; color: #8a1c1c; background: #fde8e8;\n}\n@media (max-width: 760px) {\n.hc-ai-agent-content[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { align-items: flex-start;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { display: none;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-ai-agent-page[data-v-93f3a1c4] { padding: 24px; height: 100%; overflow: auto; background: #f5f6f8;\n}\n.hc-ai-agent-header[data-v-93f3a1c4], .hc-ai-agent-form-header[data-v-93f3a1c4], .hc-ai-agent-actions[data-v-93f3a1c4] { display: flex; align-items: center; gap: 16px;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { margin: 0 auto 20px; max-width: 1100px;\n}\n.hc-ai-agent-header > div[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-header h1[data-v-93f3a1c4] { margin: 0; font-size: 22px;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { margin: 6px 0 0; color: #6b7280;\n}\n.hc-ai-agent-back[data-v-93f3a1c4], .hc-ai-agent-primary[data-v-93f3a1c4], .hc-ai-agent-danger[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4] { border: 0; cursor: pointer;\n}\n.hc-ai-agent-back[data-v-93f3a1c4] { background: transparent; font-size: 18px;\n}\n.hc-ai-agent-primary[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #1e6ee5;\n}\n.hc-ai-agent-danger[data-v-93f3a1c4] { padding: 10px 14px; border-radius: 4px; color: #fff; background: #c0392b;\n}\n.hc-ai-agent-content[data-v-93f3a1c4] { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 16px; max-width: 1100px; margin: auto;\n}\n.hc-ai-agent-list[data-v-93f3a1c4], .hc-ai-agent-form[data-v-93f3a1c4] { background: #fff; border: 1px solid #e4e7ec; border-radius: 6px; padding: 16px;\n}\n.hc-ai-agent-list[data-v-93f3a1c4] { align-self: start; padding: 8px;\n}\n.hc-ai-agent-list-item[data-v-93f3a1c4] { display: flex; flex-direction: column; align-items: flex-start; width: 100%; padding: 12px; background: transparent; text-align: left; border-radius: 4px;\n}\n.hc-ai-agent-list-item.selected[data-v-93f3a1c4], .hc-ai-agent-list-item[data-v-93f3a1c4]:hover { background: #edf4ff;\n}\n.hc-ai-agent-list-item span[data-v-93f3a1c4] { margin-top: 4px; color: #6b7280; font-size: 12px;\n}\n.hc-ai-agent-empty[data-v-93f3a1c4] { padding: 12px; color: #6b7280; font-size: 13px;\n}\n.hc-ai-agent-form[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 14px;\n}\n.hc-ai-agent-form h2[data-v-93f3a1c4] { flex: 1; margin: 0; font-size: 18px;\n}\n.hc-ai-agent-form h3[data-v-93f3a1c4] { margin: 8px 0 -4px; font-size: 14px;\n}\n.hc-ai-agent-form label[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 6px; font-size: 13px; font-weight: 600;\n}\n.hc-ai-agent-form input[data-v-93f3a1c4], .hc-ai-agent-form textarea[data-v-93f3a1c4], .hc-ai-agent-form select[data-v-93f3a1c4] { width: 100%; padding: 9px; border: 1px solid #d8dce3; border-radius: 4px; font: inherit; font-weight: 400; box-sizing: border-box;\n}\n.hc-ai-agent-form textarea[data-v-93f3a1c4] { resize: vertical;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;\n}\n.hc-ai-agent-switch[data-v-93f3a1c4] { flex-direction: row !important; align-items: center; font-weight: 400 !important;\n}\n.hc-ai-agent-advanced[data-v-93f3a1c4] { display: flex; flex-direction: column; gap: 12px;\n}\n.hc-ai-agent-actions[data-v-93f3a1c4] { margin-top: 8px;\n}\n.hc-ai-agent-actions span[data-v-93f3a1c4] { flex: 1;\n}\n.hc-ai-agent-error[data-v-93f3a1c4] { max-width: 1100px; margin: auto auto 16px; padding: 10px; color: #8a1c1c; background: #fde8e8;\n}\n.hc-ai-agent-warning[data-v-93f3a1c4] { margin: 0; padding: 10px; color: #8a5a00; background: #fff7d6; border-radius: 4px; font-size: 13px;\n}\n@media (max-width: 760px) {\n.hc-ai-agent-content[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n.hc-ai-agent-header[data-v-93f3a1c4] { align-items: flex-start;\n}\n.hc-ai-agent-header p[data-v-93f3a1c4] { display: none;\n}\n.hc-ai-agent-grid[data-v-93f3a1c4] { grid-template-columns: 1fr;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

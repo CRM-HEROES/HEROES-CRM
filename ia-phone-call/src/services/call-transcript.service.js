@@ -1,4 +1,14 @@
 const DEFAULT_SUMMARY_MODEL = 'models/gemini-3.8-flash';
+const GEMINI_SUMMARY_RETRIES = parseInt(process.env.GEMINI_SUMMARY_RETRIES || '3', 10);
+const GEMINI_SUMMARY_RETRY_DELAY_MS = parseInt(process.env.GEMINI_SUMMARY_RETRY_DELAY_MS || '1500', 10);
+
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isTransientSummaryStatus(status) {
+    return status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
+}
 
 export function createCallTranscript({ callId = null, phoneNumber = null } = {}) {
     const turns = [];
@@ -99,22 +109,46 @@ Règles :
 Conversation :
 ${text || 'Aucune conversation enregistrée.'}`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            contents: [{
-                role: 'user',
-                parts: [{ text: prompt }]
-            }]
-        })
-    });
+    let response = null;
+    let lastError = null;
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Échec de génération du résumé Gemini: ${response.status} ${errorText}`);
+    for (let attempt = 1; attempt <= GEMINI_SUMMARY_RETRIES; attempt++) {
+        try {
+            response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contents: [{
+                        role: 'user',
+                        parts: [{ text: prompt }]
+                    }]
+                })
+            });
+
+            if (response.ok) {
+                break;
+            }
+
+            const errorText = await response.text();
+            lastError = new Error(`Échec de génération du résumé Gemini: ${response.status} ${errorText}`);
+
+            if (!isTransientSummaryStatus(response.status) || attempt === GEMINI_SUMMARY_RETRIES) {
+                lastError.nonRetryable = !isTransientSummaryStatus(response.status);
+                throw lastError;
+            }
+        } catch (error) {
+            lastError = error;
+
+            if (error.nonRetryable || attempt === GEMINI_SUMMARY_RETRIES) {
+                throw lastError;
+            }
+        }
+
+        const delay = GEMINI_SUMMARY_RETRY_DELAY_MS * attempt;
+        console.warn(`[Summary] Gemini indisponible, nouvelle tentative ${attempt + 1}/${GEMINI_SUMMARY_RETRIES} dans ${delay} ms.`);
+        await sleep(delay);
     }
 
     const data = await response.json();
