@@ -66,6 +66,52 @@ class GoogleSheetsSyncRetryTest extends TestCase
         $this->assertFalse($duplicate['sameImport']);
     }
 
+    public function test_it_updates_mapped_fields_for_existing_prospects_from_the_same_incremental_import(): void
+    {
+        $job = (new ReflectionClass(ImportProspects::class))->newInstanceWithoutConstructor();
+        $reflection = new ReflectionClass($job);
+
+        foreach ([
+            'import' => new Import(['id' => 42]),
+            'prospectRelationsHandlers' => ['labels' => null],
+        ] as $name => $value) {
+            $property = $reflection->getProperty($name);
+            $property->setAccessible(true);
+            $property->setValue($job, $value);
+        }
+
+        $query = Mockery::mock();
+        $query->shouldReceive('where')->times(4)->andReturnSelf();
+        $query->shouldReceive('first')
+            ->once()
+            ->with(['meta'])
+            ->andReturn((object) ['meta' => json_encode(['crm_note' => 'keep', 'source' => 'old'])]);
+        $query->shouldReceive('update')
+            ->once()
+            ->with(Mockery::on(function (array $updates): bool {
+                return $updates['email'] === 'updated@example.com'
+                    && json_decode($updates['meta'], true) === ['crm_note' => 'keep', 'source' => 'new']
+                    && !array_key_exists('import_id', $updates)
+                    && !array_key_exists('labels', $updates)
+                    && $updates['updated_at'] instanceof \Carbon\Carbon;
+            }))
+            ->andReturn(1);
+
+        DB::shouldReceive('table')->twice()->with('prospects')->andReturn($query);
+
+        $method = $reflection->getMethod('updateExistingImportedProspect');
+        $method->setAccessible(true);
+        $method->invoke($job, 99, [
+            'email' => 'updated@example.com',
+            'meta' => ['source' => 'new'],
+            'import_id' => 42,
+            'created_at' => '2026-01-01 00:00:00',
+            'labels' => [7],
+        ]);
+
+        $this->assertTrue(true);
+    }
+
     public function test_it_dispatches_immediate_retry_when_google_sheet_sync_is_busy(): void
     {
         Bus::fake();
