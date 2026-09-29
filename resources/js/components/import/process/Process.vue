@@ -1,56 +1,5 @@
 <template>
     <item-list style="height: 100%; overflow: auto" padding="12px" gap="2px">
-        <!-- Notifier SMS de bienvenue -->
-        <item
-            v-if="!prospectImport.is_processing"
-            tag="label"
-            class="hc-import-notify-welcome-sms"
-            style="cursor: pointer"
-        >
-            <input
-                type="checkbox"
-                v-model="notifyWelcomeSms"
-                @change="onToggleNotifyWelcomeSms"
-            />
-            <div
-                class="hc-item-main-content"
-                v-text="$t('import.process.tab.import.notify_welcome_sms')"
-            ></div>
-            <loading :loading="checkingSmsSourceSetting" />
-        </item>
-
-        <item-list
-            v-if="notifyWelcomeSms && !prospectImport.is_processing"
-            padding="0 12px 10px 12px"
-            gap="5px"
-        >
-            <v-field
-                :label="$t('import.process.tab.import.welcome_sms_source')"
-                v-slot="{ label }"
-            >
-                <select v-model="welcomeSmsSource" @change="onChangeWelcomeSmsSource">
-                    <option value="brevo">{{ $t("prospect.sms.via_brevo") }}</option>
-                    <option value="smsbox">{{ $t("prospect.sms.via_smsbox") }}</option>
-                    <option value="ultramsg">{{ $t("prospect.sms.via_ultramsg") }}</option>
-                    <option value="mtarget">{{ $t("prospect.sms.via_mtarget") }}</option>
-                </select>
-            </v-field>
-
-            <v-field
-                :label="$t('import.process.tab.import.welcome_sms_message')"
-                required
-                v-slot="{ label }"
-            >
-                <textarea
-                    :placeholder="label + ' ...'"
-                    v-model="welcomeSmsMessage"
-                    @change="saveWelcomeSmsSettings"
-                    required
-                    rows="3"
-                ></textarea>
-            </v-field>
-        </item-list>
-
         <item
             v-if="prospectImport.source == 'google_sheets' && prospectImport.sync_enabled"
             style="color: #075985 !important; background-color: #e0f2fe"

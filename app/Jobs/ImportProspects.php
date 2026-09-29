@@ -33,7 +33,7 @@ use App\Support\ImportHeaderAliases;
 use App\Support\PhoneCountry;
 // The trait file is named SendsWelcomeSms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\SendsWelcomeSms as SendsWelcomeSms;
+use App\Jobs\Import\WelcomeSmsNotification;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +52,7 @@ use Illuminate\Support\Str;
 
 class ImportProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, SendsWelcomeSms;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, WelcomeSmsNotification;
 
     const MAPPING_FIELD_DEFAULT = 0;
     const MAPPING_FIELD_META = 1;
@@ -123,13 +123,6 @@ class ImportProspects implements ShouldQueue
         $this->mapping = $this->getImportMappingFields();
 
         $this->emptyProspect = $this->newProspect();
-
-        // Contact details already present in the database (to avoid duplicates)
-        $this->existingEmails = $this->getExistingEmails();
-        $this->existingPhones = $this->getExistingPhones();
-        $this->existingMobiles = $this->getExistingMobiles();
-        $this->duplicateFieldDescriptors = $this->getDuplicateFieldDescriptors();
-        $this->existingDuplicateFieldValues = $this->getExistingDuplicateFieldValues();
     }
 
     /**
@@ -307,6 +300,15 @@ class ImportProspects implements ShouldQueue
                 return;
             }
 
+            // Refresh only after obtaining the per-import lock. A queued
+            // job may have been constructed before another sync inserted
+            // its prospects, so constructor-time indexes can be stale.
+            $this->existingEmails = $this->getExistingEmails();
+            $this->existingPhones = $this->getExistingPhones();
+            $this->existingMobiles = $this->getExistingMobiles();
+            $this->duplicateFieldDescriptors = $this->getDuplicateFieldDescriptors();
+            $this->existingDuplicateFieldValues = $this->getExistingDuplicateFieldValues();
+
             $this->import->update(['processing_at' => Carbon::now()]);
 
             // Remove previous imported prospects. Skipped in incremental
@@ -441,11 +443,12 @@ class ImportProspects implements ShouldQueue
                 $duplicate = $this->findExistingDuplicate($prospect);
 
                 if ($duplicate) {
-                    // This applies both to the same import during an
-                    // incremental Google Sheets sync and to prospects owned
-                    // by another import or created manually. Keep the
-                    // existing database record authoritative and ignore the
-                    // incoming row completely.
+                    if ($this->incremental && $duplicate['sameImport']) {
+                        $this->updateExistingImportedProspect($duplicate['id'], $prospect);
+                    }
+
+                    // Prospects created manually or by another import remain
+                    // authoritative; only this import's own rows are synced.
                     continue;
                 }
 
@@ -1369,6 +1372,50 @@ class ImportProspects implements ShouldQueue
             'fields' => $matchedFields,
             'sameImport' => (int) $existing['import_id'] === (int) $this->import->id,
         ];
+    }
+
+    protected function updateExistingImportedProspect(int $prospectId, array $incoming): void
+    {
+        $existing = DB::table('prospects')
+            ->where('id', $prospectId)
+            ->where('import_id', $this->import->id)
+            ->first(['meta']);
+
+        if (!$existing) {
+            return;
+        }
+
+        $excludedFields = array_merge([
+            'meta',
+            'import_id',
+            'project_id',
+            'creator_id',
+            'duplicate_id',
+            'duplicate_group_id',
+            'duplicate_fields',
+            'created_at',
+            'updated_at',
+        ], array_keys($this->prospectRelationsHandlers));
+
+        $updates = array_diff_key($incoming, array_flip($excludedFields));
+        $incomingMeta = $incoming['meta'] ?? [];
+
+        if (!empty($incomingMeta)) {
+            $existingMeta = json_decode($existing->meta ?: '{}', true);
+            $existingMeta = is_array($existingMeta) ? $existingMeta : [];
+            $updates['meta'] = json_encode(array_replace($existingMeta, $incomingMeta));
+        }
+
+        if (empty($updates)) {
+            return;
+        }
+
+        $updates['updated_at'] = Carbon::now();
+
+        DB::table('prospects')
+            ->where('id', $prospectId)
+            ->where('import_id', $this->import->id)
+            ->update($updates);
     }
 
     /**

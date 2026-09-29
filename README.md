@@ -122,3 +122,8 @@ docker compose exec heroescrm mysqldump \
   --single-transaction --quick --lock-tables=false --skip-ssl --no-tablespaces \
   heroescrm-laravel10 | gzip > ~/backup/heroescrm_prod_backup_$(date +%Y%m%d_%H%M%S).sql.gz
 ```
+
+#### Liste Backup
+```sh
+ls -lh ~/backup/heroescrm_prod_backup_*.sql.gz
+```

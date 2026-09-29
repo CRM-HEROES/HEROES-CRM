@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Support\PhoneCountry;
 // The trait file is named SendsWelcomeSms.php. Keep the import spelling in
 // sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\SendsWelcomeSms as SendsWelcomeSms;
+use App\Jobs\Import\WelcomeSmsNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +18,7 @@ use Illuminate\Support\Str;
 
 class ImportHandleDuplicatedProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, SendsWelcomeSms;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, WelcomeSmsNotification;
 
     const MAPPING_FIELD_CLASSIC = 0;
     const MAPPING_FIELD_META = 1;

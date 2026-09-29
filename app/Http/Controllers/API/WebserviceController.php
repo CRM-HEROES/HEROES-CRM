@@ -131,99 +131,169 @@ class WebserviceController extends Controller
             return response('KO/L\'import via le webservice n\'a pas été encore bien configuré.', 400);
         }
 
-        $prospect = new Prospect([
-            'import_id' => $import->id,
-            'creator_id' => $import->creator_id,
-            'project_id' => $import->project_id
-        ]);
+        $created = DB::transaction(function () use ($request, $import) {
+            $lockedImport = Import::query()
+                ->whereKey($import->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        $meta = [];
-        $labels = [];
+            $prospect = new Prospect([
+                'import_id' => $lockedImport->id,
+                'creator_id' => $lockedImport->creator_id,
+                'project_id' => $lockedImport->project_id,
+            ]);
 
-        // update prospect field 
-        // according to the import mapping
-        foreach ($import->mapping as $index => $attribute) {
+            $meta = [];
+            $labels = [];
 
-            if (is_null($attribute)) continue;
+            // update prospect field according to the import mapping
+            foreach ($lockedImport->mapping as $index => $attribute) {
 
-            $param = $import->headers[$index];
-            if ($request->has($param)) {
-                $value = $request->input($param);
+                if (is_null($attribute)) continue;
 
-                // update meta field
-                if (Str::startsWith($attribute, 'meta->')) {
-                    $meta[str_replace('meta->', '', $attribute)] = $value;
-                // update classic field
-                } else if (Str::startsWith($attribute, 'category->')) {
-                    $category = Category::find(str_replace('category->', '', $attribute));
+                $param = $lockedImport->headers[$index];
+                if ($request->has($param)) {
+                    $value = $request->input($param);
 
-                    if ($category) {
-                        if (!empty($value)) {
-                            $label = $category->labels()->where('name', $value)->first();
+                    // update meta field
+                    if (Str::startsWith($attribute, 'meta->')) {
+                        $meta[str_replace('meta->', '', $attribute)] = $value;
+                    // update classic field
+                    } else if (Str::startsWith($attribute, 'category->')) {
+                        $category = Category::find(str_replace('category->', '', $attribute));
 
-                            // if label is not found inside this category
-                            // we create a none validated label
-                            if (!$label) {
-                                $label = new Label([
-                                    'name' => $value,
-                                    'color' => "#ffffff",
-                                    'bgcolor' => "#000000",
-                                    'validated' => 0
-                                ]);
+                        if ($category) {
+                            if (!empty($value)) {
+                                $label = $category->labels()->where('name', $value)->first();
 
-                                $category->labels()->save($label);
+                                // if label is not found inside this category
+                                // we create a none validated label
+                                if (!$label) {
+                                    $label = new Label([
+                                        'name' => $value,
+                                        'color' => "#ffffff",
+                                        'bgcolor' => "#000000",
+                                        'validated' => 0
+                                    ]);
+
+                                    $category->labels()->save($label);
+                                }
+
+                                $labels[] = $label->id;
                             }
-
-                            $labels[] = $label->id;
                         }
+                    } else {
+                        $prospect[$attribute] = $value;
                     }
-                } else {
-                    $prospect[$attribute] = $value;
                 }
             }
+
+            $prospect->meta = $meta;
+
+            if ($this->hasCoregistrationDuplicate($prospect, $lockedImport)) {
+                return false;
+            }
+
+            $prospect->save();
+
+            if ($lockedImport->users) {
+                // Same "Utilisateurs affectés" indicatif routing as
+                // ImportProspects::handleProspectsImportUsers(): only the
+                // marked users configured for this prospect's dial code
+                // receive it, falling back to every marked user when the
+                // prospect has no number or none of them match.
+                $markedUsers = User::whereIn('id', $lockedImport->users)->get(['id', 'phone_country']);
+                $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
+                $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
+
+                $prospect->users()->attach($eligibleUsers->pluck('id'));
+            }
+
+            if ($lockedImport->groups) {
+                $prospect->groups()->attach($lockedImport->groups);
+            }
+
+            $labels = array_merge($labels, $lockedImport->labels ? $lockedImport->labels : []);
+            $now = \Carbon\Carbon::now();
+            $data = array_map(function($label) use($prospect, $now) {
+                return [
+                    'prospect_id' => $prospect->id,
+                    'label_id'    => $label,
+                    'deleted_at'  => null,
+                    'created_at'  => $now,
+                    'updated_at'  => $now,
+                ];
+            }, $labels);
+            $data = array_reduce($data, function($carry, $data) {
+                return array_merge($carry, $data);
+            }, []);
+
+            DB::table('prospect_label')->insert($data);
+
+            return true;
+        }, 3);
+
+        if (!$created) {
+            return response()->json(['message' => 'Ce prospect existe déjà.'], 200);
         }
-
-        $prospect->meta = $meta;
-        $prospect->save();
-
-        if ($import->users) {
-            // Same "Utilisateurs affectés" indicatif routing as
-            // ImportProspects::handleProspectsImportUsers(): only the
-            // marked users configured for this prospect's dial code
-            // receive it, falling back to every marked user when the
-            // prospect has no number or none of them match.
-            $markedUsers = User::whereIn('id', $import->users)->get(['id', 'phone_country']);
-            $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
-            $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
-
-            $prospect->users()->attach($eligibleUsers->pluck('id'));
-        }
-
-        if ($import->groups) {
-            $prospect->groups()->attach($import->groups);
-        }
-
-        $labels = array_merge($labels, $import->labels ? $import->labels : []);
-        $now = \Carbon\Carbon::now();
-        $data = array_map(function($label) use($prospect, $now) {
-            return [
-                'prospect_id' => $prospect->id,
-                'label_id'    => $label,
-                'deleted_at'  => null,
-                'created_at'  => $now,
-                'updated_at'  => $now,
-            ];
-        }, $labels);
-        $data = array_reduce($data, function($carry, $data) {
-            return array_merge($carry, $data);
-        }, []);
-
-        DB::table('prospect_label')->insert($data);
         
         /*if ($import->labels) {
             $prospect->labels()->attach($import->labels);
         }
 
         $prospect->labels()->syncWithoutDetaching($labels);*/
+    }
+
+    protected function hasCoregistrationDuplicate(Prospect $prospect, Import $import): bool
+    {
+        $query = DB::table('prospects')
+            ->where('project_id', $import->project_id)
+            ->whereNull('deleted_at');
+
+        $duplicateFields = array_values(array_unique(array_filter(array_map(
+            'intval',
+            (array) $import->duplicates_fields
+        ))));
+
+        if ($duplicateFields && $import->project) {
+            $fields = $import->project->fields()
+                ->whereIn('id', $duplicateFields)
+                ->get(['slug', 'meta']);
+            $comparisons = [];
+
+            foreach ($fields as $field) {
+                $value = $field->meta
+                    ? data_get($prospect->meta, $field->slug)
+                    : $prospect->getAttribute($field->slug);
+
+                if ($value !== null && $value !== '') {
+                    $comparisons[] = [
+                        $field->meta ? 'meta->' . $field->slug : $field->slug,
+                        $value,
+                    ];
+                }
+            }
+
+            if ($comparisons) {
+                $query->where(function ($query) use ($comparisons) {
+                    foreach ($comparisons as [$column, $value]) {
+                        $query->orWhere($column, $value);
+                    }
+                });
+
+                return $query->exists();
+            }
+        }
+
+        $query->where(function ($query) use ($prospect) {
+            foreach (['email', 'phone_number', 'mobile_phone_number'] as $field) {
+                $value = $prospect->getAttribute($field);
+                if ($value !== null && $value !== '') {
+                    $query->orWhere($field, $value);
+                }
+            }
+        });
+
+        return $query->exists();
     }
 }
