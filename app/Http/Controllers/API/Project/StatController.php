@@ -444,10 +444,6 @@ class StatController extends Controller
                 'name' => "MTarget",
                 'color' => "rgb(0, 180, 160)"
             ],
-            'brevo' => [
-                'name' => "Brevo",
-                'color' => "rgb(11, 153, 108)"
-            ],
             'telephone' => [
                 'name' => "Téléphone",
                 'color' => "rgb(255, 79, 55)"
@@ -459,10 +455,6 @@ class StatController extends Controller
             'ringover' => [
                 'name' => "Ringover",
                 'color' => "rgb(0, 201, 76)"
-            ],
-            'kavkom' => [
-                'name' => "Kavkom",
-                'color' => "rgb(142, 36, 170)"
             ]
         ] as $source => $value) {
             $keys[$key . ".source." . $source] = array_merge($value, [

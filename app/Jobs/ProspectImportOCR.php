@@ -147,7 +147,7 @@ class ProspectImportOCR implements ShouldQueue
             // marked users configured for this prospect's dial code
             // receive it, falling back to every marked user when the
             // prospect has no number or none of them match.
-            $markedUsers = User::whereIn('id', $import->users)->get(['id', 'phone_country']);
+            $markedUsers = PhoneCountry::usersWithDialCodes($import->users, $import->project_id);
             $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
             $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
 

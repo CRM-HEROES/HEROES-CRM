@@ -581,7 +581,7 @@ class ActionController extends Controller
     	}
 
     	// Get prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Content
@@ -628,7 +628,7 @@ class ActionController extends Controller
     		return "a modifié un prospect";
     	}
 
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
 
@@ -676,7 +676,7 @@ class ActionController extends Controller
             return null;
         }
         
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	return "a consulté les informations du prospect <a target=\"_blank\" href=\"{$prospectRoute}\">{$prospectName}</a>";
@@ -688,7 +688,7 @@ class ActionController extends Controller
     protected function getActionContentProspectInteraction(Project $project, $id)
     {
     	$interaction = DB::table('interactions')
-    		->select(DB::raw('prospects.full_name as prospect_full_name, prospects.id as prospect_id, interactions.from_user as from_user, interactions.source as source'))
+    		->select(DB::raw('prospects.first_name as prospect_first_name, prospects.last_name as prospect_last_name, prospects.id as prospect_id, interactions.from_user as from_user, interactions.source as source'))
     		->join('prospects', 'prospects.id', '=', 'interactions.prospect_id')
     		->where('interactions.id', $id)
     		->first();
@@ -697,7 +697,7 @@ class ActionController extends Controller
     		return null;
     	}
 
-    	$prospectName = implode(' ', array_filter([$interaction->prospect_full_name, $interaction->prospect_full_name]));
+    	$prospectName = implode(' ', array_filter([$interaction->prospect_first_name, $interaction->prospect_last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $interaction->prospect_id]);
 
         switch ($interaction->source) {
@@ -709,9 +709,6 @@ class ActionController extends Controller
                 break;
             case 'aircall':
                 $source = "Aircall";
-                break;
-            case 'kavkom':
-                $source = "Kavkom";
                 break;
             case 'whatsapp':
                 $source = "Whatsapp";
@@ -735,7 +732,7 @@ class ActionController extends Controller
     protected function getActionContentProspectSms(Project $project, $id)
     {
     	$sms = DB::table('sms')
-    		->select(DB::raw('prospects.id as prospect_id, prospects.full_name as prospect_full_name, sms.message AS message, sms.source AS source'))
+    		->select(DB::raw('prospects.id as prospect_id, prospects.first_name as prospect_first_name, prospects.last_name as prospect_last_name, sms.message AS message, sms.source AS source'))
     		->join('prospects', 'prospects.id', '=', 'sms.prospect_id')
     		->where('sms.id', $id)
     		->first();
@@ -744,7 +741,7 @@ class ActionController extends Controller
     		return null;
     	}
 
-    	$prospectName = implode(' ', array_filter([$sms->prospect_full_name, $sms->prospect_full_name]));
+    	$prospectName = implode(' ', array_filter([$sms->prospect_first_name, $sms->prospect_last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $sms->prospect_id]);
 
         switch ($sms->source) {
@@ -757,17 +754,11 @@ class ActionController extends Controller
             case 'mtarget':
                 $source = "MTarget";
                 break;
-            case 'brevo':
-                $source = "Brevo";
-                break;
             case 'ringover':
                 $source = "Ringover";
                 break;
             case 'telephone':
                 $source = "Téléphone";
-                break;
-            case 'kavkom':
-                $source = "Kavkom";
                 break;
             case 'whatsapp':
                 $source = "Whatsapp";
@@ -795,7 +786,7 @@ class ActionController extends Controller
     	}
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Get label
@@ -829,7 +820,7 @@ class ActionController extends Controller
     	}
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Get label
@@ -862,7 +853,7 @@ class ActionController extends Controller
     	}
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Get label
@@ -943,7 +934,7 @@ class ActionController extends Controller
 		// If event is associated
 		// to a prospect
 		if ($prospect) {
-	    	$prospectName = $prospect->full_name;
+	    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
             $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
 	    	return "a affecté un <b>{$event->event_type}</b> avec le prospect <a target=\"_blank\" href=\"$prospectRoute\">{$prospectName}</a> à l'employé <a target=\"_blank\" href=\"{$userRoute}\">{$event->user}</a> pour la date du <b>{$event->date}</b>";
@@ -980,7 +971,7 @@ class ActionController extends Controller
 		// If event is associated
 		// to a prospect
 		if ($prospect) {
-	    	$prospectName = $prospect->full_name;
+	    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
             $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
 	    	return "a réservé un <b>{$event->event_type}</b> avec le prospect <a target=\"_blank\" href=\"{$prospectRoute}\">{$prospectName}</a> pour la date du <b>{$event->date}</b>";
@@ -1014,7 +1005,7 @@ class ActionController extends Controller
     	$prospect = DB::table('prospects')->where('id', $event->prospect_id)->first();
 
     	if ($prospect) {
-            $prospectName = $prospect->full_name;
+            $prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
             $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
     
             $prospectContent = " du prospect <a target=\"_blank\" href=\"{$prospectRoute}\">{$prospectName}</a>";
@@ -1076,7 +1067,7 @@ class ActionController extends Controller
     	}
 
     	// Content
-        $prospectName = $prospect->full_name;
+        $prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
         return "a effectué le devis <b>{$order->name}</b> pour le prospect <a target=\"_blank\" href=\"{$prospectRoute}\">{$prospectName}</a>";
@@ -1102,7 +1093,7 @@ class ActionController extends Controller
     	$prospect = Prospect::find($order->prospect_id);
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Content
@@ -1128,7 +1119,7 @@ class ActionController extends Controller
     	$prospect = Prospect::find($order->prospect_id);
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Content
@@ -1151,7 +1142,7 @@ class ActionController extends Controller
     	$prospect = Prospect::find($order->prospect_id);
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Content
@@ -1174,7 +1165,7 @@ class ActionController extends Controller
     	$prospect = Prospect::find($order->prospect_id);
 
     	// Prospect name
-    	$prospectName = $prospect->full_name;
+    	$prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
     	// Content
@@ -1232,7 +1223,7 @@ class ActionController extends Controller
             return null;
         }
 
-        $prospectName = $prospect->full_name;
+        $prospectName = implode(' ', array_filter([$prospect->first_name, $prospect->last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $prospect->id]);
 
         $folder = DB::table('folders')
@@ -1253,7 +1244,7 @@ class ActionController extends Controller
     protected function getActionContentAddProspectMessage(Project $project, $id)
     {
         $message = DB::table('messages')
-            ->select(DB::raw('messages.body as body, prospects.full_name as prospect_full_name, prospects.id as prospect_id, threads.name as thread_name'))
+            ->select(DB::raw('messages.body as body, prospects.first_name as prospect_first_name, prospects.last_name as prospect_last_name, prospects.id as prospect_id, threads.name as thread_name'))
             ->join('prospects', 'prospects.id', '=', 'messages.prospect_id')
             ->join('threads', 'threads.id', '=', 'messages.thread_id')
             ->where('messages.id', $id)
@@ -1263,7 +1254,7 @@ class ActionController extends Controller
             return null;
         }
 
-        $prospectName = implode(' ', array_filter([$message->prospect_full_name, $message->prospect_full_name]));
+        $prospectName = implode(' ', array_filter([$message->prospect_first_name, $message->prospect_last_name]));
         $prospectRoute = route('project.prospect.show', [$project->slug, $message->prospect_id]);
 
         // Content

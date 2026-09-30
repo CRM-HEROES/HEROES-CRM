@@ -120,6 +120,11 @@ class ImportObserver
         $mapping = $import->mapping ?: array_fill(0, count($import->headers), null);
 
         foreach ($import->headers as $i => $header) {
+            // Blank header (empty trailing columns of a spreadsheet): nothing to map
+            if ($header === null || trim((string) $header) === '') {
+                continue;
+            }
+
             // Meta Lead Ads uses human-readable headers rather than CRM slugs.
             $defaultField = $this->getKnownImportField($header);
             if ($defaultField) {

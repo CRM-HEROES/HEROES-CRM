@@ -1,5 +1,11 @@
 <template>
     <info-bloc v-if="bloc.type == 'field'" :bloc="bloc" :open="open" />
+    <phone-code-assignment
+        v-else-if="bloc.type == 'phone-codes'"
+        :project="project"
+        :user="user"
+        :open="open"
+    />
     <calendar-bloc
         v-else-if="bloc.type == 'calendar'"
         :bloc="bloc"
@@ -73,6 +79,7 @@ import ImportBloc from "./blocs/import/Bloc.vue";
 import InfoBloc from "./blocs/info/Bloc.vue";
 import MenuBloc from "./blocs/menu/Bloc.vue";
 import OrderStepBloc from "./blocs/order-step/Bloc.vue";
+import PhoneCodeAssignment from "@/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue";
 import QuestionnaireBloc from "./blocs/questionnaire/Bloc.vue";
 import RoleBloc from "./blocs/role/Bloc.vue";
 import ThreadBloc from "./blocs/thread/Bloc.vue";
@@ -92,6 +99,7 @@ export default {
         InfoBloc,
         MenuBloc,
         OrderStepBloc,
+        PhoneCodeAssignment,
         QuestionnaireBloc,
         RoleBloc,
         ThreadBloc,
@@ -111,6 +119,8 @@ export default {
     computed: {
         ...mapGetters([
             "prospect",
+            "project",
+            "user",
             "categories",
             "threads",
             "folders",

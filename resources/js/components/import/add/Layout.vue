@@ -33,7 +33,7 @@
                     required
                     ref="fileInput"
                     type="file"
-                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    accept=".csv, .tsv, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     @change="setFile"
             /></v-field>
 
@@ -48,52 +48,6 @@
                     :placeholder="label + ' ...'"
                     v-model="prospectImport.source_url"
             /></v-field>
-
-            <v-field
-                v-if="prospectImport.source == 'google_sheets'"
-                :label="$t('import.add.google_sheets.sync_enabled')"
-            >
-                <input
-                    type="checkbox"
-                    style="width: auto; min-height: 0"
-                    v-model="prospectImport.sync_enabled"
-                />
-            </v-field>
-
-            <v-field
-                v-if="
-                    prospectImport.source == 'google_sheets' &&
-                    prospectImport.sync_enabled
-                "
-                :label="$t('import.add.google_sheets.sync_interval')"
-            >
-                <select v-model.number="prospectImport.sync_interval_minutes">
-                    <option
-                        :value="1"
-                        v-text="$t('import.add.google_sheets.sync_interval_1')"
-                    ></option>
-                    <option
-                        :value="5"
-                        v-text="$t('import.add.google_sheets.sync_interval_5')"
-                    ></option>
-                    <option
-                        :value="30"
-                        v-text="$t('import.add.google_sheets.sync_interval_30')"
-                    ></option>
-                    <option
-                        :value="60"
-                        v-text="$t('import.add.google_sheets.sync_interval_60')"
-                    ></option>
-                    <option
-                        :value="180"
-                        v-text="$t('import.add.google_sheets.sync_interval_180')"
-                    ></option>
-                    <option
-                        :value="1440"
-                        v-text="$t('import.add.google_sheets.sync_interval_1440')"
-                    ></option>
-                </select>
-            </v-field>
 
             <v-field :label="$t('import.add.name')" required v-slot="{ label }"
                 ><input
@@ -168,8 +122,6 @@ export default {
                 source: "file",
                 file: null,
                 source_url: "",
-                sync_enabled: false,
-                sync_interval_minutes: 30,
                 field_delimiter: ",",
                 field_enclosure: "",
             };
@@ -320,9 +272,13 @@ export default {
         isCsvFile() {
             return (
                 this.prospectImport.file &&
-                this.prospectImport.file.name.substring(
-                    this.prospectImport.file.name.lastIndexOf(".")
-                ) == ".csv"
+                [".csv", ".tsv"].includes(
+                    this.prospectImport.file.name
+                        .substring(
+                            this.prospectImport.file.name.lastIndexOf(".")
+                        )
+                        .toLowerCase()
+                )
             );
         },
     },

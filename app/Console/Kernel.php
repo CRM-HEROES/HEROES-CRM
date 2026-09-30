@@ -42,24 +42,6 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:campaign --frequency=monthly')->monthlyOn(1);
         
         $schedule->command('app:campaign --frequency=once')->daily();
-
-        // Automatic assignment of unassigned prospects
-        $schedule->command('app:assign-prospects')->everyFiveMinutes()->withoutOverlapping();
-        $schedule->command('app:reassign-unavailable-prospects')->everyFiveMinutes()->withoutOverlapping();
-
-        // Google Sheets auto-sync: re-download and re-import sheets that
-        // opted into periodic sync. Runs often; each import's own
-        // sync_interval_minutes decides whether it is actually due.
-        $schedule->command('app:sync-google-sheets-imports')->everyFiveMinutes()->withoutOverlapping();
-
-        // ARCHER (P6): nightly prospect enrichment. Rank runs an hour after
-        // enrich to give the queue time to work through the batch.
-        $schedule->command('archer:enrich')->dailyAt('02:00')->withoutOverlapping();
-        $schedule->command('archer:rank')->dailyAt('03:00')->withoutOverlapping();
-
-        // Doctolib appointments sync: not enabled yet, App\Jobs\Doctolib\AppointmentsGet
-        // is a stub until Doctolib API/ICS access is configured.
-        // $schedule->command('app:doctolib-sync-appointments')->everyFifteenMinutes()->withoutOverlapping();
     }
 
     /**

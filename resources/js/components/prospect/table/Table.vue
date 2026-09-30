@@ -83,8 +83,8 @@ export default {
         updateParamsFromUrl() {
             store.commit(INIT_PROSPECT_PARAMS);
             store.commit(SET_PROSPECTS_FIELDS, null);
-            store.commit(SET_PROSPECTS_SORT_BY, "updated_at");
-            store.commit(SET_PROSPECTS_SORT_ORDER, "desc");
+            // store.commit(SET_PROSPECTS_SORT_BY, "id");
+            // store.commit(SET_PROSPECTS_SORT_ORDER, "desc");
 
             const url = new URL(window.location.href);
             const searchParams = new URLSearchParams(url.search);
@@ -269,12 +269,6 @@ export default {
                     if (key == "users") {
                         name = this.$t(
                             "prospect.table.column.others.affected_users"
-                        );
-                        // AI agents
-                    } else if (key == "ai-agents") {
-                        category = "ai-agents";
-                        name = this.$t(
-                            "prospect.table.column.others.ai_agents"
                         );
                         // Groups
                     } else if (key == "groups") {

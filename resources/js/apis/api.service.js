@@ -41,9 +41,7 @@ export default {
             params = [];
         }
 
-        const normalizedResource = resource.replace(/^\/+/, "");
-
-        return axios.get(`${API_URL}/${normalizedResource}`, params);
+        return axios.get(`${API_URL}/${resource}`, params);
     },
 
     post(resource, params, settings) {
@@ -55,9 +53,7 @@ export default {
             settings = [];
         }
 
-        const normalizedResource = resource.replace(/^\/+/, "");
-
-        return axios.post(`${API_URL}/${normalizedResource}`, params, settings);
+        return axios.post(`${API_URL}/${resource}`, params, settings);
     },
 
     put(resource, params) {
@@ -65,9 +61,7 @@ export default {
             params = [];
         }
 
-        const normalizedResource = resource.replace(/^\/+/, "");
-
-        return axios.put(`${API_URL}/${normalizedResource}`, params);
+        return axios.put(`${API_URL}/${resource}`, params);
     },
 
     delete(resource, params) {
@@ -75,8 +69,6 @@ export default {
             params = [];
         }
 
-        const normalizedResource = resource.replace(/^\/+/, "");
-
-        return axios.delete(`${API_URL}/${normalizedResource}`, params);
+        return axios.delete(`${API_URL}/${resource}`, params);
     },
 };

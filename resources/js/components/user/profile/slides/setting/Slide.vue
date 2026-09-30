@@ -426,6 +426,11 @@ export default {
                     icon: "fa fa-step-forward icon-cyan",
                 },
                 {
+                    key: "phone-codes",
+                    name: "Ligne affectée",
+                    icon: "fa fa-phone icon-green",
+                },
+                {
                     key: "questionnaire",
                     name: this.$t("user.profile.blocs.questionnaires"),
                     icon: "fa fa-clipboard icon-brown",

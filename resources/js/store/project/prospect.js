@@ -17,7 +17,6 @@ import {
     SET_PROSPECTS_TOTAL,
     SET_PROSPECTS_SORT_BY,
     SET_PROSPECTS_SORT_ORDER,
-    SET_PROSPECTS_DUPLICATES_FIRST,
     SET_PROSPECTS_FIELDS,
     SET_PROSPECT_PARAMS,
     ADD_PROSPECT_PARAMS,
@@ -70,10 +69,6 @@ export const state = {
     prospectsCount: 50,
     prospectsSortBy: null,
     prospectsSortOrder: "desc",
-    // Set when "Rechercher des duplications" finds duplicate clusters, so
-    // the main table groups them together (see FETCH_PROSPECTS below).
-    // Cleared as soon as the user picks a column sort themselves.
-    prospectsDuplicatesFirst: false,
     prospectsFields: null,
     prospectsOptions: false,
     prospectsMenus: true,
@@ -145,22 +140,6 @@ const actions = {
             params.fields = context.state.project.prospectsFields;
         }
 
-        // Rank every prospect belonging to a duplicate cluster first (and
-        // grouped together, see ProspectController::getProspects'
-        // duplicatesFirst handling) either as soon as any field is flagged
-        // "unique" (the duplicate-check toggle next to Email/Numéro in
-        // DefaultHeaderCell.vue), or right after "Rechercher des
-        // duplications" found some (prospectsDuplicatesFirst).
-        if (
-            context.state.project.prospectsDuplicatesFirst ||
-            (context.getters.fields &&
-                context.getters.fields.some(
-                    (field) => field.for == "prospect" && field.unique
-                ))
-        ) {
-            params.duplicatesFirst = 1;
-        }
-
         const { data } = await ProspectService.get(context.state.project.slug, {
             params: params,
         });
@@ -225,34 +204,11 @@ const actions = {
      */
     async [UPDATE_PROSPECT](context, params) {
         context.commit(UPDATE_PROSPECT, params);
-        const { data } = await ProspectService.update(
+        await ProspectService.update(
             context.state.project.slug,
             params.id,
             params
         );
-
-        // The backend may compute fields the client can't know in advance
-        // (e.g. duplicate_id/duplicate_group_id/duplicate_fields from the
-        // automatic duplicate check) — without merging those back in, a
-        // row only ever picks up its duplicate color after a full page
-        // reload.
-        if (data && ("duplicate_id" in data || "duplicate_group_id" in data)) {
-            context.commit(UPDATE_PROSPECT, {
-                id: params.id,
-                duplicate_id: data.duplicate_id,
-                duplicate_group_id: data.duplicate_group_id,
-                duplicate_fields: data.duplicate_fields,
-            });
-        }
-
-        // Same story for whichever other prospect(s) this duplicate check
-        // matched against — if one is already loaded in the table, it
-        // needs the same patch, or it stays uncolored until a reload.
-        if (data && data.duplicate_partners) {
-            data.duplicate_partners.forEach((partner) => {
-                context.commit(UPDATE_PROSPECT, partner);
-            });
-        }
     },
 
     /**
@@ -263,24 +219,8 @@ const actions = {
      * @returns prospect
      */
     async [REMOVE_PROSPECT](context, slug) {
-        const { data } = await ProspectService.destroy(
-            context.state.project.slug,
-            slug
-        );
+        await ProspectService.destroy(context.state.project.slug, slug);
         context.commit(REMOVE_PROSPECT, slug);
-
-        // Removing this prospect may have freed its duplicate-cluster
-        // partner(s) (see ProspectController::destroy) — patch their
-        // fresh state in so they stop being colored immediately, then
-        // refetch so the list re-sorts them out of the duplicates-first
-        // priority ranking and back to their normal position.
-        if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
-            data.duplicate_partners.forEach((partner) => {
-                context.commit(UPDATE_PROSPECT, partner);
-            });
-
-            context.dispatch(FETCH_PROSPECTS);
-        }
     },
 
     /**
@@ -292,20 +232,10 @@ const actions = {
      */
     async [BULK_REMOVE_PROSPECT](context, prospects) {
         context.commit(BULK_REMOVE_PROSPECT, prospects);
-        const { data } = await ProspectService.bulkDestroy(
+        await ProspectService.bulkDestroy(
             context.state.project.slug,
             prospects
         );
-
-        // Same reasoning as REMOVE_PROSPECT: a bulk removal can free
-        // several duplicate-cluster partners at once.
-        if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
-            data.duplicate_partners.forEach((partner) => {
-                context.commit(UPDATE_PROSPECT, partner);
-            });
-
-            context.dispatch(FETCH_PROSPECTS);
-        }
     },
 
     /**
@@ -317,20 +247,10 @@ const actions = {
      */
     async [BULK_FORCE_REMOVE_PROSPECT](context, prospects) {
         context.commit(BULK_FORCE_REMOVE_PROSPECT, prospects);
-        const { data } = await ProspectService.bulkForceDestroy(
+        await ProspectService.bulkForceDestroy(
             context.state.project.slug,
             prospects
         );
-
-        // Same reasoning as REMOVE_PROSPECT: a bulk removal can free
-        // several duplicate-cluster partners at once.
-        if (data && data.duplicate_partners && data.duplicate_partners.length > 0) {
-            data.duplicate_partners.forEach((partner) => {
-                context.commit(UPDATE_PROSPECT, partner);
-            });
-
-            context.dispatch(FETCH_PROSPECTS);
-        }
     },
 
     /**
@@ -657,8 +577,6 @@ const mutations = {
      */
     [SET_PROSPECTS_SORT_BY](state, column) {
         state.project.prospectsSortBy = column;
-        // A manual column sort overrides the duplicates grouping.
-        state.project.prospectsDuplicatesFirst = false;
     },
 
     /**
@@ -666,13 +584,6 @@ const mutations = {
      */
     [SET_PROSPECTS_SORT_ORDER](state, order) {
         state.project.prospectsSortOrder = order;
-    },
-
-    /**
-     * @param {*} state
-     */
-    [SET_PROSPECTS_DUPLICATES_FIRST](state, value) {
-        state.project.prospectsDuplicatesFirst = value;
     },
 
     /**

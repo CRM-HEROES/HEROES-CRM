@@ -8,7 +8,6 @@ import locale from "@/store/locale";
 import modal from "@/store/modal";
 import permission from "@/store/permission";
 import project from "@/store/project";
-import prospectEmail from "@/store/prospect-email";
 import slide from "@/store/slide";
 import statChart from "@/store/stat-chart";
 import route from "@/store/route";
@@ -24,7 +23,6 @@ const store = createStore({
         modal,
         permission,
         project,
-        prospectEmail,
         route,
         slide,
         statChart,

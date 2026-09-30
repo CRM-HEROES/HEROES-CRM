@@ -8,77 +8,12 @@ use App\Models\Message;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\Thread;
-use App\Utils\ProjectMail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class MessageController extends Controller
 {
-    /**
-     * Send a direct email to a prospect using the project Brevo settings.
-     */
-    public function email(Request $request, Project $project, Prospect $prospect)
-    {
-        abort_unless($project->id == $prospect->project_id, 404);
-
-        $this->validate($request, [
-            'to' => 'required|email',
-            'subject' => 'required|string|max:255',
-            'body' => 'required|string',
-        ]);
-
-        abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
-
-        Mail::send('emails.prospect-message', [
-            'body' => $request->input('body'),
-            'category' => $request->input('category', 'Message'),
-            'project' => $project,
-            'subject' => $request->input('subject'),
-        ], function ($message) use ($request) {
-            $message->to($request->input('to'))
-                ->subject($request->input('subject'));
-        });
-
-        return ['sent' => true];
-    }
-
-    /**
-     * Send one direct email per selected prospect.
-     */
-    public function bulkEmail(Request $request, Project $project)
-    {
-        $this->validate($request, [
-            'prospects' => 'required|array|min:1',
-            'prospects.*' => 'integer',
-            'subject' => 'required|string|max:255',
-            'body' => 'required|string',
-        ]);
-
-        abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
-
-        $prospects = $project->prospects()
-            ->whereIn('id', $request->input('prospects'))
-            ->whereNotNull('email')
-            ->where('email', '!=', '')
-            ->get();
-
-        foreach ($prospects as $prospect) {
-            Mail::send('emails.prospect-message', [
-                'body' => $request->input('body'),
-                'category' => $request->input('category', 'Message'),
-                'project' => $project,
-                'subject' => $request->input('subject'),
-            ], function ($message) use ($prospect, $request) {
-                $message->to($prospect->email)
-                    ->subject($request->input('subject'));
-            });
-        }
-
-        return ['sent' => $prospects->count()];
-    }
-
     /**
      * Display a listing of the resource.
      */

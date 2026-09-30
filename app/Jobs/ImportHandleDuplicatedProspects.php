@@ -5,9 +5,6 @@ namespace App\Jobs;
 use App\Models\Import;
 use App\Models\User;
 use App\Support\PhoneCountry;
-// The trait file is named SendsWelcomeSms.php. Keep the import spelling in
-// sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\WelcomeSmsNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -18,7 +15,7 @@ use Illuminate\Support\Str;
 
 class ImportHandleDuplicatedProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, WelcomeSmsNotification;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     const MAPPING_FIELD_CLASSIC = 0;
     const MAPPING_FIELD_META = 1;
@@ -60,8 +57,6 @@ class ImportHandleDuplicatedProspects implements ShouldQueue
                 $this->replaceDuplicating($duplicates);
                 break;
         }
-
-        $this->sendWelcomeSms($this->import);
     }
     
     /**
@@ -209,7 +204,7 @@ class ImportHandleDuplicatedProspects implements ShouldQueue
             // marked users configured for this prospect's dial code
             // receive it, falling back to every marked user when the
             // prospect has no number or none of them match.
-            $markedUsers = User::whereIn('id', $this->import->users)->get(['id', 'phone_country']);
+            $markedUsers = PhoneCountry::usersWithDialCodes($this->import->users, $this->import->project_id);
             $dialCode = PhoneCountry::detectDialCode($prospect->phone_number ?: $prospect->mobile_phone_number);
             $eligibleUsers = PhoneCountry::filterUsersByDialCode($markedUsers, $dialCode);
 

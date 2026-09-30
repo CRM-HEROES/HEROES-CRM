@@ -62,10 +62,6 @@
                             :placeholder="label + ' ...'"
                             v-model="userToCreate.email"
                     /></v-field>
-                    <v-field :label="$t('phone_country')"
-                        ><phone-country-select
-                            v-model="userToCreate.phone_country"
-                    /></v-field>
                     <v-field
                         :label="$t('password')"
                         required
@@ -215,13 +211,7 @@ import { ADD_USER, SET_USER } from "@/actions/project/user";
 import { ADD_GLOBAL_USER } from "@/actions/user";
 import { CLOSE_MODAL } from "@/actions/modal";
 
-import PhoneCountrySelect from "@/components/PhoneCountrySelect.vue";
-
 export default {
-    components: {
-        PhoneCountrySelect,
-    },
-
     data() {
         return {
             tab: 0,
@@ -271,7 +261,6 @@ export default {
                 postal_code: "",
                 city: "",
                 country: "",
-                phone_country: [],
                 default_projects: [],
             };
         },

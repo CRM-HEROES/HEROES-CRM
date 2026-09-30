@@ -77,7 +77,6 @@
                         ></div>
                     </label>
                     <user-bloc />
-                    <ai-agent-bloc />
                     <role-bloc />
                     <group-bloc />
                     <menu-bloc />
@@ -112,7 +111,6 @@
                         }"
                     />
                     <document-bloc />
-                    <line-bloc />
                 </div>
                 <div>
                     <category-bloc />
@@ -246,7 +244,6 @@ import FolderBloc from "./blocs/folder/Bloc.vue";
 import GroupBloc from "./blocs/group/Bloc.vue";
 import ImportBloc from "./blocs/import/Bloc.vue";
 import InfoBloc from "./blocs/info/Bloc.vue";
-import LineBloc from "./blocs/line/Bloc.vue";
 import MenuBloc from "./blocs/menu/Bloc.vue";
 import OrderActionBloc from "./blocs/order-action/Bloc.vue";
 import OrderStatusBloc from "./blocs/order-status/Bloc.vue";
@@ -255,7 +252,6 @@ import ProductBloc from "./blocs/product/Bloc.vue";
 import RoleBloc from "./blocs/role/Bloc.vue";
 import ThreadBloc from "./blocs/thread/Bloc.vue";
 import UserBloc from "./blocs/user/Bloc.vue";
-import AiAgentBloc from "./blocs/ai-agent/Bloc.vue";
 
 export default {
     components: {
@@ -268,7 +264,6 @@ export default {
         GroupBloc,
         ImportBloc,
         InfoBloc,
-        LineBloc,
         MenuBloc,
         OrderActionBloc,
         OrderStatusBloc,
@@ -277,7 +272,6 @@ export default {
         RoleBloc,
         ThreadBloc,
         UserBloc,
-        AiAgentBloc,
     },
 
     data() {

@@ -8,7 +8,6 @@ use App\Notifications\GoogleContactDeletedProspect;
 use App\Notifications\GoogleContactNewProspect;
 use App\Notifications\PipedrivePersonNewProspect;
 use App\Notifications\PipedrivePersonUpdatedProspect;
-use App\Services\ProspectAutoAssignment;
 use Illuminate\Support\Facades\DB;
 use Venturecraft\Revisionable\Revision;
 
@@ -37,10 +36,17 @@ class ProspectObserver
         $this->getLatLng($prospect);
         $this->storeGoogleContact($prospect);
         $this->storePipedrivePerson($prospect);
+    }
 
-        if (!$prospect->users()->exists()) {
-            app(ProspectAutoAssignment::class)->assignProspect($prospect);
-        }
+    /**
+     * Handle the Prospect "updating" event.
+     *
+     * @param  \App\Models\Prospect  $prospect
+     * @return void
+     */
+    public function updating(Prospect $prospect)
+    {
+        $this->checkUniqueValue($prospect);
     }
 
     /**
@@ -76,6 +82,36 @@ class ProspectObserver
             }
         }
         $prospect->meta = $meta;
+    }
+
+    /**
+     * Check unique value
+     *
+     * @param  \App\Models\Prospect  $prospect
+     * @return void
+     */
+    protected function checkUniqueValue(Prospect $prospect)
+    {
+        foreach (
+            $prospect->project->fields()
+                ->where('for', 'prospect')
+                ->where('meta', 0)
+                ->where('unique', 1)
+                ->get(['id', 'slug', 'name']) as $field
+        ) {
+            if (!$prospect->isDirty($field->slug) || empty($prospect->{$field->slug})) {
+                continue;
+            }
+        
+            $d = Prospect::
+                where('id', '!=', $prospect->id)
+                ->where($field->slug, $prospect->{$field->slug})
+                ->first(['id', 'first_name', 'last_name']);
+
+            if ($d) {
+                abort(400, 'Valeur dupliquée pour la colonne: ' . $field->name . ', Prospect: ' . $d->full_name);
+            }
+        }
     }
 
     /**
@@ -223,13 +259,8 @@ class ProspectObserver
                     'revisionable_type' => get_class($prospect),
                     'revisionable_id' => $prospect->getKey(),
                     'key' => "meta->{$field}",
-                    // Revision::insert() is a raw bulk insert: it bypasses
-                    // Eloquent casts, so an array value here (e.g. a nested
-                    // meta field like ai_phone_agent_last_analysis) would
-                    // crash the query binder with "Array to string
-                    // conversion" instead of being JSON-encoded.
-                    'old_value' => is_array($oldValue) ? json_encode($oldValue) : $oldValue,
-                    'new_value' => is_array($newValue) ? json_encode($newValue) : $newValue,
+                    'old_value' => $oldValue,
+                    'new_value' => $newValue,
                     'user_id' => auth()->id(),
                     'created_at' => \Carbon\Carbon::now(),
                     'updated_at' => \Carbon\Carbon::now(),

@@ -29,14 +29,10 @@ class ProspectFieldRenderer implements FieldRenderer
      */
     public function render($content)
     {
-        // Both patterns must always be evaluated: with && short-circuiting,
-        // a content string containing both a {prospect.x} and a
-        // {prospect.meta.x} token only ever had defaultMatch populated,
-        // silently skipping every meta token replacement below.
-        $hasDefaultMatch = preg_match_all($this->defaultPattern, $content, $this->defaultMatch);
-        $hasMetaMatch = preg_match_all($this->metaPattern, $content, $this->metaMatch);
-
-        if (!$hasDefaultMatch && !$hasMetaMatch) {
+        if (
+            !preg_match_all($this->defaultPattern, $content, $this->defaultMatch) &&
+            !preg_match_all($this->metaPattern, $content, $this->metaMatch)
+        ) {
             return $content;
         }
 

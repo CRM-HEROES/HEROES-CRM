@@ -31,9 +31,6 @@ use App\Models\User;
 use App\Services\ProspectAutoAssignment;
 use App\Support\ImportHeaderAliases;
 use App\Support\PhoneCountry;
-// The trait file is named SendsWelcomeSms.php. Keep the import spelling in
-// sync with the file for case-sensitive production filesystems.
-use App\Jobs\Import\WelcomeSmsNotification;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 use Illuminate\Support\Facades\Log;
@@ -52,7 +49,7 @@ use Illuminate\Support\Str;
 
 class ImportProspects implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, WelcomeSmsNotification;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     const MAPPING_FIELD_DEFAULT = 0;
     const MAPPING_FIELD_META = 1;
@@ -88,30 +85,16 @@ class ImportProspects implements ShouldQueue
     protected $duplicateFieldDescriptors = [];
     protected $existingDuplicateFieldValues = [];
     protected $seenDuplicateFieldValues = [];
-    protected $incremental = false;
     protected $acceptedProspectIndexes = [];
 
     /**
      * Create a new job instance.
      *
-     * @param  bool  $incremental  When true (auto-sync of a Google Sheets
-     *   import): don't wipe and recreate the import's own prospects on
-     *   every run — instead recognise them as "already imported" so a row
-        *   already present (matched by email/phone/mobile against a prospect this
-        *   same import already created on a previous sync) is simply skipped,
-     *   and only genuinely new rows are inserted. False (default) preserves
-     *   the existing "start fresh from this file" behaviour used by
-     *   manual/file imports and the "Re importer" button.
-     *
-    *   Either way, a row matching any existing prospect is ignored so the
-    *   database remains authoritative and no duplicate is created.
-     *
      * @return void
      */
-    public function __construct($import, bool $incremental = false)
+    public function __construct($import)
     {
         $this->import = $import;
-        $this->incremental = $incremental;
         $this->date = Carbon::now()->format('Y-m-d H:i:s');
         $this->categories = $this->getCategories();
         $this->threads = $this->getThreads();
@@ -311,18 +294,8 @@ class ImportProspects implements ShouldQueue
 
             $this->import->update(['processing_at' => Carbon::now()]);
 
-            // Remove previous imported prospects. Skipped in incremental
-            // mode (auto-sync): the import's own prospects stay in place
-            // and are recognised via existingEmails/existingMobiles below,
-            // so re-running never duplicates them and any manual edits
-            // made to them in the CRM between two syncs aren't wiped out.
-            // Google Sheets auto-sync is always treated as incremental for
-            // safety: we must never delete or overwrite already imported
-            // database data from a re-sync, even if a stale or duplicate
-            // job reaches this codepath.
-            if (!$this->incremental && $this->import->source !== 'google_sheets') {
-                $this->removePreviousImportProspects();
-            }
+            // Remove the prospects created by a previous run of this import
+            $this->removePreviousImportProspects();
 
 
             // Total count of imported prospects
@@ -443,12 +416,6 @@ class ImportProspects implements ShouldQueue
                 $duplicate = $this->findExistingDuplicate($prospect);
 
                 if ($duplicate) {
-                    if ($this->incremental && $duplicate['sameImport']) {
-                        $this->updateExistingImportedProspect($duplicate['id'], $prospect);
-                    }
-
-                    // Prospects created manually or by another import remain
-                    // authoritative; only this import's own rows are synced.
                     continue;
                 }
 
@@ -504,13 +471,6 @@ class ImportProspects implements ShouldQueue
 
         // Update import infos
         // Mark import as finished.
-        // rows_count reflects the import's current total prospect count
-        // rather than just $rowsCount (rows freshly inserted this run):
-        // in incremental mode a sync that finds nothing new would
-        // otherwise report "0" even though the import still owns its
-        // previously-synced prospects. In non-incremental mode this is
-        // equivalent to $rowsCount anyway, since previous rows were wiped
-        // before this run started.
         $this->import->update([
             'rows_count' => DB::table('prospects')
                 ->where('import_id', $this->import->id)
@@ -519,12 +479,6 @@ class ImportProspects implements ShouldQueue
             'is_processing' => 0,
             'processed_at' => Carbon::now(),
         ]);
-
-        // Notifier SMS de bienvenue :
-        // envoyé une fois l'import terminé — les prospects flagués comme
-        // doublons (cf. findExistingDuplicate ci-dessus) sont exclus de cet
-        // envoi par sendWelcomeSms() elle-même (ils existent déjà en base).
-        $this->sendWelcomeSms($this->import);
 
         ImportFinished::dispatch($this->import->refresh());
 
@@ -569,20 +523,6 @@ class ImportProspects implements ShouldQueue
      */
     protected function removePreviousImportProspects()
     {
-        // Safety guard: Google Sheets auto-sync must never wipe an
-        // existing import's prospects or overwrite CRM data that was
-        // already created by a previous sync. A stale duplicate run must
-        // simply exit without deleting rows.
-        if ($this->import->source === 'google_sheets' || $this->import->sync_enabled) {
-            Log::warning('ImportProspects: refusing to delete existing prospects for auto-sync import', [
-                'import_id' => $this->import->id,
-                'project_id' => $this->import->project_id,
-                'source' => $this->import->source,
-            ]);
-
-            return;
-        }
-
         DB::table('prospects')
             ->where('import_id', $this->import->id)
             ->delete();
@@ -873,22 +813,10 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            // Exclude this import's own prospects, UNLESS running
-            // incrementally: in the normal (non-incremental) mode they are
-            // about to be deleted and recreated by
-            // removePreviousImportProspects(), so treating them as
-            // "already existing" would make every row of a re-processed
-            // import look like a duplicate of itself, silently wiping the
-            // import's data instead of recreating it. In incremental mode
-            // nothing gets deleted, so they must be included here instead —
-            // that's what lets a re-synced row be recognised as already
-            // imported (skipped/merged) rather than duplicated. Prospects
-            // with no import_id (created manually) always count as
-            // "existing" either way, hence the whereNull branch.
-            ->when(!$this->incremental, function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-                });
+            // Exclude this import's own prospects: they are deleted and
+            // recreated by removePreviousImportProspects().
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
             })
             ->whereNull('deleted_at')
             ->whereNotNull('email')
@@ -906,7 +834,7 @@ class ImportProspects implements ShouldQueue
 
     /**
      * Preload phone numbers already present in the project so they cannot be
-     * recreated by a file import or an incremental Google Sheets sync.
+     * recreated by a file or Google Sheets import.
      */
     protected function getExistingPhones()
     {
@@ -914,10 +842,8 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            ->when(!$this->incremental, function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-                });
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
             })
             ->whereNull('deleted_at')
             ->whereNotNull('phone_number')
@@ -946,12 +872,8 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            // See getExistingEmails() for why this import's own prospects
-            // are excluded here only outside incremental mode.
-            ->when(!$this->incremental, function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-                });
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
             })
             ->whereNull('deleted_at')
             ->whereNotNull('mobile_phone_number')
@@ -1022,6 +944,18 @@ class ImportProspects implements ShouldQueue
 
         if (preg_match('/^0[1-9]\d{8}$/', $digits)) {
             return '+33' . substr($digits, 1);
+        }
+
+        // Spreadsheet numeric cells lose the leading "0" ("614284461") or the
+        // "+" ("33614284461") of French numbers.
+        if ($value === $digits) {
+            if (preg_match('/^[1-9]\d{8}$/', $digits)) {
+                return '+33' . $digits;
+            }
+
+            if (preg_match('/^33[1-9]\d{8}$/', $digits)) {
+                return '+' . $digits;
+            }
         }
 
         return $digits;
@@ -1095,10 +1029,8 @@ class ImportProspects implements ShouldQueue
 
         $query = DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            ->when(!$this->incremental, function ($q) {
-                $q->where(function ($q) {
-                    $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-                });
+            ->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
             })
             ->whereNull('deleted_at')
             ->select(['id', 'import_id', 'meta']);
@@ -1307,7 +1239,6 @@ class ImportProspects implements ShouldQueue
             return [
                 'id' => $existing['id'],
                 'fields' => $matchedFields,
-                'sameImport' => (int) $existing['import_id'] === (int) $this->import->id,
             ];
         }
 
@@ -1370,52 +1301,7 @@ class ImportProspects implements ShouldQueue
         return [
             'id' => $existing['id'],
             'fields' => $matchedFields,
-            'sameImport' => (int) $existing['import_id'] === (int) $this->import->id,
         ];
-    }
-
-    protected function updateExistingImportedProspect(int $prospectId, array $incoming): void
-    {
-        $existing = DB::table('prospects')
-            ->where('id', $prospectId)
-            ->where('import_id', $this->import->id)
-            ->first(['meta']);
-
-        if (!$existing) {
-            return;
-        }
-
-        $excludedFields = array_merge([
-            'meta',
-            'import_id',
-            'project_id',
-            'creator_id',
-            'duplicate_id',
-            'duplicate_group_id',
-            'duplicate_fields',
-            'created_at',
-            'updated_at',
-        ], array_keys($this->prospectRelationsHandlers));
-
-        $updates = array_diff_key($incoming, array_flip($excludedFields));
-        $incomingMeta = $incoming['meta'] ?? [];
-
-        if (!empty($incomingMeta)) {
-            $existingMeta = json_decode($existing->meta ?: '{}', true);
-            $existingMeta = is_array($existingMeta) ? $existingMeta : [];
-            $updates['meta'] = json_encode(array_replace($existingMeta, $incomingMeta));
-        }
-
-        if (empty($updates)) {
-            return;
-        }
-
-        $updates['updated_at'] = Carbon::now();
-
-        DB::table('prospects')
-            ->where('id', $prospectId)
-            ->where('import_id', $this->import->id)
-            ->update($updates);
     }
 
     /**
@@ -1752,7 +1638,7 @@ class ImportProspects implements ShouldQueue
             return; // All prospects already have users assigned
         }
 
-        $markedUsers = User::whereIn('id', $this->import->users)->get(['id', 'phone_country']);
+        $markedUsers = PhoneCountry::usersWithDialCodes($this->import->users, $this->import->project_id);
 
         $prospectsById = DB::table('prospects')
             ->whereIn('id', $unassignedProspectIds)

@@ -120,6 +120,14 @@ class DefaultField implements ImportColumnToFieldInterface
             return;
         }
 
+        // xls/xlsx readers return real dates as DateTime objects and
+        // numeric cells (e.g. phone numbers) as int/float
+        if ($value instanceof \DateTimeInterface) {
+            $value = $value->format('c');
+        } elseif (is_float($value) && floor($value) == $value) {
+            $value = number_format($value, 0, '', '');
+        }
+
         $value = (string) $value;
         if (in_array($field, $this->limitedDefaultFieldsSize)) {
             $value = mb_substr($value, 0, 20);

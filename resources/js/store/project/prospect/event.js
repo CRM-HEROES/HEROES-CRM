@@ -114,6 +114,7 @@ export const mutations = {
         ];
         state.project.events = [
             ...(state.project.events ? state.project.events : []),
+            ,
             event,
         ];
         state.project.prospects = state.project.prospects.map((o) =>

@@ -2,9 +2,6 @@ version: '3'
 services:
   #PHP Service
   heroescrm:
-    build:
-      context: .
-      dockerfile: Dockerfile
     image: heroescrm:latest
     container_name: heroescrm
     restart: always
@@ -13,8 +10,6 @@ services:
       SERVICE_NAME: app
       SERVICE_TAGS: production
       PHP_MEMORY_LIMIT: 128M
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     working_dir: /var/www
     volumes:
       - ./:/var/www
@@ -39,33 +34,6 @@ services:
     env_file:
       - .env
       
-  # MySQL Service
-  mysql:
-    image: mysql:8.0
-    container_name: mysql-heroes
-    restart: unless-stopped
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: heroes
-    volumes:
-      - ./mysql:/var/lib/mysql
-    ports:
-      - "3306:3306"
-    networks:
-      - heroes-network
-
-  # Adminer service
-  adminer:
-    image: adminer:latest
-    container_name: adminer
-    restart: unless-stopped
-    ports:
-      - "18085:8080"
-    depends_on:
-      - mysql
-    networks:
-      - heroes-network
-
   #Nginx Service
   webserver:
     image: nginx:latest
@@ -111,8 +79,6 @@ services:
       SERVICE_TAGS: production
       PHP_MEMORY_LIMIT: 128M
       working_dir: /var/www
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
        - ./:/var/www
        - ./storage/:/var/www/storage/
@@ -125,74 +91,7 @@ services:
     networks:
       - heroes-network
 
-  # ia-phone-call Service
-  ia-phone-call:
-    build:
-      context: ./ia-phone-call
-      dockerfile: Dockerfile
-      target: production
-    container_name: ia-phone-call
-    restart: unless-stopped
-    env_file:
-      - ./ia-phone-call/.env
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    ports:
-      - "${AUDIOSOCKET_PORT:-9701}:${PORT:-9701}"
-      - "${API_PORT:-3000}:3000"
-    volumes:
-      - ./ia-phone-call/recordings:/app/recordings
-      - calls_data:/data/calls
-      - asterisk_dynamic_config:/data/asterisk
-    networks:
-      - heroes-network
-      - ia-phone-net
-    depends_on:
-      asterisk:
-        condition: service_healthy
-
-  # Asterisk Service (remplace la stack FreeSWITCH / ai-phone-agent)
-  asterisk:
-    build:
-      context: ./ia-phone-call/asterisk
-      dockerfile: Dockerfile.asterisk
-    container_name: ia-asterisk
-    restart: unless-stopped
-    env_file:
-      - ./ia-phone-call/.env
-    environment:
-      - TZ=${TZ:-Europe/Paris}
-    ports:
-      - "${SIP_PORT:-5060}:5060/udp"
-      - "${SIP_PORT:-5060}:5060/tcp"
-      - "${SIP_TLS_PORT:-5061}:5061/udp"
-      - "${SIP_TLS_PORT:-5061}:5061/tcp"
-      - "10000-10099:10000-10099/udp"
-      - "5038:5038/tcp"
-    volumes:
-      - ./ia-phone-call/asterisk/pjsip.conf.template:/etc/asterisk/pjsip.conf.template:ro
-      - ./ia-phone-call/asterisk/extensions.conf:/etc/asterisk/extensions.conf:ro
-      - ./ia-phone-call/asterisk/manager.conf:/etc/asterisk/manager.conf:ro
-      - calls_data:/var/spool/asterisk/monitor
-      - asterisk_dynamic_config:/etc/asterisk/dynamic
-    networks:
-      - ia-phone-net
-    healthcheck:
-      test: ["CMD", "asterisk", "-rx", "core show version"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
 #Docker Networks
 networks:
   heroes-network:
     driver: bridge
-  ia-phone-net:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 10.210.0.0/24
-
-volumes:
-  calls_data:
-  asterisk_dynamic_config:

@@ -5,14 +5,11 @@ namespace App\Http\Controllers\API\Project;
 use App\Filters\EventFilters;
 use App\Filters\ProspectRequestFilters;
 use App\Http\Controllers\Controller;
-use App\Models\AiAgent;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
-use App\Services\ProspectDuplicateChecker;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -66,80 +63,18 @@ class ProspectController extends Controller
                 ->toArray()
         )->toArray();
 
-        // A repeat submission (retried webhook, ad platform resending the
-        // same lead, double form submit...) for an email/phone already
-        // present in this project updates that prospect instead of
-        // creating a duplicate row. Blank incoming values never overwrite
-        // existing good data.
-        $existing = $this->findExistingProspect($project, $defaultFieldValues);
-
-        if ($existing) {
-            $existing->update(array_merge(
-                array_filter($defaultFieldValues, fn ($value) => filled($value)),
-                ['meta' => array_merge($existing->meta ?: [], array_filter($metaFieldValues, fn ($value) => filled($value)))]
-            ));
-
-            $prospect = $existing;
-        } else {
-            $prospect = $project->prospects()->create(array_merge(
-                $defaultFieldValues,
-                [
-                    'meta' => $metaFieldValues,
-                    'creator_id' => auth()->id(),
-                ]
-            ));
-
-            (new ProspectDuplicateChecker())->check($prospect);
-        }
+        $prospect =  $project->prospects()->create(array_merge(
+            $defaultFieldValues,
+            [
+                'meta' => $metaFieldValues,
+                'creator_id' => auth()->id(),
+            ]
+        ));
 
         $prospect->load('creator');
         $prospect->load('users');
 
         return $prospect;
-    }
-
-    /**
-     * Find a non-deleted prospect in this project matching the submitted
-     * email (normalized case/whitespace) or, failing that, mobile/phone
-     * number (exact match — unlike App\Jobs\ImportProspects's bulk
-     * normalizePhone(), this is a single hot-path lookup on prospect
-     * creation, not a full-table dedup pass).
-     *
-     * withoutGlobalScopes() bypasses ProspectScope's per-user visibility
-     * restriction on purpose, same as ProspectDuplicateChecker::matchField()
-     * and ImportProspects's existingEmails/existingMobiles: this must catch
-     * a duplicate across the whole project regardless of who can currently
-     * see it, not just the requesting user's own/assigned prospects.
-     */
-    protected function findExistingProspect(Project $project, array $values): ?Prospect
-    {
-        $query = Prospect::withoutGlobalScopes()
-            ->where('project_id', $project->id)
-            ->whereNull('deleted_at');
-
-        if (!empty($values['email'])) {
-            $prospect = (clone $query)
-                ->whereRaw('LOWER(TRIM(email)) = ?', [strtolower(trim($values['email']))])
-                ->first();
-
-            if ($prospect) {
-                return $prospect;
-            }
-        }
-
-        foreach (['mobile_phone_number', 'phone_number'] as $field) {
-            if (empty($values[$field])) {
-                continue;
-            }
-
-            $prospect = (clone $query)->where($field, $values[$field])->first();
-
-            if ($prospect) {
-                return $prospect;
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -221,9 +156,6 @@ class ProspectController extends Controller
             },
         ]);
 
-        // AI agents assigned through the prospect's import
-        $this->resolveImportAiAgents([$prospect]);
-
         return $prospect;
     }
 
@@ -254,19 +186,7 @@ class ProspectController extends Controller
             $defaultFieldValues, ['meta' => array_merge($prospect->meta ?: [], $metaFieldValues)]
         ));
 
-        $duplicatePartners = (new ProspectDuplicateChecker())->check($prospect);
-
-        return [
-            'message' => trans('common.success.updated_resource'),
-            'duplicate_id' => $prospect->duplicate_id,
-            'duplicate_group_id' => $prospect->duplicate_group_id,
-            'duplicate_fields' => $prospect->duplicate_fields,
-            // Any other prospect this check touched (its duplicate
-            // partner(s)) — without this, a partner already loaded in the
-            // table only ever picks up its own new color after a full
-            // page reload.
-            'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
-        ];
+        return ['message' => trans('common.success.updated_resource')];
     }
 
     /**
@@ -274,46 +194,9 @@ class ProspectController extends Controller
      */
     public function destroy(Project $project, Prospect $prospect)
     {
-        $groupId = $prospect->duplicate_group_id;
-
         $prospect->delete();
 
-        $duplicatePartners = $groupId
-            ? $this->recheckDuplicateGroupMembers([$groupId], [$prospect->id])
-            : collect();
-
-        return [
-            'message' => trans('common.success.deleted_resource'),
-            // The deleted prospect may have been the only reason its
-            // duplicate-cluster partner(s) were still flagged — without
-            // pushing their fresh state back, they'd stay colored/
-            // prioritized in the table until a full page reload.
-            'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
-        ];
-    }
-
-    /**
-     * Deleting a prospect can leave its former duplicate-cluster
-     * partner(s) with no one left to match. ProspectDuplicateChecker
-     * already knows how to clear duplicate_group_id/duplicate_fields
-     * when a prospect no longer matches anyone (see its "no more
-     * matches" branch), so we just re-run it for whoever shared the
-     * affected group(s) — excluding the prospect(s) just removed — and
-     * hand back their fresh state.
-     *
-     * @return Collection<int, Prospect>
-     */
-    protected function recheckDuplicateGroupMembers(array $groupIds, array $excludeIds): Collection
-    {
-        $members = Prospect::withoutGlobalScopes()
-            ->whereIn('duplicate_group_id', $groupIds)
-            ->whereNotIn('id', $excludeIds)
-            ->whereNull('deleted_at')
-            ->get();
-
-        $checker = new ProspectDuplicateChecker();
-
-        return $members->each(fn($member) => $checker->check($member));
+        return ['message' => trans('common.success.deleted_resource')];
     }
 
     /**
@@ -335,21 +218,12 @@ class ProspectController extends Controller
 
         switch ($request->input('action')) {
             case "delete":
+                $prospects->delete();
+                return ['message' => trans('common.success.deleted_resource')];
+
             case "force_delete":
-                $removed = $prospects->get(['id', 'duplicate_group_id']);
-                $ids = $removed->pluck('id')->all();
-                $groupIds = $removed->pluck('duplicate_group_id')->filter()->unique()->values()->all();
-
-                $request->input('action') == 'delete' ? $prospects->delete() : $prospects->forceDelete();
-
-                $duplicatePartners = !empty($groupIds)
-                    ? $this->recheckDuplicateGroupMembers($groupIds, $ids)
-                    : collect();
-
-                return [
-                    'message' => trans('common.success.deleted_resource'),
-                    'duplicate_partners' => $duplicatePartners->map->only(['id', 'duplicate_group_id', 'duplicate_fields'])->values(),
-                ];
+                $prospects->forceDelete();
+                return ['message' => trans('common.success.deleted_resource')];
 
             case "restore":
                 $prospects->restore();
@@ -631,9 +505,8 @@ class ProspectController extends Controller
         // Count
         $count = min($request->input('count', 50), 500);
 
-        // Sort By.
-        // Default to the prospects created most recently in the project view.
-        $sortBy = $request->input('sortBy', "created_at");
+        // Sort By
+        $sortBy = $request->input('sortBy', "id");
 
         if ($sortBy == "null") {
             $sortBy = null;
@@ -642,7 +515,6 @@ class ProspectController extends Controller
             $sortBy != 'interactions_created_at' &&
             $sortBy != 'sms_created_at' &&
             $sortBy != 'messages_created_at' &&
-            $sortBy != 'created_at' &&
             !$project
                 ->fields()
                 ->where('slug', Str::replace('meta->', '', $sortBy))
@@ -676,21 +548,19 @@ class ProspectController extends Controller
                     'longitude',
                     'meta',
                     'prospects.creator_id',
-                    // Needed to resolve each prospect's AI agents
-                    // from imports.ai_agents
-                    'prospects.import_id',
                 ],
                 $request->has('fields') ? [] : [
                     'valid_address',
                     'mobile_phone_number',
                     'phone_number',
                     'processed_at',
-                    'prospects.deleted_at',
-                    'duplicate_id',
-                    'duplicate_group_id',
-                    'duplicate_fields'
+                    'prospects.deleted_at'
                 ]
         );
+
+        if (in_array('import', $fields)) {
+            $defaultFields[] = "import_id";
+        }
 
         // Categories in which we select labels associated to prospects
         $categories = array_map(function($field) {
@@ -902,25 +772,8 @@ class ProspectController extends Controller
 
             ->filter($filters)
 
-            // Prospects belonging to a duplicate cluster sort first (see
-            // App\Services\ProspectDuplicateChecker / App\Jobs\CheckDuplicatedProspects
-            // for duplicate_group_id), then grouped by duplicate_group_id so
-            // a cluster's members land next to each other ("couples") rather
-            // than merely sharing the "has duplicates" bucket. The normal
-            // sort stays the final tiebreaker, both within a cluster and for
-            // the non-duplicate rows that follow.
-            ->when($request->boolean('duplicatesFirst'), function($query) {
-                $query
-                    ->orderByRaw('duplicate_group_id IS NULL')
-                    ->orderBy('duplicate_group_id');
-            })
-
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
                 $query->orderBy($sortBy, $sortOrder);
-
-                if (in_array($sortBy, ['created_at', 'updated_at'], true)) {
-                    $query->orderBy('id', 'desc');
-                }
             })
             ->skip(($request->input('page', 1) - 1) * $count)
             ->paginate($count);
@@ -943,56 +796,6 @@ class ProspectController extends Controller
             })
         );
 
-        // AI agents of each prospect (from its import)
-        $this->resolveImportAiAgents($data->getCollection());
-
         return $data;
-    }
-
-    /**
-     * Attach the AI agents of each prospect, resolved from the import that
-     * created it (imports.ai_agents JSON of agent ids — the "Relations"
-     * step of the import), under the `ai_agents` attribute expected by the
-     * prospects table. Same shape as the former ai_agent_prospect pivot
-     * (id, name, is_active), with two batch queries for the whole page.
-     *
-     * The imports table is read directly (not through the Import relation)
-     * so ImportScope never hides an import that is simply not owned by the
-     * requesting user: the agents are still the ones that were applied to
-     * these prospects at import time.
-     *
-     * @param  iterable  $prospects list of Prospect models
-     */
-    protected function resolveImportAiAgents($prospects)
-    {
-        $prospects = collect($prospects);
-
-        $importIds = $prospects->pluck('import_id')->filter()->unique()->values();
-
-        $importAgents = $importIds->isEmpty()
-            ? collect()
-            : DB::table('imports')
-                ->whereIn('id', $importIds)
-                ->pluck('ai_agents', 'id')
-                ->map(function ($aiAgents) {
-                    return json_decode($aiAgents, true) ?: [];
-                });
-
-        $agentIds = $importAgents->flatten()->filter()->unique()->values();
-
-        $agents = $agentIds->isEmpty()
-            ? collect()
-            : AiAgent::whereIn('id', $agentIds)
-                ->get(['id', 'name', 'is_active'])
-                ->keyBy('id');
-
-        foreach ($prospects as $prospect) {
-            $prospect->ai_agents = collect($importAgents->get($prospect->import_id) ?: [])
-                ->map(function ($aiAgentId) use ($agents) {
-                    return $agents->get($aiAgentId);
-                })
-                ->filter()
-                ->values();
-        }
     }
 }

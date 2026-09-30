@@ -147,14 +147,6 @@ class Project extends Model
     }
 
     /**
-     * AI phone agents configured for this project.
-     */
-    public function aiAgents()
-    {
-        return $this->hasMany(AiAgent::class);
-    }
-
-    /**
      * Calendars
      */
     public function calendars()
@@ -267,14 +259,6 @@ class Project extends Model
     }
 
     /**
-     * Lines
-     */
-    public function lines()
-    {
-        return $this->hasMany(Line::class);
-    }
-
-    /**
      * Menus
      */
     public function menus()
@@ -344,14 +328,6 @@ class Project extends Model
     public function pipedriveAccounts()
     {
         return $this->hasMany(PipedriveAccount::class);
-    }
-
-    /**
-     * Doctolib accounts
-     */
-    public function doctolibAccounts()
-    {
-        return $this->hasMany(DoctolibAccount::class);
     }
 
     /**

@@ -31,6 +31,3 @@ export const REMOVE_IMPORT_ROLE = "removeImportRole";
 
 export const ADD_IMPORT_USER_GROUP = "addImportUserGroup";
 export const REMOVE_IMPORT_USER_GROUP = "removeImportUserGroup";
-
-export const ADD_IMPORT_AI_AGENT = "addImportAiAgent";
-export const REMOVE_IMPORT_AI_AGENT = "removeImportAiAgent";

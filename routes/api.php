@@ -1,12 +1,8 @@
 <?php
 
-use App\Http\Controllers\API\AiPhoneAgentController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
-use App\Http\Controllers\API\GeminiLiveController;
-use App\Http\Controllers\API\KavkomController;
-use App\Http\Controllers\API\KavkomWebhookController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
@@ -24,7 +20,6 @@ use App\Http\Controllers\API\Project\CategoryController as ProjectCategoryContro
 use App\Http\Controllers\API\Project\CommissionController as ProjectCommissionController;
 
 use App\Http\Controllers\API\Project\CampaignController as ProjectCampaignController;
-use App\Http\Controllers\API\Project\AiAgentController as ProjectAiAgentController;
 use App\Http\Controllers\API\Project\Campaign\ActionController as ProjectCampaignActionController;
 use App\Http\Controllers\API\Project\Campaign\CampaignActionController as ProjectCampaignCampaignActionController;
 use App\Http\Controllers\API\Project\Campaign\CampaignOperatorController as ProjectCampaignCampaignOperatorController;
@@ -63,7 +58,6 @@ use App\Http\Controllers\API\Project\Import\MappingController as ProjectImportMa
 use App\Http\Controllers\API\Project\Import\UserController as ProjectImportUserController;
 
 use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
-use App\Http\Controllers\API\Project\LineController as ProjectLineController;
 use App\Http\Controllers\API\Project\LogoController as ProjectLogoController;
 use App\Http\Controllers\API\Project\MenuController as ProjectMenuController;
 use App\Http\Controllers\API\Project\MenuIconController as ProjectMenuIconController;
@@ -77,7 +71,6 @@ use App\Http\Controllers\API\Project\Order\StepController as ProjectOrderStepCon
 
 use App\Http\Controllers\API\Project\PermissionController as ProjectPermissionController;
 
-use App\Http\Controllers\API\Project\DoctolibController as ProjectDoctolibController;
 use App\Http\Controllers\API\Project\PipedriveController as ProjectPipedriveController;
 use App\Http\Controllers\API\Project\PipelineController as ProjectPipelineController;
 use App\Http\Controllers\API\Project\Pipeline\LabelController as ProjectPipelineLabelController;
@@ -208,25 +201,11 @@ Route::post('/google/auth/login', [App\Http\Controllers\API\Google\AuthControlle
 // Two factors
 Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class, 'login']);
 
-// Kavkom sends CDRs without a CRM session. The controller validates the
-// domain and API token already configured in the user's Kavkom modal.
-Route::post('/webhooks/kavkom/cdr', [KavkomWebhookController::class, 'cdr'])->name('webhooks.kavkom.cdr');
-
-// The Node ai-phone-agent bridge posts here once a live AI-answered call
-// ends. No CRM session either — authenticated by a shared secret header.
-Route::post('/webhooks/ai-phone-agent/calls', [AiPhoneAgentController::class, 'ingest'])->name('webhooks.ai-phone-agent.calls');
-
 // User Permission
 Route::get('permission', [PermissionController::class, 'index'])->name("permission");
 
 // Webservice
 Route::get('/webservice/{import}/prospect', [WebserviceController::class, 'prospect']);
-
-// Real-time Google Sheets sync, called by the Apps Script trigger the
-// client installs in their own sheet. Throttled: it's a public,
-// token-authenticated endpoint (same pattern as the route above), not a
-// session-authenticated one.
-Route::post('/webservice/{import}/sync', [WebserviceController::class, 'syncGoogleSheet']);
 
 Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->name("project.logo");
 
@@ -278,24 +257,7 @@ Route::group([
 
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // Kavkom
-    Route::post('/settings/kavkom/test', [KavkomController::class, 'test'])->name('settings.kavkom.test');
-    Route::post('/settings/kavkom/call', [KavkomController::class, 'call'])->name('settings.kavkom.call');
-    Route::get('/settings/kavkom/call/{callUuid}/status', [KavkomController::class, 'callStatus'])->name('settings.kavkom.call.status');
-    Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
-    // Inbound calls: the global softphone identifies the caller and logs the
-    // call in the prospect history as it rings, is answered and ends.
-    Route::post('/settings/kavkom/incoming', [KavkomController::class, 'incoming'])->name('settings.kavkom.incoming');
-    Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
-
     Route::get('dashboard/projects', [DashboardController::class, 'projects'])->name('dashboard.projects');
-
-    // Gemini Live (voice assistant)
-    Route::post('/voice-assistant/token', [GeminiLiveController::class, 'token'])->name('voice-assistant.token');
-
-    // AI phone agent ("Appeler avec l'IA" on a prospect)
-    Route::post('/settings/ai-phone-agent/call', [AiPhoneAgentController::class, 'trigger'])->name('settings.ai-phone-agent.call');
 
     // Default field
     Route::get('default-field', [DefaultFieldController::class, 'index'])->name('default-field');
@@ -357,7 +319,6 @@ Route::group([
         Route::delete('user/{user}/product/{product}/action/{action}/commission', [ProjectCommissionController::class, 'destroy'])->name('commission.user-product-action.destroy');
 
         // Campaign
-        Route::apiResource('ai-agent', ProjectAiAgentController::class);
         Route::get('campaign/{campaign}/check-rules', [ProjectCampaignController::class, 'checkRules'])->name('campaign.check-rules');
         Route::apiResource('campaign', ProjectCampaignController::class);
         Route::apiResource('campaign-action', ProjectCampaignActionController::class);
@@ -420,9 +381,6 @@ Route::group([
         // Group
         Route::apiResource('group', ProjectGroupController::class);
 
-        // Line
-        Route::apiResource('line', ProjectLineController::class);
-
         // Google Drive
         Route::get('google/drive', [ProjectGoogleDriveController::class, 'index']);
         Route::delete('google/drive/{account}', [ProjectGoogleDriveController::class, 'destroy']);
@@ -439,10 +397,6 @@ Route::group([
         // Import Relation User Group (groups used as a pool of users, distinct from "import.group" which tags the imported prospects)
         Route::apiResource('import.user-group', \App\Http\Controllers\API\Project\Import\UserGroupController::class)
             ->parameters(['user-group' => 'group'])
-            ->only('index', 'update', 'destroy');
-        // Import Relation AI Agent (AI phone agents assigned to the import's prospects)
-        Route::apiResource('import.ai-agent', \App\Http\Controllers\API\Project\Import\AiAgentController::class)
-            ->parameters(['ai-agent' => 'aiAgent'])
             ->only('index', 'update', 'destroy');
         // Import Relation Label
         Route::apiResource('import.label', ProjectImportLabelController::class)->only('index', 'update', 'destroy');
@@ -493,10 +447,6 @@ Route::group([
         // User Permission
         Route::get('permission', [ProjectPermissionController::class, 'index'])->name("permission");
 
-        // Doctolib
-        Route::apiResource('doctolib', ProjectDoctolibController::class)->only('index', 'store', 'delete');
-        Route::post('doctolib/{doctolib}/sync', [ProjectDoctolibController::class, 'sync']);
-
         // Pipedrive
         Route::apiResource('pipedrive', ProjectPipedriveController::class)->only('index', 'store', 'delete');
         Route::get('pipedrive/{pipedrive}/person', [ProjectPipedriveController::class, 'person']);
@@ -534,8 +484,6 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
-        Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
-        Route::put('prospect/{prospect}/ai-agent', [\App\Http\Controllers\API\Project\ProspectAiAgentController::class, 'update']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 
@@ -574,7 +522,6 @@ Route::group([
             // Log
             Route::get('log', [ProspectLogController::class, 'index']);
             // Message
-            Route::post('email', [ProspectMessageController::class, 'email']);
             Route::apiResource('thread.message', ProspectMessageController::class);
             // Message User
             Route::match(['PUT', 'PATCH'], 'thread/{thread}/message/{message}/user/{user}', [ProspectMessageUserController::class, 'update']);
@@ -632,7 +579,6 @@ Route::group([
         Route::get('/setting/{setting}/check', [ProjectSettingController::class, 'check']);
         Route::get('/setting/{setting}', [ProjectSettingController::class, 'show']);
         Route::match(['PUT', 'PATCH'], '/setting/{setting}', [ProjectSettingController::class, 'update']);
-        Route::post('/setting/{setting}/test', [ProjectSettingController::class, 'test']);
         Route::delete('/setting/{setting}', [ProjectSettingController::class, 'destroy']);
 
         // Sms Template

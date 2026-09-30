@@ -1,13 +1,11 @@
 <template>
     <slide
         :name="name"
-        @open="
-            fetchInteractions(), fetchSelectedProspects(), fetchOperatorsConfigStatus()
-        "
+        @open="fetchInteractions(), fetchSelectedProspects()"
         :title="
             $t('prospect.interaction.title', {
                 prospect: interactionProspect
-                    ? interactionProspect.first_name
+                    ? interactionProspect.last_name
                     : '',
             })
         "
@@ -39,7 +37,7 @@
                     <template v-if="can('all.prospect.interaction.add')">
                         <item
                             v-if="interactionProspect.phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 4)"
+                            @click.prevent="(tab = 1), (frameTab = 3)"
                         >
                             <icon class="fa fa-phone" />
                             <div
@@ -52,7 +50,7 @@
                         </item>
                         <item
                             v-if="interactionProspect.mobile_phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 5)"
+                            @click.prevent="(tab = 1), (frameTab = 4)"
                         >
                             <icon class="fa fa-mobile" />
                             <div
@@ -160,45 +158,8 @@
                                         v-text="number"
                                     ></span>
                                 </div>
-                                <icon
-                                    v-if="ringoverConfigured"
-                                    class="fa fa-check-circle"
-                                    color="#09be0c"
-                                    v-tooltip="$t('line.operator.configured')"
-                                />
                                 <icon class="fa fa-caret-right" />
                             </item>
-
-                            <!-- Kavkom -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaKavkom(number)"
-                            >
-                                <icon class="fa fa-phone" color="#8e24aa" />
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_kavkom'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <icon
-                                    v-if="kavkomConfigured"
-                                    class="fa fa-check-circle"
-                                    color="#09be0c"
-                                    v-tooltip="$t('line.operator.configured')"
-                                />
-                                <icon class="fa fa-caret-right" />
-                            </item>
-
                         </template>
 
                         <!-- Add history -->
@@ -240,7 +201,7 @@
 
             <!-- List of interaction -->
             <template #2>
-                <frame-layout :count="7" :tab="frameTab" class="hc-flex-1">
+                <frame-layout :count="5" :tab="frameTab" class="hc-flex-1">
                     <template #1 v-if="interactionProspect">
                         <tab-layout
                             :count="2"
@@ -404,6 +365,10 @@
                                         )
                                     "
                                 ></div>
+                                <icon
+                                    class="fa fa-cog"
+                                    @click.stop="ringoverSetting"
+                                />
                             </item>
                             <div
                                 style="
@@ -411,7 +376,6 @@
                                     width: 100%;
                                     height: 100%;
                                     overflow: auto;
-                                    padding: 16px;
                                 "
                             >
                                 <ringover
@@ -447,99 +411,14 @@
                         </div>
                     </template>
 
-                    <template #3 v-if="interactionProspect">
-                        <div class="hc-flex-column" style="height: 100%">
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="
-                                        $t(
-                                            'prospect.interaction.call_by_kavkom'
-                                        )
-                                    "
-                                ></div>
-                            </item>
-                            <div class="hc-kavkom-call-panel">
-                                <div class="hc-kavkom-call-card">
-                                    <div class="hc-kavkom-call-card-header">
-                                        <span class="hc-kavkom-call-icon">
-                                            <icon class="fa fa-phone" />
-                                        </span>
-                                        <div>
-                                            <div class="hc-kavkom-call-label">Appel Kavkom</div>
-                                            <div class="hc-kavkom-call-number">
-                                                {{ interaction.number }}
-                                            </div>
-                                        </div>
-                                        <span
-                                            :class="[
-                                                'hc-kavkom-call-ready',
-                                                kavkomReady ? 'is-ready' : 'is-loading',
-                                            ]"
-                                        >
-                                            <i class="fa fa-circle"></i>
-                                            {{ kavkomReady ? "Prêt" : "Connexion" }}
-                                        </span>
-                                    </div>
-
-                                    <!--
-                                        Panneau d'affichage du softphone
-                                        partagé : il ne compose pas lui-même le
-                                        numéro de destination, il auto-répond
-                                        au leg agent renvoyé par le PBX Kavkom
-                                        après l'API REST (triggerKavkomCall) et
-                                        affiche l'état de l'enregistrement SIP
-                                        et des appels. L'enregistrement et les
-                                        événements viennent du widget global
-                                        (voir @/utils/kavkom-phone et
-                                        KavkomIncomingCall.vue), ce qui permet
-                                        aussi de recevoir les appels entrants
-                                        quand cet onglet est fermé.
-                                    -->
-                                    <kavkom
-                                        ref="kavkomWebphone"
-                                        id="kavkom-webphone"
-                                        :project-id="project.id"
-                                    />
-                                </div>
-
-                                <div
-                                    v-if="kavkomCallMessage"
-                                    :class="[
-                                        'hc-kavkom-call-status',
-                                        kavkomCallSuccess ? 'success' : 'error',
-                                    ]"
-                                >
-                                    {{ kavkomCallMessage }}
-                                </div>
-
-                                <button
-                                    type="button"
-                                    class="hc-button-secondary hc-kavkom-call-action"
-                                    :disabled="callingViaKavkom || !kavkomReady"
-                                    @click="triggerKavkomCall(interaction.number)"
-                                >
-                                    <i class="fa fa-phone"></i>
-                                    {{
-                                        callingViaKavkom
-                                            ? "Appel en cours..."
-                                            : "Appeler"
-                                    }}
-                                </button>
-
-                            </div>
-                        </div>
-                    </template>
-
-                    <template #4>
+                    <template #3>
                         <select-prospect
                             @back="tab = 0"
                             @prospect-selected="setInteractionProspect"
                         />
                     </template>
 
-                    <template #5>
+                    <template #4>
                         <form
                             class="hc-flex-column"
                             style="height: 100%"
@@ -571,7 +450,7 @@
                         </form>
                     </template>
 
-                    <template #6>
+                    <template #5>
                         <form
                             class="hc-flex-column"
                             style="height: 100%; position"
@@ -602,32 +481,6 @@
                             <loading :loading="updatingMobilePhoneNumber" />
                         </form>
                     </template>
-
-                    <template #7 v-if="interactionProspect">
-                        <div class="hc-flex-column" style="height: 100%">
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="
-                                        $t(
-                                            'prospect.interaction.call_by_twilio'
-                                        )
-                                    "
-                                ></div>
-                            </item>
-                            <div
-                                style="
-                                    flex: 1;
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: auto;
-                                    padding: 16px;
-                                "
-                            >
-                            </div>
-                        </div>
-                    </template>
                 </frame-layout>
             </template>
         </tab-layout>
@@ -643,120 +496,14 @@
     font-size: 11px;
     color: #999999;
 }
-.hc-kavkom-call-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 18px;
-    text-align: center;
-    background: linear-gradient(160deg, #faf7ff 0%, #ffffff 55%);
-}
-.hc-kavkom-call-card {
-    width: 100%;
-    padding: 16px;
-    text-align: left;
-    background: #fff;
-    border: 1px solid #eadcf7;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(116, 52, 162, 0.08);
-}
-.hc-kavkom-call-card-header {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    margin-bottom: 14px;
-}
-.hc-kavkom-call-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    color: #fff;
-    background: #8e24aa;
-    border-radius: 10px;
-}
-.hc-kavkom-call-label {
-    color: #7b7284;
-    font-size: 12px;
-    font-weight: 600;
-}
-.hc-kavkom-call-help {
-    font-size: 12px;
-    color: #6c757d;
-    line-height: 1.5;
-    max-width: 320px;
-}
-.hc-kavkom-call-number {
-    margin-top: 2px;
-    font-size: 18px;
-    font-weight: 600;
-    color: #343a40;
-}
-.hc-kavkom-call-ready {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    margin-left: auto;
-    padding: 4px 7px;
-    border-radius: 999px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-.hc-kavkom-call-ready i {
-    font-size: 7px;
-}
-.hc-kavkom-call-ready.is-ready {
-    color: #16794a;
-    background: #e7f7ef;
-}
-.hc-kavkom-call-ready.is-loading {
-    color: #896b16;
-    background: #fff6d8;
-}
-.hc-kavkom-call-status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    color: #6c757d;
-    pointer-events: none;
-}
-.hc-kavkom-call-status.success {
-    color: #2e7d32;
-}
-.hc-kavkom-call-status.error {
-    color: #c62828;
-}
-.hc-kavkom-call-panel > .hc-button-secondary {
-    width: 100%;
-    min-height: 40px;
-    color: #fff;
-    background: #8e24aa;
-    border-color: #8e24aa;
-}
-.hc-kavkom-call-action {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
-.hc-kavkom-call-panel > .hc-button-secondary:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
 </style>
 
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
-import ApiService from "@/apis/api.service";
 
+import { OPEN_MODAL } from "@/actions/modal";
 import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
 import {
@@ -767,15 +514,8 @@ import {
     SET_PROSPECT_INTERACTION_FRAME_TAB,
 } from "@/actions/project/prospect/interaction";
 
-// Kavkom softphone events (see @/utils/kavkom-phone): the SIP registration
-// is shared by the whole session, so the call events are received here even
-// when the Kavkom tab of this slide is not open.
-import EventBus from "@/utils/event-bus";
-import kavkomPhone, { KAVKOM_EVENTS } from "@/utils/kavkom-phone";
-
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
-import Kavkom from "@/components/utils/Kavkom.vue";
 import Aircall from "@/components/utils/Aircall.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
@@ -783,7 +523,6 @@ import SelectProspect from "../select/Select.vue";
 export default {
     components: {
         Ringover,
-        Kavkom,
         Aircall,
         InteractionRow,
         SelectProspect,
@@ -804,37 +543,12 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
-            callingViaKavkom: false,
-            kavkomCallMessage: "",
-            kavkomCallSuccess: false,
-            kavkomCallState: "idle",
-            kavkomCallUuid: null,
-            kavkomDebugTimer: null,
-            kavkomDebugLastStatus: null,
-            // Softphone prêt = enregistré en SIP côté navigateur, capable
-            // de recevoir/auto-répondre au leg agent envoyé par le PBX.
-            kavkomReady: false,
-            // Si l'utilisateur clique "Appeler" avant que le softphone ne
-            // soit encore enregistré, on mémorise le numéro pour le lancer
-            // dès que le softphone devient prêt (onKavkomReady).
-            pendingKavkomNumber: "",
         };
     },
 
     created() {
         store.commit(SET_PROSPECT_INTERACTION_TAB, 0);
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
-        this.subscribeKavkomEvents();
-    },
-
-    beforeDestroy() {
-        this.unsubscribeKavkomEvents();
-        this.stopKavkomDebugPolling();
-    },
-
-    beforeUnmount() {
-        this.unsubscribeKavkomEvents();
-        this.stopKavkomDebugPolling();
     },
 
     methods: {
@@ -862,13 +576,8 @@ export default {
                 }
             } else if (this.prospectsSelected.length == 0) {
                 this.tab = 1;
-                this.frameTab = 3;
+                this.frameTab = 2;
             }
-        },
-
-        async fetchOperatorsConfigStatus() {
-            // No custom Twilio status check remains; the prospect interaction
-            // panel only exposes the operators still supported by this project.
         },
 
         addHistory() {
@@ -911,300 +620,6 @@ export default {
             this.addInteraction();
         },
 
-        async interactionViaKavkom(number) {
-            this.tab = 1;
-            this.frameTab = 2;
-            this.interaction = this.newInteraction();
-            this.interaction.source = "kavkom";
-            this.interaction.number = number;
-            // SIP events can arrive within milliseconds. Persist the
-            // interaction first so they never update a stale record.
-            try {
-                await this.addInteraction();
-            } catch (error) {
-                console.error("Échec création interaction Kavkom", error);
-                this.kavkomCallMessage =
-                    "Impossible de créer l'interaction CRM avant l'appel.";
-                this.kavkomCallSuccess = false;
-                return;
-            }
-            this.triggerKavkomCall(number);
-        },
-
-        /**
-         * Déclenche l'appel via l'API REST Kavkom (click-to-call officiel) :
-         * POST /api/pbx/v1/active_call/call, relayé par le backend Laravel
-         * (KavkomController::call). Le PBX Kavkom appelle d'abord notre
-         * softphone (le "leg agent", extension sélectionnée), auquel le CRM répond
-         * automatiquement pour éviter l'expiration du leg agent, puis
-         * Kavkom.vue, puis met en relation avec le numéro de destination
-         * de son côté — toute la négociation média PSTN reste côté Kavkom.
-         */
-        async triggerKavkomCall(number) {
-            if (!number) {
-                console.warn("[Kavkom] Appel ignoré : aucun numéro fourni.");
-                return;
-            }
-
-            console.log("[Kavkom] Préparation de l'appel.", {
-                prospectId: this.interactionProspect?.id,
-                numberSuffix: String(number).replace(/\D/g, "").slice(-4),
-            });
-
-            // Le softphone doit être enregistré en SIP avant de pouvoir
-            // recevoir/auto-répondre au leg agent. S'il ne l'est pas encore,
-            // on mémorise le numéro et onKavkomReady relancera l'appel dès
-            // que le softphone sera prêt.
-            if (!this.kavkomReady) {
-                console.log("[Kavkom] Appel en attente : softphone non prêt.");
-                this.pendingKavkomNumber = number;
-                this.kavkomCallMessage = "Connexion du softphone Kavkom…";
-                this.kavkomCallSuccess = false;
-                return;
-            }
-
-            this.callingViaKavkom = true;
-            this.kavkomCallMessage = "";
-            this.kavkomCallState = "requesting";
-
-            // Kavkom rappelle notre extension (le "leg agent") : le
-            // softphone doit l'accepter immédiatement, avant même que cette
-            // requête REST ne réponde.
-            kavkomPhone.expectAgentLeg();
-
-            try {
-                const { data } = await ApiService.post("settings/kavkom/call", {
-                    destination: number,
-                    prospect_id: this.interactionProspect?.id,
-                    project_id: this.project?.id,
-                });
-
-                if (!data.success) {
-                    console.warn("[Kavkom] L'API a refusé le lancement de l'appel.", { message: data.message });
-                    // Refusé avant que Kavkom ne fasse sonner l'extension :
-                    // le prochain INVITE n'est plus un leg agent.
-                    kavkomPhone.forgetAgentLeg();
-                    this.kavkomCallMessage =
-                        data.message || "Impossible de lancer l'appel Kavkom.";
-                    this.kavkomCallSuccess = false;
-                    return;
-                }
-
-                // Kavkom may complete the agent leg before its REST response
-                // returns. Never overwrite a newer SIP result with this
-                // asynchronous acknowledgement.
-                if (this.kavkomCallState === "requesting") {
-                    this.kavkomCallMessage =
-                        "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
-                    this.kavkomCallSuccess = true;
-                    this.kavkomCallState = "requested";
-                }
-                console.log("[Kavkom] Appel lancé.", {
-                    callUuid: data.call_uuid || null,
-                    apiConfirmation: true,
-                });
-                if (data.call_uuid) {
-                    this.kavkomCallUuid = data.call_uuid;
-                    this.startKavkomDebugPolling(data.call_uuid);
-                }
-            } catch (error) {
-                console.error("[Kavkom] Erreur lors du lancement de l'appel.", {
-                    status: error.response?.status,
-                    message: error.response?.data?.message || error.message,
-                });
-                // Kavkom can time out its HTTP response after it has already
-                // sent the SIP INVITE. Preserve the newer SIP state instead
-                // of hiding the Accept button behind a stale API error.
-                if (this.kavkomCallState === "requesting") {
-                    this.kavkomCallMessage =
-                        error.response?.data?.message ||
-                        "Kavkom n'a pas confirmé la demande à temps. Si l'appel démarre dans le CRM, ne relancez pas le bouton.";
-                    this.kavkomCallSuccess = false;
-                    this.kavkomCallState = "failed";
-                }
-            } finally {
-                this.callingViaKavkom = false;
-            }
-        },
-
-        startKavkomDebugPolling(callUuid) {
-            this.stopKavkomDebugPolling();
-            this.kavkomDebugLastStatus = null;
-            let polls = 0;
-
-            console.log("[Kavkom][Debug] Server-side processing tracking enabled.", { callUuid });
-            this.kavkomDebugTimer = window.setInterval(async () => {
-                polls += 1;
-                if (this.kavkomCallUuid !== callUuid) {
-                    return;
-                }
-                try {
-                    const { data } = await ApiService.get(
-                        `settings/kavkom/call/${encodeURIComponent(callUuid)}/status`
-                    );
-                    // A request from a previous call can resolve after a
-                    // new call starts. Never display that stale response.
-                    if (this.kavkomCallUuid !== callUuid) {
-                        return;
-                    }
-                    const signature = `${data.status}|${data.has_recording}|${data.processed_at}|${data.error || ""}`;
-                    if (signature !== this.kavkomDebugLastStatus) {
-                        this.kavkomDebugLastStatus = signature;
-                        console.log("[Kavkom][Debug] Server processing status.", {
-                            callUuid: data.call_uuid,
-                            status: data.status,
-                            hasRecording: data.has_recording,
-                            processedAt: data.processed_at,
-                            interactionId: data.interaction_id,
-                            error: data.error || null,
-                        });
-                    }
-                    if (["processed", "ignored"].includes(data.status) || polls >= 60) {
-                        this.stopKavkomDebugPolling();
-                    }
-                } catch (error) {
-                    // A 404 is normal until Kavkom has posted the CDR.
-                    if (polls === 1 || polls % 6 === 0) {
-                        console.debug("[Kavkom][Debug] CDR not received yet.", {
-                            callUuid,
-                            status: error.response?.status,
-                        });
-                    }
-                }
-            }, 5000);
-        },
-
-        stopKavkomDebugPolling() {
-            if (this.kavkomDebugTimer) {
-                window.clearInterval(this.kavkomDebugTimer);
-                this.kavkomDebugTimer = null;
-            }
-        },
-
-        subscribeKavkomEvents() {
-            EventBus.on(KAVKOM_EVENTS.READY, this.onKavkomReady);
-            EventBus.on(KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
-            EventBus.on(KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
-            EventBus.on(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
-            EventBus.on(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
-            EventBus.on(
-                KAVKOM_EVENTS.CONNECTION_ERROR,
-                this.onKavkomConnectionError
-            );
-        },
-
-        unsubscribeKavkomEvents() {
-            EventBus.off(KAVKOM_EVENTS.READY, this.onKavkomReady);
-            EventBus.off(
-                KAVKOM_EVENTS.INCOMING_CALL,
-                this.onKavkomIncomingCall
-            );
-            EventBus.off(
-                KAVKOM_EVENTS.CALL_ANSWERED,
-                this.onKavkomCallAnswered
-            );
-            EventBus.off(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
-            EventBus.off(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
-            EventBus.off(
-                KAVKOM_EVENTS.CONNECTION_ERROR,
-                this.onKavkomConnectionError
-            );
-        },
-
-        onKavkomReady() {
-            this.kavkomReady = true;
-            console.log("[Kavkom][Debug] SIP softphone ready.");
-
-            if (this.pendingKavkomNumber) {
-                const number = this.pendingKavkomNumber;
-                this.pendingKavkomNumber = "";
-                this.triggerKavkomCall(number);
-            }
-        },
-
-        /**
-         * Le softphone partagé distingue le leg agent d'un clic-à-appeler
-         * (auto-répondu, il alimente l'interaction de cette slide) d'un vrai
-         * appel entrant (l'agent décide, le widget global historise).
-         */
-        onKavkomIncomingCall({ direction, number, automatic } = {}) {
-            if (direction === "inbound") {
-                console.log("[Kavkom][Debug] Incoming call.", { number });
-                this.kavkomCallState = "ringing";
-                this.kavkomCallSuccess = true;
-                this.kavkomCallMessage = `Appel entrant${
-                    number ? " de " + number : ""
-                } — répondez depuis la fenêtre d'appel.`;
-                return;
-            }
-
-            console.log("[Kavkom][Debug] Agent leg ringing.", { automatic });
-            this.interaction.status = "ringing";
-            this.updateInteraction();
-            this.kavkomCallState = "ringing";
-            this.kavkomCallSuccess = true;
-            this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
-        },
-
-        onKavkomCallAnswered({ direction } = {}) {
-            if (direction === "inbound") {
-                this.kavkomCallState = "active";
-                this.kavkomCallSuccess = true;
-                this.kavkomCallMessage = "Appel entrant en cours.";
-                return;
-            }
-
-            console.log("[Kavkom][Debug] Call answered; media bridge active.");
-            this.interaction.status = "answered";
-            this.updateInteraction();
-            this.kavkomCallState = "active";
-            this.kavkomCallSuccess = true;
-            this.kavkomCallMessage = "Appel Kavkom en cours.";
-        },
-
-        onKavkomConnectionError(message) {
-            console.error("[Kavkom][Debug] SIP connection error.", { message });
-            this.kavkomReady = false;
-            this.callingViaKavkom = false;
-            this.kavkomCallState = "failed";
-            this.kavkomCallSuccess = false;
-            this.kavkomCallMessage = message;
-        },
-
-        onKavkomCallFailed({ message, direction } = {}) {
-            console.warn("[Kavkom][Debug] Call failed.", { message, direction });
-            this.callingViaKavkom = false;
-            this.kavkomCallState = "failed";
-            this.kavkomCallSuccess = false;
-            this.kavkomCallMessage = message;
-        },
-
-        onKavkomCallHangup({ durationMs = null, direction = null, missed = false } = {}) {
-            if (direction === "inbound") {
-                console.log("[Kavkom][Debug] Incoming call hangup.", {
-                    durationMs,
-                    missed,
-                });
-                this.kavkomCallState = missed ? "failed" : "completed";
-                this.kavkomCallSuccess = !missed;
-                this.kavkomCallMessage = missed
-                    ? "Appel entrant manqué."
-                    : "Appel entrant terminé.";
-                this.callingViaKavkom = false;
-                return;
-            }
-
-            console.log("[Kavkom][Debug] Call hangup.", { durationMs });
-            this.interaction.status = "hangup";
-            this.updateInteraction();
-            this.callingViaKavkom = false;
-            this.kavkomCallSuccess = !(durationMs !== null && durationMs < 5000);
-            this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
-            this.kavkomCallMessage = this.kavkomCallSuccess
-                ? "Appel terminé. La transcription sera traitée après réception de l'enregistrement Kavkom."
-                : "Kavkom a fermé l'appel avant la mise en relation. Le leg agent a fonctionné ; consultez le CDR Kavkom pour le motif exact du numéro appelé.";
-        },
-
         /**
          *
          */
@@ -1225,37 +640,19 @@ export default {
          *
          */
         async updateInteraction() {
-            if (!this.interaction || !this.interactionProspect?.id) {
-                return;
-            }
-
-            // Ne rien tenter si aucun prospect n'est rattaché à l'interaction
-            // en cours (ex: le leg agent Kavkom peut arriver avant que le
-            // contexte prospect ne soit chargé).
-            if (!this.interactionProspect) {
-                this.logKavkomWarn?.(
-                    "updateInteraction ignoré : aucun prospect actif"
-                );
+            if (!this.interaction) {
                 return;
             }
 
             if (!this.interaction.id) {
-                try {
-                    this.interaction = await store.dispatch(
-                        ADD_PROSPECT_INTERACTION,
-                        this.interaction
-                    );
-                } catch (error) {
-                    console.error("Échec création interaction", error);
-                }
+                this.interaction = await store.dispatch(
+                    ADD_PROSPECT_INTERACTION,
+                    this.interaction
+                );
                 return;
             }
 
-            try {
-                await store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
-            } catch (error) {
-                console.error("Échec mise à jour interaction", error);
-            }
+            store.dispatch(UPDATE_PROSPECT_INTERACTION, this.interaction);
         },
 
         /**
@@ -1264,7 +661,7 @@ export default {
         nextInteraction() {
             if (
                 this.selectedProspects.length - 1 >
-                this.currentProspectIndex
+                this.this.currentProspectIndex
             ) {
                 this.currentProspectIndex++;
             } else {
@@ -1344,6 +741,10 @@ export default {
                 duration: 5000,
             });
         },
+
+        ringoverSetting() {
+            store.commit(OPEN_MODAL, "setting-ringover");
+        },
     },
 
     watch: {
@@ -1396,31 +797,7 @@ export default {
             "prospectsSelected",
             "leftSlideOpen",
             "can",
-            "lines",
         ]),
-
-        /**
-         * A configured Kavkom "Line" requires all fields, enforced by
-         * LineController's validation — its mere existence, assigned to
-         * this agent, is enough to know the SIP identity is ready.
-         */
-        kavkomConfigured() {
-            return this.lines.some(
-                (line) =>
-                    line.operator === "kavkom" &&
-                    String(line.user_id) === String(this.user.id)
-            );
-        },
-
-        /**
-         * Ringover's live widget authenticates itself (Ringover's own
-         * browser SSO) rather than using the CRM-stored config, so any
-         * configured Ringover line in the project is enough — it isn't
-         * tied to a specific agent the way Kavkom's SIP identity is.
-         */
-        ringoverConfigured() {
-            return this.lines.some((line) => line.operator === "ringover");
-        },
 
         currentProspect() {
             if (this.selectedProspects.length > this.currentProspectIndex) {

@@ -12,5 +12,3 @@ nginx/
 .gitignore
 .github/
 storage/
-mysql/
-mysql.sock

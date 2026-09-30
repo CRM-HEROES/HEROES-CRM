@@ -83,14 +83,6 @@
             ></div>
             <icon class="fa fa-caret-right" />
         </item>
-        <item tag="a" @click.prevent="actionProspectEmail">
-            <icon class="fa fa-envelope" />
-            <div
-                class="hc-item-main-content"
-                v-text="$t('campaign.action.prospect.email.title')"
-            ></div>
-            <icon class="fa fa-caret-right" />
-        </item>
         <item tag="a" @click.prevent="actionProspectEvent">
             <icon class="fa fa-calendar" />
             <div
@@ -270,13 +262,6 @@ export default {
          */
         actionProspectSms() {
             store.commit(OPEN_SLIDE, "campaign-action-prospect-sms");
-        },
-
-        /**
-         *
-         */
-        actionProspectEmail() {
-            store.commit(OPEN_SLIDE, "campaign-action-prospect-email");
         },
 
         /**

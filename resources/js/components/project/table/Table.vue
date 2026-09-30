@@ -460,7 +460,6 @@ export default {
          *
          */
         fixedColumns() {
-            console.log(this.columns,"----")
             return this.columns.filter((c) => c.fixed);
         },
 
