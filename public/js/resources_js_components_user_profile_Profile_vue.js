@@ -1,176 +1,135 @@
 "use strict";
 (self["webpackChunk"] = self["webpackChunk"] || []).push([["resources_js_components_user_profile_Profile_vue"],{
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js":
-/*!************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js ***!
-  \************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js":
+/*!********************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js ***!
+  \********************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/constants/phoneCountries */ "./resources/js/constants/phoneCountries.js");
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _apis_project_user_setting__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/project/user/setting */ "./resources/js/apis/project/user/setting.js");
+/* harmony import */ var _components_user_profile_blocs_Bloc_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/components/user/profile/blocs/Bloc.vue */ "./resources/js/components/user/profile/blocs/Bloc.vue");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
+
+
+
+
+
+
+var SLIDE_NAME = "user-manage-phone-country-codes";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    Bloc: _components_user_profile_blocs_Bloc_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+  },
   props: {
-    modelValue: {
-      type: [String, Array],
-      "default": function _default() {
-        return [];
-      }
+    project: {
+      type: Object,
+      required: true
     },
-    disabled: {
+    user: {
+      type: Object,
+      required: true
+    },
+    open: {
       type: Boolean,
-      "default": false
+      "default": deviceType() == "desktop"
     }
   },
   data: function data() {
     return {
-      open: false,
-      keyword: "",
-      panelStyle: {}
+      loading: true,
+      saveError: false
     };
   },
-  beforeUnmount: function beforeUnmount() {
-    document.removeEventListener("click", this.handleClickOutside, true);
-    window.removeEventListener("scroll", this.handleScroll, true);
-    window.removeEventListener("resize", this.close);
-  },
-  methods: {
-    /**
-     * Format country tag display
-     */
-    formatCountryTag: function formatCountryTag(dialCode) {
-      var country = _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
-        return c.dial_code === dialCode.replace(/^\+/, '');
-      });
-      if (!country) return dialCode;
-      return "".concat(country.flag, " +").concat(country.dial_code);
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["assignedPhoneCountryCodes", "slideOpen"])), {}, {
+    assignedCountries: function assignedCountries() {
+      return this.assignedPhoneCountryCodes(this.project.slug, this.user.id);
     },
-    /**
-     * Check if dial_code is selected
-     */
-    isSelected: function isSelected(dialCode) {
-      return this.selectedDialCodes.includes(dialCode);
-    },
-    /**
-     * Toggle dial_code selection (add or remove)
-     */
-    toggleCountry: function toggleCountry(country) {
-      var dialCode = "+".concat(country.dial_code);
-      if (this.isSelected(dialCode)) {
-        this.removeCountry(dialCode);
-      } else {
-        this.addCountry(dialCode);
+    slideIsOpen: function slideIsOpen() {
+      return this.slideOpen(SLIDE_NAME);
+    }
+  }),
+  watch: {
+    slideIsOpen: function slideIsOpen(isOpen, wasOpen) {
+      if (wasOpen && !isOpen) {
+        this.fetchAssignedCountries();
       }
     },
-    /**
-     * Add dial_code to selection
-     */
-    addCountry: function addCountry(dialCode) {
-      var newSelection = [].concat(_toConsumableArray(this.selectedDialCodes), [dialCode]);
-      this.$emit("update:modelValue", newSelection);
-    },
-    /**
-     * Remove dial_code from selection
-     */
-    removeCountry: function removeCountry(dialCode) {
-      var newSelection = this.selectedDialCodes.filter(function (code) {
-        return code !== dialCode;
-      });
-      this.$emit("update:modelValue", newSelection);
-    },
-    /**
-     *
-     */
-    toggle: function toggle() {
-      var _this = this;
-      if (this.open) {
-        this.close();
-        return;
-      }
-      var rect = this.$refs.wrapper.getBoundingClientRect();
-      this.panelStyle = {
-        top: "".concat(rect.bottom + 4, "px"),
-        left: "".concat(rect.left, "px")
-      };
-      this.keyword = "";
-      this.open = true;
-      this.$nextTick(function () {
-        var _this$$refs$search;
-        (_this$$refs$search = _this.$refs.search) === null || _this$$refs$search === void 0 ? void 0 : _this$$refs$search.focus();
-        document.addEventListener("click", _this.handleClickOutside, true);
-        window.addEventListener("scroll", _this.handleScroll, true);
-        window.addEventListener("resize", _this.close);
-      });
-    },
-    /**
-     *
-     */
-    close: function close() {
-      this.open = false;
-      document.removeEventListener("click", this.handleClickOutside, true);
-      window.removeEventListener("scroll", this.handleScroll, true);
-      window.removeEventListener("resize", this.close);
-    },
-    /**
-     * Scrolling the option list itself fires a native "scroll" event
-     * that a capturing window listener also sees — only closing on a
-     * scroll outside the panel keeps the list itself scrollable.
-     */
-    handleScroll: function handleScroll(event) {
-      var _event$target, _event$target$closest;
-      if ((_event$target = event.target) !== null && _event$target !== void 0 && (_event$target$closest = _event$target.closest) !== null && _event$target$closest !== void 0 && _event$target$closest.call(_event$target, ".hc-phone-country-panel")) {
-        return;
-      }
-      this.close();
-    },
-    /**
-     *
-     */
-    handleClickOutside: function handleClickOutside(event) {
-      if (this.$refs.wrapper && !this.$refs.wrapper.contains(event.target) && !event.target.closest(".hc-phone-country-panel")) {
-        this.close();
-      }
+    "user.id": function userId() {
+      this.fetchAssignedCountries();
     }
   },
-  computed: {
-    /**
-     * Get selected dial codes as array
-     */
-    selectedDialCodes: function selectedDialCodes() {
-      if (Array.isArray(this.modelValue)) {
-        return this.modelValue;
-      }
-      return this.modelValue ? [this.modelValue] : [];
+  mounted: function mounted() {
+    var _this = this;
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            _this.fetchAssignedCountries();
+          case 1:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee);
+    }))();
+  },
+  methods: {
+    fetchAssignedCountries: function fetchAssignedCountries() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var _yield$UserSettingSer, data;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _this2.loading = true;
+              _this2.saveError = false;
+              _context2.prev = 2;
+              _context2.next = 5;
+              return _apis_project_user_setting__WEBPACK_IMPORTED_MODULE_0__["default"].show(_this2.project.slug, _this2.user.id, "assigned-phone-country-codes");
+            case 5:
+              _yield$UserSettingSer = _context2.sent;
+              data = _yield$UserSettingSer.data;
+              _store__WEBPACK_IMPORTED_MODULE_2__["default"].commit(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_4__.SET_ASSIGNED_PHONE_COUNTRY_CODES, {
+                project: _this2.project.slug,
+                user: _this2.user.id,
+                countries: Array.isArray(data) ? data : []
+              });
+              _context2.next = 13;
+              break;
+            case 10:
+              _context2.prev = 10;
+              _context2.t0 = _context2["catch"](2);
+              _this2.saveError = true;
+            case 13:
+              _context2.prev = 13;
+              _this2.loading = false;
+              return _context2.finish(13);
+            case 16:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[2, 10, 13, 16]]);
+      }))();
     },
-    /**
-     * Get the first selected dial code for backward compatibility
-     */
-    selected: function selected() {
-      var firstDialCode = this.selectedDialCodes[0];
-      if (!firstDialCode) return null;
-      var cleanDialCode = firstDialCode.replace(/^\+/, '');
-      return _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].find(function (c) {
-        return c.dial_code === cleanDialCode;
-      }) || null;
-    },
-    /**
-     *
-     */
-    filteredCountries: function filteredCountries() {
-      var keyword = removeStringAccent(this.keyword);
-      return _constants_phoneCountries__WEBPACK_IMPORTED_MODULE_0__["default"].filter(function (country) {
-        return removeStringAccent(country.label).indexOf(keyword) >= 0 || country.dial_code.indexOf(keyword) >= 0;
-      });
+    openSlide: function openSlide() {
+      _store__WEBPACK_IMPORTED_MODULE_2__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, SLIDE_NAME);
     }
   }
 });
@@ -2502,14 +2461,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         columnId: "users",
         headerId: "hc-prospects-table-header-users-users"
       },
-      // AI agents
-      {
-        type: "other",
-        name: this.$t("prospect.table.column.others.ai_agents"),
-        icon: "fa fa-robot icon-brown",
-        columnId: "ai-agents",
-        headerId: "hc-prospects-table-header-ai-agents-ai-agents"
-      },
       // Groups
       {
         type: "other",
@@ -2902,7 +2853,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _blocs_calendar_Bloc_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./blocs/calendar/Bloc.vue */ "./resources/js/components/user/profile/blocs/calendar/Bloc.vue");
 /* harmony import */ var _blocs_category_Bloc_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./blocs/category/Bloc.vue */ "./resources/js/components/user/profile/blocs/category/Bloc.vue");
 /* harmony import */ var _blocs_document_Bloc_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./blocs/document/Bloc.vue */ "./resources/js/components/user/profile/blocs/document/Bloc.vue");
@@ -2914,17 +2865,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./blocs/info/Bloc.vue */ "./resources/js/components/user/profile/blocs/info/Bloc.vue");
 /* harmony import */ var _blocs_menu_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./blocs/menu/Bloc.vue */ "./resources/js/components/user/profile/blocs/menu/Bloc.vue");
 /* harmony import */ var _blocs_order_step_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./blocs/order-step/Bloc.vue */ "./resources/js/components/user/profile/blocs/order-step/Bloc.vue");
-/* harmony import */ var _blocs_questionnaire_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./blocs/questionnaire/Bloc.vue */ "./resources/js/components/user/profile/blocs/questionnaire/Bloc.vue");
-/* harmony import */ var _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./blocs/role/Bloc.vue */ "./resources/js/components/user/profile/blocs/role/Bloc.vue");
-/* harmony import */ var _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./blocs/thread/Bloc.vue */ "./resources/js/components/user/profile/blocs/thread/Bloc.vue");
-/* harmony import */ var _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./blocs/user/Bloc.vue */ "./resources/js/components/user/profile/blocs/user/Bloc.vue");
-/* harmony import */ var _blocs_vehicle_position_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./blocs/vehicle-position/Bloc.vue */ "./resources/js/components/user/profile/blocs/vehicle-position/Bloc.vue");
+/* harmony import */ var _components_global_user_profile_blocs_info_PhoneCodeAssignment_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue */ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue");
+/* harmony import */ var _blocs_questionnaire_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./blocs/questionnaire/Bloc.vue */ "./resources/js/components/user/profile/blocs/questionnaire/Bloc.vue");
+/* harmony import */ var _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./blocs/role/Bloc.vue */ "./resources/js/components/user/profile/blocs/role/Bloc.vue");
+/* harmony import */ var _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./blocs/thread/Bloc.vue */ "./resources/js/components/user/profile/blocs/thread/Bloc.vue");
+/* harmony import */ var _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./blocs/user/Bloc.vue */ "./resources/js/components/user/profile/blocs/user/Bloc.vue");
+/* harmony import */ var _blocs_vehicle_position_Bloc_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./blocs/vehicle-position/Bloc.vue */ "./resources/js/components/user/profile/blocs/vehicle-position/Bloc.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -2955,11 +2908,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     InfoBloc: _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
     MenuBloc: _blocs_menu_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
     OrderStepBloc: _blocs_order_step_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
-    QuestionnaireBloc: _blocs_questionnaire_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
-    RoleBloc: _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
-    ThreadBloc: _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__["default"],
-    UserBloc: _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__["default"],
-    VehiclePositionBloc: _blocs_vehicle_position_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__["default"]
+    PhoneCodeAssignment: _components_global_user_profile_blocs_info_PhoneCodeAssignment_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
+    QuestionnaireBloc: _blocs_questionnaire_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
+    RoleBloc: _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__["default"],
+    ThreadBloc: _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__["default"],
+    UserBloc: _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__["default"],
+    VehiclePositionBloc: _blocs_vehicle_position_Bloc_vue__WEBPACK_IMPORTED_MODULE_16__["default"]
   },
   props: {
     bloc: {
@@ -2969,7 +2923,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       type: Boolean
     }
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_16__.mapGetters)(["prospect", "categories", "threads", "folders", "pipelines"]))
+  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_17__.mapGetters)(["prospect", "project", "user", "categories", "threads", "folders", "pipelines"]))
 });
 
 /***/ }),
@@ -4140,10 +4094,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         slug: "country",
         name: "Pays",
         meta: false
-      }, {
-        slug: "phone_country",
-        name: "Pays du numéro",
-        meta: false
       }].filter(function (field) {
         return _this.bloc.items.indexOf(field.slug) >= 0;
       });
@@ -5248,6 +5198,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         name: this.$t("user.profile.blocs.order_steps"),
         icon: "fa fa-step-forward icon-cyan"
       }, {
+        key: "phone-codes",
+        name: "Ligne affectée",
+        icon: "fa fa-phone icon-green"
+      }, {
         key: "questionnaire",
         name: this.$t("user.profile.blocs.questionnaires"),
         icon: "fa fa-clipboard icon-brown"
@@ -5486,12 +5440,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_user__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/user */ "./resources/js/apis/user.js");
 /* harmony import */ var _apis_project_user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/project/user */ "./resources/js/apis/project/user.js");
 /* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
-/* harmony import */ var _components_PhoneCountrySelect_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/components/PhoneCountrySelect.vue */ "./resources/js/components/PhoneCountrySelect.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -5512,11 +5465,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  components: {
-    PhoneCountrySelect: _components_PhoneCountrySelect_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
-  },
   props: {
     /**
      * Project
@@ -5669,7 +5618,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       })));
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project"])), {}, {
     /**
      * When value is updated
      * Send modification to the API
@@ -6356,10 +6305,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true":
-/*!****************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true ***!
-  \****************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -6369,80 +6318,64 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _withScopeId = function _withScopeId(n) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-3ca985e2"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-00573f2c"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
 };
 var _hoisted_1 = {
-  "class": "hc-phone-country-select",
-  ref: "wrapper"
+  "class": "hc-phone-code-assigned"
 };
 var _hoisted_2 = {
-  "class": "hc-phone-country-selected-list"
+  "class": "hc-item-main-content"
 };
-var _hoisted_3 = ["textContent"];
-var _hoisted_4 = ["placeholder"];
-var _hoisted_5 = ["placeholder"];
-var _hoisted_6 = {
-  "class": "hc-phone-country-list"
+var _hoisted_3 = {
+  "class": "hc-phone-code-value"
 };
-var _hoisted_7 = ["onClick", "textContent"];
+var _hoisted_4 = {
+  key: 1,
+  "class": "hc-phone-code-error",
+  role: "alert"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-trigger", {
-      disabled: $props.disabled
-    }])
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.selectedDialCodes, function (dialCode) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-      key: dialCode,
-      "class": "hc-phone-country-tag"
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCountryTag(dialCode))
-    }, null, 8 /* PROPS */, _hoisted_3), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-      key: 0,
-      "class": "fa fa-times",
-      onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-        return $options.removeCountry(dialCode);
-      }, ["stop"]),
-      style: {
-        "cursor": "pointer",
-        "margin-left": "4px"
-      }
-    }, null, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-  }), 128 /* KEYED_FRAGMENT */)), !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 0,
-    type: "text",
-    "class": "hc-phone-country-input",
-    placeholder: $options.selectedDialCodes.length === 0 ? '—' : '',
-    onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-      return !$props.disabled && $options.toggle();
-    }, ["stop"])),
-    readonly: ""
-  }, null, 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
-    to: "body"
-  }, [$data.open && !$props.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-    key: 0,
-    "class": "hc-phone-country-panel",
-    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($data.panelStyle)
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    ref: "search",
-    type: "text",
-    "class": "hc-phone-country-search",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-      return $data.keyword = $event;
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("bloc");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_bloc, {
+    icon: "fa fa-phone icon-green",
+    name: "Ligne affectée",
+    open: $props.open
+  }, {
+    options: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        tag: "a",
+        "class": "fa fa-plus icon-blue",
+        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.openSlide, ["prevent", "stop"])
+      }, null, 8 /* PROPS */, ["onClick"])];
     }),
-    placeholder: _ctx.$t('search') + ' ...'
-  }, null, 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.keyword]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredCountries, function (country) {
-    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-      key: country.code,
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-phone-country-option", {
-        selected: $options.isSelected("+".concat(country.dial_code))
-      }]),
-      onClick: function onClick($event) {
-        return $options.toggleCountry(country);
-      },
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("".concat(country.flag, " ").concat(country.label, " (+").concat(country.dial_code, ")"))
-    }, null, 10 /* CLASS, PROPS */, _hoisted_7);
-  }), 128 /* KEYED_FRAGMENT */))])], 4 /* STYLE */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]))], 512 /* NEED_PATCH */);
+    body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.assignedCountries, function (country) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+          key: country.country_code
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              "class": "fa fa-phone"
+            }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(country.country_name), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(country.calling_code), 1 /* TEXT */)];
+          }),
+          _: 2 /* DYNAMIC */
+        }, 1024 /* DYNAMIC_SLOTS */);
+      }), 128 /* KEYED_FRAGMENT */)), !$options.assignedCountries.length && !$data.loading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+        key: 0
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Aucune ligne affectée. ")];
+        }),
+        _: 1 /* STABLE */
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.saveError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_4, " L’enregistrement a échoué. Réessayez. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+        loading: $data.loading
+      }, null, 8 /* PROPS */, ["loading"])])];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["open"]);
 }
 
 /***/ }),
@@ -8558,6 +8491,7 @@ __webpack_require__.r(__webpack_exports__);
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_info_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("info-bloc");
+  var _component_phone_code_assignment = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("phone-code-assignment");
   var _component_calendar_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("calendar-bloc");
   var _component_category_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("category-bloc");
   var _component_document_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("document-bloc");
@@ -8577,69 +8511,74 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'calendar' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_calendar_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'phone-codes' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_phone_code_assignment, {
     key: 1,
-    bloc: $props.bloc,
+    project: _ctx.project,
+    user: _ctx.user,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'category' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_category_bloc, {
+  }, null, 8 /* PROPS */, ["project", "user", "open"])) : $props.bloc.type == 'calendar' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_calendar_bloc, {
     key: 2,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'document' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_document_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'category' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_category_bloc, {
     key: 3,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'export' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_export_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'document' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_document_bloc, {
     key: 4,
+    bloc: $props.bloc,
+    open: $props.open
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'export' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_export_bloc, {
+    key: 5,
     bloc: $props.bloc,
     open: $props.open
   }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type.indexOf('folder->') == 0 && _ctx.folders.find(function (folder) {
     return folder["for"] == 'user' && folder.id == $props.bloc.type.replace('folder->', '');
   }) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_file_bloc, {
-    key: 5,
+    key: 6,
     bloc: $props.bloc,
     open: $props.open,
     folder: _ctx.folders.find(function (folder) {
       return folder["for"] == 'user' && folder.id == $props.bloc.type.replace('folder->', '');
     })
   }, null, 8 /* PROPS */, ["bloc", "open", "folder"])) : $props.bloc.type == 'folder' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_folder_bloc, {
-    key: 6,
-    bloc: $props.bloc,
-    open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'group' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_group_bloc, {
     key: 7,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_import_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'group' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_group_bloc, {
     key: 8,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'menu' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_menu_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_import_bloc, {
     key: 9,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'order-step' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_order_step_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'menu' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_menu_bloc, {
     key: 10,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'questionnaire' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_questionnaire_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'order-step' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_order_step_bloc, {
     key: 11,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'role' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_role_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'questionnaire' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_questionnaire_bloc, {
     key: 12,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_thread_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'role' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_role_bloc, {
     key: 13,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'user' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_user_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_thread_bloc, {
     key: 14,
     bloc: $props.bloc,
     open: $props.open
-  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'vehicle-position' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_vehicle_position_bloc, {
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'user' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_user_bloc, {
     key: 15,
+    bloc: $props.bloc,
+    open: $props.open
+  }, null, 8 /* PROPS */, ["bloc", "open"])) : $props.bloc.type == 'vehicle-position' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_vehicle_position_bloc, {
+    key: 16,
     bloc: $props.bloc,
     open: $props.open
   }, null, 8 /* PROPS */, ["bloc", "open"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
@@ -10865,14 +10804,14 @@ var _hoisted_3 = {
 var _hoisted_4 = ["disabled", "placeholder"];
 var _hoisted_5 = ["textContent"];
 var _hoisted_6 = {
-  key: 3,
+  key: 2,
   "class": "hc-default-cell-label"
 };
 var _hoisted_7 = ["disabled", "placeholder"];
 var _hoisted_8 = ["textContent"];
 var _hoisted_9 = ["disabled", "placeholder"];
 var _hoisted_10 = {
-  key: 5,
+  key: 4,
   "class": "hc-default-cell-label"
 };
 var _hoisted_11 = ["disabled", "placeholder"];
@@ -10880,7 +10819,6 @@ var _hoisted_12 = ["textContent"];
 var _hoisted_13 = ["href"];
 var _hoisted_14 = ["disabled", "placeholder"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_phone_country_select = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("phone-country-select");
   return $props.field == 'created_at' || $props.field == 'updated_at' || $props.field == 'last_activity' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label)
   }, null, 8 /* PROPS */, _hoisted_2)])) : $props.field == 'phone_number' || $props.field == 'mobile_phone_number' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -10905,29 +10843,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     lazy: true
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label)
-  }, null, 8 /* PROPS */, _hoisted_5)])) : $props.field == 'phone_country' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_phone_country_select, {
-    key: 2,
-    modelValue: $options.value,
-    "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
-      return $options.value = $event;
-    }),
-    disabled: $props.disabled
-  }, null, 8 /* PROPS */, ["modelValue", "disabled"])) : $props.field == 'email' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, _hoisted_5)])) : $props.field == 'email' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "email",
     "class": "hc-default-cell-input",
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+    "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $options.value = $event;
     }),
     disabled: $props.disabled,
     placeholder: $props.placeholder,
-    onFocus: _cache[7] || (_cache[7] = function () {
+    onFocus: _cache[6] || (_cache[6] = function () {
       return $options.select && $options.select.apply($options, arguments);
     }),
-    onKeydown: [_cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    onKeydown: [_cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextInput && $options.focusNextInput.apply($options, arguments);
-    }, ["enter"])), _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["enter"])), _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusPreviousProjectInput && $options.focusPreviousProjectInput.apply($options, arguments);
-    }, ["up"])), _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["up"])), _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextProjectInput && $options.focusNextProjectInput.apply($options, arguments);
     }, ["down"]))]
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
@@ -10935,22 +10866,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label)
   }, null, 8 /* PROPS */, _hoisted_8)])) : $props.field == 'password' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 4,
+    key: 3,
     type: "text",
     "class": "hc-default-cell-input",
-    "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
       return $options.value = $event;
     }),
     disabled: $props.disabled,
     placeholder: $props.placeholder,
-    onFocus: _cache[12] || (_cache[12] = function () {
+    onFocus: _cache[11] || (_cache[11] = function () {
       return $options.select && $options.select.apply($options, arguments);
     }),
-    onKeydown: [_cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    onKeydown: [_cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextInput && $options.focusNextInput.apply($options, arguments);
-    }, ["enter"])), _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["enter"])), _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusPreviousProjectInput && $options.focusPreviousProjectInput.apply($options, arguments);
-    }, ["up"])), _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["up"])), _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextProjectInput && $options.focusNextProjectInput.apply($options, arguments);
     }, ["down"]))]
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_9)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
@@ -10958,19 +10889,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }]]) : $props.field == 'website_url' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     "class": "hc-default-cell-input",
-    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+    "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
       return $options.value = $event;
     }),
     disabled: $props.disabled,
     placeholder: $props.placeholder,
-    onFocus: _cache[17] || (_cache[17] = function () {
+    onFocus: _cache[16] || (_cache[16] = function () {
       return $options.select && $options.select.apply($options, arguments);
     }),
-    onKeydown: [_cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    onKeydown: [_cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextInput && $options.focusNextInput.apply($options, arguments);
-    }, ["enter"])), _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["enter"])), _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusPreviousProjectInput && $options.focusPreviousProjectInput.apply($options, arguments);
-    }, ["up"])), _cache[20] || (_cache[20] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["up"])), _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextProjectInput && $options.focusNextProjectInput.apply($options, arguments);
     }, ["down"]))]
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_11), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
@@ -10983,21 +10914,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     href: $options.value,
     "class": "fa fa-external-link"
   }, null, 8 /* PROPS */, _hoisted_13)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 6,
+    key: 5,
     "class": "hc-default-cell-input",
-    "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+    "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
       return $options.value = $event;
     }),
     disabled: $props.disabled,
     placeholder: $props.placeholder,
-    onFocus: _cache[22] || (_cache[22] = function () {
+    onFocus: _cache[21] || (_cache[21] = function () {
       return $options.select && $options.select.apply($options, arguments);
     }),
-    onKeydown: [_cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    onKeydown: [_cache[22] || (_cache[22] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextInput && $options.focusNextInput.apply($options, arguments);
-    }, ["enter"])), _cache[24] || (_cache[24] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["enter"])), _cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusPreviousProjectInput && $options.focusPreviousProjectInput.apply($options, arguments);
-    }, ["up"])), _cache[25] || (_cache[25] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
+    }, ["up"])), _cache[24] || (_cache[24] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextProjectInput && $options.focusNextProjectInput.apply($options, arguments);
     }, ["down"]))]
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
@@ -11566,912 +11497,23 @@ var ListenersMixin = {
 
 /***/ }),
 
-/***/ "./resources/js/constants/phoneCountries.js":
-/*!**************************************************!*\
-  !*** ./resources/js/constants/phoneCountries.js ***!
-  \**************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
-function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-/**
- * ISO 3166-1 alpha-2 code + E.164 dial code for every country. The flag is
- * derived from the code (each letter maps to a Unicode regional indicator
- * symbol) rather than typed by hand, so the list stays easy to extend
- * without risking a wrong emoji.
- */
-function flagFromCode(code) {
-  return code.toUpperCase().replace(/./g, function (_char) {
-    return String.fromCodePoint(127397 + _char.charCodeAt(0));
-  });
-}
-var countries = [{
-  code: "AD",
-  label: "Andorre",
-  dial_code: "376"
-}, {
-  code: "AE",
-  label: "Émirats arabes unis",
-  dial_code: "971"
-}, {
-  code: "AF",
-  label: "Afghanistan",
-  dial_code: "93"
-}, {
-  code: "AG",
-  label: "Antigua-et-Barbuda",
-  dial_code: "1"
-}, {
-  code: "AL",
-  label: "Albanie",
-  dial_code: "355"
-}, {
-  code: "AM",
-  label: "Arménie",
-  dial_code: "374"
-}, {
-  code: "AO",
-  label: "Angola",
-  dial_code: "244"
-}, {
-  code: "AR",
-  label: "Argentine",
-  dial_code: "54"
-}, {
-  code: "AT",
-  label: "Autriche",
-  dial_code: "43"
-}, {
-  code: "AU",
-  label: "Australie",
-  dial_code: "61"
-}, {
-  code: "AZ",
-  label: "Azerbaïdjan",
-  dial_code: "994"
-}, {
-  code: "BA",
-  label: "Bosnie-Herzégovine",
-  dial_code: "387"
-}, {
-  code: "BB",
-  label: "Barbade",
-  dial_code: "1"
-}, {
-  code: "BD",
-  label: "Bangladesh",
-  dial_code: "880"
-}, {
-  code: "BE",
-  label: "Belgique",
-  dial_code: "32"
-}, {
-  code: "BF",
-  label: "Burkina Faso",
-  dial_code: "226"
-}, {
-  code: "BG",
-  label: "Bulgarie",
-  dial_code: "359"
-}, {
-  code: "BH",
-  label: "Bahreïn",
-  dial_code: "973"
-}, {
-  code: "BI",
-  label: "Burundi",
-  dial_code: "257"
-}, {
-  code: "BJ",
-  label: "Bénin",
-  dial_code: "229"
-}, {
-  code: "BN",
-  label: "Brunei",
-  dial_code: "673"
-}, {
-  code: "BO",
-  label: "Bolivie",
-  dial_code: "591"
-}, {
-  code: "BR",
-  label: "Brésil",
-  dial_code: "55"
-}, {
-  code: "BS",
-  label: "Bahamas",
-  dial_code: "1"
-}, {
-  code: "BT",
-  label: "Bhoutan",
-  dial_code: "975"
-}, {
-  code: "BW",
-  label: "Botswana",
-  dial_code: "267"
-}, {
-  code: "BY",
-  label: "Biélorussie",
-  dial_code: "375"
-}, {
-  code: "BZ",
-  label: "Belize",
-  dial_code: "501"
-}, {
-  code: "CA",
-  label: "Canada",
-  dial_code: "1"
-}, {
-  code: "CD",
-  label: "République démocratique du Congo",
-  dial_code: "243"
-}, {
-  code: "CF",
-  label: "République centrafricaine",
-  dial_code: "236"
-}, {
-  code: "CG",
-  label: "Congo-Brazzaville",
-  dial_code: "242"
-}, {
-  code: "CH",
-  label: "Suisse",
-  dial_code: "41"
-}, {
-  code: "CI",
-  label: "Côte d'Ivoire",
-  dial_code: "225"
-}, {
-  code: "CL",
-  label: "Chili",
-  dial_code: "56"
-}, {
-  code: "CM",
-  label: "Cameroun",
-  dial_code: "237"
-}, {
-  code: "CN",
-  label: "Chine",
-  dial_code: "86"
-}, {
-  code: "CO",
-  label: "Colombie",
-  dial_code: "57"
-}, {
-  code: "CR",
-  label: "Costa Rica",
-  dial_code: "506"
-}, {
-  code: "CU",
-  label: "Cuba",
-  dial_code: "53"
-}, {
-  code: "CV",
-  label: "Cap-Vert",
-  dial_code: "238"
-}, {
-  code: "CY",
-  label: "Chypre",
-  dial_code: "357"
-}, {
-  code: "CZ",
-  label: "République tchèque",
-  dial_code: "420"
-}, {
-  code: "DE",
-  label: "Allemagne",
-  dial_code: "49"
-}, {
-  code: "DJ",
-  label: "Djibouti",
-  dial_code: "253"
-}, {
-  code: "DK",
-  label: "Danemark",
-  dial_code: "45"
-}, {
-  code: "DM",
-  label: "Dominique",
-  dial_code: "1"
-}, {
-  code: "DO",
-  label: "République dominicaine",
-  dial_code: "1"
-}, {
-  code: "DZ",
-  label: "Algérie",
-  dial_code: "213"
-}, {
-  code: "EC",
-  label: "Équateur",
-  dial_code: "593"
-}, {
-  code: "EE",
-  label: "Estonie",
-  dial_code: "372"
-}, {
-  code: "EG",
-  label: "Égypte",
-  dial_code: "20"
-}, {
-  code: "ER",
-  label: "Érythrée",
-  dial_code: "291"
-}, {
-  code: "ES",
-  label: "Espagne",
-  dial_code: "34"
-}, {
-  code: "ET",
-  label: "Éthiopie",
-  dial_code: "251"
-}, {
-  code: "FI",
-  label: "Finlande",
-  dial_code: "358"
-}, {
-  code: "FJ",
-  label: "Fidji",
-  dial_code: "679"
-}, {
-  code: "FM",
-  label: "Micronésie",
-  dial_code: "691"
-}, {
-  code: "FO",
-  label: "Îles Féroé",
-  dial_code: "298"
-}, {
-  code: "FR",
-  label: "France",
-  dial_code: "33"
-}, {
-  code: "GA",
-  label: "Gabon",
-  dial_code: "241"
-}, {
-  code: "GB",
-  label: "Royaume-Uni",
-  dial_code: "44"
-}, {
-  code: "GD",
-  label: "Grenade",
-  dial_code: "1"
-}, {
-  code: "GE",
-  label: "Géorgie",
-  dial_code: "995"
-}, {
-  code: "GH",
-  label: "Ghana",
-  dial_code: "233"
-}, {
-  code: "GI",
-  label: "Gibraltar",
-  dial_code: "350"
-}, {
-  code: "GL",
-  label: "Groenland",
-  dial_code: "299"
-}, {
-  code: "GM",
-  label: "Gambie",
-  dial_code: "220"
-}, {
-  code: "GN",
-  label: "Guinée",
-  dial_code: "224"
-}, {
-  code: "GQ",
-  label: "Guinée équatoriale",
-  dial_code: "240"
-}, {
-  code: "GR",
-  label: "Grèce",
-  dial_code: "30"
-}, {
-  code: "GT",
-  label: "Guatemala",
-  dial_code: "502"
-}, {
-  code: "GW",
-  label: "Guinée-Bissau",
-  dial_code: "245"
-}, {
-  code: "GY",
-  label: "Guyana",
-  dial_code: "592"
-}, {
-  code: "HK",
-  label: "Hong Kong",
-  dial_code: "852"
-}, {
-  code: "HN",
-  label: "Honduras",
-  dial_code: "504"
-}, {
-  code: "HR",
-  label: "Croatie",
-  dial_code: "385"
-}, {
-  code: "HT",
-  label: "Haïti",
-  dial_code: "509"
-}, {
-  code: "HU",
-  label: "Hongrie",
-  dial_code: "36"
-}, {
-  code: "ID",
-  label: "Indonésie",
-  dial_code: "62"
-}, {
-  code: "IE",
-  label: "Irlande",
-  dial_code: "353"
-}, {
-  code: "IL",
-  label: "Israël",
-  dial_code: "972"
-}, {
-  code: "IN",
-  label: "Inde",
-  dial_code: "91"
-}, {
-  code: "IQ",
-  label: "Irak",
-  dial_code: "964"
-}, {
-  code: "IR",
-  label: "Iran",
-  dial_code: "98"
-}, {
-  code: "IS",
-  label: "Islande",
-  dial_code: "354"
-}, {
-  code: "IT",
-  label: "Italie",
-  dial_code: "39"
-}, {
-  code: "JM",
-  label: "Jamaïque",
-  dial_code: "1"
-}, {
-  code: "JO",
-  label: "Jordanie",
-  dial_code: "962"
-}, {
-  code: "JP",
-  label: "Japon",
-  dial_code: "81"
-}, {
-  code: "KE",
-  label: "Kenya",
-  dial_code: "254"
-}, {
-  code: "KG",
-  label: "Kirghizistan",
-  dial_code: "996"
-}, {
-  code: "KH",
-  label: "Cambodge",
-  dial_code: "855"
-}, {
-  code: "KI",
-  label: "Kiribati",
-  dial_code: "686"
-}, {
-  code: "KM",
-  label: "Comores",
-  dial_code: "269"
-}, {
-  code: "KN",
-  label: "Saint-Christophe-et-Niévès",
-  dial_code: "1"
-}, {
-  code: "KP",
-  label: "Corée du Nord",
-  dial_code: "850"
-}, {
-  code: "KR",
-  label: "Corée du Sud",
-  dial_code: "82"
-}, {
-  code: "KW",
-  label: "Koweït",
-  dial_code: "965"
-}, {
-  code: "KZ",
-  label: "Kazakhstan",
-  dial_code: "7"
-}, {
-  code: "LA",
-  label: "Laos",
-  dial_code: "856"
-}, {
-  code: "LB",
-  label: "Liban",
-  dial_code: "961"
-}, {
-  code: "LC",
-  label: "Sainte-Lucie",
-  dial_code: "1"
-}, {
-  code: "LI",
-  label: "Liechtenstein",
-  dial_code: "423"
-}, {
-  code: "LK",
-  label: "Sri Lanka",
-  dial_code: "94"
-}, {
-  code: "LR",
-  label: "Liberia",
-  dial_code: "231"
-}, {
-  code: "LS",
-  label: "Lesotho",
-  dial_code: "266"
-}, {
-  code: "LT",
-  label: "Lituanie",
-  dial_code: "370"
-}, {
-  code: "LU",
-  label: "Luxembourg",
-  dial_code: "352"
-}, {
-  code: "LV",
-  label: "Lettonie",
-  dial_code: "371"
-}, {
-  code: "LY",
-  label: "Libye",
-  dial_code: "218"
-}, {
-  code: "MA",
-  label: "Maroc",
-  dial_code: "212"
-}, {
-  code: "MC",
-  label: "Monaco",
-  dial_code: "377"
-}, {
-  code: "MD",
-  label: "Moldavie",
-  dial_code: "373"
-}, {
-  code: "ME",
-  label: "Monténégro",
-  dial_code: "382"
-}, {
-  code: "MG",
-  label: "Madagascar",
-  dial_code: "261"
-}, {
-  code: "MH",
-  label: "Îles Marshall",
-  dial_code: "692"
-}, {
-  code: "MK",
-  label: "Macédoine du Nord",
-  dial_code: "389"
-}, {
-  code: "ML",
-  label: "Mali",
-  dial_code: "223"
-}, {
-  code: "MM",
-  label: "Birmanie",
-  dial_code: "95"
-}, {
-  code: "MN",
-  label: "Mongolie",
-  dial_code: "976"
-}, {
-  code: "MO",
-  label: "Macao",
-  dial_code: "853"
-}, {
-  code: "MR",
-  label: "Mauritanie",
-  dial_code: "222"
-}, {
-  code: "MT",
-  label: "Malte",
-  dial_code: "356"
-}, {
-  code: "MU",
-  label: "Maurice",
-  dial_code: "230"
-}, {
-  code: "MV",
-  label: "Maldives",
-  dial_code: "960"
-}, {
-  code: "MW",
-  label: "Malawi",
-  dial_code: "265"
-}, {
-  code: "MX",
-  label: "Mexique",
-  dial_code: "52"
-}, {
-  code: "MY",
-  label: "Malaisie",
-  dial_code: "60"
-}, {
-  code: "MZ",
-  label: "Mozambique",
-  dial_code: "258"
-}, {
-  code: "NA",
-  label: "Namibie",
-  dial_code: "264"
-}, {
-  code: "NC",
-  label: "Nouvelle-Calédonie",
-  dial_code: "687"
-}, {
-  code: "NE",
-  label: "Niger",
-  dial_code: "227"
-}, {
-  code: "NG",
-  label: "Nigeria",
-  dial_code: "234"
-}, {
-  code: "NI",
-  label: "Nicaragua",
-  dial_code: "505"
-}, {
-  code: "NL",
-  label: "Pays-Bas",
-  dial_code: "31"
-}, {
-  code: "NO",
-  label: "Norvège",
-  dial_code: "47"
-}, {
-  code: "NP",
-  label: "Népal",
-  dial_code: "977"
-}, {
-  code: "NR",
-  label: "Nauru",
-  dial_code: "674"
-}, {
-  code: "NZ",
-  label: "Nouvelle-Zélande",
-  dial_code: "64"
-}, {
-  code: "OM",
-  label: "Oman",
-  dial_code: "968"
-}, {
-  code: "PA",
-  label: "Panama",
-  dial_code: "507"
-}, {
-  code: "PE",
-  label: "Pérou",
-  dial_code: "51"
-}, {
-  code: "PF",
-  label: "Polynésie française",
-  dial_code: "689"
-}, {
-  code: "PG",
-  label: "Papouasie-Nouvelle-Guinée",
-  dial_code: "675"
-}, {
-  code: "PH",
-  label: "Philippines",
-  dial_code: "63"
-}, {
-  code: "PK",
-  label: "Pakistan",
-  dial_code: "92"
-}, {
-  code: "PL",
-  label: "Pologne",
-  dial_code: "48"
-}, {
-  code: "PR",
-  label: "Porto Rico",
-  dial_code: "1"
-}, {
-  code: "PS",
-  label: "Palestine",
-  dial_code: "970"
-}, {
-  code: "PT",
-  label: "Portugal",
-  dial_code: "351"
-}, {
-  code: "PW",
-  label: "Palaos",
-  dial_code: "680"
-}, {
-  code: "PY",
-  label: "Paraguay",
-  dial_code: "595"
-}, {
-  code: "QA",
-  label: "Qatar",
-  dial_code: "974"
-}, {
-  code: "RE",
-  label: "La Réunion",
-  dial_code: "262"
-}, {
-  code: "RO",
-  label: "Roumanie",
-  dial_code: "40"
-}, {
-  code: "RS",
-  label: "Serbie",
-  dial_code: "381"
-}, {
-  code: "RU",
-  label: "Russie",
-  dial_code: "7"
-}, {
-  code: "RW",
-  label: "Rwanda",
-  dial_code: "250"
-}, {
-  code: "SA",
-  label: "Arabie saoudite",
-  dial_code: "966"
-}, {
-  code: "SB",
-  label: "Îles Salomon",
-  dial_code: "677"
-}, {
-  code: "SC",
-  label: "Seychelles",
-  dial_code: "248"
-}, {
-  code: "SD",
-  label: "Soudan",
-  dial_code: "249"
-}, {
-  code: "SE",
-  label: "Suède",
-  dial_code: "46"
-}, {
-  code: "SG",
-  label: "Singapour",
-  dial_code: "65"
-}, {
-  code: "SI",
-  label: "Slovénie",
-  dial_code: "386"
-}, {
-  code: "SK",
-  label: "Slovaquie",
-  dial_code: "421"
-}, {
-  code: "SL",
-  label: "Sierra Leone",
-  dial_code: "232"
-}, {
-  code: "SM",
-  label: "Saint-Marin",
-  dial_code: "378"
-}, {
-  code: "SN",
-  label: "Sénégal",
-  dial_code: "221"
-}, {
-  code: "SO",
-  label: "Somalie",
-  dial_code: "252"
-}, {
-  code: "SR",
-  label: "Suriname",
-  dial_code: "597"
-}, {
-  code: "SS",
-  label: "Soudan du Sud",
-  dial_code: "211"
-}, {
-  code: "ST",
-  label: "Sao Tomé-et-Principe",
-  dial_code: "239"
-}, {
-  code: "SV",
-  label: "Salvador",
-  dial_code: "503"
-}, {
-  code: "SY",
-  label: "Syrie",
-  dial_code: "963"
-}, {
-  code: "SZ",
-  label: "Eswatini",
-  dial_code: "268"
-}, {
-  code: "TD",
-  label: "Tchad",
-  dial_code: "235"
-}, {
-  code: "TG",
-  label: "Togo",
-  dial_code: "228"
-}, {
-  code: "TH",
-  label: "Thaïlande",
-  dial_code: "66"
-}, {
-  code: "TJ",
-  label: "Tadjikistan",
-  dial_code: "992"
-}, {
-  code: "TL",
-  label: "Timor oriental",
-  dial_code: "670"
-}, {
-  code: "TM",
-  label: "Turkménistan",
-  dial_code: "993"
-}, {
-  code: "TN",
-  label: "Tunisie",
-  dial_code: "216"
-}, {
-  code: "TO",
-  label: "Tonga",
-  dial_code: "676"
-}, {
-  code: "TR",
-  label: "Turquie",
-  dial_code: "90"
-}, {
-  code: "TT",
-  label: "Trinité-et-Tobago",
-  dial_code: "1"
-}, {
-  code: "TV",
-  label: "Tuvalu",
-  dial_code: "688"
-}, {
-  code: "TW",
-  label: "Taïwan",
-  dial_code: "886"
-}, {
-  code: "TZ",
-  label: "Tanzanie",
-  dial_code: "255"
-}, {
-  code: "UA",
-  label: "Ukraine",
-  dial_code: "380"
-}, {
-  code: "UG",
-  label: "Ouganda",
-  dial_code: "256"
-}, {
-  code: "US",
-  label: "États-Unis",
-  dial_code: "1"
-}, {
-  code: "UY",
-  label: "Uruguay",
-  dial_code: "598"
-}, {
-  code: "UZ",
-  label: "Ouzbékistan",
-  dial_code: "998"
-}, {
-  code: "VA",
-  label: "Vatican",
-  dial_code: "379"
-}, {
-  code: "VC",
-  label: "Saint-Vincent-et-les-Grenadines",
-  dial_code: "1"
-}, {
-  code: "VE",
-  label: "Venezuela",
-  dial_code: "58"
-}, {
-  code: "VN",
-  label: "Viêt Nam",
-  dial_code: "84"
-}, {
-  code: "VU",
-  label: "Vanuatu",
-  dial_code: "678"
-}, {
-  code: "WS",
-  label: "Samoa",
-  dial_code: "685"
-}, {
-  code: "XK",
-  label: "Kosovo",
-  dial_code: "383"
-}, {
-  code: "YE",
-  label: "Yémen",
-  dial_code: "967"
-}, {
-  code: "YT",
-  label: "Mayotte",
-  dial_code: "262"
-}, {
-  code: "ZA",
-  label: "Afrique du Sud",
-  dial_code: "27"
-}, {
-  code: "ZM",
-  label: "Zambie",
-  dial_code: "260"
-}, {
-  code: "ZW",
-  label: "Zimbabwe",
-  dial_code: "263"
-}];
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (countries.map(function (country) {
-  return _objectSpread(_objectSpread({}, country), {}, {
-    flag: flagFromCode(country.code)
-  });
-}).sort(function (a, b) {
-  return a.label.localeCompare(b.label, "fr");
-}));
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
 // Imports
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-select[data-v-3ca985e2] {\n    position: relative;\n    display: block;\n    width: 100%;\n}\n.hc-phone-country-trigger[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    box-sizing: border-box;\n    padding: 2px 4px;\n    font-size: 12px;\n    line-height: 21px;\n    cursor: pointer;\n    align-items: center;\n}\n.hc-phone-country-trigger[data-v-3ca985e2]:hover {\n    background-color: #00000011;\n}\n.hc-phone-country-trigger.disabled[data-v-3ca985e2] {\n    cursor: not-allowed;\n    opacity: 0.6;\n}\n.hc-phone-country-selected-list[data-v-3ca985e2] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n    width: 100%;\n    align-items: center;\n}\n.hc-phone-country-tag[data-v-3ca985e2] {\n    display: inline-flex;\n    align-items: center;\n    gap: 4px;\n    background-color: #e3f2fd;\n    border: 1px solid #1e88e5;\n    border-radius: 3px;\n    padding: 2px 6px;\n    font-size: 11px;\n    color: #1e88e5;\n    white-space: nowrap;\n}\n.hc-phone-country-input[data-v-3ca985e2] {\n    flex: 1;\n    min-width: 100px;\n    border: none;\n    outline: none;\n    background: transparent;\n    font-size: 12px;\n    cursor: pointer;\n    padding: 0;\n}\n.hc-phone-country-placeholder[data-v-3ca985e2] {\n    color: #999;\n}\n", ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css":
-/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css ***!
-  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
-// Imports
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-country-panel {\n    position: fixed;\n    z-index: 9999;\n    width: 280px;\n    background: white;\n    border: 1px solid #ddd;\n    border-radius: 4px;\n    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);\n    padding: 6px;\n    box-sizing: border-box;\n}\n.hc-phone-country-search {\n    width: 100%;\n    height: 26px;\n    padding: 0 6px;\n    margin-bottom: 4px;\n    font-size: 12px;\n    border: 1px solid #ddd;\n    border-radius: 3px;\n    box-sizing: border-box;\n}\n.hc-phone-country-list {\n    max-height: 260px;\n    overflow-y: auto;\n}\n.hc-phone-country-option {\n    padding: 5px 8px;\n    font-size: 12px;\n    cursor: pointer;\n    border-radius: 3px;\n    white-space: nowrap;\n    color: #333;\n}\n.hc-phone-country-option:hover {\n    background-color: #1e88e5;\n    color: white;\n}\n.hc-phone-country-option.selected {\n    background-color: #1e88e5;\n    color: white;\n    font-weight: bold;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-assignment[data-v-00573f2c] {\r\n    width: 100%;\n}\n.hc-phone-code-assigned[data-v-00573f2c] {\r\n    padding: 5px 10px;\n}\n.hc-phone-code-value[data-v-00573f2c] {\r\n    color: #59665f;\r\n    font-variant-numeric: tabular-nums;\n}\n.hc-phone-code-error[data-v-00573f2c] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -12800,19 +11842,19 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.user-log-row {\n    width: 100%;\n 
 
 /***/ }),
 
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
 /* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_0_id_3ca985e2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css");
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_style_index_0_id_00573f2c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css");
 
             
 
@@ -12821,40 +11863,11 @@ var options = {};
 options.insert = "head";
 options.singleton = false;
 
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_0_id_3ca985e2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_style_index_0_id_00573f2c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_0_id_3ca985e2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
-
-/***/ }),
-
-/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css":
-/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css ***!
-  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
-/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_1_id_3ca985e2_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css");
-
-            
-
-var options = {};
-
-options.insert = "head";
-options.singleton = false;
-
-var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_1_id_3ca985e2_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
-
-
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_1_id_3ca985e2_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_style_index_0_id_00573f2c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -13264,21 +12277,20 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 /***/ }),
 
-/***/ "./resources/js/components/PhoneCountrySelect.vue":
-/*!********************************************************!*\
-  !*** ./resources/js/components/PhoneCountrySelect.vue ***!
-  \********************************************************/
+/***/ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue ***!
+  \****************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _PhoneCountrySelect_vue_vue_type_template_id_3ca985e2_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true */ "./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true");
-/* harmony import */ var _PhoneCountrySelect_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PhoneCountrySelect.vue?vue&type=script&lang=js */ "./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js");
-/* harmony import */ var _PhoneCountrySelect_vue_vue_type_style_index_0_id_3ca985e2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css */ "./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css");
-/* harmony import */ var _PhoneCountrySelect_vue_vue_type_style_index_1_id_3ca985e2_lang_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css */ "./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css");
-/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _PhoneCodeAssignment_vue_vue_type_template_id_00573f2c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true */ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true");
+/* harmony import */ var _PhoneCodeAssignment_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PhoneCodeAssignment.vue?vue&type=script&lang=js */ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js");
+/* harmony import */ var _PhoneCodeAssignment_vue_vue_type_style_index_0_id_00573f2c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css */ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
@@ -13286,8 +12298,7 @@ __webpack_require__.r(__webpack_exports__);
 ;
 
 
-
-const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_4__["default"])(_PhoneCountrySelect_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_PhoneCountrySelect_vue_vue_type_template_id_3ca985e2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-3ca985e2"],['__file',"resources/js/components/PhoneCountrySelect.vue"]])
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_PhoneCodeAssignment_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_PhoneCodeAssignment_vue_vue_type_template_id_00573f2c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-00573f2c"],['__file',"resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -15141,17 +14152,17 @@ if (false) {}
 
 /***/ }),
 
-/***/ "./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js":
-/*!********************************************************************************!*\
-  !*** ./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js ***!
-  \********************************************************************************/
+/***/ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCodeAssignment.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=script&lang=js");
  
 
 /***/ }),
@@ -16161,17 +15172,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true":
-/*!**************************************************************************************************!*\
-  !*** ./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true ***!
-  \**************************************************************************************************/
+/***/ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true":
+/*!**********************************************************************************************************************************!*\
+  !*** ./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true ***!
+  \**********************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_template_id_3ca985e2_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_template_id_00573f2c_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_template_id_3ca985e2_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=template&id=3ca985e2&scoped=true");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_template_id_00573f2c_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=template&id=00573f2c&scoped=true");
 
 
 /***/ }),
@@ -17136,26 +16147,14 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css":
-/*!****************************************************************************************************************!*\
-  !*** ./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css ***!
-  \****************************************************************************************************************/
+/***/ "./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css":
+/*!************************************************************************************************************************************************!*\
+  !*** ./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css ***!
+  \************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_0_id_3ca985e2_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=0&id=3ca985e2&scoped=true&lang=css");
-
-
-/***/ }),
-
-/***/ "./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css":
-/*!****************************************************************************************************!*\
-  !*** ./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css ***!
-  \****************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCountrySelect_vue_vue_type_style_index_1_id_3ca985e2_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader/dist/cjs.js!../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/PhoneCountrySelect.vue?vue&type=style&index=1&id=3ca985e2&lang=css");
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneCodeAssignment_vue_vue_type_style_index_0_id_00573f2c_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/global/user/profile/blocs/info/PhoneCodeAssignment.vue?vue&type=style&index=0&id=00573f2c&scoped=true&lang=css");
 
 
 /***/ }),

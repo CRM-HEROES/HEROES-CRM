@@ -310,13 +310,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * @param {*} e
      */
     search: function search(e) {
-      // Flush the pending debounced keyword update
-      // so Enter uses the value just typed, instead of
-      // a stale one from before the 300ms debounce fired
-      if (this.keywordTimeout !== undefined) {
-        clearTimeout(this.keywordTimeout);
-        this.keyword = this.tmpKeyword;
-      }
       if (this.keyword.length == 0) {
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.INIT_PROSPECT_PARAMS);
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
@@ -868,20 +861,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.fetchProspects();
       this.fetchUsers();
       this.fetchProjects();
-
-      // Live filter the prospects table as the user
-      // types, without waiting for Enter, when already
-      // on the prospect list page
-      if (this.project && this.$route.name == "prospect") {
-        if (this.keyword.length == 0) {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.INIT_PROSPECT_PARAMS);
-        } else {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_PARAMS, {
-            query: this.keyword
-          });
-        }
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
-      }
     },
     selected: function selected() {
       var _this7 = this;
@@ -5104,8 +5083,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       var _this = this;
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.INIT_PROSPECT_PARAMS);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_FIELDS, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_SORT_BY, "updated_at");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_SORT_ORDER, "desc");
+      // store.commit(SET_PROSPECTS_SORT_BY, "id");
+      // store.commit(SET_PROSPECTS_SORT_ORDER, "desc");
+
       var url = new URL(window.location.href);
       var searchParams = new URLSearchParams(url.search);
       var filters = {};
@@ -5235,10 +5215,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         // Users
         if (key == "users") {
           name = _this4.$t("prospect.table.column.others.affected_users");
-          // AI agents
-        } else if (key == "ai-agents") {
-          category = "ai-agents";
-          name = _this4.$t("prospect.table.column.others.ai_agents");
           // Groups
         } else if (key == "groups") {
           name = _this4.$t("prospect.table.column.others.affected_groups");
@@ -7865,38 +7841,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     /**
-     * Toggle the "check duplicate on input" (unique)
-     * setting for the current field
-     */
-    toggleUnique: function toggleUnique() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var unique;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
-            case 0:
-              unique = !_this5.field.unique;
-              _context5.next = 3;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.UPDATE_FIELD, {
-                id: _this5.field.id,
-                unique: unique
-              });
-            case 3:
-              // Either direction changes what's colored/prioritized
-              // server-side (see FieldController::update: activating
-              // scans every existing prospect for this field, deactivating
-              // strips this field out of duplicate_fields project-wide) —
-              // refetch so the table reflects it immediately instead of
-              // waiting for the next unrelated reload.
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
-            case 4:
-            case "end":
-              return _context5.stop();
-          }
-        }, _callee5);
-      }))();
-    },
-    /**
      * Show asterisk sign for required search
      */
     showRequired: function showRequired() {
@@ -7906,17 +7850,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Hide asterisk sign for required search
      */
     hideRequired: function hideRequired() {
-      var _this6 = this;
+      var _this5 = this;
       setTimeout(function () {
-        _this6.requiredShown = false;
+        _this5.requiredShown = false;
       }, 200);
     },
     /**
      */
     hideOptions: function hideOptions() {
-      var _this7 = this;
+      var _this6 = this;
       setTimeout(function () {
-        _this7.showOptions = false;
+        _this6.showOptions = false;
       }, 200);
     }
   },
@@ -7945,9 +7889,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Current field
      */
     field: function field() {
-      var _this8 = this;
+      var _this7 = this;
       return this.fields.find(function (f) {
-        return f["for"] == "prospect" && (_this8.column.category == "meta" ? f.meta && f.slug == _this8.column.id : !f.meta && f.slug == _this8.column.id);
+        return f["for"] == "prospect" && (_this7.column.category == "meta" ? f.meta && f.slug == _this7.column.id : !f.meta && f.slug == _this7.column.id);
       });
     },
     isRequiredFilterKey: function isRequiredFilterKey() {
@@ -7961,20 +7905,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     isValidFilter: function isValidFilter() {
       return this.prospectsParamExists(this.isValidFilterKey);
-    },
-    /**
-     * Only show the quick duplicate-check
-     * shortcut for email and phone fields.
-     * Built-in email/phone fields are created without
-     * a "type" (they default to "text" in DB), so we
-     * also match them by slug, in addition to matching
-     * custom fields by their "email"/"tel" type.
-     */
-    canToggleUnique: function canToggleUnique() {
-      if (!this.field || !this.can("all.project.field.update")) {
-        return false;
-      }
-      return ["email", "phone_number", "mobile_phone_number"].includes(this.field.slug) || ["email", "tel"].includes(this.field.type);
     }
   })
 });
@@ -9937,14 +9867,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         columnId: "users",
         headerId: "hc-prospects-table-header-users-users"
       },
-      // AI agents
-      {
-        type: "other",
-        name: this.$t("prospect.table.column.others.ai_agents"),
-        icon: "fa fa-robot icon-brown",
-        columnId: "ai-agents",
-        headerId: "hc-prospects-table-header-ai-agents-ai-agents"
-      },
       // Groups
       {
         type: "other",
@@ -11794,17 +11716,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         prospect: $props.prospect,
         items: $props.prospect.users ? $props.prospect.users : [],
         onClick: $options.manageUsers
-      }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'ai-agents' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
+      }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
         key: 11,
-        prospect: $props.prospect,
-        items: $props.prospect.ai_agents ? $props.prospect.ai_agents : []
-      }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 12,
         prospect: $props.prospect,
         items: $props.prospect.groups ? $props.prospect.groups : [],
         onClick: $options.manageGroups
       }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'orders' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 13,
+        key: 12,
         prospect: $props.prospect,
         items: $props.prospect.orders ? $props.prospect.orders.map(function (order) {
           return _objectSpread(_objectSpread({}, order.status ? order.status : {}), order);
@@ -11812,15 +11730,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "item-clicked": $options.showOrder,
         onClick: $options.manageOrders
       }, null, 8 /* PROPS */, ["prospect", "items", "item-clicked", "onClick"])) : $options.category == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 14,
+        key: 13,
         prospect: $props.prospect,
         items: $props.prospect["import"] ? [$props.prospect["import"]] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'pipedrive-accounts' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 15,
+        key: 14,
         prospect: $props.prospect,
         items: $props.prospect.pipedrive_accounts ? $props.prospect.pipedrive_accounts : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'creator' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 16,
+        key: 15,
         prospect: $props.prospect,
         items: $props.prospect.creator ? [$props.prospect.creator] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
@@ -12148,70 +12066,66 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 0,
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterUser, ["stop"])
-      }, null, 8 /* PROPS */, ["column", "onClick"])) : $props.column.category == 'ai-agents' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      }, null, 8 /* PROPS */, ["column", "onClick"])) : $props.column.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 1
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" AI agents "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
-        column: $props.column
-      }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 2
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Groups "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterGroup, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'orders' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 3
+        key: 2
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Orders "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterOrder, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 4
+        key: 3
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Import "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterImport, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'pipedrive-accounts' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 5
+        key: 4
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Pipedrive accounts "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterPipedriveAccount, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'creator' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 6
+        key: 5
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Creator "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCreator, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'category' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 7
+        key: 6
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Labels "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_relation_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCategory, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'events' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 8
+        key: 7
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Events "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_event_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterEvent, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'event-field' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 9
+        key: 8
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Events "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_event_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterEvent, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'interactions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 10
+        key: 9
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Interactions "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_interaction_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterInteraction, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'sms' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 11
+        key: 10
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_sms_header_cell, {
         column: $props.column
       }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 12
+        key: 11
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Thread "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_thread_header_cell, {
         column: $props.column
       }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.column.category == 'default' && $props.column.id == 'created_at' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 13
+        key: 12
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Created at field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_created_at_header_cell, {
         column: $props.column,
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.filterCreatedAt, ["stop"])
       }, null, 8 /* PROPS */, ["column", "onClick"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 14
+        key: 13
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Meta field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Default field "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_default_header_cell, {
         onFocus: _cache[0] || (_cache[0] = function ($event) {
           return _ctx.$emit('focus');
@@ -13467,9 +13381,8 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Trier", -1 /* HOISTED */);
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Modifier le champ", -1 /* HOISTED */);
 var _hoisted_3 = [_hoisted_2];
-var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["placeholder"];
-var _hoisted_6 = ["textContent"];
+var _hoisted_4 = ["placeholder"];
+var _hoisted_5 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
@@ -13477,7 +13390,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-default-header-cell-label', $data.requiredShown ? 'required-shown' : '', $data.showOptions ? 'show-options' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-default-header-cell-options",
-    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $data.showOptions = !$data.showOptions;
     }, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -13493,43 +13406,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.edit && $options.edit.apply($options, arguments);
     }, ["prevent"]))
-  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canToggleUnique ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-    key: 1,
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-clone', $options.field.unique ? 'icon-green' : '']),
-    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-      return $options.toggleUnique && $options.toggleUnique.apply($options, arguments);
-    }, ["prevent"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.field.unique ? 'Vérification doublon activée' : 'Vérifier doublon lors de la saisie')
-  }, null, 8 /* PROPS */, _hoisted_4)], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     placeholder: $props.column.name + ' ...',
-    onFocus: _cache[4] || (_cache[4] = function ($event) {
+    onFocus: _cache[3] || (_cache[3] = function ($event) {
       return _ctx.$emit('focus'), $options.showRequired();
     }),
-    onBlur: _cache[5] || (_cache[5] = function ($event) {
+    onBlur: _cache[4] || (_cache[4] = function ($event) {
       return _ctx.$emit('blur'), $options.hideRequired(), $options.hideOptions();
     }),
-    onChange: _cache[6] || (_cache[6] = function () {
+    onChange: _cache[5] || (_cache[5] = function () {
       return $options.search && $options.search.apply($options, arguments);
     }),
-    onKeydown: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-      return $event.target.blur();
-    }, ["prevent"]), ["enter"])),
     ref: "search"
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
-    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleWithField && $options.toggleWithField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */), [[_directive_tooltip, $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'Sans ' + $props.column.name : 'Tous' : 'Avec ' + $props.column.name]]), !$props.column.meta && $props.column.id == 'street' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
     key: 0,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-check', 'hc-default-header-cell-label-valid', $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? 'icon-red' : 'icon-grey' : 'icon-green']),
-    onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleValidField && $options.toggleValidField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.name)
-  }, null, 8 /* PROPS */, _hoisted_6)], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, _hoisted_5)], 2 /* CLASS */);
 }
 
 /***/ }),

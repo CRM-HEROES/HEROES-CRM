@@ -81,16 +81,14 @@ return [
     ],
 
     'prospects-table' => [
-        ['key' => "last_name"],
         ['key' => "first_name"],
+        ['key' => "last_name"],
         ['key' => "email"],
         ['key' => "street"],
         ['key' => "street_bis"],
         ['key' => "postal_code"],
         ['key' => "city"],
         ['key' => "country"],
-        ['key' => "users"],
-        ['key' => "ai-agents"],
     ],
 
     'users-table' => [

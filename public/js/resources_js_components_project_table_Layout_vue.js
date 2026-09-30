@@ -1243,7 +1243,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     fixedColumns: function fixedColumns() {
-      console.log(this.columns, "----");
       return this.columns.filter(function (c) {
         return c.fixed;
       });

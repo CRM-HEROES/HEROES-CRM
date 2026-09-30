@@ -26,75 +26,6 @@
                         v-model="prospectImportToUpdate.source_url"
                 /></v-field>
 
-                <v-field :label="$t('import.update.google_sheets.sync_enabled')">
-                    <input
-                        type="checkbox"
-                        style="width: auto; min-height: 0"
-                        v-model="prospectImportToUpdate.sync_enabled"
-                    />
-                </v-field>
-
-                <v-field
-                    v-if="prospectImportToUpdate.sync_enabled"
-                    :label="$t('import.update.google_sheets.sync_interval')"
-                >
-                    <select
-                        v-model.number="
-                            prospectImportToUpdate.sync_interval_minutes
-                        "
-                    >
-                        <option
-                            :value="1"
-                            v-text="
-                                $t('import.add.google_sheets.sync_interval_1')
-                            "
-                        ></option>
-                        <option
-                            :value="5"
-                            v-text="
-                                $t('import.add.google_sheets.sync_interval_5')
-                            "
-                        ></option>
-                        <option
-                            :value="30"
-                            v-text="
-                                $t('import.add.google_sheets.sync_interval_30')
-                            "
-                        ></option>
-                        <option
-                            :value="60"
-                            v-text="
-                                $t('import.add.google_sheets.sync_interval_60')
-                            "
-                        ></option>
-                        <option
-                            :value="180"
-                            v-text="
-                                $t(
-                                    'import.add.google_sheets.sync_interval_180'
-                                )
-                            "
-                        ></option>
-                        <option
-                            :value="1440"
-                            v-text="
-                                $t(
-                                    'import.add.google_sheets.sync_interval_1440'
-                                )
-                            "
-                        ></option>
-                    </select>
-                </v-field>
-
-                <v-field
-                    v-if="prospectImportToUpdate.sync_enabled"
-                    :label="$t('import.update.google_sheets.last_synced_at')"
-                >
-                    <div
-                        v-text="lastSyncedAtLabel"
-                        style="border: none !important; min-height: auto !important; padding: 5px 0 !important"
-                    ></div>
-                </v-field>
             </template>
         </item-list>
         <buttons>
@@ -146,10 +77,6 @@ export default {
 
                 if (this.prospectImportToUpdate.source == "google_sheets") {
                     payload.source_url = this.prospectImportToUpdate.source_url;
-                    payload.sync_enabled =
-                        this.prospectImportToUpdate.sync_enabled;
-                    payload.sync_interval_minutes =
-                        this.prospectImportToUpdate.sync_interval_minutes;
                 }
 
                 await store.dispatch(UPDATE_IMPORT, payload);
@@ -199,20 +126,6 @@ export default {
 
     computed: {
         ...mapGetters(["prospectImport"]),
-
-        /**
-         * Human readable "last synced at" for the auto-sync status,
-         * falling back to the "never synced yet" message.
-         */
-        lastSyncedAtLabel() {
-            const value = this.prospectImportToUpdate.last_synced_at;
-
-            if (!value) {
-                return this.$t("import.update.google_sheets.never_synced");
-            }
-
-            return dayjs(new Date(value)).format("DD/MM/YYYY HH:mm:ss");
-        },
     },
 };
 </script>

@@ -11,21 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('user_project', 'last_activity')) {
-            Schema::table('user_project', function (Blueprint $table) {
-                $table->timestamp('last_activity')->nullable()->after('prospects_count');
-            });
-        }
+        Schema::table('user_project', function (Blueprint $table) {
+            if (!Schema::hasColumn('user_project', 'last_activity')) {
+                $table->timestamp('last_activity')
+                    ->nullable()
+                    ->after('prospects_count');
+            }
+        });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        if (Schema::hasColumn('user_project', 'last_activity')) {
-            Schema::table('user_project', function (Blueprint $table) {
-                $table->dropColumn('last_activity');
-            });
-        }
+        Schema::table('user_project', function (Blueprint $table) {
+            $table->dropColumn('last_activity');
+        });
     }
 };

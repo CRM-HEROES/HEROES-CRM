@@ -11,7 +11,7 @@ use Illuminate\Validation\ValidationException;
  * Downloads the XLSX export of a public Google Sheets URL (all of its
  * sheets/tabs) and stores it on the "imports" disk, exactly like an
  * uploaded file. Shared between the manual "import from URL" flow
- * (ImportController) and the periodic auto-sync (SyncGoogleSheetImports).
+ * (ImportController).
  */
 class GoogleSheetDownloader
 {
@@ -40,7 +40,7 @@ class GoogleSheetDownloader
         $exportUrl = "https://docs.google.com/spreadsheets/d/{$spreadsheetId}/export?format=xlsx";
 
         try {
-            $response = Http::timeout(15)->connectTimeout(5)->get($exportUrl);
+            $response = Http::timeout(120)->connectTimeout(10)->get($exportUrl);
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             throw ValidationException::withMessages([
                 'url' => "Impossible de contacter Google Sheets (problème réseau). Réessayez.",

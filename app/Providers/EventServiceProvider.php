@@ -6,7 +6,6 @@ use App\Events\ProjectUserAttached;
 use App\Events\ProspectLabelAttached;
 use App\Events\ProspectUserAttached;
 use App\Events\UserDeviceCreated;
-use App\Listeners\GenerateAiQuoteOnLabelAttachedListener;
 use App\Listeners\ProjectUserAttachedListener;
 use App\Listeners\ProspectLabelAttachedListener;
 use App\Listeners\ProspectUserAttachedListener;
@@ -52,7 +51,6 @@ use App\Models\UserSetting;
 // use App\Observers\CalendarObserver;
 // use App\Observers\CategoryObserver;
 // use App\Observers\DocumentObserver;
-use App\Observers\ImportAiAgentObserver;
 use App\Observers\DocumentFileObserver;
 use App\Observers\DocumentPageObserver;
 use App\Observers\EventObserver;
@@ -75,7 +73,6 @@ use App\Observers\OrderObserver;
 use App\Observers\ProductImageObserver;
 // use App\Observers\ProductObserver;
 use App\Observers\ProjectObserver;
-use App\Observers\ProspectAiAgentObserver;
 use App\Observers\ProspectObserver;
 use App\Observers\ProspectQuestionnaireResponseObserver;
 // use App\Observers\QuestionnaireObserver;
@@ -128,7 +125,6 @@ class EventServiceProvider extends ServiceProvider
         File::observe(FileObserver::class);
         Folder::observe(FolderObserver::class);
         // Group::observe(GroupObserver::class);
-        Import::observe(ImportAiAgentObserver::class);
         Import::observe(ImportObserver::class);
         Invoice::observe(InvoiceObserver::class);
         Interaction::observe(InteractionObserver::class);
@@ -144,7 +140,6 @@ class EventServiceProvider extends ServiceProvider
         // Product::observe(ProductObserver::class);
         ProductImage::observe(ProductImageObserver::class);
         Project::observe(ProjectObserver::class);
-        Prospect::observe(ProspectAiAgentObserver::class);
         Prospect::observe(ProspectObserver::class);
         ProspectQuestionnaireResponse::observe(ProspectQuestionnaireResponseObserver::class);
         // Questionnaire::observe(QuestionnaireObserver::class);
@@ -161,12 +156,7 @@ class EventServiceProvider extends ServiceProvider
             ProspectLabelAttached::class,
             [ProspectLabelAttachedListener::class, 'handle']
         );
-
-        LaravelEvent::listen(
-            ProspectLabelAttached::class,
-            [GenerateAiQuoteOnLabelAttachedListener::class, 'handle']
-        );
-
+    
         LaravelEvent::listen(
             ProspectUserAttached::class,
             [ProspectUserAttachedListener::class, 'handle']

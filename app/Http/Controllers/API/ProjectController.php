@@ -102,14 +102,6 @@ class ProjectController extends Controller
             },
             'imports' => function($query) {
             },
-            'lines' => function($query) {
-                // The "config" column holds operator credentials
-                // (API tokens, etc.) and must not be broadcast
-                // to every project member on page load.
-                $query
-                    ->select('id', 'project_id', 'name', 'operator', 'user_id')
-                    ->orderBy('name');
-            },
             'menus' => function($query) {
                 $query
                     ->select('id', 'project_id', 'name', 'color', 'bgcolor', 'filters')

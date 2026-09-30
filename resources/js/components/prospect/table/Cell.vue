@@ -1,9 +1,5 @@
 <template>
-    <component
-        :is="tag"
-        :class="[isFiltered ? 'filtered' : '']"
-        :style="style"
-    >
+    <component :is="tag" :class="[isFiltered ? 'filtered' : '']" :style="style">
         <street-cell
             v-if="column.key == 'street'"
             :prospect="prospect"
@@ -76,11 +72,6 @@
             :prospect="prospect"
             :items="prospect.users ? prospect.users : []"
             @click="manageUsers"
-        />
-        <relation-cell
-            v-else-if="category == 'ai-agents'"
-            :prospect="prospect"
-            :items="prospect.ai_agents ? prospect.ai_agents : []"
         />
         <relation-cell
             v-else-if="category == 'groups'"
@@ -165,7 +156,7 @@ export default {
         StreetCell,
         ThreadCell,
     },
-    
+
     props: {
         /**
          * HTML tag
@@ -192,6 +183,7 @@ export default {
             type: Object,
         },
     },
+
     methods: {
         /**
          * Associated prospect labels

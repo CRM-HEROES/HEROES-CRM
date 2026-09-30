@@ -126,38 +126,6 @@ return [
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
         ],
-
-        'kavkom' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/kavkom.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
-
-        'ai-phone-agent' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/ai-phone-agent.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
-
-        'ai-quote' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/ai-quote.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
-
-        'archer' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/archer.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => 14,
-            'replace_placeholders' => true,
-        ],
     ],
 
 ];

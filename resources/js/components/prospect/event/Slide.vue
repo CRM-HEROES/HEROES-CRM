@@ -1374,10 +1374,10 @@ export default {
             this.addingEvent = true;
 
             try {
-                await store.dispatch(
-                    this.prospect && this.prospect.id == data.prospect_id
+                const d = await store.dispatch(
+                    /*this.prospect && this.prospect.id
                         ? ADD_PROSPECT_EVENT
-                        : ADD_EVENT,
+                        : */ ADD_EVENT,
                     data
                 );
 
@@ -1385,6 +1385,13 @@ export default {
                     store.commit(UPDATE_PROSPECT, {
                         id: this.prospect.id,
                         street: this.prospectEvent.location,
+                    });
+                }
+
+                if (this.prospect && this.prospect.id == data.prospect_id) {
+                    store.commit(ADD_PROSPECT_EVENT, {
+                        ...this.prospectEvent,
+                        id: d.id,
                     });
                 }
             } finally {
@@ -1429,14 +1436,18 @@ export default {
             this.updatingEvent = true;
 
             try {
-                if (this.prospect && this.prospect.id == data.prospect_id) {
-                    await store.dispatch(UPDATE_PROSPECT_EVENT, data);
-                } else {
-                    await store.dispatch(UPDATE_EVENT, data);
+                await store.dispatch(
+                    /*this.prospect ? UPDATE_PROSPECT_EVENT : */ UPDATE_EVENT,
+                    data
+                );
 
-                    if (this.prospect) {
-                        store.commit(REMOVE_PROSPECT_EVENT, this.prospectEvent.id);
-                    }
+                if (this.prospect && this.prospect.id != data.prospect_id) {
+                    store.commit(REMOVE_PROSPECT_EVENT, this.prospectEvent.id);
+                } else {
+                    store.commit(
+                        this.prospect ? UPDATE_PROSPECT_EVENT : UPDATE_EVENT,
+                        this.prospectEvent
+                    );
                 }
             } finally {
                 this.updatingEvent = false;
@@ -2225,12 +2236,6 @@ export default {
 
             if (this.can("all")) {
                 return true;
-            }
-
-            // Computed server-side: takes into account whether the user
-            // is affected to the event itself or to its related prospect
-            if (this.prospectEvent.editable !== undefined) {
-                return this.prospectEvent.editable;
             }
 
             if (this.prospectEvent.user_id == this.user.id) {

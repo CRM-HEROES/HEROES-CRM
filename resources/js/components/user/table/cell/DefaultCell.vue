@@ -26,11 +26,6 @@
         />
         <span v-text="label"></span>
     </label>
-    <phone-country-select
-        v-else-if="field == 'phone_country'"
-        v-model="value"
-        :disabled="disabled"
-    />
     <label v-else-if="field == 'email'" class="hc-default-cell-label">
         <input
             type="email"
@@ -99,13 +94,7 @@ import ProjectUserService from "@/apis/project/user";
 
 import { UPDATE_USER } from "@/actions/project/user";
 
-import PhoneCountrySelect from "@/components/PhoneCountrySelect.vue";
-
 export default {
-    components: {
-        PhoneCountrySelect,
-    },
-
     props: {
         /**
          * Project

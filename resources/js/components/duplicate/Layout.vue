@@ -165,10 +165,7 @@ import ApiService from "@/apis/api.service";
 import { mapGetters } from "vuex";
 import store from "@/store";
 
-import {
-    FETCH_PROSPECTS,
-    SET_PROSPECTS_DUPLICATES_FIRST,
-} from "@/actions/project/prospect";
+import { FETCH_PROSPECTS } from "@/actions/project/prospect";
 
 // Components
 import DuplicateRow from "./DuplicateRow.vue";
@@ -214,21 +211,6 @@ export default {
                     `project/${this.project.slug}/duplicate/show`
                 );
                 this.duplicates = data;
-
-                // Bring duplicate clusters to the top of the main table,
-                // grouped by pair, so the ones just found are immediately
-                // visible there too (see ProspectController::getProspects'
-                // duplicatesFirst handling).
-                if (data && data.length > 0) {
-                    store.commit(SET_PROSPECTS_DUPLICATES_FIRST, true);
-                }
-
-                // The detection above updates duplicate_group_id in the
-                // database, but the main prospects table already has its
-                // own (now stale) copy of each row loaded in the store —
-                // without this, the new/updated duplicate coloring only
-                // ever appeared after a full page reload.
-                store.dispatch(FETCH_PROSPECTS);
             } finally {
                 this.fetchingDuplicates = false;
             }
@@ -307,25 +289,15 @@ export default {
         ...mapGetters(["project", "fields"]),
 
         /**
-         * Checked fields (duplicateFields) are grouped at the top, so they
-         * stay visible/easy to review among a project's full field list —
-         * the keyword filter still applies on top of that grouping.
          */
         filteredFields() {
             const keyword = removeStringAccent(this.fieldKeyword);
 
-            return this.fields
-                .filter(
-                    (field) =>
-                        field.for == "prospect" &&
-                        removeStringAccent(field.name).indexOf(keyword) >= 0
-                )
-                .slice()
-                .sort((a, b) => {
-                    const aChecked = this.duplicateFields.includes(a.id);
-                    const bChecked = this.duplicateFields.includes(b.id);
-                    return aChecked === bChecked ? 0 : aChecked ? -1 : 1;
-                });
+            return this.fields.filter(
+                (field) =>
+                    field.for == "prospect" &&
+                    removeStringAccent(field.name).indexOf(keyword) >= 0
+            );
         },
 
         /**

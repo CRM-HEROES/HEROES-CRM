@@ -58,17 +58,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               _context.next = 5;
               return axios.post("/login", _this.auth).then(function (_ref) {
                 var data = _ref.data;
-                // Une session déjà authentifiée fait rediriger le
-                // middleware "guest" vers "/" (200, mais sans ce
-                // message) : ne pas considérer ça comme un login réussi.
-                if (data && data.message === "Login successful") {
-                  _this.signIn();
-                } else {
-                  flashError({
-                    title: "Authentification",
-                    body: _this.$t("auth.login.error")
-                  });
-                }
+                _this.signIn();
               })["catch"](function (error) {
                 if (!(error.response && error.response.status === 422 && error.response.data && error.response.data.message == "Two factors validation")) {
                   flashError({

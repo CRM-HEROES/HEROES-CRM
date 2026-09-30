@@ -47,7 +47,6 @@
     "phone": "Phone number",
     "city": "City",
     "country": "Country",
-    "phone_country": "Phone country",
     "description": "Description",
     "type": "Type",
     "color": "Text color",
@@ -206,8 +205,7 @@
                     "import": "Import",
                     "creator": "Created by",
                     "groups": "Groups",
-                    "users": "Users",
-                    "ai_agents": "AI agents"
+                    "users": "Users"
                 },
                 "import": {
                     "use": "Use import columns...",
@@ -447,8 +445,6 @@
             "call_by_phone": "Call by phone",
             "call_by_aircall": "Call by Aircall",
             "call_by_ringover": "Call by Ringover",
-            "call_by_kavkom": "Call by Kavkom",
-            "call_by_twilio": "Call by Twilio (browser)",
             "history": "History"
         },
         "message": {
@@ -515,7 +511,6 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
-            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {source}",
             "templates": "SMS templates",
             "enter_text_message": "Enter a text message"
@@ -565,58 +560,19 @@
             }
         }
     },
-    "sms": {
-        "error": {
-            "unknown_source": "Unknown SMS source: {source}"
-        },
-        "smsbox": {
-            "error": {
-                "empty_setting": "SMSBOX settings are not configured for this project."
-            }
-        },
-        "ultramsg": {
-            "error": {
-                "empty_setting": "Ultramsg settings are not configured for this project."
-            }
-        },
-        "mtarget": {
-            "error": {
-                "empty_setting": "MTarget settings are not configured for this project."
-            }
-        },
-        "brevo": {
-            "error": {
-                "invalid_type": "invalid SMS type.",
-                "empty_setting": "Brevo settings are not configured for this project.",
-                "empty_message": "the SMS message is empty.",
-                "empty_number": "the recipient's number is empty.",
-                "other": "Brevo error"
-            }
-        }
-    },
+
     "import": {
         "add": {
             "title": "Import prospects",
             "from": {
                 "label": "From",
                 "local_file": "Local file",
-                "google_sheets": "Google Sheets (link)",
-                "webservice": "External via URL"
+                "google_sheets": "Google Sheets"
+            },
+            "google_sheets": {
+                "url": "Public spreadsheet link"
             },
             "file": "File",
-            "google_sheets": {
-                "url": "Google Sheets link",
-                "invalid_url": "This Google Sheets link is not valid.",
-                "unreachable": "Unable to fetch this Google Sheets file. Make sure the share link allows \"Anyone with the link\" to view the document.",
-                "sync_enabled": "Sync automatically",
-                "sync_interval": "Sync frequency",
-                "sync_interval_1": "Instant (via the Google Sheets script)",
-                "sync_interval_5": "Every 5 minutes",
-                "sync_interval_30": "Every 30 minutes",
-                "sync_interval_60": "Every hour",
-                "sync_interval_180": "Every 3 hours",
-                "sync_interval_1440": "Once a day"
-            },
             "name": "Name",
             "field_delimiter": "Field delimiter",
             "field_enclosure": "Field enclosure",
@@ -628,11 +584,7 @@
         "update": {
             "name": "name",
             "google_sheets": {
-                "url": "Google Sheets link",
-                "sync_enabled": "Sync automatically",
-                "sync_interval": "Sync frequency",
-                "last_synced_at": "Last synced",
-                "never_synced": "Never synced"
+                "url": "Google Sheets link"
             }
         },
         "process": {
@@ -657,13 +609,14 @@
                     "new_column": "New column",
                     "auto_field": "[New field]",
                     "auto_category": "[New category]",
-                    "auto_thread": "[New thread]"
+                    "auto_thread": "[New thread]",
+                    "sheets": "Sheets to import"
                 },
                 "relations": {
                     "title": "Relations",
                     "affected_users": "Affected users",
-                    "affected_user_groups": "Affected user groups",
-                    "affected_groups": "Affected groups"
+                    "affected_groups": "Affected groups",
+                    "affected_user_groups": "Affected user groups"
                 },
                 "import": {
                     "title": "Import",
@@ -687,24 +640,14 @@
                         "choose_action": "Choose an action to do",
                         "remove_duplicating": "Delete old duplicate leads",
                         "remove_duplicates": "Remove lead duplications in import",
-                        "replace_duplicating": "Overwrite the modified data of old prospects with those of new ones"
+                        "replace_duplicating": "Overwrite the modified data of old prospects with those of new ones",
+                        "selection_required": "Select at least one field in MAJ before starting the import."
                     },
                     "processing": "We will send you an email when the import is complete.",
-                    "sync": {
-                        "active": "Automatic sync enabled"
+                    "processing_error": {
+                        "invalid_date": "A date in the file is invalid. Check the date columns.",
+                        "failed": "Import processing failed. Check the logs for details."
                     },
-                    "realtime": {
-                        "intro": "For real-time sync (instead of waiting for the next automatic pass), you can have Google Sheets notify the CRM directly.",
-                        "step_1": "Open this Google Sheet, then <b>Extensions &gt; Apps Script</b>.",
-                        "step_2": "Paste the script below (replace all existing content), pick the <b>setup</b> function from the dropdown at the top, click <b>Run</b>, then authorize access. Done: every edit to the sheet will now notify the CRM automatically.",
-                        "copy_script": "Copy script",
-                        "script_copied": "Script copied — paste it into Extensions > Apps Script in your Google Sheet"
-                    },
-                    "notify_welcome_sms": "Notify with welcome SMS",
-                    "welcome_sms_source": "Welcome SMS source",
-                    "welcome_sms_message": "Welcome SMS message",
-                    "welcome_sms_message_default": "Welcome! Thank you for joining us.",
-                    "welcome_sms_sent": "Welcome SMS sent",
                     "webservice": {
                         "step_1": "To associate your zap with this import,<br />Connect to Zapier, and create your zap there:<br /><a target=\"_blank\" href=\"https://zapier.com/webintent/create-zap?entry-point-method=make_a_zap_call_to_action\">Create a Zap</a>",
                         "step_2": "Choose <b>Google Sheet</b> as <b>Trigger</b>,<br />Choose <b>New Spreadsheet Row [instant]</b> as <b>Event</b>,<br />Click on <b>Continue</b>.",
@@ -1128,14 +1071,6 @@
                     "name": "Send SMS",
                     "source": "Source",
                     "sms": "SMS"
-                },
-                "email": {
-                    "title": "Send an email",
-                    "name": "Send an email",
-                    "subject": "Subject",
-                    "body": "Message",
-                    "enter_subject": "Enter a subject",
-                    "enter_message": "Enter a message"
                 },
                 "event": {
                     "title": "Create an event",
@@ -1827,23 +1762,6 @@
         }
     },
 
-    "line": {
-        "add": {
-            "title": "New line"
-        },
-        "operator": {
-            "choose": "Choose an operator",
-            "configured": "Operator configured"
-        },
-        "configuration": {
-            "title": "Configuration"
-        },
-        "assign_to": {
-            "title": "Assign to {user}",
-            "pick_title": "Assign to an agent"
-        }
-    },
-
     "locale": {
         "setting": {
             "title": "Locale"
@@ -1961,7 +1879,6 @@
                 "folders": "Folders",
                 "groups": "Groups",
                 "imports": "Imports",
-                "lines": "Lines",
                 "menus": "Menus",
                 "order_actions": "Order actions",
                 "order_statuses": "Order statuses",

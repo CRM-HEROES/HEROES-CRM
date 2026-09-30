@@ -33,7 +33,6 @@ const ProspectProfile = () =>
 // Project
 const ProjectTable = () => import("@/components/project/table/Layout.vue");
 const ProjectProfile = () => import("@/components/project/profile/Profile.vue");
-const AiAgentLayout = () => import("@/components/ai-agent/Layout.vue");
 // User
 const UserTable = () => import("@/components/user/table/Layout.vue");
 const UserProfile = () => import("@/components/user/profile/Profile.vue");
@@ -140,15 +139,6 @@ const routes = [
                 },
             },
             {
-                name: "project.ai-agent",
-                path: "ai-agent",
-                component: AiAgentLayout,
-                meta: {
-                    title: `Agents IA`,
-                    page: "project.ai-agent.index",
-                },
-            },
-            {
                 name: "user",
                 path: "user",
                 component: UserTable,
@@ -199,26 +189,6 @@ const routes = [
                 component: Order,
                 meta: {
                     title: `Devis`,
-                },
-            },
-            {
-                name: "planning",
-                path: "planning",
-                redirect: (to) => {
-                    const query = { ...(to.query || {}) };
-                    if (!query.filters && store.state.auth?.user?.id) {
-                        query.filters = JSON.stringify({
-                            withUsers: [store.state.auth.user.id],
-                        });
-                    }
-
-                    return {
-                        name: "event",
-                        params: {
-                            project: to.params.project,
-                        },
-                        query,
-                    };
                 },
             },
             {

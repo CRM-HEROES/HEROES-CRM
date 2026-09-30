@@ -30,7 +30,6 @@ class Prospect extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'ai_agent_id',
         'company_name',
         'country',
         'city',
@@ -39,9 +38,9 @@ class Prospect extends Authenticatable
         'email',
         'fax_number',
         'first_name',
-        'last_name',
         'ip_address',
         'job_title',
+        'last_name',
         'latitude',
         'longitude',
         'meta',
@@ -58,14 +57,6 @@ class Prospect extends Authenticatable
         'title',
         'valid_address',
         'website_url',
-        'sector',
-        'appetency_score',
-        'verified_email',
-        'verified_phone',
-        'external_profile_url',
-        'archer_score',
-        'archer_priority',
-        'archer_scored_at',
     ];
 
     
@@ -76,24 +67,10 @@ class Prospect extends Authenticatable
      */
     protected $casts = [
         'meta' => 'json',
-        'duplicate_fields' => 'json',
         'date_of_birth' => 'date',
         'processed_at' => 'datetime',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'verified_email' => 'boolean',
-        'verified_phone' => 'boolean',
-        'archer_priority' => 'boolean',
-        'archer_scored_at' => 'datetime',
-    ];
-
-    /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
-     */
-    protected $appends = [
-        'full_name',
     ];
 
 
@@ -189,12 +166,6 @@ class Prospect extends Authenticatable
 
     // Relationships
 
-    /** AI voice agent explicitly assigned to this prospect. */
-    public function aiAgent()
-    {
-        return $this->belongsTo(AiAgent::class);
-    }
-
     /**
      * Available events
      */
@@ -217,14 +188,6 @@ class Prospect extends Authenticatable
     public function creator()
     {
         return $this->belongsTo(User::class, 'creator_id');
-    }
-
-    /**
-     * ARCHER enrichment history (see App\Services\Archer)
-     */
-    public function enrichments()
-    {
-        return $this->hasMany(ProspectEnrichment::class);
     }
 
     /**
@@ -370,6 +333,4 @@ class Prospect extends Authenticatable
     {
         return $this->belongsToMany(User::class, 'prospect_user');
     }
-
-
 }

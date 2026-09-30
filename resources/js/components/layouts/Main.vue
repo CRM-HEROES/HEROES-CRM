@@ -37,6 +37,7 @@
             <manage-user-calendars-slide />
             <manage-user-categories-slide />
             <manage-user-documents-slide />
+            <manage-user-phone-country-codes-slide v-if="project && user" />
             <manage-user-duplicate-slide />
             <manage-user-files-slide />
             <manage-user-folders-slide />
@@ -76,7 +77,6 @@
             <add-group-modal v-if="can('all.project.group.add')" />
             <add-import-modal v-if="can('all.prospect.import')" />
             <add-label-modal v-if="can('all.project.category.label.add')" />
-            <add-line-modal v-if="can('all.project.line.add')" />
             <add-menu-modal />
             <add-message-template-modal
                 v-if="can('all.project.message-template.add')"
@@ -137,7 +137,6 @@
             <update-label-modal
                 v-if="can('all.project.category.label.update')"
             />
-            <update-line-modal v-if="can('all.project.line.update')" />
             <update-menu-modal />
             <update-message-template-modal
                 v-if="can('all.project.message-template.update')"
@@ -200,12 +199,11 @@
 
             <protected-content>
                 <setting-email-modal />
-                <prospect-email-modal />
                 <setting-smsbox-modal />
                 <setting-ultramsg-modal />
                 <setting-m-target-modal />
                 <setting-pipedrive-modal />
-                <setting-brevo-modal />
+                <setting-ringover-modal />
             </protected-content>
 
             <menu-icon-slide />
@@ -216,10 +214,6 @@
 
         <layout-footer v-if="impersonating" />
 
-        <!-- Kavkom softphone: registered once for the whole session so
-             incoming calls ring on every page of the CRM. -->
-        <kavkom-incoming-call />
-
         <manage-user-sessions-slide />
         <manage-locale-slide />
         <manage-tutorial-slide />
@@ -228,8 +222,6 @@
         <tooltip />
         <tutorial-tooltip />
         <loading :loading="changing" />
-
-        <!-- <voice-assistant /> -->
     </div>
 </template>
 
@@ -292,6 +284,7 @@ import ManageUserActionsSlide from "@/components/user/action/Slide.vue";
 import ManageUserCalendarsSlide from "@/components/user/calendar/Slide.vue";
 import ManageUserCategoriesSlide from "@/components/user/category/Slide.vue";
 import ManageUserDocumentsSlide from "@/components/user/document/Slide.vue";
+import ManageUserPhoneCountryCodesSlide from "@/components/user/phone-country-codes/Slide.vue";
 import ManageUserDuplicateSlide from "@/components/user/duplicate/Slide.vue";
 import ManageUserFilesSlide from "@/components/user/file/Slide.vue";
 import ManageUserFoldersSlide from "@/components/user/folder/Slide.vue";
@@ -330,7 +323,6 @@ import AddFolderModal from "@/components/folder/add/Modal.vue";
 import AddGroupModal from "@/components/group/add/Modal.vue";
 import AddImportModal from "@/components/import/add/Modal.vue";
 import AddLabelModal from "@/components/label/add/Modal.vue";
-import AddLineModal from "@/components/line/add/Modal.vue";
 import AddMenuModal from "@/components/menu/add/Modal.vue";
 import AddMessageTemplateModal from "@/components/message-template/add/Modal.vue";
 import AddOrderActionModal from "@/components/order/action/add/Modal.vue";
@@ -369,7 +361,6 @@ import UpdateFolderModal from "@/components/folder/update/Modal.vue";
 import UpdateGroupModal from "@/components/group/update/Modal.vue";
 import UpdateImportModal from "@/components/import/update/Modal.vue";
 import UpdateLabelModal from "@/components/label/update/Modal.vue";
-import UpdateLineModal from "@/components/line/update/Modal.vue";
 import UpdateMenuModal from "@/components/menu/update/Modal.vue";
 import UpdateMessageTemplateModal from "@/components/message-template/update/Modal.vue";
 import UpdateOrderActionModal from "@/components/order/action/update/Modal.vue";
@@ -412,12 +403,11 @@ import ManageProspectBulkFieldModal from "@/components/prospect/bulk/field/Modal
 import ManageProspectBulkProjectModal from "@/components/prospect/bulk/project/Modal.vue";
 
 import SettingEmailModal from "@/components/settings/Email.vue";
-import ProspectEmailModal from "@/components/prospect/email/Modal.vue";
 import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
+import SettingRingoverModal from "@/components/settings/Ringover.vue";
 import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
 import SettingMTargetModal from "@/components/settings/MTarget.vue";
 import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
-import SettingBrevoModal from "@/components/settings/Brevo.vue";
 
 import MenuIconSlide from "@/components/menu-icon/Slide.vue";
 import TrashSlide from "@/components/trash/Slide.vue";
@@ -428,8 +418,6 @@ import LayoutHeader from "./Header.vue";
 import LayoutFooter from "./Footer.vue";
 
 import Confirm from "@/components/Confirm.vue";
-import VoiceAssistant from "@/components/utils/VoiceAssistant.vue";
-import KavkomIncomingCall from "@/components/utils/KavkomIncomingCall.vue";
 
 export default {
     name: "main",
@@ -468,6 +456,7 @@ export default {
         ManageUserCalendarsSlide,
         ManageUserCategoriesSlide,
         ManageUserDocumentsSlide,
+        ManageUserPhoneCountryCodesSlide,
         ManageUserDuplicateSlide,
         ManageUserFilesSlide,
         ManageUserFoldersSlide,
@@ -505,7 +494,6 @@ export default {
         AddGroupModal,
         AddImportModal,
         AddLabelModal,
-        AddLineModal,
         AddMenuModal,
         AddMessageTemplateModal,
         AddOrderActionModal,
@@ -544,7 +532,6 @@ export default {
         UpdateGroupModal,
         UpdateImportModal,
         UpdateLabelModal,
-        UpdateLineModal,
         UpdateMenuModal,
         UpdateMessageTemplateModal,
         UpdateOrderActionModal,
@@ -587,12 +574,11 @@ export default {
         ManageProspectBulkProjectModal,
 
         SettingEmailModal,
-        ProspectEmailModal,
         SettingSmsboxModal,
+        SettingRingoverModal,
         SettingUltramsgModal,
         SettingMTargetModal,
         SettingPipedriveModal,
-        SettingBrevoModal,
 
         MenuIconSlide,
         TrashSlide,
@@ -600,8 +586,6 @@ export default {
         ApiPappersSlide,
 
         Confirm,
-        VoiceAssistant,
-        KavkomIncomingCall,
     },
 
     data() {
@@ -621,7 +605,10 @@ export default {
             signOut: "auth/logout",
         }),
         async logout() {
-            await this.signOut();
+            await axios.post("/logout").then((response) => {
+                this.signOut();
+                this.$router.push({ name: "login" });
+            });
         },
         keydown(e) {
             if (e.ctrlKey) {
@@ -651,6 +638,7 @@ export default {
         ...mapGetters("route", ["changing"]),
         ...mapGetters([
             "project",
+            "user",
             "can",
             "canMessage",
             "canFile",

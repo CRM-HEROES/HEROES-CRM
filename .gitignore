@@ -10,7 +10,6 @@
 .env
 .env.backup
 .env.production
-/ai-phone-agent/freeswitch/docker/signalwire_token.txt
 .phpunit.result.cache
 Homestead.json
 Homestead.yaml
@@ -28,6 +27,4 @@ supervisord.pid
 supervisord.log.*
 nginx/certbot
 mysql-data/
-mysql/
 backup/
-secrets/

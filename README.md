@@ -59,8 +59,6 @@ Appliquez les migrations et les seeders :
 
 ```sh
 php artisan migrate --seed
-ou
-php artisan migrate:fresh --seed
 ```
 
 ### 5. Installer les dépendances frontend
@@ -112,18 +110,4 @@ php artisan view:cache
 
 ```sh
 php artisan queue:work --tries=3 --queue=google_event,google_map,google_drive,imports,emails,woocommerce,media,sms,documents
-```
-
-#### Backup manuel
-```sh
-cd ~/Heroescrm
-docker compose exec heroescrm mysqldump \
-  -h 10.7.226.11 -P 18501 -u heroescrm-laravel10 -p'50EruoJbVOux@' \
-  --single-transaction --quick --lock-tables=false --skip-ssl --no-tablespaces \
-  heroescrm-laravel10 | gzip > ~/backup/heroescrm_prod_backup_$(date +%Y%m%d_%H%M%S).sql.gz
-```
-
-#### Liste Backup
-```sh
-ls -lh ~/backup/heroescrm_prod_backup_*.sql.gz
 ```

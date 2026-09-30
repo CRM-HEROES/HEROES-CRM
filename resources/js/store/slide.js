@@ -5,6 +5,7 @@ import {
     CLOSE_SLIDE,
     CLOSE_SLIDES,
 } from "@/actions/slide";
+import { SET_ASSIGNED_PHONE_COUNTRY_CODES } from "@/actions/project/user/setting";
 
 /**
  * Slide Store state
@@ -12,6 +13,7 @@ import {
 const state = {
     slides: [],
     leftSlides: [],
+    assignedPhoneCountryCodes: {},
 };
 
 /**
@@ -75,6 +77,14 @@ const mutations = {
         state.slides = [];
         state.leftSlides = [];
     },
+
+    [SET_ASSIGNED_PHONE_COUNTRY_CODES](state, { project, user, countries }) {
+        const key = `${project}:${user}`;
+        state.assignedPhoneCountryCodes = {
+            ...state.assignedPhoneCountryCodes,
+            [key]: countries,
+        };
+    },
 };
 
 /**
@@ -96,6 +106,9 @@ const getters = {
      * @returns
      */
     leftSlides: (state) => state.leftSlides,
+
+    assignedPhoneCountryCodes: (state) => (project, user) =>
+        state.assignedPhoneCountryCodes[`${project}:${user}`] || [],
 
     /**
      * Get slide open

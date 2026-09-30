@@ -418,7 +418,8 @@ class ProspectAutoAssignment
         return $project->users()
             ->whereNull('banned_at')
             ->whereIn('users.id', $candidateUserIds)
-            ->get(['users.id', 'users.name', 'users.role', 'users.last_activity', 'users.phone_country'])
+            ->get(['users.id', 'users.name', 'users.role', 'users.last_activity'])
+            ->pipe(fn ($users) => PhoneCountry::withDialCodes($users, $project->id))
             ->filter(function (User $user) use ($busyUserIds, $excludeUserIds) {
                 return !in_array($user->id, $busyUserIds, true)
                     && !in_array($user->id, $excludeUserIds, true);

@@ -49,21 +49,13 @@ class DocumentThumbnail
             try {
                 $imagick = PDFThumbnail::generate($file, 1, $this->size);
                 $imagick->writeImage($disk->path($thumbnail));
-            } catch (\Throwable $e) {
-                // \Exception alone never catches "Class Imagick not found"
-                // (a \Error, not an \Exception), so a missing Imagick
-                // extension used to crash the request with a 500 instead
-                // of just failing to produce a thumbnail.
-                \Illuminate\Support\Facades\Log::warning('Document thumbnail generation failed.', [
-                    'document_id' => $this->document->id,
-                    'error' => $e->getMessage(),
-                ]);
-                return false;
+            } catch (\Exception $e) {
+                throw $e;
             } finally {
                 unlink($file);
             }
         }
-
+        
         return $disk->get($thumbnail);
     }
 

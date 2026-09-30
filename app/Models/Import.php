@@ -28,7 +28,6 @@ class Import extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'ai_agents',
         'cols_count',
         'creator_id',
         'field_delimiter',
@@ -40,10 +39,6 @@ class Import extends Model
         'labels',
         'mapping',
         'name',
-        'notify_welcome_sms',
-        'welcome_sms_message',
-        'welcome_sms_source',
-        'welcome_sms_sent_at',
         'path',
         'projects',
         'processing_at',
@@ -55,9 +50,6 @@ class Import extends Model
         'source',
         'token',
         'source_url',
-        'sync_enabled',
-        'sync_interval_minutes',
-        'last_synced_at',
         'users',
         'user_groups',
         'values',
@@ -88,21 +80,16 @@ class Import extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'ai_agents' => 'json',
         'duplicates_fields' => 'json',
         'groups'    => 'json',
         'headers'   => 'json',
         'labels'    => 'json',
         'mapping'   => 'json',
-        'notify_welcome_sms' => 'boolean',
-        'welcome_sms_sent_at' => 'datetime',
         'projects'  => 'json',
         'roles'     => 'json',
         'prospects' => 'json',
         'sheets'    => 'json',
         'selected_sheets' => 'json',
-        'sync_enabled' => 'boolean',
-        'last_synced_at' => 'datetime',
         'users'     => 'json',
         'user_groups' => 'json',
         'values'    => 'json',

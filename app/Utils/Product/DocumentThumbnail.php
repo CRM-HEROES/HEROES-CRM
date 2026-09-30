@@ -37,10 +37,7 @@ class DocumentThumbnail
             $imagick->writeDocument($disk->path($thumbnail));
 
             return $disk->get($thumbnail);
-        } catch (\Throwable $e) {
-            // \Exception alone never catches "Class Imagick not found"
-            // (a \Error), so a missing Imagick extension crashed the
-            // request instead of just failing to produce a thumbnail.
+        } catch (\Exception $e) {
             return null;
         }
     }

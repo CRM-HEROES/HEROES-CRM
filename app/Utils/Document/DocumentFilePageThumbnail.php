@@ -38,13 +38,9 @@ class DocumentFilePageThumbnail
             try {
                 $imagick = PDFThumbnail::generate($disk->path($this->file->path), $this->page, $this->size);
                 $imagick->writeImage($disk->path($thumbnail));
-            } catch (\Throwable $e) {
-                // \Exception alone never catches "Class Imagick not
-                // found" (a \Error), so a missing Imagick extension
-                // crashed the request instead of just failing to
-                // produce a thumbnail.
+            } catch (\Exception $e) {
                 ProjectLog::error($this->file->document->project, $e->getMessage());
-                return null;
+                throw $e;
             }
         }
         
