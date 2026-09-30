@@ -26,6 +26,14 @@
                         v-model="prospectImportToUpdate.source_url"
                 /></v-field>
 
+                <v-field :label="$t('import.update.google_sheets.sync_enabled')">
+                    <input
+                        type="checkbox"
+                        style="width: auto; min-height: 0"
+                        v-model="prospectImportToUpdate.sync_enabled"
+                    />
+                </v-field>
+
             </template>
         </item-list>
         <buttons>
@@ -77,6 +85,8 @@ export default {
 
                 if (this.prospectImportToUpdate.source == "google_sheets") {
                     payload.source_url = this.prospectImportToUpdate.source_url;
+                    payload.sync_enabled =
+                        !!this.prospectImportToUpdate.sync_enabled;
                 }
 
                 await store.dispatch(UPDATE_IMPORT, payload);

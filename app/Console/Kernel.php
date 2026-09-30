@@ -42,6 +42,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:campaign --frequency=monthly')->monthlyOn(1);
         
         $schedule->command('app:campaign --frequency=once')->daily();
+
+        // Google Sheets instant sync: recover rows left behind by a crash / restart
+        $schedule->command('sheet-sync:recover')->everyMinute()->withoutOverlapping();
     }
 
     /**

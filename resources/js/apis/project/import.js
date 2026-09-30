@@ -16,6 +16,11 @@ export default {
             params
         );
     },
+    syncScript(project, projectImport) {
+        return ApiService.get(
+            `project/${project}/import/${projectImport}/sync-script`
+        );
+    },
     destroy(project, projectImport, params) {
         return ApiService.delete(`project/${project}/import/${projectImport}`, {
             data: params,

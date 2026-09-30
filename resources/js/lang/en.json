@@ -570,7 +570,8 @@
                 "google_sheets": "Google Sheets"
             },
             "google_sheets": {
-                "url": "Public spreadsheet link"
+                "url": "Public spreadsheet link",
+                "sync_enabled": "Instant sync (new leads)"
             },
             "file": "File",
             "name": "Name",
@@ -584,7 +585,8 @@
         "update": {
             "name": "name",
             "google_sheets": {
-                "url": "Google Sheets link"
+                "url": "Google Sheets link",
+                "sync_enabled": "Instant sync (new leads)"
             }
         },
         "process": {
@@ -626,6 +628,13 @@
                         "import": "Delete import",
                         "import_and_prospects": "Delete import and prospects",
                         "prospects": "Delete only prospects"
+                    },
+                    "sync": {
+                        "active": "Instant sync enabled",
+                        "step_1": "Open your Google Sheet, then <b>Extensions &gt; Apps Script</b>.",
+                        "step_2": "Paste the script (replace all existing content), pick the <b>setup</b> function, click <b>Run</b> and authorize access. Only <b>new</b> leads are sent, existing leads are never modified.",
+                        "copy_script": "Copy script",
+                        "script_copied": "Script copied. Paste it into Extensions > Apps Script of your Google Sheet."
                     },
                     "download": "Download import",
                     "stop": "Stop import",

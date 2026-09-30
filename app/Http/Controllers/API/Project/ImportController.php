@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Import;
 use App\Models\Project;
 use App\Services\Import\GoogleSheetDownloader;
+use App\Services\Import\SheetSyncScript;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -32,6 +33,7 @@ class ImportController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'source_url' => 'required_if:source,google_sheets',
+            'sync_enabled' => 'sometimes|boolean',
         ]);
 
         // Used by the frontend to show a non-blocking warning toast — the
@@ -45,7 +47,8 @@ class ImportController extends Controller
                 'name',
                 'source',
                 'field_delimiter',
-                'field_enclosure'
+                'field_enclosure',
+                'sync_enabled'
             ),
             $this->storeFile($request, $project),
             [
@@ -97,6 +100,7 @@ class ImportController extends Controller
             'duplicates_fields' => 'sometimes|array',
             'selected_sheets' => 'sometimes|nullable|array',
             'source_url' => 'sometimes|nullable|url',
+            'sync_enabled' => 'sometimes|boolean',
         ]);
 
         $import->update($request->only(
@@ -106,10 +110,26 @@ class ImportController extends Controller
             'duplicates_fields',
             'selected_sheets',
             'is_processing',
-            'source_url'
+            'source_url',
+            'sync_enabled'
         ));
 
         return ['message' => trans('common.success.updated_resource')];
+    }
+
+    /**
+     * Google Apps Script to paste in the sheet for the instant sync
+     * (webhook URL, secret and "MAJ" key columns already embedded).
+     */
+    public function syncScript(Project $project, Import $import, SheetSyncScript $script)
+    {
+        abort_unless($project->id == $import->project_id, 404);
+        abort_unless($import->source === 'google_sheets', 400);
+
+        return [
+            'webhook_url' => $script->webhookUrl($import),
+            'script' => $script->build($import),
+        ];
     }
 
     /**

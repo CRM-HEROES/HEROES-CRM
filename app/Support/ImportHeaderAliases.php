@@ -58,6 +58,15 @@ class ImportHeaderAliases
         return strtolower(trim(preg_replace('/\s+/', ' ', $header)));
     }
 
+    /**
+     * Normalized header names known to map to the given CRM field
+     * (e.g. "email" => ["email", "e mail", "mail"]).
+     */
+    public static function aliasesFor(string $field): array
+    {
+        return array_keys(array_filter(self::$aliases, fn ($target) => $target === $field));
+    }
+
     /** Return the CRM field a known header maps to, or null if unrecognised. */
     public static function resolve($header): ?string
     {

@@ -1,5 +1,42 @@
 <template>
     <item-list style="height: 100%; overflow: auto" padding="12px" gap="2px">
+        <template
+            v-if="prospectImport.source == 'google_sheets' && prospectImport.sync_enabled"
+        >
+            <item style="color: #075985 !important; background-color: #e0f2fe">
+                <icon class="fa fa-bolt" style="color: #075985" />
+                <div
+                    class="hc-item-main-content hc-flex-column"
+                    style="padding: 5px 0"
+                >
+                    <span
+                        v-text="$t('import.process.tab.import.sync.active')"
+                        style="color: #075985"
+                    ></span>
+                </div>
+            </item>
+            <item class="hc-import-webservice-step">
+                <icon class="fa fa-step-forward" />
+                <div
+                    class="hc-item-main-content"
+                    style="white-space: normal"
+                    v-html="$t('import.process.tab.import.sync.step_1')"
+                ></div>
+            </item>
+            <item class="hc-import-webservice-step" @click="copySyncScript">
+                <icon class="fa fa-copy" />
+                <div class="hc-item-main-content" style="white-space: normal">
+                    <span v-html="$t('import.process.tab.import.sync.step_2')"></span>
+                    <br />
+                    <b
+                        v-text="$t('import.process.tab.import.sync.copy_script')"
+                        style="cursor: pointer"
+                    ></b>
+                </div>
+                <loading :loading="loadingSyncScript" />
+            </item>
+        </template>
+
         <item
             v-if="!prospectImport.is_processing && (!prospectImport.roles || prospectImport.roles.length === 0) && (!prospectImport.users || prospectImport.users.length === 0)"
             style="color: #92400e !important; background-color: #fef3c7"
@@ -249,6 +286,7 @@ export default {
             deletingImportProspects: false,
             deletingProspects: false,
             settingProspectsTable: false,
+            loadingSyncScript: false,
         };
     },
 
@@ -571,6 +609,32 @@ export default {
             }
 
             return null;
+        },
+
+        // GOOGLE SHEETS INSTANT SYNC
+
+        /**
+         * Copy the Apps Script (webhook URL, secret and key columns
+         * already embedded) to the clipboard.
+         */
+        async copySyncScript() {
+            this.loadingSyncScript = true;
+
+            try {
+                const { data } = await ImportService.syncScript(
+                    this.project.slug,
+                    this.prospectImport.id
+                );
+                await navigator.clipboard.writeText(data.script);
+
+                flashInfo({
+                    title: "Import",
+                    body: this.$t("import.process.tab.import.sync.script_copied"),
+                    duration: 6000,
+                });
+            } finally {
+                this.loadingSyncScript = false;
+            }
         },
 
         // WEB SERVICE IMPORT
