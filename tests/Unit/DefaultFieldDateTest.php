@@ -20,7 +20,7 @@ class DefaultFieldDateTest extends TestCase
         $expected = now()
             ->parse('2026-09-24T12:17:55-05:00')
             ->setTimezone(config('app.timezone'))
-            ->format('Y-m-d H:i:s');
+            ->format('Y-m-d H:i:s.v');
 
         $this->assertSame($expected, $prospect['created_at']);
     }

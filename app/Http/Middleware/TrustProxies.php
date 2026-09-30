@@ -25,4 +25,24 @@ class TrustProxies extends Middleware
         Request::HEADER_X_FORWARDED_PORT |
         Request::HEADER_X_FORWARDED_PROTO |
         Request::HEADER_X_FORWARDED_AWS_ELB;
+
+    /**
+     * Optional TRUSTED_PROXIES env variable: "*" or a comma separated list of
+     * proxy IPs. Needed behind a tunnel / reverse proxy that terminates HTTPS
+     * (ngrok, load balancer), otherwise Laravel sees "http" and redirects to
+     * http:// URLs, which browsers block as mixed content.
+     * Unset = nobody is trusted (unchanged default).
+     */
+    protected function proxies()
+    {
+        $proxies = env('TRUSTED_PROXIES');
+
+        if ($proxies === '*') {
+            return '*';
+        }
+
+        return $proxies
+            ? array_map('trim', explode(',', $proxies))
+            : $this->proxies;
+    }
 }

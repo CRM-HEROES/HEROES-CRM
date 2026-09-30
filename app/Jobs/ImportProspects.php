@@ -86,6 +86,13 @@ class ImportProspects implements ShouldQueue
     protected $existingDuplicateFieldValues = [];
     protected $seenDuplicateFieldValues = [];
     protected $acceptedProspectIndexes = [];
+    protected $createdIdByIndex = [];
+    // Sync mode (rows pushed by the Google Sheets webhook): this import's own
+    // prospects count as "existing" (nothing is deleted and recreated) ...
+    protected $includeOwnImport = false;
+    // ... and existing prospects are looked up for the incoming rows only,
+    // instead of loading every prospect of the project for each batch.
+    protected $syncScope = null;
 
     /**
      * Create a new job instance.
@@ -504,6 +511,106 @@ class ImportProspects implements ShouldQueue
     }
 }
 
+    /**
+     * Google Sheets instant sync: create the prospects of rows pushed by the
+     * webhook. Never updates or deletes anything: a row matching an existing
+     * prospect (same "MAJ" fields, or same email / phone when none is chosen)
+     * is reported as skipped and that prospect stays untouched.
+     *
+     * The caller (SheetSyncProcessor) holds the project deduplication lock and
+     * wraps this call in a transaction.
+     *
+     * @param  array  $items  [['key' => string, 'headers' => array, 'values' => array], ...]
+     * @return array  key => ['status' => created|skipped, 'prospect_id' => ?int, 'reason' => ?string]
+     */
+    public function syncRows(array $items): array
+    {
+        $this->includeOwnImport = true;
+        $this->date = Carbon::now()->format('Y-m-d H:i:s');
+        $this->emptyProspect = $this->newProspect();
+        $this->mapping = $this->getImportMappingFields();
+        $this->duplicateFieldDescriptors = $this->getDuplicateFieldDescriptors();
+        $this->seenDuplicates = ['email' => [], 'phone' => [], 'mobile' => []];
+        $this->seenDuplicateFieldValues = [];
+
+        $results = [];
+        $candidates = [];
+        $columnMaps = [];
+
+        foreach (array_values($items) as $index => $item) {
+            $key = $item['key'];
+            $headers = array_values((array) $item['headers']);
+            $signature = md5(json_encode($headers));
+            $columnMaps[$signature] = $columnMaps[$signature] ?? $this->buildSheetColumnMap($headers);
+
+            $row = $this->remapRowToMasterColumns(array_values((array) $item['values']), $columnMaps[$signature]);
+            $prospect = $this->importRowToProspect($row, $index);
+            $this->normalizeProspectPhones($prospect);
+
+            if ($this->isSuspiciousProspect($prospect)) {
+                $results[$key] = ['status' => 'skipped', 'reason' => 'suspicious_row'];
+                continue;
+            }
+
+            if ($this->hasNoContactInfo($prospect)) {
+                $results[$key] = ['status' => 'skipped', 'reason' => 'no_contact_info'];
+                continue;
+            }
+
+            $candidates[$key] = $prospect;
+        }
+
+        if (empty($candidates)) {
+            return $results;
+        }
+
+        $this->syncScope = $this->buildSyncScope($candidates);
+
+        try {
+            $this->existingEmails = $this->getExistingEmails();
+            $this->existingPhones = $this->getExistingPhones();
+            $this->existingMobiles = $this->getExistingMobiles();
+            $this->existingDuplicateFieldValues = $this->getExistingDuplicateFieldValues();
+
+            $accepted = [];
+            $acceptedKeys = [];
+
+            foreach ($candidates as $key => $prospect) {
+                if ($this->isRepeatedWithinFile($prospect)) {
+                    $results[$key] = ['status' => 'skipped', 'reason' => 'duplicate_in_batch'];
+                    continue;
+                }
+
+                $duplicate = $this->findExistingDuplicate($prospect);
+                if ($duplicate) {
+                    $results[$key] = ['status' => 'skipped', 'reason' => 'already_exists', 'prospect_id' => $duplicate['id']];
+                    continue;
+                }
+
+                $accepted[] = $prospect;
+                $acceptedKeys[] = $key;
+            }
+
+            if ($accepted) {
+                $this->handleProspects($accepted);
+
+                foreach ($acceptedKeys as $position => $key) {
+                    $id = $this->createdIdByIndex[$position] ?? null;
+
+                    // Not inserted: createProspects() found it already
+                    // present once it held the lock.
+                    $results[$key] = $id
+                        ? ['status' => 'created', 'prospect_id' => $id]
+                        : ['status' => 'skipped', 'reason' => 'already_exists'];
+                }
+            }
+        } finally {
+            $this->syncScope = null;
+        }
+
+        return $results;
+    }
+
     public function failed(\Throwable $exception)
     {
         Log::error('ImportProspects: import failed', [
@@ -804,6 +911,136 @@ class ImportProspects implements ShouldQueue
     }
 
     /**
+     * A normal import deletes and recreates its own prospects, so they must not
+     * count as "existing". In sync mode nothing is deleted: they do count.
+     */
+    protected function applyOwnImportFilter($query)
+    {
+        if (!$this->includeOwnImport) {
+            $query->where(function ($q) {
+                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
+            });
+        }
+
+        return $query;
+    }
+
+    /**
+     * Sync mode only: restrict an existing-prospect lookup to the values of the
+     * incoming rows. These prefilters may over-select but never under-select:
+     * the exact comparison is still done by the same PHP normalisation as a
+     * normal import.
+     */
+    protected function narrowByEmail($query, string $column)
+    {
+        if ($this->syncScope === null) {
+            return $query;
+        }
+
+        $emails = $this->syncScope['emails'];
+
+        return $emails ? $query->whereIn($column, $emails) : $query->whereRaw('1 = 0');
+    }
+
+    protected function narrowByPhone($query, string $column)
+    {
+        if ($this->syncScope === null) {
+            return $query;
+        }
+
+        $suffixes = $this->syncScope['phones'];
+
+        return $suffixes
+            ? $query->whereIn(DB::raw("RIGHT(REGEXP_REPLACE(`{$column}`, '[^0-9]', ''), 9)"), $suffixes)
+            : $query->whereRaw('1 = 0');
+    }
+
+    protected function narrowByDuplicateFields($query, array $fields): void
+    {
+        if ($this->syncScope === null) {
+            return;
+        }
+
+        $query->where(function ($q) use ($fields) {
+            $any = false;
+
+            foreach ($fields as $field) {
+                $slug = $field['slug'];
+                $values = $this->syncScope['fields'][$slug] ?? [];
+
+                if (!$values || !preg_match('/^[a-zA-Z0-9_]+$/', $slug)) {
+                    continue;
+                }
+
+                $any = true;
+                $expression = $field['meta']
+                    ? "TRIM(JSON_UNQUOTE(JSON_EXTRACT(meta, '$.{$slug}')))"
+                    : "TRIM(`{$slug}`)";
+
+                if ($this->isPhoneSlug($slug)) {
+                    $expression = "RIGHT(REGEXP_REPLACE({$expression}, '[^0-9]', ''), 9)";
+                }
+
+                $q->orWhereIn(DB::raw($expression), $values);
+            }
+
+            if (!$any) {
+                $q->whereRaw('1 = 0');
+            }
+        });
+    }
+
+    protected function isPhoneSlug(string $slug): bool
+    {
+        $slug = strtolower($slug);
+
+        return str_contains($slug, 'phone') || str_contains($slug, 'mobile');
+    }
+
+    protected function phoneSuffix($normalizedPhone): string
+    {
+        return substr(preg_replace('/\D+/', '', (string) $normalizedPhone), -9);
+    }
+
+    /**
+     * Values to look up in the database for a batch of incoming prospects.
+     */
+    protected function buildSyncScope(array $prospects): array
+    {
+        $scope = ['emails' => [], 'phones' => [], 'fields' => []];
+
+        foreach ($prospects as $prospect) {
+            if (!empty($prospect['email'])) {
+                $scope['emails'][strtolower(trim($prospect['email']))] = true;
+            }
+
+            foreach (['phone_number', 'mobile_phone_number'] as $field) {
+                if (!empty($prospect[$field])) {
+                    $suffix = $this->phoneSuffix($this->normalizePhone($prospect[$field]));
+                    if ($suffix !== '') {
+                        $scope['phones'][$suffix] = true;
+                    }
+                }
+            }
+
+            foreach ($this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors) as $slug => $value) {
+                $value = $this->isPhoneSlug($slug) ? $this->phoneSuffix($value) : $value;
+                if ($value !== '') {
+                    $scope['fields'][$slug][$value] = true;
+                }
+            }
+        }
+
+        $scope['emails'] = array_keys($scope['emails']);
+        $scope['phones'] = array_keys($scope['phones']);
+        foreach ($scope['fields'] as $slug => $values) {
+            $scope['fields'][$slug] = array_keys($values);
+        }
+
+        return $scope;
+    }
+
+    /**
      * Précharge les emails des prospects déjà présents en base
      * (même projet) afin de ne pas ré-importer une personne existante.
      */
@@ -813,14 +1050,11 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            // Exclude this import's own prospects: they are deleted and
-            // recreated by removePreviousImportProspects().
-            ->where(function ($q) {
-                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-            })
+            ->tap(fn ($q) => $this->applyOwnImportFilter($q))
             ->whereNull('deleted_at')
             ->whereNotNull('email')
             ->where('email', '<>', '')
+            ->tap(fn ($q) => $this->narrowByEmail($q, 'email'))
             ->select('id', 'email', 'import_id')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$emails) {
@@ -842,12 +1076,11 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            ->where(function ($q) {
-                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-            })
+            ->tap(fn ($q) => $this->applyOwnImportFilter($q))
             ->whereNull('deleted_at')
             ->whereNotNull('phone_number')
             ->where('phone_number', '<>', '')
+            ->tap(fn ($q) => $this->narrowByPhone($q, 'phone_number'))
             ->select('id', 'phone_number', 'import_id')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$phones) {
@@ -872,12 +1105,11 @@ class ImportProspects implements ShouldQueue
 
         DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            ->where(function ($q) {
-                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-            })
+            ->tap(fn ($q) => $this->applyOwnImportFilter($q))
             ->whereNull('deleted_at')
             ->whereNotNull('mobile_phone_number')
             ->where('mobile_phone_number', '<>', '')
+            ->tap(fn ($q) => $this->narrowByPhone($q, 'mobile_phone_number'))
             ->select('id', 'mobile_phone_number', 'import_id')
             ->orderBy('id')
             ->chunk(5000, function ($rows) use (&$mobiles) {
@@ -1029,11 +1261,11 @@ class ImportProspects implements ShouldQueue
 
         $query = DB::table('prospects')
             ->where('project_id', $this->import->project_id)
-            ->where(function ($q) {
-                $q->whereNull('import_id')->orWhere('import_id', '<>', $this->import->id);
-            })
+            ->tap(fn ($q) => $this->applyOwnImportFilter($q))
             ->whereNull('deleted_at')
             ->select(['id', 'import_id', 'meta']);
+
+        $this->narrowByDuplicateFields($query, $fields);
 
         foreach ($fields as $field) {
             if (!$field['meta']) {
@@ -1741,10 +1973,15 @@ class ImportProspects implements ShouldQueue
         }, $prospects);
 
         // Create prospects
+        $this->createdIdByIndex = [];
         $prospectsIds = $this->createProspects($prospects);
 
         if (empty($prospectsIds)) {
             return;
+        }
+
+        if (count($prospectsIds) === count($this->acceptedProspectIndexes)) {
+            $this->createdIdByIndex = array_combine($this->acceptedProspectIndexes, $prospectsIds);
         }
 
         if (count($this->acceptedProspectIndexes) !== count($prospects)) {

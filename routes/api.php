@@ -206,6 +206,10 @@ Route::get('permission', [PermissionController::class, 'index'])->name("permissi
 
 // Webservice
 Route::get('/webservice/{import}/prospect', [WebserviceController::class, 'prospect']);
+// Google Sheets instant sync: rows pushed by the Apps Script (signed body, idempotent)
+Route::post('/webservice/{import}/sheet-sync', [\App\Http\Controllers\API\SheetSyncController::class, 'store'])
+    ->withoutMiddleware('throttle:api')
+    ->middleware('throttle:1200,1');
 
 Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->name("project.logo");
 
@@ -388,6 +392,7 @@ Route::group([
         // Import
         Route::apiResource('import', ProjectImportController::class);
         Route::get('/import/{import}/download', [ProjectImportController::class, 'download'])->name("import.download");
+        Route::get('/import/{import}/sync-script', [ProjectImportController::class, 'syncScript']);
         Route::get('/import/{import}/duplicate/find', [ProjectImportDuplicateController::class, 'find']);
         Route::get('/import/{import}/duplicate/show', [ProjectImportDuplicateController::class, 'show']);
         Route::delete('/import/{import}/duplicate', [ProjectImportDuplicateController::class, 'destroy']);

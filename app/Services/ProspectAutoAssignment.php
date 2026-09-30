@@ -31,9 +31,18 @@ class ProspectAutoAssignment
      */
     protected bool $enforceAvailabilityFilter = false;
 
-    public function assignUnassignedProspects(?Project $project = null, ?int $importId = null): int
+    /**
+     * @param  int[]|null  $prospectIds  When given, only these prospects are considered
+     *                                   (used by the instant Google Sheets sync so that it
+     *                                   never touches prospects it did not just create).
+     */
+    public function assignUnassignedProspects(?Project $project = null, ?int $importId = null, ?array $prospectIds = null): int
     {
         $query = Prospect::doesntHave('users');
+
+        if ($prospectIds !== null) {
+            $query->whereIn('id', $prospectIds);
+        }
 
         if ($project) {
             $query->where('project_id', $project->id);

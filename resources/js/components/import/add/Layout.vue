@@ -49,6 +49,17 @@
                     v-model="prospectImport.source_url"
             /></v-field>
 
+            <v-field
+                v-if="prospectImport.source == 'google_sheets'"
+                :label="$t('import.add.google_sheets.sync_enabled')"
+            >
+                <input
+                    type="checkbox"
+                    style="width: auto; min-height: 0"
+                    v-model="prospectImport.sync_enabled"
+                />
+            </v-field>
+
             <v-field :label="$t('import.add.name')" required v-slot="{ label }"
                 ><input
                     required
@@ -122,6 +133,7 @@ export default {
                 source: "file",
                 file: null,
                 source_url: "",
+                sync_enabled: false,
                 field_delimiter: ",",
                 field_enclosure: "",
             };
