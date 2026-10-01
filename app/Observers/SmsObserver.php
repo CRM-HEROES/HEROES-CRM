@@ -42,6 +42,10 @@ class SmsObserver
             case 'mtarget':
                 $this->sendByMTarget($sms);
                 break;
+
+            case 'brevo':
+                $this->sendByBrevo($sms);
+                break;
     
             case 'ringover':
             case 'whatsapp':
@@ -95,6 +99,20 @@ class SmsObserver
         }
 
         $sms->prospect->notify(new \App\Notifications\MTarget($sms));
+    }
+
+    /**
+     * Send Brevo sms
+     */
+    protected function sendByBrevo(Sms $sms): void
+    {
+        if (!ProjectSetting::check($sms->prospect->project, "brevo")) {
+            $sms->update(['error' => "Brevo: " . trans('sms.brevo.error.empty_setting')]);
+            \ProjectLog::error($sms->prospect->project, "Brevo: " . trans('sms.brevo.error.empty_setting'));
+            return;
+        }
+
+        $sms->prospect->notify(new \App\Notifications\Brevo($sms));
     }
     
     /**

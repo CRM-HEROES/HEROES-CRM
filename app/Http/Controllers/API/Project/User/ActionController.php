@@ -754,6 +754,9 @@ class ActionController extends Controller
             case 'mtarget':
                 $source = "MTarget";
                 break;
+            case 'brevo':
+                $source = "Brevo";
+                break;
             case 'ringover':
                 $source = "Ringover";
                 break;

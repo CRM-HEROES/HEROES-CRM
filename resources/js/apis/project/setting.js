@@ -9,6 +9,9 @@ export default {
             value: params,
         });
     },
+    test(project, setting) {
+        return ApiService.post(`project/${project}/setting/${setting}/test`);
+    },
     destroy(project, setting) {
         return ApiService.delete(`project/${project}/setting/${setting}`);
     },

@@ -410,6 +410,7 @@
             "via_mtarget": "通过 MTarget 发送短信",
             "via_ringover": "通过振铃发送短信",
             "via_ultramsg": "通过 UltraMsg 发送短信",
+            "via_brevo": "通过 Brevo 发送短信",
             "via_source": "通过{source}发送短信",
             "templates": "短信模板",
             "enter_text_message": "输入短信"
@@ -456,6 +457,35 @@
             "success": {
                 "title": "名片扫描件",
                 "message": "您导入的文件很快就会被扫描<br>并且相应的潜在客户将被导入到您的项目中。"
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "未知的短信来源：{source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "该项目尚未配置 SMSBOX 设置。"
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "该项目尚未配置 Ultramsg 设置。"
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "该项目尚未配置 MTarget 设置。"
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "无效的短信类型。",
+                "empty_setting": "该项目尚未配置 Brevo 设置。",
+                "empty_message": "短信内容为空。",
+                "empty_number": "收件人号码为空。",
+                "other": "Brevo 错误"
             }
         }
     },

@@ -442,6 +442,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {fonte}",
             "templates": "Modelos de SMS",
             "enter_text_message": "Digite uma mensagem de texto"
@@ -488,6 +489,35 @@
             "success": {
                 "title": "Digitalização de cartão de visita",
                 "message": "Seus arquivos importados serão verificados em breve<br>e os clientes potenciais correspondentes serão importados para o seu projeto."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "Fonte de SMS desconhecida: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "as configurações do SMSBOX não estão definidas para este projeto."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "as configurações do Ultramsg não estão definidas para este projeto."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "as configurações do MTarget não estão definidas para este projeto."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "tipo de SMS inválido.",
+                "empty_setting": "as configurações do Brevo não estão definidas para este projeto.",
+                "empty_message": "a mensagem do SMS está vazia.",
+                "empty_number": "o número do destinatário está vazio.",
+                "other": "erro do Brevo"
             }
         }
     },
