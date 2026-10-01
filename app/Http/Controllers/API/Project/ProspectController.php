@@ -506,11 +506,17 @@ class ProspectController extends Controller
         $count = min($request->input('count', 50), 500);
 
         // Sort By
+        // Default: most recently added to the CRM first (import, instant sync,
+        // manual creation). The id only ever grows, so a lead that is edited
+        // never changes place and a freshly imported / synchronized lead is
+        // always on top, whatever its own "created at" date is (a Meta lead
+        // imported today keeps the date it was created on Meta).
         $sortBy = $request->input('sortBy', "id");
 
         if ($sortBy == "null") {
             $sortBy = null;
         } else if (
+            $sortBy != 'id' &&
             $sortBy != 'events_started_at' &&
             $sortBy != 'interactions_created_at' &&
             $sortBy != 'sms_created_at' &&
@@ -773,7 +779,7 @@ class ProspectController extends Controller
             ->filter($filters)
 
             ->when($sortBy && $sortOrder, function($query) use($sortBy, $sortOrder) {
-                $query->orderBy($sortBy, $sortOrder);
+                $query->orderBy($sortBy === 'id' ? 'prospects.id' : $sortBy, $sortOrder);
             })
             ->skip(($request->input('page', 1) - 1) * $count)
             ->paginate($count);
