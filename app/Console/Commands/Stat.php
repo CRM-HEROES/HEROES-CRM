@@ -276,7 +276,7 @@ class Stat extends Command
         $stats[] = new ProjectNewInteractionsDurationsStat($project, null, null);
         $stats[] = new ProjectTotalInteractionsStat($project, null, null);
         $stats[] = new ProjectTotalInteractionsDurationsStat($project, null, null);
-        foreach (['aircall', 'ringover', 'telephone'] as $source) {
+        foreach (['aircall', 'ringover', 'cloudtalk', 'telephone'] as $source) {
             $stats[] = new ProjectNewInteractionsStat($project, $source, null);
             $stats[] = new ProjectNewInteractionsDurationsStat($project, $source, null);
             $stats[] = new ProjectTotalInteractionsStat($project, $source, null);

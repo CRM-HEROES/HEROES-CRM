@@ -444,6 +444,10 @@ class StatController extends Controller
                 'name' => "MTarget",
                 'color' => "rgb(0, 180, 160)"
             ],
+            'brevo' => [
+                'name' => "Brevo",
+                'color' => "rgb(11, 153, 108)"
+            ],
             'telephone' => [
                 'name' => "Téléphone",
                 'color' => "rgb(255, 79, 55)"
@@ -476,6 +480,10 @@ class StatController extends Controller
             'aircall' => [
                 'name' => "Aircall",
                 'color' => "rgb(255, 99, 132)"
+            ],
+            'cloudtalk' => [
+                'name' => "CloudTalk",
+                'color' => "rgb(31, 111, 235)"
             ],
             'ringover' => [
                 'name' => "Ringover",

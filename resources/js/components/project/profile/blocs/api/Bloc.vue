@@ -8,6 +8,18 @@
                     <div class="hc-item-main-content">Mail</div>
                 </item>
 
+                <!-- Brevo -->
+                <item @click="configureBrevo">
+                    <icon>
+                        <img
+                            src="/images/partenaire-ext/sendinblue.png"
+                            alt="Brevo"
+                            style="width: 25px; height: 25px; object-fit: contain"
+                        />
+                    </icon>
+                    <div class="hc-item-main-content">SMS via Brevo</div>
+                </item>
+
                 <!-- SMSBOX -->
                 <item @click="configureSmsbox">
                     <icon>
@@ -94,6 +106,10 @@ export default {
          */
         configureEmail() {
             store.commit(OPEN_MODAL, "setting-email");
+        },
+
+        configureBrevo() {
+            store.commit(OPEN_MODAL, "setting-brevo");
         },
 
         configureSmsbox() {

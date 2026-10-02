@@ -445,6 +445,7 @@
             "call_by_phone": "Appeler via Téléphone",
             "call_by_aircall": "Appeler via Aircall",
             "call_by_ringover": "Appeler via Ringover",
+            "call_by_cloudtalk": "Appeler via CloudTalk",
             "history": "Historique"
         },
         "message": {
@@ -511,6 +512,7 @@
             "via_mtarget": "SMS via MTarget",
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
+            "via_brevo": "SMS via Brevo",
             "via_source": "SMS via {source}",
             "templates": "Templates SMS",
             "enter_text_message": "Saisir un SMS"
@@ -557,6 +559,36 @@
             "success": {
                 "title": "Scan de carte de visite",
                 "message": "Vos fichiers importés seront prochainement scannés<br>et les prospects correspondant seront importés dans votre projet."
+            }
+        }
+    },
+
+    "sms": {
+        "error": {
+            "unknown_source": "Source de SMS inconnue : {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "la configuration SMSBOX n'est pas renseignée pour ce projet."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "la configuration Ultramsg n'est pas renseignée pour ce projet."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "la configuration MTarget n'est pas renseignée pour ce projet."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "type de SMS invalide.",
+                "empty_setting": "la configuration Brevo n'est pas renseignée pour ce projet.",
+                "empty_message": "le message du SMS est vide.",
+                "empty_number": "le numéro du destinataire est vide.",
+                "other": "erreur Brevo"
             }
         }
     },
@@ -1893,6 +1925,7 @@
                 "folders": "Dossiers",
                 "groups": "Groupes",
                 "imports": "Imports",
+                "lines": "Lignes téléphoniques",
                 "menus": "Menus",
                 "order_actions": "Actions sur les devis",
                 "order_statuses": "Etats de devis",

@@ -71,6 +71,10 @@ export default {
                     key: "aircall",
                     name: "Aircall",
                 },
+                {
+                    key: "cloudtalk",
+                    name: "CloudTalk",
+                },
             ],
         };
     },

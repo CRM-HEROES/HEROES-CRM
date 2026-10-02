@@ -111,6 +111,7 @@
                         }"
                     />
                     <document-bloc />
+                    <line-bloc />
                 </div>
                 <div>
                     <category-bloc />
@@ -244,6 +245,7 @@ import FolderBloc from "./blocs/folder/Bloc.vue";
 import GroupBloc from "./blocs/group/Bloc.vue";
 import ImportBloc from "./blocs/import/Bloc.vue";
 import InfoBloc from "./blocs/info/Bloc.vue";
+import LineBloc from "./blocs/line/Bloc.vue";
 import MenuBloc from "./blocs/menu/Bloc.vue";
 import OrderActionBloc from "./blocs/order-action/Bloc.vue";
 import OrderStatusBloc from "./blocs/order-status/Bloc.vue";
@@ -264,6 +266,7 @@ export default {
         GroupBloc,
         ImportBloc,
         InfoBloc,
+        LineBloc,
         MenuBloc,
         OrderActionBloc,
         OrderStatusBloc,

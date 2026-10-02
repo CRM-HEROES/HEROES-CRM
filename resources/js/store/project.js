@@ -39,6 +39,7 @@ import fieldStore from "./project/field";
 import folderStore from "./project/folder";
 import groupStore from "./project/group";
 import importStore from "./project/import";
+import lineStore from "./project/line";
 import mapStore from "./project/map";
 import metricStore from "./project/stat/metric";
 import menuStore from "./project/menu";
@@ -213,6 +214,7 @@ export const actions = {
     ...folderStore.actions,
     ...groupStore.actions,
     ...importStore.actions,
+    ...lineStore.actions,
     ...menuStore.actions,
     ...metricStore.actions,
     ...messageTemplateStore.actions,
@@ -530,6 +532,7 @@ export const mutations = {
     ...eventStore.mutations,
     ...groupStore.mutations,
     ...importStore.mutations,
+    ...lineStore.mutations,
     ...mapStore.mutations,
     ...menuStore.mutations,
     ...metricStore.mutations,
@@ -731,6 +734,7 @@ const getters = {
     ...folderStore.getters,
     ...groupStore.getters,
     ...importStore.getters,
+    ...lineStore.getters,
     ...mapStore.getters,
     ...menuStore.getters,
     ...metricStore.getters,

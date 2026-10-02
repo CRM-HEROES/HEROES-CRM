@@ -710,6 +710,9 @@ class ActionController extends Controller
             case 'aircall':
                 $source = "Aircall";
                 break;
+            case 'cloudtalk':
+                $source = "CloudTalk";
+                break;
             case 'whatsapp':
                 $source = "Whatsapp";
                 break;
@@ -753,6 +756,9 @@ class ActionController extends Controller
                 break;
             case 'mtarget':
                 $source = "MTarget";
+                break;
+            case 'brevo':
+                $source = "Brevo";
                 break;
             case 'ringover':
                 $source = "Ringover";

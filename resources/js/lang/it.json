@@ -347,6 +347,7 @@
             "call_by_phone": "Chiama per telefono",
             "call_by_aircall": "Chiama tramite Aircall",
             "call_by_ringover": "Chiama tramite Ringover",
+            "call_by_cloudtalk": "Chiama tramite CloudTalk",
             "history": "Storia"
         },
         "message": {
@@ -410,6 +411,7 @@
             "via_mtarget": "SMS tramite MTarget",
             "via_ringover": "SMS tramite Ringover",
             "via_ultramsg": "SMS tramite UltraMsg",
+            "via_brevo": "SMS tramite Brevo",
             "via_source": "SMS tramite {fonte}",
             "templates": "Modelli SMS",
             "enter_text_message": "Inserisci un messaggio di testo"
@@ -456,6 +458,35 @@
             "success": {
                 "title": "Scansione di biglietti da visita",
                 "message": "I tuoi file importati verranno presto scansionati<br>e i potenziali clienti corrispondenti verranno importati nel tuo progetto."
+            }
+        }
+    },
+    "sms": {
+        "error": {
+            "unknown_source": "Fonte SMS sconosciuta: {source}"
+        },
+        "smsbox": {
+            "error": {
+                "empty_setting": "le impostazioni SMSBOX non sono configurate per questo progetto."
+            }
+        },
+        "ultramsg": {
+            "error": {
+                "empty_setting": "le impostazioni Ultramsg non sono configurate per questo progetto."
+            }
+        },
+        "mtarget": {
+            "error": {
+                "empty_setting": "le impostazioni MTarget non sono configurate per questo progetto."
+            }
+        },
+        "brevo": {
+            "error": {
+                "invalid_type": "tipo di SMS non valido.",
+                "empty_setting": "le impostazioni Brevo non sono configurate per questo progetto.",
+                "empty_message": "il messaggio SMS è vuoto.",
+                "empty_number": "il numero del destinatario è vuoto.",
+                "other": "errore Brevo"
             }
         }
     },
