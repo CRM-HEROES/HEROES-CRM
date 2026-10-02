@@ -347,6 +347,7 @@
             "call_by_phone": "通过电话拨打",
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
+            "call_by_cloudtalk": "通过 CloudTalk 呼叫",
             "history": "历史"
         },
         "message": {

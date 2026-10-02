@@ -445,6 +445,7 @@
             "call_by_phone": "Appeler via Téléphone",
             "call_by_aircall": "Appeler via Aircall",
             "call_by_ringover": "Appeler via Ringover",
+            "call_by_cloudtalk": "Appeler via CloudTalk",
             "history": "Historique"
         },
         "message": {
@@ -1924,6 +1925,7 @@
                 "folders": "Dossiers",
                 "groups": "Groupes",
                 "imports": "Imports",
+                "lines": "Lignes téléphoniques",
                 "menus": "Menus",
                 "order_actions": "Actions sur les devis",
                 "order_statuses": "Etats de devis",

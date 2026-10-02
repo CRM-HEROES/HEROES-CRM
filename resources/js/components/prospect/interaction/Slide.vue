@@ -160,6 +160,41 @@
                                 </div>
                                 <icon class="fa fa-caret-right" />
                             </item>
+
+                            <!-- CloudTalk -->
+                            <item
+                                class="hc-prospect-interaction-item"
+                                @click="interactionViaCloudtalk(number)"
+                            >
+                                <icon>
+                                    <svg viewBox="0 0 40 40">
+                                        <path
+                                            fill="#1f6feb"
+                                            d="M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
+                                        ></path>
+                                        <path
+                                            fill="#ffffff"
+                                            d="M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
+                                        ></path>
+                                    </svg>
+                                </icon>
+                                <div
+                                    class="hc-item-main-content hc-flex-column"
+                                >
+                                    <span
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_cloudtalk'
+                                            )
+                                        "
+                                    ></span>
+                                    <span
+                                        class="hc-prospect-interaction-item-number"
+                                        v-text="number"
+                                    ></span>
+                                </div>
+                                <icon class="fa fa-caret-right" />
+                            </item>
                         </template>
 
                         <!-- Add history -->
@@ -201,7 +236,7 @@
 
             <!-- List of interaction -->
             <template #2>
-                <frame-layout :count="5" :tab="frameTab" class="hc-flex-1">
+                <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
                     <template #1 v-if="interactionProspect">
                         <tab-layout
                             :count="2"
@@ -481,6 +516,61 @@
                             <loading :loading="updatingMobilePhoneNumber" />
                         </form>
                     </template>
+
+                    <template #6 v-if="interactionProspect">
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item @click="tab = 0" class="bordered">
+                                <icon class="fa fa-caret-left" />
+                                <div
+                                    class="hc-item-main-content"
+                                    v-text="
+                                        $t(
+                                            'prospect.interaction.call_by_cloudtalk'
+                                        )
+                                    "
+                                ></div>
+                            </item>
+                            <div
+                                style="
+                                    flex: 1;
+                                    width: 100%;
+                                    height: 100%;
+                                    overflow: auto;
+                                "
+                            >
+                                <cloudtalk
+                                    id="cloudtalk-phone"
+                                    :number="interaction.number"
+                                    style="width: 100%; height: 100%"
+                                    @outgoing-call="
+                                        (callInfos) => {
+                                            interaction.status =
+                                                'initiated';
+                                            interaction.data = {
+                                                id: callInfos.call_uuid,
+                                            };
+                                            updateInteraction();
+                                        }
+                                    "
+                                    @call-ended="
+                                        (callInfos) => {
+                                            interaction.status = 'ended';
+                                            interaction.data = {
+                                                id: callInfos.call_uuid,
+                                            };
+                                            updateInteraction();
+                                            nextInteraction();
+                                        }
+                                    "
+                                    @answered-call="
+                                        (interaction.status =
+                                            'answered'),
+                                            updateInteraction()
+                                    "
+                                />
+                            </div>
+                        </div>
+                    </template>
                 </frame-layout>
             </template>
         </tab-layout>
@@ -517,6 +607,7 @@ import {
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
 import Aircall from "@/components/utils/Aircall.vue";
+import Cloudtalk from "@/components/utils/Cloudtalk.vue";
 import InteractionRow from "./InteractionRow.vue";
 import SelectProspect from "../select/Select.vue";
 
@@ -524,6 +615,7 @@ export default {
     components: {
         Ringover,
         Aircall,
+        Cloudtalk,
         InteractionRow,
         SelectProspect,
     },
@@ -616,6 +708,15 @@ export default {
             this.frameTab = 1;
             this.interaction = this.newInteraction();
             this.interaction.source = "ringover";
+            this.interaction.number = number;
+            this.addInteraction();
+        },
+
+        interactionViaCloudtalk(number) {
+            this.tab = 1;
+            this.frameTab = 5;
+            this.interaction = this.newInteraction();
+            this.interaction.source = "cloudtalk";
             this.interaction.number = number;
             this.addInteraction();
         },

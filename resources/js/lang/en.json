@@ -445,6 +445,7 @@
             "call_by_phone": "Call by phone",
             "call_by_aircall": "Call by Aircall",
             "call_by_ringover": "Call by Ringover",
+            "call_by_cloudtalk": "Call by CloudTalk",
             "history": "History"
         },
         "message": {
@@ -1919,6 +1920,7 @@
                 "folders": "Folders",
                 "groups": "Groups",
                 "imports": "Imports",
+                "lines": "Phone lines",
                 "menus": "Menus",
                 "order_actions": "Order actions",
                 "order_statuses": "Order statuses",

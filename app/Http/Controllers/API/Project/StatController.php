@@ -481,6 +481,10 @@ class StatController extends Controller
                 'name' => "Aircall",
                 'color' => "rgb(255, 99, 132)"
             ],
+            'cloudtalk' => [
+                'name' => "CloudTalk",
+                'color' => "rgb(31, 111, 235)"
+            ],
             'ringover' => [
                 'name' => "Ringover",
                 'color' => "rgb(0, 201, 76)"

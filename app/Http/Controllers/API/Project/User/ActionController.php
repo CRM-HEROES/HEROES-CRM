@@ -710,6 +710,9 @@ class ActionController extends Controller
             case 'aircall':
                 $source = "Aircall";
                 break;
+            case 'cloudtalk':
+                $source = "CloudTalk";
+                break;
             case 'whatsapp':
                 $source = "Whatsapp";
                 break;
