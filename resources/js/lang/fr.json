@@ -2421,5 +2421,21 @@
         "add": {
             "title": "Nouveau pipeline"
         }
+    },
+
+    "line": {
+        "operator": {
+            "choose": "Choisir un opérateur"
+        },
+        "configuration": {
+            "title": "Configuration de la ligne"
+        },
+        "assign_to": {
+            "title": "Assigner à {user}",
+            "pick_title": "Choisir un agent"
+        },
+        "add": {
+            "title": "Ajouter une ligne"
+        }
     }
 }

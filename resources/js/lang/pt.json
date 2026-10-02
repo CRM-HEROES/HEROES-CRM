@@ -2195,5 +2195,20 @@
         "dashboard": {
             "between_dates": "Entre {início} e {fim}"
         }
+    },
+    "line": {
+        "operator": {
+            "choose": "Escolher um operador"
+        },
+        "configuration": {
+            "title": "Configuração da linha"
+        },
+        "assign_to": {
+            "title": "Atribuir a {user}",
+            "pick_title": "Escolher um agente"
+        },
+        "add": {
+            "title": "Adicionar uma linha"
+        }
     }
 }

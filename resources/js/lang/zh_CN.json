@@ -1842,5 +1842,20 @@
         "remove_duplicating": "删除旧的重复潜在客户",
         "remove_duplicates": "删除导入中的重复线索",
         "replace_duplicating": "用新潜在客户的数据覆盖旧潜在客户的修改数据"
+    },
+    "line": {
+        "operator": {
+            "choose": "选择操作员"
+        },
+        "configuration": {
+            "title": "线路配置"
+        },
+        "assign_to": {
+            "title": "分配给 {user}",
+            "pick_title": "选择代理"
+        },
+        "add": {
+            "title": "添加线路"
+        }
     }
 }
