@@ -102,7 +102,9 @@ class EventController extends Controller
             // Creator user
             $event->creator_id == auth()->id() || 
             // Associated users
-            $event->users()->where('id', auth()->id())->first(), 
+            $event->users()->where('id', auth()->id())->first() ||
+            // Users assigned to the event prospect
+            $this->isProspectUser($event),
             404
         );
 
@@ -111,6 +113,7 @@ class EventController extends Controller
         $event->load('creator:id,name');
         $event->load('doneBy:id,name');
         $event->load('prospect:id,first_name,last_name,mobile_phone_number,phone_number');
+        $event->load('prospect.users:id');
         $event->load('user:id,name');
         $event->load('users:id,name');
         $event->load('order');
@@ -149,7 +152,9 @@ class EventController extends Controller
             // Affected user
             $event->user_id == auth()->id() || 
             // Creator user
-            $event->creator_id == auth()->id(), 
+            $event->creator_id == auth()->id() ||
+            // Users assigned to the event prospect
+            $this->isProspectUser($event),
             404
         );
 
@@ -187,13 +192,26 @@ class EventController extends Controller
             // Affected user
             $event->user_id == auth()->id() || 
             // Creator user
-            $event->creator_id == auth()->id(), 
+            $event->creator_id == auth()->id() ||
+            // Users assigned to the event prospect
+            $this->isProspectUser($event),
             404
         );
 
         $event->delete();
 
         return ['message' => trans('common.success.deleted_resource')];
+    }
+
+    /**
+     * Is the authenticated user assigned to the event prospect
+     */
+    protected function isProspectUser(Event $event)
+    {
+        return $event->prospect_id &&
+            $event->prospect()->whereHas('users', function($query) {
+                $query->where('users.id', auth()->id());
+            })->exists();
     }
 
     /**

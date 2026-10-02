@@ -2246,6 +2246,22 @@ export default {
                 return true;
             }
 
+            // Users assigned to the event prospect
+            const prospectUsers =
+                (this.prospectEvent.prospect &&
+                    this.prospectEvent.prospect.users) ||
+                (this.prospect &&
+                this.prospect.id == this.prospectEvent.prospect_id
+                    ? this.prospect.users
+                    : null);
+
+            if (
+                prospectUsers &&
+                prospectUsers.some((u) => u.id == this.user.id)
+            ) {
+                return true;
+            }
+
             return false;
         },
 
