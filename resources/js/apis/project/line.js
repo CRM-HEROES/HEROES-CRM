@@ -16,6 +16,12 @@ export default {
     makeCloudtalkCall(project, params) {
         return ApiService.post(`project/${project}/line/cloudtalk/call`, params);
     },
+    lookupCloudtalkCall(project, params) {
+        return ApiService.post(
+            `project/${project}/line/cloudtalk/lookup`,
+            params
+        );
+    },
     verifyCloudtalk(project, params) {
         return ApiService.post(`project/${project}/line/cloudtalk/verify`, params);
     },

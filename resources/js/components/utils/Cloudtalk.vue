@@ -242,7 +242,10 @@ export default {
                 return;
             }
 
-            const properties = data.properties || {};
+            const properties = this.normalizeProperties(
+                data.properties || {},
+                data.event
+            );
 
             if (this.isCallActivity(data.event)) {
                 this.$emit("call-activity", {
@@ -277,6 +280,32 @@ export default {
             return ["ringing", "dialing", "calling", "hangup", "ended"].includes(
                 eventName
             );
+        },
+
+        normalizeProperties(properties, eventName) {
+            const direction =
+                properties.direction ||
+                (eventName == "dialing"
+                    ? "outbound"
+                    : eventName == "ringing"
+                    ? "inbound"
+                    : null);
+            const externalNumber =
+                properties.external_number ||
+                properties.customer_number ||
+                properties.contact_phone ||
+                properties.phone_number ||
+                properties.number ||
+                (direction == "outbound" ? properties.to : properties.from) ||
+                properties.from ||
+                properties.to ||
+                "";
+
+            return {
+                ...properties,
+                ...(direction ? { direction } : {}),
+                ...(externalNumber ? { external_number: externalNumber } : {}),
+            };
         },
     },
 

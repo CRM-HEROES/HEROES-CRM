@@ -6,3 +6,4 @@ export const SHOW_LINE = "showLine";
 export const UPDATE_LINE = "updateLine";
 export const REMOVE_LINE = "removeLine";
 export const MAKE_CLOUDTALK_CALL = "makeCloudtalkCall";
+export const LOOKUP_CLOUDTALK_CALL = "lookupCloudtalkCall";

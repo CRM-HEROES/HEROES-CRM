@@ -29863,7 +29863,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       cloudtalkWaitingForEvent: false,
       cloudtalkLoginRequired: false,
       cloudtalkPhoneVisible: false,
-      cloudtalkEventTimeout: null
+      cloudtalkEventTimeout: null,
+      cloudtalkLookup: {
+        number: null,
+        prospect: null,
+        threads: [],
+        messages: []
+      },
+      cloudtalkLookupLoading: false,
+      cloudtalkLookupRequest: 0
     };
   },
   created: function created() {
@@ -29967,8 +29975,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context2.next = 10;
               return _this3.addInteraction();
             case 10:
+              _this3.fetchCloudtalkCallContext({
+                external_number: number
+              });
               _this3.makeCloudtalkCall();
-            case 11:
+            case 12:
             case "end":
               return _context2.stop();
           }
@@ -30070,13 +30081,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var callId = callInfos.call_uuid || callInfos.call_id || callInfos.id;
       var currentCallId = this.interaction && this.interaction.data && (this.interaction.data.id || this.interaction.data.call_uuid || this.interaction.data.call_id);
       if (this.interaction && this.interaction.source == "cloudtalk" && (!callId || !currentCallId || currentCallId == callId)) {
+        this.fetchCloudtalkCallContext(callInfos);
         return;
       }
       this.interaction = this.newInteraction();
       this.interaction.source = "cloudtalk";
-      this.interaction.number = callInfos.external_number || callInfos.number || "";
+      this.interaction.number = this.cloudtalkCallNumber(callInfos);
       this.interaction.from_number = callInfos.internal_number || "";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
     },
     showCloudtalkLogin: function showCloudtalkLogin() {
       this.cloudtalkWaitingForEvent = false;
@@ -30118,24 +30131,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.showCloudtalkPhone();
       this.interaction.status = "ringing";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
     },
     cloudtalkCallOutgoing: function cloudtalkCallOutgoing(callInfos) {
       this.showCloudtalkPhone();
       this.interaction.status = "initiated";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
     },
     cloudtalkCallAnswered: function cloudtalkCallAnswered(callInfos) {
       this.showCloudtalkPhone();
       this.interaction.status = "answered";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
     },
     cloudtalkCallHangup: function cloudtalkCallHangup(callInfos) {
       this.showCloudtalkPhone();
       this.interaction.status = "hangup";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
       if (this.interactionProspect) {
         this.nextInteraction();
@@ -30145,75 +30162,235 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.showCloudtalkPhone();
       this.interaction.status = "ended";
       this.setCloudtalkCallData(callInfos);
+      this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
       if (this.interactionProspect) {
         this.nextInteraction();
       }
     },
+    cloudtalkCallContactInfo: function cloudtalkCallContactInfo(callInfos) {
+      this.fetchCloudtalkCallContext(callInfos);
+    },
     setCloudtalkCallData: function setCloudtalkCallData() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-      var callId = callInfos.call_uuid || callInfos.call_id || callInfos.id;
-      this.interaction.data = _objectSpread(_objectSpread({}, this.interaction.data || {}), callId ? {
+      var callId = this.cloudtalkCallId(callInfos);
+      var number = this.cloudtalkCallNumber(callInfos, true);
+      if (number) {
+        this.interaction.number = number;
+      }
+      this.interaction.data = _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, this.interaction.data || {}), callId ? {
         id: callId
+      } : {}), number ? {
+        external_number: number
+      } : {}), callInfos.direction ? {
+        direction: callInfos.direction
       } : {});
+    },
+    cloudtalkCallId: function cloudtalkCallId() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var useFallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      return callInfos.call_uuid || callInfos.call_id || callInfos.id || (useFallback && this.interaction && this.interaction.data && this.interaction.data.id ? this.interaction.data.id : "") || "";
+    },
+    cloudtalkCallNumber: function cloudtalkCallNumber() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var useFallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      return callInfos.external_number || callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || callInfos.from || callInfos.to || (useFallback && this.cloudtalkLookup.number ? this.cloudtalkLookup.number : "") || (useFallback && this.interaction.number ? this.interaction.number : "") || "";
+    },
+    fetchCloudtalkCallContext: function fetchCloudtalkCallContext() {
+      var _arguments = arguments,
+        _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var callInfos, number, numberKey, callId, previousLookup, sameResolvedCall, request, data;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              callInfos = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
+              number = _this7.cloudtalkCallNumber(callInfos, true);
+              numberKey = _this7.normalizePhone(number);
+              callId = _this7.cloudtalkCallId(callInfos, true);
+              previousLookup = _objectSpread({}, _this7.cloudtalkLookup || {});
+              sameResolvedCall = previousLookup.prospect && previousLookup.callId && callId && previousLookup.callId == callId;
+              if (!(!numberKey || numberKey.length < 6)) {
+                _context4.next = 8;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 8:
+              if (!(_this7.cloudtalkLookup.numberKey == numberKey && _this7.cloudtalkLookup.resolved)) {
+                _context4.next = 10;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 10:
+              request = ++_this7.cloudtalkLookupRequest;
+              _this7.cloudtalkLookupLoading = true;
+              _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, _this7.cloudtalkLookup), {}, {
+                number: number,
+                numberKey: numberKey,
+                callId: callId,
+                resolved: false
+              });
+              _context4.prev = 13;
+              _context4.next = 16;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_6__.LOOKUP_CLOUDTALK_CALL, {
+                number: number
+              });
+            case 16:
+              data = _context4.sent;
+              if (!(request != _this7.cloudtalkLookupRequest)) {
+                _context4.next = 19;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 19:
+              if (!(!data.prospect && sameResolvedCall)) {
+                _context4.next = 22;
+                break;
+              }
+              _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, previousLookup), {}, {
+                number: previousLookup.number || data.number || number,
+                numberKey: previousLookup.numberKey || numberKey,
+                callId: callId,
+                resolved: true
+              });
+              return _context4.abrupt("return");
+            case 22:
+              _this7.cloudtalkLookup = {
+                number: data.number || number,
+                numberKey: numberKey,
+                callId: callId,
+                prospect: data.prospect || null,
+                threads: data.threads || [],
+                messages: data.messages || [],
+                resolved: true
+              };
+              if (!data.prospect) {
+                _context4.next = 34;
+                break;
+              }
+              if (!_this7.interactionProspect || _this7.interactionProspect.id != data.prospect.id) {
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, data.prospect);
+              }
+              if (!(_this7.interaction && _this7.interaction.source == "cloudtalk" && !_this7.interaction.id)) {
+                _context4.next = 34;
+                break;
+              }
+              _context4.prev = 26;
+              _context4.next = 29;
+              return _this7.addInteraction();
+            case 29:
+              _context4.next = 34;
+              break;
+            case 31:
+              _context4.prev = 31;
+              _context4.t0 = _context4["catch"](26);
+              _this7.interaction.data = _objectSpread(_objectSpread({}, _this7.interaction.data || {}), {}, {
+                error: _context4.t0.message
+              });
+            case 34:
+              _context4.next = 39;
+              break;
+            case 36:
+              _context4.prev = 36;
+              _context4.t1 = _context4["catch"](13);
+              if (request == _this7.cloudtalkLookupRequest) {
+                _this7.cloudtalkLookup = {
+                  number: number,
+                  numberKey: numberKey,
+                  callId: callId,
+                  prospect: null,
+                  threads: [],
+                  messages: [],
+                  resolved: true
+                };
+              }
+            case 39:
+              _context4.prev = 39;
+              if (request == _this7.cloudtalkLookupRequest) {
+                _this7.cloudtalkLookupLoading = false;
+              }
+              return _context4.finish(39);
+            case 42:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[13, 36, 39, 42], [26, 31]]);
+      }))();
+    },
+    normalizePhone: function normalizePhone(number) {
+      return String(number || "").replace(/\D+/g, "");
+    },
+    cloudtalkMessagesForThread: function cloudtalkMessagesForThread(thread) {
+      return this.cloudtalkLookupMessages.filter(function (message) {
+        return message.thread_id == thread.id;
+      });
+    },
+    messagePreview: function messagePreview(body) {
+      return String(body || "").replace(/<br\s*\/?>/g, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    },
+    formatCloudtalkDate: function formatCloudtalkDate(value) {
+      if (!value) {
+        return "";
+      }
+      return new Date(value).toLocaleString();
     },
     /**
      *
      */
     addInteraction: function addInteraction() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              _this7.addingInteraction = true;
-              _context4.prev = 1;
-              _context4.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this7.interaction);
+              _this8.addingInteraction = true;
+              _context5.prev = 1;
+              _context5.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this8.interaction);
             case 4:
-              _this7.interaction = _context4.sent;
+              _this8.interaction = _context5.sent;
             case 5:
-              _context4.prev = 5;
-              _this7.addingInteraction = false;
-              return _context4.finish(5);
+              _context5.prev = 5;
+              _this8.addingInteraction = false;
+              return _context5.finish(5);
             case 8:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[1,, 5, 8]]);
+        }, _callee5, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              if (!(!_this8.interaction || !_this8.interactionProspect)) {
-                _context5.next = 2;
+              if (!(!_this9.interaction || !_this9.interactionProspect)) {
+                _context6.next = 2;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 2:
-              if (_this8.interaction.id) {
-                _context5.next = 7;
+              if (_this9.interaction.id) {
+                _context6.next = 7;
                 break;
               }
-              _context5.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this8.interaction);
+              _context6.next = 5;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this9.interaction);
             case 5:
-              _this8.interaction = _context5.sent;
-              return _context5.abrupt("return");
+              _this9.interaction = _context6.sent;
+              return _context6.abrupt("return");
             case 7:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this8.interaction);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this9.interaction);
             case 8:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     /**
@@ -30234,46 +30411,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              _this9.updatingPhoneNumber = true;
-              _context6.prev = 1;
-              _context6.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this9.interactionProspect.id,
-                phone_number: _this9.phoneNumber
-              });
-            case 4:
-              _context6.prev = 4;
-              _this9.updatingPhoneNumber = false;
-              _this9.tab = 0;
-              return _context6.finish(4);
-            case 8:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _this10.updatingMobilePhoneNumber = true;
+              _this10.updatingPhoneNumber = true;
               _context7.prev = 1;
               _context7.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
                 id: _this10.interactionProspect.id,
-                mobile_phone_number: _this10.mobilePhoneNumber
+                phone_number: _this10.phoneNumber
               });
             case 4:
               _context7.prev = 4;
-              _this10.updatingMobilePhoneNumber = false;
+              _this10.updatingPhoneNumber = false;
               _this10.tab = 0;
               return _context7.finish(4);
             case 8:
@@ -30283,45 +30435,70 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee7, null, [[1,, 4, 8]]);
       }))();
     },
-    fetchSelectedProspects: function fetchSelectedProspects() {
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
       var _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              if (!(_this11.prospectsSelected.length == 0)) {
-                _context8.next = 3;
+              _this11.updatingMobilePhoneNumber = true;
+              _context8.prev = 1;
+              _context8.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
+                id: _this11.interactionProspect.id,
+                mobile_phone_number: _this11.mobilePhoneNumber
+              });
+            case 4:
+              _context8.prev = 4;
+              _this11.updatingMobilePhoneNumber = false;
+              _this11.tab = 0;
+              return _context8.finish(4);
+            case 8:
+            case "end":
+              return _context8.stop();
+          }
+        }, _callee8, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
+            case 0:
+              if (!(_this12.prospectsSelected.length == 0)) {
+                _context9.next = 3;
                 break;
               }
-              _this11.selectedProspects = [];
-              return _context8.abrupt("return");
+              _this12.selectedProspects = [];
+              return _context9.abrupt("return");
             case 3:
-              _context8.prev = 3;
-              _context8.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this11.project.slug, {
+              _context9.prev = 3;
+              _context9.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this12.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this11.prospectsSelected
+                    ids: _this12.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context8.sent;
+              _yield$ProspectServic = _context9.sent;
               data = _yield$ProspectServic.data;
-              _this11.selectedProspects = data.data.filter(function (prospect) {
+              _this12.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context8.prev = 9;
-              _this11.fetchingProspect = false;
-              return _context8.finish(9);
+              _context9.prev = 9;
+              _this12.fetchingProspect = false;
+              return _context9.finish(9);
             case 12:
             case "end":
-              return _context8.stop();
+              return _context9.stop();
           }
-        }, _callee8, null, [[3,, 9, 12]]);
+        }, _callee9, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -30341,24 +30518,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this12 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-          while (1) switch (_context9.prev = _context9.next) {
+      var _this13 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) switch (_context10.prev = _context10.next) {
             case 0:
-              if (newValue && _this12.leftSlideOpen(_this12.name)) {
-                _this12.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this12.interaction.number)) {
-                  _this12.interaction.number = newValue.phone_number;
+              if (newValue && _this13.leftSlideOpen(_this13.name)) {
+                _this13.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this13.interaction.number)) {
+                  _this13.interaction.number = newValue.phone_number;
                 } else {
-                  _this12.interaction.number = newValue.mobile_phone_number;
+                  _this13.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context9.stop();
+              return _context10.stop();
           }
-        }, _callee9);
+        }, _callee10);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -30385,6 +30562,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
       return null;
     },
+    interactionTitleProspect: function interactionTitleProspect() {
+      return this.interactionProspect || this.cloudtalkCallProspect;
+    },
+    slideWidth: function slideWidth() {
+      if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallContextVisible) {
+        return "760px";
+      }
+      if (this.tab == 1 && this.frameTab == 0) {
+        return "395px";
+      }
+      return "300px";
+    },
     /**
      * Webhook URL
      * for web service import
@@ -30398,10 +30587,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     cloudtalkPhoneDisplayed: function cloudtalkPhoneDisplayed() {
       return (this.cloudtalkPhoneVisible || this.cloudtalkLoginRequired || this.cloudtalkLoading) && this.tab == 1 && this.frameTab == 5;
     },
+    cloudtalkCallContextVisible: function cloudtalkCallContextVisible() {
+      return this.cloudtalkLookupLoading || !!this.cloudtalkCallProspect;
+    },
+    cloudtalkCallProspect: function cloudtalkCallProspect() {
+      return this.cloudtalkLookup && this.cloudtalkLookup.prospect ? this.cloudtalkLookup.prospect : null;
+    },
+    cloudtalkProspectName: function cloudtalkProspectName() {
+      if (!this.cloudtalkCallProspect) {
+        return "";
+      }
+      var name = [this.cloudtalkCallProspect.first_name, this.cloudtalkCallProspect.last_name].filter(function (value) {
+        return value;
+      }).join(" ");
+      return name || this.cloudtalkCallProspect.company_name || this.cloudtalkCallProspect.email || this.cloudtalkLookup.number || "";
+    },
+    cloudtalkLookupThreads: function cloudtalkLookupThreads() {
+      return this.cloudtalkLookup && this.cloudtalkLookup.threads ? this.cloudtalkLookup.threads : [];
+    },
+    cloudtalkLookupMessages: function cloudtalkLookupMessages() {
+      return this.cloudtalkLookup && this.cloudtalkLookup.messages ? this.cloudtalkLookup.messages : [];
+    },
     cloudtalkLine: function cloudtalkLine() {
-      var _this13 = this;
+      var _this14 = this;
       return this.lines.find(function (line) {
-        return line.operator === "cloudtalk" && _this13.user && line.user_id == _this13.user.id;
+        return line.operator === "cloudtalk" && _this14.user && line.user_id == _this14.user.id;
       });
     }
   })
@@ -52459,6 +52669,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 /**
  * CloudTalk Phone (https://phone.cloudtalk.io)
  *
@@ -52532,7 +52748,7 @@ __webpack_require__.r(__webpack_exports__);
      * Handle events sent by the CloudTalk Phone iframe
      */
     handleMessage: function handleMessage(event) {
-      if (event.origin !== this.origin) {
+      if (!this.allowedOrigin.test(event.origin)) {
         return;
       }
       var data = event.data;
@@ -52546,7 +52762,7 @@ __webpack_require__.r(__webpack_exports__);
       if (!data || !data.event) {
         return;
       }
-      var properties = data.properties || {};
+      var properties = this.normalizeProperties(data.properties || {}, data.event);
       if (this.isCallActivity(data.event)) {
         this.$emit("call-activity", {
           event: data.event,
@@ -52576,6 +52792,15 @@ __webpack_require__.r(__webpack_exports__);
     },
     isCallActivity: function isCallActivity(eventName) {
       return ["ringing", "dialing", "calling", "hangup", "ended"].includes(eventName);
+    },
+    normalizeProperties: function normalizeProperties(properties, eventName) {
+      var direction = properties.direction || (eventName == "dialing" ? "outbound" : eventName == "ringing" ? "inbound" : null);
+      var externalNumber = properties.external_number || properties.customer_number || properties.contact_phone || properties.phone_number || properties.number || (direction == "outbound" ? properties.to : properties.from) || properties.from || properties.to || "";
+      return _objectSpread(_objectSpread(_objectSpread({}, properties), direction ? {
+        direction: direction
+      } : {}), externalNumber ? {
+        external_number: externalNumber
+      } : {});
     }
   },
   computed: {
@@ -78667,25 +78892,82 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "hc-prospect-interaction-root"
 };
-var _hoisted_2 = ["textContent"];
-var _hoisted_3 = ["textContent"];
+var _hoisted_2 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context"
+};
+var _hoisted_3 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-loading"
+};
 var _hoisted_4 = {
-  "class": "hc-item-main-content hc-flex-column"
+  "class": "hc-prospect-interaction-cloudtalk-context-header"
 };
 var _hoisted_5 = ["textContent"];
 var _hoisted_6 = ["textContent"];
-var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_7 = {
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_8 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = {
+  key: 1,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_11 = ["textContent"];
+var _hoisted_12 = {
+  key: 2,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_13 = ["textContent"];
+var _hoisted_14 = {
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-prospect-interaction-cloudtalk-context-heading"
+}, " Threads ", -1 /* HOISTED */);
+var _hoisted_16 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-empty"
+};
+var _hoisted_17 = {
+  "class": "hc-prospect-interaction-cloudtalk-thread-title"
+};
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = {
+  "class": "hc-prospect-interaction-cloudtalk-message-meta"
+};
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-message-users"
+};
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 40 40"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   fill: "#00B388",
   d: "M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
 })], -1 /* HOISTED */);
-var _hoisted_8 = {
+var _hoisted_32 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_9 = ["textContent"];
-var _hoisted_10 = ["textContent"];
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = ["textContent"];
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 40 40"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   d: "M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z",
@@ -78698,12 +78980,12 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
     "fill": "rgb(85, 195, 192)"
   }
 })], -1 /* HOISTED */);
-var _hoisted_12 = {
+var _hoisted_36 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = ["textContent"];
+var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 40 40"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   fill: "#1f6feb",
@@ -78712,21 +78994,21 @@ var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   fill: "#ffffff",
   d: "M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
 })], -1 /* HOISTED */);
-var _hoisted_16 = {
+var _hoisted_40 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_17 = ["textContent"];
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = {
+var _hoisted_41 = ["textContent"];
+var _hoisted_42 = ["textContent"];
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = ["textContent"];
+var _hoisted_45 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = {
+var _hoisted_46 = ["textContent"];
+var _hoisted_47 = {
   style: {
     "flex": "1",
     "width": "100%",
@@ -78735,34 +79017,34 @@ var _hoisted_23 = {
     "overflow": "auto"
   }
 };
-var _hoisted_24 = {
+var _hoisted_48 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_49 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Paramètre Aircall Webhook'
 }, null, -1 /* HOISTED */);
-var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Rendez-vous sur la page webhook d\'aircall'
 }, null, -1 /* HOISTED */);
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_51 = ["textContent"];
+var _hoisted_52 = ["textContent"];
+var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content",
   textContent: 'Enfin cliquer sur "Ajouter webhook"'
 }, null, -1 /* HOISTED */);
-var _hoisted_30 = {
+var _hoisted_54 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_31 = ["textContent"];
-var _hoisted_32 = {
+var _hoisted_55 = ["textContent"];
+var _hoisted_56 = {
   style: {
     "flex": "1",
     "width": "100%",
@@ -78770,18 +79052,18 @@ var _hoisted_32 = {
     "overflow": "auto"
   }
 };
-var _hoisted_33 = ["textContent"];
-var _hoisted_34 = ["textContent"];
-var _hoisted_35 = ["textContent"];
-var _hoisted_36 = ["textContent"];
-var _hoisted_37 = {
+var _hoisted_57 = ["textContent"];
+var _hoisted_58 = ["textContent"];
+var _hoisted_59 = ["textContent"];
+var _hoisted_60 = ["textContent"];
+var _hoisted_61 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_38 = ["textContent"];
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_62 = ["textContent"];
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   style: {
     "flex": "1",
     "width": "100%",
@@ -78792,9 +79074,10 @@ var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 }, null, -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_cloudtalk = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk");
-  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
-  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
   var _component_interaction_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-row");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
   var _component_aircall = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("aircall");
@@ -78811,28 +79094,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects();
     }),
     title: _ctx.$t('prospect.interaction.title', {
-      prospect: _ctx.interactionProspect ? _ctx.interactionProspect.last_name : ''
+      prospect: $options.interactionTitleProspect ? $options.interactionTitleProspect.last_name : ''
     }),
-    url: _ctx.interactionProspect ? {
+    url: $options.interactionTitleProspect ? {
       name: 'prospect.show',
       params: {
         project: _ctx.project.slug,
-        prospect: _ctx.interactionProspect.id
+        prospect: $options.interactionTitleProspect.id
       }
     } : null,
     left: true,
     eager: true,
     icon: "fa fa-phone",
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      width: $data.tab == 1 && $data.frameTab == 0 ? '395px' : $data.tab == 1 && $data.frameTab == 1 ? '300px' : '300px'
+      width: $options.slideWidth
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-interaction-cloudtalk-panel', {
+          visible: $options.cloudtalkPhoneDisplayed,
+          'with-context': $options.cloudtalkCallContextVisible
+        }])
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk, {
         id: "cloudtalk-phone",
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-interaction-cloudtalk-phone', {
-          visible: $options.cloudtalkPhoneDisplayed
-        }]),
+        "class": "hc-prospect-interaction-cloudtalk-phone",
         number: $data.interaction.number,
         calling: $data.callingCloudtalk,
         loading: $options.cloudtalkLoading,
@@ -78842,8 +79128,81 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onOutgoingCall: $options.cloudtalkCallOutgoing,
         onCallEnded: $options.cloudtalkCallEnded,
         onHangupCall: $options.cloudtalkCallHangup,
-        onAnsweredCall: $options.cloudtalkCallAnswered
-      }, null, 8 /* PROPS */, ["class", "number", "calling", "loading", "onMakeCall", "onCallActivity", "onRingingCall", "onOutgoingCall", "onCallEnded", "onHangupCall", "onAnsweredCall"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
+        onAnsweredCall: $options.cloudtalkCallAnswered,
+        onContactInfo: $options.cloudtalkCallContactInfo
+      }, null, 8 /* PROPS */, ["number", "calling", "loading", "onMakeCall", "onCallActivity", "onRingingCall", "onOutgoingCall", "onCallEnded", "onHangupCall", "onAnsweredCall", "onContactInfo"]), $options.cloudtalkCallContextVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("aside", _hoisted_2, [$data.cloudtalkLookupLoading && !$options.cloudtalkCallProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+        loading: $data.cloudtalkLookupLoading
+      }, null, 8 /* PROPS */, ["loading"])])) : $options.cloudtalkCallProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 1
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-prospect-interaction-cloudtalk-context-title",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkProspectName)
+      }, null, 8 /* PROPS */, _hoisted_5), $options.cloudtalkCallProspect.company_name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        key: 0,
+        "class": "hc-prospect-interaction-cloudtalk-context-subtitle",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.company_name)
+      }, null, 8 /* PROPS */, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+        "class": "hc-prospect-interaction-cloudtalk-context-link",
+        to: {
+          name: 'prospect.show',
+          params: {
+            project: _ctx.project.slug,
+            prospect: $options.cloudtalkCallProspect.id
+          }
+        }
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-external-link"
+          })];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["to"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$options.cloudtalkCallProspect.email ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-envelope"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.email)
+      }, null, 8 /* PROPS */, _hoisted_9)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.cloudtalkCallProspect.phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-phone"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.phone_number)
+      }, null, 8 /* PROPS */, _hoisted_11)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.cloudtalkCallProspect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-mobile"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.mobile_phone_number)
+      }, null, 8 /* PROPS */, _hoisted_13)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, $options.cloudtalkLookupThreads.length == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, " Aucun thread lie a votre utilisateur. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkLookupThreads, function (thread) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+          key: thread.id,
+          "class": "hc-prospect-interaction-cloudtalk-thread"
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          "class": "hc-prospect-interaction-cloudtalk-thread-color",
+          style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+            color: thread.color,
+            backgroundColor: thread.bgcolor
+          })
+        }, null, 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.name)
+        }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+          textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.user_messages_count + '/' + thread.messages_count)
+        }, null, 8 /* PROPS */, _hoisted_19)]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkMessagesForThread(thread), function (message) {
+          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+            key: message.id,
+            "class": "hc-prospect-interaction-cloudtalk-message"
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.creator ? message.creator.name : '')
+          }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCloudtalkDate(message.created_at))
+          }, null, 8 /* PROPS */, _hoisted_22)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-prospect-interaction-cloudtalk-message-body",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.messagePreview(message.body))
+          }, null, 8 /* PROPS */, _hoisted_23), message.users && message.users.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-user"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.users.map(function (user) {
+              return user.name;
+            }).join(', '))
+          }, null, 8 /* PROPS */, _hoisted_25)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+        }), 128 /* KEYED_FRAGMENT */))]);
+      }), 128 /* KEYED_FRAGMENT */))])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
         count: 2,
         tab: $data.tab,
         "class": "hc-flex-1"
@@ -78883,7 +79242,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_33)];
+                  }, null, 8 /* PROPS */, _hoisted_57)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -78914,7 +79273,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_34)];
+                  }, null, 8 /* PROPS */, _hoisted_58)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -78943,7 +79302,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_35)];
+                  }, null, 8 /* PROPS */, _hoisted_59)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -78974,7 +79333,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_36)];
+                  }, null, 8 /* PROPS */, _hoisted_60)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -78991,7 +79350,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "class": "hc-flex-1"
               }, {
                 "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                     onClick: _cache[4] || (_cache[4] = function ($event) {
                       return $data.tab = 0;
                     }),
@@ -79003,7 +79362,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
-                      }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-cog",
                         onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                           return $data.aircallTab = 1;
@@ -79011,7 +79370,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       })];
                     }),
                     _: 1 /* STABLE */
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
+                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
                     id: "aircall-phone",
                     number: $data.interaction.number,
                     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
@@ -79040,7 +79399,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, null, 8 /* PROPS */, ["number", "style"])])])];
                 }),
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                     onClick: _cache[8] || (_cache[8] = function ($event) {
                       return $data.aircallTab = 0;
                     }),
@@ -79049,7 +79408,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-caret-left"
-                      }), _hoisted_25];
+                      }), _hoisted_49];
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -79068,7 +79427,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-wifi"
-                          }), _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                          }), _hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-caret-right"
                           })];
                         }),
@@ -79083,7 +79442,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                             "class": "hc-item-main-content",
                             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Mettre ' + $options.aircallWebhookURL + ' comme URL')
-                          }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                          }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-copy"
                           })];
                         }),
@@ -79095,14 +79454,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                             "class": "hc-item-main-content",
                             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Cocher "call.ended" dans la section Appel')
-                          }, null, 8 /* PROPS */, _hoisted_28)];
+                          }, null, 8 /* PROPS */, _hoisted_52)];
                         }),
                         _: 1 /* STABLE */
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
                         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                             "class": "fa fa-check"
-                          }), _hoisted_29];
+                          }), _hoisted_53];
                         }),
                         _: 1 /* STABLE */
                       })];
@@ -79117,7 +79476,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined, _ctx.interactionProspect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[9] || (_cache[9] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -79129,13 +79488,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
-                  }, null, 8 /* PROPS */, _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_55), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-cog",
                     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.ringoverSetting, ["stop"])
                   }, null, 8 /* PROPS */, ["onClick"])];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
                 id: "ringover-phone",
                 number: $data.interaction.number,
                 tab: "phone",
@@ -79165,7 +79524,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined, _ctx.interactionProspect ? {
             name: "6",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: $options.backFromCloudtalk,
                 "class": "bordered"
               }, {
@@ -79175,10 +79534,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
-                  }, null, 8 /* PROPS */, _hoisted_38)];
+                  }, null, 8 /* PROPS */, _hoisted_62)];
                 }),
                 _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["onClick"]), _hoisted_39])];
+              }, 8 /* PROPS */, ["onClick"]), _hoisted_63])];
             }),
             key: "2"
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
@@ -79209,7 +79568,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
@@ -79226,7 +79585,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
@@ -79248,12 +79607,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                       "class": "fa fa-phone",
                       color: "#489f1f"
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_phone'))
-                    }, null, 8 /* PROPS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }, null, 8 /* PROPS */, _hoisted_29), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       "class": "hc-prospect-interaction-item-number",
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_6)])];
+                    }, null, 8 /* PROPS */, _hoisted_30)])];
                   }),
                   _: 2 /* DYNAMIC */
                 }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick", "href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Aircall "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
@@ -79265,15 +79624,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                     return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
                       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_7];
+                        return [_hoisted_31];
                       }),
                       _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
-                    }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       "class": "hc-prospect-interaction-item-number",
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_10)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    }, null, 8 /* PROPS */, _hoisted_34)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                       "class": "fa fa-caret-right"
                     })];
                   }),
@@ -79287,15 +79646,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                     return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
                       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_11];
+                        return [_hoisted_35];
                       }),
                       _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
-                    }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       "class": "hc-prospect-interaction-item-number",
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_14)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    }, null, 8 /* PROPS */, _hoisted_38)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                       "class": "fa fa-caret-right"
                     })];
                   }),
@@ -79309,15 +79668,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                     return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
                       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_15];
+                        return [_hoisted_39];
                       }),
                       _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
-                    }, null, 8 /* PROPS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                       "class": "hc-prospect-interaction-item-number",
                       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    }, null, 8 /* PROPS */, _hoisted_42)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                       "class": "fa fa-caret-right"
                     })];
                   }),
@@ -79336,7 +79695,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.add_history'))
-                  }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+                  }, null, 8 /* PROPS */, _hoisted_43), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
                     loading: $data.addingHistory
                   }, null, 8 /* PROPS */, ["loading"])];
                 }),
@@ -79357,7 +79716,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.history'))
-                  }, null, 8 /* PROPS */, _hoisted_20)];
+                  }, null, 8 /* PROPS */, _hoisted_44)];
                 }),
                 _: 1 /* STABLE */
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.prospectInteractions, function (c) {
@@ -106548,7 +106907,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    position: absolute;\n    top: 42px;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-phone.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-panel {\n    position: absolute;\n    top: 42px;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-panel.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    flex: 1;\n    min-width: 0;\n}\n.hc-prospect-interaction-cloudtalk-context {\n    display: flex;\n    flex: 0 0 320px;\n    flex-direction: column;\n    gap: 14px;\n    height: 100%;\n    overflow: auto;\n    padding: 14px;\n    border-left: 1px solid #e5e5e5;\n    background: #fafafa;\n}\n.hc-prospect-interaction-cloudtalk-context-loading {\n    position: relative;\n    min-height: 80px;\n}\n.hc-prospect-interaction-cloudtalk-context-header {\n    display: flex;\n    align-items: flex-start;\n    justify-content: space-between;\n    gap: 10px;\n}\n.hc-prospect-interaction-cloudtalk-context-title {\n    font-size: 16px;\n    font-weight: 700;\n    line-height: 1.2;\n    color: #222222;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-subtitle {\n    margin-top: 3px;\n    font-size: 12px;\n    color: #777777;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-link {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-prospect-interaction-cloudtalk-context-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-prospect-interaction-cloudtalk-context-heading {\n    font-size: 11px;\n    font-weight: 700;\n    color: #777777;\n    text-transform: uppercase;\n}\n.hc-prospect-interaction-cloudtalk-context-line {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 12px;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-context-line span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-context-empty {\n    font-size: 12px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-thread {\n    padding: 10px;\n    border: 1px solid #e7e7e7;\n    border-radius: 6px;\n    background: #ffffff;\n}\n.hc-prospect-interaction-cloudtalk-thread-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: #222222;\n}\n.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-thread-title small {\n    font-size: 11px;\n    font-weight: 600;\n    color: #777777;\n}\n.hc-prospect-interaction-cloudtalk-thread-color {\n    display: inline-block;\n    flex: 0 0 10px;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n}\n.hc-prospect-interaction-cloudtalk-message {\n    margin-top: 9px;\n    padding-top: 9px;\n    border-top: 1px solid #eeeeee;\n}\n.hc-prospect-interaction-cloudtalk-message-meta {\n    display: flex;\n    justify-content: space-between;\n    gap: 8px;\n    font-size: 10px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-message-body {\n    margin-top: 4px;\n    display: -webkit-box;\n    overflow: hidden;\n    color: #333333;\n    font-size: 12px;\n    line-height: 1.35;\n    -webkit-line-clamp: 3;\n    -webkit-box-orient: vertical;\n}\n.hc-prospect-interaction-cloudtalk-message-users {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: 5px;\n    font-size: 11px;\n    color: #777777;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

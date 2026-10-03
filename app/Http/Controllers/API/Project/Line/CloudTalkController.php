@@ -4,7 +4,9 @@ namespace App\Http\Controllers\API\Project\Line;
 
 use App\Http\Controllers\Controller;
 use App\Models\Line;
+use App\Models\Message;
 use App\Models\Project;
+use App\Models\Prospect;
 use App\Services\CloudTalk;
 use Illuminate\Http\Request;
 use RuntimeException;
@@ -83,6 +85,100 @@ class CloudTalkController extends Controller
         ];
     }
 
+    /**
+     * Resolve a CloudTalk call number to the current user's prospect context.
+     */
+    public function lookup(Request $request, Project $project)
+    {
+        $this->validate($request, [
+            'number' => 'required|string',
+        ]);
+
+        $number = $request->input('number');
+        $normalized = $this->normalizePhone($number);
+
+        if (strlen($normalized) < 6) {
+            return [
+                'number' => $number,
+                'prospect' => null,
+                'threads' => [],
+                'messages' => [],
+            ];
+        }
+
+        $prospect = $this->findProspectByPhone($project, $normalized);
+
+        if (!$prospect) {
+            return [
+                'number' => $number,
+                'prospect' => null,
+                'threads' => [],
+                'messages' => [],
+            ];
+        }
+
+        $threads = $project
+            ->threads()
+            ->select('id', 'name', 'color', 'bgcolor', 'order')
+            ->whereHas('messages', function($query) use($prospect) {
+                $query->where('prospect_id', $prospect->id);
+            })
+            ->withCount([
+                'messages as messages_count' => function($query) use($prospect) {
+                    $query->where('prospect_id', $prospect->id);
+                },
+                'messages as user_messages_count' => function($query) use($prospect) {
+                    $query
+                        ->where('prospect_id', $prospect->id)
+                        ->whereHas('users', function($query) {
+                            $query->where('id', auth()->id());
+                        });
+                },
+                'messages as waiting_messages_count' => function($query) use($prospect) {
+                    $query
+                        ->where('prospect_id', $prospect->id)
+                        ->whereHas('users', function($query) {
+                            $query
+                                ->where('id', auth()->id())
+                                ->whereNull('user_message.archived_at');
+                        });
+                },
+            ])
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get();
+
+        $messages = Message::where('prospect_id', $prospect->id)
+            ->whereIn('thread_id', $threads->pluck('id')->toArray())
+            ->whereHas('users', function($query) {
+                $query->where('id', auth()->id());
+            })
+            ->with([
+                'creator:id,name',
+                'users' => function($query) {
+                    $query->where('id', auth()->id())->select('id', 'name');
+                },
+            ])
+            ->select('id', 'body', 'prospect_id', 'thread_id', 'created_at', 'creator_id')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
+            ->get();
+
+        $prospect->load([
+            'users' => function($query) {
+                $query->where('id', auth()->id())->select('id', 'name');
+            },
+            'creator:id,name',
+        ]);
+
+        return [
+            'number' => $number,
+            'prospect' => $prospect,
+            'threads' => $threads,
+            'messages' => $messages,
+        ];
+    }
+
     protected function resolveLine(Request $request, Project $project): ?Line
     {
         $query = $project
@@ -135,5 +231,71 @@ class CloudTalkController extends Controller
         return in_array($status, [403, 404, 406, 409, 422, 500, 503])
             ? $status
             : 500;
+    }
+
+    protected function findProspectByPhone(Project $project, string $normalized): ?Prospect
+    {
+        $suffix = substr($normalized, -8);
+        $phoneExpression = $this->normalizedPhoneExpression('phone_number');
+        $mobileExpression = $this->normalizedPhoneExpression('mobile_phone_number');
+
+        return $project
+            ->prospects()
+            ->select(
+                'id',
+                'project_id',
+                'creator_id',
+                'first_name',
+                'last_name',
+                'company_name',
+                'email',
+                'phone_number',
+                'mobile_phone_number'
+            )
+            ->where(function($query) use($suffix, $phoneExpression, $mobileExpression) {
+                $query
+                    ->whereRaw("{$phoneExpression} LIKE ?", ["%{$suffix}"])
+                    ->orWhereRaw("{$mobileExpression} LIKE ?", ["%{$suffix}"]);
+            })
+            ->limit(20)
+            ->get()
+            ->first(function($prospect) use($normalized) {
+                return $this->phonesMatch($prospect->phone_number, $normalized) ||
+                    $this->phonesMatch($prospect->mobile_phone_number, $normalized);
+            });
+    }
+
+    protected function normalizePhone(?string $number): string
+    {
+        return preg_replace('/\D+/', '', (string) $number);
+    }
+
+    protected function phonesMatch(?string $phoneNumber, string $normalized): bool
+    {
+        $phoneNumber = $this->normalizePhone($phoneNumber);
+
+        if (!$phoneNumber || !$normalized) {
+            return false;
+        }
+
+        if ($phoneNumber === $normalized) {
+            return true;
+        }
+
+        $length = min(strlen($phoneNumber), strlen($normalized), 9);
+
+        return $length >= 6 &&
+            substr($phoneNumber, -$length) === substr($normalized, -$length);
+    }
+
+    protected function normalizedPhoneExpression(string $column): string
+    {
+        $expression = "`{$column}`";
+
+        foreach ([' ', '.', '-', '(', ')', '+', '/'] as $character) {
+            $expression = "REPLACE({$expression}, '{$character}', '')";
+        }
+
+        return $expression;
     }
 }

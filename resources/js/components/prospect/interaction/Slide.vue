@@ -4,18 +4,18 @@
         @open="fetchInteractions(), fetchSelectedProspects()"
         :title="
             $t('prospect.interaction.title', {
-                prospect: interactionProspect
-                    ? interactionProspect.last_name
+                prospect: interactionTitleProspect
+                    ? interactionTitleProspect.last_name
                     : '',
             })
         "
         :url="
-            interactionProspect
+            interactionTitleProspect
                 ? {
                       name: 'prospect.show',
                       params: {
                           project: project.slug,
-                          prospect: interactionProspect.id,
+                          prospect: interactionTitleProspect.id,
                       },
                   }
                 : null
@@ -23,33 +23,184 @@
         :left="true"
         :eager="true"
         icon="fa fa-phone"
-        :style="{
-            width:
-                tab == 1 && frameTab == 0
-                    ? '395px'
-                    : tab == 1 && frameTab == 1
-                    ? '300px'
-                    : '300px',
-        }"
+        :style="{ width: slideWidth }"
     >
         <div class="hc-prospect-interaction-root">
-            <cloudtalk
-                id="cloudtalk-phone"
+            <div
                 :class="[
-                    'hc-prospect-interaction-cloudtalk-phone',
-                    { visible: cloudtalkPhoneDisplayed },
+                    'hc-prospect-interaction-cloudtalk-panel',
+                    {
+                        visible: cloudtalkPhoneDisplayed,
+                        'with-context': cloudtalkCallContextVisible,
+                    },
                 ]"
-                :number="interaction.number"
-                :calling="callingCloudtalk"
-                :loading="cloudtalkLoading"
-                @make-call="makeCloudtalkCall"
-                @call-activity="displayCloudtalkPhoneFromIframe"
-                @ringing-call="cloudtalkCallRinging"
-                @outgoing-call="cloudtalkCallOutgoing"
-                @call-ended="cloudtalkCallEnded"
-                @hangup-call="cloudtalkCallHangup"
-                @answered-call="cloudtalkCallAnswered"
-            />
+            >
+                <cloudtalk
+                    id="cloudtalk-phone"
+                    class="hc-prospect-interaction-cloudtalk-phone"
+                    :number="interaction.number"
+                    :calling="callingCloudtalk"
+                    :loading="cloudtalkLoading"
+                    @make-call="makeCloudtalkCall"
+                    @call-activity="displayCloudtalkPhoneFromIframe"
+                    @ringing-call="cloudtalkCallRinging"
+                    @outgoing-call="cloudtalkCallOutgoing"
+                    @call-ended="cloudtalkCallEnded"
+                    @hangup-call="cloudtalkCallHangup"
+                    @answered-call="cloudtalkCallAnswered"
+                    @contact-info="cloudtalkCallContactInfo"
+                />
+
+                <aside
+                    v-if="cloudtalkCallContextVisible"
+                    class="hc-prospect-interaction-cloudtalk-context"
+                >
+                    <div
+                        v-if="cloudtalkLookupLoading && !cloudtalkCallProspect"
+                        class="hc-prospect-interaction-cloudtalk-context-loading"
+                    >
+                        <loading :loading="cloudtalkLookupLoading" />
+                    </div>
+
+                    <template v-else-if="cloudtalkCallProspect">
+                        <div class="hc-prospect-interaction-cloudtalk-context-header">
+                            <div>
+                                <div
+                                    class="hc-prospect-interaction-cloudtalk-context-title"
+                                    v-text="cloudtalkProspectName"
+                                ></div>
+                                <div
+                                    v-if="cloudtalkCallProspect.company_name"
+                                    class="hc-prospect-interaction-cloudtalk-context-subtitle"
+                                    v-text="cloudtalkCallProspect.company_name"
+                                ></div>
+                            </div>
+                            <router-link
+                                class="hc-prospect-interaction-cloudtalk-context-link"
+                                :to="{
+                                    name: 'prospect.show',
+                                    params: {
+                                        project: project.slug,
+                                        prospect: cloudtalkCallProspect.id,
+                                    },
+                                }"
+                            >
+                                <icon class="fa fa-external-link" />
+                            </router-link>
+                        </div>
+
+                        <div class="hc-prospect-interaction-cloudtalk-context-section">
+                            <div
+                                v-if="cloudtalkCallProspect.email"
+                                class="hc-prospect-interaction-cloudtalk-context-line"
+                            >
+                                <icon class="fa fa-envelope" />
+                                <span v-text="cloudtalkCallProspect.email"></span>
+                            </div>
+                            <div
+                                v-if="cloudtalkCallProspect.phone_number"
+                                class="hc-prospect-interaction-cloudtalk-context-line"
+                            >
+                                <icon class="fa fa-phone" />
+                                <span
+                                    v-text="cloudtalkCallProspect.phone_number"
+                                ></span>
+                            </div>
+                            <div
+                                v-if="cloudtalkCallProspect.mobile_phone_number"
+                                class="hc-prospect-interaction-cloudtalk-context-line"
+                            >
+                                <icon class="fa fa-mobile" />
+                                <span
+                                    v-text="
+                                        cloudtalkCallProspect.mobile_phone_number
+                                    "
+                                ></span>
+                            </div>
+                        </div>
+
+                        <div class="hc-prospect-interaction-cloudtalk-context-section">
+                            <div class="hc-prospect-interaction-cloudtalk-context-heading">
+                                information
+                            </div>
+                            <div
+                                v-if="cloudtalkLookupThreads.length == 0"
+                                class="hc-prospect-interaction-cloudtalk-context-empty"
+                            >
+                                Aucun information lie a votre utilisateur.
+                            </div>
+                            <div
+                                v-for="thread in cloudtalkLookupThreads"
+                                :key="thread.id"
+                                class="hc-prospect-interaction-cloudtalk-thread"
+                            >
+                                <div class="hc-prospect-interaction-cloudtalk-thread-title">
+                                    <span
+                                        class="hc-prospect-interaction-cloudtalk-thread-color"
+                                        :style="{
+                                            color: thread.color,
+                                            backgroundColor: thread.bgcolor,
+                                        }"
+                                    ></span>
+                                    <span v-text="thread.name"></span>
+                                    <small
+                                        v-text="
+                                            thread.user_messages_count +
+                                            '/' +
+                                            thread.messages_count
+                                        "
+                                    ></small>
+                                </div>
+
+                                <div
+                                    v-for="message in cloudtalkMessagesForThread(
+                                        thread
+                                    )"
+                                    :key="message.id"
+                                    class="hc-prospect-interaction-cloudtalk-message"
+                                >
+                                    <div class="hc-prospect-interaction-cloudtalk-message-meta">
+                                        <span
+                                            v-text="
+                                                message.creator
+                                                    ? message.creator.name
+                                                    : ''
+                                            "
+                                        ></span>
+                                        <span
+                                            v-text="
+                                                formatCloudtalkDate(
+                                                    message.created_at
+                                                )
+                                            "
+                                        ></span>
+                                    </div>
+                                    <div
+                                        class="hc-prospect-interaction-cloudtalk-message-body"
+                                        v-text="messagePreview(message.body)"
+                                    ></div>
+                                    <div
+                                        v-if="
+                                            message.users &&
+                                            message.users.length
+                                        "
+                                        class="hc-prospect-interaction-cloudtalk-message-users"
+                                    >
+                                        <icon class="fa fa-user" />
+                                        <span
+                                            v-text="
+                                                message.users
+                                                    .map((user) => user.name)
+                                                    .join(', ')
+                                            "
+                                        ></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </aside>
+            </div>
 
             <tab-layout :count="2" :tab="tab" class="hc-flex-1">
                 <template #1 v-if="interactionProspect">
@@ -585,23 +736,185 @@
     color: #999999;
 }
 
-.hc-prospect-interaction-cloudtalk-phone {
+.hc-prospect-interaction-cloudtalk-panel {
     position: absolute;
     top: 42px;
     right: 0;
     bottom: 0;
     left: 0;
     z-index: 5;
+    display: flex;
     background: #ffffff;
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
 }
 
-.hc-prospect-interaction-cloudtalk-phone.visible {
+.hc-prospect-interaction-cloudtalk-panel.visible {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
+}
+
+.hc-prospect-interaction-cloudtalk-phone {
+    flex: 1;
+    min-width: 0;
+}
+
+.hc-prospect-interaction-cloudtalk-context {
+    display: flex;
+    flex: 0 0 320px;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    overflow: auto;
+    padding: 14px;
+    border-left: 1px solid #e5e5e5;
+    background: #fafafa;
+}
+
+.hc-prospect-interaction-cloudtalk-context-loading {
+    position: relative;
+    min-height: 80px;
+}
+
+.hc-prospect-interaction-cloudtalk-context-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.hc-prospect-interaction-cloudtalk-context-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #222222;
+    overflow-wrap: anywhere;
+}
+
+.hc-prospect-interaction-cloudtalk-context-subtitle {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #777777;
+    overflow-wrap: anywhere;
+}
+
+.hc-prospect-interaction-cloudtalk-context-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    color: #555555;
+    text-decoration: none;
+}
+
+.hc-prospect-interaction-cloudtalk-context-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hc-prospect-interaction-cloudtalk-context-heading {
+    font-size: 11px;
+    font-weight: 700;
+    color: #777777;
+    text-transform: uppercase;
+}
+
+.hc-prospect-interaction-cloudtalk-context-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 12px;
+    color: #333333;
+}
+
+.hc-prospect-interaction-cloudtalk-context-line span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hc-prospect-interaction-cloudtalk-context-empty {
+    font-size: 12px;
+    color: #999999;
+}
+
+.hc-prospect-interaction-cloudtalk-thread {
+    padding: 10px;
+    border: 1px solid #e7e7e7;
+    border-radius: 6px;
+    background: #ffffff;
+}
+
+.hc-prospect-interaction-cloudtalk-thread-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 13px;
+    font-weight: 700;
+    color: #222222;
+}
+
+.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hc-prospect-interaction-cloudtalk-thread-title small {
+    font-size: 11px;
+    font-weight: 600;
+    color: #777777;
+}
+
+.hc-prospect-interaction-cloudtalk-thread-color {
+    display: inline-block;
+    flex: 0 0 10px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.hc-prospect-interaction-cloudtalk-message {
+    margin-top: 9px;
+    padding-top: 9px;
+    border-top: 1px solid #eeeeee;
+}
+
+.hc-prospect-interaction-cloudtalk-message-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 10px;
+    color: #999999;
+}
+
+.hc-prospect-interaction-cloudtalk-message-body {
+    margin-top: 4px;
+    display: -webkit-box;
+    overflow: hidden;
+    color: #333333;
+    font-size: 12px;
+    line-height: 1.35;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.hc-prospect-interaction-cloudtalk-message-users {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 11px;
+    color: #777777;
 }
 </style>
 
@@ -621,7 +934,10 @@ import {
     SET_PROSPECT_INTERACTION_TAB,
     SET_PROSPECT_INTERACTION_FRAME_TAB,
 } from "@/actions/project/prospect/interaction";
-import { MAKE_CLOUDTALK_CALL } from "@/actions/project/line";
+import {
+    MAKE_CLOUDTALK_CALL,
+    LOOKUP_CLOUDTALK_CALL,
+} from "@/actions/project/line";
 
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
@@ -659,6 +975,14 @@ export default {
             cloudtalkLoginRequired: false,
             cloudtalkPhoneVisible: false,
             cloudtalkEventTimeout: null,
+            cloudtalkLookup: {
+                number: null,
+                prospect: null,
+                threads: [],
+                messages: [],
+            },
+            cloudtalkLookupLoading: false,
+            cloudtalkLookupRequest: 0,
         };
     },
 
@@ -750,6 +1074,7 @@ export default {
             this.interaction.source = "cloudtalk";
             this.interaction.number = number;
             await this.addInteraction();
+            this.fetchCloudtalkCallContext({ external_number: number });
             this.makeCloudtalkCall();
         },
 
@@ -866,15 +1191,16 @@ export default {
                 this.interaction.source == "cloudtalk" &&
                 (!callId || !currentCallId || currentCallId == callId)
             ) {
+                this.fetchCloudtalkCallContext(callInfos);
                 return;
             }
 
             this.interaction = this.newInteraction();
             this.interaction.source = "cloudtalk";
-            this.interaction.number =
-                callInfos.external_number || callInfos.number || "";
+            this.interaction.number = this.cloudtalkCallNumber(callInfos);
             this.interaction.from_number = callInfos.internal_number || "";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
         },
 
         showCloudtalkLogin() {
@@ -923,6 +1249,7 @@ export default {
             this.showCloudtalkPhone();
             this.interaction.status = "ringing";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
         },
 
@@ -930,6 +1257,7 @@ export default {
             this.showCloudtalkPhone();
             this.interaction.status = "initiated";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
         },
 
@@ -937,6 +1265,7 @@ export default {
             this.showCloudtalkPhone();
             this.interaction.status = "answered";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
         },
 
@@ -944,6 +1273,7 @@ export default {
             this.showCloudtalkPhone();
             this.interaction.status = "hangup";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
             if (this.interactionProspect) {
                 this.nextInteraction();
@@ -954,20 +1284,197 @@ export default {
             this.showCloudtalkPhone();
             this.interaction.status = "ended";
             this.setCloudtalkCallData(callInfos);
+            this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
             if (this.interactionProspect) {
                 this.nextInteraction();
             }
         },
 
+        cloudtalkCallContactInfo(callInfos) {
+            this.fetchCloudtalkCallContext(callInfos);
+        },
+
         setCloudtalkCallData(callInfos = {}) {
-            const callId =
-                callInfos.call_uuid || callInfos.call_id || callInfos.id;
+            const callId = this.cloudtalkCallId(callInfos);
+            const number = this.cloudtalkCallNumber(callInfos, true);
+
+            if (number) {
+                this.interaction.number = number;
+            }
 
             this.interaction.data = {
                 ...(this.interaction.data || {}),
                 ...(callId ? { id: callId } : {}),
+                ...(number ? { external_number: number } : {}),
+                ...(callInfos.direction
+                    ? { direction: callInfos.direction }
+                    : {}),
             };
+        },
+
+        cloudtalkCallId(callInfos = {}, useFallback = false) {
+            return (
+                callInfos.call_uuid ||
+                callInfos.call_id ||
+                callInfos.id ||
+                (useFallback &&
+                this.interaction &&
+                this.interaction.data &&
+                this.interaction.data.id
+                    ? this.interaction.data.id
+                    : "") ||
+                ""
+            );
+        },
+
+        cloudtalkCallNumber(callInfos = {}, useFallback = false) {
+            return (
+                callInfos.external_number ||
+                callInfos.customer_number ||
+                callInfos.contact_phone ||
+                callInfos.phone_number ||
+                callInfos.number ||
+                callInfos.from ||
+                callInfos.to ||
+                (useFallback && this.cloudtalkLookup.number
+                    ? this.cloudtalkLookup.number
+                    : "") ||
+                (useFallback && this.interaction.number
+                    ? this.interaction.number
+                    : "") ||
+                ""
+            );
+        },
+
+        async fetchCloudtalkCallContext(callInfos = {}) {
+            const number = this.cloudtalkCallNumber(callInfos, true);
+            const numberKey = this.normalizePhone(number);
+            const callId = this.cloudtalkCallId(callInfos, true);
+            const previousLookup = { ...(this.cloudtalkLookup || {}) };
+            const sameResolvedCall =
+                previousLookup.prospect &&
+                previousLookup.callId &&
+                callId &&
+                previousLookup.callId == callId;
+
+            if (!numberKey || numberKey.length < 6) {
+                return;
+            }
+
+            if (
+                this.cloudtalkLookup.numberKey == numberKey &&
+                this.cloudtalkLookup.resolved
+            ) {
+                return;
+            }
+
+            const request = ++this.cloudtalkLookupRequest;
+            this.cloudtalkLookupLoading = true;
+            this.cloudtalkLookup = {
+                ...this.cloudtalkLookup,
+                number,
+                numberKey,
+                callId,
+                resolved: false,
+            };
+
+            try {
+                const data = await store.dispatch(LOOKUP_CLOUDTALK_CALL, {
+                    number,
+                });
+
+                if (request != this.cloudtalkLookupRequest) {
+                    return;
+                }
+
+                if (!data.prospect && sameResolvedCall) {
+                    this.cloudtalkLookup = {
+                        ...previousLookup,
+                        number: previousLookup.number || data.number || number,
+                        numberKey: previousLookup.numberKey || numberKey,
+                        callId,
+                        resolved: true,
+                    };
+                    return;
+                }
+
+                this.cloudtalkLookup = {
+                    number: data.number || number,
+                    numberKey,
+                    callId,
+                    prospect: data.prospect || null,
+                    threads: data.threads || [],
+                    messages: data.messages || [],
+                    resolved: true,
+                };
+
+                if (data.prospect) {
+                    if (
+                        !this.interactionProspect ||
+                        this.interactionProspect.id != data.prospect.id
+                    ) {
+                        store.commit(SET_INTERACTION_PROSPECT, data.prospect);
+                    }
+
+                    if (
+                        this.interaction &&
+                        this.interaction.source == "cloudtalk" &&
+                        !this.interaction.id
+                    ) {
+                        try {
+                            await this.addInteraction();
+                        } catch (error) {
+                            this.interaction.data = {
+                                ...(this.interaction.data || {}),
+                                error: error.message,
+                            };
+                        }
+                    }
+                }
+            } catch (error) {
+                if (request == this.cloudtalkLookupRequest) {
+                    this.cloudtalkLookup = {
+                        number,
+                        numberKey,
+                        callId,
+                        prospect: null,
+                        threads: [],
+                        messages: [],
+                        resolved: true,
+                    };
+                }
+            } finally {
+                if (request == this.cloudtalkLookupRequest) {
+                    this.cloudtalkLookupLoading = false;
+                }
+            }
+        },
+
+        normalizePhone(number) {
+            return String(number || "").replace(/\D+/g, "");
+        },
+
+        cloudtalkMessagesForThread(thread) {
+            return this.cloudtalkLookupMessages.filter(
+                (message) => message.thread_id == thread.id
+            );
+        },
+
+        messagePreview(body) {
+            return String(body || "")
+                .replace(/<br\s*\/?>/g, " ")
+                .replace(/<[^>]+>/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+        },
+
+        formatCloudtalkDate(value) {
+            if (!value) {
+                return "";
+            }
+
+            return new Date(value).toLocaleString();
         },
 
         /**
@@ -1158,6 +1665,22 @@ export default {
             return null;
         },
 
+        interactionTitleProspect() {
+            return this.interactionProspect || this.cloudtalkCallProspect;
+        },
+
+        slideWidth() {
+            if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallContextVisible) {
+                return "760px";
+            }
+
+            if (this.tab == 1 && this.frameTab == 0) {
+                return "395px";
+            }
+
+            return "300px";
+        },
+
         /**
          * Webhook URL
          * for web service import
@@ -1178,6 +1701,49 @@ export default {
                 this.tab == 1 &&
                 this.frameTab == 5
             );
+        },
+
+        cloudtalkCallContextVisible() {
+            return this.cloudtalkLookupLoading || !!this.cloudtalkCallProspect;
+        },
+
+        cloudtalkCallProspect() {
+            return this.cloudtalkLookup && this.cloudtalkLookup.prospect
+                ? this.cloudtalkLookup.prospect
+                : null;
+        },
+
+        cloudtalkProspectName() {
+            if (!this.cloudtalkCallProspect) {
+                return "";
+            }
+
+            const name = [
+                this.cloudtalkCallProspect.first_name,
+                this.cloudtalkCallProspect.last_name,
+            ]
+                .filter((value) => value)
+                .join(" ");
+
+            return (
+                name ||
+                this.cloudtalkCallProspect.company_name ||
+                this.cloudtalkCallProspect.email ||
+                this.cloudtalkLookup.number ||
+                ""
+            );
+        },
+
+        cloudtalkLookupThreads() {
+            return this.cloudtalkLookup && this.cloudtalkLookup.threads
+                ? this.cloudtalkLookup.threads
+                : [];
+        },
+
+        cloudtalkLookupMessages() {
+            return this.cloudtalkLookup && this.cloudtalkLookup.messages
+                ? this.cloudtalkLookup.messages
+                : [];
         },
 
         cloudtalkLine() {

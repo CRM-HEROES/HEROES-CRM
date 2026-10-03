@@ -9,6 +9,7 @@ import {
     UPDATE_LINE,
     REMOVE_LINE,
     MAKE_CLOUDTALK_CALL,
+    LOOKUP_CLOUDTALK_CALL,
 } from "@/actions/project/line";
 
 /**
@@ -81,6 +82,17 @@ const actions = {
      */
     async [MAKE_CLOUDTALK_CALL](context, params) {
         const { data } = await lineService.makeCloudtalkCall(
+            context.state.project.slug,
+            params
+        );
+        return data;
+    },
+
+    /**
+     * Resolve a CloudTalk call number to the current user's prospect context.
+     */
+    async [LOOKUP_CLOUDTALK_CALL](context, params) {
+        const { data } = await lineService.lookupCloudtalkCall(
             context.state.project.slug,
             params
         );

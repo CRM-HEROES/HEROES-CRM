@@ -28052,6 +28052,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ADD_LINE: () => (/* binding */ ADD_LINE),
 /* harmony export */   FETCH_LINES: () => (/* binding */ FETCH_LINES),
+/* harmony export */   LOOKUP_CLOUDTALK_CALL: () => (/* binding */ LOOKUP_CLOUDTALK_CALL),
 /* harmony export */   MAKE_CLOUDTALK_CALL: () => (/* binding */ MAKE_CLOUDTALK_CALL),
 /* harmony export */   REMOVE_LINE: () => (/* binding */ REMOVE_LINE),
 /* harmony export */   SET_LINE: () => (/* binding */ SET_LINE),
@@ -28067,6 +28068,7 @@ var SHOW_LINE = "showLine";
 var UPDATE_LINE = "updateLine";
 var REMOVE_LINE = "removeLine";
 var MAKE_CLOUDTALK_CALL = "makeCloudtalkCall";
+var LOOKUP_CLOUDTALK_CALL = "lookupCloudtalkCall";
 
 /***/ }),
 
@@ -31381,6 +31383,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   makeCloudtalkCall: function makeCloudtalkCall(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/call"), params);
+  },
+  lookupCloudtalkCall: function lookupCloudtalkCall(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/lookup"), params);
   },
   verifyCloudtalk: function verifyCloudtalk(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/verify"), params);
@@ -41622,20 +41627,38 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_line__W
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.LOOKUP_CLOUDTALK_CALL, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    var _yield$lineService$lo, data;
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
           _context6.next = 2;
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].lookupCloudtalkCall(context.state.project.slug, params);
+        case 2:
+          _yield$lineService$lo = _context6.sent;
+          data = _yield$lineService$lo.data;
+          return _context6.abrupt("return", data);
+        case 5:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6);
+  }))();
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
+        case 0:
+          _context7.next = 2;
           return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
         case 2:
           context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, slug);
         case 3:
         case "end":
-          return _context6.stop();
+          return _context7.stop();
       }
-    }, _callee6);
+    }, _callee7);
   }))();
 }), _actions);
 
