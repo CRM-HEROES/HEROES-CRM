@@ -7,7 +7,7 @@
         ]"
         @click.stop
     >
-        <template v-if="firstOpen">
+        <template v-if="firstOpen || eager">
             <div class="hc-slide-header">
                 <icon
                     v-if="icon"
@@ -192,6 +192,11 @@ export default {
          *
          */
         left: {
+            type: Boolean,
+            default: false,
+        },
+
+        eager: {
             type: Boolean,
             default: false,
         },

@@ -69,21 +69,11 @@
                     ></div>
                 </item>
                 <item-list gap="5px" class="hc-flex-1">
-                    <v-field
-                        v-for="field in operatorFields"
-                        :key="field.key"
-                        :label="field.label"
-                        required
-                        v-slot="{ label }"
-                        ><input
-                            :type="field.type"
-                            :placeholder="label + ' ...'"
-                            v-model="lineToUpdate.config[field.key]"
-                            required
-                    /></v-field>
-                    <kavkom-diagnostic
-                        v-if="lineToUpdate.operator === 'kavkom'"
+                    <operator-config-fields
+                        ref="operatorConfigFields"
+                        :operator="lineToUpdate.operator"
                         :config="lineToUpdate.config"
+                        :fields="operatorFields"
                     />
                 </item-list>
                 <buttons>
@@ -135,12 +125,12 @@ import { CLOSE_MODAL } from "@/actions/modal";
 import lineOperators from "@/constants/lineOperators";
 
 // Components
-import KavkomDiagnostic from "../KavkomDiagnostic.vue";
+import OperatorConfigFields from "../OperatorConfigFields.vue";
 import ToUserRow from "../ToUserRow.vue";
 
 export default {
     components: {
-        KavkomDiagnostic,
+        OperatorConfigFields,
         ToUserRow,
     },
 
@@ -173,13 +163,24 @@ export default {
          *
          */
         async update() {
+            if (!(await this.validateOperatorConfig())) {
+                return;
+            }
+
             this.updatingLine = true;
 
             try {
+                this.normalizeConfig();
                 await store.dispatch(UPDATE_LINE, this.lineToUpdate);
+                store.commit(CLOSE_MODAL);
+            } catch (error) {
+                flashError({
+                    title: "Ligne",
+                    body: this.errorMessage(error),
+                    duration: 7000,
+                });
             } finally {
                 this.updatingLine = false;
-                store.commit(CLOSE_MODAL);
             }
         },
 
@@ -197,6 +198,44 @@ export default {
                     store.commit(CLOSE_MODAL);
                 }
             });
+        },
+
+        normalizeConfig() {
+            Object.keys(this.lineToUpdate.config).forEach((key) => {
+                if (
+                    this.lineToUpdate.config[key] !== null &&
+                    this.lineToUpdate.config[key] !== undefined
+                ) {
+                    this.lineToUpdate.config[key] = String(
+                        this.lineToUpdate.config[key]
+                    );
+                }
+            });
+        },
+
+        async validateOperatorConfig() {
+            if (!this.$refs.operatorConfigFields) {
+                return true;
+            }
+
+            return await this.$refs.operatorConfigFields.validate();
+        },
+
+        errorMessage(error) {
+            const errors = error.response?.data?.errors;
+
+            if (errors) {
+                const firstError = Object.values(errors)[0];
+
+                if (Array.isArray(firstError) && firstError.length > 0) {
+                    return firstError[0];
+                }
+            }
+
+            return (
+                error.response?.data?.message ||
+                "Impossible d'enregistrer la ligne."
+            );
         },
     },
 

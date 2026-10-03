@@ -61,21 +61,11 @@
                     ></div>
                 </item>
                 <item-list gap="5px" class="hc-flex-1">
-                    <v-field
-                        v-for="field in operatorFields"
-                        :key="field.key"
-                        :label="field.label"
-                        required
-                        v-slot="{ label }"
-                        ><input
-                            :type="field.type"
-                            :placeholder="label + ' ...'"
-                            v-model="line.config[field.key]"
-                            required
-                    /></v-field>
-                    <kavkom-diagnostic
-                        v-if="line.operator === 'kavkom'"
+                    <operator-config-fields
+                        ref="operatorConfigFields"
+                        :operator="line.operator"
                         :config="line.config"
+                        :fields="operatorFields"
                     />
                 </item-list>
                 <buttons>
@@ -127,12 +117,12 @@ import { CLOSE_MODAL } from "@/actions/modal";
 import lineOperators from "@/constants/lineOperators";
 
 // Components
-import KavkomDiagnostic from "../KavkomDiagnostic.vue";
+import OperatorConfigFields from "../OperatorConfigFields.vue";
 import ToUserRow from "../ToUserRow.vue";
 
 export default {
     components: {
-        KavkomDiagnostic,
+        OperatorConfigFields,
         ToUserRow,
     },
 
@@ -162,16 +152,63 @@ export default {
          *
          */
         async storeLine() {
+            if (!(await this.validateOperatorConfig())) {
+                return;
+            }
+
             this.addingLine = true;
 
             try {
+                this.normalizeConfig();
                 await store.dispatch(ADD_LINE, this.line);
-            } finally {
-                this.addingLine = false;
                 this.line = this.newLine();
                 this.tab = 0;
                 store.commit(CLOSE_MODAL);
+            } catch (error) {
+                flashError({
+                    title: "Ligne",
+                    body: this.errorMessage(error),
+                    duration: 7000,
+                });
+            } finally {
+                this.addingLine = false;
             }
+        },
+
+        normalizeConfig() {
+            Object.keys(this.line.config).forEach((key) => {
+                if (
+                    this.line.config[key] !== null &&
+                    this.line.config[key] !== undefined
+                ) {
+                    this.line.config[key] = String(this.line.config[key]);
+                }
+            });
+        },
+
+        async validateOperatorConfig() {
+            if (!this.$refs.operatorConfigFields) {
+                return true;
+            }
+
+            return await this.$refs.operatorConfigFields.validate();
+        },
+
+        errorMessage(error) {
+            const errors = error.response?.data?.errors;
+
+            if (errors) {
+                const firstError = Object.values(errors)[0];
+
+                if (Array.isArray(firstError) && firstError.length > 0) {
+                    return firstError[0];
+                }
+            }
+
+            return (
+                error.response?.data?.message ||
+                "Impossible d'enregistrer la ligne."
+            );
         },
     },
 

@@ -102,6 +102,11 @@ class ProjectController extends Controller
             },
             'imports' => function($query) {
             },
+            'lines' => function($query) {
+                $query
+                    ->select('id', 'project_id', 'name', 'operator', 'user_id')
+                    ->orderBy('name');
+            },
             'menus' => function($query) {
                 $query
                     ->select('id', 'project_id', 'name', 'color', 'bgcolor', 'filters')

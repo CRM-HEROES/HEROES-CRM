@@ -13,6 +13,15 @@ export default {
     update(project, line, params) {
         return ApiService.put(`project/${project}/line/${line}`, params);
     },
+    makeCloudtalkCall(project, params) {
+        return ApiService.post(`project/${project}/line/cloudtalk/call`, params);
+    },
+    verifyCloudtalk(project, params) {
+        return ApiService.post(`project/${project}/line/cloudtalk/verify`, params);
+    },
+    getCloudtalkAgents(project, params) {
+        return ApiService.post(`project/${project}/line/cloudtalk/agents`, params);
+    },
     destroy(project, line) {
         return ApiService.delete(`project/${project}/line/${line}`);
     },

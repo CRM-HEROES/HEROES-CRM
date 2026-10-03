@@ -8,6 +8,7 @@ import {
     SHOW_LINE,
     UPDATE_LINE,
     REMOVE_LINE,
+    MAKE_CLOUDTALK_CALL,
 } from "@/actions/project/line";
 
 /**
@@ -73,6 +74,17 @@ const actions = {
             params
         );
         context.commit(UPDATE_LINE, params);
+    },
+
+    /**
+     * Make an outbound CloudTalk call.
+     */
+    async [MAKE_CLOUDTALK_CALL](context, params) {
+        const { data } = await lineService.makeCloudtalkCall(
+            context.state.project.slug,
+            params
+        );
+        return data;
     },
 
     /**

@@ -21,6 +21,7 @@
                 : null
         "
         :left="true"
+        :eager="true"
         icon="fa fa-phone"
         :style="{
             width:
@@ -31,468 +32,47 @@
                     : '300px',
         }"
     >
-        <tab-layout :count="2" :tab="tab" class="hc-flex-1">
-            <template #1 v-if="interactionProspect">
-                <item-list style="height: 100%; overflow: auto" padding="12px">
-                    <template v-if="can('all.prospect.interaction.add')">
-                        <item
-                            v-if="interactionProspect.phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 3)"
-                        >
-                            <icon class="fa fa-phone" />
-                            <div
-                                class="hc-item-main-content"
-                                v-text="
-                                    $t('prospect.interaction.edit_phone_number')
-                                "
-                            ></div>
-                            <icon class="fa fa-caret-right" />
-                        </item>
-                        <item
-                            v-if="interactionProspect.mobile_phone_number"
-                            @click.prevent="(tab = 1), (frameTab = 4)"
-                        >
-                            <icon class="fa fa-mobile" />
-                            <div
-                                class="hc-item-main-content"
-                                v-text="
-                                    $t(
-                                        'prospect.interaction.edit_mobile_phone_number'
-                                    )
-                                "
-                            ></div>
-                            <icon class="fa fa-caret-right" />
-                        </item>
-                        <template
-                            v-for="number in [
-                                interactionProspect.phone_number,
-                                interactionProspect.mobile_phone_number,
-                            ].filter((n) => n)"
-                            :key="number"
-                        >
-                            <!-- Telephone -->
+        <div class="hc-prospect-interaction-root">
+            <cloudtalk
+                id="cloudtalk-phone"
+                :class="[
+                    'hc-prospect-interaction-cloudtalk-phone',
+                    { visible: cloudtalkPhoneDisplayed },
+                ]"
+                :number="interaction.number"
+                :calling="callingCloudtalk"
+                :loading="cloudtalkLoading"
+                @make-call="makeCloudtalkCall"
+                @call-activity="displayCloudtalkPhoneFromIframe"
+                @ringing-call="cloudtalkCallRinging"
+                @outgoing-call="cloudtalkCallOutgoing"
+                @call-ended="cloudtalkCallEnded"
+                @hangup-call="cloudtalkCallHangup"
+                @answered-call="cloudtalkCallAnswered"
+            />
+
+            <tab-layout :count="2" :tab="tab" class="hc-flex-1">
+                <template #1 v-if="interactionProspect">
+                    <item-list style="height: 100%; overflow: auto" padding="12px">
+                        <template v-if="can('all.prospect.interaction.add')">
                             <item
-                                tag="a"
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaTelephone(number)"
-                                :href="'tel:' + number"
+                                v-if="interactionProspect.phone_number"
+                                @click.prevent="(tab = 1), (frameTab = 3)"
                             >
-                                <icon class="fa fa-phone" color="#489f1f" />
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_phone'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                            </item>
-
-                            <!-- Aircall -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaAircall(number)"
-                            >
-                                <icon>
-                                    <svg viewBox="0 0 40 40">
-                                        <path
-                                            fill="#00B388"
-                                            d="M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
-                                        ></path>
-                                    </svg>
-                                </icon>
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_aircall'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <icon class="fa fa-caret-right" />
-                            </item>
-
-                            <!-- Ringover -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaRingover(number)"
-                            >
-                                <icon>
-                                    <svg viewBox="0 0 40 40">
-                                        <path
-                                            d="M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z"
-                                            style="fill: rgb(85, 195, 192)"
-                                        ></path>
-                                        <path
-                                            d="M30.1,23.1c-1.3,4.3-5.3,7.4-10.1,7.4s-8.7-3.1-10.1-7.4H0.3C1.8,32.7,10,40,20,40s18.2-7.3,19.7-16.9H30.1z"
-                                            style="fill: rgb(85, 195, 192)"
-                                        ></path>
-                                    </svg>
-                                </icon>
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_ringover'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <icon class="fa fa-caret-right" />
-                            </item>
-
-                            <!-- CloudTalk -->
-                            <item
-                                class="hc-prospect-interaction-item"
-                                @click="interactionViaCloudtalk(number)"
-                            >
-                                <icon>
-                                    <svg viewBox="0 0 40 40">
-                                        <path
-                                            fill="#1f6feb"
-                                            d="M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
-                                        ></path>
-                                        <path
-                                            fill="#ffffff"
-                                            d="M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
-                                        ></path>
-                                    </svg>
-                                </icon>
-                                <div
-                                    class="hc-item-main-content hc-flex-column"
-                                >
-                                    <span
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_cloudtalk'
-                                            )
-                                        "
-                                    ></span>
-                                    <span
-                                        class="hc-prospect-interaction-item-number"
-                                        v-text="number"
-                                    ></span>
-                                </div>
-                                <icon class="fa fa-caret-right" />
-                            </item>
-                        </template>
-
-                        <!-- Add history -->
-                        <item
-                            tag="a"
-                            class="hc-prospect-interaction-item"
-                            @click="addHistory()"
-                        >
-                            <icon class="fa fa-plus icon-green" />
-                            <div
-                                class="hc-item-main-content"
-                                v-text="$t('prospect.interaction.add_history')"
-                            ></div>
-                            <loading :loading="addingHistory" />
-                        </item>
-                    </template>
-                    <item
-                        style="
-                            background-color: #7939b8;
-                            color: white;
-                            margin-top: 10px;
-                            margin-bottom: 10px;
-                        "
-                        v-if="prospectInteractions.length > 0"
-                    >
-                        <icon class="fa fa-clock" color="white"></icon>
-                        <div
-                            class="hc-main-content"
-                            v-text="$t('prospect.interaction.history')"
-                        ></div>
-                    </item>
-                    <interaction-row
-                        v-for="c in prospectInteractions"
-                        :key="c.id"
-                        :interaction="c"
-                    />
-                </item-list>
-            </template>
-
-            <!-- List of interaction -->
-            <template #2>
-                <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
-                    <template #1 v-if="interactionProspect">
-                        <tab-layout
-                            :count="2"
-                            :tab="aircallTab"
-                            class="hc-flex-1"
-                        >
-                            <template #1>
-                                <div
-                                    class="hc-flex-column"
-                                    style="height: 100%"
-                                >
-                                    <item @click="tab = 0" class="bordered">
-                                        <icon class="fa fa-caret-left" />
-                                        <div
-                                            class="hc-item-main-content"
-                                            v-text="
-                                                $t(
-                                                    'prospect.interaction.call_by_aircall'
-                                                )
-                                            "
-                                        ></div>
-                                        <icon
-                                            class="fa fa-cog"
-                                            @click.stop="aircallTab = 1"
-                                        />
-                                    </item>
-                                    <div
-                                        style="
-                                            flex: 1;
-                                            width: 100%;
-                                            height: 100%;
-                                            padding: 10px;
-                                            overflow: auto;
-                                        "
-                                    >
-                                        <aircall
-                                            id="aircall-phone"
-                                            :number="interaction.number"
-                                            :style="{
-                                                width: '100%',
-                                                height: '100%',
-                                                display:
-                                                    tab == 1 && frameTab == 0
-                                                        ? 'block'
-                                                        : 'none',
-                                            }"
-                                            @outgoing-call="
-                                                (callInfos) => {
-                                                    interaction.status =
-                                                        'initiated';
-                                                    interaction.data = {
-                                                        id: callInfos.call_id,
-                                                    };
-                                                    updateInteraction();
-                                                }
-                                            "
-                                            @call-ended="
-                                                (callInfos) => {
-                                                    interaction.status =
-                                                        'ended';
-                                                    interaction.data = {
-                                                        id: callInfos.call_id,
-                                                    };
-                                                    updateInteraction();
-                                                    nextInteraction();
-                                                }
-                                            "
-                                            @answered-call="
-                                                (interaction.status =
-                                                    'answered'),
-                                                    updateInteraction()
-                                            "
-                                        />
-                                    </div>
-                                </div>
-                            </template>
-                            <template #2>
-                                <div
-                                    class="hc-flex-column"
-                                    style="height: 100%"
-                                >
-                                    <item
-                                        @click="aircallTab = 0"
-                                        class="bordered"
-                                    >
-                                        <icon class="fa fa-caret-left" />
-                                        <div
-                                            class="hc-item-main-content"
-                                            v-text="'Paramètre Aircall Webhook'"
-                                        ></div>
-                                    </item>
-                                    <item-list
-                                        class="hc-flex-1"
-                                        gap="5px"
-                                        style="overflow: auto"
-                                    >
-                                        <item
-                                            tag="a"
-                                            href="https://dashboard.aircall.io/integrations/flow/install/webhook/webhook/0"
-                                            target="_blank"
-                                        >
-                                            <icon class="fa fa-wifi" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="
-                                                    'Rendez-vous sur la page webhook d\'aircall'
-                                                "
-                                            ></div>
-                                            <icon class="fa fa-caret-right" />
-                                        </item>
-                                        <item
-                                            tag="a"
-                                            @click.prevent="
-                                                copyAircallWebhookURLToClipboard
-                                            "
-                                        >
-                                            <icon class="fa fa-link" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="
-                                                    'Mettre ' +
-                                                    aircallWebhookURL +
-                                                    ' comme URL'
-                                                "
-                                            ></div>
-                                            <icon class="fa fa-copy" />
-                                        </item>
-                                        <item>
-                                            <icon class="fa fa-check" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="
-                                                    'Cocher &quot;call.ended&quot; dans la section Appel'
-                                                "
-                                            ></div>
-                                        </item>
-                                        <item>
-                                            <icon class="fa fa-check" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="
-                                                    'Enfin cliquer sur &quot;Ajouter webhook&quot;'
-                                                "
-                                            ></div>
-                                        </item>
-                                    </item-list>
-                                </div>
-                            </template>
-                        </tab-layout>
-                    </template>
-
-                    <template #2 v-if="interactionProspect">
-                        <div class="hc-flex-column" style="height: 100%">
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
+                                <icon class="fa fa-phone" />
                                 <div
                                     class="hc-item-main-content"
                                     v-text="
-                                        $t(
-                                            'prospect.interaction.call_by_ringover'
-                                        )
+                                        $t('prospect.interaction.edit_phone_number')
                                     "
                                 ></div>
-                                <icon
-                                    class="fa fa-cog"
-                                    @click.stop="ringoverSetting"
-                                />
+                                <icon class="fa fa-caret-right" />
                             </item>
-                            <div
-                                style="
-                                    flex: 1;
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: auto;
-                                "
+                            <item
+                                v-if="interactionProspect.mobile_phone_number"
+                                @click.prevent="(tab = 1), (frameTab = 4)"
                             >
-                                <ringover
-                                    id="ringover-phone"
-                                    :number="interaction.number"
-                                    tab="phone"
-                                    style="flex: 1; width: 100%; height: 100%"
-                                    @ringing-call="
-                                        (callInfo) => {
-                                            interaction.from_number =
-                                                callInfo.data.from;
-                                            interaction.status = 'ringing';
-                                            interaction.data.id =
-                                                callInfo.data.call_id;
-                                            updateInteraction();
-                                        }
-                                    "
-                                    @hangup-call="
-                                        (callInfo) => {
-                                            interaction.status = 'hangup';
-                                            interaction.data.id =
-                                                callInfo.data.call_id;
-                                            updateInteraction();
-                                            nextInteraction();
-                                        }
-                                    "
-                                    @answered-call="
-                                        (interaction.status = 'answered'),
-                                            updateInteraction()
-                                    "
-                                />
-                            </div>
-                        </div>
-                    </template>
-
-                    <template #3>
-                        <select-prospect
-                            @back="tab = 0"
-                            @prospect-selected="setInteractionProspect"
-                        />
-                    </template>
-
-                    <template #4>
-                        <form
-                            class="hc-flex-column"
-                            style="height: 100%"
-                            @submit.prevent="updateProspectPhoneNumber"
-                        >
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="
-                                        $t(
-                                            'prospect.interaction.edit_phone_number'
-                                        )
-                                    "
-                                ></div>
-                            </item>
-                            <item-list padding="12px" style="height: auto">
-                                <v-field
-                                    :label="$t('field.prospect.phone_number')"
-                                    ><input
-                                        type="tel"
-                                        v-model.lazy="phoneNumber"
-                                /></v-field>
-                            </item-list>
-                            <buttons>
-                                <button v-text="$t('update')"></button>
-                            </buttons>
-                            <loading :loading="updatingPhoneNumber" />
-                        </form>
-                    </template>
-
-                    <template #5>
-                        <form
-                            class="hc-flex-column"
-                            style="height: 100%; position"
-                            @submit.prevent="updateProspectMobilePhoneNumber"
-                        >
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
+                                <icon class="fa fa-mobile" />
                                 <div
                                     class="hc-item-main-content"
                                     v-text="
@@ -501,83 +81,501 @@
                                         )
                                     "
                                 ></div>
+                                <icon class="fa fa-caret-right" />
                             </item>
-                            <item-list padding="12px" style="height: auto">
-                                <v-field
-                                    :label="$t('field.prospect.phone_number')"
-                                    ><input
-                                        type="tel"
-                                        v-model.lazy="mobilePhoneNumber"
-                                /></v-field>
-                            </item-list>
-                            <buttons>
-                                <button v-text="$t('update')"></button>
-                            </buttons>
-                            <loading :loading="updatingMobilePhoneNumber" />
-                        </form>
-                    </template>
+                            <template
+                                v-for="number in [
+                                    interactionProspect.phone_number,
+                                    interactionProspect.mobile_phone_number,
+                                ].filter((n) => n)"
+                                :key="number"
+                            >
+                                <!-- Telephone -->
+                                <item
+                                    tag="a"
+                                    class="hc-prospect-interaction-item"
+                                    @click="interactionViaTelephone(number)"
+                                    :href="'tel:' + number"
+                                >
+                                    <icon class="fa fa-phone" color="#489f1f" />
+                                    <div
+                                        class="hc-item-main-content hc-flex-column"
+                                    >
+                                        <span
+                                            v-text="
+                                                $t(
+                                                    'prospect.interaction.call_by_phone'
+                                                )
+                                            "
+                                        ></span>
+                                        <span
+                                            class="hc-prospect-interaction-item-number"
+                                            v-text="number"
+                                        ></span>
+                                    </div>
+                                </item>
 
-                    <template #6 v-if="interactionProspect">
-                        <div class="hc-flex-column" style="height: 100%">
-                            <item @click="tab = 0" class="bordered">
-                                <icon class="fa fa-caret-left" />
+                                <!-- Aircall -->
+                                <item
+                                    class="hc-prospect-interaction-item"
+                                    @click="interactionViaAircall(number)"
+                                >
+                                    <icon>
+                                        <svg viewBox="0 0 40 40">
+                                            <path
+                                                fill="#00B388"
+                                                d="M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
+                                            ></path>
+                                        </svg>
+                                    </icon>
+                                    <div
+                                        class="hc-item-main-content hc-flex-column"
+                                    >
+                                        <span
+                                            v-text="
+                                                $t(
+                                                    'prospect.interaction.call_by_aircall'
+                                                )
+                                            "
+                                        ></span>
+                                        <span
+                                            class="hc-prospect-interaction-item-number"
+                                            v-text="number"
+                                        ></span>
+                                    </div>
+                                    <icon class="fa fa-caret-right" />
+                                </item>
+
+                                <!-- Ringover -->
+                                <item
+                                    class="hc-prospect-interaction-item"
+                                    @click="interactionViaRingover(number)"
+                                >
+                                    <icon>
+                                        <svg viewBox="0 0 40 40">
+                                            <path
+                                                d="M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z"
+                                                style="fill: rgb(85, 195, 192)"
+                                            ></path>
+                                            <path
+                                                d="M30.1,23.1c-1.3,4.3-5.3,7.4-10.1,7.4s-8.7-3.1-10.1-7.4H0.3C1.8,32.7,10,40,20,40s18.2-7.3,19.7-16.9H30.1z"
+                                                style="fill: rgb(85, 195, 192)"
+                                            ></path>
+                                        </svg>
+                                    </icon>
+                                    <div
+                                        class="hc-item-main-content hc-flex-column"
+                                    >
+                                        <span
+                                            v-text="
+                                                $t(
+                                                    'prospect.interaction.call_by_ringover'
+                                                )
+                                            "
+                                        ></span>
+                                        <span
+                                            class="hc-prospect-interaction-item-number"
+                                            v-text="number"
+                                        ></span>
+                                    </div>
+                                    <icon class="fa fa-caret-right" />
+                                </item>
+
+                                <!-- CloudTalk -->
+                                <item
+                                    class="hc-prospect-interaction-item"
+                                    @click="interactionViaCloudtalk(number)"
+                                >
+                                    <icon>
+                                        <svg viewBox="0 0 40 40">
+                                            <path
+                                                fill="#1f6feb"
+                                                d="M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
+                                            ></path>
+                                            <path
+                                                fill="#ffffff"
+                                                d="M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
+                                            ></path>
+                                        </svg>
+                                    </icon>
+                                    <div
+                                        class="hc-item-main-content hc-flex-column"
+                                    >
+                                        <span
+                                            v-text="
+                                                $t(
+                                                    'prospect.interaction.call_by_cloudtalk'
+                                                )
+                                            "
+                                        ></span>
+                                        <span
+                                            class="hc-prospect-interaction-item-number"
+                                            v-text="number"
+                                        ></span>
+                                    </div>
+                                    <icon class="fa fa-caret-right" />
+                                </item>
+                            </template>
+
+                            <!-- Add history -->
+                            <item
+                                tag="a"
+                                class="hc-prospect-interaction-item"
+                                @click="addHistory()"
+                            >
+                                <icon class="fa fa-plus icon-green" />
                                 <div
                                     class="hc-item-main-content"
-                                    v-text="
-                                        $t(
-                                            'prospect.interaction.call_by_cloudtalk'
-                                        )
+                                    v-text="$t('prospect.interaction.add_history')"
+                                ></div>
+                                <loading :loading="addingHistory" />
+                            </item>
+                        </template>
+                        <item
+                            style="
+                                background-color: #7939b8;
+                                color: white;
+                                margin-top: 10px;
+                                margin-bottom: 10px;
+                            "
+                            v-if="prospectInteractions.length > 0"
+                        >
+                            <icon class="fa fa-clock" color="white"></icon>
+                            <div
+                                class="hc-main-content"
+                                v-text="$t('prospect.interaction.history')"
+                            ></div>
+                        </item>
+                        <interaction-row
+                            v-for="c in prospectInteractions"
+                            :key="c.id"
+                            :interaction="c"
+                        />
+                    </item-list>
+                </template>
+
+                <!-- List of interaction -->
+                <template #2>
+                    <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
+                        <template #1 v-if="interactionProspect">
+                            <tab-layout
+                                :count="2"
+                                :tab="aircallTab"
+                                class="hc-flex-1"
+                            >
+                                <template #1>
+                                    <div
+                                        class="hc-flex-column"
+                                        style="height: 100%"
+                                    >
+                                        <item @click="tab = 0" class="bordered">
+                                            <icon class="fa fa-caret-left" />
+                                            <div
+                                                class="hc-item-main-content"
+                                                v-text="
+                                                    $t(
+                                                        'prospect.interaction.call_by_aircall'
+                                                    )
+                                                "
+                                            ></div>
+                                            <icon
+                                                class="fa fa-cog"
+                                                @click.stop="aircallTab = 1"
+                                            />
+                                        </item>
+                                        <div
+                                            style="
+                                                flex: 1;
+                                                width: 100%;
+                                                height: 100%;
+                                                padding: 10px;
+                                                overflow: auto;
+                                            "
+                                        >
+                                            <aircall
+                                                id="aircall-phone"
+                                                :number="interaction.number"
+                                                :style="{
+                                                    width: '100%',
+                                                    height: '100%',
+                                                    display:
+                                                        tab == 1 && frameTab == 0
+                                                            ? 'block'
+                                                            : 'none',
+                                                }"
+                                                @outgoing-call="
+                                                    (callInfos) => {
+                                                        interaction.status =
+                                                            'initiated';
+                                                        interaction.data = {
+                                                            id: callInfos.call_id,
+                                                        };
+                                                        updateInteraction();
+                                                    }
+                                                "
+                                                @call-ended="
+                                                    (callInfos) => {
+                                                        interaction.status =
+                                                            'ended';
+                                                        interaction.data = {
+                                                            id: callInfos.call_id,
+                                                        };
+                                                        updateInteraction();
+                                                        nextInteraction();
+                                                    }
+                                                "
+                                                @answered-call="
+                                                    (interaction.status =
+                                                        'answered'),
+                                                        updateInteraction()
+                                                "
+                                            />
+                                        </div>
+                                    </div>
+                                </template>
+                                <template #2>
+                                    <div
+                                        class="hc-flex-column"
+                                        style="height: 100%"
+                                    >
+                                        <item
+                                            @click="aircallTab = 0"
+                                            class="bordered"
+                                        >
+                                            <icon class="fa fa-caret-left" />
+                                            <div
+                                                class="hc-item-main-content"
+                                                v-text="'Paramètre Aircall Webhook'"
+                                            ></div>
+                                        </item>
+                                        <item-list
+                                            class="hc-flex-1"
+                                            gap="5px"
+                                            style="overflow: auto"
+                                        >
+                                            <item
+                                                tag="a"
+                                                href="https://dashboard.aircall.io/integrations/flow/install/webhook/webhook/0"
+                                                target="_blank"
+                                            >
+                                                <icon class="fa fa-wifi" />
+                                                <div
+                                                    class="hc-item-main-content"
+                                                    v-text="
+                                                        'Rendez-vous sur la page webhook d\'aircall'
+                                                    "
+                                                ></div>
+                                                <icon class="fa fa-caret-right" />
+                                            </item>
+                                            <item
+                                                tag="a"
+                                                @click.prevent="
+                                                    copyAircallWebhookURLToClipboard
+                                                "
+                                            >
+                                                <icon class="fa fa-link" />
+                                                <div
+                                                    class="hc-item-main-content"
+                                                    v-text="
+                                                        'Mettre ' +
+                                                        aircallWebhookURL +
+                                                        ' comme URL'
+                                                    "
+                                                ></div>
+                                                <icon class="fa fa-copy" />
+                                            </item>
+                                            <item>
+                                                <icon class="fa fa-check" />
+                                                <div
+                                                    class="hc-item-main-content"
+                                                    v-text="
+                                                        'Cocher &quot;call.ended&quot; dans la section Appel'
+                                                    "
+                                                ></div>
+                                            </item>
+                                            <item>
+                                                <icon class="fa fa-check" />
+                                                <div
+                                                    class="hc-item-main-content"
+                                                    v-text="
+                                                        'Enfin cliquer sur &quot;Ajouter webhook&quot;'
+                                                    "
+                                                ></div>
+                                            </item>
+                                        </item-list>
+                                    </div>
+                                </template>
+                            </tab-layout>
+                        </template>
+
+                        <template #2 v-if="interactionProspect">
+                            <div class="hc-flex-column" style="height: 100%">
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_ringover'
+                                            )
+                                        "
+                                    ></div>
+                                    <icon
+                                        class="fa fa-cog"
+                                        @click.stop="ringoverSetting"
+                                    />
+                                </item>
+                                <div
+                                    style="
+                                        flex: 1;
+                                        width: 100%;
+                                        height: 100%;
+                                        overflow: auto;
+                                    "
+                                >
+                                    <ringover
+                                        id="ringover-phone"
+                                        :number="interaction.number"
+                                        tab="phone"
+                                        style="flex: 1; width: 100%; height: 100%"
+                                        @ringing-call="
+                                            (callInfo) => {
+                                                interaction.from_number =
+                                                    callInfo.data.from;
+                                                interaction.status = 'ringing';
+                                                interaction.data.id =
+                                                    callInfo.data.call_id;
+                                                updateInteraction();
+                                            }
+                                        "
+                                        @hangup-call="
+                                            (callInfo) => {
+                                                interaction.status = 'hangup';
+                                                interaction.data.id =
+                                                    callInfo.data.call_id;
+                                                updateInteraction();
+                                                nextInteraction();
+                                            }
+                                        "
+                                        @answered-call="
+                                            (interaction.status = 'answered'),
+                                                updateInteraction()
+                                        "
+                                    />
+                                </div>
+                            </div>
+                        </template>
+
+                        <template #3>
+                            <select-prospect
+                                @back="tab = 0"
+                                @prospect-selected="setInteractionProspect"
+                            />
+                        </template>
+
+                        <template #4>
+                            <form
+                                class="hc-flex-column"
+                                style="height: 100%"
+                                @submit.prevent="updateProspectPhoneNumber"
+                            >
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.edit_phone_number'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+                                <item-list padding="12px" style="height: auto">
+                                    <v-field
+                                        :label="$t('field.prospect.phone_number')"
+                                        ><input
+                                            type="tel"
+                                            v-model.lazy="phoneNumber"
+                                    /></v-field>
+                                </item-list>
+                                <buttons>
+                                    <button v-text="$t('update')"></button>
+                                </buttons>
+                                <loading :loading="updatingPhoneNumber" />
+                            </form>
+                        </template>
+
+                        <template #5>
+                            <form
+                                class="hc-flex-column"
+                                style="height: 100%; position: relative"
+                                @submit.prevent="updateProspectMobilePhoneNumber"
+                            >
+                                <item @click="tab = 0" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.edit_mobile_phone_number'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+                                <item-list padding="12px" style="height: auto">
+                                    <v-field
+                                        :label="$t('field.prospect.phone_number')"
+                                        ><input
+                                            type="tel"
+                                            v-model.lazy="mobilePhoneNumber"
+                                    /></v-field>
+                                </item-list>
+                                <buttons>
+                                    <button v-text="$t('update')"></button>
+                                </buttons>
+                                <loading :loading="updatingMobilePhoneNumber" />
+                            </form>
+                        </template>
+
+                        <template #6 v-if="interactionProspect">
+                            <div class="hc-flex-column" style="height: 100%">
+                                <item @click="backFromCloudtalk" class="bordered">
+                                    <icon class="fa fa-caret-left" />
+                                    <div
+                                        class="hc-item-main-content"
+                                        v-text="
+                                            $t(
+                                                'prospect.interaction.call_by_cloudtalk'
+                                            )
+                                        "
+                                    ></div>
+                                </item>
+                                <div
+                                    style="
+                                        flex: 1;
+                                        width: 100%;
+                                        height: 100%;
+                                        overflow: auto;
+                                        position: relative;
                                     "
                                 ></div>
-                            </item>
-                            <div
-                                style="
-                                    flex: 1;
-                                    width: 100%;
-                                    height: 100%;
-                                    overflow: auto;
-                                "
-                            >
-                                <cloudtalk
-                                    id="cloudtalk-phone"
-                                    :number="interaction.number"
-                                    style="width: 100%; height: 100%"
-                                    @outgoing-call="
-                                        (callInfos) => {
-                                            interaction.status =
-                                                'initiated';
-                                            interaction.data = {
-                                                id: callInfos.call_uuid,
-                                            };
-                                            updateInteraction();
-                                        }
-                                    "
-                                    @call-ended="
-                                        (callInfos) => {
-                                            interaction.status = 'ended';
-                                            interaction.data = {
-                                                id: callInfos.call_uuid,
-                                            };
-                                            updateInteraction();
-                                            nextInteraction();
-                                        }
-                                    "
-                                    @answered-call="
-                                        (interaction.status =
-                                            'answered'),
-                                            updateInteraction()
-                                    "
-                                />
                             </div>
-                        </div>
-                    </template>
-                </frame-layout>
-            </template>
-        </tab-layout>
+                        </template>
+                    </frame-layout>
+                </template>
+            </tab-layout>
+        </div>
     </slide>
 </template>
 
 <style>
+.hc-prospect-interaction-root {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow-y: hidden;
+}
+
 .hc-prospect-interaction-item {
     padding: 4px 0 !important;
     text-decoration: none;
@@ -585,6 +583,25 @@
 .hc-prospect-interaction-item-number {
     font-size: 11px;
     color: #999999;
+}
+
+.hc-prospect-interaction-cloudtalk-phone {
+    position: absolute;
+    top: 42px;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    background: #ffffff;
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.hc-prospect-interaction-cloudtalk-phone.visible {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
 }
 </style>
 
@@ -596,6 +613,7 @@ import ProspectService from "@/apis/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
 import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
+import { OPEN_LEFT_SLIDE } from "@/actions/slide";
 import {
     FETCH_PROSPECT_INTERACTIONS,
     ADD_PROSPECT_INTERACTION,
@@ -603,6 +621,7 @@ import {
     SET_PROSPECT_INTERACTION_TAB,
     SET_PROSPECT_INTERACTION_FRAME_TAB,
 } from "@/actions/project/prospect/interaction";
+import { MAKE_CLOUDTALK_CALL } from "@/actions/project/line";
 
 // Components
 import Ringover from "@/components/utils/Ringover.vue";
@@ -635,12 +654,21 @@ export default {
             fetchingInteraction: false,
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
+            callingCloudtalk: false,
+            cloudtalkWaitingForEvent: false,
+            cloudtalkLoginRequired: false,
+            cloudtalkPhoneVisible: false,
+            cloudtalkEventTimeout: null,
         };
     },
 
     created() {
         store.commit(SET_PROSPECT_INTERACTION_TAB, 0);
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+    },
+
+    beforeUnmount() {
+        this.clearCloudtalkEventTimeout();
     },
 
     methods: {
@@ -712,13 +740,234 @@ export default {
             this.addInteraction();
         },
 
-        interactionViaCloudtalk(number) {
+        async interactionViaCloudtalk(number) {
             this.tab = 1;
             this.frameTab = 5;
+            this.cloudtalkPhoneVisible = true;
+            this.cloudtalkWaitingForEvent = false;
+            this.cloudtalkLoginRequired = false;
             this.interaction = this.newInteraction();
             this.interaction.source = "cloudtalk";
             this.interaction.number = number;
-            this.addInteraction();
+            await this.addInteraction();
+            this.makeCloudtalkCall();
+        },
+
+        async makeCloudtalkCall() {
+            if (this.callingCloudtalk || !this.interaction.number) {
+                return;
+            }
+
+            this.callingCloudtalk = true;
+            this.cloudtalkPhoneVisible = true;
+            this.cloudtalkWaitingForEvent = true;
+            this.cloudtalkLoginRequired = false;
+            this.clearCloudtalkEventTimeout();
+
+            try {
+                const params = {
+                    number: this.interaction.number,
+                };
+
+                if (this.cloudtalkLine) {
+                    params.line_id = this.cloudtalkLine.id;
+                }
+
+                const response = await store.dispatch(
+                    MAKE_CLOUDTALK_CALL,
+                    params
+                );
+
+                this.interaction.status = "initiated";
+                this.interaction.data = {
+                    ...(this.interaction.data || {}),
+                    cloudtalk: response.responseData,
+                };
+                this.updateInteraction();
+                if (this.cloudtalkWaitingForEvent) {
+                    this.startCloudtalkEventTimeout();
+                }
+            } catch (error) {
+                this.cloudtalkWaitingForEvent = false;
+                this.clearCloudtalkEventTimeout();
+
+                const status =
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.status
+                        ? error.response.data.status
+                        : error.response
+                        ? error.response.status
+                        : null;
+
+                const message =
+                    error.response &&
+                    error.response.data &&
+                    error.response.data.message
+                        ? error.response.data.message
+                        : "Impossible de lancer l'appel CloudTalk.";
+
+                if (status == 403) {
+                    this.showCloudtalkLogin();
+                }
+
+                this.interaction.status = "failed";
+                this.interaction.data = {
+                    ...(this.interaction.data || {}),
+                    error: message,
+                };
+                this.updateInteraction();
+
+                flashError({
+                    title: "CloudTalk",
+                    body: message,
+                    duration: 7000,
+                });
+            } finally {
+                this.callingCloudtalk = false;
+            }
+        },
+
+        showCloudtalkPhone() {
+            this.clearCloudtalkEventTimeout();
+            this.cloudtalkWaitingForEvent = false;
+            this.cloudtalkLoginRequired = false;
+            this.cloudtalkPhoneVisible = true;
+            this.tab = 1;
+            this.frameTab = 5;
+        },
+
+        displayCloudtalkPhoneFromIframe(payload = {}) {
+            this.prepareCloudtalkInteractionFromIframe(payload.properties || {});
+
+            if (!this.leftSlideOpen(this.name)) {
+                store.commit(OPEN_LEFT_SLIDE, this.name);
+            }
+
+            this.showCloudtalkPhone();
+
+            setTimeout(() => {
+                this.showCloudtalkPhone();
+            }, 0);
+        },
+
+        prepareCloudtalkInteractionFromIframe(callInfos = {}) {
+            const callId =
+                callInfos.call_uuid || callInfos.call_id || callInfos.id;
+            const currentCallId =
+                this.interaction &&
+                this.interaction.data &&
+                (this.interaction.data.id ||
+                    this.interaction.data.call_uuid ||
+                    this.interaction.data.call_id);
+
+            if (
+                this.interaction &&
+                this.interaction.source == "cloudtalk" &&
+                (!callId || !currentCallId || currentCallId == callId)
+            ) {
+                return;
+            }
+
+            this.interaction = this.newInteraction();
+            this.interaction.source = "cloudtalk";
+            this.interaction.number =
+                callInfos.external_number || callInfos.number || "";
+            this.interaction.from_number = callInfos.internal_number || "";
+            this.setCloudtalkCallData(callInfos);
+        },
+
+        showCloudtalkLogin() {
+            this.cloudtalkWaitingForEvent = false;
+            this.cloudtalkLoginRequired = true;
+            this.cloudtalkPhoneVisible = false;
+            this.tab = 1;
+            this.frameTab = 5;
+        },
+
+        backFromCloudtalk() {
+            this.cloudtalkPhoneVisible = false;
+            this.cloudtalkWaitingForEvent = false;
+            this.cloudtalkLoginRequired = false;
+            this.clearCloudtalkEventTimeout();
+            this.tab = 0;
+        },
+
+        startCloudtalkEventTimeout() {
+            this.clearCloudtalkEventTimeout();
+
+            this.cloudtalkEventTimeout = setTimeout(() => {
+                if (!this.cloudtalkWaitingForEvent) {
+                    return;
+                }
+
+                this.cloudtalkWaitingForEvent = false;
+                this.showCloudtalkLogin();
+
+                flashWarning({
+                    title: "CloudTalk",
+                    body: "Aucun evenement CloudTalk recu. Connectez-vous dans CloudTalk puis relancez l'appel.",
+                    duration: 7000,
+                });
+            }, 25000);
+        },
+
+        clearCloudtalkEventTimeout() {
+            if (this.cloudtalkEventTimeout) {
+                clearTimeout(this.cloudtalkEventTimeout);
+                this.cloudtalkEventTimeout = null;
+            }
+        },
+
+        cloudtalkCallRinging(callInfos) {
+            this.showCloudtalkPhone();
+            this.interaction.status = "ringing";
+            this.setCloudtalkCallData(callInfos);
+            this.updateInteraction();
+        },
+
+        cloudtalkCallOutgoing(callInfos) {
+            this.showCloudtalkPhone();
+            this.interaction.status = "initiated";
+            this.setCloudtalkCallData(callInfos);
+            this.updateInteraction();
+        },
+
+        cloudtalkCallAnswered(callInfos) {
+            this.showCloudtalkPhone();
+            this.interaction.status = "answered";
+            this.setCloudtalkCallData(callInfos);
+            this.updateInteraction();
+        },
+
+        cloudtalkCallHangup(callInfos) {
+            this.showCloudtalkPhone();
+            this.interaction.status = "hangup";
+            this.setCloudtalkCallData(callInfos);
+            this.updateInteraction();
+            if (this.interactionProspect) {
+                this.nextInteraction();
+            }
+        },
+
+        cloudtalkCallEnded(callInfos) {
+            this.showCloudtalkPhone();
+            this.interaction.status = "ended";
+            this.setCloudtalkCallData(callInfos);
+            this.updateInteraction();
+            if (this.interactionProspect) {
+                this.nextInteraction();
+            }
+        },
+
+        setCloudtalkCallData(callInfos = {}) {
+            const callId =
+                callInfos.call_uuid || callInfos.call_id || callInfos.id;
+
+            this.interaction.data = {
+                ...(this.interaction.data || {}),
+                ...(callId ? { id: callId } : {}),
+            };
         },
 
         /**
@@ -741,7 +990,7 @@ export default {
          *
          */
         async updateInteraction() {
-            if (!this.interaction) {
+            if (!this.interaction || !this.interactionProspect) {
                 return;
             }
 
@@ -898,6 +1147,7 @@ export default {
             "prospectsSelected",
             "leftSlideOpen",
             "can",
+            "lines",
         ]),
 
         currentProspect() {
@@ -914,6 +1164,29 @@ export default {
          */
         aircallWebhookURL: function () {
             return window.location.origin + "/webhook/aircall";
+        },
+
+        cloudtalkLoading() {
+            return this.callingCloudtalk || this.cloudtalkWaitingForEvent;
+        },
+
+        cloudtalkPhoneDisplayed() {
+            return (
+                (this.cloudtalkPhoneVisible ||
+                    this.cloudtalkLoginRequired ||
+                    this.cloudtalkLoading) &&
+                this.tab == 1 &&
+                this.frameTab == 5
+            );
+        },
+
+        cloudtalkLine() {
+            return this.lines.find(
+                (line) =>
+                    line.operator === "cloudtalk" &&
+                    this.user &&
+                    line.user_id == this.user.id
+            );
         },
     },
 };

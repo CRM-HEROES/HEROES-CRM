@@ -4902,6 +4902,22 @@ __webpack_require__.r(__webpack_exports__);
     type: "text"
   }]
 }, {
+  value: "cloudtalk",
+  label: "CloudTalk",
+  fields: [{
+    key: "api_key_id",
+    label: "API Access Key ID",
+    type: "text"
+  }, {
+    key: "api_key_secret",
+    label: "API Access Key Secret",
+    type: "password"
+  }, {
+    key: "agent_id",
+    label: "Agent",
+    type: "select"
+  }]
+}, {
   value: "ringover",
   label: "Ringover",
   fields: [{

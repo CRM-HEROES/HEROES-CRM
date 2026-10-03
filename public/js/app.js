@@ -25010,6 +25010,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     left: {
       type: Boolean,
       "default": false
+    },
+    eager: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
@@ -26965,7 +26969,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-slide', $options.open ? 'active' : '', _ctx.leftSlideOpen($props.name) ? 'left' : '']),
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-  }, [$data.firstOpen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [$data.firstOpen || $props.eager ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [$props.icon ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
     key: 0,
@@ -28048,6 +28052,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ADD_LINE: () => (/* binding */ ADD_LINE),
 /* harmony export */   FETCH_LINES: () => (/* binding */ FETCH_LINES),
+/* harmony export */   MAKE_CLOUDTALK_CALL: () => (/* binding */ MAKE_CLOUDTALK_CALL),
 /* harmony export */   REMOVE_LINE: () => (/* binding */ REMOVE_LINE),
 /* harmony export */   SET_LINE: () => (/* binding */ SET_LINE),
 /* harmony export */   SET_LINES: () => (/* binding */ SET_LINES),
@@ -28061,6 +28066,7 @@ var ADD_LINE = "addLine";
 var SHOW_LINE = "showLine";
 var UPDATE_LINE = "updateLine";
 var REMOVE_LINE = "removeLine";
+var MAKE_CLOUDTALK_CALL = "makeCloudtalkCall";
 
 /***/ }),
 
@@ -31372,6 +31378,15 @@ __webpack_require__.r(__webpack_exports__);
   },
   update: function update(project, line, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/line/").concat(line), params);
+  },
+  makeCloudtalkCall: function makeCloudtalkCall(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/call"), params);
+  },
+  verifyCloudtalk: function verifyCloudtalk(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/verify"), params);
+  },
+  getCloudtalkAgents: function getCloudtalkAgents(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line/cloudtalk/agents"), params);
   },
   destroy: function destroy(project, line) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/line/").concat(line));
@@ -41589,20 +41604,38 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_line__W
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.MAKE_CLOUDTALK_CALL, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var _yield$lineService$ma, data;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].makeCloudtalkCall(context.state.project.slug, params);
+        case 2:
+          _yield$lineService$ma = _context5.sent;
+          data = _yield$lineService$ma.data;
+          return _context5.abrupt("return", data);
+        case 5:
+        case "end":
+          return _context5.stop();
+      }
+    }, _callee5);
+  }))();
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.next = 2;
           return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
         case 2:
           context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, slug);
         case 3:
         case "end":
-          return _context5.stop();
+          return _context6.stop();
       }
-    }, _callee5);
+    }, _callee6);
   }))();
 }), _actions);
 

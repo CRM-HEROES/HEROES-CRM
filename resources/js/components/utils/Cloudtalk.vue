@@ -1,19 +1,38 @@
 <template>
     <div :id="id" class="hc-cloudtalk">
-        <div v-if="number" class="hc-cloudtalk-header">
+        <!-- <div v-if="number" class="hc-cloudtalk-header">
             <div class="hc-cloudtalk-number" v-text="number"></div>
-            <button
-                type="button"
-                class="hc-cloudtalk-copy"
-                @click="copyNumber"
-                aria-label="Copier le numéro"
-            >
-                <icon class="fa fa-copy" />
-            </button>
+            <div class="hc-cloudtalk-actions">
+                <button
+                    type="button"
+                    class="hc-cloudtalk-action"
+                    :disabled="calling"
+                    @click="requestCall"
+                    aria-label="Appeler via CloudTalk"
+                    title="Appeler via CloudTalk"
+                >
+                    <icon class="fa fa-phone" />
+                </button>
+                <button
+                    type="button"
+                    class="hc-cloudtalk-action"
+                    @click="copyNumber"
+                    aria-label="Copier le numéro"
+                    title="Copier le numéro"
+                >
+                    <icon class="fa fa-copy" />
+                </button>
+            </div>
+        </div> -->
+        <div v-if="loading" class="hc-cloudtalk-loading">
+            <loading :loading="loading" />
         </div>
         <iframe
             :src="src"
-            class="hc-cloudtalk-iframe"
+            :class="[
+                'hc-cloudtalk-iframe',
+                { 'hc-cloudtalk-iframe-loading': loading },
+            ]"
             allow="microphone *; camera *; display-capture *; autoplay *; clipboard-read *; clipboard-write *; fullscreen *"
             allowfullscreen
             referrerpolicy="origin"
@@ -25,8 +44,10 @@
 .hc-cloudtalk {
     display: flex;
     flex-direction: column;
+    position: relative;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 .hc-cloudtalk-header {
@@ -48,7 +69,13 @@
     white-space: nowrap;
 }
 
-.hc-cloudtalk-copy {
+.hc-cloudtalk-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hc-cloudtalk-action {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -59,8 +86,13 @@
     cursor: pointer;
 }
 
-.hc-cloudtalk-copy:hover {
+.hc-cloudtalk-action:hover {
     color: #000;
+}
+
+.hc-cloudtalk-action:disabled {
+    color: #aaa;
+    cursor: wait;
 }
 
 .hc-cloudtalk-iframe {
@@ -68,6 +100,28 @@
     width: 100%;
     height: 100%;
     flex: 1;
+    position: relative;
+    z-index: 1;
+    transition: filter 150ms ease-out;
+    margin-bottom: 50px;
+}
+
+.hc-cloudtalk-iframe-loading {
+    filter: blur(2px);
+}
+
+.hc-cloudtalk-loading {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 2;
+    height: 52px;
+    background: rgba(255, 255, 255, 0.86);
+}
+
+.hc-cloudtalk-loading .hc-loading-overlay {
+    background-color: transparent;
 }
 </style>
 
@@ -75,15 +129,24 @@
 /**
  * CloudTalk Phone (https://phone.cloudtalk.io)
  *
- * CloudTalk only communicates from the iframe to the parent application
- * through window.postMessage (ringing, dialing, calling, hangup, ended,
- * contact_info). There is no documented API to trigger an outbound call
- * from the parent, so the phone cannot be dialed programmatically: the
- * `number` prop is kept for API consistency with the other providers.
+ * The iframe remains the phone UI. Outbound calls are requested by emitting
+ * an event to the parent Vue component, which calls the Laravel backend and
+ * lets Laravel call the documented CloudTalk Make a Call API.
  *
  * CloudTalk recommends a minimum size of 700px x 420px.
  */
 export default {
+    emits: [
+        "answered-call",
+        "call-activity",
+        "call-ended",
+        "contact-info",
+        "hangup-call",
+        "make-call",
+        "outgoing-call",
+        "ringing-call",
+    ],
+
     props: {
         id: {
             type: String,
@@ -97,6 +160,16 @@ export default {
         number: {
             type: String,
             default: null,
+        },
+
+        calling: {
+            type: Boolean,
+            default: false,
+        },
+
+        loading: {
+            type: Boolean,
+            default: false,
         },
     },
 
@@ -116,6 +189,14 @@ export default {
     },
 
     methods: {
+        requestCall() {
+            if (!this.number || this.calling) {
+                return;
+            }
+
+            this.$emit("make-call", this.number);
+        },
+
         copyNumber() {
             if (!this.number) {
                 return;
@@ -143,7 +224,7 @@ export default {
          * Handle events sent by the CloudTalk Phone iframe
          */
         handleMessage(event) {
-            if (!this.allowedOrigin.test(event.origin)) {
+            if (event.origin !== this.origin) {
                 return;
             }
 
@@ -162,6 +243,13 @@ export default {
             }
 
             const properties = data.properties || {};
+
+            if (this.isCallActivity(data.event)) {
+                this.$emit("call-activity", {
+                    event: data.event,
+                    properties,
+                });
+            }
 
             switch (data.event) {
                 case "ringing":
@@ -183,6 +271,12 @@ export default {
                     this.$emit("contact-info", properties);
                     break;
             }
+        },
+
+        isCallActivity(eventName) {
+            return ["ringing", "dialing", "calling", "hangup", "ended"].includes(
+                eventName
+            );
         },
     },
 

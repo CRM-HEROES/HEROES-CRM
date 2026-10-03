@@ -5,7 +5,10 @@ namespace App\Http\Controllers\API\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Line;
 use App\Models\Project;
+use App\Services\CloudTalk;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use RuntimeException;
 
 class LineController extends Controller
 {
@@ -16,6 +19,7 @@ class LineController extends Controller
      */
     protected $operatorConfigFields = [
         'kavkom' => ['api_token', 'domain_uuid', 'phone_number', 'extension'],
+        'cloudtalk' => ['api_key_id', 'api_key_secret', 'agent_id'],
         'ringover' => ['api_token'],
     ];
 
@@ -39,6 +43,10 @@ class LineController extends Controller
         abort_unless(auth()->user()->can('projectLineAdd', $project), 404);
 
         $this->validate($request, $this->rules($request->input('operator')));
+        $this->validateOperatorConfig(
+            $request->input('operator'),
+            $request->input('config', [])
+        );
 
         return $project
             ->lines()
@@ -71,6 +79,10 @@ class LineController extends Controller
         abort_unless($project->id == $line->project_id, 404);
 
         $this->validate($request, $this->rules($request->input('operator')));
+        $this->validateOperatorConfig(
+            $request->input('operator'),
+            $request->input('config', [])
+        );
 
         $line->update($request->only(
             'name',
@@ -113,5 +125,30 @@ class LineController extends Controller
         }
 
         return $rules;
+    }
+
+    protected function validateOperatorConfig(string $operator, array $config): void
+    {
+        if ($operator !== 'cloudtalk') {
+            return;
+        }
+
+        try {
+            $agents = app(CloudTalk::class)->agents($config);
+        } catch (RuntimeException $e) {
+            throw ValidationException::withMessages([
+                'config.api_key_id' => $e->getMessage(),
+            ]);
+        }
+
+        $agentExists = collect($agents)->contains(
+            fn ($agent) => (string) $agent['id'] === (string) ($config['agent_id'] ?? '')
+        );
+
+        if (!$agentExists) {
+            throw ValidationException::withMessages([
+                'config.agent_id' => 'Agent CloudTalk introuvable pour ces identifiants.',
+            ]);
+        }
     }
 }
