@@ -2,6 +2,7 @@
     <slide
         :name="name"
         @open="fetchInteractions(), fetchSelectedProspects()"
+        @closed="resetCloudtalkSlideState"
         :title="
             $t('prospect.interaction.title', {
                 prospect: interactionTitleProspect
@@ -1212,11 +1213,20 @@ export default {
         },
 
         backFromCloudtalk() {
+            this.resetCloudtalkSlideState();
+        },
+
+        resetCloudtalkSlideState() {
+            if (this.interaction.source != "cloudtalk" && this.frameTab != 5) {
+                return;
+            }
+
             this.cloudtalkPhoneVisible = false;
             this.cloudtalkWaitingForEvent = false;
             this.cloudtalkLoginRequired = false;
             this.clearCloudtalkEventTimeout();
             this.tab = 0;
+            this.frameTab = 0;
         },
 
         startCloudtalkEventTimeout() {

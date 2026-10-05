@@ -30099,11 +30099,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.frameTab = 5;
     },
     backFromCloudtalk: function backFromCloudtalk() {
+      this.resetCloudtalkSlideState();
+    },
+    resetCloudtalkSlideState: function resetCloudtalkSlideState() {
+      if (this.interaction.source != "cloudtalk" && this.frameTab != 5) {
+        return;
+      }
       this.cloudtalkPhoneVisible = false;
       this.cloudtalkWaitingForEvent = false;
       this.cloudtalkLoginRequired = false;
       this.clearCloudtalkEventTimeout();
       this.tab = 0;
+      this.frameTab = 0;
     },
     startCloudtalkEventTimeout: function startCloudtalkEventTimeout() {
       var _this6 = this;
@@ -52748,7 +52755,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * Handle events sent by the CloudTalk Phone iframe
      */
     handleMessage: function handleMessage(event) {
-      if (!this.allowedOrigin.test(event.origin)) {
+      if (event.origin !== this.origin) {
         return;
       }
       var data = event.data;
@@ -78928,7 +78935,7 @@ var _hoisted_14 = {
 };
 var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-prospect-interaction-cloudtalk-context-heading"
-}, " Threads ", -1 /* HOISTED */);
+}, " information ", -1 /* HOISTED */);
 var _hoisted_16 = {
   key: 0,
   "class": "hc-prospect-interaction-cloudtalk-context-empty"
@@ -79093,6 +79100,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onOpen: _cache[20] || (_cache[20] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects();
     }),
+    onClosed: $options.resetCloudtalkSlideState,
     title: _ctx.$t('prospect.interaction.title', {
       prospect: $options.interactionTitleProspect ? $options.interactionTitleProspect.last_name : ''
     }),
@@ -79169,7 +79177,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "fa fa-mobile"
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.mobile_phone_number)
-      }, null, 8 /* PROPS */, _hoisted_13)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, $options.cloudtalkLookupThreads.length == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, " Aucun thread lie a votre utilisateur. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkLookupThreads, function (thread) {
+      }, null, 8 /* PROPS */, _hoisted_13)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, $options.cloudtalkLookupThreads.length == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, " Aucun information lie a votre utilisateur. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkLookupThreads, function (thread) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: thread.id,
           "class": "hc-prospect-interaction-cloudtalk-thread"
@@ -79733,7 +79741,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])])];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["name", "title", "url", "style"]);
+  }, 8 /* PROPS */, ["name", "onClosed", "title", "url", "style"]);
 }
 
 /***/ }),
