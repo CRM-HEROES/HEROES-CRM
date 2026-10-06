@@ -121,6 +121,7 @@
         "order": "Ordini",
         "documents": "Documenti",
         "campaigns": "Campagne",
+        "monitoring": "Monitoraggio server",
         "stat": "Statistiche",
         "settings": "Impostazioni"
     },

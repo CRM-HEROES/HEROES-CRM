@@ -138,6 +138,7 @@
         "order": "Devis",
         "documents": "Documents",
         "campaigns": "Campagnes",
+        "monitoring": "Monitoring serveur",
         "stat": "Statistiques",
         "settings": "Paramètres"
     },
