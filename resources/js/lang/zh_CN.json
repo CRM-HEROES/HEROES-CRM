@@ -121,6 +121,7 @@
         "order": "命令",
         "documents": "文件",
         "campaigns": "活动",
+        "monitoring": "服务器监控",
         "stat": "统计数据",
         "settings": "设置"
     },

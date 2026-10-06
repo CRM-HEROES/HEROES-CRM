@@ -125,6 +125,7 @@
         "order": "Pedidos",
         "documents": "Documentos",
         "campaigns": "Campanhas",
+        "monitoring": "Monitoramento do servidor",
         "stat": "Estatísticas",
         "settings": "Configurações"
     },

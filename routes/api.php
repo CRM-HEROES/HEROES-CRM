@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\Monitoring\ServerMonitoringController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
@@ -216,6 +217,10 @@ Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->na
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+
+    // Server monitoring (super admin only, checked in the controller)
+    Route::get('/monitoring/overview', [ServerMonitoringController::class, 'overview']);
+    Route::get('/monitoring/history', [ServerMonitoringController::class, 'history']);
 
     // Authenticated user
     Route::get('/auth', function (Request $request) {

@@ -521,6 +521,33 @@
                         />
                     </svg>
                 </header-menu>
+
+                <!-- Server monitoring (super admin only) -->
+
+                <header-menu
+                    v-if="user && user.is_super_admin"
+                    :label="$t('header.monitoring')"
+                    :to="{
+                        name: 'monitoring',
+                        params: {
+                            project: project.slug,
+                        },
+                    }"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                        <rect x="6" y="10" width="88" height="62" rx="9" fill="#1f2a44" />
+                        <polyline
+                            points="14,52 30,52 38,30 50,62 60,38 68,52 86,52"
+                            fill="none"
+                            stroke="#2dd4a7"
+                            stroke-width="5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                        <rect x="38" y="76" width="24" height="7" fill="#1f2a44" />
+                        <rect x="26" y="83" width="48" height="7" rx="3" fill="#1f2a44" />
+                    </svg>
+                </header-menu>
             </template>
         </nav>
         <div style="flex: 1; height: 100%; z-index: 5">

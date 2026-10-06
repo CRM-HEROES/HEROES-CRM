@@ -63,6 +63,7 @@ class ImportProspects implements ShouldQueue
     const MAPPING_FIELD_USER = 9;
     const MAPPING_FIELD_GROUP = 10;
     const MAPPING_FIELD_CALENDAR = 11;
+    const DUPLICATE_COMPOSITE = '*';
 
     protected $import;
     protected $limit = 500;
@@ -173,12 +174,35 @@ class ImportProspects implements ShouldQueue
         }, $masterHeaders);
 
         $columnMap = [];
+        $usedMasterIndexes = [];
+
+        // Same position first: when this sheet has the same header as the
+        // reference at the same index (always the case for the first sheet),
+        // keep it there. This is what keeps files with blank or repeated
+        // column names intact instead of collapsing them onto one column.
+        foreach ($sheetHeader as $sheetIndex => $header) {
+            if (
+                isset($masterAliases[$sheetIndex])
+                && $masterAliases[$sheetIndex] === $this->resolveHeaderAlias($header)
+            ) {
+                $columnMap[$sheetIndex] = $sheetIndex;
+                $usedMasterIndexes[$sheetIndex] = true;
+            }
+        }
 
         foreach ($sheetHeader as $sheetIndex => $header) {
-            $masterIndex = array_search($this->resolveHeaderAlias($header), $masterAliases, true);
+            if (isset($columnMap[$sheetIndex])) {
+                continue;
+            }
 
-            if ($masterIndex !== false) {
-                $columnMap[$sheetIndex] = $masterIndex;
+            $alias = $this->resolveHeaderAlias($header);
+
+            foreach ($masterAliases as $masterIndex => $masterAlias) {
+                if ($masterAlias === $alias && !isset($usedMasterIndexes[$masterIndex])) {
+                    $columnMap[$sheetIndex] = $masterIndex;
+                    $usedMasterIndexes[$masterIndex] = true;
+                    break;
+                }
             }
         }
 
@@ -879,18 +903,8 @@ class ImportProspects implements ShouldQueue
         $pathinfoExtension = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
 
         // CSV
-        if ($pathinfoExtension == 'csv') {
-            $reader = ReaderEntityFactory::createCSVReader();
-
-            if ($this->import->field_delimiter) {
-                $reader->setFieldDelimiter($this->normalizeCsvDelimiter($this->import->field_delimiter));
-            }
-
-            if ($this->import->field_enclosure) {
-                $reader->setFieldEnclosure($this->import->field_enclosure);
-            }
-
-            return $reader;
+        if (\App\Support\ImportCsvReader::supports($pathinfoExtension)) {
+            return \App\Support\ImportCsvReader::make($this->import, $filepath);
         }
 
         // ODS
@@ -1211,9 +1225,22 @@ class ImportProspects implements ShouldQueue
      */
     protected function hasNoContactInfo($prospect)
     {
-        return empty($prospect['email'])
-            && empty($prospect['phone_number'])
-            && empty($prospect['mobile_phone_number']);
+        // Les fichiers qui ne sont pas des listes de leads (ex: liste
+        // d'adresses/sites à visiter) n'ont ni email ni téléphone : une ligne
+        // reste exploitable dès qu'elle porte une adresse, un nom ou une
+        // société. Seules les lignes sans aucune donnée d'identification
+        // sont ignorées.
+        foreach ([
+            'email', 'phone_number', 'mobile_phone_number',
+            'street', 'city', 'postal_code',
+            'company_name', 'first_name', 'last_name',
+        ] as $field) {
+            if (!empty($prospect[$field])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -1276,6 +1303,8 @@ class ImportProspects implements ShouldQueue
         $values = [];
 
         foreach ($query->cursor() as $row) {
+            $rowValues = [];
+
             foreach ($fields as $field) {
                 $sourceValue = $field['meta']
                     ? data_get(json_decode($row->meta ?: '[]', true) ?: [], $field['slug'])
@@ -1286,15 +1315,39 @@ class ImportProspects implements ShouldQueue
                 }
 
                 $key = $this->normalizeDuplicateComparisonValue($sourceValue, $field['slug']);
-                if ($key === '') {
-                    continue;
+                if ($key !== '') {
+                    $rowValues[$field['slug']] = $key;
                 }
+            }
 
-                $values[$field['slug']][$key] = ['id' => (int) $row->id, 'import_id' => $row->import_id];
+            $composite = $this->compositeDuplicateKey($rowValues, $fields);
+            if ($composite !== null) {
+                $values[self::DUPLICATE_COMPOSITE][$composite] = ['id' => (int) $row->id, 'import_id' => $row->import_id];
             }
         }
 
         return $values;
+    }
+
+    /**
+     * The fields chosen in "MAJ" are combined: two rows are duplicates only
+     * when ALL the selected fields are equal (e.g. address + postal code +
+     * city = the same address), not when any single one matches (a shared
+     * city must not make two different addresses duplicates). Returns null
+     * when the row has no value for any of the selected fields.
+     */
+    protected function compositeDuplicateKey(array $values, array $fields): ?string
+    {
+        if (empty($values)) {
+            return null;
+        }
+
+        $parts = [];
+        foreach ($fields as $field) {
+            $parts[] = $values[$field['slug']] ?? '';
+        }
+
+        return implode("\x1f", $parts);
     }
 
     protected function normalizeDuplicateComparisonValue($value, ?string $fieldSlug = null): string
@@ -1382,13 +1435,20 @@ class ImportProspects implements ShouldQueue
     protected function isRepeatedWithinFile($prospect)
     {
         if (!empty($this->duplicateFieldDescriptors)) {
-            foreach ($this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors) as $field => $value) {
-                if (isset($this->seenDuplicateFieldValues[$field]) && in_array($value, $this->seenDuplicateFieldValues[$field], true)) {
-                    return true;
-                }
+            $composite = $this->compositeDuplicateKey(
+                $this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors),
+                $this->duplicateFieldDescriptors
+            );
 
-                $this->seenDuplicateFieldValues[$field][] = $value;
+            if ($composite === null) {
+                return false;
             }
+
+            if (isset($this->seenDuplicateFieldValues[$composite])) {
+                return true;
+            }
+
+            $this->seenDuplicateFieldValues[$composite] = true;
 
             return false;
         }
@@ -1446,31 +1506,19 @@ class ImportProspects implements ShouldQueue
     protected function findExistingDuplicate($prospect)
     {
         if (!empty($this->duplicateFieldDescriptors)) {
-            $existing = null;
-            $matchedFields = [];
+            $values = $this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors);
+            $composite = $this->compositeDuplicateKey($values, $this->duplicateFieldDescriptors);
+            $match = $composite !== null
+                ? ($this->existingDuplicateFieldValues[self::DUPLICATE_COMPOSITE][$composite] ?? null)
+                : null;
 
-            foreach ($this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors) as $field => $value) {
-                $match = $this->existingDuplicateFieldValues[$field][$value] ?? null;
-                if (!$match) {
-                    continue;
-                }
-
-                if ($existing === null) {
-                    $existing = $match;
-                }
-
-                if ($existing['id'] === $match['id']) {
-                    $matchedFields[] = $field;
-                }
-            }
-
-            if ($existing === null) {
+            if (!$match) {
                 return null;
             }
 
             return [
-                'id' => $existing['id'],
-                'fields' => $matchedFields,
+                'id' => $match['id'],
+                'fields' => array_keys($values),
             ];
         }
 
