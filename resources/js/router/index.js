@@ -42,8 +42,6 @@ const Map = () => import("@/components/map/Map.vue");
 const Document = () => import("@/components/document/Document.vue");
 // Campaign
 const Campaign = () => import("@/components/campaign/Campaign.vue");
-// Server monitoring
-const Monitoring = () => import("@/components/monitoring/Monitoring.vue");
 // Agenda
 const Agenda = () => import("@/components/event/Agenda.vue");
 // Pipeline
@@ -233,23 +231,6 @@ const routes = [
                 component: Campaign,
                 meta: {
                     title: `Campagne`,
-                },
-            },
-            {
-                name: "monitoring",
-                path: "monitoring",
-                component: Monitoring,
-                meta: {
-                    title: `Monitoring serveur`,
-                },
-                // Super admins only (the API enforces it as well)
-                beforeEnter: (to, from, next) => {
-                    const user = store.state.auth && store.state.auth.user;
-                    if (user && user.is_super_admin) {
-                        next();
-                    } else {
-                        next({ name: "NotFound" });
-                    }
                 },
             },
             {
