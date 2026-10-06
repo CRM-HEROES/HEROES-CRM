@@ -138,7 +138,6 @@
         "order": "Orders",
         "documents": "Documents",
         "campaigns": "Campaigns",
-        "monitoring": "Server monitoring",
         "stat": "Stats",
         "settings": "Settings"
     },

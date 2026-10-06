@@ -45,10 +45,6 @@ class Kernel extends ConsoleKernel
 
         // Google Sheets instant sync: recover rows left behind by a crash / restart
         $schedule->command('sheet-sync:recover')->everyMinute()->withoutOverlapping();
-
-        // Server monitoring (super admin dashboard)
-        $schedule->command('app:monitoring-collect')->everyMinute()->withoutOverlapping(5);
-        $schedule->command('app:monitoring-prune')->hourly();
     }
 
     /**
