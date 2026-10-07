@@ -225,13 +225,22 @@ class CloudTalkController extends Controller
         try {
             $filters = $this->historyFilters($request, $cloudTalk, $line);
             $history = $cloudTalk->callHistory($line, $filters);
+            $call = $this->bestMatchingHistory($history, $request);
+
+            if (!$call) {
+                $history = $this->matchingHistory(
+                    $this->broadCloudTalkHistory($request, $cloudTalk, $line),
+                    $request
+                );
+                $call = $this->bestMatchingHistory($history, $request);
+            }
         } catch (RuntimeException $e) {
             return $this->runtimeError($e);
         }
 
         return [
             'number' => $request->input('number'),
-            'call' => $this->bestMatchingHistory($history, $request),
+            'call' => $call,
             'history' => $history,
         ];
     }
@@ -319,6 +328,13 @@ class CloudTalkController extends Controller
 
     protected function bestMatchingHistory(array $history, Request $request): ?array
     {
+        return collect($this->matchingHistory($history, $request))
+            ->sortByDesc(fn ($call) => $call['ended_at'] ?: $call['started_at'] ?: '')
+            ->first();
+    }
+
+    protected function matchingHistory(array $history, Request $request): array
+    {
         $callId = $request->input('call_id');
         $number = $this->normalizePhone($request->input('number'));
         $direction = $this->cloudTalkDirection($request->input('direction'));
@@ -329,14 +345,97 @@ class CloudTalkController extends Controller
                     return (string) $call['id'] === (string) $callId;
                 }
 
-                if ($direction && $call['type'] && $call['type'] !== $direction) {
+                if ($callId && $this->callUuidMatches($call, (string) $callId)) {
+                    return true;
+                }
+
+                if ($callId && !$number) {
                     return false;
                 }
 
-                return !$number || $this->phonesMatch($call['number'], $number);
+                if ($direction && !$this->directionsMatch($call['type'] ?? null, $direction)) {
+                    return false;
+                }
+
+                return !$number || $this->phonesMatch($call['number'] ?? null, $number);
             })
-            ->sortByDesc(fn ($call) => $call['ended_at'] ?: $call['started_at'] ?: '')
-            ->first();
+            ->values()
+            ->all();
+    }
+
+    protected function broadCloudTalkHistory(Request $request, CloudTalk $cloudTalk, Line $line): array
+    {
+        $history = [];
+
+        foreach (range(1, 3) as $page) {
+            $pageHistory = $cloudTalk->callHistory($line, array_merge(
+                $this->broadHistoryFilters($request),
+                ['page' => $page]
+            ));
+
+            if (!$pageHistory) {
+                break;
+            }
+
+            $history = array_merge($history, $pageHistory);
+
+            if (count($pageHistory) < 100) {
+                break;
+            }
+        }
+
+        return $history;
+    }
+
+    protected function broadHistoryFilters(Request $request): array
+    {
+        $endedAt = $this->cloudTalkDate($request->input('ended_at'), now()->addDay());
+        $startedAt = $this->cloudTalkDate($request->input('started_at'), now()->subDay());
+
+        return [
+            'date_from' => Carbon::parse($startedAt)->subDay()->toDateTimeString(),
+            'date_to' => Carbon::parse($endedAt)->addDay()->toDateTimeString(),
+            'limit' => 100,
+        ];
+    }
+
+    protected function callUuidMatches(array $call, string $callId): bool
+    {
+        foreach ([
+            'uuid',
+            'raw.Cdr.uuid',
+            'raw.Cdr.call_uuid',
+            'raw.Call.uuid',
+            'raw.Call.call_uuid',
+            'raw.uuid',
+            'raw.call_uuid',
+        ] as $path) {
+            $value = data_get($call, $path);
+
+            if ($value && (string) $value === $callId) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected function directionsMatch(?string $callDirection, string $requestDirection): bool
+    {
+        if (!$callDirection) {
+            return true;
+        }
+
+        return $this->directionFamily($callDirection) === $this->directionFamily($requestDirection);
+    }
+
+    protected function directionFamily(string $direction): string
+    {
+        return match ($direction) {
+            'inbound', 'incoming' => 'incoming',
+            'outbound', 'outgoing' => 'outgoing',
+            default => $direction,
+        };
     }
 
     protected function cloudTalkDirection(?string $direction): ?string

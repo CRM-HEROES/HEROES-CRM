@@ -250,10 +250,20 @@ class CloudTalk
 
         return [
             'id' => $id,
+            'uuid' => data_get($cdr, 'uuid')
+                ?: data_get($cdr, 'call_uuid')
+                ?: data_get($item, 'Call.uuid')
+                ?: data_get($item, 'Call.call_uuid')
+                ?: data_get($item, 'uuid')
+                ?: data_get($item, 'call_uuid'),
             'type' => data_get($cdr, 'type'),
             'status' => data_get($cdr, 'status'),
-            'number' => data_get($cdr, 'public_external'),
-            'from_number' => data_get($cdr, 'public_internal'),
+            'number' => data_get($cdr, 'public_external')
+                ?: data_get($cdr, 'external_number')
+                ?: data_get($item, 'Call.external_number'),
+            'from_number' => data_get($cdr, 'public_internal')
+                ?: data_get($cdr, 'internal_number')
+                ?: data_get($item, 'Call.internal_number'),
             'recorded' => $recorded,
             'recording_link' => data_get($cdr, 'recording_link'),
             'recording_url' => $recorded && $id

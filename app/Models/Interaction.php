@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,6 +46,7 @@ class Interaction extends Model
      */
     protected $appends = [
         'audio',
+        'duration',
     ];
 
 
@@ -66,6 +68,24 @@ class Interaction extends Model
             'prospect' => $this->prospect->id, 
             'interaction' => $this->id
         ]);
+    }
+
+    public function getDurationAttribute(): ?int
+    {
+        if (!$this->started_at || !$this->ended_at) {
+            return null;
+        }
+
+        try {
+            $startedAt = Carbon::parse($this->started_at);
+            $endedAt = Carbon::parse($this->ended_at);
+        } catch (\Throwable $e) {
+            return null;
+        }
+
+        $duration = $endedAt->getTimestamp() - $startedAt->getTimestamp();
+
+        return $duration >= 0 ? $duration : null;
     }
 
     public function cloudTalkCallId(): ?string

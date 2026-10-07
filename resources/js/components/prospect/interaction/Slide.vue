@@ -1448,7 +1448,7 @@ export default {
                 return "395px";
             }
 
-            return "300px";
+            return "350px";
         },
 
         /**

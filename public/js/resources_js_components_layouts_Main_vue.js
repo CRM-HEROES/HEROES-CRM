@@ -29775,6 +29775,11 @@ __webpack_require__.r(__webpack_exports__);
       type: Object
     }
   },
+  data: function data() {
+    return {
+      playingAudio: false
+    };
+  },
   computed: {
     /**
      *
@@ -29782,11 +29787,46 @@ __webpack_require__.r(__webpack_exports__);
     date: function date() {
       return dayjs(this.interaction.created_at).fromNow();
     },
+    durationLabel: function durationLabel() {
+      var duration = this.interaction.duration;
+      if (duration === null || duration === undefined || duration === "") {
+        return "";
+      }
+      var seconds = parseInt(duration, 10);
+      if (Number.isNaN(seconds) || seconds < 0) {
+        return "";
+      }
+      var minutes = Math.floor(seconds / 60);
+      var remainingSeconds = seconds % 60;
+      return "".concat(minutes, ":").concat(String(remainingSeconds).padStart(2, "0"));
+    },
     audioIcon: function audioIcon() {
+      if (this.playingAudio) {
+        return "fa fa-pause-circle";
+      }
       return this.interaction.source == "cloudtalk" ? "fa fa-play-circle" : "fa fa-microphone";
     },
     audioTitle: function audioTitle() {
       return this.interaction.source == "cloudtalk" ? "Ecouter la conversation" : "Ecouter l'enregistrement";
+    }
+  },
+  methods: {
+    toggleAudio: function toggleAudio() {
+      var _this = this;
+      var audio = this.$refs.audio;
+      if (!audio) {
+        return;
+      }
+      if (this.playingAudio) {
+        audio.pause();
+        return;
+      }
+      var promise = audio.play();
+      if (promise && promise["catch"]) {
+        promise["catch"](function () {
+          _this.playingAudio = false;
+        });
+      }
     }
   }
 });
@@ -79484,15 +79524,20 @@ var _hoisted_3 = {
   "class": "hc-item-main-content hc-flex-column"
 };
 var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["textContent"];
-var _hoisted_6 = {
+var _hoisted_5 = {
+  "class": "hc-prospect-interaction-date"
+};
+var _hoisted_6 = ["textContent"];
+var _hoisted_7 = ["textContent"];
+var _hoisted_8 = {
   "class": "hc-flex-column",
   style: {
     "align-items": "flex-end"
   }
 };
-var _hoisted_7 = ["textContent"];
-var _hoisted_8 = ["textContent"];
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = ["src"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -79520,26 +79565,42 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-prospect-interaction-creator",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.creator ? $props.interaction.creator.name : '(Utilisateur inconnu)')
-      }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-        "class": "hc-prospect-interaction-date",
+      }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.date)
-      }, null, 8 /* PROPS */, _hoisted_5)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [$props.interaction.number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      }, null, 8 /* PROPS */, _hoisted_6), $options.durationLabel ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+        key: 0,
+        "class": "hc-prospect-interaction-duration",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(' - ' + $options.durationLabel)
+      }, null, 8 /* PROPS */, _hoisted_7)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [$props.interaction.number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 0,
         "class": "hc-prospect-interaction-number",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.number)
-      }, null, 8 /* PROPS */, _hoisted_7)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interaction.from_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      }, null, 8 /* PROPS */, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interaction.from_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 1,
         "class": "hc-prospect-interaction-from-number",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.from_number)
-      }, null, 8 /* PROPS */, _hoisted_8)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      }, null, 8 /* PROPS */, _hoisted_10)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
         key: 3,
-        tag: "a",
-        href: $props.interaction.audio,
-        target: "_blank",
-        rel: "noopener",
+        tag: "button",
+        type: "button",
+        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.toggleAudio, ["prevent", "stop"]),
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.audioIcon),
         title: $options.audioTitle
-      }, null, 8 /* PROPS */, ["href", "class", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+      }, null, 8 /* PROPS */, ["onClick", "class", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("audio", {
+        key: 4,
+        ref: "audio",
+        src: $props.interaction.audio,
+        preload: "none",
+        onPlay: _cache[0] || (_cache[0] = function ($event) {
+          return $data.playingAudio = true;
+        }),
+        onPause: _cache[1] || (_cache[1] = function ($event) {
+          return $data.playingAudio = false;
+        }),
+        onEnded: _cache[2] || (_cache[2] = function ($event) {
+          return $data.playingAudio = false;
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["class"]);
@@ -107892,7 +107953,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-creator {\n    color: #333333;\n}\n.hc-prospect-interaction-date {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-from-number {\n    font-size: 11px;\n    color: #7939b8;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-creator {\n    color: #333333;\n}\n.hc-prospect-interaction-date {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-duration {\n    color: #666666;\n}\n.hc-prospect-interaction-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-from-number {\n    font-size: 11px;\n    color: #7939b8;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
