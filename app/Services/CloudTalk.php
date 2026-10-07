@@ -10,7 +10,9 @@ use RuntimeException;
 class CloudTalk
 {
     protected const AGENTS_URL = 'https://my.cloudtalk.io/api/agents/index.json';
+    protected const CALL_HISTORY_URL = 'https://my.cloudtalk.io/api/calls/index.json';
     protected const MAKE_CALL_URL = 'https://my.cloudtalk.io/api/calls/create.json';
+    protected const RECORDING_URL = 'https://my.cloudtalk.io/api/calls/recording/%s.json';
 
     /**
      * Check CloudTalk API credentials by calling an authenticated endpoint.
@@ -115,6 +117,110 @@ class CloudTalk
     }
 
     /**
+     * Extract the call id from a CloudTalk API response when the endpoint
+     * provides one. Some Make a Call responses only confirm the request.
+     */
+    public function callId(array $response): ?string
+    {
+        foreach ([
+            'responseData.data.call_id',
+            'responseData.data.id',
+            'responseData.data.Call.id',
+            'responseData.call_id',
+            'responseData.id',
+            'responseData.call.id',
+            'responseData.call_uuid',
+            'data.call_id',
+            'data.id',
+            'Call.id',
+            'call.id',
+            'call_id',
+            'id',
+            'call_uuid',
+        ] as $path) {
+            $value = data_get($response, $path);
+
+            if ($value) {
+                return (string) $value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Fetch CloudTalk call history for the configured line.
+     */
+    public function callHistory(Line $line, array $filters = []): array
+    {
+        $config = $line->config ?: [];
+
+        $this->validateConfig($config);
+
+        try {
+            $response = Http::timeout(30)
+                ->acceptJson()
+                ->withBasicAuth($config['api_key_id'], $config['api_key_secret'])
+                ->get(self::CALL_HISTORY_URL, array_filter($filters, fn ($value) => $value !== null && $value !== ''));
+        } catch (ConnectionException $e) {
+            throw new RuntimeException("Impossible de joindre l'API CloudTalk.", 503);
+        }
+
+        $body = $response->json();
+        $cloudTalkStatus = (int) data_get($body, 'responseData.status', 0);
+
+        if (!$response->successful() || ($cloudTalkStatus && $cloudTalkStatus !== 200)) {
+            $message = data_get($body, 'responseData.message');
+            $status = $cloudTalkStatus ?: $response->status();
+
+            throw new RuntimeException(
+                $this->messageForStatus($status, $message),
+                $status
+            );
+        }
+
+        return collect(data_get($body, 'responseData.data', []))
+            ->map(fn ($item) => $this->normalizeCallHistoryItem($item))
+            ->filter(fn ($item) => !empty($item['id']))
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Fetch recording media without persisting it locally.
+     */
+    public function recordingMedia(Line $line, string $callId): array
+    {
+        $config = $line->config ?: [];
+
+        $this->validateConfig($config);
+
+        try {
+            $response = Http::timeout(60)
+                ->withBasicAuth($config['api_key_id'], $config['api_key_secret'])
+                ->get(sprintf(self::RECORDING_URL, $callId));
+        } catch (ConnectionException $e) {
+            throw new RuntimeException("Impossible de joindre l'API CloudTalk.", 503);
+        }
+
+        if (!$response->successful()) {
+            $body = $response->json();
+            $status = (int) data_get($body, 'responseData.status', $response->status());
+            $message = data_get($body, 'responseData.message');
+
+            throw new RuntimeException(
+                $this->messageForStatus($status, $message),
+                $status ?: $response->status()
+            );
+        }
+
+        return [
+            'body' => $response->body(),
+            'content_type' => $response->header('Content-Type') ?: 'audio/x-wav',
+        ];
+    }
+
+    /**
      * Format and validate the callee number expected by CloudTalk.
      */
     public function formatCalleeNumber(string $number): string
@@ -126,6 +232,43 @@ class CloudTalk
         }
 
         return $number;
+    }
+
+    public function normalizePublicNumber(?string $number): string
+    {
+        return preg_replace('/\D+/', '', (string) $number);
+    }
+
+    protected function normalizeCallHistoryItem(array $item): array
+    {
+        $cdr = data_get($item, 'Cdr', []);
+        $id = (string) data_get($cdr, 'id', '');
+        $recorded = filter_var(
+            data_get($cdr, 'recorded', false),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        return [
+            'id' => $id,
+            'type' => data_get($cdr, 'type'),
+            'status' => data_get($cdr, 'status'),
+            'number' => data_get($cdr, 'public_external'),
+            'from_number' => data_get($cdr, 'public_internal'),
+            'recorded' => $recorded,
+            'recording_link' => data_get($cdr, 'recording_link'),
+            'recording_url' => $recorded && $id
+                ? sprintf(self::RECORDING_URL, $id)
+                : null,
+            'started_at' => data_get($cdr, 'started_at'),
+            'answered_at' => data_get($cdr, 'answered_at'),
+            'ended_at' => data_get($cdr, 'ended_at'),
+            'talking_time' => data_get($cdr, 'talking_time'),
+            'waiting_time' => data_get($cdr, 'waiting_time'),
+            'wrapup_time' => data_get($cdr, 'wrapup_time'),
+            'agent' => data_get($item, 'Agent'),
+            'contact' => data_get($item, 'Contact'),
+            'raw' => $item,
+        ];
     }
 
     protected function validateConfig(array $config): void
@@ -165,6 +308,7 @@ class CloudTalk
             404 => 'Ressource CloudTalk introuvable.',
             406 => 'Donnees CloudTalk invalides. Verifiez le numero E.164 et l agent.',
             409 => 'Agent CloudTalk deja en appel.',
+            410 => 'Enregistrement CloudTalk expire.',
             500 => 'Erreur API CloudTalk.',
             default => $message ?: 'Erreur CloudTalk.',
         };

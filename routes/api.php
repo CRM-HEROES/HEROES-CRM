@@ -427,6 +427,7 @@ Route::group([
         Route::post('line/cloudtalk/verify', [ProjectLineCloudTalkController::class, 'verify']);
         Route::post('line/cloudtalk/agents', [ProjectLineCloudTalkController::class, 'agents']);
         Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);
+        Route::post('line/cloudtalk/history', [ProjectLineCloudTalkController::class, 'history']);
         Route::post('line/cloudtalk/call', [ProjectLineCloudTalkController::class, 'store']);
         Route::apiResource('line', ProjectLineController::class);
 

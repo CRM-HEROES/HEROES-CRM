@@ -57,11 +57,55 @@ class Interaction extends Model
      */
     public function getAudioAttribute()
     {
-        return $this->path ? route('api.project.prospect.interaction.audio', [
+        if (!$this->path && !$this->hasCloudTalkRecording()) {
+            return null;
+        }
+
+        return route('api.project.prospect.interaction.audio', [
             'project' => $this->prospect->project->slug, 
             'prospect' => $this->prospect->id, 
             'interaction' => $this->id
-        ]) : null;
+        ]);
+    }
+
+    public function cloudTalkCallId(): ?string
+    {
+        if ($this->source !== 'cloudtalk' || !is_array($this->data)) {
+            return null;
+        }
+
+        $callId = data_get($this->data, 'call_id')
+            ?: data_get($this->data, 'cdr_id')
+            ?: data_get($this->data, 'cloudtalk_call.id')
+            ?: data_get($this->data, 'cloudtalk_history.Cdr.id')
+            ?: data_get($this->data, 'id');
+
+        if (!$callId || !preg_match('/^\d+$/', (string) $callId)) {
+            return null;
+        }
+
+        return (string) $callId;
+    }
+
+    protected function hasCloudTalkRecording(): bool
+    {
+        if ($this->source !== 'cloudtalk' || !$this->cloudTalkCallId()) {
+            return false;
+        }
+
+        $recorded = data_get($this->data, 'recorded');
+        $recorded ??= data_get($this->data, 'cloudtalk_call.recorded');
+        $recorded ??= data_get($this->data, 'cloudtalk_history.Cdr.recorded');
+
+        if ($recorded !== null) {
+            return filter_var($recorded, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        return (bool) (
+            data_get($this->data, 'recording_url') ||
+            data_get($this->data, 'cloudtalk_call.recording_url') ||
+            data_get($this->data, 'cloudtalk_history.Cdr.recording_link')
+        );
     }
 
     /**

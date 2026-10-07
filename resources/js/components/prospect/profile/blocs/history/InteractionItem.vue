@@ -49,6 +49,10 @@ export default {
                 return "Aircall";
             }
 
+            if (this.item.source == "cloudtalk") {
+                return "CloudTalk";
+            }
+
             return this.item.source;
         },
     },

@@ -27,693 +27,78 @@
         :style="{ width: slideWidth }"
     >
         <div class="hc-prospect-interaction-root">
-            <div
-                :class="[
-                    'hc-prospect-interaction-cloudtalk-panel',
-                    {
-                        visible: cloudtalkPhoneDisplayed,
-                        'with-context': cloudtalkCallContextVisible,
-                    },
-                ]"
-            >
-                <cloudtalk
-                    id="cloudtalk-phone"
-                    class="hc-prospect-interaction-cloudtalk-phone"
-                    :number="interaction.number"
-                    :calling="callingCloudtalk"
-                    :loading="cloudtalkLoading"
-                    @make-call="makeCloudtalkCall"
-                    @call-activity="displayCloudtalkPhoneFromIframe"
-                    @ringing-call="cloudtalkCallRinging"
-                    @outgoing-call="cloudtalkCallOutgoing"
-                    @call-ended="cloudtalkCallEnded"
-                    @hangup-call="cloudtalkCallHangup"
-                    @answered-call="cloudtalkCallAnswered"
-                    @contact-info="cloudtalkCallContactInfo"
-                />
-
-                <aside
-                    v-if="cloudtalkCallContextVisible"
-                    class="hc-prospect-interaction-cloudtalk-context"
-                >
-                    <div
-                        v-if="cloudtalkLookupLoading && !cloudtalkCallProspect"
-                        class="hc-prospect-interaction-cloudtalk-context-loading"
-                    >
-                        <loading :loading="cloudtalkLookupLoading" />
-                    </div>
-
-                    <template v-else-if="cloudtalkCallProspect">
-                        <div class="hc-prospect-interaction-cloudtalk-context-header">
-                            <div>
-                                <div
-                                    class="hc-prospect-interaction-cloudtalk-context-title"
-                                    v-text="cloudtalkProspectName"
-                                ></div>
-                                <div
-                                    v-if="cloudtalkCallProspect.company_name"
-                                    class="hc-prospect-interaction-cloudtalk-context-subtitle"
-                                    v-text="cloudtalkCallProspect.company_name"
-                                ></div>
-                            </div>
-                            <router-link
-                                class="hc-prospect-interaction-cloudtalk-context-link"
-                                :to="{
-                                    name: 'prospect.show',
-                                    params: {
-                                        project: project.slug,
-                                        prospect: cloudtalkCallProspect.id,
-                                    },
-                                }"
-                            >
-                                <icon class="fa fa-external-link" />
-                            </router-link>
-                        </div>
-
-                        <div class="hc-prospect-interaction-cloudtalk-context-section">
-                            <div
-                                v-if="cloudtalkCallProspect.email"
-                                class="hc-prospect-interaction-cloudtalk-context-line"
-                            >
-                                <icon class="fa fa-envelope" />
-                                <span v-text="cloudtalkCallProspect.email"></span>
-                            </div>
-                            <div
-                                v-if="cloudtalkCallProspect.phone_number"
-                                class="hc-prospect-interaction-cloudtalk-context-line"
-                            >
-                                <icon class="fa fa-phone" />
-                                <span
-                                    v-text="cloudtalkCallProspect.phone_number"
-                                ></span>
-                            </div>
-                            <div
-                                v-if="cloudtalkCallProspect.mobile_phone_number"
-                                class="hc-prospect-interaction-cloudtalk-context-line"
-                            >
-                                <icon class="fa fa-mobile" />
-                                <span
-                                    v-text="
-                                        cloudtalkCallProspect.mobile_phone_number
-                                    "
-                                ></span>
-                            </div>
-                        </div>
-
-                        <div class="hc-prospect-interaction-cloudtalk-context-section">
-                            <div class="hc-prospect-interaction-cloudtalk-context-heading">
-                                information
-                            </div>
-                            <div
-                                v-if="cloudtalkLookupThreads.length == 0"
-                                class="hc-prospect-interaction-cloudtalk-context-empty"
-                            >
-                                Aucun information lie a votre utilisateur.
-                            </div>
-                            <div
-                                v-for="thread in cloudtalkLookupThreads"
-                                :key="thread.id"
-                                class="hc-prospect-interaction-cloudtalk-thread"
-                            >
-                                <div class="hc-prospect-interaction-cloudtalk-thread-title">
-                                    <span
-                                        class="hc-prospect-interaction-cloudtalk-thread-color"
-                                        :style="{
-                                            color: thread.color,
-                                            backgroundColor: thread.bgcolor,
-                                        }"
-                                    ></span>
-                                    <span v-text="thread.name"></span>
-                                    <small
-                                        v-text="
-                                            thread.user_messages_count +
-                                            '/' +
-                                            thread.messages_count
-                                        "
-                                    ></small>
-                                </div>
-
-                                <div
-                                    v-for="message in cloudtalkMessagesForThread(
-                                        thread
-                                    )"
-                                    :key="message.id"
-                                    class="hc-prospect-interaction-cloudtalk-message"
-                                >
-                                    <div class="hc-prospect-interaction-cloudtalk-message-meta">
-                                        <span
-                                            v-text="
-                                                message.creator
-                                                    ? message.creator.name
-                                                    : ''
-                                            "
-                                        ></span>
-                                        <span
-                                            v-text="
-                                                formatCloudtalkDate(
-                                                    message.created_at
-                                                )
-                                            "
-                                        ></span>
-                                    </div>
-                                    <div
-                                        class="hc-prospect-interaction-cloudtalk-message-body"
-                                        v-text="messagePreview(message.body)"
-                                    ></div>
-                                    <div
-                                        v-if="
-                                            message.users &&
-                                            message.users.length
-                                        "
-                                        class="hc-prospect-interaction-cloudtalk-message-users"
-                                    >
-                                        <icon class="fa fa-user" />
-                                        <span
-                                            v-text="
-                                                message.users
-                                                    .map((user) => user.name)
-                                                    .join(', ')
-                                            "
-                                        ></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </template>
-                </aside>
-            </div>
+            <cloudtalk-panel
+                :displayed="cloudtalkPhoneDisplayed"
+                :context-visible="cloudtalkCallContextVisible"
+                :number="interaction.number"
+                :calling="callingCloudtalk"
+                :loading="cloudtalkLoading"
+                :lookup-loading="cloudtalkLookupLoading"
+                :lookup-number="cloudtalkLookup.number"
+                :prospect="cloudtalkCallProspect"
+                :prospect-name="cloudtalkProspectName"
+                :project="project"
+                :threads="cloudtalkLookupThreads"
+                :creating-prospect="cloudtalkCreatingProspect"
+                :can-create-prospect="can('all.prospect.add')"
+                :messages-for-thread="cloudtalkMessagesForThread"
+                :format-date="formatCloudtalkDate"
+                :message-preview="messagePreview"
+                @make-call="makeCloudtalkCall"
+                @call-activity="displayCloudtalkPhoneFromIframe"
+                @ringing-call="cloudtalkCallRinging"
+                @outgoing-call="cloudtalkCallOutgoing"
+                @call-ended="cloudtalkCallEnded"
+                @hangup-call="cloudtalkCallHangup"
+                @answered-call="cloudtalkCallAnswered"
+                @contact-info="cloudtalkCallContactInfo"
+                @create-prospect="createCloudtalkProspect"
+            />
 
             <tab-layout :count="2" :tab="tab" class="hc-flex-1">
                 <template #1 v-if="interactionProspect">
-                    <item-list style="height: 100%; overflow: auto" padding="12px">
-                        <template v-if="can('all.prospect.interaction.add')">
-                            <item
-                                v-if="interactionProspect.phone_number"
-                                @click.prevent="(tab = 1), (frameTab = 3)"
-                            >
-                                <icon class="fa fa-phone" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="
-                                        $t('prospect.interaction.edit_phone_number')
-                                    "
-                                ></div>
-                                <icon class="fa fa-caret-right" />
-                            </item>
-                            <item
-                                v-if="interactionProspect.mobile_phone_number"
-                                @click.prevent="(tab = 1), (frameTab = 4)"
-                            >
-                                <icon class="fa fa-mobile" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="
-                                        $t(
-                                            'prospect.interaction.edit_mobile_phone_number'
-                                        )
-                                    "
-                                ></div>
-                                <icon class="fa fa-caret-right" />
-                            </item>
-                            <template
-                                v-for="number in [
-                                    interactionProspect.phone_number,
-                                    interactionProspect.mobile_phone_number,
-                                ].filter((n) => n)"
-                                :key="number"
-                            >
-                                <!-- Telephone -->
-                                <item
-                                    tag="a"
-                                    class="hc-prospect-interaction-item"
-                                    @click="interactionViaTelephone(number)"
-                                    :href="'tel:' + number"
-                                >
-                                    <icon class="fa fa-phone" color="#489f1f" />
-                                    <div
-                                        class="hc-item-main-content hc-flex-column"
-                                    >
-                                        <span
-                                            v-text="
-                                                $t(
-                                                    'prospect.interaction.call_by_phone'
-                                                )
-                                            "
-                                        ></span>
-                                        <span
-                                            class="hc-prospect-interaction-item-number"
-                                            v-text="number"
-                                        ></span>
-                                    </div>
-                                </item>
-
-                                <!-- Aircall -->
-                                <item
-                                    class="hc-prospect-interaction-item"
-                                    @click="interactionViaAircall(number)"
-                                >
-                                    <icon>
-                                        <svg viewBox="0 0 40 40">
-                                            <path
-                                                fill="#00B388"
-                                                d="M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
-                                            ></path>
-                                        </svg>
-                                    </icon>
-                                    <div
-                                        class="hc-item-main-content hc-flex-column"
-                                    >
-                                        <span
-                                            v-text="
-                                                $t(
-                                                    'prospect.interaction.call_by_aircall'
-                                                )
-                                            "
-                                        ></span>
-                                        <span
-                                            class="hc-prospect-interaction-item-number"
-                                            v-text="number"
-                                        ></span>
-                                    </div>
-                                    <icon class="fa fa-caret-right" />
-                                </item>
-
-                                <!-- Ringover -->
-                                <item
-                                    class="hc-prospect-interaction-item"
-                                    @click="interactionViaRingover(number)"
-                                >
-                                    <icon>
-                                        <svg viewBox="0 0 40 40">
-                                            <path
-                                                d="M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z"
-                                                style="fill: rgb(85, 195, 192)"
-                                            ></path>
-                                            <path
-                                                d="M30.1,23.1c-1.3,4.3-5.3,7.4-10.1,7.4s-8.7-3.1-10.1-7.4H0.3C1.8,32.7,10,40,20,40s18.2-7.3,19.7-16.9H30.1z"
-                                                style="fill: rgb(85, 195, 192)"
-                                            ></path>
-                                        </svg>
-                                    </icon>
-                                    <div
-                                        class="hc-item-main-content hc-flex-column"
-                                    >
-                                        <span
-                                            v-text="
-                                                $t(
-                                                    'prospect.interaction.call_by_ringover'
-                                                )
-                                            "
-                                        ></span>
-                                        <span
-                                            class="hc-prospect-interaction-item-number"
-                                            v-text="number"
-                                        ></span>
-                                    </div>
-                                    <icon class="fa fa-caret-right" />
-                                </item>
-
-                                <!-- CloudTalk -->
-                                <item
-                                    class="hc-prospect-interaction-item"
-                                    @click="interactionViaCloudtalk(number)"
-                                >
-                                    <icon>
-                                        <svg viewBox="0 0 40 40">
-                                            <path
-                                                fill="#1f6feb"
-                                                d="M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
-                                            ></path>
-                                            <path
-                                                fill="#ffffff"
-                                                d="M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
-                                            ></path>
-                                        </svg>
-                                    </icon>
-                                    <div
-                                        class="hc-item-main-content hc-flex-column"
-                                    >
-                                        <span
-                                            v-text="
-                                                $t(
-                                                    'prospect.interaction.call_by_cloudtalk'
-                                                )
-                                            "
-                                        ></span>
-                                        <span
-                                            class="hc-prospect-interaction-item-number"
-                                            v-text="number"
-                                        ></span>
-                                    </div>
-                                    <icon class="fa fa-caret-right" />
-                                </item>
-                            </template>
-
-                            <!-- Add history -->
-                            <item
-                                tag="a"
-                                class="hc-prospect-interaction-item"
-                                @click="addHistory()"
-                            >
-                                <icon class="fa fa-plus icon-green" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="$t('prospect.interaction.add_history')"
-                                ></div>
-                                <loading :loading="addingHistory" />
-                            </item>
-                        </template>
-                        <item
-                            style="
-                                background-color: #7939b8;
-                                color: white;
-                                margin-top: 10px;
-                                margin-bottom: 10px;
-                            "
-                            v-if="prospectInteractions.length > 0"
-                        >
-                            <icon class="fa fa-clock" color="white"></icon>
-                            <div
-                                class="hc-main-content"
-                                v-text="$t('prospect.interaction.history')"
-                            ></div>
-                        </item>
-                        <interaction-row
-                            v-for="c in prospectInteractions"
-                            :key="c.id"
-                            :interaction="c"
-                        />
-                    </item-list>
+                    <interaction-list
+                        :interaction-prospect="interactionProspect"
+                        :prospect-interactions="prospectInteractions"
+                        :adding-history="addingHistory"
+                        :can-add="can('all.prospect.interaction.add')"
+                        @edit-phone="(tab = 1), (frameTab = 3)"
+                        @edit-mobile="(tab = 1), (frameTab = 4)"
+                        @call-telephone="interactionViaTelephone"
+                        @call-aircall="interactionViaAircall"
+                        @call-ringover="interactionViaRingover"
+                        @call-cloudtalk="interactionViaCloudtalk"
+                        @add-history="addHistory"
+                    />
                 </template>
 
                 <!-- List of interaction -->
                 <template #2>
-                    <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
-                        <template #1 v-if="interactionProspect">
-                            <tab-layout
-                                :count="2"
-                                :tab="aircallTab"
-                                class="hc-flex-1"
-                            >
-                                <template #1>
-                                    <div
-                                        class="hc-flex-column"
-                                        style="height: 100%"
-                                    >
-                                        <item @click="tab = 0" class="bordered">
-                                            <icon class="fa fa-caret-left" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="
-                                                    $t(
-                                                        'prospect.interaction.call_by_aircall'
-                                                    )
-                                                "
-                                            ></div>
-                                            <icon
-                                                class="fa fa-cog"
-                                                @click.stop="aircallTab = 1"
-                                            />
-                                        </item>
-                                        <div
-                                            style="
-                                                flex: 1;
-                                                width: 100%;
-                                                height: 100%;
-                                                padding: 10px;
-                                                overflow: auto;
-                                            "
-                                        >
-                                            <aircall
-                                                id="aircall-phone"
-                                                :number="interaction.number"
-                                                :style="{
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    display:
-                                                        tab == 1 && frameTab == 0
-                                                            ? 'block'
-                                                            : 'none',
-                                                }"
-                                                @outgoing-call="
-                                                    (callInfos) => {
-                                                        interaction.status =
-                                                            'initiated';
-                                                        interaction.data = {
-                                                            id: callInfos.call_id,
-                                                        };
-                                                        updateInteraction();
-                                                    }
-                                                "
-                                                @call-ended="
-                                                    (callInfos) => {
-                                                        interaction.status =
-                                                            'ended';
-                                                        interaction.data = {
-                                                            id: callInfos.call_id,
-                                                        };
-                                                        updateInteraction();
-                                                        nextInteraction();
-                                                    }
-                                                "
-                                                @answered-call="
-                                                    (interaction.status =
-                                                        'answered'),
-                                                        updateInteraction()
-                                                "
-                                            />
-                                        </div>
-                                    </div>
-                                </template>
-                                <template #2>
-                                    <div
-                                        class="hc-flex-column"
-                                        style="height: 100%"
-                                    >
-                                        <item
-                                            @click="aircallTab = 0"
-                                            class="bordered"
-                                        >
-                                            <icon class="fa fa-caret-left" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="'Paramètre Aircall Webhook'"
-                                            ></div>
-                                        </item>
-                                        <item-list
-                                            class="hc-flex-1"
-                                            gap="5px"
-                                            style="overflow: auto"
-                                        >
-                                            <item
-                                                tag="a"
-                                                href="https://dashboard.aircall.io/integrations/flow/install/webhook/webhook/0"
-                                                target="_blank"
-                                            >
-                                                <icon class="fa fa-wifi" />
-                                                <div
-                                                    class="hc-item-main-content"
-                                                    v-text="
-                                                        'Rendez-vous sur la page webhook d\'aircall'
-                                                    "
-                                                ></div>
-                                                <icon class="fa fa-caret-right" />
-                                            </item>
-                                            <item
-                                                tag="a"
-                                                @click.prevent="
-                                                    copyAircallWebhookURLToClipboard
-                                                "
-                                            >
-                                                <icon class="fa fa-link" />
-                                                <div
-                                                    class="hc-item-main-content"
-                                                    v-text="
-                                                        'Mettre ' +
-                                                        aircallWebhookURL +
-                                                        ' comme URL'
-                                                    "
-                                                ></div>
-                                                <icon class="fa fa-copy" />
-                                            </item>
-                                            <item>
-                                                <icon class="fa fa-check" />
-                                                <div
-                                                    class="hc-item-main-content"
-                                                    v-text="
-                                                        'Cocher &quot;call.ended&quot; dans la section Appel'
-                                                    "
-                                                ></div>
-                                            </item>
-                                            <item>
-                                                <icon class="fa fa-check" />
-                                                <div
-                                                    class="hc-item-main-content"
-                                                    v-text="
-                                                        'Enfin cliquer sur &quot;Ajouter webhook&quot;'
-                                                    "
-                                                ></div>
-                                            </item>
-                                        </item-list>
-                                    </div>
-                                </template>
-                            </tab-layout>
-                        </template>
-
-                        <template #2 v-if="interactionProspect">
-                            <div class="hc-flex-column" style="height: 100%">
-                                <item @click="tab = 0" class="bordered">
-                                    <icon class="fa fa-caret-left" />
-                                    <div
-                                        class="hc-item-main-content"
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_ringover'
-                                            )
-                                        "
-                                    ></div>
-                                    <icon
-                                        class="fa fa-cog"
-                                        @click.stop="ringoverSetting"
-                                    />
-                                </item>
-                                <div
-                                    style="
-                                        flex: 1;
-                                        width: 100%;
-                                        height: 100%;
-                                        overflow: auto;
-                                    "
-                                >
-                                    <ringover
-                                        id="ringover-phone"
-                                        :number="interaction.number"
-                                        tab="phone"
-                                        style="flex: 1; width: 100%; height: 100%"
-                                        @ringing-call="
-                                            (callInfo) => {
-                                                interaction.from_number =
-                                                    callInfo.data.from;
-                                                interaction.status = 'ringing';
-                                                interaction.data.id =
-                                                    callInfo.data.call_id;
-                                                updateInteraction();
-                                            }
-                                        "
-                                        @hangup-call="
-                                            (callInfo) => {
-                                                interaction.status = 'hangup';
-                                                interaction.data.id =
-                                                    callInfo.data.call_id;
-                                                updateInteraction();
-                                                nextInteraction();
-                                            }
-                                        "
-                                        @answered-call="
-                                            (interaction.status = 'answered'),
-                                                updateInteraction()
-                                        "
-                                    />
-                                </div>
-                            </div>
-                        </template>
-
-                        <template #3>
-                            <select-prospect
-                                @back="tab = 0"
-                                @prospect-selected="setInteractionProspect"
-                            />
-                        </template>
-
-                        <template #4>
-                            <form
-                                class="hc-flex-column"
-                                style="height: 100%"
-                                @submit.prevent="updateProspectPhoneNumber"
-                            >
-                                <item @click="tab = 0" class="bordered">
-                                    <icon class="fa fa-caret-left" />
-                                    <div
-                                        class="hc-item-main-content"
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.edit_phone_number'
-                                            )
-                                        "
-                                    ></div>
-                                </item>
-                                <item-list padding="12px" style="height: auto">
-                                    <v-field
-                                        :label="$t('field.prospect.phone_number')"
-                                        ><input
-                                            type="tel"
-                                            v-model.lazy="phoneNumber"
-                                    /></v-field>
-                                </item-list>
-                                <buttons>
-                                    <button v-text="$t('update')"></button>
-                                </buttons>
-                                <loading :loading="updatingPhoneNumber" />
-                            </form>
-                        </template>
-
-                        <template #5>
-                            <form
-                                class="hc-flex-column"
-                                style="height: 100%; position: relative"
-                                @submit.prevent="updateProspectMobilePhoneNumber"
-                            >
-                                <item @click="tab = 0" class="bordered">
-                                    <icon class="fa fa-caret-left" />
-                                    <div
-                                        class="hc-item-main-content"
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.edit_mobile_phone_number'
-                                            )
-                                        "
-                                    ></div>
-                                </item>
-                                <item-list padding="12px" style="height: auto">
-                                    <v-field
-                                        :label="$t('field.prospect.phone_number')"
-                                        ><input
-                                            type="tel"
-                                            v-model.lazy="mobilePhoneNumber"
-                                    /></v-field>
-                                </item-list>
-                                <buttons>
-                                    <button v-text="$t('update')"></button>
-                                </buttons>
-                                <loading :loading="updatingMobilePhoneNumber" />
-                            </form>
-                        </template>
-
-                        <template #6 v-if="interactionProspect">
-                            <div class="hc-flex-column" style="height: 100%">
-                                <item @click="backFromCloudtalk" class="bordered">
-                                    <icon class="fa fa-caret-left" />
-                                    <div
-                                        class="hc-item-main-content"
-                                        v-text="
-                                            $t(
-                                                'prospect.interaction.call_by_cloudtalk'
-                                            )
-                                        "
-                                    ></div>
-                                </item>
-                                <div
-                                    style="
-                                        flex: 1;
-                                        width: 100%;
-                                        height: 100%;
-                                        overflow: auto;
-                                        position: relative;
-                                    "
-                                ></div>
-                            </div>
-                        </template>
-                    </frame-layout>
+                    <interaction-frames
+                        v-model:phone-number="phoneNumber"
+                        v-model:mobile-phone-number="mobilePhoneNumber"
+                        :interaction-prospect="interactionProspect"
+                        :interaction="interaction"
+                        :tab="tab"
+                        :frame-tab="frameTab"
+                        :aircall-tab="aircallTab"
+                        :aircall-webhook-url="aircallWebhookURL"
+                        :updating-phone-number="updatingPhoneNumber"
+                        :updating-mobile-phone-number="updatingMobilePhoneNumber"
+                        @back="tab = 0"
+                        @aircall-setting="aircallTab = 1"
+                        @aircall-back-setting="aircallTab = 0"
+                        @copy-aircall-webhook="copyAircallWebhookURLToClipboard"
+                        @ringover-setting="ringoverSetting"
+                        @update-interaction="updateInteraction"
+                        @next-interaction="nextInteraction"
+                        @prospect-selected="setInteractionProspect"
+                        @update-phone-number="updateProspectPhoneNumber"
+                        @update-mobile-phone-number="
+                            updateProspectMobilePhoneNumber
+                        "
+                        @back-cloudtalk="backFromCloudtalk"
+                    />
                 </template>
             </tab-layout>
         </div>
@@ -845,6 +230,32 @@
     color: #999999;
 }
 
+.hc-prospect-interaction-cloudtalk-context-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 34px;
+    padding: 8px 10px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    background: #ffffff;
+    color: #333333;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.hc-prospect-interaction-cloudtalk-context-button:hover {
+    background: #f5f5f5;
+}
+
+.hc-prospect-interaction-cloudtalk-context-button:disabled {
+    color: #999999;
+    cursor: default;
+}
+
 .hc-prospect-interaction-cloudtalk-thread {
     padding: 10px;
     border: 1px solid #e7e7e7;
@@ -923,9 +334,14 @@
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
+import ProspectInteractionService from "@/apis/project/prospect/interaction";
 
 import { OPEN_MODAL } from "@/actions/modal";
-import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
+import {
+    ADD_PROSPECT,
+    SET_PROSPECT,
+    UPDATE_PROSPECT,
+} from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
 import { OPEN_LEFT_SLIDE } from "@/actions/slide";
 import {
@@ -938,22 +354,19 @@ import {
 import {
     MAKE_CLOUDTALK_CALL,
     LOOKUP_CLOUDTALK_CALL,
+    FETCH_CLOUDTALK_CALL_HISTORY,
 } from "@/actions/project/line";
 
 // Components
-import Ringover from "@/components/utils/Ringover.vue";
-import Aircall from "@/components/utils/Aircall.vue";
-import Cloudtalk from "@/components/utils/Cloudtalk.vue";
-import InteractionRow from "./InteractionRow.vue";
-import SelectProspect from "../select/Select.vue";
+import CloudtalkPanel from "./components/CloudtalkPanel.vue";
+import InteractionFrames from "./components/InteractionFrames.vue";
+import InteractionList from "./components/InteractionList.vue";
 
 export default {
     components: {
-        Ringover,
-        Aircall,
-        Cloudtalk,
-        InteractionRow,
-        SelectProspect,
+        CloudtalkPanel,
+        InteractionFrames,
+        InteractionList,
     },
 
     data() {
@@ -976,6 +389,7 @@ export default {
             cloudtalkLoginRequired: false,
             cloudtalkPhoneVisible: false,
             cloudtalkEventTimeout: null,
+            cloudtalkCreatingProspect: false,
             cloudtalkLookup: {
                 number: null,
                 prospect: null,
@@ -984,6 +398,7 @@ export default {
             },
             cloudtalkLookupLoading: false,
             cloudtalkLookupRequest: 0,
+            cloudtalkHistoryTimeouts: [],
         };
     },
 
@@ -994,6 +409,7 @@ export default {
 
     beforeUnmount() {
         this.clearCloudtalkEventTimeout();
+        this.clearCloudtalkHistoryTimeout();
     },
 
     methods: {
@@ -1091,6 +507,10 @@ export default {
             this.clearCloudtalkEventTimeout();
 
             try {
+                if (!this.interaction.id && this.interactionProspect) {
+                    await this.addInteraction();
+                }
+
                 const params = {
                     number: this.interaction.number,
                 };
@@ -1099,17 +519,30 @@ export default {
                     params.line_id = this.cloudtalkLine.id;
                 }
 
+                if (this.interaction.id) {
+                    params.interaction_id = this.interaction.id;
+                }
+
                 const response = await store.dispatch(
                     MAKE_CLOUDTALK_CALL,
                     params
                 );
 
+                const callId = this.cloudtalkCallId(response, false);
                 this.interaction.status = "initiated";
                 this.interaction.data = {
                     ...(this.interaction.data || {}),
                     cloudtalk: response.responseData,
+                    ...(callId ? { id: callId, call_id: callId } : {}),
                 };
-                this.updateInteraction();
+
+                if (response.interaction) {
+                    this.interaction = response.interaction;
+                    store.commit(UPDATE_PROSPECT_INTERACTION, response.interaction);
+                } else {
+                    await this.updateInteraction();
+                }
+
                 if (this.cloudtalkWaitingForEvent) {
                     this.startCloudtalkEventTimeout();
                 }
@@ -1185,6 +618,7 @@ export default {
                 this.interaction.data &&
                 (this.interaction.data.id ||
                     this.interaction.data.call_uuid ||
+                    this.interaction.data.cdr_id ||
                     this.interaction.data.call_id);
 
             if (
@@ -1296,6 +730,12 @@ export default {
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
             this.updateInteraction();
+            this.scheduleCloudtalkHistorySync(
+                callInfos,
+                1,
+                this.cloneInteraction(this.interaction),
+                this.interactionProspect ? this.interactionProspect.id : null
+            );
             if (this.interactionProspect) {
                 this.nextInteraction();
             }
@@ -1305,41 +745,171 @@ export default {
             this.fetchCloudtalkCallContext(callInfos);
         },
 
+        async createCloudtalkProspect() {
+            const number =
+                this.cloudtalkLookup && this.cloudtalkLookup.number
+                    ? this.cloudtalkLookup.number
+                    : this.interaction.number;
+
+            if (!number || this.cloudtalkCreatingProspect) {
+                return;
+            }
+
+            this.cloudtalkCreatingProspect = true;
+
+            try {
+                const prospect = await store.dispatch(ADD_PROSPECT, {
+                    phone_number: number,
+                });
+
+                store.commit(SET_INTERACTION_PROSPECT, prospect);
+                this.cloudtalkLookup = {
+                    ...this.cloudtalkLookup,
+                    number,
+                    numberKey: this.normalizePhone(number),
+                    prospect,
+                    threads: [],
+                    messages: [],
+                    resolved: true,
+                };
+
+                if (
+                    this.interaction &&
+                    this.interaction.source == "cloudtalk" &&
+                    !this.interaction.id
+                ) {
+                    try {
+                        await this.addInteraction();
+                    } catch (error) {
+                        this.interaction.data = {
+                            ...(this.interaction.data || {}),
+                            error: error.message,
+                        };
+                    }
+                }
+            } finally {
+                this.cloudtalkCreatingProspect = false;
+            }
+        },
+
         setCloudtalkCallData(callInfos = {}) {
             const callId = this.cloudtalkCallId(callInfos);
             const number = this.cloudtalkCallNumber(callInfos, true);
+            const recordingUrl =
+                callInfos.recording_url ||
+                callInfos.recording ||
+                callInfos.recording_link ||
+                "";
 
             if (number) {
                 this.interaction.number = number;
             }
 
+            if (callInfos.started_at || callInfos.startedAt) {
+                this.interaction.started_at =
+                    callInfos.started_at || callInfos.startedAt;
+            }
+
+            if (callInfos.ended_at || callInfos.endedAt) {
+                this.interaction.ended_at =
+                    callInfos.ended_at || callInfos.endedAt;
+            }
+
             this.interaction.data = {
                 ...(this.interaction.data || {}),
-                ...(callId ? { id: callId } : {}),
+                ...(callId ? { id: callId, call_id: callId } : {}),
+                ...(callInfos.call_uuid
+                    ? { call_uuid: callInfos.call_uuid }
+                    : {}),
                 ...(number ? { external_number: number } : {}),
                 ...(callInfos.direction
                     ? { direction: callInfos.direction }
+                    : {}),
+                ...(recordingUrl ? { recording_url: recordingUrl } : {}),
+                ...(callInfos.recorded !== undefined
+                    ? { recorded: callInfos.recorded }
                     : {}),
             };
         },
 
         cloudtalkCallId(callInfos = {}, useFallback = false) {
+            const responseData = callInfos.responseData || {};
+            const data = callInfos.data || responseData.data || {};
+            const call = callInfos.call || responseData.call || data.call || {};
+            const cloudtalkCall =
+                callInfos.cloudtalk_call ||
+                responseData.cloudtalk_call ||
+                data.cloudtalk_call ||
+                {};
+
             return (
                 callInfos.call_uuid ||
                 callInfos.call_id ||
+                callInfos.cdr_id ||
                 callInfos.id ||
+                data.call_uuid ||
+                data.call_id ||
+                data.cdr_id ||
+                data.id ||
+                call.call_uuid ||
+                call.call_id ||
+                call.cdr_id ||
+                call.id ||
+                cloudtalkCall.call_uuid ||
+                cloudtalkCall.call_id ||
+                cloudtalkCall.cdr_id ||
+                cloudtalkCall.id ||
+                responseData.call_uuid ||
+                responseData.call_id ||
+                responseData.cdr_id ||
+                responseData.id ||
                 (useFallback &&
                 this.interaction &&
                 this.interaction.data &&
-                this.interaction.data.id
-                    ? this.interaction.data.id
+                (this.interaction.data.call_id ||
+                    this.interaction.data.cdr_id ||
+                    this.interaction.data.id)
+                    ? this.interaction.data.call_id ||
+                      this.interaction.data.cdr_id ||
+                      this.interaction.data.id
                     : "") ||
                 ""
             );
         },
 
+        /**
+         * Number already attached to the call handled by the interaction.
+         *
+         * Returns an empty string when the event belongs to another call, so a
+         * new call can still bring its own number.
+         */
+        knownCloudtalkCallNumber(callInfos = {}) {
+            if (
+                !this.interaction ||
+                this.interaction.source != "cloudtalk" ||
+                !this.interaction.number
+            ) {
+                return "";
+            }
+
+            const currentCallId =
+                (this.interaction.data &&
+                    (this.interaction.data.call_id ||
+                        this.interaction.data.cdr_id ||
+                        this.interaction.data.id)) ||
+                "";
+            const eventCallId = this.cloudtalkCallId(callInfos, false);
+
+            if (currentCallId && eventCallId && currentCallId != eventCallId) {
+                return "";
+            }
+
+            return this.interaction.number;
+        },
+
         cloudtalkCallNumber(callInfos = {}, useFallback = false) {
-            return (
+            const known = this.knownCloudtalkCallNumber(callInfos);
+            const candidate =
                 callInfos.external_number ||
                 callInfos.customer_number ||
                 callInfos.contact_phone ||
@@ -1347,14 +917,32 @@ export default {
                 callInfos.number ||
                 callInfos.from ||
                 callInfos.to ||
-                (useFallback && this.cloudtalkLookup.number
-                    ? this.cloudtalkLookup.number
-                    : "") ||
-                (useFallback && this.interaction.number
-                    ? this.interaction.number
-                    : "") ||
-                ""
-            );
+                "";
+
+            if (candidate) {
+                // CloudTalk also reports its own numbers inside the call
+                // events (internal agent number like "365811021001", caller
+                // id, ...): while the event belongs to the call already
+                // started, the number chosen when the call began wins.
+                if (
+                    known &&
+                    this.normalizePhone(known) != this.normalizePhone(candidate)
+                ) {
+                    return known;
+                }
+
+                return candidate;
+            }
+
+            if (useFallback) {
+                return (
+                    (this.cloudtalkLookup && this.cloudtalkLookup.number) ||
+                    known ||
+                    ""
+                );
+            }
+
+            return "";
         },
 
         async fetchCloudtalkCallContext(callInfos = {}) {
@@ -1374,7 +962,7 @@ export default {
 
             if (
                 this.cloudtalkLookup.numberKey == numberKey &&
-                this.cloudtalkLookup.resolved
+                (this.cloudtalkLookup.resolved || this.cloudtalkLookupLoading)
             ) {
                 return;
             }
@@ -1459,6 +1047,176 @@ export default {
                     this.cloudtalkLookupLoading = false;
                 }
             }
+        },
+
+        scheduleCloudtalkHistorySync(
+            callInfos = {},
+            attempt = 1,
+            interaction = null,
+            prospectId = null
+        ) {
+            const timeout = setTimeout(() => {
+                this.cloudtalkHistoryTimeouts =
+                    this.cloudtalkHistoryTimeouts.filter(
+                        (item) => item != timeout
+                    );
+                this.syncCloudtalkCallHistory(
+                    callInfos,
+                    attempt,
+                    interaction,
+                    prospectId
+                );
+            }, attempt == 1 ? 3000 : 8000);
+
+            this.cloudtalkHistoryTimeouts.push(timeout);
+        },
+
+        clearCloudtalkHistoryTimeout() {
+            this.cloudtalkHistoryTimeouts.forEach((timeout) =>
+                clearTimeout(timeout)
+            );
+            this.cloudtalkHistoryTimeouts = [];
+        },
+
+        async syncCloudtalkCallHistory(
+            callInfos = {},
+            attempt = 1,
+            interaction = null,
+            prospectId = null
+        ) {
+            const targetInteraction = interaction || this.interaction;
+            const targetProspectId =
+                prospectId ||
+                (this.interactionProspect ? this.interactionProspect.id : null);
+
+            if (
+                !targetInteraction ||
+                targetInteraction.source != "cloudtalk" ||
+                !targetProspectId
+            ) {
+                return;
+            }
+
+            const number =
+                this.cloudtalkCallNumber(callInfos, false) ||
+                targetInteraction.number;
+            const callId =
+                this.cloudtalkCallId(callInfos, false) ||
+                (targetInteraction.data || {}).call_id ||
+                (targetInteraction.data || {}).cdr_id ||
+                (targetInteraction.data || {}).id;
+            const params = {
+                number,
+                call_id: callId,
+                started_at: targetInteraction.started_at,
+                ended_at: targetInteraction.ended_at,
+                direction:
+                    callInfos.direction ||
+                    (targetInteraction.data || {}).direction ||
+                    null,
+            };
+
+            if (this.cloudtalkLine) {
+                params.line_id = this.cloudtalkLine.id;
+            }
+
+            try {
+                const data = await store.dispatch(
+                    FETCH_CLOUDTALK_CALL_HISTORY,
+                    params
+                );
+
+                if (!data.call) {
+                    if (attempt < 3) {
+                        this.scheduleCloudtalkHistorySync(
+                            callInfos,
+                            attempt + 1,
+                            targetInteraction,
+                            targetProspectId
+                        );
+                    }
+                    return;
+                }
+
+                const updatedInteraction = this.applyCloudtalkHistory(
+                    data.call,
+                    targetInteraction
+                );
+
+                if (updatedInteraction.id) {
+                    const { data: savedInteraction } =
+                        await ProspectInteractionService.update(
+                            this.project.slug,
+                            targetProspectId,
+                            updatedInteraction.id,
+                            updatedInteraction
+                        );
+
+                    if (
+                        this.interaction &&
+                        this.interaction.id == updatedInteraction.id
+                    ) {
+                        this.interaction = savedInteraction;
+                    }
+
+                    if (
+                        this.interactionProspect &&
+                        this.interactionProspect.id == targetProspectId
+                    ) {
+                        await this.fetchInteractions();
+                    }
+                }
+            } catch (error) {
+                if (attempt < 3) {
+                    this.scheduleCloudtalkHistorySync(
+                        callInfos,
+                        attempt + 1,
+                        targetInteraction,
+                        targetProspectId
+                    );
+                }
+            }
+        },
+
+        applyCloudtalkHistory(call, interaction = null) {
+            const targetInteraction = interaction || this.interaction;
+            const existingData = targetInteraction.data || {};
+
+            targetInteraction.data = {
+                ...existingData,
+                call_id: call.id,
+                cdr_id: call.id,
+                recorded: call.recorded,
+                recording_url: call.recording_url || existingData.recording_url,
+                recording_link:
+                    call.recording_link || existingData.recording_link,
+                cloudtalk_call: call,
+                cloudtalk_history: call.raw,
+            };
+
+            targetInteraction.number = call.number || targetInteraction.number || "";
+            targetInteraction.from_number =
+                call.from_number || targetInteraction.from_number || "";
+            targetInteraction.started_at =
+                call.started_at || targetInteraction.started_at || null;
+            targetInteraction.ended_at =
+                call.ended_at || targetInteraction.ended_at || null;
+            targetInteraction.status = call.status || targetInteraction.status;
+
+            return targetInteraction;
+        },
+
+        cloneInteraction(interaction) {
+            if (!interaction) {
+                return null;
+            }
+
+            return {
+                ...interaction,
+                data: {
+                    ...(interaction && interaction.data ? interaction.data : {}),
+                },
+            };
         },
 
         normalizePhone(number) {
@@ -1625,7 +1383,9 @@ export default {
                         oldValue.phone_number == this.interaction.number)
                 ) {
                     this.interaction.number = newValue.phone_number;
-                } else {
+                } else if (newValue.mobile_phone_number) {
+                    // never clear interaction.number: it is the number used
+                    // to resolve the context of the call in progress.
                     this.interaction.number = newValue.mobile_phone_number;
                 }
             }
@@ -1714,7 +1474,14 @@ export default {
         },
 
         cloudtalkCallContextVisible() {
-            return this.cloudtalkLookupLoading || !!this.cloudtalkCallProspect;
+            return (
+                this.cloudtalkLookupLoading ||
+                !!this.cloudtalkCallProspect ||
+                (this.cloudtalkPhoneDisplayed &&
+                    this.cloudtalkLookup &&
+                    this.cloudtalkLookup.resolved &&
+                    !!this.cloudtalkLookup.number)
+            );
         },
 
         cloudtalkCallProspect() {
@@ -1739,6 +1506,8 @@ export default {
                 name ||
                 this.cloudtalkCallProspect.company_name ||
                 this.cloudtalkCallProspect.email ||
+                this.cloudtalkCallProspect.phone_number ||
+                this.cloudtalkCallProspect.mobile_phone_number ||
                 this.cloudtalkLookup.number ||
                 ""
             );

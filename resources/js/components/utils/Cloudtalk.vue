@@ -241,20 +241,20 @@ export default {
             if (!data || !data.event) {
                 return;
             }
-
+            
+            const eventName = this.normalizeEventName(data.event);
             const properties = this.normalizeProperties(
                 data.properties || {},
-                data.event
+                eventName
             );
 
-            if (this.isCallActivity(data.event)) {
+            if (this.isCallActivity(eventName)) {
                 this.$emit("call-activity", {
-                    event: data.event,
+                    event: eventName,
                     properties,
                 });
             }
-
-            switch (data.event) {
+            switch (eventName) {
                 case "ringing":
                     this.$emit("ringing-call", properties);
                     break;
@@ -274,6 +274,23 @@ export default {
                     this.$emit("contact-info", properties);
                     break;
             }
+        },
+
+        normalizeEventName(eventName) {
+            return (
+                {
+                    call_ringing: "ringing",
+                    "call.ringing": "ringing",
+                    call_dialing: "dialing",
+                    "call.dialing": "dialing",
+                    call_calling: "calling",
+                    "call.calling": "calling",
+                    call_hangup: "hangup",
+                    "call.hangup": "hangup",
+                    call_ended: "ended",
+                    "call.ended": "ended",
+                }[eventName] || eventName
+            );
         },
 
         isCallActivity(eventName) {

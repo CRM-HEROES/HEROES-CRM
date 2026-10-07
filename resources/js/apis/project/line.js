@@ -22,6 +22,12 @@ export default {
             params
         );
     },
+    fetchCloudtalkCallHistory(project, params) {
+        return ApiService.post(
+            `project/${project}/line/cloudtalk/history`,
+            params
+        );
+    },
     verifyCloudtalk(project, params) {
         return ApiService.post(`project/${project}/line/cloudtalk/verify`, params);
     },

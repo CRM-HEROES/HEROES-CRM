@@ -10,6 +10,7 @@ import {
     REMOVE_LINE,
     MAKE_CLOUDTALK_CALL,
     LOOKUP_CLOUDTALK_CALL,
+    FETCH_CLOUDTALK_CALL_HISTORY,
 } from "@/actions/project/line";
 
 /**
@@ -93,6 +94,17 @@ const actions = {
      */
     async [LOOKUP_CLOUDTALK_CALL](context, params) {
         const { data } = await lineService.lookupCloudtalkCall(
+            context.state.project.slug,
+            params
+        );
+        return data;
+    },
+
+    /**
+     * Fetch recent CloudTalk call history for the current agent.
+     */
+    async [FETCH_CLOUDTALK_CALL_HISTORY](context, params) {
+        const { data } = await lineService.fetchCloudtalkCallHistory(
             context.state.project.slug,
             params
         );

@@ -29781,6 +29781,12 @@ __webpack_require__.r(__webpack_exports__);
      */
     date: function date() {
       return dayjs(this.interaction.created_at).fromNow();
+    },
+    audioIcon: function audioIcon() {
+      return this.interaction.source == "cloudtalk" ? "fa fa-play-circle" : "fa fa-microphone";
+    },
+    audioTitle: function audioTitle() {
+      return this.interaction.source == "cloudtalk" ? "Ecouter la conversation" : "Ecouter l'enregistrement";
     }
   }
 });
@@ -29798,19 +29804,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
-/* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
-/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_line__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/line */ "./resources/js/actions/project/line.js");
-/* harmony import */ var _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/utils/Ringover.vue */ "./resources/js/components/utils/Ringover.vue");
-/* harmony import */ var _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/components/utils/Aircall.vue */ "./resources/js/components/utils/Aircall.vue");
-/* harmony import */ var _components_utils_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/components/utils/Cloudtalk.vue */ "./resources/js/components/utils/Cloudtalk.vue");
-/* harmony import */ var _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./InteractionRow.vue */ "./resources/js/components/prospect/interaction/InteractionRow.vue");
-/* harmony import */ var _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../select/Select.vue */ "./resources/js/components/prospect/select/Select.vue");
+/* harmony import */ var _apis_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/project/prospect/interaction */ "./resources/js/apis/project/prospect/interaction.js");
+/* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_line__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/line */ "./resources/js/actions/project/line.js");
+/* harmony import */ var _components_CloudtalkPanel_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./components/CloudtalkPanel.vue */ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue");
+/* harmony import */ var _components_InteractionFrames_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./components/InteractionFrames.vue */ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue");
+/* harmony import */ var _components_InteractionList_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./components/InteractionList.vue */ "./resources/js/components/prospect/interaction/components/InteractionList.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -29830,19 +29835,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 // Components
-
-
 
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Ringover: _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-    Aircall: _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
-    Cloudtalk: _components_utils_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    InteractionRow: _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
-    SelectProspect: _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__["default"]
+    CloudtalkPanel: _components_CloudtalkPanel_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    InteractionFrames: _components_InteractionFrames_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    InteractionList: _components_InteractionList_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
   },
   data: function data() {
     return {
@@ -29864,6 +29866,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       cloudtalkLoginRequired: false,
       cloudtalkPhoneVisible: false,
       cloudtalkEventTimeout: null,
+      cloudtalkCreatingProspect: false,
       cloudtalkLookup: {
         number: null,
         prospect: null,
@@ -29871,15 +29874,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         messages: []
       },
       cloudtalkLookupLoading: false,
-      cloudtalkLookupRequest: 0
+      cloudtalkLookupRequest: 0,
+      cloudtalkHistoryTimeouts: []
     };
   },
   created: function created() {
-    _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_TAB, 0);
-    _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+    _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_TAB, 0);
+    _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
   },
   beforeUnmount: function beforeUnmount() {
     this.clearCloudtalkEventTimeout();
+    this.clearCloudtalkHistoryTimeout();
   },
   methods: {
     newInteraction: function newInteraction() {
@@ -29905,7 +29910,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this.fetchingInteraction = true;
               _context.prev = 4;
               _context.next = 7;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECT_INTERACTIONS);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECT_INTERACTIONS);
             case 7:
               _context.prev = 7;
               _this.fetchingInteraction = false;
@@ -29989,7 +29994,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     makeCloudtalkCall: function makeCloudtalkCall() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var params, response, status, message;
+        var params, response, callId, status, message;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
@@ -30005,28 +30010,53 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this4.cloudtalkLoginRequired = false;
               _this4.clearCloudtalkEventTimeout();
               _context3.prev = 7;
+              if (!(!_this4.interaction.id && _this4.interactionProspect)) {
+                _context3.next = 11;
+                break;
+              }
+              _context3.next = 11;
+              return _this4.addInteraction();
+            case 11:
               params = {
                 number: _this4.interaction.number
               };
               if (_this4.cloudtalkLine) {
                 params.line_id = _this4.cloudtalkLine.id;
               }
-              _context3.next = 12;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_6__.MAKE_CLOUDTALK_CALL, params);
-            case 12:
+              if (_this4.interaction.id) {
+                params.interaction_id = _this4.interaction.id;
+              }
+              _context3.next = 16;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_7__.MAKE_CLOUDTALK_CALL, params);
+            case 16:
               response = _context3.sent;
+              callId = _this4.cloudtalkCallId(response, false);
               _this4.interaction.status = "initiated";
               _this4.interaction.data = _objectSpread(_objectSpread({}, _this4.interaction.data || {}), {}, {
                 cloudtalk: response.responseData
-              });
-              _this4.updateInteraction();
+              }, callId ? {
+                id: callId,
+                call_id: callId
+              } : {});
+              if (!response.interaction) {
+                _context3.next = 25;
+                break;
+              }
+              _this4.interaction = response.interaction;
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, response.interaction);
+              _context3.next = 27;
+              break;
+            case 25:
+              _context3.next = 27;
+              return _this4.updateInteraction();
+            case 27:
               if (_this4.cloudtalkWaitingForEvent) {
                 _this4.startCloudtalkEventTimeout();
               }
-              _context3.next = 30;
+              _context3.next = 41;
               break;
-            case 19:
-              _context3.prev = 19;
+            case 30:
+              _context3.prev = 30;
               _context3.t0 = _context3["catch"](7);
               _this4.cloudtalkWaitingForEvent = false;
               _this4.clearCloudtalkEventTimeout();
@@ -30045,15 +30075,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 body: message,
                 duration: 7000
               });
-            case 30:
-              _context3.prev = 30;
+            case 41:
+              _context3.prev = 41;
               _this4.callingCloudtalk = false;
-              return _context3.finish(30);
-            case 33:
+              return _context3.finish(41);
+            case 44:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[7, 19, 30, 33]]);
+        }, _callee3, null, [[7, 30, 41, 44]]);
       }))();
     },
     showCloudtalkPhone: function showCloudtalkPhone() {
@@ -30069,7 +30099,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var payload = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       this.prepareCloudtalkInteractionFromIframe(payload.properties || {});
       if (!this.leftSlideOpen(this.name)) {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_5__.OPEN_LEFT_SLIDE, this.name);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_6__.OPEN_LEFT_SLIDE, this.name);
       }
       this.showCloudtalkPhone();
       setTimeout(function () {
@@ -30079,7 +30109,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     prepareCloudtalkInteractionFromIframe: function prepareCloudtalkInteractionFromIframe() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var callId = callInfos.call_uuid || callInfos.call_id || callInfos.id;
-      var currentCallId = this.interaction && this.interaction.data && (this.interaction.data.id || this.interaction.data.call_uuid || this.interaction.data.call_id);
+      var currentCallId = this.interaction && this.interaction.data && (this.interaction.data.id || this.interaction.data.call_uuid || this.interaction.data.cdr_id || this.interaction.data.call_id);
       if (this.interaction && this.interaction.source == "cloudtalk" && (!callId || !currentCallId || currentCallId == callId)) {
         this.fetchCloudtalkCallContext(callInfos);
         return;
@@ -30171,6 +30201,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.setCloudtalkCallData(callInfos);
       this.fetchCloudtalkCallContext(callInfos);
       this.updateInteraction();
+      this.scheduleCloudtalkHistorySync(callInfos, 1, this.cloneInteraction(this.interaction), this.interactionProspect ? this.interactionProspect.id : null);
       if (this.interactionProspect) {
         this.nextInteraction();
       }
@@ -30178,91 +30209,200 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     cloudtalkCallContactInfo: function cloudtalkCallContactInfo(callInfos) {
       this.fetchCloudtalkCallContext(callInfos);
     },
+    createCloudtalkProspect: function createCloudtalkProspect() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var number, prospect;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              number = _this7.cloudtalkLookup && _this7.cloudtalkLookup.number ? _this7.cloudtalkLookup.number : _this7.interaction.number;
+              if (!(!number || _this7.cloudtalkCreatingProspect)) {
+                _context4.next = 3;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 3:
+              _this7.cloudtalkCreatingProspect = true;
+              _context4.prev = 4;
+              _context4.next = 7;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT, {
+                phone_number: number
+              });
+            case 7:
+              prospect = _context4.sent;
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, prospect);
+              _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, _this7.cloudtalkLookup), {}, {
+                number: number,
+                numberKey: _this7.normalizePhone(number),
+                prospect: prospect,
+                threads: [],
+                messages: [],
+                resolved: true
+              });
+              if (!(_this7.interaction && _this7.interaction.source == "cloudtalk" && !_this7.interaction.id)) {
+                _context4.next = 19;
+                break;
+              }
+              _context4.prev = 11;
+              _context4.next = 14;
+              return _this7.addInteraction();
+            case 14:
+              _context4.next = 19;
+              break;
+            case 16:
+              _context4.prev = 16;
+              _context4.t0 = _context4["catch"](11);
+              _this7.interaction.data = _objectSpread(_objectSpread({}, _this7.interaction.data || {}), {}, {
+                error: _context4.t0.message
+              });
+            case 19:
+              _context4.prev = 19;
+              _this7.cloudtalkCreatingProspect = false;
+              return _context4.finish(19);
+            case 22:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[4,, 19, 22], [11, 16]]);
+      }))();
+    },
     setCloudtalkCallData: function setCloudtalkCallData() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var callId = this.cloudtalkCallId(callInfos);
       var number = this.cloudtalkCallNumber(callInfos, true);
+      var recordingUrl = callInfos.recording_url || callInfos.recording || callInfos.recording_link || "";
       if (number) {
         this.interaction.number = number;
       }
-      this.interaction.data = _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, this.interaction.data || {}), callId ? {
-        id: callId
+      if (callInfos.started_at || callInfos.startedAt) {
+        this.interaction.started_at = callInfos.started_at || callInfos.startedAt;
+      }
+      if (callInfos.ended_at || callInfos.endedAt) {
+        this.interaction.ended_at = callInfos.ended_at || callInfos.endedAt;
+      }
+      this.interaction.data = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread({}, this.interaction.data || {}), callId ? {
+        id: callId,
+        call_id: callId
+      } : {}), callInfos.call_uuid ? {
+        call_uuid: callInfos.call_uuid
       } : {}), number ? {
         external_number: number
       } : {}), callInfos.direction ? {
         direction: callInfos.direction
+      } : {}), recordingUrl ? {
+        recording_url: recordingUrl
+      } : {}), callInfos.recorded !== undefined ? {
+        recorded: callInfos.recorded
       } : {});
     },
     cloudtalkCallId: function cloudtalkCallId() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var useFallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      return callInfos.call_uuid || callInfos.call_id || callInfos.id || (useFallback && this.interaction && this.interaction.data && this.interaction.data.id ? this.interaction.data.id : "") || "";
+      var responseData = callInfos.responseData || {};
+      var data = callInfos.data || responseData.data || {};
+      var call = callInfos.call || responseData.call || data.call || {};
+      var cloudtalkCall = callInfos.cloudtalk_call || responseData.cloudtalk_call || data.cloudtalk_call || {};
+      return callInfos.call_uuid || callInfos.call_id || callInfos.cdr_id || callInfos.id || data.call_uuid || data.call_id || data.cdr_id || data.id || call.call_uuid || call.call_id || call.cdr_id || call.id || cloudtalkCall.call_uuid || cloudtalkCall.call_id || cloudtalkCall.cdr_id || cloudtalkCall.id || responseData.call_uuid || responseData.call_id || responseData.cdr_id || responseData.id || (useFallback && this.interaction && this.interaction.data && (this.interaction.data.call_id || this.interaction.data.cdr_id || this.interaction.data.id) ? this.interaction.data.call_id || this.interaction.data.cdr_id || this.interaction.data.id : "") || "";
+    },
+    /**
+     * Number already attached to the call handled by the interaction.
+     *
+     * Returns an empty string when the event belongs to another call, so a
+     * new call can still bring its own number.
+     */
+    knownCloudtalkCallNumber: function knownCloudtalkCallNumber() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      if (!this.interaction || this.interaction.source != "cloudtalk" || !this.interaction.number) {
+        return "";
+      }
+      var currentCallId = this.interaction.data && (this.interaction.data.call_id || this.interaction.data.cdr_id || this.interaction.data.id) || "";
+      var eventCallId = this.cloudtalkCallId(callInfos, false);
+      if (currentCallId && eventCallId && currentCallId != eventCallId) {
+        return "";
+      }
+      return this.interaction.number;
     },
     cloudtalkCallNumber: function cloudtalkCallNumber() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var useFallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-      return callInfos.external_number || callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || callInfos.from || callInfos.to || (useFallback && this.cloudtalkLookup.number ? this.cloudtalkLookup.number : "") || (useFallback && this.interaction.number ? this.interaction.number : "") || "";
+      var known = this.knownCloudtalkCallNumber(callInfos);
+      var candidate = callInfos.external_number || callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || callInfos.from || callInfos.to || "";
+      if (candidate) {
+        // CloudTalk also reports its own numbers inside the call
+        // events (internal agent number like "365811021001", caller
+        // id, ...): while the event belongs to the call already
+        // started, the number chosen when the call began wins.
+        if (known && this.normalizePhone(known) != this.normalizePhone(candidate)) {
+          return known;
+        }
+        return candidate;
+      }
+      if (useFallback) {
+        return this.cloudtalkLookup && this.cloudtalkLookup.number || known || "";
+      }
+      return "";
     },
     fetchCloudtalkCallContext: function fetchCloudtalkCallContext() {
       var _arguments = arguments,
-        _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var callInfos, number, numberKey, callId, previousLookup, sameResolvedCall, request, data;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
               callInfos = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : {};
-              number = _this7.cloudtalkCallNumber(callInfos, true);
-              numberKey = _this7.normalizePhone(number);
-              callId = _this7.cloudtalkCallId(callInfos, true);
-              previousLookup = _objectSpread({}, _this7.cloudtalkLookup || {});
+              number = _this8.cloudtalkCallNumber(callInfos, true);
+              numberKey = _this8.normalizePhone(number);
+              callId = _this8.cloudtalkCallId(callInfos, true);
+              previousLookup = _objectSpread({}, _this8.cloudtalkLookup || {});
               sameResolvedCall = previousLookup.prospect && previousLookup.callId && callId && previousLookup.callId == callId;
               if (!(!numberKey || numberKey.length < 6)) {
-                _context4.next = 8;
+                _context5.next = 8;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 8:
-              if (!(_this7.cloudtalkLookup.numberKey == numberKey && _this7.cloudtalkLookup.resolved)) {
-                _context4.next = 10;
+              if (!(_this8.cloudtalkLookup.numberKey == numberKey && (_this8.cloudtalkLookup.resolved || _this8.cloudtalkLookupLoading))) {
+                _context5.next = 10;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 10:
-              request = ++_this7.cloudtalkLookupRequest;
-              _this7.cloudtalkLookupLoading = true;
-              _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, _this7.cloudtalkLookup), {}, {
+              request = ++_this8.cloudtalkLookupRequest;
+              _this8.cloudtalkLookupLoading = true;
+              _this8.cloudtalkLookup = _objectSpread(_objectSpread({}, _this8.cloudtalkLookup), {}, {
                 number: number,
                 numberKey: numberKey,
                 callId: callId,
                 resolved: false
               });
-              _context4.prev = 13;
-              _context4.next = 16;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_6__.LOOKUP_CLOUDTALK_CALL, {
+              _context5.prev = 13;
+              _context5.next = 16;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_7__.LOOKUP_CLOUDTALK_CALL, {
                 number: number
               });
             case 16:
-              data = _context4.sent;
-              if (!(request != _this7.cloudtalkLookupRequest)) {
-                _context4.next = 19;
+              data = _context5.sent;
+              if (!(request != _this8.cloudtalkLookupRequest)) {
+                _context5.next = 19;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 19:
               if (!(!data.prospect && sameResolvedCall)) {
-                _context4.next = 22;
+                _context5.next = 22;
                 break;
               }
-              _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, previousLookup), {}, {
+              _this8.cloudtalkLookup = _objectSpread(_objectSpread({}, previousLookup), {}, {
                 number: previousLookup.number || data.number || number,
                 numberKey: previousLookup.numberKey || numberKey,
                 callId: callId,
                 resolved: true
               });
-              return _context4.abrupt("return");
+              return _context5.abrupt("return");
             case 22:
-              _this7.cloudtalkLookup = {
+              _this8.cloudtalkLookup = {
                 number: data.number || number,
                 numberKey: numberKey,
                 callId: callId,
@@ -30272,36 +30412,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 resolved: true
               };
               if (!data.prospect) {
-                _context4.next = 34;
+                _context5.next = 34;
                 break;
               }
-              if (!_this7.interactionProspect || _this7.interactionProspect.id != data.prospect.id) {
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, data.prospect);
+              if (!_this8.interactionProspect || _this8.interactionProspect.id != data.prospect.id) {
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, data.prospect);
               }
-              if (!(_this7.interaction && _this7.interaction.source == "cloudtalk" && !_this7.interaction.id)) {
-                _context4.next = 34;
+              if (!(_this8.interaction && _this8.interaction.source == "cloudtalk" && !_this8.interaction.id)) {
+                _context5.next = 34;
                 break;
               }
-              _context4.prev = 26;
-              _context4.next = 29;
-              return _this7.addInteraction();
+              _context5.prev = 26;
+              _context5.next = 29;
+              return _this8.addInteraction();
             case 29:
-              _context4.next = 34;
+              _context5.next = 34;
               break;
             case 31:
-              _context4.prev = 31;
-              _context4.t0 = _context4["catch"](26);
-              _this7.interaction.data = _objectSpread(_objectSpread({}, _this7.interaction.data || {}), {}, {
-                error: _context4.t0.message
+              _context5.prev = 31;
+              _context5.t0 = _context5["catch"](26);
+              _this8.interaction.data = _objectSpread(_objectSpread({}, _this8.interaction.data || {}), {}, {
+                error: _context5.t0.message
               });
             case 34:
-              _context4.next = 39;
+              _context5.next = 39;
               break;
             case 36:
-              _context4.prev = 36;
-              _context4.t1 = _context4["catch"](13);
-              if (request == _this7.cloudtalkLookupRequest) {
-                _this7.cloudtalkLookup = {
+              _context5.prev = 36;
+              _context5.t1 = _context5["catch"](13);
+              if (request == _this8.cloudtalkLookupRequest) {
+                _this8.cloudtalkLookup = {
                   number: number,
                   numberKey: numberKey,
                   callId: callId,
@@ -30312,17 +30452,146 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
               }
             case 39:
-              _context4.prev = 39;
-              if (request == _this7.cloudtalkLookupRequest) {
-                _this7.cloudtalkLookupLoading = false;
+              _context5.prev = 39;
+              if (request == _this8.cloudtalkLookupRequest) {
+                _this8.cloudtalkLookupLoading = false;
               }
-              return _context4.finish(39);
+              return _context5.finish(39);
             case 42:
             case "end":
-              return _context4.stop();
+              return _context5.stop();
           }
-        }, _callee4, null, [[13, 36, 39, 42], [26, 31]]);
+        }, _callee5, null, [[13, 36, 39, 42], [26, 31]]);
       }))();
+    },
+    scheduleCloudtalkHistorySync: function scheduleCloudtalkHistorySync() {
+      var _this9 = this;
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var attempt = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      var interaction = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+      var prospectId = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
+      var timeout = setTimeout(function () {
+        _this9.cloudtalkHistoryTimeouts = _this9.cloudtalkHistoryTimeouts.filter(function (item) {
+          return item != timeout;
+        });
+        _this9.syncCloudtalkCallHistory(callInfos, attempt, interaction, prospectId);
+      }, attempt == 1 ? 3000 : 8000);
+      this.cloudtalkHistoryTimeouts.push(timeout);
+    },
+    clearCloudtalkHistoryTimeout: function clearCloudtalkHistoryTimeout() {
+      this.cloudtalkHistoryTimeouts.forEach(function (timeout) {
+        return clearTimeout(timeout);
+      });
+      this.cloudtalkHistoryTimeouts = [];
+    },
+    syncCloudtalkCallHistory: function syncCloudtalkCallHistory() {
+      var _arguments2 = arguments,
+        _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        var callInfos, attempt, interaction, prospectId, targetInteraction, targetProspectId, number, callId, params, data, updatedInteraction, _yield$ProspectIntera, savedInteraction;
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              callInfos = _arguments2.length > 0 && _arguments2[0] !== undefined ? _arguments2[0] : {};
+              attempt = _arguments2.length > 1 && _arguments2[1] !== undefined ? _arguments2[1] : 1;
+              interaction = _arguments2.length > 2 && _arguments2[2] !== undefined ? _arguments2[2] : null;
+              prospectId = _arguments2.length > 3 && _arguments2[3] !== undefined ? _arguments2[3] : null;
+              targetInteraction = interaction || _this10.interaction;
+              targetProspectId = prospectId || (_this10.interactionProspect ? _this10.interactionProspect.id : null);
+              if (!(!targetInteraction || targetInteraction.source != "cloudtalk" || !targetProspectId)) {
+                _context6.next = 8;
+                break;
+              }
+              return _context6.abrupt("return");
+            case 8:
+              number = _this10.cloudtalkCallNumber(callInfos, false) || targetInteraction.number;
+              callId = _this10.cloudtalkCallId(callInfos, false) || (targetInteraction.data || {}).call_id || (targetInteraction.data || {}).cdr_id || (targetInteraction.data || {}).id;
+              params = {
+                number: number,
+                call_id: callId,
+                started_at: targetInteraction.started_at,
+                ended_at: targetInteraction.ended_at,
+                direction: callInfos.direction || (targetInteraction.data || {}).direction || null
+              };
+              if (_this10.cloudtalkLine) {
+                params.line_id = _this10.cloudtalkLine.id;
+              }
+              _context6.prev = 12;
+              _context6.next = 15;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_7__.FETCH_CLOUDTALK_CALL_HISTORY, params);
+            case 15:
+              data = _context6.sent;
+              if (data.call) {
+                _context6.next = 19;
+                break;
+              }
+              if (attempt < 3) {
+                _this10.scheduleCloudtalkHistorySync(callInfos, attempt + 1, targetInteraction, targetProspectId);
+              }
+              return _context6.abrupt("return");
+            case 19:
+              updatedInteraction = _this10.applyCloudtalkHistory(data.call, targetInteraction);
+              if (!updatedInteraction.id) {
+                _context6.next = 29;
+                break;
+              }
+              _context6.next = 23;
+              return _apis_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_2__["default"].update(_this10.project.slug, targetProspectId, updatedInteraction.id, updatedInteraction);
+            case 23:
+              _yield$ProspectIntera = _context6.sent;
+              savedInteraction = _yield$ProspectIntera.data;
+              if (_this10.interaction && _this10.interaction.id == updatedInteraction.id) {
+                _this10.interaction = savedInteraction;
+              }
+              if (!(_this10.interactionProspect && _this10.interactionProspect.id == targetProspectId)) {
+                _context6.next = 29;
+                break;
+              }
+              _context6.next = 29;
+              return _this10.fetchInteractions();
+            case 29:
+              _context6.next = 34;
+              break;
+            case 31:
+              _context6.prev = 31;
+              _context6.t0 = _context6["catch"](12);
+              if (attempt < 3) {
+                _this10.scheduleCloudtalkHistorySync(callInfos, attempt + 1, targetInteraction, targetProspectId);
+              }
+            case 34:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6, null, [[12, 31]]);
+      }))();
+    },
+    applyCloudtalkHistory: function applyCloudtalkHistory(call) {
+      var interaction = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      var targetInteraction = interaction || this.interaction;
+      var existingData = targetInteraction.data || {};
+      targetInteraction.data = _objectSpread(_objectSpread({}, existingData), {}, {
+        call_id: call.id,
+        cdr_id: call.id,
+        recorded: call.recorded,
+        recording_url: call.recording_url || existingData.recording_url,
+        recording_link: call.recording_link || existingData.recording_link,
+        cloudtalk_call: call,
+        cloudtalk_history: call.raw
+      });
+      targetInteraction.number = call.number || targetInteraction.number || "";
+      targetInteraction.from_number = call.from_number || targetInteraction.from_number || "";
+      targetInteraction.started_at = call.started_at || targetInteraction.started_at || null;
+      targetInteraction.ended_at = call.ended_at || targetInteraction.ended_at || null;
+      targetInteraction.status = call.status || targetInteraction.status;
+      return targetInteraction;
+    },
+    cloneInteraction: function cloneInteraction(interaction) {
+      if (!interaction) {
+        return null;
+      }
+      return _objectSpread(_objectSpread({}, interaction), {}, {
+        data: _objectSpread({}, interaction && interaction.data ? interaction.data : {})
+      });
     },
     normalizePhone: function normalizePhone(number) {
       return String(number || "").replace(/\D+/g, "");
@@ -30345,59 +30614,59 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     addInteraction: function addInteraction() {
-      var _this8 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _this8.addingInteraction = true;
-              _context5.prev = 1;
-              _context5.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this8.interaction);
+              _this11.addingInteraction = true;
+              _context7.prev = 1;
+              _context7.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this11.interaction);
             case 4:
-              _this8.interaction = _context5.sent;
+              _this11.interaction = _context7.sent;
             case 5:
-              _context5.prev = 5;
-              _this8.addingInteraction = false;
-              return _context5.finish(5);
+              _context7.prev = 5;
+              _this11.addingInteraction = false;
+              return _context7.finish(5);
             case 8:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
-        }, _callee5, null, [[1,, 5, 8]]);
+        }, _callee7, null, [[1,, 5, 8]]);
       }))();
     },
     /**
      *
      */
     updateInteraction: function updateInteraction() {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              if (!(!_this9.interaction || !_this9.interactionProspect)) {
-                _context6.next = 2;
+              if (!(!_this12.interaction || !_this12.interactionProspect)) {
+                _context8.next = 2;
                 break;
               }
-              return _context6.abrupt("return");
+              return _context8.abrupt("return");
             case 2:
-              if (_this9.interaction.id) {
-                _context6.next = 7;
+              if (_this12.interaction.id) {
+                _context8.next = 7;
                 break;
               }
-              _context6.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_INTERACTION, _this9.interaction);
+              _context8.next = 5;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT_INTERACTION, _this12.interaction);
             case 5:
-              _this9.interaction = _context6.sent;
-              return _context6.abrupt("return");
+              _this12.interaction = _context8.sent;
+              return _context8.abrupt("return");
             case 7:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT_INTERACTION, _this9.interaction);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT_INTERACTION, _this12.interaction);
             case 8:
             case "end":
-              return _context6.stop();
+              return _context8.stop();
           }
-        }, _callee6);
+        }, _callee8);
       }))();
     },
     /**
@@ -30407,105 +30676,105 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (this.selectedProspects.length - 1 > this["this"].currentProspectIndex) {
         this.currentProspectIndex++;
       } else {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, null);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
       }
     },
     /**
      *
      */
     setInteractionProspect: function setInteractionProspect(prospect) {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, prospect);
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
-            case 0:
-              _this10.updatingPhoneNumber = true;
-              _context7.prev = 1;
-              _context7.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this10.interactionProspect.id,
-                phone_number: _this10.phoneNumber
-              });
-            case 4:
-              _context7.prev = 4;
-              _this10.updatingPhoneNumber = false;
-              _this10.tab = 0;
-              return _context7.finish(4);
-            case 8:
-            case "end":
-              return _context7.stop();
-          }
-        }, _callee7, null, [[1,, 4, 8]]);
-      }))();
-    },
-    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
-      var _this11 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-          while (1) switch (_context8.prev = _context8.next) {
-            case 0:
-              _this11.updatingMobilePhoneNumber = true;
-              _context8.prev = 1;
-              _context8.next = 4;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, {
-                id: _this11.interactionProspect.id,
-                mobile_phone_number: _this11.mobilePhoneNumber
-              });
-            case 4:
-              _context8.prev = 4;
-              _this11.updatingMobilePhoneNumber = false;
-              _this11.tab = 0;
-              return _context8.finish(4);
-            case 8:
-            case "end":
-              return _context8.stop();
-          }
-        }, _callee8, null, [[1,, 4, 8]]);
-      }))();
-    },
-    fetchSelectedProspects: function fetchSelectedProspects() {
-      var _this12 = this;
+      var _this13 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        var _yield$ProspectServic, data;
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
-              if (!(_this12.prospectsSelected.length == 0)) {
-                _context9.next = 3;
+              _this13.updatingPhoneNumber = true;
+              _context9.prev = 1;
+              _context9.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
+                id: _this13.interactionProspect.id,
+                phone_number: _this13.phoneNumber
+              });
+            case 4:
+              _context9.prev = 4;
+              _this13.updatingPhoneNumber = false;
+              _this13.tab = 0;
+              return _context9.finish(4);
+            case 8:
+            case "end":
+              return _context9.stop();
+          }
+        }, _callee9, null, [[1,, 4, 8]]);
+      }))();
+    },
+    updateProspectMobilePhoneNumber: function updateProspectMobilePhoneNumber() {
+      var _this14 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+          while (1) switch (_context10.prev = _context10.next) {
+            case 0:
+              _this14.updatingMobilePhoneNumber = true;
+              _context10.prev = 1;
+              _context10.next = 4;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, {
+                id: _this14.interactionProspect.id,
+                mobile_phone_number: _this14.mobilePhoneNumber
+              });
+            case 4:
+              _context10.prev = 4;
+              _this14.updatingMobilePhoneNumber = false;
+              _this14.tab = 0;
+              return _context10.finish(4);
+            case 8:
+            case "end":
+              return _context10.stop();
+          }
+        }, _callee10, null, [[1,, 4, 8]]);
+      }))();
+    },
+    fetchSelectedProspects: function fetchSelectedProspects() {
+      var _this15 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
+        var _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+          while (1) switch (_context11.prev = _context11.next) {
+            case 0:
+              if (!(_this15.prospectsSelected.length == 0)) {
+                _context11.next = 3;
                 break;
               }
-              _this12.selectedProspects = [];
-              return _context9.abrupt("return");
+              _this15.selectedProspects = [];
+              return _context11.abrupt("return");
             case 3:
-              _context9.prev = 3;
-              _context9.next = 6;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this12.project.slug, {
+              _context11.prev = 3;
+              _context11.next = 6;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this15.project.slug, {
                 params: {
                   filters: JSON.stringify({
-                    ids: _this12.prospectsSelected
+                    ids: _this15.prospectsSelected
                   }),
                   fields: "first_name,last_name,phone_number,mobile_phone_number"
                 }
               });
             case 6:
-              _yield$ProspectServic = _context9.sent;
+              _yield$ProspectServic = _context11.sent;
               data = _yield$ProspectServic.data;
-              _this12.selectedProspects = data.data.filter(function (prospect) {
+              _this15.selectedProspects = data.data.filter(function (prospect) {
                 return prospect.phone_number || prospect.mobile_phone_number;
               });
             case 9:
-              _context9.prev = 9;
-              _this12.fetchingProspect = false;
-              return _context9.finish(9);
+              _context11.prev = 9;
+              _this15.fetchingProspect = false;
+              return _context11.finish(9);
             case 12:
             case "end":
-              return _context9.stop();
+              return _context11.stop();
           }
-        }, _callee9, null, [[3,, 9, 12]]);
+        }, _callee11, null, [[3,, 9, 12]]);
       }))();
     },
     /**
@@ -30520,29 +30789,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
     },
     ringoverSetting: function ringoverSetting() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "setting-ringover");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.OPEN_MODAL, "setting-ringover");
     }
   },
   watch: {
     interactionProspect: function interactionProspect(newValue, oldValue) {
-      var _this13 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
-        return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-          while (1) switch (_context10.prev = _context10.next) {
+      var _this16 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+          while (1) switch (_context12.prev = _context12.next) {
             case 0:
-              if (newValue && _this13.leftSlideOpen(_this13.name)) {
-                _this13.fetchInteractions();
-                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this13.interaction.number)) {
-                  _this13.interaction.number = newValue.phone_number;
-                } else {
-                  _this13.interaction.number = newValue.mobile_phone_number;
+              if (newValue && _this16.leftSlideOpen(_this16.name)) {
+                _this16.fetchInteractions();
+                if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this16.interaction.number)) {
+                  _this16.interaction.number = newValue.phone_number;
+                } else if (newValue.mobile_phone_number) {
+                  // never clear interaction.number: it is the number used
+                  // to resolve the context of the call in progress.
+                  _this16.interaction.number = newValue.mobile_phone_number;
                 }
               }
             case 1:
             case "end":
-              return _context10.stop();
+              return _context12.stop();
           }
-        }, _callee10);
+        }, _callee12);
       }))();
     },
     selectedProspects: function selectedProspects() {
@@ -30557,12 +30828,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     currentProspect: function currentProspect(newValue) {
       if (newValue) {
         setTimeout(function () {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, newValue);
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, newValue);
         }, 1000);
       }
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)(["project", "interactionProspect", "prospectFullName", "prospectInteractions", "interactionTab", "interactionFrameTab", "prospectsSelected", "leftSlideOpen", "can", "lines"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "interactionProspect", "prospectFullName", "prospectInteractions", "interactionTab", "interactionFrameTab", "prospectsSelected", "leftSlideOpen", "can", "lines"])), {}, {
     currentProspect: function currentProspect() {
       if (this.selectedProspects.length > this.currentProspectIndex) {
         return this.selectedProspects[this.currentProspectIndex];
@@ -30595,7 +30866,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return (this.cloudtalkPhoneVisible || this.cloudtalkLoginRequired || this.cloudtalkLoading) && this.tab == 1 && this.frameTab == 5;
     },
     cloudtalkCallContextVisible: function cloudtalkCallContextVisible() {
-      return this.cloudtalkLookupLoading || !!this.cloudtalkCallProspect;
+      return this.cloudtalkLookupLoading || !!this.cloudtalkCallProspect || this.cloudtalkPhoneDisplayed && this.cloudtalkLookup && this.cloudtalkLookup.resolved && !!this.cloudtalkLookup.number;
     },
     cloudtalkCallProspect: function cloudtalkCallProspect() {
       return this.cloudtalkLookup && this.cloudtalkLookup.prospect ? this.cloudtalkLookup.prospect : null;
@@ -30607,7 +30878,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var name = [this.cloudtalkCallProspect.first_name, this.cloudtalkCallProspect.last_name].filter(function (value) {
         return value;
       }).join(" ");
-      return name || this.cloudtalkCallProspect.company_name || this.cloudtalkCallProspect.email || this.cloudtalkLookup.number || "";
+      return name || this.cloudtalkCallProspect.company_name || this.cloudtalkCallProspect.email || this.cloudtalkCallProspect.phone_number || this.cloudtalkCallProspect.mobile_phone_number || this.cloudtalkLookup.number || "";
     },
     cloudtalkLookupThreads: function cloudtalkLookupThreads() {
       return this.cloudtalkLookup && this.cloudtalkLookup.threads ? this.cloudtalkLookup.threads : [];
@@ -30616,12 +30887,388 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return this.cloudtalkLookup && this.cloudtalkLookup.messages ? this.cloudtalkLookup.messages : [];
     },
     cloudtalkLine: function cloudtalkLine() {
-      var _this14 = this;
+      var _this17 = this;
       return this.lines.find(function (line) {
-        return line.operator === "cloudtalk" && _this14.user && line.user_id == _this14.user.id;
+        return line.operator === "cloudtalk" && _this17.user && line.user_id == _this17.user.id;
       });
     }
   })
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js":
+/*!**************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/utils/Aircall.vue */ "./resources/js/components/utils/Aircall.vue");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    Aircall: _components_utils_Aircall_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    interaction: {
+      type: Object,
+      required: true
+    },
+    tab: {
+      type: Number,
+      required: true
+    },
+    frameTab: {
+      type: Number,
+      required: true
+    },
+    aircallTab: {
+      type: Number,
+      required: true
+    },
+    aircallWebhookUrl: {
+      type: String,
+      required: true
+    }
+  },
+  emits: ["back", "setting", "back-setting", "copy-webhook", "update-interaction", "next-interaction"]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  emits: ["back"]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js":
+/*!****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js ***!
+  \****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _components_utils_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/utils/Cloudtalk.vue */ "./resources/js/components/utils/Cloudtalk.vue");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    Cloudtalk: _components_utils_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    displayed: {
+      type: Boolean,
+      "default": false
+    },
+    contextVisible: {
+      type: Boolean,
+      "default": false
+    },
+    number: {
+      type: [String, Number],
+      "default": ""
+    },
+    lookupNumber: {
+      type: [String, Number],
+      "default": ""
+    },
+    calling: {
+      type: Boolean,
+      "default": false
+    },
+    loading: {
+      type: Boolean,
+      "default": false
+    },
+    lookupLoading: {
+      type: Boolean,
+      "default": false
+    },
+    prospect: {
+      type: Object,
+      "default": null
+    },
+    prospectName: {
+      type: String,
+      "default": ""
+    },
+    project: {
+      type: Object,
+      required: true
+    },
+    threads: {
+      type: Array,
+      "default": function _default() {
+        return [];
+      }
+    },
+    messagesForThread: {
+      type: Function,
+      required: true
+    },
+    formatDate: {
+      type: Function,
+      required: true
+    },
+    messagePreview: {
+      type: Function,
+      required: true
+    },
+    creatingProspect: {
+      type: Boolean,
+      "default": false
+    },
+    canCreateProspect: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  computed: {
+    contextNumber: function contextNumber() {
+      return this.lookupNumber || this.number;
+    },
+    hasDifferentContextNumber: function hasDifferentContextNumber() {
+      if (!this.prospect || !this.contextNumber) {
+        return false;
+      }
+      var contextNumber = this.normalizePhone(this.contextNumber);
+      return contextNumber && this.prospectPhoneNumbers.length > 0 && !this.prospectPhoneNumbers.includes(contextNumber);
+    },
+    prospectPhoneNumbers: function prospectPhoneNumbers() {
+      var _this = this;
+      if (!this.prospect) {
+        return [];
+      }
+      return [this.prospect.phone_number, this.prospect.mobile_phone_number].filter(function (number) {
+        return number;
+      }).map(function (number) {
+        return _this.normalizePhone(number);
+      });
+    },
+    shouldShowContextNumber: function shouldShowContextNumber() {
+      return this.contextNumber && (!this.prospectPhoneNumbers.length || this.hasDifferentContextNumber);
+    }
+  },
+  methods: {
+    normalizePhone: function normalizePhone(number) {
+      return String(number || "").replace(/\D+/g, "");
+    }
+  },
+  emits: ["make-call", "call-activity", "ringing-call", "outgoing-call", "call-ended", "hangup-call", "answered-call", "contact-info", "create-prospect"]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js":
+/*!*******************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js ***!
+  \*******************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _select_Select_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../select/Select.vue */ "./resources/js/components/prospect/select/Select.vue");
+/* harmony import */ var _AircallFrame_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AircallFrame.vue */ "./resources/js/components/prospect/interaction/components/AircallFrame.vue");
+/* harmony import */ var _RingoverFrame_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./RingoverFrame.vue */ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue");
+/* harmony import */ var _PhoneNumberForm_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./PhoneNumberForm.vue */ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue");
+/* harmony import */ var _CloudtalkFrame_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./CloudtalkFrame.vue */ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue");
+
+
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    SelectProspect: _select_Select_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    AircallFrame: _AircallFrame_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    RingoverFrame: _RingoverFrame_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    PhoneNumberForm: _PhoneNumberForm_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    CloudtalkFrame: _CloudtalkFrame_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+  },
+  props: {
+    interactionProspect: {
+      type: Object,
+      "default": null
+    },
+    interaction: {
+      type: Object,
+      required: true
+    },
+    tab: {
+      type: Number,
+      required: true
+    },
+    frameTab: {
+      type: Number,
+      required: true
+    },
+    aircallTab: {
+      type: Number,
+      required: true
+    },
+    aircallWebhookUrl: {
+      type: String,
+      required: true
+    },
+    phoneNumber: {
+      type: String,
+      "default": null
+    },
+    mobilePhoneNumber: {
+      type: String,
+      "default": null
+    },
+    updatingPhoneNumber: {
+      type: Boolean,
+      "default": false
+    },
+    updatingMobilePhoneNumber: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  emits: ["back", "aircall-setting", "aircall-back-setting", "copy-aircall-webhook", "ringover-setting", "update-interaction", "next-interaction", "prospect-selected", "update-phone-number", "update-mobile-phone-number", "update:phoneNumber", "update:mobilePhoneNumber", "back-cloudtalk"]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../InteractionRow.vue */ "./resources/js/components/prospect/interaction/InteractionRow.vue");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    InteractionRow: _InteractionRow_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    interactionProspect: {
+      type: Object,
+      required: true
+    },
+    prospectInteractions: {
+      type: Array,
+      "default": function _default() {
+        return [];
+      }
+    },
+    addingHistory: {
+      type: Boolean,
+      "default": false
+    },
+    canAdd: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  emits: ["edit-phone", "edit-mobile", "call-telephone", "call-aircall", "call-ringover", "call-cloudtalk", "add-history"]
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js":
+/*!*****************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js ***!
+  \*****************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    titleKey: {
+      type: String,
+      required: true
+    },
+    modelValue: {
+      type: [String, Number],
+      "default": null
+    },
+    loading: {
+      type: Boolean,
+      "default": false
+    },
+    relative: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  emits: ["back", "submit", "update:modelValue"],
+  computed: {
+    value: {
+      get: function get() {
+        return this.modelValue;
+      },
+      set: function set(value) {
+        this.$emit("update:modelValue", value);
+      }
+    },
+    formStyle: function formStyle() {
+      return this.relative ? "height: 100%; position: relative" : "height: 100%";
+    }
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/utils/Ringover.vue */ "./resources/js/components/utils/Ringover.vue");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    Ringover: _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+  },
+  props: {
+    interaction: {
+      type: Object,
+      required: true
+    }
+  },
+  emits: ["back", "setting", "update-interaction", "next-interaction"]
 });
 
 /***/ }),
@@ -52769,14 +53416,15 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (!data || !data.event) {
         return;
       }
-      var properties = this.normalizeProperties(data.properties || {}, data.event);
-      if (this.isCallActivity(data.event)) {
+      var eventName = this.normalizeEventName(data.event);
+      var properties = this.normalizeProperties(data.properties || {}, eventName);
+      if (this.isCallActivity(eventName)) {
         this.$emit("call-activity", {
-          event: data.event,
+          event: eventName,
           properties: properties
         });
       }
-      switch (data.event) {
+      switch (eventName) {
         case "ringing":
           this.$emit("ringing-call", properties);
           break;
@@ -52796,6 +53444,20 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           this.$emit("contact-info", properties);
           break;
       }
+    },
+    normalizeEventName: function normalizeEventName(eventName) {
+      return {
+        call_ringing: "ringing",
+        "call.ringing": "ringing",
+        call_dialing: "dialing",
+        "call.dialing": "dialing",
+        call_calling: "calling",
+        "call.calling": "calling",
+        call_hangup: "hangup",
+        "call.hangup": "hangup",
+        call_ended: "ended",
+        "call.ended": "ended"
+      }[eventName] || eventName;
     },
     isCallActivity: function isCallActivity(eventName) {
       return ["ringing", "dialing", "calling", "hangup", "ended"].includes(eventName);
@@ -78874,8 +79536,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         tag: "a",
         href: $props.interaction.audio,
         target: "_blank",
-        "class": "fa fa-microphone"
-      }, null, 8 /* PROPS */, ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+        rel: "noopener",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.audioIcon),
+        title: $options.audioTitle
+      }, null, 8 /* PROPS */, ["href", "class", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["class"]);
@@ -78899,205 +79563,15 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "hc-prospect-interaction-root"
 };
-var _hoisted_2 = {
-  key: 0,
-  "class": "hc-prospect-interaction-cloudtalk-context"
-};
-var _hoisted_3 = {
-  key: 0,
-  "class": "hc-prospect-interaction-cloudtalk-context-loading"
-};
-var _hoisted_4 = {
-  "class": "hc-prospect-interaction-cloudtalk-context-header"
-};
-var _hoisted_5 = ["textContent"];
-var _hoisted_6 = ["textContent"];
-var _hoisted_7 = {
-  "class": "hc-prospect-interaction-cloudtalk-context-section"
-};
-var _hoisted_8 = {
-  key: 0,
-  "class": "hc-prospect-interaction-cloudtalk-context-line"
-};
-var _hoisted_9 = ["textContent"];
-var _hoisted_10 = {
-  key: 1,
-  "class": "hc-prospect-interaction-cloudtalk-context-line"
-};
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = {
-  key: 2,
-  "class": "hc-prospect-interaction-cloudtalk-context-line"
-};
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = {
-  "class": "hc-prospect-interaction-cloudtalk-context-section"
-};
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "hc-prospect-interaction-cloudtalk-context-heading"
-}, " information ", -1 /* HOISTED */);
-var _hoisted_16 = {
-  key: 0,
-  "class": "hc-prospect-interaction-cloudtalk-context-empty"
-};
-var _hoisted_17 = {
-  "class": "hc-prospect-interaction-cloudtalk-thread-title"
-};
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = {
-  "class": "hc-prospect-interaction-cloudtalk-message-meta"
-};
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = {
-  key: 0,
-  "class": "hc-prospect-interaction-cloudtalk-message-users"
-};
-var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = {
-  "class": "hc-item-main-content hc-flex-column"
-};
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = ["textContent"];
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
-  viewBox: "0 0 40 40"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  fill: "#00B388",
-  d: "M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
-})], -1 /* HOISTED */);
-var _hoisted_32 = {
-  "class": "hc-item-main-content hc-flex-column"
-};
-var _hoisted_33 = ["textContent"];
-var _hoisted_34 = ["textContent"];
-var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
-  viewBox: "0 0 40 40"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  d: "M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z",
-  style: {
-    "fill": "rgb(85, 195, 192)"
-  }
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  d: "M30.1,23.1c-1.3,4.3-5.3,7.4-10.1,7.4s-8.7-3.1-10.1-7.4H0.3C1.8,32.7,10,40,20,40s18.2-7.3,19.7-16.9H30.1z",
-  style: {
-    "fill": "rgb(85, 195, 192)"
-  }
-})], -1 /* HOISTED */);
-var _hoisted_36 = {
-  "class": "hc-item-main-content hc-flex-column"
-};
-var _hoisted_37 = ["textContent"];
-var _hoisted_38 = ["textContent"];
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
-  viewBox: "0 0 40 40"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  fill: "#1f6feb",
-  d: "M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
-}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  fill: "#ffffff",
-  d: "M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
-})], -1 /* HOISTED */);
-var _hoisted_40 = {
-  "class": "hc-item-main-content hc-flex-column"
-};
-var _hoisted_41 = ["textContent"];
-var _hoisted_42 = ["textContent"];
-var _hoisted_43 = ["textContent"];
-var _hoisted_44 = ["textContent"];
-var _hoisted_45 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_46 = ["textContent"];
-var _hoisted_47 = {
-  style: {
-    "flex": "1",
-    "width": "100%",
-    "height": "100%",
-    "padding": "10px",
-    "overflow": "auto"
-  }
-};
-var _hoisted_48 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_49 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "hc-item-main-content",
-  textContent: 'Paramètre Aircall Webhook'
-}, null, -1 /* HOISTED */);
-var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "hc-item-main-content",
-  textContent: 'Rendez-vous sur la page webhook d\'aircall'
-}, null, -1 /* HOISTED */);
-var _hoisted_51 = ["textContent"];
-var _hoisted_52 = ["textContent"];
-var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "hc-item-main-content",
-  textContent: 'Enfin cliquer sur "Ajouter webhook"'
-}, null, -1 /* HOISTED */);
-var _hoisted_54 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_55 = ["textContent"];
-var _hoisted_56 = {
-  style: {
-    "flex": "1",
-    "width": "100%",
-    "height": "100%",
-    "overflow": "auto"
-  }
-};
-var _hoisted_57 = ["textContent"];
-var _hoisted_58 = ["textContent"];
-var _hoisted_59 = ["textContent"];
-var _hoisted_60 = ["textContent"];
-var _hoisted_61 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_62 = ["textContent"];
-var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  style: {
-    "flex": "1",
-    "width": "100%",
-    "height": "100%",
-    "overflow": "auto",
-    "position": "relative"
-  }
-}, null, -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_cloudtalk = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk");
-  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
-  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
-  var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
-  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
-  var _component_interaction_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-row");
-  var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
-  var _component_aircall = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("aircall");
+  var _component_cloudtalk_panel = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk-panel");
+  var _component_interaction_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-list");
+  var _component_interaction_frames = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-frames");
   var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
-  var _component_ringover = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("ringover");
-  var _component_select_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("select-prospect");
-  var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
-  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
-  var _component_frame_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("frame-layout");
   var _component_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("slide", true);
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[20] || (_cache[20] = function ($event) {
+    onOpen: _cache[7] || (_cache[7] = function ($event) {
       return $options.fetchInteractions(), $options.fetchSelectedProspects();
     }),
     onClosed: $options.resetCloudtalkSlideState,
@@ -79119,17 +79593,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-interaction-cloudtalk-panel', {
-          visible: $options.cloudtalkPhoneDisplayed,
-          'with-context': $options.cloudtalkCallContextVisible
-        }])
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk, {
-        id: "cloudtalk-phone",
-        "class": "hc-prospect-interaction-cloudtalk-phone",
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk_panel, {
+        displayed: $options.cloudtalkPhoneDisplayed,
+        "context-visible": $options.cloudtalkCallContextVisible,
         number: $data.interaction.number,
         calling: $data.callingCloudtalk,
         loading: $options.cloudtalkLoading,
+        "lookup-loading": $data.cloudtalkLookupLoading,
+        "lookup-number": $data.cloudtalkLookup.number,
+        prospect: $options.cloudtalkCallProspect,
+        "prospect-name": $options.cloudtalkProspectName,
+        project: _ctx.project,
+        threads: $options.cloudtalkLookupThreads,
+        "creating-prospect": $data.cloudtalkCreatingProspect,
+        "can-create-prospect": _ctx.can('all.prospect.add'),
+        "messages-for-thread": $options.cloudtalkMessagesForThread,
+        "format-date": $options.formatCloudtalkDate,
+        "message-preview": $options.messagePreview,
         onMakeCall: $options.makeCloudtalkCall,
         onCallActivity: $options.displayCloudtalkPhoneFromIframe,
         onRingingCall: $options.cloudtalkCallRinging,
@@ -79137,611 +79617,1132 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onCallEnded: $options.cloudtalkCallEnded,
         onHangupCall: $options.cloudtalkCallHangup,
         onAnsweredCall: $options.cloudtalkCallAnswered,
-        onContactInfo: $options.cloudtalkCallContactInfo
-      }, null, 8 /* PROPS */, ["number", "calling", "loading", "onMakeCall", "onCallActivity", "onRingingCall", "onOutgoingCall", "onCallEnded", "onHangupCall", "onAnsweredCall", "onContactInfo"]), $options.cloudtalkCallContextVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("aside", _hoisted_2, [$data.cloudtalkLookupLoading && !$options.cloudtalkCallProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-        loading: $data.cloudtalkLookupLoading
-      }, null, 8 /* PROPS */, ["loading"])])) : $options.cloudtalkCallProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-        key: 1
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-        "class": "hc-prospect-interaction-cloudtalk-context-title",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkProspectName)
-      }, null, 8 /* PROPS */, _hoisted_5), $options.cloudtalkCallProspect.company_name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-        key: 0,
-        "class": "hc-prospect-interaction-cloudtalk-context-subtitle",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.company_name)
-      }, null, 8 /* PROPS */, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
-        "class": "hc-prospect-interaction-cloudtalk-context-link",
-        to: {
-          name: 'prospect.show',
-          params: {
-            project: _ctx.project.slug,
-            prospect: $options.cloudtalkCallProspect.id
-          }
-        }
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-            "class": "fa fa-external-link"
-          })];
-        }),
-        _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["to"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [$options.cloudtalkCallProspect.email ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-        "class": "fa fa-envelope"
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.email)
-      }, null, 8 /* PROPS */, _hoisted_9)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.cloudtalkCallProspect.phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-        "class": "fa fa-phone"
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.phone_number)
-      }, null, 8 /* PROPS */, _hoisted_11)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.cloudtalkCallProspect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-        "class": "fa fa-mobile"
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkCallProspect.mobile_phone_number)
-      }, null, 8 /* PROPS */, _hoisted_13)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, $options.cloudtalkLookupThreads.length == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, " Aucun information lie a votre utilisateur. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkLookupThreads, function (thread) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-          key: thread.id,
-          "class": "hc-prospect-interaction-cloudtalk-thread"
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-          "class": "hc-prospect-interaction-cloudtalk-thread-color",
-          style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-            color: thread.color,
-            backgroundColor: thread.bgcolor
-          })
-        }, null, 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-          textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.name)
-        }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
-          textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.user_messages_count + '/' + thread.messages_count)
-        }, null, 8 /* PROPS */, _hoisted_19)]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.cloudtalkMessagesForThread(thread), function (message) {
-          return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-            key: message.id,
-            "class": "hc-prospect-interaction-cloudtalk-message"
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.creator ? message.creator.name : '')
-          }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.formatCloudtalkDate(message.created_at))
-          }, null, 8 /* PROPS */, _hoisted_22)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-            "class": "hc-prospect-interaction-cloudtalk-message-body",
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.messagePreview(message.body))
-          }, null, 8 /* PROPS */, _hoisted_23), message.users && message.users.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-            "class": "fa fa-user"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.users.map(function (user) {
-              return user.name;
-            }).join(', '))
-          }, null, 8 /* PROPS */, _hoisted_25)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-        }), 128 /* KEYED_FRAGMENT */))]);
-      }), 128 /* KEYED_FRAGMENT */))])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
+        onContactInfo: $options.cloudtalkCallContactInfo,
+        onCreateProspect: $options.createCloudtalkProspect
+      }, null, 8 /* PROPS */, ["displayed", "context-visible", "number", "calling", "loading", "lookup-loading", "lookup-number", "prospect", "prospect-name", "project", "threads", "creating-prospect", "can-create-prospect", "messages-for-thread", "format-date", "message-preview", "onMakeCall", "onCallActivity", "onRingingCall", "onOutgoingCall", "onCallEnded", "onHangupCall", "onAnsweredCall", "onContactInfo", "onCreateProspect"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
         count: 2,
         tab: $data.tab,
         "class": "hc-flex-1"
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_frame_layout, {
-            count: 6,
-            tab: $data.frameTab,
-            "class": "hc-flex-1"
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
-            "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[13] || (_cache[13] = function ($event) {
-                  return $data.tab = 0;
-                }),
-                onProspectSelected: $options.setInteractionProspect
-              }, null, 8 /* PROPS */, ["onProspectSelected"])];
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_interaction_frames, {
+            "phone-number": $data.phoneNumber,
+            "onUpdate:phoneNumber": _cache[2] || (_cache[2] = function ($event) {
+              return $data.phoneNumber = $event;
             }),
-            "4": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-                "class": "hc-flex-column",
-                style: {
-                  "height": "100%"
-                },
-                onSubmit: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-                  return $options.updateProspectPhoneNumber && $options.updateProspectPhoneNumber.apply($options, arguments);
-                }, ["prevent"]))
-              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[14] || (_cache[14] = function ($event) {
-                  return $data.tab = 0;
-                }),
-                "class": "bordered"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-left"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_57)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-                padding: "12px",
-                style: {
-                  "height": "auto"
-                }
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-                    label: _ctx.$t('field.prospect.phone_number')
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-                        type: "tel",
-                        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
-                          return $data.phoneNumber = $event;
-                        })
-                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.phoneNumber, void 0, {
-                        lazy: true
-                      }]])];
-                    }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["label"])];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_58)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-                loading: $data.updatingPhoneNumber
-              }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
+            "mobile-phone-number": $data.mobilePhoneNumber,
+            "onUpdate:mobilePhoneNumber": _cache[3] || (_cache[3] = function ($event) {
+              return $data.mobilePhoneNumber = $event;
             }),
-            "5": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-                "class": "hc-flex-column",
-                style: {
-                  "height": "100%",
-                  "position": "relative"
-                },
-                onSubmit: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-                  return $options.updateProspectMobilePhoneNumber && $options.updateProspectMobilePhoneNumber.apply($options, arguments);
-                }, ["prevent"]))
-              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[17] || (_cache[17] = function ($event) {
-                  return $data.tab = 0;
-                }),
-                "class": "bordered"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-left"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_59)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-                padding: "12px",
-                style: {
-                  "height": "auto"
-                }
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-                    label: _ctx.$t('field.prospect.phone_number')
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-                        type: "tel",
-                        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
-                          return $data.mobilePhoneNumber = $event;
-                        })
-                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.mobilePhoneNumber, void 0, {
-                        lazy: true
-                      }]])];
-                    }),
-                    _: 1 /* STABLE */
-                  }, 8 /* PROPS */, ["label"])];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-                  }, null, 8 /* PROPS */, _hoisted_60)];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-                loading: $data.updatingMobilePhoneNumber
-              }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
+            "interaction-prospect": _ctx.interactionProspect,
+            interaction: $data.interaction,
+            tab: $data.tab,
+            "frame-tab": $data.frameTab,
+            "aircall-tab": $data.aircallTab,
+            "aircall-webhook-url": $options.aircallWebhookURL,
+            "updating-phone-number": $data.updatingPhoneNumber,
+            "updating-mobile-phone-number": $data.updatingMobilePhoneNumber,
+            onBack: _cache[4] || (_cache[4] = function ($event) {
+              return $data.tab = 0;
             }),
-            _: 2 /* DYNAMIC */
-          }, [_ctx.interactionProspect ? {
-            name: "1",
-            fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
-                count: 2,
-                tab: $data.aircallTab,
-                "class": "hc-flex-1"
-              }, {
-                "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                    onClick: _cache[4] || (_cache[4] = function ($event) {
-                      return $data.tab = 0;
-                    }),
-                    "class": "bordered"
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                        "class": "fa fa-caret-left"
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                        "class": "hc-item-main-content",
-                        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
-                      }, null, 8 /* PROPS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                        "class": "fa fa-cog",
-                        onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-                          return $data.aircallTab = 1;
-                        }, ["stop"]))
-                      })];
-                    }),
-                    _: 1 /* STABLE */
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
-                    id: "aircall-phone",
-                    number: $data.interaction.number,
-                    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-                      width: '100%',
-                      height: '100%',
-                      display: $data.tab == 1 && $data.frameTab == 0 ? 'block' : 'none'
-                    }),
-                    onOutgoingCall: _cache[5] || (_cache[5] = function (callInfos) {
-                      $data.interaction.status = 'initiated';
-                      $data.interaction.data = {
-                        id: callInfos.call_id
-                      };
-                      $options.updateInteraction();
-                    }),
-                    onCallEnded: _cache[6] || (_cache[6] = function (callInfos) {
-                      $data.interaction.status = 'ended';
-                      $data.interaction.data = {
-                        id: callInfos.call_id
-                      };
-                      $options.updateInteraction();
-                      $options.nextInteraction();
-                    }),
-                    onAnsweredCall: _cache[7] || (_cache[7] = function ($event) {
-                      return $data.interaction.status = 'answered', $options.updateInteraction();
-                    })
-                  }, null, 8 /* PROPS */, ["number", "style"])])])];
-                }),
-                "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                    onClick: _cache[8] || (_cache[8] = function ($event) {
-                      return $data.aircallTab = 0;
-                    }),
-                    "class": "bordered"
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                        "class": "fa fa-caret-left"
-                      }), _hoisted_49];
-                    }),
-                    _: 1 /* STABLE */
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-                    "class": "hc-flex-1",
-                    gap: "5px",
-                    style: {
-                      "overflow": "auto"
-                    }
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                        tag: "a",
-                        href: "https://dashboard.aircall.io/integrations/flow/install/webhook/webhook/0",
-                        target: "_blank"
-                      }, {
-                        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-wifi"
-                          }), _hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-caret-right"
-                          })];
-                        }),
-                        _: 1 /* STABLE */
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                        tag: "a",
-                        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.copyAircallWebhookURLToClipboard, ["prevent"])
-                      }, {
-                        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-link"
-                          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                            "class": "hc-item-main-content",
-                            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Mettre ' + $options.aircallWebhookURL + ' comme URL')
-                          }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-copy"
-                          })];
-                        }),
-                        _: 1 /* STABLE */
-                      }, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
-                        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-check"
-                          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                            "class": "hc-item-main-content",
-                            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Cocher "call.ended" dans la section Appel')
-                          }, null, 8 /* PROPS */, _hoisted_52)];
-                        }),
-                        _: 1 /* STABLE */
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
-                        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                            "class": "fa fa-check"
-                          }), _hoisted_53];
-                        }),
-                        _: 1 /* STABLE */
-                      })];
-                    }),
-                    _: 1 /* STABLE */
-                  })])];
-                }),
-                _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["tab"])];
+            onAircallSetting: _cache[5] || (_cache[5] = function ($event) {
+              return $data.aircallTab = 1;
             }),
-            key: "0"
-          } : undefined, _ctx.interactionProspect ? {
-            name: "2",
-            fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[9] || (_cache[9] = function ($event) {
-                  return $data.tab = 0;
-                }),
-                "class": "bordered"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-left"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
-                  }, null, 8 /* PROPS */, _hoisted_55), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-cog",
-                    onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.ringoverSetting, ["stop"])
-                  }, null, 8 /* PROPS */, ["onClick"])];
-                }),
-                _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
-                id: "ringover-phone",
-                number: $data.interaction.number,
-                tab: "phone",
-                style: {
-                  "flex": "1",
-                  "width": "100%",
-                  "height": "100%"
-                },
-                onRingingCall: _cache[10] || (_cache[10] = function (callInfo) {
-                  $data.interaction.from_number = callInfo.data.from;
-                  $data.interaction.status = 'ringing';
-                  $data.interaction.data.id = callInfo.data.call_id;
-                  $options.updateInteraction();
-                }),
-                onHangupCall: _cache[11] || (_cache[11] = function (callInfo) {
-                  $data.interaction.status = 'hangup';
-                  $data.interaction.data.id = callInfo.data.call_id;
-                  $options.updateInteraction();
-                  $options.nextInteraction();
-                }),
-                onAnsweredCall: _cache[12] || (_cache[12] = function ($event) {
-                  return $data.interaction.status = 'answered', $options.updateInteraction();
-                })
-              }, null, 8 /* PROPS */, ["number"])])])];
+            onAircallBackSetting: _cache[6] || (_cache[6] = function ($event) {
+              return $data.aircallTab = 0;
             }),
-            key: "1"
-          } : undefined, _ctx.interactionProspect ? {
-            name: "6",
-            fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_61, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: $options.backFromCloudtalk,
-                "class": "bordered"
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-left"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
-                  }, null, 8 /* PROPS */, _hoisted_62)];
-                }),
-                _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["onClick"]), _hoisted_63])];
-            }),
-            key: "2"
-          } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
+            onCopyAircallWebhook: $options.copyAircallWebhookURLToClipboard,
+            onRingoverSetting: $options.ringoverSetting,
+            onUpdateInteraction: $options.updateInteraction,
+            onNextInteraction: $options.nextInteraction,
+            onProspectSelected: $options.setInteractionProspect,
+            onUpdatePhoneNumber: $options.updateProspectPhoneNumber,
+            onUpdateMobilePhoneNumber: $options.updateProspectMobilePhoneNumber,
+            onBackCloudtalk: $options.backFromCloudtalk
+          }, null, 8 /* PROPS */, ["phone-number", "mobile-phone-number", "interaction-prospect", "interaction", "tab", "frame-tab", "aircall-tab", "aircall-webhook-url", "updating-phone-number", "updating-mobile-phone-number", "onCopyAircallWebhook", "onRingoverSetting", "onUpdateInteraction", "onNextInteraction", "onProspectSelected", "onUpdatePhoneNumber", "onUpdateMobilePhoneNumber", "onBackCloudtalk"])];
         }),
         _: 2 /* DYNAMIC */
       }, [_ctx.interactionProspect ? {
         name: "1",
         fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-            style: {
-              "height": "100%",
-              "overflow": "auto"
-            },
-            padding: "12px"
-          }, {
-            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [_ctx.can('all.prospect.interaction.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-                key: 0
-              }, [_ctx.interactionProspect.phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 0,
-                onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-                  return $data.tab = 1, $data.frameTab = 3;
-                }, ["prevent"]))
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-phone"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-right"
-                  })];
-                }),
-                _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.interactionProspect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 1,
-                onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
-                  return $data.tab = 1, $data.frameTab = 4;
-                }, ["prevent"]))
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-mobile"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
-                  }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-caret-right"
-                  })];
-                }),
-                _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)([_ctx.interactionProspect.phone_number, _ctx.interactionProspect.mobile_phone_number].filter(function (n) {
-                return n;
-              }), function (number) {
-                return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-                  key: number
-                }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Telephone "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                  tag: "a",
-                  "class": "hc-prospect-interaction-item",
-                  onClick: function onClick($event) {
-                    return $options.interactionViaTelephone(number);
-                  },
-                  href: 'tel:' + number
-                }, {
-                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                      "class": "fa fa-phone",
-                      color: "#489f1f"
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_phone'))
-                    }, null, 8 /* PROPS */, _hoisted_29), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      "class": "hc-prospect-interaction-item-number",
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_30)])];
-                  }),
-                  _: 2 /* DYNAMIC */
-                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick", "href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Aircall "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                  "class": "hc-prospect-interaction-item",
-                  onClick: function onClick($event) {
-                    return $options.interactionViaAircall(number);
-                  }
-                }, {
-                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
-                      "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_31];
-                      }),
-                      _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
-                    }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      "class": "hc-prospect-interaction-item-number",
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_34)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                      "class": "fa fa-caret-right"
-                    })];
-                  }),
-                  _: 2 /* DYNAMIC */
-                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                  "class": "hc-prospect-interaction-item",
-                  onClick: function onClick($event) {
-                    return $options.interactionViaRingover(number);
-                  }
-                }, {
-                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
-                      "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_35];
-                      }),
-                      _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
-                    }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      "class": "hc-prospect-interaction-item-number",
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_38)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                      "class": "fa fa-caret-right"
-                    })];
-                  }),
-                  _: 2 /* DYNAMIC */
-                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" CloudTalk "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                  "class": "hc-prospect-interaction-item",
-                  onClick: function onClick($event) {
-                    return $options.interactionViaCloudtalk(number);
-                  }
-                }, {
-                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
-                      "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                        return [_hoisted_39];
-                      }),
-                      _: 1 /* STABLE */
-                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
-                    }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                      "class": "hc-prospect-interaction-item-number",
-                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
-                    }, null, 8 /* PROPS */, _hoisted_42)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                      "class": "fa fa-caret-right"
-                    })];
-                  }),
-                  _: 2 /* DYNAMIC */
-                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"])], 64 /* STABLE_FRAGMENT */);
-              }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add history "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                tag: "a",
-                "class": "hc-prospect-interaction-item",
-                onClick: _cache[2] || (_cache[2] = function ($event) {
-                  return $options.addHistory();
-                })
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-plus icon-green"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-item-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.add_history'))
-                  }, null, 8 /* PROPS */, _hoisted_43), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-                    loading: $data.addingHistory
-                  }, null, 8 /* PROPS */, ["loading"])];
-                }),
-                _: 1 /* STABLE */
-              })], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospectInteractions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 1,
-                style: {
-                  "background-color": "#7939b8",
-                  "color": "white",
-                  "margin-top": "10px",
-                  "margin-bottom": "10px"
-                }
-              }, {
-                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                    "class": "fa fa-clock",
-                    color: "white"
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                    "class": "hc-main-content",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.history'))
-                  }, null, 8 /* PROPS */, _hoisted_44)];
-                }),
-                _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.prospectInteractions, function (c) {
-                return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_interaction_row, {
-                  key: c.id,
-                  interaction: c
-                }, null, 8 /* PROPS */, ["interaction"]);
-              }), 128 /* KEYED_FRAGMENT */))];
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_interaction_list, {
+            "interaction-prospect": _ctx.interactionProspect,
+            "prospect-interactions": _ctx.prospectInteractions,
+            "adding-history": $data.addingHistory,
+            "can-add": _ctx.can('all.prospect.interaction.add'),
+            onEditPhone: _cache[0] || (_cache[0] = function ($event) {
+              return $data.tab = 1, $data.frameTab = 3;
             }),
-            _: 1 /* STABLE */
-          })];
+            onEditMobile: _cache[1] || (_cache[1] = function ($event) {
+              return $data.tab = 1, $data.frameTab = 4;
+            }),
+            onCallTelephone: $options.interactionViaTelephone,
+            onCallAircall: $options.interactionViaAircall,
+            onCallRingover: $options.interactionViaRingover,
+            onCallCloudtalk: $options.interactionViaCloudtalk,
+            onAddHistory: $options.addHistory
+          }, null, 8 /* PROPS */, ["interaction-prospect", "prospect-interactions", "adding-history", "can-add", "onCallTelephone", "onCallAircall", "onCallRingover", "onCallCloudtalk", "onAddHistory"])];
         }),
         key: "0"
       } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])])];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["name", "onClosed", "title", "url", "style"]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9 ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_2 = ["textContent"];
+var _hoisted_3 = {
+  style: {
+    "flex": "1",
+    "width": "100%",
+    "height": "100%",
+    "padding": "10px",
+    "overflow": "auto"
+  }
+};
+var _hoisted_4 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-item-main-content",
+  textContent: 'Paramètre Aircall Webhook'
+}, null, -1 /* HOISTED */);
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-item-main-content",
+  textContent: 'Rendez-vous sur la page webhook d\'aircall'
+}, null, -1 /* HOISTED */);
+var _hoisted_7 = ["textContent"];
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-item-main-content",
+  textContent: 'Enfin cliquer sur "Ajouter webhook"'
+}, null, -1 /* HOISTED */);
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_aircall = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("aircall");
+  var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
+  var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_tab_layout, {
+    count: 2,
+    tab: $props.aircallTab,
+    "class": "hc-flex-1"
+  }, {
+    "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        onClick: _cache[1] || (_cache[1] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        "class": "bordered"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-caret-left"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
+          }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-cog",
+            onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+              return _ctx.$emit('setting');
+            }, ["stop"]))
+          })];
+        }),
+        _: 1 /* STABLE */
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall, {
+        id: "aircall-phone",
+        number: $props.interaction.number,
+        style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+          width: '100%',
+          height: '100%',
+          display: $props.tab == 1 && $props.frameTab == 0 ? 'block' : 'none'
+        }),
+        onOutgoingCall: _cache[2] || (_cache[2] = function (callInfos) {
+          $props.interaction.status = 'initiated';
+          $props.interaction.data = {
+            id: callInfos.call_id
+          };
+          _ctx.$emit('update-interaction');
+        }),
+        onCallEnded: _cache[3] || (_cache[3] = function (callInfos) {
+          $props.interaction.status = 'ended';
+          $props.interaction.data = {
+            id: callInfos.call_id
+          };
+          _ctx.$emit('update-interaction');
+          _ctx.$emit('next-interaction');
+        }),
+        onAnsweredCall: _cache[4] || (_cache[4] = function ($event) {
+          return $props.interaction.status = 'answered', _ctx.$emit('update-interaction');
+        })
+      }, null, 8 /* PROPS */, ["number", "style"])])])];
+    }),
+    "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        onClick: _cache[5] || (_cache[5] = function ($event) {
+          return _ctx.$emit('back-setting');
+        }),
+        "class": "bordered"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-caret-left"
+          }), _hoisted_5];
+        }),
+        _: 1 /* STABLE */
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+        "class": "hc-flex-1",
+        gap: "5px",
+        style: {
+          "overflow": "auto"
+        }
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            tag: "a",
+            href: "https://dashboard.aircall.io/integrations/flow/install/webhook/webhook/0",
+            target: "_blank"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-wifi"
+              }), _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-caret-right"
+              })];
+            }),
+            _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            tag: "a",
+            onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+              return _ctx.$emit('copy-webhook');
+            }, ["prevent"]))
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-link"
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                "class": "hc-item-main-content",
+                textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Mettre ' + $props.aircallWebhookUrl + ' comme URL')
+              }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-copy"
+              })];
+            }),
+            _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-check"
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                "class": "hc-item-main-content",
+                textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Cocher "call.ended" dans la section Appel')
+              }, null, 8 /* PROPS */, _hoisted_8)];
+            }),
+            _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, null, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-check"
+              }), _hoisted_9];
+            }),
+            _: 1 /* STABLE */
+          })];
+        }),
+        _: 1 /* STABLE */
+      })])];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["tab"]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50 ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_2 = ["textContent"];
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  style: {
+    "flex": "1",
+    "width": "100%",
+    "height": "100%",
+    "overflow": "auto",
+    "position": "relative"
+  }
+}, null, -1 /* HOISTED */);
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+    onClick: _cache[0] || (_cache[0] = function ($event) {
+      return _ctx.$emit('back');
+    }),
+    "class": "bordered"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-caret-left"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-item-main-content",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
+      }, null, 8 /* PROPS */, _hoisted_2)];
+    }),
+    _: 1 /* STABLE */
+  }), _hoisted_3]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132 ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context"
+};
+var _hoisted_2 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-loading"
+};
+var _hoisted_3 = {
+  "class": "hc-prospect-interaction-cloudtalk-context-header"
+};
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = ["textContent"];
+var _hoisted_6 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_7 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-heading"
+};
+var _hoisted_8 = {
+  key: 1,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = {
+  key: 2,
+  "class": "hc-prospect-interaction-cloudtalk-context-empty"
+};
+var _hoisted_11 = ["disabled"];
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Creer un prospect avec ce numero'
+}, null, -1 /* HOISTED */);
+var _hoisted_13 = {
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-prospect-interaction-cloudtalk-context-heading"
+}, " Prospect ", -1 /* HOISTED */);
+var _hoisted_15 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_16 = ["textContent"];
+var _hoisted_17 = {
+  key: 1,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = {
+  key: 2,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = {
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-prospect-interaction-cloudtalk-context-heading"
+}, " information ", -1 /* HOISTED */);
+var _hoisted_23 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-empty"
+};
+var _hoisted_24 = {
+  "class": "hc-prospect-interaction-cloudtalk-thread-title"
+};
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = {
+  "class": "hc-prospect-interaction-cloudtalk-message-meta"
+};
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-message-users"
+};
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = {
+  key: 2,
+  "class": "hc-prospect-interaction-cloudtalk-context-section"
+};
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-prospect-interaction-cloudtalk-context-heading"
+}, " Numero CloudTalk ", -1 /* HOISTED */);
+var _hoisted_35 = {
+  key: 0,
+  "class": "hc-prospect-interaction-cloudtalk-context-line"
+};
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-prospect-interaction-cloudtalk-context-empty"
+}, " Aucun prospect lie a ce numero. ", -1 /* HOISTED */);
+var _hoisted_38 = ["disabled"];
+var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Creer un prospect avec ce numero'
+}, null, -1 /* HOISTED */);
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_cloudtalk = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk");
+  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_router_link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("router-link");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-interaction-cloudtalk-panel', {
+      visible: $props.displayed,
+      'with-context': $props.contextVisible
+    }])
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk, {
+    id: "cloudtalk-phone",
+    "class": "hc-prospect-interaction-cloudtalk-phone",
+    number: $props.number,
+    calling: $props.calling,
+    loading: $props.loading,
+    onMakeCall: _cache[0] || (_cache[0] = function ($event) {
+      return _ctx.$emit('make-call');
+    }),
+    onCallActivity: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.$emit('call-activity', $event);
+    }),
+    onRingingCall: _cache[2] || (_cache[2] = function ($event) {
+      return _ctx.$emit('ringing-call', $event);
+    }),
+    onOutgoingCall: _cache[3] || (_cache[3] = function ($event) {
+      return _ctx.$emit('outgoing-call', $event);
+    }),
+    onCallEnded: _cache[4] || (_cache[4] = function ($event) {
+      return _ctx.$emit('call-ended', $event);
+    }),
+    onHangupCall: _cache[5] || (_cache[5] = function ($event) {
+      return _ctx.$emit('hangup-call', $event);
+    }),
+    onAnsweredCall: _cache[6] || (_cache[6] = function ($event) {
+      return _ctx.$emit('answered-call', $event);
+    }),
+    onContactInfo: _cache[7] || (_cache[7] = function ($event) {
+      return _ctx.$emit('contact-info', $event);
+    })
+  }, null, 8 /* PROPS */, ["number", "calling", "loading"]), $props.contextVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("aside", _hoisted_1, [$props.lookupLoading && !$props.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+    loading: $props.lookupLoading
+  }, null, 8 /* PROPS */, ["loading"])])) : $props.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-prospect-interaction-cloudtalk-context-title",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.prospectName)
+  }, null, 8 /* PROPS */, _hoisted_4), $props.prospect.company_name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 0,
+    "class": "hc-prospect-interaction-cloudtalk-context-subtitle",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.prospect.company_name)
+  }, null, 8 /* PROPS */, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_router_link, {
+    "class": "hc-prospect-interaction-cloudtalk-context-link",
+    to: {
+      name: 'prospect.show',
+      params: {
+        project: $props.project.slug,
+        prospect: $props.prospect.id
+      }
+    }
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-external-link"
+      })];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["to"])]), $options.shouldShowContextNumber || $options.hasDifferentContextNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [$options.shouldShowContextNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, " Numero CloudTalk ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.shouldShowContextNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.contextNumber)
+  }, null, 8 /* PROPS */, _hoisted_9)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.hasDifferentContextNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, " Le numero CloudTalk est different du numero du prospect. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.hasDifferentContextNumber && $props.canCreateProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 3,
+    type: "button",
+    "class": "hc-prospect-interaction-cloudtalk-context-button",
+    disabled: $props.creatingProspect,
+    onClick: _cache[8] || (_cache[8] = function ($event) {
+      return _ctx.$emit('create-prospect');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-plus"
+  }), _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+    loading: $props.creatingProspect
+  }, null, 8 /* PROPS */, ["loading"])], 8 /* PROPS */, _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [_hoisted_14, $props.prospect.email ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-envelope"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.prospect.email)
+  }, null, 8 /* PROPS */, _hoisted_16)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.prospect.phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.prospect.phone_number)
+  }, null, 8 /* PROPS */, _hoisted_18)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.prospect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-mobile"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.prospect.mobile_phone_number)
+  }, null, 8 /* PROPS */, _hoisted_20)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [_hoisted_22, $props.threads.length == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_23, " Aucun information lie a votre utilisateur. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.threads, function (thread) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      key: thread.id,
+      "class": "hc-prospect-interaction-cloudtalk-thread"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      "class": "hc-prospect-interaction-cloudtalk-thread-color",
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+        color: thread.color,
+        backgroundColor: thread.bgcolor
+      })
+    }, null, 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.name)
+    }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(thread.user_messages_count + '/' + thread.messages_count)
+    }, null, 8 /* PROPS */, _hoisted_26)]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.messagesForThread(thread), function (message) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        key: message.id,
+        "class": "hc-prospect-interaction-cloudtalk-message"
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.creator ? message.creator.name : '')
+      }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.formatDate(message.created_at))
+      }, null, 8 /* PROPS */, _hoisted_29)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-prospect-interaction-cloudtalk-message-body",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.messagePreview(message.body))
+      }, null, 8 /* PROPS */, _hoisted_30), message.users && message.users.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-user"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(message.users.map(function (user) {
+          return user.name;
+        }).join(', '))
+      }, null, 8 /* PROPS */, _hoisted_32)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+    }), 128 /* KEYED_FRAGMENT */))]);
+  }), 128 /* KEYED_FRAGMENT */))])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, [_hoisted_34, $options.contextNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.contextNumber)
+  }, null, 8 /* PROPS */, _hoisted_36)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_37, $props.canCreateProspect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
+    type: "button",
+    "class": "hc-prospect-interaction-cloudtalk-context-button",
+    disabled: $props.creatingProspect,
+    onClick: _cache[9] || (_cache[9] = function ($event) {
+      return _ctx.$emit('create-prospect');
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-plus"
+  }), _hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+    loading: $props.creatingProspect
+  }, null, 8 /* PROPS */, ["loading"])], 8 /* PROPS */, _hoisted_38)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78 ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_aircall_frame = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("aircall-frame");
+  var _component_ringover_frame = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("ringover-frame");
+  var _component_select_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("select-prospect");
+  var _component_phone_number_form = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("phone-number-form");
+  var _component_cloudtalk_frame = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk-frame");
+  var _component_frame_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("frame-layout");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_frame_layout, {
+    count: 6,
+    tab: $props.frameTab,
+    "class": "hc-flex-1"
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
+    "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
+        onBack: _cache[10] || (_cache[10] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        onProspectSelected: _cache[11] || (_cache[11] = function ($event) {
+          return _ctx.$emit('prospect-selected', $event);
+        })
+      })];
+    }),
+    "4": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_phone_number_form, {
+        "title-key": "prospect.interaction.edit_phone_number",
+        "model-value": $props.phoneNumber,
+        loading: $props.updatingPhoneNumber,
+        onBack: _cache[12] || (_cache[12] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        onSubmit: _cache[13] || (_cache[13] = function ($event) {
+          return _ctx.$emit('update-phone-number');
+        }),
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+          return _ctx.$emit('update:phoneNumber', $event);
+        })
+      }, null, 8 /* PROPS */, ["model-value", "loading"])];
+    }),
+    "5": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_phone_number_form, {
+        "title-key": "prospect.interaction.edit_mobile_phone_number",
+        "model-value": $props.mobilePhoneNumber,
+        loading: $props.updatingMobilePhoneNumber,
+        relative: true,
+        onBack: _cache[15] || (_cache[15] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        onSubmit: _cache[16] || (_cache[16] = function ($event) {
+          return _ctx.$emit('update-mobile-phone-number');
+        }),
+        "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+          return _ctx.$emit('update:mobilePhoneNumber', $event);
+        })
+      }, null, 8 /* PROPS */, ["model-value", "loading"])];
+    }),
+    _: 2 /* DYNAMIC */
+  }, [$props.interactionProspect ? {
+    name: "1",
+    fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_aircall_frame, {
+        interaction: $props.interaction,
+        tab: $props.tab,
+        "frame-tab": $props.frameTab,
+        "aircall-tab": $props.aircallTab,
+        "aircall-webhook-url": $props.aircallWebhookUrl,
+        onBack: _cache[0] || (_cache[0] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        onSetting: _cache[1] || (_cache[1] = function ($event) {
+          return _ctx.$emit('aircall-setting');
+        }),
+        onBackSetting: _cache[2] || (_cache[2] = function ($event) {
+          return _ctx.$emit('aircall-back-setting');
+        }),
+        onCopyWebhook: _cache[3] || (_cache[3] = function ($event) {
+          return _ctx.$emit('copy-aircall-webhook');
+        }),
+        onUpdateInteraction: _cache[4] || (_cache[4] = function ($event) {
+          return _ctx.$emit('update-interaction');
+        }),
+        onNextInteraction: _cache[5] || (_cache[5] = function ($event) {
+          return _ctx.$emit('next-interaction');
+        })
+      }, null, 8 /* PROPS */, ["interaction", "tab", "frame-tab", "aircall-tab", "aircall-webhook-url"])];
+    }),
+    key: "0"
+  } : undefined, $props.interactionProspect ? {
+    name: "2",
+    fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover_frame, {
+        interaction: $props.interaction,
+        onBack: _cache[6] || (_cache[6] = function ($event) {
+          return _ctx.$emit('back');
+        }),
+        onSetting: _cache[7] || (_cache[7] = function ($event) {
+          return _ctx.$emit('ringover-setting');
+        }),
+        onUpdateInteraction: _cache[8] || (_cache[8] = function ($event) {
+          return _ctx.$emit('update-interaction');
+        }),
+        onNextInteraction: _cache[9] || (_cache[9] = function ($event) {
+          return _ctx.$emit('next-interaction');
+        })
+      }, null, 8 /* PROPS */, ["interaction"])];
+    }),
+    key: "1"
+  } : undefined, $props.interactionProspect ? {
+    name: "6",
+    fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk_frame, {
+        onBack: _cache[18] || (_cache[18] = function ($event) {
+          return _ctx.$emit('back-cloudtalk');
+        })
+      })];
+    }),
+    key: "2"
+  } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"]);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88 ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = ["textContent"];
+var _hoisted_2 = ["textContent"];
+var _hoisted_3 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = ["textContent"];
+var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 40 40"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  fill: "#00B388",
+  d: "M39.1,9.8c-0.9-4.5-4.5-8-9-9C27.9,0.3,24.2,0,20,0S12.1,0.3,9.9,0.8c-4.5,0.9-8,4.5-9,9 c-0.5,2.3-0.9,6-0.9,10.2c0,4.2,0.3,7.9,0.9,10.2c0.9,4.5,4.5,8,9,9C12.1,39.6,15.8,40,20,40s7.9-0.3,10.1-0.9c4.5-0.9,8-4.5,9-9 c0.5-2.3,0.9-6,0.9-10.2C39.9,15.8,39.6,12.1,39.1,9.8z M29.3,30.5C29.3,30.5,29.3,30.5,29.3,30.5c-0.7,0.3-1.9,0.5-3.5,0.6 c-0.1,0-0.1,0-0.2,0c-0.3,0-0.6-0.2-0.8-0.5c-0.4-0.9-1.2-1.6-2.2-1.8c-0.6-0.1-1.5-0.2-2.6-0.2s-2,0.1-2.6,0.2 c-1,0.2-1.8,0.9-2.2,1.8c-0.1,0.3-0.4,0.5-0.8,0.5c-0.1,0-0.2,0-0.2,0c-1.6-0.2-2.8-0.4-3.5-0.6c0,0,0,0,0,0 c-0.5-0.2-0.8-0.6-0.8-1.2c0,0,0,0,0,0c0,0,0,0,0-0.1c0,0,0,0,0,0c0,0,0,0,0,0c0.1-1.6,1.1-5.5,2.6-9.8c1.7-5,3.5-9,4.2-9.8 c0.1-0.1,0.3-0.2,0.4-0.3c0.1,0,0.1-0.1,0.2-0.1c0,0,0,0,0,0c0.5-0.2,1.5-0.3,2.6-0.3c1.1,0,2.1,0.1,2.6,0.3c0,0,0,0,0,0 c0.1,0,0.2,0.1,0.2,0.1c0.2,0.1,0.3,0.2,0.4,0.3c0,0,0,0,0,0c0.8,0.8,2.6,4.8,4.2,9.8c1.5,4.4,2.5,8.2,2.6,9.8c0,0,0,0,0,0 c0,0,0,0,0,0c0,0,0,0,0,0.1c0,0,0,0,0,0C30.1,29.8,29.8,30.3,29.3,30.5z"
+})], -1 /* HOISTED */);
+var _hoisted_7 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 40 40"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z",
+  style: {
+    "fill": "rgb(85, 195, 192)"
+  }
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M30.1,23.1c-1.3,4.3-5.3,7.4-10.1,7.4s-8.7-3.1-10.1-7.4H0.3C1.8,32.7,10,40,20,40s18.2-7.3,19.7-16.9H30.1z",
+  style: {
+    "fill": "rgb(85, 195, 192)"
+  }
+})], -1 /* HOISTED */);
+var _hoisted_11 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_12 = ["textContent"];
+var _hoisted_13 = ["textContent"];
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 40 40"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  fill: "#1f6feb",
+  d: "M30.8,18.6c-0.6-1.4-1.9-2.3-3.4-2.3c-0.2,0-0.4,0-0.6,0.1C26.2,12.5,22.6,9.6,18.3,9.6c-4.9,0-9,3.8-9.5,8.6c-0.2,0-0.4-0.1-0.6-0.1c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6h20.6c2.9,0,5.2-2.3,5.2-5.2C34.1,21.4,32.8,19.4,30.8,18.6z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  fill: "#ffffff",
+  d: "M22.8,25.9c-1.6-0.8-2.9-2.1-3.7-3.7c-0.1-0.2-0.1-0.5,0.1-0.7l0.7-0.7c0.3-0.3,0.3-0.8,0.1-1.1l-1.1-1.5c-0.2-0.3-0.6-0.4-0.9-0.3c-1.1,0.4-1.9,1.3-2.1,2.4c-0.2,1.4,0.3,2.9,1.2,4.2c1,1.5,2.6,2.6,4.3,3.1c1,0.3,2.1,0.1,2.9-0.5c0.4-0.3,0.5-0.8,0.3-1.2l-0.9-1.6C23.6,26,23.2,25.8,22.8,25.9z"
+})], -1 /* HOISTED */);
+var _hoisted_15 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_16 = ["textContent"];
+var _hoisted_17 = ["textContent"];
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = ["textContent"];
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_interaction_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("interaction-row");
+  var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item_list, {
+    style: {
+      "height": "100%",
+      "overflow": "auto"
+    },
+    padding: "12px"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [$props.canAdd ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 0
+      }, [$props.interactionProspect.phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+        key: 0,
+        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return _ctx.$emit('edit-phone');
+        }, ["prevent"]))
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-phone"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_phone_number'))
+          }, null, 8 /* PROPS */, _hoisted_1), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-caret-right"
+          })];
+        }),
+        _: 1 /* STABLE */
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interactionProspect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+        key: 1,
+        onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return _ctx.$emit('edit-mobile');
+        }, ["prevent"]))
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-mobile"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.edit_mobile_phone_number'))
+          }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-caret-right"
+          })];
+        }),
+        _: 1 /* STABLE */
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)([$props.interactionProspect.phone_number, $props.interactionProspect.mobile_phone_number].filter(function (n) {
+        return n;
+      }), function (number) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          key: number
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Telephone "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          tag: "a",
+          "class": "hc-prospect-interaction-item",
+          onClick: function onClick($event) {
+            return _ctx.$emit('call-telephone', number);
+          },
+          href: 'tel:' + number
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              "class": "fa fa-phone",
+              color: "#489f1f"
+            }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_phone'))
+            }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              "class": "hc-prospect-interaction-item-number",
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
+            }, null, 8 /* PROPS */, _hoisted_5)])];
+          }),
+          _: 2 /* DYNAMIC */
+        }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick", "href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Aircall "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          "class": "hc-prospect-interaction-item",
+          onClick: function onClick($event) {
+            return _ctx.$emit('call-aircall', number);
+          }
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+              "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                return [_hoisted_6];
+              }),
+              _: 1 /* STABLE */
+            }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_aircall'))
+            }, null, 8 /* PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              "class": "hc-prospect-interaction-item-number",
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
+            }, null, 8 /* PROPS */, _hoisted_9)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              "class": "fa fa-caret-right"
+            })];
+          }),
+          _: 2 /* DYNAMIC */
+        }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          "class": "hc-prospect-interaction-item",
+          onClick: function onClick($event) {
+            return _ctx.$emit('call-ringover', number);
+          }
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+              "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                return [_hoisted_10];
+              }),
+              _: 1 /* STABLE */
+            }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
+            }, null, 8 /* PROPS */, _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              "class": "hc-prospect-interaction-item-number",
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
+            }, null, 8 /* PROPS */, _hoisted_13)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              "class": "fa fa-caret-right"
+            })];
+          }),
+          _: 2 /* DYNAMIC */
+        }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" CloudTalk "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          "class": "hc-prospect-interaction-item",
+          onClick: function onClick($event) {
+            return _ctx.$emit('call-cloudtalk', number);
+          }
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+              "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                return [_hoisted_14];
+              }),
+              _: 1 /* STABLE */
+            }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_cloudtalk'))
+            }, null, 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              "class": "hc-prospect-interaction-item-number",
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(number)
+            }, null, 8 /* PROPS */, _hoisted_17)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              "class": "fa fa-caret-right"
+            })];
+          }),
+          _: 2 /* DYNAMIC */
+        }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"])], 64 /* STABLE_FRAGMENT */);
+      }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Add history "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        tag: "a",
+        "class": "hc-prospect-interaction-item",
+        onClick: _cache[2] || (_cache[2] = function ($event) {
+          return _ctx.$emit('add-history');
+        })
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-plus icon-green"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.add_history'))
+          }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+            loading: $props.addingHistory
+          }, null, 8 /* PROPS */, ["loading"])];
+        }),
+        _: 1 /* STABLE */
+      })], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.prospectInteractions.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+        key: 1,
+        style: {
+          "background-color": "#7939b8",
+          "color": "white",
+          "margin-top": "10px",
+          "margin-bottom": "10px"
+        }
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-clock",
+            color: "white"
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.history'))
+          }, null, 8 /* PROPS */, _hoisted_19)];
+        }),
+        _: 1 /* STABLE */
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.prospectInteractions, function (c) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_interaction_row, {
+          key: c.id,
+          interaction: c
+        }, null, 8 /* PROPS */, ["interaction"]);
+      }), 128 /* KEYED_FRAGMENT */))];
+    }),
+    _: 1 /* STABLE */
+  });
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2 ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = ["textContent"];
+var _hoisted_2 = ["textContent"];
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
+  var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
+  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
+  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
+    "class": "hc-flex-column",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.formStyle),
+    onSubmit: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return _ctx.$emit('submit');
+    }, ["prevent"]))
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+    onClick: _cache[0] || (_cache[0] = function ($event) {
+      return _ctx.$emit('back');
+    }),
+    "class": "bordered"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-caret-left"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-item-main-content",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($props.titleKey))
+      }, null, 8 /* PROPS */, _hoisted_1)];
+    }),
+    _: 1 /* STABLE */
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+    padding: "12px",
+    style: {
+      "height": "auto"
+    }
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+        label: _ctx.$t('field.prospect.phone_number')
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+            type: "tel",
+            "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+              return $options.value = $event;
+            })
+          }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
+            lazy: true
+          }]])];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["label"])];
+    }),
+    _: 1 /* STABLE */
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
+      }, null, 8 /* PROPS */, _hoisted_2)];
+    }),
+    _: 1 /* STABLE */
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+    loading: $props.loading
+  }, null, 8 /* PROPS */, ["loading"])], 36 /* STYLE, HYDRATE_EVENTS */);
+}
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596 ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_2 = ["textContent"];
+var _hoisted_3 = {
+  style: {
+    "flex": "1",
+    "width": "100%",
+    "height": "100%",
+    "overflow": "auto"
+  }
+};
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_ringover = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("ringover");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.$emit('back');
+    }),
+    "class": "bordered"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-caret-left"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-item-main-content",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.call_by_ringover'))
+      }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-cog",
+        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return _ctx.$emit('setting');
+        }, ["stop"]))
+      })];
+    }),
+    _: 1 /* STABLE */
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
+    id: "ringover-phone",
+    number: $props.interaction.number,
+    tab: "phone",
+    style: {
+      "flex": "1",
+      "width": "100%",
+      "height": "100%"
+    },
+    onRingingCall: _cache[2] || (_cache[2] = function (callInfo) {
+      $props.interaction.from_number = callInfo.data.from;
+      $props.interaction.status = 'ringing';
+      $props.interaction.data.id = callInfo.data.call_id;
+      _ctx.$emit('update-interaction');
+    }),
+    onHangupCall: _cache[3] || (_cache[3] = function (callInfo) {
+      $props.interaction.status = 'hangup';
+      $props.interaction.data.id = callInfo.data.call_id;
+      _ctx.$emit('update-interaction');
+      _ctx.$emit('next-interaction');
+    }),
+    onAnsweredCall: _cache[4] || (_cache[4] = function ($event) {
+      return $props.interaction.status = 'answered', _ctx.$emit('update-interaction');
+    })
+  }, null, 8 /* PROPS */, ["number"])])]);
 }
 
 /***/ }),
@@ -106915,7 +107916,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-panel {\n    position: absolute;\n    top: 42px;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-panel.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    flex: 1;\n    min-width: 0;\n}\n.hc-prospect-interaction-cloudtalk-context {\n    display: flex;\n    flex: 0 0 320px;\n    flex-direction: column;\n    gap: 14px;\n    height: 100%;\n    overflow: auto;\n    padding: 14px;\n    border-left: 1px solid #e5e5e5;\n    background: #fafafa;\n}\n.hc-prospect-interaction-cloudtalk-context-loading {\n    position: relative;\n    min-height: 80px;\n}\n.hc-prospect-interaction-cloudtalk-context-header {\n    display: flex;\n    align-items: flex-start;\n    justify-content: space-between;\n    gap: 10px;\n}\n.hc-prospect-interaction-cloudtalk-context-title {\n    font-size: 16px;\n    font-weight: 700;\n    line-height: 1.2;\n    color: #222222;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-subtitle {\n    margin-top: 3px;\n    font-size: 12px;\n    color: #777777;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-link {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-prospect-interaction-cloudtalk-context-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-prospect-interaction-cloudtalk-context-heading {\n    font-size: 11px;\n    font-weight: 700;\n    color: #777777;\n    text-transform: uppercase;\n}\n.hc-prospect-interaction-cloudtalk-context-line {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 12px;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-context-line span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-context-empty {\n    font-size: 12px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-thread {\n    padding: 10px;\n    border: 1px solid #e7e7e7;\n    border-radius: 6px;\n    background: #ffffff;\n}\n.hc-prospect-interaction-cloudtalk-thread-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: #222222;\n}\n.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-thread-title small {\n    font-size: 11px;\n    font-weight: 600;\n    color: #777777;\n}\n.hc-prospect-interaction-cloudtalk-thread-color {\n    display: inline-block;\n    flex: 0 0 10px;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n}\n.hc-prospect-interaction-cloudtalk-message {\n    margin-top: 9px;\n    padding-top: 9px;\n    border-top: 1px solid #eeeeee;\n}\n.hc-prospect-interaction-cloudtalk-message-meta {\n    display: flex;\n    justify-content: space-between;\n    gap: 8px;\n    font-size: 10px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-message-body {\n    margin-top: 4px;\n    display: -webkit-box;\n    overflow: hidden;\n    color: #333333;\n    font-size: 12px;\n    line-height: 1.35;\n    -webkit-line-clamp: 3;\n    -webkit-box-orient: vertical;\n}\n.hc-prospect-interaction-cloudtalk-message-users {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: 5px;\n    font-size: 11px;\n    color: #777777;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-panel {\n    position: absolute;\n    top: 42px;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-panel.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    flex: 1;\n    min-width: 0;\n}\n.hc-prospect-interaction-cloudtalk-context {\n    display: flex;\n    flex: 0 0 320px;\n    flex-direction: column;\n    gap: 14px;\n    height: 100%;\n    overflow: auto;\n    padding: 14px;\n    border-left: 1px solid #e5e5e5;\n    background: #fafafa;\n}\n.hc-prospect-interaction-cloudtalk-context-loading {\n    position: relative;\n    min-height: 80px;\n}\n.hc-prospect-interaction-cloudtalk-context-header {\n    display: flex;\n    align-items: flex-start;\n    justify-content: space-between;\n    gap: 10px;\n}\n.hc-prospect-interaction-cloudtalk-context-title {\n    font-size: 16px;\n    font-weight: 700;\n    line-height: 1.2;\n    color: #222222;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-subtitle {\n    margin-top: 3px;\n    font-size: 12px;\n    color: #777777;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-link {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-prospect-interaction-cloudtalk-context-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-prospect-interaction-cloudtalk-context-heading {\n    font-size: 11px;\n    font-weight: 700;\n    color: #777777;\n    text-transform: uppercase;\n}\n.hc-prospect-interaction-cloudtalk-context-line {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 12px;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-context-line span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-context-empty {\n    font-size: 12px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-context-button {\n    position: relative;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-height: 34px;\n    padding: 8px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n    cursor: pointer;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-prospect-interaction-cloudtalk-context-button:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-context-button:disabled {\n    color: #999999;\n    cursor: default;\n}\n.hc-prospect-interaction-cloudtalk-thread {\n    padding: 10px;\n    border: 1px solid #e7e7e7;\n    border-radius: 6px;\n    background: #ffffff;\n}\n.hc-prospect-interaction-cloudtalk-thread-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: #222222;\n}\n.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-thread-title small {\n    font-size: 11px;\n    font-weight: 600;\n    color: #777777;\n}\n.hc-prospect-interaction-cloudtalk-thread-color {\n    display: inline-block;\n    flex: 0 0 10px;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n}\n.hc-prospect-interaction-cloudtalk-message {\n    margin-top: 9px;\n    padding-top: 9px;\n    border-top: 1px solid #eeeeee;\n}\n.hc-prospect-interaction-cloudtalk-message-meta {\n    display: flex;\n    justify-content: space-between;\n    gap: 8px;\n    font-size: 10px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-message-body {\n    margin-top: 4px;\n    display: -webkit-box;\n    overflow: hidden;\n    color: #333333;\n    font-size: 12px;\n    line-height: 1.35;\n    -webkit-line-clamp: 3;\n    -webkit-box-orient: vertical;\n}\n.hc-prospect-interaction-cloudtalk-message-users {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: 5px;\n    font-size: 11px;\n    color: #777777;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -118103,6 +119104,202 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/prospect/interaction/components/AircallFrame.vue":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/AircallFrame.vue ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _AircallFrame_vue_vue_type_template_id_3bede6e9__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AircallFrame.vue?vue&type=template&id=3bede6e9 */ "./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9");
+/* harmony import */ var _AircallFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AircallFrame.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_AircallFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_AircallFrame_vue_vue_type_template_id_3bede6e9__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/AircallFrame.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CloudtalkFrame_vue_vue_type_template_id_4beffa50__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CloudtalkFrame.vue?vue&type=template&id=4beffa50 */ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50");
+/* harmony import */ var _CloudtalkFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CloudtalkFrame.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_CloudtalkFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_CloudtalkFrame_vue_vue_type_template_id_4beffa50__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/CloudtalkFrame.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _CloudtalkPanel_vue_vue_type_template_id_59d59132__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CloudtalkPanel.vue?vue&type=template&id=59d59132 */ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132");
+/* harmony import */ var _CloudtalkPanel_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CloudtalkPanel.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_CloudtalkPanel_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_CloudtalkPanel_vue_vue_type_template_id_59d59132__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/CloudtalkPanel.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue":
+/*!***************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionFrames.vue ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _InteractionFrames_vue_vue_type_template_id_b7f5bf78__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractionFrames.vue?vue&type=template&id=b7f5bf78 */ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78");
+/* harmony import */ var _InteractionFrames_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InteractionFrames.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_InteractionFrames_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_InteractionFrames_vue_vue_type_template_id_b7f5bf78__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/InteractionFrames.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionList.vue":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionList.vue ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _InteractionList_vue_vue_type_template_id_a0144c88__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractionList.vue?vue&type=template&id=a0144c88 */ "./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88");
+/* harmony import */ var _InteractionList_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InteractionList.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_InteractionList_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_InteractionList_vue_vue_type_template_id_a0144c88__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/InteractionList.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue":
+/*!*************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _PhoneNumberForm_vue_vue_type_template_id_6a86ebb2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./PhoneNumberForm.vue?vue&type=template&id=6a86ebb2 */ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2");
+/* harmony import */ var _PhoneNumberForm_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./PhoneNumberForm.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_PhoneNumberForm_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_PhoneNumberForm_vue_vue_type_template_id_6a86ebb2__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/PhoneNumberForm.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue":
+/*!***********************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/RingoverFrame.vue ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _RingoverFrame_vue_vue_type_template_id_00e66596__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./RingoverFrame.vue?vue&type=template&id=00e66596 */ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596");
+/* harmony import */ var _RingoverFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RingoverFrame.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_RingoverFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_RingoverFrame_vue_vue_type_template_id_00e66596__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/interaction/components/RingoverFrame.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/prospect/label/CategoryRow.vue":
 /*!****************************************************************!*\
   !*** ./resources/js/components/prospect/label/CategoryRow.vue ***!
@@ -129269,6 +130466,118 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_AircallFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_AircallFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./AircallFrame.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js":
+/*!************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js ***!
+  \************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./CloudtalkFrame.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js":
+/*!************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js ***!
+  \************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkPanel_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkPanel_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./CloudtalkPanel.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js":
+/*!***************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js ***!
+  \***************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionFrames_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionFrames_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionFrames.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js ***!
+  \*************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionList_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionList_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionList.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js ***!
+  \*************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneNumberForm_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneNumberForm_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneNumberForm.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js":
+/*!***********************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js ***!
+  \***********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RingoverFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RingoverFrame_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./RingoverFrame.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/prospect/label/CategoryRow.vue?vue&type=script&lang=js":
 /*!****************************************************************************************!*\
   !*** ./resources/js/components/prospect/label/CategoryRow.vue?vue&type=script&lang=js ***!
@@ -137425,6 +138734,118 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Slide_vue_vue_type_template_id_b34ec0c8__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Slide_vue_vue_type_template_id_b34ec0c8__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Slide.vue?vue&type=template&id=b34ec0c8 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/Slide.vue?vue&type=template&id=b34ec0c8");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9":
+/*!****************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9 ***!
+  \****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_AircallFrame_vue_vue_type_template_id_3bede6e9__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_AircallFrame_vue_vue_type_template_id_3bede6e9__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./AircallFrame.vue?vue&type=template&id=3bede6e9 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/AircallFrame.vue?vue&type=template&id=3bede6e9");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50 ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkFrame_vue_vue_type_template_id_4beffa50__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkFrame_vue_vue_type_template_id_4beffa50__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./CloudtalkFrame.vue?vue&type=template&id=4beffa50 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkFrame.vue?vue&type=template&id=4beffa50");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132 ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkPanel_vue_vue_type_template_id_59d59132__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_CloudtalkPanel_vue_vue_type_template_id_59d59132__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./CloudtalkPanel.vue?vue&type=template&id=59d59132 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/CloudtalkPanel.vue?vue&type=template&id=59d59132");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78":
+/*!*********************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78 ***!
+  \*********************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionFrames_vue_vue_type_template_id_b7f5bf78__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionFrames_vue_vue_type_template_id_b7f5bf78__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionFrames.vue?vue&type=template&id=b7f5bf78 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionFrames.vue?vue&type=template&id=b7f5bf78");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88":
+/*!*******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88 ***!
+  \*******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionList_vue_vue_type_template_id_a0144c88__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionList_vue_vue_type_template_id_a0144c88__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionList.vue?vue&type=template&id=a0144c88 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/InteractionList.vue?vue&type=template&id=a0144c88");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2":
+/*!*******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2 ***!
+  \*******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneNumberForm_vue_vue_type_template_id_6a86ebb2__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_PhoneNumberForm_vue_vue_type_template_id_6a86ebb2__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./PhoneNumberForm.vue?vue&type=template&id=6a86ebb2 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/PhoneNumberForm.vue?vue&type=template&id=6a86ebb2");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596":
+/*!*****************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596 ***!
+  \*****************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RingoverFrame_vue_vue_type_template_id_00e66596__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RingoverFrame_vue_vue_type_template_id_00e66596__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./RingoverFrame.vue?vue&type=template&id=00e66596 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/interaction/components/RingoverFrame.vue?vue&type=template&id=00e66596");
 
 
 /***/ }),

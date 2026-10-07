@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API\Project\Line;
 
 use App\Http\Controllers\Controller;
+use App\Models\Interaction;
 use App\Models\Line;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Services\CloudTalk;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use RuntimeException;
 
@@ -61,6 +63,7 @@ class CloudTalkController extends Controller
         $this->validate($request, [
             'number' => 'required|string',
             'line_id' => 'nullable|integer',
+            'interaction_id' => 'nullable|integer',
         ]);
 
         $line = $this->resolveLine($request, $project);
@@ -78,10 +81,22 @@ class CloudTalkController extends Controller
             return $this->runtimeError($e);
         }
 
+        $responseData = data_get($response, 'responseData');
+        $callId = $cloudTalk->callId($response);
+        $interaction = $this->updateInteractionFromCallResponse(
+            $request,
+            $project,
+            $number,
+            is_array($responseData) ? $responseData : null,
+            $callId
+        );
+
         return [
             'message' => 'Appel CloudTalk lance.',
             'number' => $number,
-            'responseData' => data_get($response, 'responseData'),
+            'call_id' => $callId,
+            'responseData' => $responseData,
+            'interaction' => $interaction,
         ];
     }
 
@@ -179,6 +194,48 @@ class CloudTalkController extends Controller
         ];
     }
 
+    /**
+     * Fetch recent CloudTalk call history for the authenticated agent.
+     */
+    public function history(Request $request, Project $project, CloudTalk $cloudTalk)
+    {
+        $this->validate($request, [
+            'number' => 'nullable|string',
+            'call_id' => 'nullable|string',
+            'line_id' => 'nullable|integer',
+            'started_at' => 'nullable|string',
+            'ended_at' => 'nullable|string',
+            'direction' => 'nullable|string',
+        ]);
+
+        if (!$request->filled('number') && !$request->filled('call_id')) {
+            return response()->json([
+                'message' => 'Numero ou identifiant CloudTalk requis.',
+            ], 422);
+        }
+
+        $line = $this->resolveLine($request, $project);
+
+        if (!$line) {
+            return response()->json([
+                'message' => 'Aucune ligne CloudTalk affectee a votre utilisateur.',
+            ], 404);
+        }
+
+        try {
+            $filters = $this->historyFilters($request, $cloudTalk, $line);
+            $history = $cloudTalk->callHistory($line, $filters);
+        } catch (RuntimeException $e) {
+            return $this->runtimeError($e);
+        }
+
+        return [
+            'number' => $request->input('number'),
+            'call' => $this->bestMatchingHistory($history, $request),
+            'history' => $history,
+        ];
+    }
+
     protected function resolveLine(Request $request, Project $project): ?Line
     {
         $query = $project
@@ -191,6 +248,114 @@ class CloudTalkController extends Controller
         }
 
         return $query->first();
+    }
+
+    protected function updateInteractionFromCallResponse(
+        Request $request,
+        Project $project,
+        string $number,
+        ?array $responseData,
+        ?string $callId
+    ): ?Interaction {
+        if (!$request->filled('interaction_id')) {
+            return null;
+        }
+
+        $interaction = Interaction::query()
+            ->where('id', $request->input('interaction_id'))
+            ->where('source', 'cloudtalk')
+            ->where('creator_id', auth()->id())
+            ->whereHas('prospect', function($query) use($project) {
+                $query->where('project_id', $project->id);
+            })
+            ->first();
+
+        if (!$interaction) {
+            return null;
+        }
+
+        $data = is_array($interaction->data) ? $interaction->data : [];
+        $data['cloudtalk'] = $responseData;
+
+        if ($callId) {
+            $data['id'] = $callId;
+            $data['call_id'] = $callId;
+        }
+
+        $interaction->update([
+            'number' => $number,
+            'status' => 'initiated',
+            'data' => $data,
+        ]);
+
+        return $interaction->fresh()->load('creator:id,name');
+    }
+
+    protected function historyFilters(Request $request, CloudTalk $cloudTalk, Line $line): array
+    {
+        $callId = $request->input('call_id');
+
+        if ($callId && preg_match('/^\d+$/', (string) $callId)) {
+            return [
+                'call_id' => $callId,
+                'limit' => 1,
+                'page' => 1,
+            ];
+        }
+
+        $endedAt = $this->cloudTalkDate($request->input('ended_at'), now()->addMinutes(5));
+        $startedAt = $this->cloudTalkDate($request->input('started_at'), now()->subHours(6));
+
+        return [
+            'public_external' => $cloudTalk->normalizePublicNumber($request->input('number')),
+            'user_id' => data_get($line->config, 'agent_id'),
+            'type' => $this->cloudTalkDirection($request->input('direction')),
+            'date_from' => Carbon::parse($startedAt)->subMinutes(10)->toDateTimeString(),
+            'date_to' => Carbon::parse($endedAt)->addMinutes(10)->toDateTimeString(),
+            'limit' => 20,
+            'page' => 1,
+        ];
+    }
+
+    protected function bestMatchingHistory(array $history, Request $request): ?array
+    {
+        $callId = $request->input('call_id');
+        $number = $this->normalizePhone($request->input('number'));
+        $direction = $this->cloudTalkDirection($request->input('direction'));
+
+        return collect($history)
+            ->filter(function($call) use($callId, $number, $direction) {
+                if ($callId && preg_match('/^\d+$/', (string) $callId)) {
+                    return (string) $call['id'] === (string) $callId;
+                }
+
+                if ($direction && $call['type'] && $call['type'] !== $direction) {
+                    return false;
+                }
+
+                return !$number || $this->phonesMatch($call['number'], $number);
+            })
+            ->sortByDesc(fn ($call) => $call['ended_at'] ?: $call['started_at'] ?: '')
+            ->first();
+    }
+
+    protected function cloudTalkDirection(?string $direction): ?string
+    {
+        return match ($direction) {
+            'outbound', 'outgoing' => 'outgoing',
+            'inbound', 'incoming' => 'incoming',
+            'internal' => 'internal',
+            default => null,
+        };
+    }
+
+    protected function cloudTalkDate(?string $value, $fallback): string
+    {
+        try {
+            return Carbon::parse($value ?: $fallback)->toDateTimeString();
+        } catch (\Throwable $e) {
+            return Carbon::parse($fallback)->toDateTimeString();
+        }
     }
 
     protected function authorizeCloudTalkConfig(Project $project): void

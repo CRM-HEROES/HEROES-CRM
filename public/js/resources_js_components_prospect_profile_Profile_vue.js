@@ -2331,6 +2331,9 @@ __webpack_require__.r(__webpack_exports__);
       if (this.item.source == "aircall") {
         return "Aircall";
       }
+      if (this.item.source == "cloudtalk") {
+        return "CloudTalk";
+      }
       return this.item.source;
     }
   }
@@ -2748,6 +2751,12 @@ __webpack_require__.r(__webpack_exports__);
         return this.interaction.created_at;
       }
       return date;
+    },
+    audioIcon: function audioIcon() {
+      return this.interaction.source == "cloudtalk" ? "fa fa-play-circle" : "fa fa-microphone";
+    },
+    audioTitle: function audioTitle() {
+      return this.interaction.source == "cloudtalk" ? "Ecouter la conversation" : "Ecouter l'enregistrement";
     }
   }
 });
@@ -8051,8 +8060,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         tag: "a",
         href: $props.interaction.audio,
         target: "_blank",
-        "class": "fa fa-microphone"
-      }, null, 8 /* PROPS */, ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+        rel: "noopener",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.audioIcon),
+        title: $options.audioTitle
+      }, null, 8 /* PROPS */, ["href", "class", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["class"]);

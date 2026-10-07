@@ -50,7 +50,9 @@
             v-if="interaction.audio"
             :href="interaction.audio"
             target="_blank"
-            class="fa fa-microphone"
+            rel="noopener"
+            :class="audioIcon"
+            :title="audioTitle"
         />
     </item>
 </template>
@@ -95,6 +97,18 @@ export default {
             }
 
             return date;
+        },
+
+        audioIcon() {
+            return this.interaction.source == "cloudtalk"
+                ? "fa fa-play-circle"
+                : "fa fa-microphone";
+        },
+
+        audioTitle() {
+            return this.interaction.source == "cloudtalk"
+                ? "Ecouter la conversation"
+                : "Ecouter l'enregistrement";
         },
     },
 };
