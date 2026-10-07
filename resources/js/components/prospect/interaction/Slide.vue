@@ -611,6 +611,8 @@ export default {
         },
 
         prepareCloudtalkInteractionFromIframe(callInfos = {}) {
+            this.syncIncomingCloudtalkProspect(callInfos);
+
             const callId =
                 callInfos.call_uuid || callInfos.call_id || callInfos.id;
             const currentCallId =
@@ -762,7 +764,7 @@ export default {
                     phone_number: number,
                 });
 
-                store.commit(SET_INTERACTION_PROSPECT, prospect);
+                this.setActiveInteractionProspect(prospect);
                 this.cloudtalkLookup = {
                     ...this.cloudtalkLookup,
                     number,
@@ -909,15 +911,7 @@ export default {
 
         cloudtalkCallNumber(callInfos = {}, useFallback = false) {
             const known = this.knownCloudtalkCallNumber(callInfos);
-            const candidate =
-                callInfos.external_number ||
-                callInfos.customer_number ||
-                callInfos.contact_phone ||
-                callInfos.phone_number ||
-                callInfos.number ||
-                callInfos.from ||
-                callInfos.to ||
-                "";
+            const candidate = this.cloudtalkCandidateNumber(callInfos);
 
             if (candidate) {
                 // CloudTalk also reports its own numbers inside the call
@@ -943,6 +937,19 @@ export default {
             }
 
             return "";
+        },
+
+        cloudtalkCandidateNumber(callInfos = {}) {
+            return (
+                callInfos.external_number ||
+                callInfos.customer_number ||
+                callInfos.contact_phone ||
+                callInfos.phone_number ||
+                callInfos.number ||
+                callInfos.from ||
+                callInfos.to ||
+                ""
+            );
         },
 
         async fetchCloudtalkCallContext(callInfos = {}) {
@@ -1008,12 +1015,7 @@ export default {
                 };
 
                 if (data.prospect) {
-                    if (
-                        !this.interactionProspect ||
-                        this.interactionProspect.id != data.prospect.id
-                    ) {
-                        store.commit(SET_INTERACTION_PROSPECT, data.prospect);
-                    }
+                    this.setActiveInteractionProspect(data.prospect);
 
                     if (
                         this.interaction &&
@@ -1223,6 +1225,65 @@ export default {
             return String(number || "").replace(/\D+/g, "");
         },
 
+        isCloudtalkIncomingCall(callInfos = {}) {
+            return ["inbound", "incoming"].includes(
+                String(callInfos.direction || callInfos.type || "").toLowerCase()
+            );
+        },
+
+        syncIncomingCloudtalkProspect(callInfos = {}) {
+            if (!this.isCloudtalkIncomingCall(callInfos)) {
+                return;
+            }
+
+            const number = this.cloudtalkCandidateNumber(callInfos);
+
+            if (
+                !number ||
+                !this.interactionProspect ||
+                !this.prospectMatchesPhone(this.interactionProspect, number)
+            ) {
+                this.setActiveInteractionProspect(null);
+            }
+        },
+
+        prospectMatchesPhone(prospect, number) {
+            return (
+                this.phoneNumbersMatch(prospect.phone_number, number) ||
+                this.phoneNumbersMatch(prospect.mobile_phone_number, number)
+            );
+        },
+
+        phoneNumbersMatch(firstNumber, secondNumber) {
+            const first = this.normalizePhone(firstNumber);
+            const second = this.normalizePhone(secondNumber);
+
+            if (!first || !second) {
+                return false;
+            }
+
+            if (first === second) {
+                return true;
+            }
+
+            const length = Math.min(first.length, second.length, 9);
+
+            return (
+                length >= 6 &&
+                first.slice(-length) === second.slice(-length)
+            );
+        },
+
+        setActiveInteractionProspect(prospect) {
+            if (!prospect) {
+                store.commit(SET_INTERACTION_PROSPECT, null);
+                return;
+            }
+
+            store.commit(SET_PROSPECT, prospect);
+            store.commit(SET_INTERACTION_PROSPECT, prospect);
+        },
+
         cloudtalkMessagesForThread(thread) {
             return this.cloudtalkLookupMessages.filter(
                 (message) => message.thread_id == thread.id
@@ -1290,7 +1351,7 @@ export default {
             ) {
                 this.currentProspectIndex++;
             } else {
-                store.commit(SET_INTERACTION_PROSPECT, null);
+                this.setActiveInteractionProspect(null);
             }
         },
 
@@ -1298,7 +1359,7 @@ export default {
          *
          */
         setInteractionProspect(prospect) {
-            store.commit(SET_PROSPECT, prospect);
+            this.setActiveInteractionProspect(prospect);
             this.tab = 0;
         },
 
@@ -1406,7 +1467,7 @@ export default {
         currentProspect(newValue) {
             if (newValue) {
                 setTimeout(() => {
-                    store.commit(SET_INTERACTION_PROSPECT, newValue);
+                    this.setActiveInteractionProspect(newValue);
                 }, 1000);
             }
         },
@@ -1436,6 +1497,10 @@ export default {
         },
 
         interactionTitleProspect() {
+            if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallProspect) {
+                return this.cloudtalkCallProspect;
+            }
+
             return this.interactionProspect || this.cloudtalkCallProspect;
         },
 

@@ -30148,6 +30148,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     prepareCloudtalkInteractionFromIframe: function prepareCloudtalkInteractionFromIframe() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      this.syncIncomingCloudtalkProspect(callInfos);
       var callId = callInfos.call_uuid || callInfos.call_id || callInfos.id;
       var currentCallId = this.interaction && this.interaction.data && (this.interaction.data.id || this.interaction.data.call_uuid || this.interaction.data.cdr_id || this.interaction.data.call_id);
       if (this.interaction && this.interaction.source == "cloudtalk" && (!callId || !currentCallId || currentCallId == callId)) {
@@ -30271,7 +30272,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               });
             case 7:
               prospect = _context4.sent;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, prospect);
+              _this7.setActiveInteractionProspect(prospect);
               _this7.cloudtalkLookup = _objectSpread(_objectSpread({}, _this7.cloudtalkLookup), {}, {
                 number: number,
                 numberKey: _this7.normalizePhone(number),
@@ -30367,7 +30368,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var useFallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       var known = this.knownCloudtalkCallNumber(callInfos);
-      var candidate = callInfos.external_number || callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || callInfos.from || callInfos.to || "";
+      var candidate = this.cloudtalkCandidateNumber(callInfos);
       if (candidate) {
         // CloudTalk also reports its own numbers inside the call
         // events (internal agent number like "365811021001", caller
@@ -30382,6 +30383,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return this.cloudtalkLookup && this.cloudtalkLookup.number || known || "";
       }
       return "";
+    },
+    cloudtalkCandidateNumber: function cloudtalkCandidateNumber() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      return callInfos.external_number || callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || callInfos.from || callInfos.to || "";
     },
     fetchCloudtalkCallContext: function fetchCloudtalkCallContext() {
       var _arguments = arguments,
@@ -30455,9 +30460,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _context5.next = 34;
                 break;
               }
-              if (!_this8.interactionProspect || _this8.interactionProspect.id != data.prospect.id) {
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, data.prospect);
-              }
+              _this8.setActiveInteractionProspect(data.prospect);
               if (!(_this8.interaction && _this8.interaction.source == "cloudtalk" && !_this8.interaction.id)) {
                 _context5.next = 34;
                 break;
@@ -30636,6 +30639,43 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     normalizePhone: function normalizePhone(number) {
       return String(number || "").replace(/\D+/g, "");
     },
+    isCloudtalkIncomingCall: function isCloudtalkIncomingCall() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      return ["inbound", "incoming"].includes(String(callInfos.direction || callInfos.type || "").toLowerCase());
+    },
+    syncIncomingCloudtalkProspect: function syncIncomingCloudtalkProspect() {
+      var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      if (!this.isCloudtalkIncomingCall(callInfos)) {
+        return;
+      }
+      var number = this.cloudtalkCandidateNumber(callInfos);
+      if (!number || !this.interactionProspect || !this.prospectMatchesPhone(this.interactionProspect, number)) {
+        this.setActiveInteractionProspect(null);
+      }
+    },
+    prospectMatchesPhone: function prospectMatchesPhone(prospect, number) {
+      return this.phoneNumbersMatch(prospect.phone_number, number) || this.phoneNumbersMatch(prospect.mobile_phone_number, number);
+    },
+    phoneNumbersMatch: function phoneNumbersMatch(firstNumber, secondNumber) {
+      var first = this.normalizePhone(firstNumber);
+      var second = this.normalizePhone(secondNumber);
+      if (!first || !second) {
+        return false;
+      }
+      if (first === second) {
+        return true;
+      }
+      var length = Math.min(first.length, second.length, 9);
+      return length >= 6 && first.slice(-length) === second.slice(-length);
+    },
+    setActiveInteractionProspect: function setActiveInteractionProspect(prospect) {
+      if (!prospect) {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+        return;
+      }
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, prospect);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, prospect);
+    },
     cloudtalkMessagesForThread: function cloudtalkMessagesForThread(thread) {
       return this.cloudtalkLookupMessages.filter(function (message) {
         return message.thread_id == thread.id;
@@ -30716,14 +30756,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (this.selectedProspects.length - 1 > this["this"].currentProspectIndex) {
         this.currentProspectIndex++;
       } else {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+        this.setActiveInteractionProspect(null);
       }
     },
     /**
      *
      */
     setInteractionProspect: function setInteractionProspect(prospect) {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, prospect);
+      this.setActiveInteractionProspect(prospect);
       this.tab = 0;
     },
     updateProspectPhoneNumber: function updateProspectPhoneNumber() {
@@ -30866,9 +30906,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.frameTab = this.interactionFrameTab;
     },
     currentProspect: function currentProspect(newValue) {
+      var _this17 = this;
       if (newValue) {
         setTimeout(function () {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, newValue);
+          _this17.setActiveInteractionProspect(newValue);
         }, 1000);
       }
     }
@@ -30881,6 +30922,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return null;
     },
     interactionTitleProspect: function interactionTitleProspect() {
+      if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallProspect) {
+        return this.cloudtalkCallProspect;
+      }
       return this.interactionProspect || this.cloudtalkCallProspect;
     },
     slideWidth: function slideWidth() {
@@ -30890,7 +30934,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (this.tab == 1 && this.frameTab == 0) {
         return "395px";
       }
-      return "300px";
+      return "350px";
     },
     /**
      * Webhook URL
@@ -30927,9 +30971,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return this.cloudtalkLookup && this.cloudtalkLookup.messages ? this.cloudtalkLookup.messages : [];
     },
     cloudtalkLine: function cloudtalkLine() {
-      var _this17 = this;
+      var _this18 = this;
       return this.lines.find(function (line) {
-        return line.operator === "cloudtalk" && _this17.user && line.user_id == _this17.user.id;
+        return line.operator === "cloudtalk" && _this18.user && line.user_id == _this18.user.id;
       });
     }
   })
