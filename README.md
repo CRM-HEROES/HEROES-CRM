@@ -111,3 +111,16 @@ php artisan view:cache
 ```sh
 php artisan queue:work --tries=3 --queue=google_event,google_map,google_drive,imports,emails,woocommerce,media,sms,documents
 ```
+
+#### Backup de la base de production
+
+Le script `scripts/backup-heroescrm.sh` fait un `mysqldump` compressé dans `/home/heroes/backup` (7 jours de rétention).
+Les identifiants ne sont pas dans le dépôt : ils sont lus dans `/home/heroes/.heroescrm-backup.env`
+(modèle : `scripts/backup-heroescrm.env.example`, à protéger avec `chmod 600`).
+
+```sh
+chmod +x scripts/backup-heroescrm.sh
+./scripts/backup-heroescrm.sh                 # sauvegarde manuelle
+# cron (tous les jours à 02h00) :
+# 0 2 * * * /home/heroes/Heroescrm/scripts/backup-heroescrm.sh
+```

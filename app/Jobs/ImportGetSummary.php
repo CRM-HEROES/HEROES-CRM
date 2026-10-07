@@ -138,20 +138,11 @@ class ImportGetSummary implements ShouldQueue
         $pathinfoExtension = strtolower(pathinfo($this->import->path, PATHINFO_EXTENSION));
 
         // CSV
-        if ($pathinfoExtension == 'csv') {
-            $reader = ReaderEntityFactory::createCSVReader();
-
-            $meta= $this->import->meta;
-
-            if ($this->import->field_delimiter) {
-                $reader->setFieldDelimiter($this->normalizeCsvDelimiter($this->import->field_delimiter));
-            }
-            
-            if ($this->import->field_enclosure) {
-                $reader->setFieldEnclosure($this->import->field_enclosure);
-            }
-
-            return $reader;
+        if (\App\Support\ImportCsvReader::supports($pathinfoExtension)) {
+            return \App\Support\ImportCsvReader::make(
+                $this->import,
+                storage_path('app/imports/' . $this->import->path)
+            );
         }
 
         // ODS

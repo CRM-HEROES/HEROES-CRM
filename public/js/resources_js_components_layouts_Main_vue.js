@@ -6663,7 +6663,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * (Show field delimiter and enclosure param fields)
      */
     isCsvFile: function isCsvFile() {
-      return this.prospectImport.file && [".csv", ".tsv"].includes(this.prospectImport.file.name.substring(this.prospectImport.file.name.lastIndexOf(".")).toLowerCase());
+      return this.prospectImport.file && [".csv", ".tsv", ".txt"].includes(this.prospectImport.file.name.substring(this.prospectImport.file.name.lastIndexOf(".")).toLowerCase());
     }
   }
 });
@@ -22247,6 +22247,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
      *
      */
     editable: function editable() {
+      var _this10 = this;
       if (!this.prospectEvent.id) {
         return true;
       }
@@ -22257,6 +22258,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         return true;
       }
       if (this.prospectEvent.creator_id == this.user.id) {
+        return true;
+      }
+
+      // Users assigned to the event prospect
+      var prospectUsers = this.prospectEvent.prospect && this.prospectEvent.prospect.users || (this.prospect && this.prospect.id == this.prospectEvent.prospect_id ? this.prospect.users : null);
+      if (prospectUsers && prospectUsers.some(function (u) {
+        return u.id == _this10.user.id;
+      })) {
         return true;
       }
       return false;
@@ -60109,7 +60118,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             required: "",
             ref: "fileInput",
             type: "file",
-            accept: ".csv, .tsv, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
+            accept: ".csv, .tsv, .txt, .ods, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel",
             onChange: _cache[1] || (_cache[1] = function () {
               return $options.setFile && $options.setFile.apply($options, arguments);
             })
@@ -63659,7 +63668,38 @@ var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   d: "M99.7,43.6H87.9c0.2,1.7,0.4,3.5,0.4,5.2c0,1.8-0.2,3.5-0.4,5.2h11.8c0.2-1.7,0.3-3.5,0.3-5.2 S99.9,45.4,99.7,43.6z"
 }, null, -1 /* HOISTED */);
 var _hoisted_51 = [_hoisted_44, _hoisted_45, _hoisted_46, _hoisted_47, _hoisted_48, _hoisted_49, _hoisted_50];
-var _hoisted_52 = {
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  viewBox: "0 0 100 100"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
+  x: "6",
+  y: "10",
+  width: "88",
+  height: "62",
+  rx: "9",
+  fill: "#1f2a44"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("polyline", {
+  points: "14,52 30,52 38,30 50,62 60,38 68,52 86,52",
+  fill: "none",
+  stroke: "#2dd4a7",
+  "stroke-width": "5",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
+  x: "38",
+  y: "76",
+  width: "24",
+  height: "7",
+  fill: "#1f2a44"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
+  x: "26",
+  y: "83",
+  width: "48",
+  height: "7",
+  rx: "3",
+  fill: "#1f2a44"
+})], -1 /* HOISTED */);
+var _hoisted_53 = {
   style: {
     "flex": "1",
     "height": "100%",
@@ -63926,7 +63966,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 'project.header.menu.campaign',
     name: _ctx.$t('tutorial.project_header_menu_campaign.name'),
     body: _ctx.$t('tutorial.project_header_menu_campaign.body.0') + '<br><img style="width: 100%;margin: 10px 0;border-radius: 5px;" src="/images/tutorial/header.campaigns.gif" /><br><ul><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.1') + '</li><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.2') + '</li><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.3') + '</li><li>...</li></ul>'
-  }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_global_search, null, null, 512 /* NEED_PATCH */), [[_directive_tuto, _ctx.project ? {
+  }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Server monitoring (super admin only) "), _ctx.user && _ctx.user.is_super_admin ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_header_menu, {
+    key: 4,
+    label: _ctx.$t('header.monitoring'),
+    to: {
+      name: 'monitoring',
+      params: {
+        project: _ctx.project.slug
+      }
+    }
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [_hoisted_52];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["label", "to"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_global_search, null, null, 512 /* NEED_PATCH */), [[_directive_tuto, _ctx.project ? {
     key: 'project.header.search',
     name: _ctx.$t('tutorial.project_header_search.name'),
     body: '<b>CTRL + F</b><br>' + _ctx.$t('tutorial.project_header_search.body.0') + '<br>' + _ctx.$t('tutorial.project_header_search.body.1')
@@ -109053,7 +109107,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

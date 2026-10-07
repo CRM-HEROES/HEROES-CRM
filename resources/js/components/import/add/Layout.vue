@@ -33,7 +33,7 @@
                     required
                     ref="fileInput"
                     type="file"
-                    accept=".csv, .tsv, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    accept=".csv, .tsv, .txt, .ods, .xls, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                     @change="setFile"
             /></v-field>
 
@@ -284,7 +284,7 @@ export default {
         isCsvFile() {
             return (
                 this.prospectImport.file &&
-                [".csv", ".tsv"].includes(
+                [".csv", ".tsv", ".txt"].includes(
                     this.prospectImport.file.name
                         .substring(
                             this.prospectImport.file.name.lastIndexOf(".")
