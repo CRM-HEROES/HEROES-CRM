@@ -81,7 +81,12 @@ class ImportGetSummary implements ShouldQueue
                     // mapping (applied by index to every sheet), so a
                     // later sheet's header row must not overwrite it.
                     if ($headers === null) {
-                        $headers = $data;
+                        // Headers are stored as JSON text: dates/numbers
+                        // used as column titles must become plain strings.
+                        $headers = array_map(
+                            fn ($header) => \App\Support\ImportHeaderAliases::toText($header),
+                            $data
+                        );
                     }
                     $isHeaderRow = false;
                 } else {

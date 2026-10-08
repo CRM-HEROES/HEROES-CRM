@@ -87,7 +87,7 @@ export default {
 
             store.dispatch(UPDATE_PROJECT_USER_SETTING, {
                 key: "events.agenda.filters.users",
-                value: eventParamsUsers,
+                value: eventParamsUsers || [],
             });
         },
     },

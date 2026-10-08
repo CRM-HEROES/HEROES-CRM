@@ -172,9 +172,19 @@ class ProjectController extends Controller
                     ->orderBy('relevance', 'desc')
                     ->orderBy('name');
             },
-            'users' => function($query) {
+            'users' => function($query) use($project) {
                 $query->select('id', 'name', 'last_name', 'email', 'role', 'users.creator_id')
-                    ->forCurrentUser()
+                    // Users allowed to view the agendas of the others
+                    // must be able to list all the project users
+                    ->when(auth()->user()->can('projectUserAgenda', $project), function($query) {
+                        $query
+                            ->withoutGlobalScope(\App\Models\Scopes\UserScope::class)
+                            ->where(function($query) {
+                                $query->whereNull('role')->orWhere('role', '!=', 'super_admin');
+                            });
+                    }, function($query) {
+                        $query->forCurrentUser();
+                    })
                     ->with("roles:id,name");
             },
             'userSettings' => function($query) {

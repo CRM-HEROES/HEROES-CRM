@@ -64505,7 +64505,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "width": "40px !important",
       "height": "40px !important"
     }
-  }, null, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("header-menu\n            tag=\"a\"\n            icon=\"fa fa-power-off\"\n            @click.prevent=\"logout\"\n            style=\"width: 40px !important\"\n        /")], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("header-menu\r\n            tag=\"a\"\r\n            icon=\"fa fa-power-off\"\r\n            @click.prevent=\"logout\"\r\n            style=\"width: 40px !important\"\r\n        /")], 2 /* CLASS */);
 }
 
 /***/ }),
@@ -100979,6 +100979,10 @@ __webpack_require__.r(__webpack_exports__);
         name: "Enlever un utilisateur du projet",
         icon: "fa-times"
       }, {
+        key: "agenda",
+        name: "Voir les agendas des autres utilisateurs",
+        icon: "fa-calendar icon-purple"
+      }, {
         key: "commission",
         name: "Gérer les commission d'un utilisateur",
         icon: "fa-money",
@@ -107877,7 +107881,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-main-layout-header {\n    display: flex;\n    flex-direction: row;\n    height: 46px;\n    width: 100%;\n    background-color: white;\n    padding: 3px;\n    align-items: center;\n}\n#hc-main-layout-header-menus {\n    display: flex;\n    flex-direction: row;\n    height: 100%;\n    gap: 2px;\n    align-items: center;\n}\n#hc-main-layout-header-toggle-menus {\n    display: none;\n}\n#hc-main-layout-header-close {\n    display: none;\n}\n@media (max-width: 767px) {\n    /*\n    #hc-main-layout-header-menus {\n        position: fixed;\n        left: 0;\n        top: 0;\n        height: 100%;\n        width: 240px;\n        background-color: white;\n        z-index: 1000;\n        flex-direction: column;\n        transform: translateX(-100%);\n        transition: all 100ms ease-out;\n        padding: 10px;\n    }\n\n    .show-menus #hc-main-layout-header-menus {\n        transform: translateX(0);\n        box-shadow: 0 0 50px #0003;\n    }\n\n    #hc-main-layout-header-close {\n        display: flex;\n    }\n\n    #hc-main-layout-header-toggle-menus {\n        display: flex;\n    }\n\n    .hc-header-menu {\n        width: 100%;\n        display: flex;\n    }\n\n    .hc-header-menu > i,\n    .hc-header-menu > svg,\n    .hc-header-menu > img {\n        width: 36px;\n        height: 36px;\n        padding: 7px;\n        text-align: center;\n        line-height: 22px;\n    }\n\n    .hc-header-menu > span {\n        opacity: 1;\n        visibility: visible;\n        position: relative;\n        flex: 1;\n        padding-left: 5px;\n        background: none;\n        color: black;\n        top: unset;\n        left: 0;\n        transform: translate(0);\n        font-size: 12px;\n    }\n\n    .hc-header-menu:hover > span {\n        transform: translateX(0);\n    }*/\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-main-layout-header {\r\n    display: flex;\r\n    flex-direction: row;\r\n    height: 46px;\r\n    width: 100%;\r\n    background-color: white;\r\n    padding: 3px;\r\n    align-items: center;\n}\n#hc-main-layout-header-menus {\r\n    display: flex;\r\n    flex-direction: row;\r\n    height: 100%;\r\n    gap: 2px;\r\n    align-items: center;\n}\n#hc-main-layout-header-toggle-menus {\r\n    display: none;\n}\n#hc-main-layout-header-close {\r\n    display: none;\n}\n@media (max-width: 767px) {\r\n    /*\r\n    #hc-main-layout-header-menus {\r\n        position: fixed;\r\n        left: 0;\r\n        top: 0;\r\n        height: 100%;\r\n        width: 240px;\r\n        background-color: white;\r\n        z-index: 1000;\r\n        flex-direction: column;\r\n        transform: translateX(-100%);\r\n        transition: all 100ms ease-out;\r\n        padding: 10px;\r\n    }\r\n\r\n    .show-menus #hc-main-layout-header-menus {\r\n        transform: translateX(0);\r\n        box-shadow: 0 0 50px #0003;\r\n    }\r\n\r\n    #hc-main-layout-header-close {\r\n        display: flex;\r\n    }\r\n\r\n    #hc-main-layout-header-toggle-menus {\r\n        display: flex;\r\n    }\r\n\r\n    .hc-header-menu {\r\n        width: 100%;\r\n        display: flex;\r\n    }\r\n\r\n    .hc-header-menu > i,\r\n    .hc-header-menu > svg,\r\n    .hc-header-menu > img {\r\n        width: 36px;\r\n        height: 36px;\r\n        padding: 7px;\r\n        text-align: center;\r\n        line-height: 22px;\r\n    }\r\n\r\n    .hc-header-menu > span {\r\n        opacity: 1;\r\n        visibility: visible;\r\n        position: relative;\r\n        flex: 1;\r\n        padding-left: 5px;\r\n        background: none;\r\n        color: black;\r\n        top: unset;\r\n        left: 0;\r\n        transform: translate(0);\r\n        font-size: 12px;\r\n    }\r\n\r\n    .hc-header-menu:hover > span {\r\n        transform: translateX(0);\r\n    }*/\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

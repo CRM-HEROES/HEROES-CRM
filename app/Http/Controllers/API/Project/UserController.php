@@ -312,6 +312,14 @@ class UserController extends Controller
         return $project
             ->users()
             ->forCurrentUser()
+            // Users allowed to view the agendas of the others must be able to list them
+            ->when(auth()->user()->can('projectUserAgenda', $project), function($query) {
+                $query
+                    ->withoutGlobalScope(\App\Models\Scopes\UserScope::class)
+                    ->where(function($query) {
+                        $query->whereNull('role')->orWhere('role', '!=', 'super_admin');
+                    });
+            })
             ->select($defaultFields)
             ->when(in_array('calendars', $fields), function($query) use($project) {
                 $query->with(['calendars' => function ($query) use($project) {
