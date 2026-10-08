@@ -597,6 +597,8 @@ export default {
     computed: {
         ...mapGetters([
             "project",
+            "user",
+            "can",
             "users",
             "roles",
             "calendars",
@@ -770,6 +772,8 @@ export default {
             return this.users
                 .filter(
                     (user) =>
+                        (this.can("all.project.user.agenda") ||
+                            user.id == this.user.id) &&
                         removeStringAccent(user.name).indexOf(keyword) >= 0
                 )
                 .sort((user1, user2) =>

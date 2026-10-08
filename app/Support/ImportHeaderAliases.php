@@ -66,12 +66,30 @@ class ImportHeaderAliases
     ];
 
     /**
+     * A header cell is not always text: xlsx/ods readers return real dates
+     * as DateTime objects and numbers as int/float (e.g. a column titled
+     * with a date or a year).
+     */
+    public static function toText($header): string
+    {
+        if ($header instanceof \DateTimeInterface) {
+            return $header->format('Y-m-d');
+        }
+
+        if (is_array($header) || (is_object($header) && !method_exists($header, '__toString'))) {
+            return '';
+        }
+
+        return (string) $header;
+    }
+
+    /**
      * Normalize a header for comparison: strip accents/case/punctuation so
      * that "E-mail", "e_mail" and "E Mail" are recognised as the same header.
      */
     public static function normalize($header): string
     {
-        $header = Str::ascii((string) $header);
+        $header = Str::ascii(self::toText($header));
         $header = str_replace(['\\_', '_'], ' ', $header);
         $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
 
