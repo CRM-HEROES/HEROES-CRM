@@ -58,6 +58,8 @@ use App\Http\Controllers\API\Project\Import\MappingController as ProjectImportMa
 use App\Http\Controllers\API\Project\Import\UserController as ProjectImportUserController;
 
 use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
+use App\Http\Controllers\API\Project\LineController as ProjectLineController;
+use App\Http\Controllers\API\Project\Line\CloudTalkController as ProjectLineCloudTalkController;
 use App\Http\Controllers\API\Project\LogoController as ProjectLogoController;
 use App\Http\Controllers\API\Project\MenuController as ProjectMenuController;
 use App\Http\Controllers\API\Project\MenuIconController as ProjectMenuIconController;
@@ -420,6 +422,15 @@ Route::group([
         Route::match(['PUT', 'PATCH'], '/import/{import}/mapping/{index}/link', [ProjectImportMappingController::class, 'link']);
         Route::match(['PUT', 'PATCH'], '/import/{import}/mapping/{index}/user', [ProjectImportMappingController::class, 'user']);
         Route::delete('/import/{import}/mapping/{index}', [ProjectImportMappingController::class, 'destroy']);
+
+        // Line
+        Route::post('line/cloudtalk/verify', [ProjectLineCloudTalkController::class, 'verify']);
+        Route::post('line/cloudtalk/agents', [ProjectLineCloudTalkController::class, 'agents']);
+        Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);
+        Route::post('line/cloudtalk/history', [ProjectLineCloudTalkController::class, 'history']);
+        Route::post('line/cloudtalk/call', [ProjectLineCloudTalkController::class, 'store']);
+        Route::get('line/available-users', [ProjectLineController::class, 'availableUsers']);
+        Route::apiResource('line', ProjectLineController::class);
 
         // Logo
         Route::post('logo', [ProjectLogoController::class, 'store']);

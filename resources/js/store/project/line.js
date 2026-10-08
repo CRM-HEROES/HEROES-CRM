@@ -8,6 +8,10 @@ import {
     SHOW_LINE,
     UPDATE_LINE,
     REMOVE_LINE,
+    FETCH_LINE_AVAILABLE_USERS,
+    MAKE_CLOUDTALK_CALL,
+    LOOKUP_CLOUDTALK_CALL,
+    FETCH_CLOUDTALK_CALL_HISTORY,
 } from "@/actions/project/line";
 
 /**
@@ -45,6 +49,21 @@ const actions = {
     },
 
     /**
+     * Fetch users that do not already have a line config for an operator.
+     *
+     * @param {*} context
+     * @param {Object} params query params
+     * @returns users
+     */
+    async [FETCH_LINE_AVAILABLE_USERS](context, params) {
+        const { data } = await lineService.availableUsers(
+            context.state.project.slug,
+            params
+        );
+        return data;
+    },
+
+    /**
      * Add line
      *
      * @param {*} context
@@ -73,6 +92,39 @@ const actions = {
             params
         );
         context.commit(UPDATE_LINE, params);
+    },
+
+    /**
+     * Make an outbound CloudTalk call.
+     */
+    async [MAKE_CLOUDTALK_CALL](context, params) {
+        const { data } = await lineService.makeCloudtalkCall(
+            context.state.project.slug,
+            params
+        );
+        return data;
+    },
+
+    /**
+     * Resolve a CloudTalk call number to the current user's prospect context.
+     */
+    async [LOOKUP_CLOUDTALK_CALL](context, params) {
+        const { data } = await lineService.lookupCloudtalkCall(
+            context.state.project.slug,
+            params
+        );
+        return data;
+    },
+
+    /**
+     * Fetch recent CloudTalk call history for the current agent.
+     */
+    async [FETCH_CLOUDTALK_CALL_HISTORY](context, params) {
+        const { data } = await lineService.fetchCloudtalkCallHistory(
+            context.state.project.slug,
+            params
+        );
+        return data;
     },
 
     /**

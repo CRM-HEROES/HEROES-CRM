@@ -1842,5 +1842,20 @@
         "remove_duplicating": "Elimina i vecchi lead duplicati",
         "remove_duplicates": "Rimuovi le duplicazioni dei lead durante l'importazione",
         "replace_duplicating": "Sovrascrivi i dati modificati dei vecchi prospect con quelli dei nuovi"
+    },
+    "line": {
+        "operator": {
+            "choose": "Scegli un operatore"
+        },
+        "configuration": {
+            "title": "Configurazione della linea"
+        },
+        "assign_to": {
+            "title": "Assegna a {user}",
+            "pick_title": "Scegli un agente"
+        },
+        "add": {
+            "title": "Aggiungi una linea"
+        }
     }
 }

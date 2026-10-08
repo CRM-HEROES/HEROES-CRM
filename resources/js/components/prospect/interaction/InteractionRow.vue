@@ -39,7 +39,14 @@
                         : '(Utilisateur inconnu)'
                 "
             ></div>
-            <div class="hc-prospect-interaction-date" v-text="date"></div>
+            <div class="hc-prospect-interaction-date">
+                <span v-text="date"></span>
+                <span
+                    v-if="durationLabel"
+                    class="hc-prospect-interaction-duration"
+                    v-text="' - ' + durationLabel"
+                ></span>
+            </div>
         </div>
 
         <div class="hc-flex-column" style="align-items: flex-end">
@@ -56,12 +63,22 @@
         </div>
 
         <icon
-            tag="a"
+            tag="button"
             v-if="interaction.audio"
-            :href="interaction.audio"
-            target="_blank"
-            class="fa fa-microphone"
+            type="button"
+            @click.prevent.stop="toggleAudio"
+            :class="audioIcon"
+            :title="audioTitle"
         />
+        <audio
+            v-if="interaction.audio"
+            ref="audio"
+            :src="interaction.audio"
+            preload="none"
+            @play="playingAudio = true"
+            @pause="playingAudio = false"
+            @ended="playingAudio = false"
+        ></audio>
     </item>
 </template>
 
@@ -72,6 +89,9 @@
 .hc-prospect-interaction-date {
     font-size: 11px;
     color: #999999;
+}
+.hc-prospect-interaction-duration {
+    color: #666666;
 }
 .hc-prospect-interaction-number {
     font-size: 11px;
@@ -91,12 +111,76 @@ export default {
         },
     },
 
+    data() {
+        return {
+            playingAudio: false,
+        };
+    },
+
     computed: {
         /**
          *
          */
         date() {
             return dayjs(this.interaction.created_at).fromNow();
+        },
+
+        durationLabel() {
+            const duration = this.interaction.duration;
+
+            if (duration === null || duration === undefined || duration === "") {
+                return "";
+            }
+
+            const seconds = parseInt(duration, 10);
+
+            if (Number.isNaN(seconds) || seconds < 0) {
+                return "";
+            }
+
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+
+            return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
+        },
+
+        audioIcon() {
+            if (this.playingAudio) {
+                return "fa fa-pause-circle";
+            }
+
+            return this.interaction.source == "cloudtalk"
+                ? "fa fa-play-circle"
+                : "fa fa-microphone";
+        },
+
+        audioTitle() {
+            return this.interaction.source == "cloudtalk"
+                ? "Ecouter la conversation"
+                : "Ecouter l'enregistrement";
+        },
+    },
+
+    methods: {
+        toggleAudio() {
+            const audio = this.$refs.audio;
+
+            if (!audio) {
+                return;
+            }
+
+            if (this.playingAudio) {
+                audio.pause();
+                return;
+            }
+
+            const promise = audio.play();
+
+            if (promise && promise.catch) {
+                promise.catch(() => {
+                    this.playingAudio = false;
+                });
+            }
         },
     },
 };

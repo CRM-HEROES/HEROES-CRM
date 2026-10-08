@@ -1842,5 +1842,20 @@
         "remove_duplicating": "पुराने डुप्लिकेट लीड हटाएँ",
         "remove_duplicates": "आयात में लीड डुप्लिकेशंस हटाएं",
         "replace_duplicating": "पुरानी संभावनाओं के संशोधित डेटा को नई संभावनाओं के साथ अधिलेखित करें"
+    },
+    "line": {
+        "operator": {
+            "choose": "ऑपरेटर चुनें"
+        },
+        "configuration": {
+            "title": "लाइन कॉन्फ़िगरेशन"
+        },
+        "assign_to": {
+            "title": "{user} को असाइन करें",
+            "pick_title": "एजेंट चुनें"
+        },
+        "add": {
+            "title": "लाइन जोड़ें"
+        }
     }
 }

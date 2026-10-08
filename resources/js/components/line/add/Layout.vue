@@ -1,18 +1,12 @@
 <template>
-    <tab-layout :count="3" :tab="tab" class="hc-flex-1">
+    <tab-layout :count="2" :tab="tab" class="hc-flex-1">
         <template #1>
             <form
                 class="hc-flex-column"
                 style="height: 100%"
-                @submit.prevent="tab = 1"
+                @submit.prevent="goToConfig"
             >
                 <item-list gap="5px">
-                    <v-field :label="$t('name')" required v-slot="{ label }"
-                        ><input
-                            :placeholder="label + ' ...'"
-                            v-model="line.name"
-                            required
-                    /></v-field>
                     <v-field :label="$t('line.operator.choose')" required
                         ><select v-model="line.operator" required>
                             <option value="" disabled></option>
@@ -23,27 +17,56 @@
                                 v-text="operator.label"
                             ></option></select
                     ></v-field>
-                    <item @click="tab = 2">
-                        <icon class="fa fa-user" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="
-                                $t('line.assign_to.title', {
-                                    user: assignedUser
-                                        ? assignedUser.name
-                                        : 'un agent ...',
-                                })
+                    <v-field :label="$t('line.assign_to.pick_title')" required>
+                        <select
+                            v-model="line.user_id"
+                            :disabled="
+                                !line.operator ||
+                                fetchingAvailableUsers ||
+                                availableUsers.length === 0
                             "
-                        ></div>
-                        <icon class="fa fa-caret-right" />
-                    </item>
+                            required
+                        >
+                            <option :value="null" disabled></option>
+                            <option
+                                v-if="line.operator && fetchingAvailableUsers"
+                                :value="null"
+                                disabled
+                            >
+                                Chargement des agents...
+                            </option>
+                            <option
+                                v-if="
+                                    line.operator &&
+                                    !fetchingAvailableUsers &&
+                                    availableUsers.length === 0
+                                "
+                                :value="null"
+                                disabled
+                            >
+                                Aucun agent disponible
+                            </option>
+                            <option
+                                v-for="user in availableUsers"
+                                :key="user.id"
+                                :value="user.id"
+                                v-text="user.name"
+                            ></option>
+                        </select>
+                    </v-field>
                 </item-list>
                 <buttons>
                     <button
-                        :disabled="!line.name || !line.operator"
+                        :disabled="
+                            !line.operator ||
+                            !line.user_id ||
+                            prefillingConfig ||
+                            fetchingAvailableUsers
+                        "
                         v-text="$t('next')"
                     ></button>
                 </buttons>
+                <loading :loading="prefillingConfig || fetchingAvailableUsers" />
             </form>
         </template>
 
@@ -61,21 +84,11 @@
                     ></div>
                 </item>
                 <item-list gap="5px" class="hc-flex-1">
-                    <v-field
-                        v-for="field in operatorFields"
-                        :key="field.key"
-                        :label="field.label"
-                        required
-                        v-slot="{ label }"
-                        ><input
-                            :type="field.type"
-                            :placeholder="label + ' ...'"
-                            v-model="line.config[field.key]"
-                            required
-                    /></v-field>
-                    <kavkom-diagnostic
-                        v-if="line.operator === 'kavkom'"
+                    <operator-config-fields
+                        ref="operatorConfigFields"
+                        :operator="line.operator"
                         :config="line.config"
+                        :fields="operatorFields"
                     />
                 </item-list>
                 <buttons>
@@ -83,34 +96,6 @@
                 </buttons>
                 <loading :loading="addingLine" />
             </form>
-        </template>
-
-        <template #3>
-            <div class="hc-flex-column" style="height: 100%">
-                <item @click="tab = 0">
-                    <icon class="fa fa-caret-left" />
-                    <div
-                        class="hc-item-main-content"
-                        v-text="$t('line.assign_to.pick_title')"
-                    ></div>
-                </item>
-                <search v-model="userKeyword" />
-                <item-list class="hc-flex-1" padding="5px">
-                    <item @click="(line.user_id = null), (tab = 0)">
-                        <icon class="fa fa-times" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('none')"
-                        ></div>
-                    </item>
-                    <to-user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                        @click="(line.user_id = user.id), (tab = 0)"
-                    />
-                </item-list>
-            </div>
         </template>
     </tab-layout>
 </template>
@@ -120,27 +105,32 @@ import { mapGetters } from "vuex";
 import store from "@/store";
 
 // Actions
-import { ADD_LINE } from "@/actions/project/line";
+import {
+    ADD_LINE,
+    SHOW_LINE,
+    FETCH_LINE_AVAILABLE_USERS,
+} from "@/actions/project/line";
 import { CLOSE_MODAL } from "@/actions/modal";
 
 // Constants
 import lineOperators from "@/constants/lineOperators";
 
 // Components
-import KavkomDiagnostic from "../KavkomDiagnostic.vue";
-import ToUserRow from "../ToUserRow.vue";
+import OperatorConfigFields from "../OperatorConfigFields.vue";
 
 export default {
     components: {
-        KavkomDiagnostic,
-        ToUserRow,
+        OperatorConfigFields,
     },
 
     data() {
         return {
             line: this.newLine(),
             addingLine: false,
-            userKeyword: "",
+            prefillingConfig: false,
+            fetchingAvailableUsers: false,
+            availableUsers: [],
+            configPrefilledFor: "",
             tab: 0,
         };
     },
@@ -158,25 +148,238 @@ export default {
             };
         },
 
+        async goToConfig() {
+            if (
+                !this.line.operator ||
+                !this.line.user_id ||
+                this.fetchingAvailableUsers
+            ) {
+                return;
+            }
+
+            this.prepareLine();
+            await this.prefillOperatorConfig();
+            this.tab = 1;
+        },
+
         /**
          *
          */
         async storeLine() {
+            this.prepareLine();
+
+            if (this.hasExistingConfigForSelection()) {
+                flashError({
+                    title: "Ligne",
+                    body: "Cet agent a déjà une configuration pour cet opérateur.",
+                    duration: 7000,
+                });
+                return;
+            }
+
+            if (!(await this.validateOperatorConfig())) {
+                return;
+            }
+
             this.addingLine = true;
 
             try {
+                this.normalizeConfig();
                 await store.dispatch(ADD_LINE, this.line);
-            } finally {
-                this.addingLine = false;
                 this.line = this.newLine();
+                this.availableUsers = [];
+                this.configPrefilledFor = "";
                 this.tab = 0;
                 store.commit(CLOSE_MODAL);
+            } catch (error) {
+                flashError({
+                    title: "Ligne",
+                    body: this.errorMessage(error),
+                    duration: 7000,
+                });
+            } finally {
+                this.addingLine = false;
             }
+        },
+
+        async loadAvailableUsers() {
+            const operator = this.line.operator;
+
+            if (!operator) {
+                this.availableUsers = [];
+                this.fetchingAvailableUsers = false;
+                return;
+            }
+
+            this.fetchingAvailableUsers = true;
+
+            try {
+                const users = await store.dispatch(FETCH_LINE_AVAILABLE_USERS, {
+                    operator,
+                });
+
+                if (this.line.operator !== operator) {
+                    return;
+                }
+
+                this.availableUsers = users;
+
+                if (
+                    !this.availableUsers.some(
+                        (user) => user.id == this.line.user_id
+                    )
+                ) {
+                    this.line.user_id = null;
+                }
+            } catch (error) {
+                this.availableUsers = this.localAvailableUsers(operator);
+
+                flashError({
+                    title: "Ligne",
+                    body: this.errorMessage(
+                        error,
+                        "Impossible de charger les agents disponibles."
+                    ),
+                    duration: 7000,
+                });
+            } finally {
+                if (this.line.operator === operator) {
+                    this.fetchingAvailableUsers = false;
+                }
+            }
+        },
+
+        localAvailableUsers(operator) {
+            if (!operator) {
+                return [];
+            }
+
+            const assignedUserIds = this.lines
+                .filter((line) => line.operator === operator)
+                .map((line) => line.user_id)
+                .filter((userId) => userId !== null && userId !== undefined)
+                .map((userId) => String(userId));
+
+            return this.users.filter(
+                (user) => assignedUserIds.indexOf(String(user.id)) < 0
+            );
+        },
+
+        hasExistingConfigForSelection() {
+            return this.lines.some(
+                (line) =>
+                    line.operator === this.line.operator &&
+                    line.user_id == this.line.user_id
+            );
+        },
+
+        prepareLine() {
+            this.line.name = this.generatedLineName;
+        },
+
+        async prefillOperatorConfig() {
+            const operator = this.line.operator;
+
+            if (!operator || this.configPrefilledFor === operator) {
+                return;
+            }
+
+            const sourceLine = this.lines.find(
+                (line) => line.operator === operator
+            );
+
+            this.configPrefilledFor = operator;
+
+            if (!sourceLine) {
+                return;
+            }
+
+            this.prefillingConfig = true;
+
+            try {
+                const fullLine = await store.dispatch(SHOW_LINE, sourceLine.id);
+
+                if (this.line.operator !== operator) {
+                    return;
+                }
+
+                if (
+                    this.project &&
+                    fullLine.project_id &&
+                    fullLine.project_id != this.project.id
+                ) {
+                    return;
+                }
+
+                this.line.config = {
+                    ...this.reusableConfig(fullLine.config),
+                    ...(this.line.config ?? {}),
+                };
+            } finally {
+                this.prefillingConfig = false;
+            }
+        },
+
+        reusableConfig(config) {
+            const reusable = { ...(config ?? {}) };
+            delete reusable.agent_id;
+            return reusable;
+        },
+
+        normalizeConfig() {
+            Object.keys(this.line.config).forEach((key) => {
+                if (
+                    this.line.config[key] !== null &&
+                    this.line.config[key] !== undefined
+                ) {
+                    this.line.config[key] = String(this.line.config[key]);
+                }
+            });
+        },
+
+        async validateOperatorConfig() {
+            if (!this.$refs.operatorConfigFields) {
+                return true;
+            }
+
+            return await this.$refs.operatorConfigFields.validate();
+        },
+
+        errorMessage(error, fallback = "Impossible d'enregistrer la ligne.") {
+            const errors = error.response?.data?.errors;
+
+            if (errors) {
+                const firstError = Object.values(errors)[0];
+
+                if (Array.isArray(firstError) && firstError.length > 0) {
+                    return firstError[0];
+                }
+            }
+
+            return (
+                error.response?.data?.message ||
+                fallback
+            );
+        },
+    },
+
+    watch: {
+        "line.operator"(value, oldValue) {
+            if (value === oldValue) {
+                return;
+            }
+
+            this.line.user_id = null;
+            this.line.config = {};
+            this.availableUsers = this.localAvailableUsers(value);
+            this.configPrefilledFor = "";
+            this.loadAvailableUsers();
+            this.prefillOperatorConfig();
         },
     },
 
     computed: {
-        ...mapGetters(["users"]),
+        ...mapGetters(["project", "users", "lines"]),
 
         lineOperators() {
             return lineOperators;
@@ -199,15 +402,17 @@ export default {
             return this.users.find((u) => u.id == this.line.user_id);
         },
 
-        /**
-         *
-         */
-        filteredUsers() {
-            const keyword = removeStringAccent(this.userKeyword);
-
-            return this.users.filter(
-                (user) => removeStringAccent(user.name).indexOf(keyword) >= 0
+        generatedLineName() {
+            const operator = lineOperators.find(
+                (operator) => operator.value === this.line.operator
             );
+            const operatorName = operator ? operator.label : this.line.operator;
+            const userName = this.assignedUser ? this.assignedUser.name : "Agent";
+
+            return [operatorName, userName]
+                .filter(Boolean)
+                .join(" - ")
+                .slice(0, 100);
         },
     },
 };

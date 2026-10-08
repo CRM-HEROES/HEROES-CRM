@@ -71,6 +71,80 @@
 .dark .hc-v-field > div > * {
     border-color: #444444;
 }
+
+.hc-line-operator-config-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.hc-line-secret-preview {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+}
+
+.hc-line-secret-preview-value {
+    flex: 1;
+    min-width: 0;
+    padding: 5px 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #333333;
+}
+
+.hc-line-secret-preview-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 34px;
+    width: 34px;
+    min-height: 34px;
+    border: none;
+    border-left: 1px solid #dddddd;
+    background: transparent;
+    color: #12a0f3;
+    cursor: pointer;
+}
+
+.hc-line-secret-preview-edit:focus {
+    outline: 2px solid #12a0f3;
+    outline-offset: -2px;
+}
+
+.dark .hc-line-secret-preview-value {
+    color: #bbbbbb;
+}
+
+.dark .hc-line-secret-preview-edit {
+    border-left-color: #444444;
+}
+
+.hc-cloudtalk-agent-loader {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.hc-cloudtalk-agent-message {
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    background: #f8f9fa;
+    color: #495057;
+}
+
+.hc-cloudtalk-agent-message.success {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.hc-cloudtalk-agent-message.error {
+    background: #ffebee;
+    color: #c62828;
+}
 </style>
 
 <script>

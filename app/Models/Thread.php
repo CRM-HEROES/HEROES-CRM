@@ -58,6 +58,14 @@ class Thread extends Model
     // Relationships
 
     /**
+     * Messages
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class);
+    }
+
+    /**
      * Project
      */
     public function project()
