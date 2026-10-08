@@ -2,6 +2,7 @@ export default [
     {
         value: "kavkom",
         label: "Kavkom",
+        logo: "/images/partenaire-ext/kavkom.png",
         fields: [
             { key: "api_token", label: "Jeton API (X-API-TOKEN)", type: "password" },
             { key: "domain_uuid", label: "Domain UUID", type: "text" },
@@ -12,6 +13,7 @@ export default [
     {
         value: "cloudtalk",
         label: "CloudTalk",
+        logo: "/images/partenaire-ext/cloudtalk.png",
         fields: [
             { key: "api_key_id", label: "API Access Key ID", type: "text" },
             { key: "api_key_secret", label: "API Access Key Secret", type: "password" },
@@ -21,11 +23,13 @@ export default [
     {
         value: "ringover",
         label: "Ringover",
+        logo: "/images/partenaire-ext/ringover.png",
         fields: [{ key: "api_token", label: "Token", type: "text" }],
     },
     {
         value: "twilio",
         label: "Twilio",
+        logo: "/images/partenaire-ext/twilio.ico",
         fields: [
             { key: "account_sid", label: "Account SID", type: "text" },
             { key: "auth_token", label: "Auth Token", type: "password" },

@@ -1,5 +1,5 @@
 <template>
-    <modal name="line-update" :title="line ? line.name : ''">
+    <modal name="line-update" :title="lineTitle">
         <layout />
     </modal>
 </template>
@@ -14,7 +14,21 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["line"]),
+        ...mapGetters(["line", "users"]),
+
+        assignedUser() {
+            return this.line
+                ? this.users.find((user) => user.id == this.line.user_id)
+                : null;
+        },
+
+        lineTitle() {
+            if (!this.line) {
+                return "";
+            }
+
+            return this.assignedUser ? this.assignedUser.name : this.line.name;
+        },
     },
 };
 </script>

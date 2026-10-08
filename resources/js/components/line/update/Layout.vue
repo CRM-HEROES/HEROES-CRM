@@ -1,21 +1,16 @@
 <template>
-    <tab-layout :count="3" :tab="tab" class="hc-flex-1">
+    <tab-layout :count="2" :tab="tab" class="hc-flex-1">
         <template #1>
             <form
                 class="hc-flex-column"
                 style="height: 100%"
                 v-if="lineToUpdate"
-                @submit.prevent="tab = 1"
+                @submit.prevent="goToConfig"
             >
                 <item-list gap="5px" class="hc-flex-1" padding="10px 0">
-                    <v-field :label="$t('name')" required v-slot="{ label }"
-                        ><input
-                            :placeholder="label + ' ...'"
-                            v-model="lineToUpdate.name"
-                            required
-                    /></v-field>
                     <v-field :label="$t('line.operator.choose')" required
                         ><select v-model="lineToUpdate.operator" required>
+                            <option value="" disabled></option>
                             <option
                                 v-for="operator in lineOperators"
                                 :key="operator.value"
@@ -23,20 +18,34 @@
                                 v-text="operator.label"
                             ></option></select
                     ></v-field>
-                    <item @click="tab = 2">
-                        <icon class="fa fa-user" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="
-                                $t('line.assign_to.title', {
-                                    user: assignedUser
-                                        ? assignedUser.name
-                                        : 'un agent ...',
-                                })
+                    <v-field :label="$t('line.assign_to.pick_title')" required>
+                        <select
+                            v-model="lineToUpdate.user_id"
+                            :disabled="
+                                !lineToUpdate.operator ||
+                                availableUsers.length === 0
                             "
-                        ></div>
-                        <icon class="fa fa-caret-right" />
-                    </item>
+                            required
+                        >
+                            <option :value="null" disabled></option>
+                            <option
+                                v-if="
+                                    lineToUpdate.operator &&
+                                    availableUsers.length === 0
+                                "
+                                :value="null"
+                                disabled
+                            >
+                                Aucun agent disponible
+                            </option>
+                            <option
+                                v-for="user in availableUsers"
+                                :key="user.id"
+                                :value="user.id"
+                                v-text="user.name"
+                            ></option>
+                        </select>
+                    </v-field>
                 </item-list>
                 <buttons>
                     <button
@@ -46,11 +55,15 @@
                         v-text="$t('delete')"
                     ></button>
                     <button
-                        :disabled="!lineToUpdate.name || !lineToUpdate.operator"
+                        :disabled="
+                            !lineToUpdate.operator ||
+                            !lineToUpdate.user_id ||
+                            prefillingConfig
+                        "
                         v-text="$t('next')"
                     ></button>
                 </buttons>
-                <loading :loading="removingLine" />
+                <loading :loading="removingLine || prefillingConfig" />
             </form>
         </template>
 
@@ -82,34 +95,6 @@
                 <loading :loading="updatingLine" />
             </form>
         </template>
-
-        <template #3>
-            <div class="hc-flex-column" style="height: 100%" v-if="lineToUpdate">
-                <item @click="tab = 0">
-                    <icon class="fa fa-caret-left" />
-                    <div
-                        class="hc-item-main-content"
-                        v-text="$t('line.assign_to.pick_title')"
-                    ></div>
-                </item>
-                <search v-model="userKeyword" />
-                <item-list class="hc-flex-1" padding="5px">
-                    <item @click="(lineToUpdate.user_id = null), (tab = 0)">
-                        <icon class="fa fa-times" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('none')"
-                        ></div>
-                    </item>
-                    <to-user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                        @click="(lineToUpdate.user_id = user.id), (tab = 0)"
-                    />
-                </item-list>
-            </div>
-        </template>
     </tab-layout>
 </template>
 
@@ -126,12 +111,10 @@ import lineOperators from "@/constants/lineOperators";
 
 // Components
 import OperatorConfigFields from "../OperatorConfigFields.vue";
-import ToUserRow from "../ToUserRow.vue";
 
 export default {
     components: {
         OperatorConfigFields,
-        ToUserRow,
     },
 
     data() {
@@ -140,7 +123,8 @@ export default {
             removingLine: false,
             fetchingLine: false,
             lineToUpdate: this.cloneLine(this.line),
-            userKeyword: "",
+            prefillingConfig: false,
+            configPrefilledFor: "",
             tab: 0,
         };
     },
@@ -159,10 +143,18 @@ export default {
                 : line;
         },
 
+        async goToConfig() {
+            this.prepareLine();
+            await this.prefillOperatorConfig();
+            this.tab = 1;
+        },
+
         /**
          *
          */
         async update() {
+            this.prepareLine();
+
             if (!(await this.validateOperatorConfig())) {
                 return;
             }
@@ -198,6 +190,64 @@ export default {
                     store.commit(CLOSE_MODAL);
                 }
             });
+        },
+
+        prepareLine() {
+            this.lineToUpdate.name = this.generatedLineName;
+        },
+
+        async prefillOperatorConfig() {
+            if (!this.lineToUpdate) {
+                return;
+            }
+
+            const operator = this.lineToUpdate.operator;
+
+            if (!operator || this.configPrefilledFor === operator) {
+                return;
+            }
+
+            const sourceLine = this.lines.find(
+                (line) =>
+                    line.operator === operator && line.id != this.lineToUpdate.id
+            );
+
+            this.configPrefilledFor = operator;
+
+            if (!sourceLine) {
+                return;
+            }
+
+            this.prefillingConfig = true;
+
+            try {
+                const fullLine = await store.dispatch(SHOW_LINE, sourceLine.id);
+
+                if (this.lineToUpdate.operator !== operator) {
+                    return;
+                }
+
+                if (
+                    this.project &&
+                    fullLine.project_id &&
+                    fullLine.project_id != this.project.id
+                ) {
+                    return;
+                }
+
+                this.lineToUpdate.config = {
+                    ...this.reusableConfig(fullLine.config),
+                    ...(this.lineToUpdate.config ?? {}),
+                };
+            } finally {
+                this.prefillingConfig = false;
+            }
+        },
+
+        reusableConfig(config) {
+            const reusable = { ...(config ?? {}) };
+            delete reusable.agent_id;
+            return reusable;
         },
 
         normalizeConfig() {
@@ -242,10 +292,10 @@ export default {
     watch: {
         async line(newValue) {
             if (newValue) {
+                this.fetchingLine = true;
                 this.lineToUpdate = this.cloneLine(newValue);
                 this.tab = 0;
-
-                this.fetchingLine = true;
+                this.configPrefilledFor = "";
 
                 try {
                     this.lineToUpdate = this.cloneLine(
@@ -256,10 +306,33 @@ export default {
                 }
             }
         },
+
+        "lineToUpdate.operator"(value, oldValue) {
+            if (
+                this.fetchingLine ||
+                !this.lineToUpdate ||
+                !oldValue ||
+                value === oldValue
+            ) {
+                return;
+            }
+
+            if (
+                !this.availableUsers.some(
+                    (user) => user.id == this.lineToUpdate.user_id
+                )
+            ) {
+                this.lineToUpdate.user_id = null;
+            }
+
+            this.lineToUpdate.config = {};
+            this.configPrefilledFor = "";
+            this.prefillOperatorConfig();
+        },
     },
 
     computed: {
-        ...mapGetters(["line", "can", "users"]),
+        ...mapGetters(["project", "line", "can", "users", "lines"]),
 
         lineOperators() {
             return lineOperators;
@@ -282,15 +355,39 @@ export default {
             return this.users.find((u) => u.id == this.lineToUpdate.user_id);
         },
 
-        /**
-         *
-         */
-        filteredUsers() {
-            const keyword = removeStringAccent(this.userKeyword);
+        availableUsers() {
+            if (!this.lineToUpdate || !this.lineToUpdate.operator) {
+                return [];
+            }
+
+            const assignedUserIds = this.lines
+                .filter(
+                    (line) =>
+                        line.operator === this.lineToUpdate.operator &&
+                        line.id != this.lineToUpdate.id
+                )
+                .map((line) => line.user_id)
+                .filter((userId) => userId !== null && userId !== undefined)
+                .map((userId) => String(userId));
 
             return this.users.filter(
-                (user) => removeStringAccent(user.name).indexOf(keyword) >= 0
+                (user) => assignedUserIds.indexOf(String(user.id)) < 0
             );
+        },
+
+        generatedLineName() {
+            const operator = lineOperators.find(
+                (operator) => operator.value === this.lineToUpdate.operator
+            );
+            const operatorName = operator
+                ? operator.label
+                : this.lineToUpdate.operator;
+            const userName = this.assignedUser ? this.assignedUser.name : "Agent";
+
+            return [operatorName, userName]
+                .filter(Boolean)
+                .join(" - ")
+                .slice(0, 100);
         },
     },
 };
