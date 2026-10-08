@@ -8,6 +8,7 @@ import {
     SHOW_LINE,
     UPDATE_LINE,
     REMOVE_LINE,
+    FETCH_LINE_AVAILABLE_USERS,
     MAKE_CLOUDTALK_CALL,
     LOOKUP_CLOUDTALK_CALL,
     FETCH_CLOUDTALK_CALL_HISTORY,
@@ -43,6 +44,21 @@ const actions = {
         const { data } = await lineService.show(
             context.state.project.slug,
             slug
+        );
+        return data;
+    },
+
+    /**
+     * Fetch users that do not already have a line config for an operator.
+     *
+     * @param {*} context
+     * @param {Object} params query params
+     * @returns users
+     */
+    async [FETCH_LINE_AVAILABLE_USERS](context, params) {
+        const { data } = await lineService.availableUsers(
+            context.state.project.slug,
+            params
         );
         return data;
     },

@@ -19,7 +19,7 @@
                 >
                     {{
                         fetchingCloudtalkAgents
-                            ? "Verification en cours..."
+                            ? "Vérification en cours..."
                             : "Tester et charger les agents"
                     }}
                 </button>
@@ -261,7 +261,7 @@ export default {
         async fetchCloudtalkAgents(showSuccessMessage = true) {
             if (!this.cloudtalkCredentialsReady) {
                 this.setCloudtalkError(
-                    "Veuillez saisir l'API Access Key ID et le Secret."
+                    "Veuillez saisir l'identifiant et le secret de la clé API."
                 );
                 return false;
             }
@@ -294,8 +294,8 @@ export default {
 
                 if (showSuccessMessage) {
                     this.cloudtalkMessage = this.cloudtalkAgents.length
-                        ? this.cloudtalkAgents.length + " agent(s) charge(s)."
-                        : "Identifiants valides, mais aucun agent CloudTalk trouve.";
+                        ? this.cloudtalkAgents.length + " agent(s) chargé(s)."
+                        : "Identifiants valides, mais aucun agent CloudTalk trouvé.";
                     this.cloudtalkMessageType = "success";
                 }
 
@@ -307,7 +307,7 @@ export default {
                 this.cloudtalkCredentialsKey = null;
                 this.setCloudtalkError(
                     error.response?.data?.message ||
-                        "Impossible de verifier les identifiants CloudTalk."
+                        "Impossible de vérifier les identifiants CloudTalk."
                 );
 
                 return false;
@@ -323,7 +323,7 @@ export default {
 
             if (!this.cloudtalkCredentialsReady) {
                 this.setCloudtalkError(
-                    "Veuillez saisir l'API Access Key ID et le Secret."
+                    "Veuillez saisir l'identifiant et le secret de la clé API."
                 );
                 return false;
             }
@@ -340,7 +340,7 @@ export default {
             }
 
             if (!this.config.agent_id) {
-                this.setCloudtalkError("Veuillez selectionner un agent CloudTalk.");
+                this.setCloudtalkError("Veuillez sélectionner un agent CloudTalk.");
                 return false;
             }
 

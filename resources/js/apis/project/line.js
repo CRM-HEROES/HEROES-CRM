@@ -4,6 +4,11 @@ export default {
     get(project, params) {
         return ApiService.get(`project/${project}/line`, params);
     },
+    availableUsers(project, params) {
+        return ApiService.get(`project/${project}/line/available-users`, {
+            params,
+        });
+    },
     create(project, params) {
         return ApiService.post(`project/${project}/line`, params);
     },

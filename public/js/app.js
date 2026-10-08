@@ -28053,6 +28053,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ADD_LINE: () => (/* binding */ ADD_LINE),
 /* harmony export */   FETCH_CLOUDTALK_CALL_HISTORY: () => (/* binding */ FETCH_CLOUDTALK_CALL_HISTORY),
 /* harmony export */   FETCH_LINES: () => (/* binding */ FETCH_LINES),
+/* harmony export */   FETCH_LINE_AVAILABLE_USERS: () => (/* binding */ FETCH_LINE_AVAILABLE_USERS),
 /* harmony export */   LOOKUP_CLOUDTALK_CALL: () => (/* binding */ LOOKUP_CLOUDTALK_CALL),
 /* harmony export */   MAKE_CLOUDTALK_CALL: () => (/* binding */ MAKE_CLOUDTALK_CALL),
 /* harmony export */   REMOVE_LINE: () => (/* binding */ REMOVE_LINE),
@@ -28068,6 +28069,7 @@ var ADD_LINE = "addLine";
 var SHOW_LINE = "showLine";
 var UPDATE_LINE = "updateLine";
 var REMOVE_LINE = "removeLine";
+var FETCH_LINE_AVAILABLE_USERS = "fetchLineAvailableUsers";
 var MAKE_CLOUDTALK_CALL = "makeCloudtalkCall";
 var LOOKUP_CLOUDTALK_CALL = "lookupCloudtalkCall";
 var FETCH_CLOUDTALK_CALL_HISTORY = "fetchCloudtalkCallHistory";
@@ -31373,6 +31375,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   get: function get(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/line"), params);
+  },
+  availableUsers: function availableUsers(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/line/available-users"), {
+      params: params
+    });
   },
   create: function create(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/line"), params);
@@ -41580,69 +41587,69 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_line__W
       }
     }, _callee2);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, function (context, params) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_LINE_AVAILABLE_USERS, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-    var _yield$lineService$cr, data;
+    var _yield$lineService$av, data;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].create(context.state.project.slug, params);
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].availableUsers(context.state.project.slug, params);
         case 2:
-          _yield$lineService$cr = _context3.sent;
-          data = _yield$lineService$cr.data;
-          context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, data);
+          _yield$lineService$av = _context3.sent;
+          data = _yield$lineService$av.data;
           return _context3.abrupt("return", data);
-        case 6:
+        case 5:
         case "end":
           return _context3.stop();
       }
     }, _callee3);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, function (context, params) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var _yield$lineService$cr, data;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
           _context4.next = 2;
-          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].create(context.state.project.slug, params);
         case 2:
-          context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, params);
-        case 3:
+          _yield$lineService$cr = _context4.sent;
+          data = _yield$lineService$cr.data;
+          context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, data);
+          return _context4.abrupt("return", data);
+        case 6:
         case "end":
           return _context4.stop();
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.MAKE_CLOUDTALK_CALL, function (context, params) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-    var _yield$lineService$ma, data;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].makeCloudtalkCall(context.state.project.slug, params);
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          _yield$lineService$ma = _context5.sent;
-          data = _yield$lineService$ma.data;
-          return _context5.abrupt("return", data);
-        case 5:
+          context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, params);
+        case 3:
         case "end":
           return _context5.stop();
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.LOOKUP_CLOUDTALK_CALL, function (context, params) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.MAKE_CLOUDTALK_CALL, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-    var _yield$lineService$lo, data;
+    var _yield$lineService$ma, data;
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
           _context6.next = 2;
-          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].lookupCloudtalkCall(context.state.project.slug, params);
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].makeCloudtalkCall(context.state.project.slug, params);
         case 2:
-          _yield$lineService$lo = _context6.sent;
-          data = _yield$lineService$lo.data;
+          _yield$lineService$ma = _context6.sent;
+          data = _yield$lineService$ma.data;
           return _context6.abrupt("return", data);
         case 5:
         case "end":
@@ -41650,17 +41657,17 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_line__W
       }
     }, _callee6);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_CLOUDTALK_CALL_HISTORY, function (context, params) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.LOOKUP_CLOUDTALK_CALL, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-    var _yield$lineService$fe, data;
+    var _yield$lineService$lo, data;
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
           _context7.next = 2;
-          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].fetchCloudtalkCallHistory(context.state.project.slug, params);
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].lookupCloudtalkCall(context.state.project.slug, params);
         case 2:
-          _yield$lineService$fe = _context7.sent;
-          data = _yield$lineService$fe.data;
+          _yield$lineService$lo = _context7.sent;
+          data = _yield$lineService$lo.data;
           return _context7.abrupt("return", data);
         case 5:
         case "end":
@@ -41668,20 +41675,38 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_line__W
       }
     }, _callee7);
   }))();
-}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_CLOUDTALK_CALL_HISTORY, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+    var _yield$lineService$fe, data;
     return _regeneratorRuntime().wrap(function _callee8$(_context8) {
       while (1) switch (_context8.prev = _context8.next) {
         case 0:
           _context8.next = 2;
+          return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].fetchCloudtalkCallHistory(context.state.project.slug, params);
+        case 2:
+          _yield$lineService$fe = _context8.sent;
+          data = _yield$lineService$fe.data;
+          return _context8.abrupt("return", data);
+        case 5:
+        case "end":
+          return _context8.stop();
+      }
+    }, _callee8);
+  }))();
+}), _defineProperty(_actions, _actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, function (context, slug) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+      while (1) switch (_context9.prev = _context9.next) {
+        case 0:
+          _context9.next = 2;
           return _apis_project_line__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
         case 2:
           context.commit(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.REMOVE_LINE, slug);
         case 3:
         case "end":
-          return _context8.stop();
+          return _context9.stop();
       }
-    }, _callee8);
+    }, _callee9);
   }))();
 }), _actions);
 
@@ -65103,7 +65128,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-buttons {\n    border-top: 1px solid #eeeeee;\n    padding: 7px;\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    justify-content: center;\n    gap: 5px;\n    position: sticky;\n    bottom: 0;\n    background-color: white;\n    position: sticky;\n    bottom: 0;\n}\n.hc-buttons:empty {\n    display: none;\n}\n.hc-buttons > button,\n.hc-buttons > a,\n.hc-buttons > label {\n    background-color: #12a0f3;\n    border-radius: 5px;\n    color: white !important;\n    border: none;\n    font-size: 12px;\n    height: 32px;\n    padding: 0 12px;\n    line-height: 34px;\n    cursor: pointer;\n    text-decoration: none;\n}\n.hc-buttons > button > i,\n.hc-buttons > a > i,\n.hc-buttons > label > i {\n    margin-right: 10px;\n}\n.hc-buttons > *.hc-button-danger {\n    background-color: #c33434;\n}\n.hc-buttons > *.hc-button-warning {\n    background-color: #c36d34;\n}\n.hc-buttons > *.hc-button-grey {\n    background-color: #888888;\n}\n.hc-buttons > *.hc-button-grey:hover {\n    background-color: #12a0f3;\n}\n.hc-buttons > button:disabled {\n    background-color: #aaaaaa;\n    cursor: not-allowed;\n}\n.hc-buttons > label > input[type=\"file\"] {\n    display: none;\n}\n.dark .hc-buttons {\n    border-top: 1px solid #444444;\n    background-color: #2e302e;\n}\n@media (max-width: 767px) {\n.hc-buttons {\n        border-top: 1px solid #eeeeee;\n        padding: 10px 7px;\n}\n.hc-buttons > button,\n    .hc-buttons > a,\n    .hc-buttons > label {\n        font-size: 14px;\n        height: 40px;\n        line-height: 40px;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-buttons {\n    border-top: 1px solid #eeeeee;\n    padding: 7px;\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    justify-content: center;\n    gap: 5px;\n    position: sticky;\n    bottom: 0;\n    background-color: white;\n    position: sticky;\n    bottom: 0;\n}\n.hc-buttons:empty {\n    display: none;\n}\n.hc-button,\n.hc-button-secondary,\n.hc-buttons > button,\n.hc-buttons > a,\n.hc-buttons > label {\n    background-color: #12a0f3;\n    border-radius: 5px;\n    color: white !important;\n    border: none;\n    font-size: 12px;\n    height: 32px;\n    padding: 0 12px;\n    line-height: 34px;\n    cursor: pointer;\n    text-decoration: none;\n}\n.hc-button,\n.hc-button-secondary {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    line-height: 1;\n}\n.hc-buttons > button > i,\n.hc-buttons > a > i,\n.hc-buttons > label > i {\n    margin-right: 10px;\n}\n.hc-button-secondary,\n.hc-buttons > *.hc-button-secondary {\n    background-color: #f1f5f9;\n    border: 1px solid #d7e0ea;\n    color: #2c3e50 !important;\n}\n.hc-button-secondary:hover:not(:disabled),\n.hc-buttons > *.hc-button-secondary:hover:not(:disabled) {\n    background-color: #e6eef7;\n    border-color: #bfd0df;\n}\n.hc-buttons > *.hc-button-danger {\n    background-color: #c33434;\n}\n.hc-buttons > *.hc-button-warning {\n    background-color: #c36d34;\n}\n.hc-buttons > *.hc-button-grey {\n    background-color: #888888;\n}\n.hc-buttons > *.hc-button-grey:hover {\n    background-color: #12a0f3;\n}\n.hc-button:disabled,\n.hc-button-secondary:disabled,\n.hc-buttons > button:disabled {\n    background-color: #aaaaaa;\n    border-color: #aaaaaa;\n    color: white !important;\n    cursor: not-allowed;\n}\n.hc-buttons > label > input[type=\"file\"] {\n    display: none;\n}\n.dark .hc-buttons {\n    border-top: 1px solid #444444;\n    background-color: #2e302e;\n}\n.dark .hc-button-secondary,\n.dark .hc-buttons > *.hc-button-secondary {\n    background-color: #3a3d40;\n    border-color: #55595d;\n    color: #eeeeee !important;\n}\n.dark .hc-button-secondary:hover:not(:disabled),\n.dark .hc-buttons > *.hc-button-secondary:hover:not(:disabled) {\n    background-color: #45494d;\n    border-color: #666b70;\n}\n@media (max-width: 767px) {\n.hc-buttons {\n        border-top: 1px solid #eeeeee;\n        padding: 10px 7px;\n}\n.hc-buttons > button,\n    .hc-buttons > a,\n    .hc-buttons > label,\n    .hc-button,\n    .hc-button-secondary {\n        font-size: 14px;\n        height: 40px;\n        line-height: 40px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -65631,7 +65656,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-v-field {\n    width: 100%;\n    display: flex;\n    flex-direction: column;\n    font-size: 12px;\n    border-radius: 3px;\n    position: relative;\n    color: #333333;\n}\n.hc-v-field > span {\n    width: 100%;\n    line-height: 20px;\n    display: inline-block;\n    padding: 0 5px;\n    font-weight: 600;\n}\n.hc-v-field > div {\n    flex: 1;\n    padding: 5px;\n}\n.hc-v-field > div > * {\n    border: 1px solid #dddddd;\n    min-height: 34px;\n    width: 100%;\n    padding: 5px 10px;\n    border-radius: 3px;\n    overflow: hidden;\n    float: left;\n    background: none;\n    color: #333333;\n}\n.hc-v-field > div > div {\n    padding: 0;\n}\n.hc-v-field > div > div > input {\n    padding: 5px 10px;\n    border: none;\n}\n.hc-v-field > div > *:focus {\n    outline: 2px solid #12a0f3;\n    border-color: transparent;\n}\n.hc-v-field > div > input[type=\"color\"] {\n    padding: 0;\n    border: none;\n}\n.hc-v-field > div > textarea {\n    height: 60px;\n}\n.dark .hc-v-field {\n    color: #bbbbbb;\n}\n.dark .hc-v-field > div > * {\n    border-color: #444444;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-v-field {\n    width: 100%;\n    display: flex;\n    flex-direction: column;\n    font-size: 12px;\n    border-radius: 3px;\n    position: relative;\n    color: #333333;\n}\n.hc-v-field > span {\n    width: 100%;\n    line-height: 20px;\n    display: inline-block;\n    padding: 0 5px;\n    font-weight: 600;\n}\n.hc-v-field > div {\n    flex: 1;\n    padding: 5px;\n}\n.hc-v-field > div > * {\n    border: 1px solid #dddddd;\n    min-height: 34px;\n    width: 100%;\n    padding: 5px 10px;\n    border-radius: 3px;\n    overflow: hidden;\n    float: left;\n    background: none;\n    color: #333333;\n}\n.hc-v-field > div > div {\n    padding: 0;\n}\n.hc-v-field > div > div > input {\n    padding: 5px 10px;\n    border: none;\n}\n.hc-v-field > div > *:focus {\n    outline: 2px solid #12a0f3;\n    border-color: transparent;\n}\n.hc-v-field > div > input[type=\"color\"] {\n    padding: 0;\n    border: none;\n}\n.hc-v-field > div > textarea {\n    height: 60px;\n}\n.dark .hc-v-field {\n    color: #bbbbbb;\n}\n.dark .hc-v-field > div > * {\n    border-color: #444444;\n}\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -14337,7 +14337,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 _context2.next = 4;
                 break;
               }
-              _this2.setCloudtalkError("Veuillez saisir l'API Access Key ID et le Secret.");
+              _this2.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
               return _context2.abrupt("return", false);
             case 4:
               _this2.fetchingCloudtalkAgents = true;
@@ -14361,7 +14361,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 _this2.config.agent_id = "";
               }
               if (showSuccessMessage) {
-                _this2.cloudtalkMessage = _this2.cloudtalkAgents.length ? _this2.cloudtalkAgents.length + " agent(s) charge(s)." : "Identifiants valides, mais aucun agent CloudTalk trouve.";
+                _this2.cloudtalkMessage = _this2.cloudtalkAgents.length ? _this2.cloudtalkAgents.length + " agent(s) chargé(s)." : "Identifiants valides, mais aucun agent CloudTalk trouvé.";
                 _this2.cloudtalkMessageType = "success";
               }
               return _context2.abrupt("return", true);
@@ -14372,7 +14372,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               _this2.config.agent_id = "";
               _this2.cloudtalkCredentialsVerified = false;
               _this2.cloudtalkCredentialsKey = null;
-              _this2.setCloudtalkError(((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Impossible de verifier les identifiants CloudTalk.");
+              _this2.setCloudtalkError(((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Impossible de vérifier les identifiants CloudTalk.");
               return _context2.abrupt("return", false);
             case 28:
               _context2.prev = 28;
@@ -14402,7 +14402,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 _context3.next = 5;
                 break;
               }
-              _this3.setCloudtalkError("Veuillez saisir l'API Access Key ID et le Secret.");
+              _this3.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
               return _context3.abrupt("return", false);
             case 5:
               if (!(!_this3.cloudtalkCredentialsVerified || _this3.cloudtalkCredentialsKey !== _this3.currentCloudtalkCredentialsKey)) {
@@ -14423,7 +14423,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 _context3.next = 14;
                 break;
               }
-              _this3.setCloudtalkError("Veuillez selectionner un agent CloudTalk.");
+              _this3.setCloudtalkError("Veuillez sélectionner un agent CloudTalk.");
               return _context3.abrupt("return", false);
             case 14:
               return _context3.abrupt("return", true);
@@ -14531,6 +14531,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       line: this.newLine(),
       addingLine: false,
       prefillingConfig: false,
+      fetchingAvailableUsers: false,
+      availableUsers: [],
       configPrefilledFor: "",
       tab: 0
     };
@@ -14553,12 +14555,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              if (!(!_this.line.operator || !_this.line.user_id || _this.fetchingAvailableUsers)) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
               _this.prepareLine();
-              _context.next = 3;
+              _context.next = 5;
               return _this.prefillOperatorConfig();
-            case 3:
+            case 5:
               _this.tab = 1;
-            case 4:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -14575,192 +14583,124 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _this2.prepareLine();
-              _context2.next = 3;
+              if (!_this2.hasExistingConfigForSelection()) {
+                _context2.next = 4;
+                break;
+              }
+              flashError({
+                title: "Ligne",
+                body: "Cet agent a déjà une configuration pour cet opérateur.",
+                duration: 7000
+              });
+              return _context2.abrupt("return");
+            case 4:
+              _context2.next = 6;
               return _this2.validateOperatorConfig();
-            case 3:
+            case 6:
               if (_context2.sent) {
-                _context2.next = 5;
+                _context2.next = 8;
                 break;
               }
               return _context2.abrupt("return");
-            case 5:
+            case 8:
               _this2.addingLine = true;
-              _context2.prev = 6;
+              _context2.prev = 9;
               _this2.normalizeConfig();
-              _context2.next = 10;
+              _context2.next = 13;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, _this2.line);
-            case 10:
+            case 13:
               _this2.line = _this2.newLine();
+              _this2.availableUsers = [];
               _this2.configPrefilledFor = "";
               _this2.tab = 0;
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context2.next = 19;
+              _context2.next = 23;
               break;
-            case 16:
-              _context2.prev = 16;
-              _context2.t0 = _context2["catch"](6);
+            case 20:
+              _context2.prev = 20;
+              _context2.t0 = _context2["catch"](9);
               flashError({
                 title: "Ligne",
                 body: _this2.errorMessage(_context2.t0),
                 duration: 7000
               });
-            case 19:
-              _context2.prev = 19;
+            case 23:
+              _context2.prev = 23;
               _this2.addingLine = false;
-              return _context2.finish(19);
-            case 22:
+              return _context2.finish(23);
+            case 26:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[6, 16, 19, 22]]);
+        }, _callee2, null, [[9, 20, 23, 26]]);
       }))();
     },
-    prepareLine: function prepareLine() {
-      this.line.name = this.generatedLineName;
-    },
-    prefillOperatorConfig: function prefillOperatorConfig() {
+    loadAvailableUsers: function loadAvailableUsers() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var operator, sourceLine, _this3$line$config, fullLine;
+        var operator, users;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               operator = _this3.line.operator;
-              if (!(!operator || _this3.configPrefilledFor === operator)) {
-                _context3.next = 3;
+              if (operator) {
+                _context3.next = 5;
                 break;
               }
+              _this3.availableUsers = [];
+              _this3.fetchingAvailableUsers = false;
               return _context3.abrupt("return");
-            case 3:
-              sourceLine = _this3.lines.find(function (line) {
-                return line.operator === operator;
+            case 5:
+              _this3.fetchingAvailableUsers = true;
+              _context3.prev = 6;
+              _context3.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_LINE_AVAILABLE_USERS, {
+                operator: operator
               });
-              _this3.configPrefilledFor = operator;
-              if (sourceLine) {
-                _context3.next = 7;
-                break;
-              }
-              return _context3.abrupt("return");
-            case 7:
-              _this3.prefillingConfig = true;
-              _context3.prev = 8;
-              _context3.next = 11;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceLine.id);
-            case 11:
-              fullLine = _context3.sent;
+            case 9:
+              users = _context3.sent;
               if (!(_this3.line.operator !== operator)) {
-                _context3.next = 14;
+                _context3.next = 12;
                 break;
               }
               return _context3.abrupt("return");
-            case 14:
-              if (!(_this3.project && fullLine.project_id && fullLine.project_id != _this3.project.id)) {
-                _context3.next = 16;
-                break;
+            case 12:
+              _this3.availableUsers = users;
+              if (!_this3.availableUsers.some(function (user) {
+                return user.id == _this3.line.user_id;
+              })) {
+                _this3.line.user_id = null;
               }
-              return _context3.abrupt("return");
+              _context3.next = 20;
+              break;
             case 16:
-              _this3.line.config = _objectSpread(_objectSpread({}, _this3.reusableConfig(fullLine.config)), (_this3$line$config = _this3.line.config) !== null && _this3$line$config !== void 0 ? _this3$line$config : {});
-            case 17:
-              _context3.prev = 17;
-              _this3.prefillingConfig = false;
-              return _context3.finish(17);
+              _context3.prev = 16;
+              _context3.t0 = _context3["catch"](6);
+              _this3.availableUsers = _this3.localAvailableUsers(operator);
+              flashError({
+                title: "Ligne",
+                body: _this3.errorMessage(_context3.t0, "Impossible de charger les agents disponibles."),
+                duration: 7000
+              });
             case 20:
+              _context3.prev = 20;
+              if (_this3.line.operator === operator) {
+                _this3.fetchingAvailableUsers = false;
+              }
+              return _context3.finish(20);
+            case 23:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[8,, 17, 20]]);
+        }, _callee3, null, [[6, 16, 20, 23]]);
       }))();
     },
-    reusableConfig: function reusableConfig(config) {
-      var reusable = _objectSpread({}, config !== null && config !== void 0 ? config : {});
-      delete reusable.agent_id;
-      return reusable;
-    },
-    normalizeConfig: function normalizeConfig() {
-      var _this4 = this;
-      Object.keys(this.line.config).forEach(function (key) {
-        if (_this4.line.config[key] !== null && _this4.line.config[key] !== undefined) {
-          _this4.line.config[key] = String(_this4.line.config[key]);
-        }
-      });
-    },
-    validateOperatorConfig: function validateOperatorConfig() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
-            case 0:
-              if (_this5.$refs.operatorConfigFields) {
-                _context4.next = 2;
-                break;
-              }
-              return _context4.abrupt("return", true);
-            case 2:
-              _context4.next = 4;
-              return _this5.$refs.operatorConfigFields.validate();
-            case 4:
-              return _context4.abrupt("return", _context4.sent);
-            case 5:
-            case "end":
-              return _context4.stop();
-          }
-        }, _callee4);
-      }))();
-    },
-    errorMessage: function errorMessage(error) {
-      var _error$response, _error$response2;
-      var errors = (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
-      if (errors) {
-        var firstError = Object.values(errors)[0];
-        if (Array.isArray(firstError) && firstError.length > 0) {
-          return firstError[0];
-        }
-      }
-      return ((_error$response2 = error.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || "Impossible d'enregistrer la ligne.";
-    }
-  },
-  watch: {
-    "line.operator": function lineOperator(value, oldValue) {
-      if (value === oldValue) {
-        return;
-      }
-      this.line.user_id = null;
-      this.line.config = {};
-      this.configPrefilledFor = "";
-      this.prefillOperatorConfig();
-    }
-  },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "users", "lines"])), {}, {
-    lineOperators: function lineOperators() {
-      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
-    },
-    /**
-     *
-     */
-    operatorFields: function operatorFields() {
-      var _this6 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
-        return o.value === _this6.line.operator;
-      });
-      return operator ? operator.fields : [];
-    },
-    /**
-     *
-     */
-    assignedUser: function assignedUser() {
-      var _this7 = this;
-      return this.users.find(function (u) {
-        return u.id == _this7.line.user_id;
-      });
-    },
-    availableUsers: function availableUsers() {
-      var _this8 = this;
-      if (!this.line.operator) {
+    localAvailableUsers: function localAvailableUsers(operator) {
+      if (!operator) {
         return [];
       }
       var assignedUserIds = this.lines.filter(function (line) {
-        return line.operator === _this8.line.operator;
+        return line.operator === operator;
       }).map(function (line) {
         return line.user_id;
       }).filter(function (userId) {
@@ -14772,10 +14712,158 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return assignedUserIds.indexOf(String(user.id)) < 0;
       });
     },
-    generatedLineName: function generatedLineName() {
+    hasExistingConfigForSelection: function hasExistingConfigForSelection() {
+      var _this4 = this;
+      return this.lines.some(function (line) {
+        return line.operator === _this4.line.operator && line.user_id == _this4.line.user_id;
+      });
+    },
+    prepareLine: function prepareLine() {
+      this.line.name = this.generatedLineName;
+    },
+    prefillOperatorConfig: function prefillOperatorConfig() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var operator, sourceLine, _this5$line$config, fullLine;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              operator = _this5.line.operator;
+              if (!(!operator || _this5.configPrefilledFor === operator)) {
+                _context4.next = 3;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 3:
+              sourceLine = _this5.lines.find(function (line) {
+                return line.operator === operator;
+              });
+              _this5.configPrefilledFor = operator;
+              if (sourceLine) {
+                _context4.next = 7;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 7:
+              _this5.prefillingConfig = true;
+              _context4.prev = 8;
+              _context4.next = 11;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceLine.id);
+            case 11:
+              fullLine = _context4.sent;
+              if (!(_this5.line.operator !== operator)) {
+                _context4.next = 14;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 14:
+              if (!(_this5.project && fullLine.project_id && fullLine.project_id != _this5.project.id)) {
+                _context4.next = 16;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 16:
+              _this5.line.config = _objectSpread(_objectSpread({}, _this5.reusableConfig(fullLine.config)), (_this5$line$config = _this5.line.config) !== null && _this5$line$config !== void 0 ? _this5$line$config : {});
+            case 17:
+              _context4.prev = 17;
+              _this5.prefillingConfig = false;
+              return _context4.finish(17);
+            case 20:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[8,, 17, 20]]);
+      }))();
+    },
+    reusableConfig: function reusableConfig(config) {
+      var reusable = _objectSpread({}, config !== null && config !== void 0 ? config : {});
+      delete reusable.agent_id;
+      return reusable;
+    },
+    normalizeConfig: function normalizeConfig() {
+      var _this6 = this;
+      Object.keys(this.line.config).forEach(function (key) {
+        if (_this6.line.config[key] !== null && _this6.line.config[key] !== undefined) {
+          _this6.line.config[key] = String(_this6.line.config[key]);
+        }
+      });
+    },
+    validateOperatorConfig: function validateOperatorConfig() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (_this7.$refs.operatorConfigFields) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return", true);
+            case 2:
+              _context5.next = 4;
+              return _this7.$refs.operatorConfigFields.validate();
+            case 4:
+              return _context5.abrupt("return", _context5.sent);
+            case 5:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
+      }))();
+    },
+    errorMessage: function errorMessage(error) {
+      var _error$response, _error$response2;
+      var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Impossible d'enregistrer la ligne.";
+      var errors = (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
+      if (errors) {
+        var firstError = Object.values(errors)[0];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          return firstError[0];
+        }
+      }
+      return ((_error$response2 = error.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || fallback;
+    }
+  },
+  watch: {
+    "line.operator": function lineOperator(value, oldValue) {
+      if (value === oldValue) {
+        return;
+      }
+      this.line.user_id = null;
+      this.line.config = {};
+      this.availableUsers = this.localAvailableUsers(value);
+      this.configPrefilledFor = "";
+      this.loadAvailableUsers();
+      this.prefillOperatorConfig();
+    }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "users", "lines"])), {}, {
+    lineOperators: function lineOperators() {
+      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
+    },
+    /**
+     *
+     */
+    operatorFields: function operatorFields() {
+      var _this8 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
+        return o.value === _this8.line.operator;
+      });
+      return operator ? operator.fields : [];
+    },
+    /**
+     *
+     */
+    assignedUser: function assignedUser() {
       var _this9 = this;
+      return this.users.find(function (u) {
+        return u.id == _this9.line.user_id;
+      });
+    },
+    generatedLineName: function generatedLineName() {
+      var _this10 = this;
       var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (operator) {
-        return operator.value === _this9.line.operator;
+        return operator.value === _this10.line.operator;
       });
       var operatorName = operator ? operator.label : this.line.operator;
       var userName = this.assignedUser ? this.assignedUser.name : "Agent";
@@ -14856,12 +14944,15 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       fetchingLine: false,
       lineToUpdate: this.cloneLine(this.line),
       prefillingConfig: false,
+      fetchingAvailableUsers: false,
+      availableUsers: [],
       configPrefilledFor: "",
       tab: 0
     };
   },
   created: function created() {
     this.lineToUpdate = this.cloneLine(this.line);
+    this.resetAvailableUsersFromLocal();
   },
   methods: {
     /**
@@ -14879,12 +14970,18 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              if (!(!_this.lineToUpdate.operator || !_this.lineToUpdate.user_id || _this.fetchingAvailableUsers)) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
               _this.prepareLine();
-              _context.next = 3;
-              return _this.prefillOperatorConfig();
-            case 3:
+              _context.next = 5;
+              return _this.loadOperatorConfig();
+            case 5:
               _this.tab = 1;
-            case 4:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -14901,41 +14998,64 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _this2.prepareLine();
-              _context2.next = 3;
+              if (!(_this2.isCreatingNewLine && _this2.hasExistingConfigForSelection())) {
+                _context2.next = 4;
+                break;
+              }
+              flashError({
+                title: "Ligne",
+                body: "Cet agent a déjà une configuration pour cet opérateur.",
+                duration: 7000
+              });
+              return _context2.abrupt("return");
+            case 4:
+              _context2.next = 6;
               return _this2.validateOperatorConfig();
-            case 3:
+            case 6:
               if (_context2.sent) {
-                _context2.next = 5;
+                _context2.next = 8;
                 break;
               }
               return _context2.abrupt("return");
-            case 5:
+            case 8:
               _this2.updatingLine = true;
-              _context2.prev = 6;
+              _context2.prev = 9;
               _this2.normalizeConfig();
-              _context2.next = 10;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, _this2.lineToUpdate);
-            case 10:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context2.next = 16;
+              if (!_this2.isCreatingNewLine) {
+                _context2.next = 16;
+                break;
+              }
+              _context2.next = 14;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, _this2.linePayload());
+            case 14:
+              _context2.next = 18;
               break;
-            case 13:
-              _context2.prev = 13;
-              _context2.t0 = _context2["catch"](6);
+            case 16:
+              _context2.next = 18;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.UPDATE_LINE, _objectSpread(_objectSpread({}, _this2.linePayload()), {}, {
+                id: _this2.lineToUpdate.id
+              }));
+            case 18:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
+              _context2.next = 24;
+              break;
+            case 21:
+              _context2.prev = 21;
+              _context2.t0 = _context2["catch"](9);
               flashError({
                 title: "Ligne",
                 body: _this2.errorMessage(_context2.t0),
                 duration: 7000
               });
-            case 16:
-              _context2.prev = 16;
+            case 24:
+              _context2.prev = 24;
               _this2.updatingLine = false;
-              return _context2.finish(16);
-            case 19:
+              return _context2.finish(24);
+            case 27:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[6, 13, 16, 19]]);
+        }, _callee2, null, [[9, 21, 24, 27]]);
       }))();
     },
     /**
@@ -14966,10 +15086,27 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     prepareLine: function prepareLine() {
       this.lineToUpdate.name = this.generatedLineName;
     },
-    prefillOperatorConfig: function prefillOperatorConfig() {
+    linePayload: function linePayload() {
+      var _this$lineToUpdate$co;
+      return {
+        name: this.lineToUpdate.name,
+        operator: this.lineToUpdate.operator,
+        user_id: this.lineToUpdate.user_id,
+        config: _objectSpread({}, (_this$lineToUpdate$co = this.lineToUpdate.config) !== null && _this$lineToUpdate$co !== void 0 ? _this$lineToUpdate$co : {})
+      };
+    },
+    /**
+     * Fetch the operator configuration with an HTTP request when the
+     * user clicks on "next".
+     *
+     * - UPDATE (operator kept): load all the data of the line.
+     * - AJOUT (new operator): load the credentials already configured
+     *   for this operator in the project, shared by every agent.
+     */
+    loadOperatorConfig: function loadOperatorConfig() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var operator, sourceLine, _this4$lineToUpdate$c, fullLine;
+        var operator, sourceId, fullLine, _fullLine$config, _this4$lineToUpdate$c;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -14986,20 +15123,18 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               }
               return _context4.abrupt("return");
             case 5:
-              sourceLine = _this4.lines.find(function (line) {
-                return line.operator === operator && line.id != _this4.lineToUpdate.id;
-              });
-              _this4.configPrefilledFor = operator;
-              if (sourceLine) {
+              sourceId = _this4.operatorConfigSourceId(operator);
+              if (sourceId) {
                 _context4.next = 9;
                 break;
               }
+              _this4.configPrefilledFor = operator;
               return _context4.abrupt("return");
             case 9:
               _this4.prefillingConfig = true;
               _context4.prev = 10;
               _context4.next = 13;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceLine.id);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceId);
             case 13:
               fullLine = _context4.sent;
               if (!(_this4.lineToUpdate.operator !== operator)) {
@@ -15014,144 +15149,135 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               }
               return _context4.abrupt("return");
             case 18:
-              _this4.lineToUpdate.config = _objectSpread(_objectSpread({}, _this4.reusableConfig(fullLine.config)), (_this4$lineToUpdate$c = _this4.lineToUpdate.config) !== null && _this4$lineToUpdate$c !== void 0 ? _this4$lineToUpdate$c : {});
-            case 19:
-              _context4.prev = 19;
-              _this4.prefillingConfig = false;
-              return _context4.finish(19);
+              if (_this4.isOperatorUpdated(operator)) {
+                // UPDATE: keep every value stored on the line
+                _this4.lineToUpdate.config = _objectSpread({}, (_fullLine$config = fullLine.config) !== null && _fullLine$config !== void 0 ? _fullLine$config : {});
+              } else {
+                // AJOUT: reuse the project credentials of the operator,
+                // shared by all the agents (without agent_id)
+                _this4.lineToUpdate.config = _objectSpread(_objectSpread({}, _this4.reusableConfig(fullLine.config)), (_this4$lineToUpdate$c = _this4.lineToUpdate.config) !== null && _this4$lineToUpdate$c !== void 0 ? _this4$lineToUpdate$c : {});
+              }
+              _this4.configPrefilledFor = operator;
+              _context4.next = 25;
+              break;
             case 22:
+              _context4.prev = 22;
+              _context4.t0 = _context4["catch"](10);
+              flashError({
+                title: "Ligne",
+                body: _this4.errorMessage(_context4.t0, "Impossible de charger la configuration de l'opérateur."),
+                duration: 7000
+              });
+            case 25:
+              _context4.prev = 25;
+              _this4.prefillingConfig = false;
+              return _context4.finish(25);
+            case 28:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[10,, 19, 22]]);
+        }, _callee4, null, [[10, 22, 25, 28]]);
       }))();
     },
-    reusableConfig: function reusableConfig(config) {
-      var reusable = _objectSpread({}, config !== null && config !== void 0 ? config : {});
-      delete reusable.agent_id;
-      return reusable;
-    },
-    normalizeConfig: function normalizeConfig() {
+    /**
+     * Id of the line whose configuration is used to prefill the
+     * operator fields.
+     */
+    operatorConfigSourceId: function operatorConfigSourceId(operator) {
       var _this5 = this;
-      Object.keys(this.lineToUpdate.config).forEach(function (key) {
-        if (_this5.lineToUpdate.config[key] !== null && _this5.lineToUpdate.config[key] !== undefined) {
-          _this5.lineToUpdate.config[key] = String(_this5.lineToUpdate.config[key]);
-        }
+      if (this.isOperatorUpdated(operator)) {
+        return this.lineToUpdate.id;
+      }
+      var sourceLine = this.lines.find(function (line) {
+        return line.operator === operator && line.id != _this5.lineToUpdate.id;
       });
+      return sourceLine ? sourceLine.id : null;
     },
-    validateOperatorConfig: function validateOperatorConfig() {
+    /**
+     * Whether the line keeps the operator it was stored with.
+     */
+    isOperatorUpdated: function isOperatorUpdated(operator) {
+      return !!this.line && this.line.operator === operator;
+    },
+    loadAvailableUsers: function loadAvailableUsers() {
       var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var operator, users;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              if (_this6.$refs.operatorConfigFields) {
+              if (_this6.lineToUpdate) {
                 _context5.next = 2;
                 break;
               }
-              return _context5.abrupt("return", true);
+              return _context5.abrupt("return");
             case 2:
-              _context5.next = 4;
-              return _this6.$refs.operatorConfigFields.validate();
-            case 4:
-              return _context5.abrupt("return", _context5.sent);
-            case 5:
+              operator = _this6.lineToUpdate.operator;
+              if (operator) {
+                _context5.next = 7;
+                break;
+              }
+              _this6.availableUsers = [];
+              _this6.fetchingAvailableUsers = false;
+              return _context5.abrupt("return");
+            case 7:
+              _this6.fetchingAvailableUsers = true;
+              _context5.prev = 8;
+              _context5.next = 11;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_LINE_AVAILABLE_USERS, {
+                operator: operator,
+                exclude_line_id: _this6.lineToUpdate.id
+              });
+            case 11:
+              users = _context5.sent;
+              if (!(!_this6.lineToUpdate || _this6.lineToUpdate.operator !== operator)) {
+                _context5.next = 14;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 14:
+              _this6.availableUsers = users;
+              if (!_this6.isOperatorUpdated(operator) && !_this6.availableUsers.some(function (user) {
+                return user.id == _this6.lineToUpdate.user_id;
+              })) {
+                _this6.lineToUpdate.user_id = null;
+              }
+              _context5.next = 22;
+              break;
+            case 18:
+              _context5.prev = 18;
+              _context5.t0 = _context5["catch"](8);
+              _this6.resetAvailableUsersFromLocal(operator);
+              flashError({
+                title: "Ligne",
+                body: _this6.errorMessage(_context5.t0, "Impossible de charger les agents disponibles."),
+                duration: 7000
+              });
+            case 22:
+              _context5.prev = 22;
+              if (_this6.lineToUpdate && _this6.lineToUpdate.operator === operator) {
+                _this6.fetchingAvailableUsers = false;
+              }
+              return _context5.finish(22);
+            case 25:
             case "end":
               return _context5.stop();
           }
-        }, _callee5);
+        }, _callee5, null, [[8, 18, 22, 25]]);
       }))();
     },
-    errorMessage: function errorMessage(error) {
-      var _error$response, _error$response2;
-      var errors = (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
-      if (errors) {
-        var firstError = Object.values(errors)[0];
-        if (Array.isArray(firstError) && firstError.length > 0) {
-          return firstError[0];
-        }
-      }
-      return ((_error$response2 = error.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || "Impossible d'enregistrer la ligne.";
-    }
-  },
-  watch: {
-    line: function line(newValue) {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
-            case 0:
-              if (!newValue) {
-                _context6.next = 14;
-                break;
-              }
-              _this7.fetchingLine = true;
-              _this7.lineToUpdate = _this7.cloneLine(newValue);
-              _this7.tab = 0;
-              _this7.configPrefilledFor = "";
-              _context6.prev = 5;
-              _context6.t0 = _this7;
-              _context6.next = 9;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, newValue.id);
-            case 9:
-              _context6.t1 = _context6.sent;
-              _this7.lineToUpdate = _context6.t0.cloneLine.call(_context6.t0, _context6.t1);
-            case 11:
-              _context6.prev = 11;
-              _this7.fetchingLine = false;
-              return _context6.finish(11);
-            case 14:
-            case "end":
-              return _context6.stop();
-          }
-        }, _callee6, null, [[5,, 11, 14]]);
-      }))();
+    resetAvailableUsersFromLocal: function resetAvailableUsersFromLocal() {
+      var _this$lineToUpdate, _this$lineToUpdate2;
+      var operator = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+      this.availableUsers = this.localAvailableUsers(operator !== null && operator !== void 0 ? operator : (_this$lineToUpdate = this.lineToUpdate) === null || _this$lineToUpdate === void 0 ? void 0 : _this$lineToUpdate.operator, (_this$lineToUpdate2 = this.lineToUpdate) === null || _this$lineToUpdate2 === void 0 ? void 0 : _this$lineToUpdate2.id);
     },
-    "lineToUpdate.operator": function lineToUpdateOperator(value, oldValue) {
-      var _this8 = this;
-      if (this.fetchingLine || !this.lineToUpdate || !oldValue || value === oldValue) {
-        return;
-      }
-      if (!this.availableUsers.some(function (user) {
-        return user.id == _this8.lineToUpdate.user_id;
-      })) {
-        this.lineToUpdate.user_id = null;
-      }
-      this.lineToUpdate.config = {};
-      this.configPrefilledFor = "";
-      this.prefillOperatorConfig();
-    }
-  },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "line", "can", "users", "lines"])), {}, {
-    lineOperators: function lineOperators() {
-      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
-    },
-    /**
-     *
-     */
-    operatorFields: function operatorFields() {
-      var _this9 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
-        return o.value === _this9.lineToUpdate.operator;
-      });
-      return operator ? operator.fields : [];
-    },
-    /**
-     *
-     */
-    assignedUser: function assignedUser() {
-      var _this10 = this;
-      return this.users.find(function (u) {
-        return u.id == _this10.lineToUpdate.user_id;
-      });
-    },
-    availableUsers: function availableUsers() {
-      var _this11 = this;
-      if (!this.lineToUpdate || !this.lineToUpdate.operator) {
+    localAvailableUsers: function localAvailableUsers(operator) {
+      var excludeLineId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (!operator) {
         return [];
       }
       var assignedUserIds = this.lines.filter(function (line) {
-        return line.operator === _this11.lineToUpdate.operator && line.id != _this11.lineToUpdate.id;
+        return line.operator === operator && line.id != excludeLineId;
       }).map(function (line) {
         return line.user_id;
       }).filter(function (userId) {
@@ -15163,10 +15289,157 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         return assignedUserIds.indexOf(String(user.id)) < 0;
       });
     },
-    generatedLineName: function generatedLineName() {
+    hasExistingConfigForSelection: function hasExistingConfigForSelection() {
+      var _this7 = this;
+      return this.lines.some(function (line) {
+        return line.operator === _this7.lineToUpdate.operator && line.user_id == _this7.lineToUpdate.user_id && line.id != _this7.lineToUpdate.id;
+      });
+    },
+    reusableConfig: function reusableConfig(config) {
+      var reusable = _objectSpread({}, config !== null && config !== void 0 ? config : {});
+      delete reusable.agent_id;
+      return reusable;
+    },
+    normalizeConfig: function normalizeConfig() {
+      var _this8 = this;
+      Object.keys(this.lineToUpdate.config).forEach(function (key) {
+        if (_this8.lineToUpdate.config[key] !== null && _this8.lineToUpdate.config[key] !== undefined) {
+          _this8.lineToUpdate.config[key] = String(_this8.lineToUpdate.config[key]);
+        }
+      });
+    },
+    validateOperatorConfig: function validateOperatorConfig() {
+      var _this9 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              if (_this9.$refs.operatorConfigFields) {
+                _context6.next = 2;
+                break;
+              }
+              return _context6.abrupt("return", true);
+            case 2:
+              _context6.next = 4;
+              return _this9.$refs.operatorConfigFields.validate();
+            case 4:
+              return _context6.abrupt("return", _context6.sent);
+            case 5:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6);
+      }))();
+    },
+    errorMessage: function errorMessage(error) {
+      var _error$response, _error$response2;
+      var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "Impossible d'enregistrer la ligne.";
+      var errors = (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
+      if (errors) {
+        var firstError = Object.values(errors)[0];
+        if (Array.isArray(firstError) && firstError.length > 0) {
+          return firstError[0];
+        }
+      }
+      return ((_error$response2 = error.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || fallback;
+    }
+  },
+  watch: {
+    line: function line(newValue) {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
+            case 0:
+              if (!newValue) {
+                _context7.next = 16;
+                break;
+              }
+              _this10.fetchingLine = true;
+              _this10.lineToUpdate = _this10.cloneLine(newValue);
+              _this10.tab = 0;
+              _this10.configPrefilledFor = "";
+              _this10.resetAvailableUsersFromLocal();
+              _context7.prev = 6;
+              _context7.t0 = _this10;
+              _context7.next = 10;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, newValue.id);
+            case 10:
+              _context7.t1 = _context7.sent;
+              _this10.lineToUpdate = _context7.t0.cloneLine.call(_context7.t0, _context7.t1);
+              _this10.resetAvailableUsersFromLocal();
+            case 13:
+              _context7.prev = 13;
+              _this10.fetchingLine = false;
+              return _context7.finish(13);
+            case 16:
+            case "end":
+              return _context7.stop();
+          }
+        }, _callee7, null, [[6,, 13, 16]]);
+      }))();
+    },
+    "lineToUpdate.operator": function lineToUpdateOperator(value, oldValue) {
+      var _this11 = this;
+      if (this.fetchingLine || !this.lineToUpdate || !oldValue || value === oldValue) {
+        return;
+      }
+      this.resetAvailableUsersFromLocal(value);
+      if (!this.availableUsers.some(function (user) {
+        return user.id == _this11.lineToUpdate.user_id;
+      })) {
+        this.lineToUpdate.user_id = null;
+      }
+      this.lineToUpdate.config = {};
+      this.configPrefilledFor = "";
+      if (!this.isOperatorUpdated(value)) {
+        this.loadAvailableUsers();
+      } else {
+        this.fetchingAvailableUsers = false;
+      }
+      this.loadOperatorConfig();
+    }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "line", "can", "users", "lines"])), {}, {
+    lineOperators: function lineOperators() {
+      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
+    },
+    isCreatingNewLine: function isCreatingNewLine() {
+      return !!this.lineToUpdate && !this.isOperatorUpdated(this.lineToUpdate.operator);
+    },
+    submitLabel: function submitLabel() {
+      return this.isCreatingNewLine ? this.$t("add") : this.$t("update");
+    },
+    /**
+     *
+     */
+    operatorFields: function operatorFields() {
       var _this12 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
+        return o.value === _this12.lineToUpdate.operator;
+      });
+      return operator ? operator.fields : [];
+    },
+    /**
+     *
+     */
+    assignedUser: function assignedUser() {
+      var _this13 = this;
+      return this.users.find(function (u) {
+        return u.id == _this13.lineToUpdate.user_id;
+      });
+    },
+    /**
+     * The agent cannot be changed when updating a line (operator kept).
+     * It stays selectable while a new operator is being configured.
+     */
+    isAgentSelectionDisabled: function isAgentSelectionDisabled() {
+      return this.isOperatorUpdated(this.lineToUpdate.operator) || !this.lineToUpdate.operator || this.fetchingAvailableUsers || this.availableUsers.length === 0;
+    },
+    generatedLineName: function generatedLineName() {
+      var _this14 = this;
       var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (operator) {
-        return operator.value === _this12.lineToUpdate.operator;
+        return operator.value === _this14.lineToUpdate.operator;
       });
       var operatorName = operator ? operator.label : this.lineToUpdate.operator;
       var userName = this.assignedUser ? this.assignedUser.name : "Agent";
@@ -31182,7 +31455,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         if (this.cloudtalkCallContextVisible && this.cloudtalkContextPanelVisible) {
           return "720px";
         }
-        return "400px";
+        return "435px";
       }
       if (this.tab == 1 && this.frameTab == 0) {
         return "395px";
@@ -66280,7 +66553,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
             return $options.fetchCloudtalkAgents(true);
           }, ["prevent"]))
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fetchingCloudtalkAgents ? "Verification en cours..." : "Tester et charger les agents"), 9 /* TEXT, PROPS */, _hoisted_3), $data.cloudtalkMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fetchingCloudtalkAgents ? "Vérification en cours..." : "Tester et charger les agents"), 9 /* TEXT, PROPS */, _hoisted_3), $data.cloudtalkMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: 0,
           "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-cloudtalk-agent-message', $data.cloudtalkMessageType]),
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.cloudtalkMessage)
@@ -66357,10 +66630,15 @@ var _hoisted_5 = {
   value: null,
   disabled: ""
 };
-var _hoisted_6 = ["value", "textContent"];
-var _hoisted_7 = ["disabled", "textContent"];
-var _hoisted_8 = ["textContent"];
+var _hoisted_6 = {
+  key: 1,
+  value: null,
+  disabled: ""
+};
+var _hoisted_7 = ["value", "textContent"];
+var _hoisted_8 = ["disabled", "textContent"];
 var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
@@ -66416,14 +66694,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
                   return $data.line.user_id = $event;
                 }),
-                disabled: !$data.line.operator || $options.availableUsers.length === 0,
+                disabled: !$data.line.operator || $data.fetchingAvailableUsers || $data.availableUsers.length === 0,
                 required: ""
-              }, [_hoisted_4, $data.line.operator && $options.availableUsers.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_5, " Aucun agent disponible ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.availableUsers, function (user) {
+              }, [_hoisted_4, $data.line.operator && $data.fetchingAvailableUsers ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_5, " Chargement des agents... ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.line.operator && !$data.fetchingAvailableUsers && $data.availableUsers.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_6, " Aucun agent disponible ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.availableUsers, function (user) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
                   key: user.id,
                   value: user.id,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.name)
-                }, null, 8 /* PROPS */, _hoisted_6);
+                }, null, 8 /* PROPS */, _hoisted_7);
               }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.line.user_id]])];
             }),
             _: 1 /* STABLE */
@@ -66433,13 +66711,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            disabled: !$data.line.operator || !$data.line.user_id || $data.prefillingConfig,
+            disabled: !$data.line.operator || !$data.line.user_id || $data.prefillingConfig || $data.fetchingAvailableUsers,
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('next'))
-          }, null, 8 /* PROPS */, _hoisted_7)];
+          }, null, 8 /* PROPS */, _hoisted_8)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-        loading: $data.prefillingConfig
+        loading: $data.prefillingConfig || $data.fetchingAvailableUsers
       }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
     }),
     "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -66462,7 +66740,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('line.configuration.title'))
-          }, null, 8 /* PROPS */, _hoisted_8)];
+          }, null, 8 /* PROPS */, _hoisted_9)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -66482,7 +66760,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-          }, null, 8 /* PROPS */, _hoisted_9)];
+          }, null, 8 /* PROPS */, _hoisted_10)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -66542,13 +66820,17 @@ var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   disabled: ""
 }, null, -1 /* HOISTED */);
 var _hoisted_2 = ["value", "textContent"];
-var _hoisted_3 = ["disabled"];
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: null,
   disabled: ""
 }, null, -1 /* HOISTED */);
-var _hoisted_5 = {
+var _hoisted_4 = {
   key: 0,
+  value: null,
+  disabled: ""
+};
+var _hoisted_5 = {
+  key: 1,
   value: null,
   disabled: ""
 };
@@ -66615,15 +66897,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
                   return $data.lineToUpdate.user_id = $event;
                 }),
-                disabled: !$data.lineToUpdate.operator || $options.availableUsers.length === 0,
+                disabled: "",
                 required: ""
-              }, [_hoisted_4, $data.lineToUpdate.operator && $options.availableUsers.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_5, " Aucun agent disponible ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.availableUsers, function (user) {
+              }, [_hoisted_3, $data.lineToUpdate.operator && $data.fetchingAvailableUsers ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_4, " Chargement des agents... ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.lineToUpdate.operator && !$data.fetchingAvailableUsers && $data.availableUsers.length === 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", _hoisted_5, " Aucun agent disponible ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.availableUsers, function (user) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
                   key: user.id,
                   value: user.id,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.name)
                 }, null, 8 /* PROPS */, _hoisted_6);
-              }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_3), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.lineToUpdate.user_id]])];
+              }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.lineToUpdate.user_id]])];
             }),
             _: 1 /* STABLE */
           }, 8 /* PROPS */, ["label"])];
@@ -66639,13 +66921,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "hc-button-danger",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('delete'))
           }, null, 8 /* PROPS */, _hoisted_7)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            disabled: !$data.lineToUpdate.operator || !$data.lineToUpdate.user_id || $data.prefillingConfig,
+            disabled: !$data.lineToUpdate.operator || !$data.lineToUpdate.user_id || $data.prefillingConfig || $data.fetchingAvailableUsers,
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('next'))
           }, null, 8 /* PROPS */, _hoisted_8)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-        loading: $data.removingLine || $data.prefillingConfig
+        loading: $data.removingLine || $data.prefillingConfig || $data.fetchingAvailableUsers
       }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -66688,7 +66970,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.submitLabel)
           }, null, 8 /* PROPS */, _hoisted_10)];
         }),
         _: 1 /* STABLE */
@@ -100171,10 +100453,10 @@ __webpack_require__.r(__webpack_exports__);
   fields: [{
     key: "api_token",
     label: "Jeton API (X-API-TOKEN)",
-    type: "password"
+    type: "text"
   }, {
     key: "domain_uuid",
-    label: "Domain UUID",
+    label: "Identifiant du domaine (Domain UUID)",
     type: "text"
   }, {
     key: "phone_number",
@@ -100182,7 +100464,7 @@ __webpack_require__.r(__webpack_exports__);
     type: "tel"
   }, {
     key: "extension",
-    label: "Extension",
+    label: "Extension (poste)",
     type: "text"
   }]
 }, {
@@ -100191,12 +100473,12 @@ __webpack_require__.r(__webpack_exports__);
   logo: "/images/partenaire-ext/cloudtalk.png",
   fields: [{
     key: "api_key_id",
-    label: "API Access Key ID",
+    label: "Identifiant de la clé API (API Key ID)",
     type: "text"
   }, {
     key: "api_key_secret",
-    label: "API Access Key Secret",
-    type: "password"
+    label: "Secret de la clé API (API Key Secret)",
+    type: "text"
   }, {
     key: "agent_id",
     label: "Agent",
@@ -100208,7 +100490,7 @@ __webpack_require__.r(__webpack_exports__);
   logo: "/images/partenaire-ext/ringover.png",
   fields: [{
     key: "api_token",
-    label: "Token",
+    label: "Jeton API (Token)",
     type: "text"
   }]
 }, {
@@ -100217,27 +100499,27 @@ __webpack_require__.r(__webpack_exports__);
   logo: "/images/partenaire-ext/twilio.ico",
   fields: [{
     key: "account_sid",
-    label: "Account SID",
+    label: "SID du compte (Account SID)",
     type: "text"
   }, {
     key: "auth_token",
-    label: "Auth Token",
-    type: "password"
+    label: "Jeton d'authentification (Auth Token)",
+    type: "text"
   }, {
     key: "api_key_sid",
-    label: "API Key SID",
+    label: "SID de la clé API (API Key SID)",
     type: "text"
   }, {
     key: "api_key_secret",
-    label: "API Key Secret",
-    type: "password"
+    label: "Secret de la clé API (API Key Secret)",
+    type: "text"
   }, {
     key: "twiml_app_sid",
-    label: "TwiML App SID",
+    label: "SID de l'application TwiML",
     type: "text"
   }, {
     key: "caller_id_number",
-    label: "Numéro appelant",
+    label: "Numéro appelant (Caller ID)",
     type: "tel"
   }]
 }]);

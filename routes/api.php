@@ -429,6 +429,7 @@ Route::group([
         Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);
         Route::post('line/cloudtalk/history', [ProjectLineCloudTalkController::class, 'history']);
         Route::post('line/cloudtalk/call', [ProjectLineCloudTalkController::class, 'store']);
+        Route::get('line/available-users', [ProjectLineController::class, 'availableUsers']);
         Route::apiResource('line', ProjectLineController::class);
 
         // Logo

@@ -21,13 +21,26 @@
                         <select
                             v-model="line.user_id"
                             :disabled="
-                                !line.operator || availableUsers.length === 0
+                                !line.operator ||
+                                fetchingAvailableUsers ||
+                                availableUsers.length === 0
                             "
                             required
                         >
                             <option :value="null" disabled></option>
                             <option
-                                v-if="line.operator && availableUsers.length === 0"
+                                v-if="line.operator && fetchingAvailableUsers"
+                                :value="null"
+                                disabled
+                            >
+                                Chargement des agents...
+                            </option>
+                            <option
+                                v-if="
+                                    line.operator &&
+                                    !fetchingAvailableUsers &&
+                                    availableUsers.length === 0
+                                "
                                 :value="null"
                                 disabled
                             >
@@ -45,12 +58,15 @@
                 <buttons>
                     <button
                         :disabled="
-                            !line.operator || !line.user_id || prefillingConfig
+                            !line.operator ||
+                            !line.user_id ||
+                            prefillingConfig ||
+                            fetchingAvailableUsers
                         "
                         v-text="$t('next')"
                     ></button>
                 </buttons>
-                <loading :loading="prefillingConfig" />
+                <loading :loading="prefillingConfig || fetchingAvailableUsers" />
             </form>
         </template>
 
@@ -89,7 +105,11 @@ import { mapGetters } from "vuex";
 import store from "@/store";
 
 // Actions
-import { ADD_LINE, SHOW_LINE } from "@/actions/project/line";
+import {
+    ADD_LINE,
+    SHOW_LINE,
+    FETCH_LINE_AVAILABLE_USERS,
+} from "@/actions/project/line";
 import { CLOSE_MODAL } from "@/actions/modal";
 
 // Constants
@@ -108,6 +128,8 @@ export default {
             line: this.newLine(),
             addingLine: false,
             prefillingConfig: false,
+            fetchingAvailableUsers: false,
+            availableUsers: [],
             configPrefilledFor: "",
             tab: 0,
         };
@@ -127,6 +149,14 @@ export default {
         },
 
         async goToConfig() {
+            if (
+                !this.line.operator ||
+                !this.line.user_id ||
+                this.fetchingAvailableUsers
+            ) {
+                return;
+            }
+
             this.prepareLine();
             await this.prefillOperatorConfig();
             this.tab = 1;
@@ -138,6 +168,15 @@ export default {
         async storeLine() {
             this.prepareLine();
 
+            if (this.hasExistingConfigForSelection()) {
+                flashError({
+                    title: "Ligne",
+                    body: "Cet agent a déjà une configuration pour cet opérateur.",
+                    duration: 7000,
+                });
+                return;
+            }
+
             if (!(await this.validateOperatorConfig())) {
                 return;
             }
@@ -148,6 +187,7 @@ export default {
                 this.normalizeConfig();
                 await store.dispatch(ADD_LINE, this.line);
                 this.line = this.newLine();
+                this.availableUsers = [];
                 this.configPrefilledFor = "";
                 this.tab = 0;
                 store.commit(CLOSE_MODAL);
@@ -160,6 +200,77 @@ export default {
             } finally {
                 this.addingLine = false;
             }
+        },
+
+        async loadAvailableUsers() {
+            const operator = this.line.operator;
+
+            if (!operator) {
+                this.availableUsers = [];
+                this.fetchingAvailableUsers = false;
+                return;
+            }
+
+            this.fetchingAvailableUsers = true;
+
+            try {
+                const users = await store.dispatch(FETCH_LINE_AVAILABLE_USERS, {
+                    operator,
+                });
+
+                if (this.line.operator !== operator) {
+                    return;
+                }
+
+                this.availableUsers = users;
+
+                if (
+                    !this.availableUsers.some(
+                        (user) => user.id == this.line.user_id
+                    )
+                ) {
+                    this.line.user_id = null;
+                }
+            } catch (error) {
+                this.availableUsers = this.localAvailableUsers(operator);
+
+                flashError({
+                    title: "Ligne",
+                    body: this.errorMessage(
+                        error,
+                        "Impossible de charger les agents disponibles."
+                    ),
+                    duration: 7000,
+                });
+            } finally {
+                if (this.line.operator === operator) {
+                    this.fetchingAvailableUsers = false;
+                }
+            }
+        },
+
+        localAvailableUsers(operator) {
+            if (!operator) {
+                return [];
+            }
+
+            const assignedUserIds = this.lines
+                .filter((line) => line.operator === operator)
+                .map((line) => line.user_id)
+                .filter((userId) => userId !== null && userId !== undefined)
+                .map((userId) => String(userId));
+
+            return this.users.filter(
+                (user) => assignedUserIds.indexOf(String(user.id)) < 0
+            );
+        },
+
+        hasExistingConfigForSelection() {
+            return this.lines.some(
+                (line) =>
+                    line.operator === this.line.operator &&
+                    line.user_id == this.line.user_id
+            );
         },
 
         prepareLine() {
@@ -234,7 +345,7 @@ export default {
             return await this.$refs.operatorConfigFields.validate();
         },
 
-        errorMessage(error) {
+        errorMessage(error, fallback = "Impossible d'enregistrer la ligne.") {
             const errors = error.response?.data?.errors;
 
             if (errors) {
@@ -247,7 +358,7 @@ export default {
 
             return (
                 error.response?.data?.message ||
-                "Impossible d'enregistrer la ligne."
+                fallback
             );
         },
     },
@@ -260,7 +371,9 @@ export default {
 
             this.line.user_id = null;
             this.line.config = {};
+            this.availableUsers = this.localAvailableUsers(value);
             this.configPrefilledFor = "";
+            this.loadAvailableUsers();
             this.prefillOperatorConfig();
         },
     },
@@ -287,22 +400,6 @@ export default {
          */
         assignedUser() {
             return this.users.find((u) => u.id == this.line.user_id);
-        },
-
-        availableUsers() {
-            if (!this.line.operator) {
-                return [];
-            }
-
-            const assignedUserIds = this.lines
-                .filter((line) => line.operator === this.line.operator)
-                .map((line) => line.user_id)
-                .filter((userId) => userId !== null && userId !== undefined)
-                .map((userId) => String(userId));
-
-            return this.users.filter(
-                (user) => assignedUserIds.indexOf(String(user.id)) < 0
-            );
         },
 
         generatedLineName() {

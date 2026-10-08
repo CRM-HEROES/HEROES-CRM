@@ -1566,7 +1566,7 @@ export default {
                     return "720px";
                 }
 
-                return "400px";
+                return "435px";
             }
 
             if (this.tab == 1 && this.frameTab == 0) {

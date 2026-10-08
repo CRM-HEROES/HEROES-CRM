@@ -44,6 +44,57 @@ class LineController extends Controller
     }
 
     /**
+     * Users that do not already have a config for the selected operator.
+     */
+    public function availableUsers(Request $request, Project $project)
+    {
+        abort_unless(
+            auth()->user()->can('projectLineAdd', $project) ||
+                auth()->user()->can('projectLineUpdate', $project),
+            404
+        );
+
+        $this->validate($request, [
+            'operator' => 'required|string|in:' .
+                implode(',', array_keys($this->operatorConfigFields)),
+            'exclude_line_id' => 'nullable|integer',
+        ]);
+
+        $excludeLineId = $request->input('exclude_line_id');
+
+        if ($excludeLineId) {
+            abort_unless(
+                $project->lines()->where('id', $excludeLineId)->exists(),
+                404
+            );
+        }
+
+        $assignedUserIds = $project
+            ->lines()
+            ->where('operator', $request->input('operator'))
+            ->when($excludeLineId, function ($query) use ($excludeLineId) {
+                $query->where('id', '!=', $excludeLineId);
+            })
+            ->whereNotNull('user_id')
+            ->pluck('user_id');
+
+        return $project
+            ->users()
+            ->select(
+                'users.id',
+                'users.name',
+                'users.last_name',
+                'users.email',
+                'users.role',
+                'users.creator_id'
+            )
+            ->forCurrentUser()
+            ->whereNotIn('users.id', $assignedUserIds)
+            ->orderBy('users.name')
+            ->get();
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request, Project $project)
@@ -51,6 +102,12 @@ class LineController extends Controller
         abort_unless(auth()->user()->can('projectLineAdd', $project), 404);
 
         $this->validate($request, $this->rules($request->input('operator')));
+        $this->validateProjectUser($project, (int) $request->input('user_id'));
+        $this->validateUniqueAgentOperatorConfig(
+            $project,
+            $request->input('operator'),
+            (int) $request->input('user_id')
+        );
         $this->validateOperatorConfig(
             $request->input('operator'),
             $request->input('config', [])
@@ -87,6 +144,13 @@ class LineController extends Controller
         abort_unless($project->id == $line->project_id, 404);
 
         $this->validate($request, $this->rules($request->input('operator')));
+        $this->validateProjectUser($project, (int) $request->input('user_id'));
+        $this->validateUniqueAgentOperatorConfig(
+            $project,
+            $request->input('operator'),
+            (int) $request->input('user_id'),
+            $line
+        );
         $this->validateOperatorConfig(
             $request->input('operator'),
             $request->input('config', [])
@@ -123,8 +187,9 @@ class LineController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:100',
-            'operator' => 'required|string|in:' . implode(',', array_keys($this->operatorConfigFields)),
-            'user_id' => 'nullable|exists:users,id',
+            'operator' => 'required|string|in:' .
+                implode(',', array_keys($this->operatorConfigFields)),
+            'user_id' => 'required|exists:users,id',
             'config' => 'required|array',
         ];
 
@@ -133,6 +198,41 @@ class LineController extends Controller
         }
 
         return $rules;
+    }
+
+    protected function validateProjectUser(Project $project, int $userId): void
+    {
+        if ($project->users()->where('users.id', $userId)->exists()) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'user_id' => "L'agent sélectionné n'appartient pas au projet.",
+        ]);
+    }
+
+    protected function validateUniqueAgentOperatorConfig(
+        Project $project,
+        string $operator,
+        int $userId,
+        ?Line $line = null
+    ): void {
+        $exists = $project
+            ->lines()
+            ->where('operator', $operator)
+            ->where('user_id', $userId)
+            ->when($line, function ($query) use ($line) {
+                $query->where('id', '!=', $line->id);
+            })
+            ->exists();
+
+        if (!$exists) {
+            return;
+        }
+
+        throw ValidationException::withMessages([
+            'user_id' => 'Cet agent a déjà une configuration pour cet opérateur.',
+        ]);
     }
 
     protected function validateOperatorConfig(string $operator, array $config): void
