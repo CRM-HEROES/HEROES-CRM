@@ -378,7 +378,7 @@ class ImportProspects implements ShouldQueue
                 // Skip the header row
                 if ($isHeaderRow) {
                     $isHeaderRow = false;
-                    $headerRow = $this->getCellsValues($r);
+                    $headerRow = array_map(fn ($header) => ImportHeaderAliases::toText($header), $this->getCellsValues($r));
                     // Different tabs of the same Google Sheets document can
                     // have columns in a different order, missing, or extra
                     // ones — align this sheet's columns to the reference
@@ -1230,6 +1230,19 @@ class ImportProspects implements ShouldQueue
         // reste exploitable dès qu'elle porte une adresse, un nom ou une
         // société. Seules les lignes sans aucune donnée d'identification
         // sont ignorées.
+        // Quand des champs MAJ sont choisis, ce sont eux qui définissent un
+        // prospect exploitable : une ligne qui porte une valeur MAJ est
+        // gardée, même sans aucune autre donnée.
+        if (
+            !empty($this->duplicateFieldDescriptors)
+            && $this->compositeDuplicateKey(
+                $this->getDuplicateComparisonValuesForProspect($prospect, $this->duplicateFieldDescriptors),
+                $this->duplicateFieldDescriptors
+            ) !== null
+        ) {
+            return false;
+        }
+
         foreach ([
             'email', 'phone_number', 'mobile_phone_number',
             'street', 'city', 'postal_code',

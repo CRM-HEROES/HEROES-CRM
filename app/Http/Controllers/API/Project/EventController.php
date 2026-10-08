@@ -258,10 +258,23 @@ class EventController extends Controller
             return Str::startsWith($field, 'category->');
         }));
 
+        // Permission to view the agendas of the other users
+        $canViewOthersAgenda = auth()->user()->can('projectUserAgenda', $project);
+
         // Result
         $events = Event
             ::whereHas('calendar', function($query) use($project) {
                 $query->where('project_id', $project->id);
+            })
+            ->when(!$canViewOthersAgenda, function($query) {
+                $query->where(function($query) {
+                    $query
+                        ->where('user_id', auth()->id())
+                        ->orWhere('creator_id', auth()->id())
+                        ->orWhereHas('users', function($query) {
+                            $query->where('users.id', auth()->id());
+                        });
+                });
             })
             ->when(in_array('calendar', $fields), function($query) {
                 $query->with('calendar:id,name,color,bgcolor,type');

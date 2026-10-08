@@ -3358,7 +3358,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_LIST, eventParamsUsers && eventParamsUsers.length > 1);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_2__.UPDATE_PROJECT_USER_SETTING, {
         key: "events.agenda.filters.users",
-        value: eventParamsUsers
+        value: eventParamsUsers || []
       });
     }
   },
@@ -3495,7 +3495,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.FETCH_EVENTS);
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "users", "roles", "calendars", "categories", "eventsParamExists", "eventsParamsValue", "eventsParams", "agendaFilter", "agendaWeekEnd", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsColorByLabel"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "user", "can", "users", "roles", "calendars", "categories", "eventsParamExists", "eventsParamsValue", "eventsParams", "agendaFilter", "agendaWeekEnd", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsColorByLabel"])), {}, {
     showWeekEnd: {
       get: function get() {
         return this.agendaWeekEnd;
@@ -3634,9 +3634,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     filteredUsers: function filteredUsers() {
+      var _this = this;
       var keyword = removeStringAccent(this.userKeyword);
       return this.users.filter(function (user) {
-        return removeStringAccent(user.name).indexOf(keyword) >= 0;
+        return (_this.can("all.project.user.agenda") || user.id == _this.user.id) && removeStringAccent(user.name).indexOf(keyword) >= 0;
       }).sort(function (user1, user2) {
         return user1.pivot && user2.pivot && user1.pivot.relevance_event > user2.pivot.relevance_event ? -1 : 1;
       });
@@ -3685,12 +3686,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     filteredLabels: function filteredLabels() {
-      var _this = this;
+      var _this2 = this;
       if (!this.category) {
         return [];
       }
       var category = this.categories.find(function (c) {
-        return c.id == _this.category.id;
+        return c.id == _this2.category.id;
       });
       if (!category || category.labels === undefined) {
         return [];
@@ -3724,9 +3725,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     colorByLabel: {
       get: function get() {
-        var _this2 = this;
+        var _this3 = this;
         return this.categories.find(function (c) {
-          return c.id == _this2.projectUserSettingsEventsColorByLabel;
+          return c.id == _this3.projectUserSettingsEventsColorByLabel;
         });
       },
       set: function set(value) {
@@ -8334,7 +8335,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-agenda-filters-header {\n    border-bottom: 1px solid #eeeeee;\n    display: flex;\n    flex-direction: row;\n    font-size: 13px;\n    align-items: center;\n    position: relative;\n}\n#hc-agenda-filters-header-title {\n    font-weight: bold;\n    font-size: 17px;\n    padding-left: 20px;\n    height: 40px;\n    line-height: 40px;\n    white-space: nowrap;\n    overflow: hidden;\n    text-overflow: ellipsis;\n}\n#hc-agenda-filters-header-close {\n    height: 30px;\n    text-align: center;\n    width: 30px;\n    font-weight: bold;\n    font-size: 15px;\n    color: #888888;\n    cursor: pointer;\n    margin: 5px;\n    border-radius: 15px;\n    border-radius: 15px;\n    font-weight: 200;\n    text-decoration: none;\n}\n#hc-agenda-filters-header-close:hover {\n    background-color: #eeeeee;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-agenda-users {\n    width: 280px;\n    height: 100%;\n    overflow: auto;\n    background-color: white;\n    border-right: 1px solid #dddddd;\n    display: flex;\n    flex-direction: column;\n    transition: all 100ms ease-out;\n}\n.hc-agenda-users.hide {\n    width: 0;\n    border: none;\n}\n.hc-agenda-users-list {\n    padding: 5px 10px;\n    width: 100%;\n    flex: 1;\n    overflow: auto;\n}\n.hc-agenda-users-list > ul {\n    margin: 0;\n    padding: 5px 0;\n    list-style: none;\n    width: 100%;\n    border-bottom: 1px solid #eee;\n}\n.hc-agenda-users-list > ul > li {\n    width: 100%;\n    margin: 2px 0;\n}\n@media (max-width: 767px) {\n.hc-agenda-users {\n        width: 440px;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-agenda-filters-header {\r\n    border-bottom: 1px solid #eeeeee;\r\n    display: flex;\r\n    flex-direction: row;\r\n    font-size: 13px;\r\n    align-items: center;\r\n    position: relative;\n}\n#hc-agenda-filters-header-title {\r\n    font-weight: bold;\r\n    font-size: 17px;\r\n    padding-left: 20px;\r\n    height: 40px;\r\n    line-height: 40px;\r\n    white-space: nowrap;\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\n}\n#hc-agenda-filters-header-close {\r\n    height: 30px;\r\n    text-align: center;\r\n    width: 30px;\r\n    font-weight: bold;\r\n    font-size: 15px;\r\n    color: #888888;\r\n    cursor: pointer;\r\n    margin: 5px;\r\n    border-radius: 15px;\r\n    border-radius: 15px;\r\n    font-weight: 200;\r\n    text-decoration: none;\n}\n#hc-agenda-filters-header-close:hover {\r\n    background-color: #eeeeee;\r\n    color: #555555;\r\n    text-decoration: none;\n}\n.hc-agenda-users {\r\n    width: 280px;\r\n    height: 100%;\r\n    overflow: auto;\r\n    background-color: white;\r\n    border-right: 1px solid #dddddd;\r\n    display: flex;\r\n    flex-direction: column;\r\n    transition: all 100ms ease-out;\n}\n.hc-agenda-users.hide {\r\n    width: 0;\r\n    border: none;\n}\n.hc-agenda-users-list {\r\n    padding: 5px 10px;\r\n    width: 100%;\r\n    flex: 1;\r\n    overflow: auto;\n}\n.hc-agenda-users-list > ul {\r\n    margin: 0;\r\n    padding: 5px 0;\r\n    list-style: none;\r\n    width: 100%;\r\n    border-bottom: 1px solid #eee;\n}\n.hc-agenda-users-list > ul > li {\r\n    width: 100%;\r\n    margin: 2px 0;\n}\n@media (max-width: 767px) {\n.hc-agenda-users {\r\n        width: 440px;\n}\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

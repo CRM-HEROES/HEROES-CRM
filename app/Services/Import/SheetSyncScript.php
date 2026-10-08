@@ -38,20 +38,14 @@ class SheetSyncScript
     }
 
     /**
-     * How the script recognises a lead: the sheet's "id" column when it has one
-     * (Meta lead id), otherwise the values of the import's "MAJ" columns.
+     * How the script recognises a lead: the values of the import's "MAJ"
+     * columns (all of them together); only when none is selected, the sheet's
+     * "id" column (Meta lead id) or else email / phones.
      */
     public function keySpec(Import $import): array
     {
         $headers = is_array($import->headers) ? $import->headers : [];
         $mapping = is_array($import->mapping) ? $import->mapping : [];
-
-        $idNames = [];
-        foreach ($headers as $header) {
-            if (ImportHeaderAliases::normalize($header) === 'id') {
-                $idNames = ['id'];
-            }
-        }
 
         $majSlugs = [];
         if (!empty($import->duplicates_fields) && $import->project) {
@@ -60,6 +54,18 @@ class SheetSyncScript
                 ->whereIn('id', (array) $import->duplicates_fields)
                 ->pluck('slug')
                 ->all();
+        }
+
+        // Once "MAJ" columns are chosen they alone decide whether two rows
+        // are the same lead: the sheet's own "id" column is only used as the
+        // key when nothing is selected.
+        $idNames = [];
+        if (empty($majSlugs)) {
+            foreach ($headers as $header) {
+                if (ImportHeaderAliases::normalize($header) === 'id') {
+                    $idNames = ['id'];
+                }
+            }
         }
 
         // No "MAJ" column chosen: the importer falls back on email / phones.

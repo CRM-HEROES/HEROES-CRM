@@ -498,6 +498,11 @@ export default {
                             icon: "fa-times",
                         },
                         {
+                            key: "agenda",
+                            name: "Voir les agendas des autres utilisateurs",
+                            icon: "fa-calendar icon-purple",
+                        },
+                        {
                             key: "commission",
                             name: "Gérer les commission d'un utilisateur",
                             icon: "fa-money",
