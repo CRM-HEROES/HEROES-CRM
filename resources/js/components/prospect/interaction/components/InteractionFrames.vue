@@ -1,5 +1,5 @@
 <template>
-    <frame-layout :count="6" :tab="frameTab" class="hc-flex-1">
+    <frame-layout :count="7" :tab="frameTab" class="hc-flex-1">
         <template #1 v-if="interactionProspect">
             <aircall-frame
                 :interaction="interaction"
@@ -59,6 +59,19 @@
         <template #6 v-if="interactionProspect">
             <cloudtalk-frame @back="$emit('back-cloudtalk')" />
         </template>
+
+        <template #7 v-if="interactionProspect">
+            <kavkom-frame
+                :number="interaction.number"
+                :project-id="projectId"
+                :ready="kavkomReady"
+                :calling="callingKavkom"
+                :message="kavkomMessage"
+                :success="kavkomSuccess"
+                @back="$emit('back')"
+                @call="$emit('call-kavkom')"
+            />
+        </template>
     </frame-layout>
 </template>
 
@@ -68,6 +81,7 @@ import AircallFrame from "./AircallFrame.vue";
 import RingoverFrame from "./RingoverFrame.vue";
 import PhoneNumberForm from "./PhoneNumberForm.vue";
 import CloudtalkFrame from "./CloudtalkFrame.vue";
+import KavkomFrame from "./KavkomFrame.vue";
 
 export default {
     components: {
@@ -76,6 +90,7 @@ export default {
         RingoverFrame,
         PhoneNumberForm,
         CloudtalkFrame,
+        KavkomFrame,
     },
 
     props: {
@@ -128,6 +143,31 @@ export default {
             type: Boolean,
             default: false,
         },
+
+        projectId: {
+            type: [Number, String],
+            default: null,
+        },
+
+        kavkomReady: {
+            type: Boolean,
+            default: false,
+        },
+
+        callingKavkom: {
+            type: Boolean,
+            default: false,
+        },
+
+        kavkomMessage: {
+            type: String,
+            default: "",
+        },
+
+        kavkomSuccess: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     emits: [
@@ -144,6 +184,7 @@ export default {
         "update:phoneNumber",
         "update:mobilePhoneNumber",
         "back-cloudtalk",
+        "call-kavkom",
     ],
 };
 </script>

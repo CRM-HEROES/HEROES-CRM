@@ -446,6 +446,7 @@
             "call_by_aircall": "Call by Aircall",
             "call_by_ringover": "Call by Ringover",
             "call_by_cloudtalk": "Call by CloudTalk",
+            "call_by_kavkom": "Call by Kavkom",
             "history": "History"
         },
         "message": {
