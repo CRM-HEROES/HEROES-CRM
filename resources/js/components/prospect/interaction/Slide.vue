@@ -53,6 +53,9 @@
                 @answered-call="cloudtalkCallAnswered"
                 @contact-info="cloudtalkCallContactInfo"
                 @create-prospect="createCloudtalkProspect"
+                @context-panel-visible="
+                    cloudtalkContextPanelVisible = $event
+                "
             />
 
             <tab-layout :count="2" :tab="tab" class="hc-flex-1">
@@ -123,6 +126,8 @@
 }
 
 .hc-prospect-interaction-cloudtalk-panel {
+    --cloudtalk-phone-width: 440px;
+    --cloudtalk-context-width: 320px;
     position: absolute;
     top: 42px;
     right: 0;
@@ -136,6 +141,17 @@
     visibility: hidden;
 }
 
+.hc-prospect-interaction-cloudtalk-panel.with-context {
+    right: auto;
+    width: var(--cloudtalk-phone-width);
+}
+
+.hc-prospect-interaction-cloudtalk-panel.context-open {
+    width: calc(
+        var(--cloudtalk-phone-width) + var(--cloudtalk-context-width)
+    );
+}
+
 .hc-prospect-interaction-cloudtalk-panel.visible {
     opacity: 1;
     pointer-events: auto;
@@ -143,13 +159,48 @@
 }
 
 .hc-prospect-interaction-cloudtalk-phone {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+}
+
+.hc-prospect-interaction-cloudtalk-panel.with-context
+    .hc-prospect-interaction-cloudtalk-phone {
+    flex: 0 0 var(--cloudtalk-phone-width);
+    width: var(--cloudtalk-phone-width);
+}
+
+.hc-prospect-interaction-cloudtalk-context-toggle {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 42px;
+    padding: 0;
+    border: 1px solid #dddddd;
+    border-right: 0;
+    border-radius: 4px 0 0 4px;
+    background: #ffffff;
+    color: #555555;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.hc-prospect-interaction-cloudtalk-context-toggle:hover {
+    background: #f5f5f5;
+}
+
+.hc-prospect-interaction-cloudtalk-panel.context-open
+    .hc-prospect-interaction-cloudtalk-context-toggle {
+    right: var(--cloudtalk-context-width);
 }
 
 .hc-prospect-interaction-cloudtalk-context {
     display: flex;
-    flex: 0 0 320px;
+    flex: 0 0 var(--cloudtalk-context-width);
     flex-direction: column;
     gap: 14px;
     height: 100%;
@@ -388,6 +439,7 @@ export default {
             cloudtalkWaitingForEvent: false,
             cloudtalkLoginRequired: false,
             cloudtalkPhoneVisible: false,
+            cloudtalkContextPanelVisible: false,
             cloudtalkEventTimeout: null,
             cloudtalkCreatingProspect: false,
             cloudtalkLookup: {
@@ -658,6 +710,7 @@ export default {
             }
 
             this.cloudtalkPhoneVisible = false;
+            this.cloudtalkContextPanelVisible = false;
             this.cloudtalkWaitingForEvent = false;
             this.cloudtalkLoginRequired = false;
             this.clearCloudtalkEventTimeout();
@@ -761,7 +814,7 @@ export default {
 
             try {
                 const prospect = await store.dispatch(ADD_PROSPECT, {
-                    phone_number: number,
+                    mobile_phone_number: number,
                 });
 
                 this.setActiveInteractionProspect(prospect);
@@ -1505,8 +1558,15 @@ export default {
         },
 
         slideWidth() {
-            if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallContextVisible) {
-                return "760px";
+            if (this.cloudtalkPhoneDisplayed) {
+                if (
+                    this.cloudtalkCallContextVisible &&
+                    this.cloudtalkContextPanelVisible
+                ) {
+                    return "720px";
+                }
+
+                return "400px";
             }
 
             if (this.tab == 1 && this.frameTab == 0) {

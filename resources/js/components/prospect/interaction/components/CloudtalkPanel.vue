@@ -5,6 +5,7 @@
             {
                 visible: displayed,
                 'with-context': contextVisible,
+                'context-open': contextVisible && contextPanelVisible,
             },
         ]"
     >
@@ -14,18 +15,34 @@
             :number="number"
             :calling="calling"
             :loading="loading"
-            @make-call="$emit('make-call')"
-            @call-activity="$emit('call-activity', $event)"
-            @ringing-call="$emit('ringing-call', $event)"
-            @outgoing-call="$emit('outgoing-call', $event)"
-            @call-ended="$emit('call-ended', $event)"
-            @hangup-call="$emit('hangup-call', $event)"
-            @answered-call="$emit('answered-call', $event)"
-            @contact-info="$emit('contact-info', $event)"
+            @make-call="emitPanelEvent('make-call')"
+            @call-activity="emitPanelEvent('call-activity', $event)"
+            @ringing-call="emitPanelEvent('ringing-call', $event)"
+            @outgoing-call="emitPanelEvent('outgoing-call', $event)"
+            @call-ended="emitPanelEvent('call-ended', $event)"
+            @hangup-call="emitPanelEvent('hangup-call', $event)"
+            @answered-call="emitPanelEvent('answered-call', $event)"
+            @contact-info="emitPanelEvent('contact-info', $event)"
         />
+
+        <button
+            v-if="contextVisible"
+            type="button"
+            class="hc-prospect-interaction-cloudtalk-context-toggle"
+            :aria-expanded="contextPanelVisible ? 'true' : 'false'"
+            :title="
+                contextPanelVisible
+                    ? 'Masquer le contexte'
+                    : 'Afficher le contexte'
+            "
+            @click="toggleContextPanel"
+        >
+            <icon class="fa fa-caret-right" />
+        </button>
 
         <aside
             v-if="contextVisible"
+            v-show="contextPanelVisible"
             class="hc-prospect-interaction-cloudtalk-context"
         >
             <div
@@ -90,7 +107,7 @@
                         type="button"
                         class="hc-prospect-interaction-cloudtalk-context-button"
                         :disabled="creatingProspect"
-                        @click="$emit('create-prospect')"
+                        @click="emitPanelEvent('create-prospect')"
                     >
                         <icon class="fa fa-plus" />
                         <span v-text="'Creer un prospect avec ce numero'"></span>
@@ -217,7 +234,7 @@
                         type="button"
                         class="hc-prospect-interaction-cloudtalk-context-button"
                         :disabled="creatingProspect"
-                        @click="$emit('create-prospect')"
+                        @click="emitPanelEvent('create-prospect')"
                     >
                         <icon class="fa fa-plus" />
                         <span v-text="'Creer un prospect avec ce numero'"></span>
@@ -319,6 +336,12 @@ export default {
         },
     },
 
+    data() {
+        return {
+            contextPanelVisible: false,
+        };
+    },
+
     computed: {
         contextNumber() {
             return this.lookupNumber || this.number;
@@ -360,7 +383,53 @@ export default {
         },
     },
 
+    watch: {
+        contextVisible(value) {
+            if (!value) {
+                this.closeContextPanel();
+            }
+        },
+
+        displayed(value) {
+            if (!value) {
+                this.closeContextPanel();
+            }
+        },
+
+        lookupNumber() {
+            this.closeContextPanel();
+        },
+
+        number() {
+            this.closeContextPanel();
+        },
+    },
+
     methods: {
+        toggleContextPanel() {
+            this.setContextPanelVisible(!this.contextPanelVisible);
+        },
+
+        closeContextPanel() {
+            this.setContextPanelVisible(false);
+        },
+
+        setContextPanelVisible(visible) {
+            const nextValue = this.contextVisible && visible;
+
+            if (this.contextPanelVisible == nextValue) {
+                return;
+            }
+
+            this.contextPanelVisible = nextValue;
+            this.$emit("context-panel-visible", nextValue);
+        },
+
+        emitPanelEvent(eventName, payload) {
+            this.closeContextPanel();
+            this.$emit(eventName, payload);
+        },
+
         normalizePhone(number) {
             return String(number || "").replace(/\D+/g, "");
         },
@@ -376,6 +445,7 @@ export default {
         "answered-call",
         "contact-info",
         "create-prospect",
+        "context-panel-visible",
     ],
 };
 </script>
