@@ -135,6 +135,24 @@
                     </div>
                     <icon class="fa fa-caret-right" />
                 </item>
+
+                <!-- Kavkom -->
+                <item
+                    class="hc-prospect-interaction-item"
+                    @click="$emit('call-kavkom', number)"
+                >
+                    <icon class="fa fa-phone" color="#8e24aa" />
+                    <div class="hc-item-main-content hc-flex-column">
+                        <span
+                            v-text="$t('prospect.interaction.call_by_kavkom')"
+                        ></span>
+                        <span
+                            class="hc-prospect-interaction-item-number"
+                            v-text="number"
+                        ></span>
+                    </div>
+                    <icon class="fa fa-caret-right" />
+                </item>
             </template>
 
             <!-- Add history -->
@@ -211,6 +229,7 @@ export default {
         "call-aircall",
         "call-ringover",
         "call-cloudtalk",
+        "call-kavkom",
         "add-history",
     ],
 };

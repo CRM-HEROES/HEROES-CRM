@@ -71,6 +71,7 @@
                         @call-aircall="interactionViaAircall"
                         @call-ringover="interactionViaRingover"
                         @call-cloudtalk="interactionViaCloudtalk"
+                        @call-kavkom="interactionViaKavkom"
                         @add-history="addHistory"
                     />
                 </template>
@@ -101,6 +102,12 @@
                             updateProspectMobilePhoneNumber
                         "
                         @back-cloudtalk="backFromCloudtalk"
+                        :project-id="project.id"
+                        :kavkom-ready="kavkomReady"
+                        :calling-kavkom="callingViaKavkom"
+                        :kavkom-message="kavkomCallMessage"
+                        :kavkom-success="kavkomCallSuccess"
+                        @call-kavkom="triggerKavkomCall(interaction.number)"
                     />
                 </template>
             </tab-layout>
@@ -384,6 +391,9 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import ApiService from "@/apis/api.service";
+import EventBus from "@/utils/event-bus";
+import kavkomPhone, { KAVKOM_EVENTS } from "@/utils/kavkom-phone";
 import ProspectService from "@/apis/project/prospect";
 import ProspectInteractionService from "@/apis/project/prospect/interaction";
 
@@ -451,17 +461,29 @@ export default {
             cloudtalkLookupLoading: false,
             cloudtalkLookupRequest: 0,
             cloudtalkHistoryTimeouts: [],
+            callingViaKavkom: false,
+            kavkomCallMessage: "",
+            kavkomCallSuccess: false,
+            kavkomCallState: "idle",
+            kavkomCallUuid: null,
+            // Ready once registered in SIP: the softphone can then
+            // auto-answer the agent leg sent by the PBX.
+            kavkomReady: kavkomPhone.state.status === "registered",
+            // Number to call as soon as the softphone becomes ready.
+            pendingKavkomNumber: "",
         };
     },
 
     created() {
         store.commit(SET_PROSPECT_INTERACTION_TAB, 0);
         store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+        this.subscribeKavkomEvents();
     },
 
     beforeUnmount() {
         this.clearCloudtalkEventTimeout();
         this.clearCloudtalkHistoryTimeout();
+        this.unsubscribeKavkomEvents();
     },
 
     methods: {
@@ -531,6 +553,193 @@ export default {
             this.interaction.source = "ringover";
             this.interaction.number = number;
             this.addInteraction();
+        },
+
+        async interactionViaKavkom(number) {
+            this.tab = 1;
+            this.frameTab = 6;
+            this.interaction = this.newInteraction();
+            this.interaction.source = "kavkom";
+            this.interaction.number = number;
+            this.kavkomCallMessage = "";
+            this.kavkomCallState = "idle";
+            this.kavkomReady = kavkomPhone.state.status === "registered";
+
+            // SIP events can arrive within milliseconds: persist the
+            // interaction first so they never update a stale record.
+            try {
+                await this.addInteraction();
+            } catch (error) {
+                this.kavkomCallMessage =
+                    "Impossible de créer l'interaction CRM avant l'appel.";
+                this.kavkomCallSuccess = false;
+                return;
+            }
+
+            this.triggerKavkomCall(number);
+        },
+
+        /**
+         * Click-to-call through the Kavkom REST API (KavkomController::call):
+         * the PBX first calls the agent's softphone (auto-answered), then
+         * bridges it to the prospect's number.
+         */
+        async triggerKavkomCall(number) {
+            if (!number || this.callingViaKavkom) {
+                return;
+            }
+
+            if (!this.kavkomReady) {
+                this.pendingKavkomNumber = number;
+                this.kavkomCallMessage = "Connexion du softphone Kavkom…";
+                this.kavkomCallSuccess = false;
+                return;
+            }
+
+            this.callingViaKavkom = true;
+            this.kavkomCallMessage = "";
+            this.kavkomCallState = "requesting";
+
+            // The agent leg can arrive before the REST response: the
+            // softphone must accept it immediately.
+            kavkomPhone.expectAgentLeg();
+
+            try {
+                const { data } = await ApiService.post("settings/kavkom/call", {
+                    destination: number,
+                    prospect_id: this.interactionProspect?.id,
+                    project_id: this.project?.id,
+                });
+
+                if (!data.success) {
+                    kavkomPhone.forgetAgentLeg();
+                    this.kavkomCallMessage =
+                        data.message || "Impossible de lancer l'appel Kavkom.";
+                    this.kavkomCallSuccess = false;
+                    this.kavkomCallState = "failed";
+                    return;
+                }
+
+                this.kavkomCallUuid = data.call_uuid || null;
+
+                // Never overwrite a newer SIP state with this
+                // asynchronous acknowledgement.
+                if (this.kavkomCallState === "requesting") {
+                    this.kavkomCallMessage =
+                        "Demande envoyée à Kavkom. Acceptez l'appel entrant pour être mis en relation avec le prospect.";
+                    this.kavkomCallSuccess = true;
+                    this.kavkomCallState = "requested";
+                }
+            } catch (error) {
+                kavkomPhone.forgetAgentLeg();
+
+                if (this.kavkomCallState === "requesting") {
+                    this.kavkomCallMessage =
+                        error.response?.data?.message ||
+                        "Kavkom n'a pas confirmé la demande à temps.";
+                    this.kavkomCallSuccess = false;
+                    this.kavkomCallState = "failed";
+                }
+            } finally {
+                this.callingViaKavkom = false;
+            }
+        },
+
+        subscribeKavkomEvents() {
+            EventBus.on(KAVKOM_EVENTS.READY, this.onKavkomReady);
+            EventBus.on(KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
+            EventBus.on(KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
+            EventBus.on(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+            EventBus.on(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+            EventBus.on(
+                KAVKOM_EVENTS.CONNECTION_ERROR,
+                this.onKavkomConnectionError
+            );
+        },
+
+        unsubscribeKavkomEvents() {
+            EventBus.off(KAVKOM_EVENTS.READY, this.onKavkomReady);
+            EventBus.off(KAVKOM_EVENTS.INCOMING_CALL, this.onKavkomIncomingCall);
+            EventBus.off(KAVKOM_EVENTS.CALL_ANSWERED, this.onKavkomCallAnswered);
+            EventBus.off(KAVKOM_EVENTS.CALL_HANGUP, this.onKavkomCallHangup);
+            EventBus.off(KAVKOM_EVENTS.CALL_FAILED, this.onKavkomCallFailed);
+            EventBus.off(
+                KAVKOM_EVENTS.CONNECTION_ERROR,
+                this.onKavkomConnectionError
+            );
+        },
+
+        // Only react to the events of a Kavkom call started from this slide.
+        isKavkomInteraction() {
+            return this.interaction.source == "kavkom" && !!this.interaction.id;
+        },
+
+        onKavkomReady() {
+            this.kavkomReady = true;
+
+            if (this.pendingKavkomNumber) {
+                const number = this.pendingKavkomNumber;
+                this.pendingKavkomNumber = "";
+                this.triggerKavkomCall(number);
+            }
+        },
+
+        onKavkomIncomingCall({ direction } = {}) {
+            if (direction === "inbound" || !this.isKavkomInteraction()) {
+                return;
+            }
+
+            this.interaction.status = "ringing";
+            this.updateInteraction();
+            this.kavkomCallState = "ringing";
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Connexion automatique de votre poste Kavkom…";
+        },
+
+        onKavkomCallAnswered({ direction } = {}) {
+            if (direction === "inbound" || !this.isKavkomInteraction()) {
+                return;
+            }
+
+            this.interaction.status = "answered";
+            this.updateInteraction();
+            this.kavkomCallState = "active";
+            this.kavkomCallSuccess = true;
+            this.kavkomCallMessage = "Appel Kavkom en cours.";
+        },
+
+        onKavkomConnectionError(message) {
+            this.kavkomReady = false;
+            this.callingViaKavkom = false;
+            this.kavkomCallState = "failed";
+            this.kavkomCallSuccess = false;
+            this.kavkomCallMessage = message;
+        },
+
+        onKavkomCallFailed({ message, direction } = {}) {
+            if (direction === "inbound") {
+                return;
+            }
+
+            this.callingViaKavkom = false;
+            this.kavkomCallState = "failed";
+            this.kavkomCallSuccess = false;
+            this.kavkomCallMessage = message;
+        },
+
+        onKavkomCallHangup({ durationMs = null, direction = null } = {}) {
+            if (direction === "inbound" || !this.isKavkomInteraction()) {
+                return;
+            }
+
+            this.interaction.status = "hangup";
+            this.updateInteraction();
+            this.callingViaKavkom = false;
+            this.kavkomCallSuccess = !(durationMs !== null && durationMs < 5000);
+            this.kavkomCallState = this.kavkomCallSuccess ? "completed" : "failed";
+            this.kavkomCallMessage = this.kavkomCallSuccess
+                ? "Appel terminé."
+                : "Kavkom a fermé l'appel avant la mise en relation.";
         },
 
         async interactionViaCloudtalk(number) {

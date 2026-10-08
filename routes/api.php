@@ -57,6 +57,7 @@ use App\Http\Controllers\API\Project\Import\LabelController as ProjectImportLabe
 use App\Http\Controllers\API\Project\Import\MappingController as ProjectImportMappingController;
 use App\Http\Controllers\API\Project\Import\UserController as ProjectImportUserController;
 
+use App\Http\Controllers\API\KavkomController;
 use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
 use App\Http\Controllers\API\Project\LineController as ProjectLineController;
 use App\Http\Controllers\API\Project\Line\CloudTalkController as ProjectLineCloudTalkController;
@@ -218,6 +219,14 @@ Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->na
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+
+    // Kavkom
+    Route::post('/settings/kavkom/test', [KavkomController::class, 'test'])->name('settings.kavkom.test');
+    Route::post('/settings/kavkom/call', [KavkomController::class, 'call'])->name('settings.kavkom.call');
+    Route::get('/settings/kavkom/call/{callUuid}/status', [KavkomController::class, 'callStatus'])->name('settings.kavkom.call.status');
+    Route::get('/settings/kavkom/credentials', [KavkomController::class, 'credentials'])->name('settings.kavkom.credentials');
+    Route::post('/settings/kavkom/incoming', [KavkomController::class, 'incoming'])->name('settings.kavkom.incoming');
+    Route::post('/settings/kavkom/test-full', [KavkomController::class, 'testFull'])->name('settings.kavkom.test-full');
 
     // Authenticated user
     Route::get('/auth', function (Request $request) {
