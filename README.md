@@ -79,6 +79,12 @@ npm run watch
 php artisan serve
 ```
 
+### Ou lancer le serveur de développement avec Docker
+
+```sh
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+```
+
 ## Compilation pour la production
 
 Pour compiler l'application en mode production :
