@@ -2609,6 +2609,9 @@ __webpack_require__.r(__webpack_exports__);
       if (this.item.source == "mtarget") {
         return "MTarget";
       }
+      if (this.item.source == "cloudtalk") {
+        return "CloudTalk";
+      }
       return this.item.source;
     }
   }

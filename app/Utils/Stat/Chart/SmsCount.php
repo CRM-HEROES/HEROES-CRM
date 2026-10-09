@@ -43,6 +43,10 @@ class SmsCount implements StatChart
                     'ringover' => [
                         'name' => "Ringover",
                         'bgcolor' => "rgb(0, 201, 76)"
+                    ],
+                    'cloudtalk' => [
+                        'name' => "CloudTalk",
+                        'bgcolor' => "rgb(31, 111, 235)"
                     ]
                 ];
 

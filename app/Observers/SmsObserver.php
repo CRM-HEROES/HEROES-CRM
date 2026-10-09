@@ -46,6 +46,10 @@ class SmsObserver
             case 'brevo':
                 $this->sendByBrevo($sms);
                 break;
+
+            case 'cloudtalk':
+                $this->sendByCloudTalk($sms);
+                break;
     
             case 'ringover':
             case 'whatsapp':
@@ -113,6 +117,29 @@ class SmsObserver
         }
 
         $sms->prospect->notify(new \App\Notifications\Brevo($sms));
+    }
+
+    /**
+     * Send CloudTalk sms
+     */
+    protected function sendByCloudTalk(Sms $sms): void
+    {
+        $line = $sms
+            ->prospect
+            ->project
+            ->lines()
+            ->where('operator', 'cloudtalk')
+            ->where('user_id', $sms->creator_id)
+            ->get()
+            ->first(fn ($line) => !empty($line->numero));
+
+        if (!$line) {
+            $sms->update(['error' => "CloudTalk: Aucune ligne CloudTalk SMS affectee a cet agent."]);
+            \ProjectLog::error($sms->prospect->project, "CloudTalk: Aucune ligne CloudTalk SMS affectee a cet agent.");
+            return;
+        }
+
+        $sms->prospect->notify(new \App\Notifications\CloudTalk($sms));
     }
     
     /**

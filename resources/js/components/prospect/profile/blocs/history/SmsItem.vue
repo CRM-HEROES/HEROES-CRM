@@ -67,6 +67,10 @@ export default {
                 return "MTarget";
             }
 
+            if (this.item.source == "cloudtalk") {
+                return "CloudTalk";
+            }
+
             return this.item.source;
         },
     },

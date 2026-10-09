@@ -448,6 +448,10 @@ class StatController extends Controller
                 'name' => "Brevo",
                 'color' => "rgb(11, 153, 108)"
             ],
+            'cloudtalk' => [
+                'name' => "CloudTalk",
+                'color' => "rgb(31, 111, 235)"
+            ],
             'telephone' => [
                 'name' => "Téléphone",
                 'color' => "rgb(255, 79, 55)"

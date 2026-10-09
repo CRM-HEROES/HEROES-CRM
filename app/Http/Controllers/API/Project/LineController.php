@@ -38,9 +38,13 @@ class LineController extends Controller
     {
         return $project
             ->lines()
-            ->select('id', 'project_id', 'name', 'operator', 'user_id')
+            ->select('id', 'project_id', 'name', 'operator', 'user_id', 'config')
             ->orderBy('name')
-            ->get();
+            ->get()
+            ->each(function (Line $line) {
+                $line->setAttribute('numero', $line->numero);
+                $line->makeHidden('config');
+            });
     }
 
     /**

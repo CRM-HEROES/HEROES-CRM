@@ -264,6 +264,10 @@ export default {
                     key: "mtarget",
                     name: "MTarget",
                 },
+                {
+                    key: "cloudtalk",
+                    name: "CloudTalk",
+                },
             ],
             exclude: false,
             fetchingUsers: false,

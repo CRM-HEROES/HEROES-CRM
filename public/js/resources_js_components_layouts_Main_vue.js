@@ -14275,6 +14275,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     fieldDisabled: function fieldDisabled(field) {
       return this.operator === "cloudtalk" && field.key === "agent_id" && (!this.cloudtalkCredentialsReady || this.fetchingCloudtalkAgents || this.cloudtalkAgents.length === 0);
     },
+    fieldRequired: function fieldRequired(field) {
+      return field.required !== false;
+    },
     fieldOptions: function fieldOptions(field) {
       if (this.operator === "cloudtalk" && field.key === "agent_id") {
         return this.cloudtalkAgents.map(function (agent) {
@@ -28956,6 +28959,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }, {
         key: "mtarget",
         name: "MTarget"
+      }, {
+        key: "cloudtalk",
+        name: "CloudTalk"
       }],
       exclude: false,
       fetchingUsers: false
@@ -37872,7 +37878,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "prospect", "prospectsSelected", "prospectFullName", "prospectSms", "slideOpen", "smsTemplates", "can"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "prospect", "prospectsSelected", "prospectFullName", "prospectSms", "slideOpen", "smsTemplates", "lines", "can"])), {}, {
     /**
      *
      */
@@ -37918,6 +37924,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      */
     smss: function smss() {
       return this.prospect ? this.prospectSms : this.bulkSms;
+    },
+    cloudtalkSmsLine: function cloudtalkSmsLine() {
+      var _this8 = this;
+      return this.lines.find(function (line) {
+        return line.operator === "cloudtalk" && _this8.user && line.user_id == _this8.user.id && line.numero;
+      });
     }
   })
 });
@@ -64884,7 +64896,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "width": "40px !important",
       "height": "40px !important"
     }
-  }, null, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("header-menu\r\n            tag=\"a\"\r\n            icon=\"fa fa-power-off\"\r\n            @click.prevent=\"logout\"\r\n            style=\"width: 40px !important\"\r\n        /")], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("header-menu\n            tag=\"a\"\n            icon=\"fa fa-power-off\"\n            @click.prevent=\"logout\"\n            style=\"width: 40px !important\"\n        /")], 2 /* CLASS */);
 }
 
 /***/ }),
@@ -66900,7 +66912,7 @@ var _hoisted_2 = {
 };
 var _hoisted_3 = ["disabled"];
 var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["onUpdate:modelValue", "disabled"];
+var _hoisted_5 = ["onUpdate:modelValue", "disabled", "required"];
 var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   disabled: ""
@@ -66912,7 +66924,7 @@ var _hoisted_8 = {
 };
 var _hoisted_9 = ["textContent"];
 var _hoisted_10 = ["title", "onClick"];
-var _hoisted_11 = ["type", "placeholder", "onUpdate:modelValue"];
+var _hoisted_11 = ["type", "placeholder", "onUpdate:modelValue", "required"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
@@ -66921,7 +66933,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_v_field, {
       key: field.key,
       label: field.label,
-      required: ""
+      required: $options.fieldRequired(field)
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
         var label = _ref.label;
@@ -66942,7 +66954,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             return $props.config[field.key] = $event;
           },
           disabled: $options.fieldDisabled(field),
-          required: ""
+          required: $options.fieldRequired(field)
         }, [_hoisted_6, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.fieldOptions(field), function (option) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             key: option.value,
@@ -66968,11 +66980,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "onUpdate:modelValue": function onUpdateModelValue($event) {
             return $props.config[field.key] = $event;
           },
-          required: ""
+          required: $options.fieldRequired(field)
         }, null, 8 /* PROPS */, _hoisted_11)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $props.config[field.key]]])];
       }),
       _: 2 /* DYNAMIC */
-    }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["label"]);
+    }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["label", "required"]);
   }), 128 /* KEYED_FRAGMENT */)), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
     key: 0,
     config: $props.config
@@ -86284,7 +86296,16 @@ var _hoisted_5 = {
 };
 var _hoisted_6 = ["textContent"];
 var _hoisted_7 = ["textContent"];
-var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  src: "/images/partenaire-ext/cloudtalk.png",
+  alt: "CloudTalk"
+}, null, -1 /* HOISTED */);
+var _hoisted_9 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = ["textContent"];
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 50 40"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   style: {
@@ -86307,12 +86328,12 @@ var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   },
   d: "M31.9,11.8L31.9,11.8c-0.8,0-1.4-0.6-1.4-1.4V5.3c0-0.8,0.6-1.4,1.4-1.4h0c0.8,0,1.4,0.6,1.4,1.4v5.2 C33.3,11.2,32.7,11.8,31.9,11.8z"
 })], -1 /* HOISTED */);
-var _hoisted_9 = {
+var _hoisted_13 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_10 = ["textContent"];
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_14 = ["textContent"];
+var _hoisted_15 = ["textContent"];
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 40 40"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   d: "M9.9,16.9c1.3-4.3,5.3-7.4,10.1-7.4s8.7,3.1,10.1,7.4h9.7C38.2,7.3,30,0,20,0S1.8,7.3,0.3,16.9H9.9z",
@@ -86325,12 +86346,12 @@ var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
     "fill": "rgb(85, 195, 192)"
   }
 })], -1 /* HOISTED */);
-var _hoisted_13 = {
+var _hoisted_17 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 50 50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   style: {
@@ -86348,12 +86369,12 @@ var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   },
   d: "M35.1,6l2.6-2.6c0.4-0.4,0.9-0.6,1.5-0.6h10v42l-2.6,2.6c-0.4,0.4-0.9,0.6-1.5,0.6h-10V6z"
 })], -1 /* HOISTED */);
-var _hoisted_17 = {
+var _hoisted_21 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 50 50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   style: {
@@ -86361,12 +86382,12 @@ var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   },
   d: "M9.4,47c0-11.9,0-23.9,0.1-35.8c2.9,11.9,5.8,23.9,8.7,35.8h14.3c2.9-11.9,5.8-23.8,8.7-35.7 c0.1,11.9,0.1,23.8,0.1,35.7H50c0-14.8,0-29.7,0-44.5c-5,0-10.1,0-15.1,0.1c-3.2,13-6.3,26-9.5,39c-3.3-13-6.5-26-9.6-39.1 c-5,0-10,0-15.1,0c0,14.8,0,29.7,0,44.5H9.4z"
 })], -1 /* HOISTED */);
-var _hoisted_21 = {
+var _hoisted_25 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 50 50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
   x: "2",
@@ -86390,22 +86411,22 @@ var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
     "fill": "#ffffff"
   }
 })], -1 /* HOISTED */);
-var _hoisted_25 = {
+var _hoisted_29 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = {
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = ["textContent"];
+var _hoisted_32 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = {
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = {
   id: "hc-prospect-sms-selected-prospects-list"
 };
-var _hoisted_31 = {
+var _hoisted_35 = {
   style: {
     "display": "flex",
     "flex-direction": "column",
@@ -86414,7 +86435,7 @@ var _hoisted_31 = {
     "position": "relative"
   }
 };
-var _hoisted_32 = {
+var _hoisted_36 = {
   style: {
     "display": "flex",
     "flex-direction": "column",
@@ -86430,23 +86451,23 @@ var _hoisted_32 = {
   },
   ref: "sms"
 };
-var _hoisted_33 = ["placeholder"];
-var _hoisted_34 = {
+var _hoisted_37 = ["placeholder"];
+var _hoisted_38 = {
   "class": "hc-flex-row"
 };
-var _hoisted_35 = ["textContent"];
-var _hoisted_36 = {
+var _hoisted_39 = ["textContent"];
+var _hoisted_40 = {
   "class": "hc-flex-column"
 };
-var _hoisted_37 = ["textContent"];
-var _hoisted_38 = {
+var _hoisted_41 = ["textContent"];
+var _hoisted_42 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_39 = ["textContent"];
-var _hoisted_40 = ["textContent"];
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -86465,7 +86486,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[19] || (_cache[19] = function ($event) {
+    onOpen: _cache[20] || (_cache[20] = function ($event) {
       return $options.fetchSms(), $options.fetchSelectedProspects();
     }),
     title: _ctx.prospectsSelected.length > 0 ? _ctx.$t('prospect.sms.bulk_title', {
@@ -86539,34 +86560,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, null, 8 /* PROPS */, _hoisted_7)])];
                 }),
                 _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SMSBOX "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              }, 8 /* PROPS */, ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" CloudTalk "), _ctx.can('all.prospect.sms.add') && $options.cloudtalkSmsLine ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 2,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[0] || (_cache[0] = function ($event) {
-                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'smsbox';
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'cloudtalk';
                 })
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    "class": "hc-prospect-sms-cloudtalk-logo"
+                  }, {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [_hoisted_8];
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_smsbox'))
-                  }, null, 8 /* PROPS */, _hoisted_10), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-                    key: 0,
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_cloudtalk'))
+                  }, null, 8 /* PROPS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                     "class": "hc-prospect-sms-item-number",
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospect.mobile_phone_number)
-                  }, null, 8 /* PROPS */, _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkSmsLine.numero)
+                  }, null, 8 /* PROPS */, _hoisted_11)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), _ctx.can('all.prospect.sms.add') && _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 2,
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SMSBOX "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[1] || (_cache[1] = function ($event) {
-                  return $data.tab = 1, $data.frameTab = 1, $data.sms.source = 'ringover';
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'smsbox';
                 })
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -86576,20 +86598,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_ringover'))
-                  }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_smsbox'))
+                  }, null, 8 /* PROPS */, _hoisted_14), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+                    key: 0,
                     "class": "hc-prospect-sms-item-number",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospect.mobile_phone_number)
-                  }, null, 8 /* PROPS */, _hoisted_15)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_15)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" UltraMsg "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), _ctx.can('all.prospect.sms.add') && _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
                 key: 3,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[2] || (_cache[2] = function ($event) {
-                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'ultramsg';
+                  return $data.tab = 1, $data.frameTab = 1, $data.sms.source = 'ringover';
                 })
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -86599,20 +86622,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_ultramsg'))
-                  }, null, 8 /* PROPS */, _hoisted_18), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-                    key: 0,
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_ringover'))
+                  }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                     "class": "hc-prospect-sms-item-number",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospect.mobile_phone_number)
-                  }, null, 8 /* PROPS */, _hoisted_19)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_19)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" UltraMsg "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 4,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[3] || (_cache[3] = function ($event) {
-                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'mtarget';
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'ultramsg';
                 })
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -86622,7 +86645,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_mtarget'))
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_ultramsg'))
                   }, null, 8 /* PROPS */, _hoisted_22), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
                     key: 0,
                     "class": "hc-prospect-sms-item-number",
@@ -86632,11 +86655,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Brevo "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 4,
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[4] || (_cache[4] = function ($event) {
-                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'brevo';
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'mtarget';
                 })
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -86646,12 +86668,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_brevo'))
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_mtarget'))
                   }, null, 8 /* PROPS */, _hoisted_26), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
                     key: 0,
                     "class": "hc-prospect-sms-item-number",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospect.mobile_phone_number)
                   }, null, 8 /* PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                    "class": "fa fa-caret-right"
+                  })];
+                }),
+                _: 1 /* STABLE */
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Brevo "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 5,
+                "class": "hc-prospect-sms-item",
+                onClick: _cache[5] || (_cache[5] = function ($event) {
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'brevo';
+                })
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [_hoisted_28];
+                    }),
+                    _: 1 /* STABLE */
+                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_brevo'))
+                  }, null, 8 /* PROPS */, _hoisted_30), _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+                    key: 0,
+                    "class": "hc-prospect-sms-item-number",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospect.mobile_phone_number)
+                  }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-right"
                   })];
                 }),
@@ -86674,8 +86720,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "class": "hc-flex-1"
               }, {
                 "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Back "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                    onClick: _cache[5] || (_cache[5] = function ($event) {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Back "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                    onClick: _cache[6] || (_cache[6] = function ($event) {
                       return $data.tab = 0;
                     }),
                     "class": "bordered"
@@ -86688,7 +86734,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                           source: $options.source
                         }))
-                      }, null, 8 /* PROPS */, _hoisted_29), $data.sms.source == 'smsbox' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_33), $data.sms.source == 'smsbox' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                         key: 0,
                         tag: "a",
                         "class": "fa fa-cog",
@@ -86714,7 +86760,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Selected prospects "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     id: "hc-prospect-sms-selected-prospects",
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.selectedProspectsFolded ? 'folded' : '')
-                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
+                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_selected_prospect, {
                       key: prospect.id,
                       prospect: prospect,
@@ -86723,7 +86769,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $data.selectedProspectsFolded ? 'fa-caret-down' : 'fa-caret-up']),
-                    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.selectedProspectsFolded = !$data.selectedProspectsFolded;
                     }, ["prevent", "stop"])),
                     size: "30",
@@ -86733,14 +86779,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-plus",
-                    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.selectedProspectsTab = 1;
                     }, ["prevent", "stop"])),
                     size: "30",
                     style: {
                       "min-width": "30px"
                     }
-                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List of SMS "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.smss, function (c) {
+                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List of SMS "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.smss, function (c) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_sms_row, {
                       key: c.id,
                       sms: c
@@ -86749,7 +86795,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     loading: $data.fetchingSms
                   }, null, 8 /* PROPS */, ["loading"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms form "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
                     "class": "hc-flex-column",
-                    onSubmit: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                    onSubmit: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                       return $options.sendSMS && $options.sendSMS.apply($options, arguments);
                     }, ["prevent"])),
                     style: {
@@ -86760,14 +86806,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     ref: "textarea",
                     id: "hc-prospect-sms-textarea",
                     placeholder: _ctx.$t('prospect.sms.enter_text_message'),
-                    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+                    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
                       return $data.sms.message = $event;
                     })
-                  }, null, 8 /* PROPS */, _hoisted_33), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
-                    onClick: _cache[9] || (_cache[9] = function ($event) {
+                    onClick: _cache[10] || (_cache[10] = function ($event) {
                       return $data.showTextEditor = false;
                     })
                   }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Reduire']]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
@@ -86775,7 +86821,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Unfold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-caret-up",
-                    onClick: _cache[10] || (_cache[10] = function ($event) {
+                    onClick: _cache[11] || (_cache[11] = function ($event) {
                       return $data.showTextEditor = true;
                     })
                   }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Agrandir']])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms chars count "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -86785,10 +86831,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       "align-items": "center"
                     },
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.charsCount + '/' + $options.page)
-                  }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
-                    onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.tab = 2;
                     }, ["prevent"]))
                   }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Modèle de SMS']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Send "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -86804,7 +86850,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
                     "search-fields": ['first_name', 'last_name', 'mobile_phone_number'],
-                    onBack: _cache[13] || (_cache[13] = function ($event) {
+                    onBack: _cache[14] || (_cache[14] = function ($event) {
                       return $data.selectedProspectsTab = 0;
                     }),
                     onProspectSelected: $options.addSelectedProspect
@@ -86815,7 +86861,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[15] || (_cache[15] = function ($event) {
+                onBack: _cache[16] || (_cache[16] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setSmsProspect
@@ -86825,8 +86871,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.prospect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[14] || (_cache[14] = function ($event) {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[15] || (_cache[15] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -86839,7 +86885,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                       source: $options.source
                     }))
-                  }, null, 8 /* PROPS */, _hoisted_37)];
+                  }, null, 8 /* PROPS */, _hoisted_41)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
@@ -86858,8 +86904,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[16] || (_cache[16] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[17] || (_cache[17] = function ($event) {
               return $data.tab = 1;
             }),
             "class": "bordered"
@@ -86870,12 +86916,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.templates'))
-              }, null, 8 /* PROPS */, _hoisted_39)];
+              }, null, 8 /* PROPS */, _hoisted_43)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.smsTemplateKeyword,
-            "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+            "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
               return $data.smsTemplateKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -86898,11 +86944,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [_ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
                 key: 0,
-                onClick: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onClick: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.addSmsTemplate && $options.addSmsTemplate.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_40)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })])];
@@ -101100,6 +101146,11 @@ __webpack_require__.r(__webpack_exports__);
     key: "agent_id",
     label: "Agent",
     type: "select"
+  }, {
+    key: "numero",
+    label: "Numéro a utilisé pour le SMS (optionnel)",
+    type: "tel",
+    required: false
   }]
 }, {
   value: "ringover",
@@ -109259,7 +109310,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-main-layout-header {\r\n    display: flex;\r\n    flex-direction: row;\r\n    height: 46px;\r\n    width: 100%;\r\n    background-color: white;\r\n    padding: 3px;\r\n    align-items: center;\n}\n#hc-main-layout-header-menus {\r\n    display: flex;\r\n    flex-direction: row;\r\n    height: 100%;\r\n    gap: 2px;\r\n    align-items: center;\n}\n#hc-main-layout-header-toggle-menus {\r\n    display: none;\n}\n#hc-main-layout-header-close {\r\n    display: none;\n}\n@media (max-width: 767px) {\r\n    /*\r\n    #hc-main-layout-header-menus {\r\n        position: fixed;\r\n        left: 0;\r\n        top: 0;\r\n        height: 100%;\r\n        width: 240px;\r\n        background-color: white;\r\n        z-index: 1000;\r\n        flex-direction: column;\r\n        transform: translateX(-100%);\r\n        transition: all 100ms ease-out;\r\n        padding: 10px;\r\n    }\r\n\r\n    .show-menus #hc-main-layout-header-menus {\r\n        transform: translateX(0);\r\n        box-shadow: 0 0 50px #0003;\r\n    }\r\n\r\n    #hc-main-layout-header-close {\r\n        display: flex;\r\n    }\r\n\r\n    #hc-main-layout-header-toggle-menus {\r\n        display: flex;\r\n    }\r\n\r\n    .hc-header-menu {\r\n        width: 100%;\r\n        display: flex;\r\n    }\r\n\r\n    .hc-header-menu > i,\r\n    .hc-header-menu > svg,\r\n    .hc-header-menu > img {\r\n        width: 36px;\r\n        height: 36px;\r\n        padding: 7px;\r\n        text-align: center;\r\n        line-height: 22px;\r\n    }\r\n\r\n    .hc-header-menu > span {\r\n        opacity: 1;\r\n        visibility: visible;\r\n        position: relative;\r\n        flex: 1;\r\n        padding-left: 5px;\r\n        background: none;\r\n        color: black;\r\n        top: unset;\r\n        left: 0;\r\n        transform: translate(0);\r\n        font-size: 12px;\r\n    }\r\n\r\n    .hc-header-menu:hover > span {\r\n        transform: translateX(0);\r\n    }*/\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-main-layout-header {\n    display: flex;\n    flex-direction: row;\n    height: 46px;\n    width: 100%;\n    background-color: white;\n    padding: 3px;\n    align-items: center;\n}\n#hc-main-layout-header-menus {\n    display: flex;\n    flex-direction: row;\n    height: 100%;\n    gap: 2px;\n    align-items: center;\n}\n#hc-main-layout-header-toggle-menus {\n    display: none;\n}\n#hc-main-layout-header-close {\n    display: none;\n}\n@media (max-width: 767px) {\n    /*\n    #hc-main-layout-header-menus {\n        position: fixed;\n        left: 0;\n        top: 0;\n        height: 100%;\n        width: 240px;\n        background-color: white;\n        z-index: 1000;\n        flex-direction: column;\n        transform: translateX(-100%);\n        transition: all 100ms ease-out;\n        padding: 10px;\n    }\n\n    .show-menus #hc-main-layout-header-menus {\n        transform: translateX(0);\n        box-shadow: 0 0 50px #0003;\n    }\n\n    #hc-main-layout-header-close {\n        display: flex;\n    }\n\n    #hc-main-layout-header-toggle-menus {\n        display: flex;\n    }\n\n    .hc-header-menu {\n        width: 100%;\n        display: flex;\n    }\n\n    .hc-header-menu > i,\n    .hc-header-menu > svg,\n    .hc-header-menu > img {\n        width: 36px;\n        height: 36px;\n        padding: 7px;\n        text-align: center;\n        line-height: 22px;\n    }\n\n    .hc-header-menu > span {\n        opacity: 1;\n        visibility: visible;\n        position: relative;\n        flex: 1;\n        padding-left: 5px;\n        background: none;\n        color: black;\n        top: unset;\n        left: 0;\n        transform: translate(0);\n        font-size: 12px;\n    }\n\n    .hc-header-menu:hover > span {\n        transform: translateX(0);\n    }*/\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -110459,7 +110510,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -110915,7 +110966,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

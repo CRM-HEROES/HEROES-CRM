@@ -18,6 +18,7 @@ export default [
             { key: "api_key_id", label: "Identifiant de la clé API (API Key ID)", type: "text" },
             { key: "api_key_secret", label: "Secret de la clé API (API Key Secret)", type: "text" },
             { key: "agent_id", label: "Agent", type: "select" },
+            { key: "numero", label: "Numéro a utilisé pour le SMS (optionnel)", type: "tel", required: false },
         ],
     },
     {

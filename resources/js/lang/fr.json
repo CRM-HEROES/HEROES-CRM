@@ -514,6 +514,7 @@
             "via_ringover": "SMS via Ringover",
             "via_ultramsg": "SMS via UltraMsg",
             "via_brevo": "SMS via Brevo",
+            "via_cloudtalk": "SMS via CloudTalk",
             "via_source": "SMS via {source}",
             "templates": "Templates SMS",
             "enter_text_message": "Saisir un SMS"

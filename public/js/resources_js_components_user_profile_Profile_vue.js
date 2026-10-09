@@ -11513,7 +11513,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-assignment[data-v-00573f2c] {\r\n    width: 100%;\n}\n.hc-phone-code-assigned[data-v-00573f2c] {\r\n    padding: 5px 10px;\n}\n.hc-phone-code-value[data-v-00573f2c] {\r\n    color: #59665f;\r\n    font-variant-numeric: tabular-nums;\n}\n.hc-phone-code-error[data-v-00573f2c] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-assignment[data-v-00573f2c] {\n    width: 100%;\n}\n.hc-phone-code-assigned[data-v-00573f2c] {\n    padding: 5px 10px;\n}\n.hc-phone-code-value[data-v-00573f2c] {\n    color: #59665f;\n    font-variant-numeric: tabular-nums;\n}\n.hc-phone-code-error[data-v-00573f2c] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

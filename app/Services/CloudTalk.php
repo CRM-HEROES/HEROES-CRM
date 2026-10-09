@@ -12,6 +12,7 @@ class CloudTalk
     protected const AGENTS_URL = 'https://my.cloudtalk.io/api/agents/index.json';
     protected const CALL_HISTORY_URL = 'https://my.cloudtalk.io/api/calls/index.json';
     protected const MAKE_CALL_URL = 'https://my.cloudtalk.io/api/calls/create.json';
+    protected const SEND_SMS_URL = 'https://my.cloudtalk.io/api/sms/send.json';
     protected const RECORDING_URL = 'https://my.cloudtalk.io/api/calls/recording/%s.json';
 
     /**
@@ -107,6 +108,62 @@ class CloudTalk
 
         if (!$response->successful() || $cloudTalkStatus !== 200) {
             $message = data_get($body, 'responseData.message');
+            throw new RuntimeException(
+                $this->messageForStatus($cloudTalkStatus, $message),
+                $cloudTalkStatus ?: $response->status()
+            );
+        }
+
+        return is_array($body) ? $body : [];
+    }
+
+    /**
+     * Send an outbound SMS through the CloudTalk sender number configured
+     * on the agent line.
+     */
+    public function sendSms(Line $line, string $recipient, string $message): array
+    {
+        $config = $line->config ?: [];
+
+        $this->validateCredentials($config);
+
+        $sender = $this->formatSmsNumber((string) data_get($config, 'numero'));
+        $recipient = $this->formatSmsNumber($recipient);
+        $message = trim($message);
+
+        if ($message === '') {
+            throw new RuntimeException('Le message SMS CloudTalk est vide.', 422);
+        }
+
+        try {
+            $response = Http::timeout(30)
+                ->acceptJson()
+                ->asJson()
+                ->withBasicAuth($config['api_key_id'], $config['api_key_secret'])
+                ->post(self::SEND_SMS_URL, [
+                    'recipient' => $recipient,
+                    'sender' => $sender,
+                    'message' => $message,
+                ]);
+        } catch (ConnectionException $e) {
+            throw new RuntimeException("Impossible de joindre l'API CloudTalk.", 503);
+        }
+
+        $body = $response->json();
+        $cloudTalkStatus = (int) data_get($body, 'responseData.status', $response->status());
+        $success = data_get($body, 'responseData.success', data_get($body, 'success', true));
+
+        if (
+            !$response->successful() ||
+            !in_array($cloudTalkStatus, [200, 201], true) ||
+            $success === false ||
+            $success === 'false'
+        ) {
+            $data = data_get($body, 'responseData.data');
+            $message = data_get($body, 'responseData.message')
+                ?: data_get($body, 'responseData.data.message')
+                ?: (is_string($data) ? $data : null);
+
             throw new RuntimeException(
                 $this->messageForStatus($cloudTalkStatus, $message),
                 $cloudTalkStatus ?: $response->status()
@@ -239,6 +296,17 @@ class CloudTalk
         return preg_replace('/\D+/', '', (string) $number);
     }
 
+    protected function formatSmsNumber(string $number): string
+    {
+        $number = preg_replace('/[\s().-]+/', '', trim($number));
+
+        if (!preg_match('/^\+[1-9]\d{1,14}$/', $number)) {
+            throw new RuntimeException('Le numero SMS CloudTalk doit etre au format E.164, par exemple +33612345678.', 406);
+        }
+
+        return $number;
+    }
+
     protected function normalizeCallHistoryItem(array $item): array
     {
         $cdr = data_get($item, 'Cdr', []);
@@ -314,6 +382,7 @@ class CloudTalk
     {
         return match ($status) {
             401 => 'Identifiants API CloudTalk invalides.',
+            402 => 'Credit CloudTalk insuffisant pour envoyer le SMS.',
             403 => 'Agent CloudTalk non connecte.',
             404 => 'Ressource CloudTalk introuvable.',
             406 => 'Donnees CloudTalk invalides. Verifiez le numero E.164 et l agent.',

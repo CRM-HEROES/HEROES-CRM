@@ -267,7 +267,7 @@ class Stat extends Command
         
         $stats[] = new ProjectNewSmsStat($project, null, null);
         $stats[] = new ProjectTotalSmsStat($project, null, null);
-        foreach (['smsbox', 'ultramsg', 'telephone', 'whatsapp', 'ringover'] as $source) {
+        foreach (['smsbox', 'ultramsg', 'telephone', 'whatsapp', 'ringover', 'cloudtalk'] as $source) {
             $stats[] = new ProjectNewSmsStat($project, $source, null);
             $stats[] = new ProjectTotalSmsStat($project, $source, null);
         }

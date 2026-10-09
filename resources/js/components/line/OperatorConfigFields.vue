@@ -4,7 +4,7 @@
             v-for="field in fields"
             :key="field.key"
             :label="field.label"
-            required
+            :required="fieldRequired(field)"
             v-slot="{ label }"
         >
             <div
@@ -33,7 +33,7 @@
                 v-if="field.type === 'select'"
                 v-model="config[field.key]"
                 :disabled="fieldDisabled(field)"
-                required
+                :required="fieldRequired(field)"
             >
                 <option value="" disabled></option>
                 <option
@@ -69,7 +69,7 @@
                 :type="field.type"
                 :placeholder="label + ' ...'"
                 v-model="config[field.key]"
-                required
+                :required="fieldRequired(field)"
             />
         </v-field>
 
@@ -205,6 +205,10 @@ export default {
                     this.fetchingCloudtalkAgents ||
                     this.cloudtalkAgents.length === 0)
             );
+        },
+
+        fieldRequired(field) {
+            return field.required !== false;
         },
 
         fieldOptions(field) {

@@ -87,6 +87,32 @@
                         </div>
                     </item>
 
+                    <!-- CloudTalk -->
+                    <item
+                        v-if="can('all.prospect.sms.add') && cloudtalkSmsLine"
+                        class="hc-prospect-sms-item"
+                        @click="
+                            (tab = 1), (frameTab = 0), (sms.source = 'cloudtalk')
+                        "
+                    >
+                        <icon class="hc-prospect-sms-cloudtalk-logo">
+                            <img
+                                src="/images/partenaire-ext/cloudtalk.png"
+                                alt="CloudTalk"
+                            />
+                        </icon>
+                        <div class="hc-item-main-content hc-flex-column">
+                            <span
+                                v-text="$t('prospect.sms.via_cloudtalk')"
+                            ></span>
+                            <span
+                                class="hc-prospect-sms-item-number"
+                                v-text="cloudtalkSmsLine.numero"
+                            ></span>
+                        </div>
+                        <icon class="fa fa-caret-right" />
+                    </item>
+
                     <!-- SMSBOX -->
                     <item
                         class="hc-prospect-sms-item"
@@ -573,6 +599,13 @@
     color: #999999;
 }
 
+.hc-prospect-sms-cloudtalk-logo img {
+    display: block;
+    max-width: 26px;
+    max-height: 26px;
+    object-fit: contain;
+}
+
 #hc-prospect-sms-textarea {
     border: 1px solid #dddddd;
     border-radius: 5px;
@@ -845,6 +878,7 @@ export default {
     },
 
     computed: {
+        ...mapGetters("auth", ["user"]),
         ...mapGetters([
             "project",
             "prospect",
@@ -853,6 +887,7 @@ export default {
             "prospectSms",
             "slideOpen",
             "smsTemplates",
+            "lines",
             "can",
         ]),
 
@@ -909,6 +944,16 @@ export default {
          */
         smss() {
             return this.prospect ? this.prospectSms : this.bulkSms;
+        },
+
+        cloudtalkSmsLine() {
+            return this.lines.find(
+                (line) =>
+                    line.operator === "cloudtalk" &&
+                    this.user &&
+                    line.user_id == this.user.id &&
+                    line.numero
+            );
         },
     },
 };

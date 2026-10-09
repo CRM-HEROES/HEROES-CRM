@@ -104,7 +104,7 @@ class ProjectController extends Controller
             },
             'lines' => function($query) {
                 $query
-                    ->select('id', 'project_id', 'name', 'operator', 'user_id')
+                    ->select('id', 'project_id', 'name', 'operator', 'user_id', 'config')
                     ->orderBy('name');
             },
             'menus' => function($query) {
@@ -197,6 +197,11 @@ class ProjectController extends Controller
                 $query->select('id', 'name', 'project_id', 'user_id');
             },
         ]);
+
+        $project->lines->each(function ($line) {
+            $line->setAttribute('numero', $line->numero);
+            $line->makeHidden('config');
+        });
         
         return $project;
     }

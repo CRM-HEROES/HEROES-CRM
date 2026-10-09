@@ -760,6 +760,9 @@ class ActionController extends Controller
             case 'brevo':
                 $source = "Brevo";
                 break;
+            case 'cloudtalk':
+                $source = "CloudTalk";
+                break;
             case 'ringover':
                 $source = "Ringover";
                 break;

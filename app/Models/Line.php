@@ -32,6 +32,17 @@ class Line extends Model
     ];
 
 
+    // Attributes
+
+    /**
+     * SMS sender number stored in the operator config.
+     */
+    public function getNumeroAttribute()
+    {
+        return data_get($this->config, 'numero');
+    }
+
+
     // Relationships
 
     /**

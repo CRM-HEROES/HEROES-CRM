@@ -5020,6 +5020,11 @@ __webpack_require__.r(__webpack_exports__);
     key: "agent_id",
     label: "Agent",
     type: "select"
+  }, {
+    key: "numero",
+    label: "Numéro a utilisé pour le SMS (optionnel)",
+    type: "tel",
+    required: false
   }]
 }, {
   value: "ringover",
