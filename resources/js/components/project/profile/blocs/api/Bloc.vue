@@ -66,6 +66,18 @@
                     <div class="hc-item-main-content">UltraMsg</div>
                 </item>
 
+                <!-- CloudTalk -->
+                <item @click="configureCloudtalk">
+                    <icon>
+                        <img
+                            src="/images/partenaire-ext/cloudtalk.png"
+                            alt="CloudTalk"
+                            style="width: 25px; height: 25px; object-fit: contain"
+                        />
+                    </icon>
+                    <div class="hc-item-main-content">CloudTalk</div>
+                </item>
+
                 <!-- MTarget -->
                 <item @click="configureMTarget">
                     <icon>
@@ -122,6 +134,10 @@ export default {
 
         configureMTarget() {
             store.commit(OPEN_MODAL, "setting-mtarget");
+        },
+
+        configureCloudtalk() {
+            store.commit(OPEN_MODAL, "setting-cloudtalk");
         },
     },
 

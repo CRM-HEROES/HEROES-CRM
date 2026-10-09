@@ -259,6 +259,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     configureMTarget: function configureMTarget() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "setting-mtarget");
+    },
+    configureCloudtalk: function configureCloudtalk() {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "setting-cloudtalk");
     }
   },
   computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["project", "roles"]))
@@ -2884,7 +2887,19 @@ var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content"
 }, "UltraMsg", -1 /* HOISTED */);
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+  src: "/images/partenaire-ext/cloudtalk.png",
+  alt: "CloudTalk",
+  style: {
+    "width": "25px",
+    "height": "25px",
+    "object-fit": "contain"
+  }
+}, null, -1 /* HOISTED */);
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-item-main-content"
+}, "CloudTalk", -1 /* HOISTED */);
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   viewBox: "0 0 50 50"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   style: {
@@ -2892,7 +2907,7 @@ var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   },
   d: "M9.4,47c0-11.9,0-23.9,0.1-35.8c2.9,11.9,5.8,23.9,8.7,35.8h14.3c2.9-11.9,5.8-23.8,8.7-35.7 c0.1,11.9,0.1,23.8,0.1,35.7H50c0-14.8,0-29.7,0-44.5c-5,0-10.1,0-15.1,0.1c-3.2,13-6.3,26-9.5,39c-3.3-13-6.5-26-9.6-39.1 c-5,0-10,0-15.1,0c0,14.8,0,29.7,0,44.5H9.4z"
 })], -1 /* HOISTED */);
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content"
 }, "SMS via MTarget", -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -2949,8 +2964,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), _hoisted_8];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-        onClick: $options.configureMTarget
+      }, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" CloudTalk "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        onClick: $options.configureCloudtalk
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
@@ -2959,6 +2974,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             _: 1 /* STABLE */
           }), _hoisted_10];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+        onClick: $options.configureMTarget
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [_hoisted_11];
+            }),
+            _: 1 /* STABLE */
+          }), _hoisted_12];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["onClick"])])];

@@ -204,6 +204,7 @@
                 <setting-smsbox-modal />
                 <setting-ultramsg-modal />
                 <setting-m-target-modal />
+                <setting-cloudtalk-modal />
                 <setting-pipedrive-modal />
                 <setting-ringover-modal />
                 <setting-brevo-modal />
@@ -407,6 +408,7 @@ import ManageProspectBulkUsersModal from "@/components/prospect/bulk/user/Modal.
 import ManageProspectBulkFieldModal from "@/components/prospect/bulk/field/Modal.vue";
 import ManageProspectBulkProjectModal from "@/components/prospect/bulk/project/Modal.vue";
 
+import SettingCloudtalkModal from "@/components/settings/Cloudtalk.vue";
 import SettingEmailModal from "@/components/settings/Email.vue";
 import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
 import SettingRingoverModal from "@/components/settings/Ringover.vue";
@@ -581,6 +583,7 @@ export default {
         ManageProspectBulkFieldModal,
         ManageProspectBulkProjectModal,
 
+        SettingCloudtalkModal,
         SettingEmailModal,
         SettingSmsboxModal,
         SettingRingoverModal,

@@ -10514,7 +10514,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_en__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dayjs/locale/fr */ "./node_modules/dayjs/locale/fr.js");
 /* harmony import */ var dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dayjs_locale_fr__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_153__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_154__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_permission__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/permission */ "./resources/js/actions/permission.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
@@ -10653,19 +10653,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _components_prospect_bulk_user_Modal_vue__WEBPACK_IMPORTED_MODULE_137__ = __webpack_require__(/*! @/components/prospect/bulk/user/Modal.vue */ "./resources/js/components/prospect/bulk/user/Modal.vue");
 /* harmony import */ var _components_prospect_bulk_field_Modal_vue__WEBPACK_IMPORTED_MODULE_138__ = __webpack_require__(/*! @/components/prospect/bulk/field/Modal.vue */ "./resources/js/components/prospect/bulk/field/Modal.vue");
 /* harmony import */ var _components_prospect_bulk_project_Modal_vue__WEBPACK_IMPORTED_MODULE_139__ = __webpack_require__(/*! @/components/prospect/bulk/project/Modal.vue */ "./resources/js/components/prospect/bulk/project/Modal.vue");
-/* harmony import */ var _components_settings_Email_vue__WEBPACK_IMPORTED_MODULE_140__ = __webpack_require__(/*! @/components/settings/Email.vue */ "./resources/js/components/settings/Email.vue");
-/* harmony import */ var _components_settings_Smsbox_vue__WEBPACK_IMPORTED_MODULE_141__ = __webpack_require__(/*! @/components/settings/Smsbox.vue */ "./resources/js/components/settings/Smsbox.vue");
-/* harmony import */ var _components_settings_Ringover_vue__WEBPACK_IMPORTED_MODULE_142__ = __webpack_require__(/*! @/components/settings/Ringover.vue */ "./resources/js/components/settings/Ringover.vue");
-/* harmony import */ var _components_settings_Ultramsg_vue__WEBPACK_IMPORTED_MODULE_143__ = __webpack_require__(/*! @/components/settings/Ultramsg.vue */ "./resources/js/components/settings/Ultramsg.vue");
-/* harmony import */ var _components_settings_MTarget_vue__WEBPACK_IMPORTED_MODULE_144__ = __webpack_require__(/*! @/components/settings/MTarget.vue */ "./resources/js/components/settings/MTarget.vue");
-/* harmony import */ var _components_settings_Pipedrive_vue__WEBPACK_IMPORTED_MODULE_145__ = __webpack_require__(/*! @/components/settings/Pipedrive.vue */ "./resources/js/components/settings/Pipedrive.vue");
-/* harmony import */ var _components_settings_Brevo_vue__WEBPACK_IMPORTED_MODULE_146__ = __webpack_require__(/*! @/components/settings/Brevo.vue */ "./resources/js/components/settings/Brevo.vue");
-/* harmony import */ var _components_menu_icon_Slide_vue__WEBPACK_IMPORTED_MODULE_147__ = __webpack_require__(/*! @/components/menu-icon/Slide.vue */ "./resources/js/components/menu-icon/Slide.vue");
-/* harmony import */ var _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_148__ = __webpack_require__(/*! @/components/trash/Slide.vue */ "./resources/js/components/trash/Slide.vue");
-/* harmony import */ var _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_149__ = __webpack_require__(/*! @/components/api/pappers/Slide.vue */ "./resources/js/components/api/pappers/Slide.vue");
-/* harmony import */ var _Header_vue__WEBPACK_IMPORTED_MODULE_150__ = __webpack_require__(/*! ./Header.vue */ "./resources/js/components/layouts/Header.vue");
-/* harmony import */ var _Footer_vue__WEBPACK_IMPORTED_MODULE_151__ = __webpack_require__(/*! ./Footer.vue */ "./resources/js/components/layouts/Footer.vue");
-/* harmony import */ var _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_152__ = __webpack_require__(/*! @/components/Confirm.vue */ "./resources/js/components/Confirm.vue");
+/* harmony import */ var _components_settings_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_140__ = __webpack_require__(/*! @/components/settings/Cloudtalk.vue */ "./resources/js/components/settings/Cloudtalk.vue");
+/* harmony import */ var _components_settings_Email_vue__WEBPACK_IMPORTED_MODULE_141__ = __webpack_require__(/*! @/components/settings/Email.vue */ "./resources/js/components/settings/Email.vue");
+/* harmony import */ var _components_settings_Smsbox_vue__WEBPACK_IMPORTED_MODULE_142__ = __webpack_require__(/*! @/components/settings/Smsbox.vue */ "./resources/js/components/settings/Smsbox.vue");
+/* harmony import */ var _components_settings_Ringover_vue__WEBPACK_IMPORTED_MODULE_143__ = __webpack_require__(/*! @/components/settings/Ringover.vue */ "./resources/js/components/settings/Ringover.vue");
+/* harmony import */ var _components_settings_Ultramsg_vue__WEBPACK_IMPORTED_MODULE_144__ = __webpack_require__(/*! @/components/settings/Ultramsg.vue */ "./resources/js/components/settings/Ultramsg.vue");
+/* harmony import */ var _components_settings_MTarget_vue__WEBPACK_IMPORTED_MODULE_145__ = __webpack_require__(/*! @/components/settings/MTarget.vue */ "./resources/js/components/settings/MTarget.vue");
+/* harmony import */ var _components_settings_Pipedrive_vue__WEBPACK_IMPORTED_MODULE_146__ = __webpack_require__(/*! @/components/settings/Pipedrive.vue */ "./resources/js/components/settings/Pipedrive.vue");
+/* harmony import */ var _components_settings_Brevo_vue__WEBPACK_IMPORTED_MODULE_147__ = __webpack_require__(/*! @/components/settings/Brevo.vue */ "./resources/js/components/settings/Brevo.vue");
+/* harmony import */ var _components_menu_icon_Slide_vue__WEBPACK_IMPORTED_MODULE_148__ = __webpack_require__(/*! @/components/menu-icon/Slide.vue */ "./resources/js/components/menu-icon/Slide.vue");
+/* harmony import */ var _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_149__ = __webpack_require__(/*! @/components/trash/Slide.vue */ "./resources/js/components/trash/Slide.vue");
+/* harmony import */ var _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_150__ = __webpack_require__(/*! @/components/api/pappers/Slide.vue */ "./resources/js/components/api/pappers/Slide.vue");
+/* harmony import */ var _Header_vue__WEBPACK_IMPORTED_MODULE_151__ = __webpack_require__(/*! ./Header.vue */ "./resources/js/components/layouts/Header.vue");
+/* harmony import */ var _Footer_vue__WEBPACK_IMPORTED_MODULE_152__ = __webpack_require__(/*! ./Footer.vue */ "./resources/js/components/layouts/Footer.vue");
+/* harmony import */ var _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_153__ = __webpack_require__(/*! @/components/Confirm.vue */ "./resources/js/components/Confirm.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
@@ -10833,11 +10834,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "main",
   components: {
-    LayoutHeader: _Header_vue__WEBPACK_IMPORTED_MODULE_150__["default"],
-    LayoutFooter: _Footer_vue__WEBPACK_IMPORTED_MODULE_151__["default"],
+    LayoutHeader: _Header_vue__WEBPACK_IMPORTED_MODULE_151__["default"],
+    LayoutFooter: _Footer_vue__WEBPACK_IMPORTED_MODULE_152__["default"],
     EventReminder: _components_event_Reminder_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
     SettingSlide: _setting_Slide_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
     AddGlobalUserModal: _components_global_user_add_Modal_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
@@ -10972,17 +10974,18 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     ManageProspectBulkGroupsModal: _components_prospect_bulk_group_Modal_vue__WEBPACK_IMPORTED_MODULE_135__["default"],
     ManageProspectBulkFieldModal: _components_prospect_bulk_field_Modal_vue__WEBPACK_IMPORTED_MODULE_138__["default"],
     ManageProspectBulkProjectModal: _components_prospect_bulk_project_Modal_vue__WEBPACK_IMPORTED_MODULE_139__["default"],
-    SettingEmailModal: _components_settings_Email_vue__WEBPACK_IMPORTED_MODULE_140__["default"],
-    SettingSmsboxModal: _components_settings_Smsbox_vue__WEBPACK_IMPORTED_MODULE_141__["default"],
-    SettingRingoverModal: _components_settings_Ringover_vue__WEBPACK_IMPORTED_MODULE_142__["default"],
-    SettingUltramsgModal: _components_settings_Ultramsg_vue__WEBPACK_IMPORTED_MODULE_143__["default"],
-    SettingMTargetModal: _components_settings_MTarget_vue__WEBPACK_IMPORTED_MODULE_144__["default"],
-    SettingPipedriveModal: _components_settings_Pipedrive_vue__WEBPACK_IMPORTED_MODULE_145__["default"],
-    SettingBrevoModal: _components_settings_Brevo_vue__WEBPACK_IMPORTED_MODULE_146__["default"],
-    MenuIconSlide: _components_menu_icon_Slide_vue__WEBPACK_IMPORTED_MODULE_147__["default"],
-    TrashSlide: _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_148__["default"],
-    ApiPappersSlide: _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_149__["default"],
-    Confirm: _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_152__["default"]
+    SettingCloudtalkModal: _components_settings_Cloudtalk_vue__WEBPACK_IMPORTED_MODULE_140__["default"],
+    SettingEmailModal: _components_settings_Email_vue__WEBPACK_IMPORTED_MODULE_141__["default"],
+    SettingSmsboxModal: _components_settings_Smsbox_vue__WEBPACK_IMPORTED_MODULE_142__["default"],
+    SettingRingoverModal: _components_settings_Ringover_vue__WEBPACK_IMPORTED_MODULE_143__["default"],
+    SettingUltramsgModal: _components_settings_Ultramsg_vue__WEBPACK_IMPORTED_MODULE_144__["default"],
+    SettingMTargetModal: _components_settings_MTarget_vue__WEBPACK_IMPORTED_MODULE_145__["default"],
+    SettingPipedriveModal: _components_settings_Pipedrive_vue__WEBPACK_IMPORTED_MODULE_146__["default"],
+    SettingBrevoModal: _components_settings_Brevo_vue__WEBPACK_IMPORTED_MODULE_147__["default"],
+    MenuIconSlide: _components_menu_icon_Slide_vue__WEBPACK_IMPORTED_MODULE_148__["default"],
+    TrashSlide: _components_trash_Slide_vue__WEBPACK_IMPORTED_MODULE_149__["default"],
+    ApiPappersSlide: _components_api_pappers_Slide_vue__WEBPACK_IMPORTED_MODULE_150__["default"],
+    Confirm: _components_Confirm_vue__WEBPACK_IMPORTED_MODULE_153__["default"]
   },
   data: function data() {
     return {
@@ -10994,7 +10997,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     dayjs.locale(this.locale);
   },
-  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapActions)({
+  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapActions)({
     signOut: "auth/logout"
   })), {}, {
     logout: function logout() {
@@ -11036,7 +11039,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_permission__WEBPACK_IMPORTED_MODULE_3__.FETCH_PERMISSIONS, this.project);
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_153__.mapGetters)(["project", "user", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)("auth", ["impersonating"])), (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)("route", ["changing"])), (0,vuex__WEBPACK_IMPORTED_MODULE_154__.mapGetters)(["project", "user", "can", "canMessage", "canFile", "canEvent", "canGroup", "canUser", "locale"])), {}, {
     projectSlug: function projectSlug() {
       return this.project ? this.project.slug : null;
     }
@@ -14451,6 +14454,24 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     setCloudtalkError: function setCloudtalkError(message) {
       this.cloudtalkMessage = message;
       this.cloudtalkMessageType = "error";
+    },
+    copyCloudtalkSmsWebhookUrl: function copyCloudtalkSmsWebhookUrl() {
+      if (!this.cloudtalkSmsWebhookUrl) {
+        return;
+      }
+      navigator.clipboard.writeText(this.cloudtalkSmsWebhookUrl).then(function () {
+        flashInfo({
+          title: "CloudTalk",
+          body: "URL Webhook SMS CloudTalk copié",
+          duration: 5000
+        });
+      })["catch"](function () {
+        flashInfo({
+          title: "CloudTalk",
+          body: "Impossible de copier l'URL du webhook",
+          duration: 5000
+        });
+      });
     }
   },
   watch: {
@@ -14481,6 +14502,15 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     currentCloudtalkCredentialsKey: function currentCloudtalkCredentialsKey() {
       return [this.config.api_key_id || "", this.config.api_key_secret || ""].join(":");
+    },
+    /**
+     * CloudTalk SMS webhook URL used to receive incoming messages.
+     */
+    cloudtalkSmsWebhookUrl: function cloudtalkSmsWebhookUrl() {
+      if (!this.project || !this.project.slug) {
+        return "";
+      }
+      return window.location.origin + "/webhook/project/" + this.project.slug + "/cloudtalk/sms";
     }
   })
 });
@@ -43989,6 +44019,66 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js":
+/*!************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js ***!
+  \************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      name: "setting-cloudtalk"
+    };
+  },
+  methods: {
+    copyCloudtalkSmsWebhookUrl: function copyCloudtalkSmsWebhookUrl() {
+      if (!this.cloudtalkSmsWebhookUrl) {
+        return;
+      }
+      navigator.clipboard.writeText(this.cloudtalkSmsWebhookUrl).then(function () {
+        flashInfo({
+          title: "CloudTalk",
+          body: "URL Webhook SMS CloudTalk copié",
+          duration: 5000
+        });
+      })["catch"](function () {
+        flashInfo({
+          title: "CloudTalk",
+          body: "Impossible de copier l'URL du webhook",
+          duration: 5000
+        });
+      });
+    }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(["project"])), {}, {
+    /**
+     * CloudTalk SMS webhook URL used to receive incoming messages.
+     */
+    cloudtalkSmsWebhookUrl: function cloudtalkSmsWebhookUrl() {
+      if (!this.project || !this.project.slug) {
+        return "";
+      }
+      return window.location.origin + "/webhook/project/" + this.project.slug + "/cloudtalk/sms";
+    }
+  })
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Email.vue?vue&type=script&lang=js":
 /*!********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Email.vue?vue&type=script&lang=js ***!
@@ -65062,6 +65152,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_setting_smsbox_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-smsbox-modal");
   var _component_setting_ultramsg_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-ultramsg-modal");
   var _component_setting_m_target_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-m-target-modal");
+  var _component_setting_cloudtalk_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-cloudtalk-modal");
   var _component_setting_pipedrive_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-pipedrive-modal");
   var _component_setting_ringover_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-ringover-modal");
   var _component_setting_brevo_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("setting-brevo-modal");
@@ -65199,7 +65290,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 54
   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_event_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_field_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_file_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_created_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_creator_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_group_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_import_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_interaction_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_label_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_message_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_thread_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_order_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_pipedrive_account_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_sms_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_user_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_filter_prospect_all_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_prospect_bulk_labels_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_prospect_bulk_users_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_prospect_bulk_groups_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_prospect_bulk_field_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_manage_prospect_bulk_project_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_protected_content, null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_email_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_smsbox_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_ultramsg_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_m_target_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_pipedrive_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_ringover_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_brevo_modal)];
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_email_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_smsbox_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_ultramsg_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_m_target_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_cloudtalk_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_pipedrive_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_ringover_modal), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_setting_brevo_modal)];
     }),
     _: 1 /* STABLE */
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_menu_icon_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_trash_slide), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_api_pappers_slide)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.impersonating ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_layout_footer, {
@@ -66932,6 +67023,26 @@ var _hoisted_8 = {
 var _hoisted_9 = ["textContent"];
 var _hoisted_10 = ["title", "onClick"];
 var _hoisted_11 = ["type", "placeholder", "onUpdate:modelValue", "required"];
+var _hoisted_12 = {
+  key: 0,
+  "class": "hc-cloudtalk-webhook"
+};
+var _hoisted_13 = {
+  "class": "hc-cloudtalk-webhook-header"
+};
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Recevoir les nouveaux SMS'
+}, null, -1 /* HOISTED */);
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-webhook-help"
+}, " Pour que les nouveaux SMS arrivent automatiquement dans le CRM, configurez cette URL comme webhook SMS entrant dans votre compte CloudTalk : ", -1 /* HOISTED */);
+var _hoisted_16 = {
+  "class": "hc-cloudtalk-webhook-url"
+};
+var _hoisted_17 = ["value"];
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Copier'
+}, null, -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
@@ -66992,8 +67103,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }),
       _: 2 /* DYNAMIC */
     }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["label", "required"]);
-  }), 128 /* KEYED_FRAGMENT */)), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
-    key: 0,
+  }), 128 /* KEYED_FRAGMENT */)), $props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-link"
+  }), _hoisted_14]), _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    readonly: "",
+    value: $options.cloudtalkSmsWebhookUrl,
+    onFocus: _cache[1] || (_cache[1] = function ($event) {
+      return $event.target.select();
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-button-secondary",
+    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.copyCloudtalkSmsWebhookUrl && $options.copyCloudtalkSmsWebhookUrl.apply($options, arguments);
+    }, ["prevent"]))
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-copy"
+  }), _hoisted_18])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
+    key: 1,
     config: $props.config
   }, null, 8 /* PROPS */, ["config"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
@@ -92194,6 +92322,88 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60":
+/*!****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60 ***!
+  \****************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_2 = {
+  "class": "hc-cloudtalk-webhook"
+};
+var _hoisted_3 = {
+  "class": "hc-cloudtalk-webhook-header"
+};
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Recevoir les nouveaux SMS'
+}, null, -1 /* HOISTED */);
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-webhook-help"
+}, " Pour que les nouveaux SMS arrivent automatiquement dans le CRM, configurez cette URL comme webhook SMS entrant dans votre compte CloudTalk : ", -1 /* HOISTED */);
+var _hoisted_6 = {
+  "class": "hc-cloudtalk-webhook-url"
+};
+var _hoisted_7 = ["value"];
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  textContent: 'Copier'
+}, null, -1 /* HOISTED */);
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
+  var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_modal, {
+    name: $data.name,
+    title: "CloudTalk",
+    width: 520
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+        gap: "5px",
+        "class": "hc-flex-1",
+        padding: "10px 0"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-link"
+          }), _hoisted_4]), _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+            type: "text",
+            readonly: "",
+            value: $options.cloudtalkSmsWebhookUrl,
+            onFocus: _cache[0] || (_cache[0] = function ($event) {
+              return $event.target.select();
+            })
+          }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "hc-button-secondary",
+            onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+              return $options.copyCloudtalkSmsWebhookUrl && $options.copyCloudtalkSmsWebhookUrl.apply($options, arguments);
+            }, ["prevent"]))
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+            "class": "fa fa-copy"
+          }), _hoisted_8])])])];
+        }),
+        _: 1 /* STABLE */
+      })])];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["name"]);
+}
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Email.vue?vue&type=template&id=9c8c44ca":
 /*!************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Email.vue?vue&type=template&id=9c8c44ca ***!
@@ -109485,7 +109695,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -110590,6 +110800,30 @@ __webpack_require__.r(__webpack_exports__);
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-role-relation {\n    padding: 2px 0 !important;\n    align-items: start;\n}\n.hc-role-relation-title {\n    color: #000000;\n}\n.hc-role-relation-value {\n    font-size: 11px;\n    opacity: 0.5;\n    color: #000000;\n}\n.hc-role-relation-value.with-value {\n    opacity: 1;\n    color: #12a0f3;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css":
+/*!*************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -112923,6 +113157,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Layout_vue_vue_type_style_index_0_id_7caf59e6_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_style_index_0_id_72e28c60_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_style_index_0_id_72e28c60_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_style_index_0_id_72e28c60_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -124993,6 +125257,37 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/settings/Cloudtalk.vue":
+/*!********************************************************!*\
+  !*** ./resources/js/components/settings/Cloudtalk.vue ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _Cloudtalk_vue_vue_type_template_id_72e28c60__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Cloudtalk.vue?vue&type=template&id=72e28c60 */ "./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60");
+/* harmony import */ var _Cloudtalk_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Cloudtalk.vue?vue&type=script&lang=js */ "./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js");
+/* harmony import */ var _Cloudtalk_vue_vue_type_style_index_0_id_72e28c60_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css */ "./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_Cloudtalk_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_Cloudtalk_vue_vue_type_template_id_72e28c60__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/settings/Cloudtalk.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/settings/Email.vue":
 /*!****************************************************!*\
   !*** ./resources/js/components/settings/Email.vue ***!
@@ -134721,6 +135016,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js":
+/*!********************************************************************************!*\
+  !*** ./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Cloudtalk.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/settings/Email.vue?vue&type=script&lang=js":
 /*!****************************************************************************!*\
   !*** ./resources/js/components/settings/Email.vue?vue&type=script&lang=js ***!
@@ -143009,6 +143320,22 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60":
+/*!**************************************************************************************!*\
+  !*** ./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60 ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_template_id_72e28c60__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_template_id_72e28c60__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Cloudtalk.vue?vue&type=template&id=72e28c60 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=template&id=72e28c60");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/settings/Email.vue?vue&type=template&id=9c8c44ca":
 /*!**********************************************************************************!*\
   !*** ./resources/js/components/settings/Email.vue?vue&type=template&id=9c8c44ca ***!
@@ -145638,6 +145965,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Layout_vue_vue_type_style_index_0_id_7caf59e6_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Layout.vue?vue&type=style&index=0&id=7caf59e6&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/role/list/Layout.vue?vue&type=style&index=0&id=7caf59e6&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css":
+/*!****************************************************************************************************!*\
+  !*** ./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Cloudtalk_vue_vue_type_style_index_0_id_72e28c60_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/settings/Cloudtalk.vue?vue&type=style&index=0&id=72e28c60&lang=css");
 
 
 /***/ }),
