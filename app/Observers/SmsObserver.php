@@ -14,6 +14,10 @@ class SmsObserver
      */
     public function creating(Sms $sms): void
     {
+        if ($sms->is_incoming || !$sms->from_user) {
+            return;
+        }
+
         $sms->message = $this->computeMessage($sms);
     }
 
@@ -22,6 +26,10 @@ class SmsObserver
      */
     public function created(Sms $sms): void
     {
+        if ($sms->is_incoming || !$sms->from_user) {
+            return;
+        }
+
         $this->send($sms);
     }
 

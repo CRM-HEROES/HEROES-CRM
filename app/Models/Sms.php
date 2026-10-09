@@ -23,13 +23,17 @@ class Sms extends Model
         'created_at',
         'creator_id',
         'from_user',
+        'is_incoming',
         'message',
         'error',
         'project_id',
         'source',
+        'sent_at',
     ];
     
     protected $casts = [
+        'from_user' => 'boolean',
+        'is_incoming' => 'boolean',
         'sent_at' => 'datetime'
     ];
 

@@ -37958,7 +37958,14 @@ __webpack_require__.r(__webpack_exports__);
      *
      */
     footer: function footer() {
-      return dayjs(this.sms.created_at).fromNow() + " via " + this.sms.source;
+      var direction = this.isIncoming ? " entrant" : "";
+      return dayjs(this.sms.created_at).fromNow() + " via " + this.sms.source + direction;
+    },
+    /**
+     *
+     */
+    isIncoming: function isIncoming() {
+      return this.sms.is_incoming || !this.sms.from_user;
     }
   }
 });
@@ -86984,7 +86991,7 @@ var _hoisted_4 = ["textContent"];
 var _hoisted_5 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-sms', 'hc-flex-row', $props.sms.from_user ? '' : 'hc-prospect-sms-from-prospect'])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-sms', 'hc-flex-row', $options.isIncoming ? 'hc-prospect-sms-from-prospect' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [$props.sms.creator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 0,
     "class": "hc-prospect-sms-header",

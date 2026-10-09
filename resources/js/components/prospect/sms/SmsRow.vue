@@ -3,7 +3,7 @@
         :class="[
             'hc-prospect-sms',
             'hc-flex-row',
-            sms.from_user ? '' : 'hc-prospect-sms-from-prospect',
+            isIncoming ? 'hc-prospect-sms-from-prospect' : '',
         ]"
     >
         <div class="hc-prospect-sms-content hc-flex-column">
@@ -91,9 +91,21 @@ export default {
          *
          */
         footer() {
+            const direction = this.isIncoming ? " entrant" : "";
+
             return (
-                dayjs(this.sms.created_at).fromNow() + " via " + this.sms.source
+                dayjs(this.sms.created_at).fromNow() +
+                " via " +
+                this.sms.source +
+                direction
             );
+        },
+
+        /**
+         *
+         */
+        isIncoming() {
+            return this.sms.is_incoming || !this.sms.from_user;
         },
     },
 };

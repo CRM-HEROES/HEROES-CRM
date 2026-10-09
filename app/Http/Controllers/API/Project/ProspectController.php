@@ -146,7 +146,7 @@ class ProspectController extends Controller
                 $query->select('id', 'name');
             },
             'sms' => function($query) {
-                $query->select('id', 'message', 'error', 'source', 'prospect_id', 'creator_id', 'created_at');
+                $query->select('id', 'message', 'error', 'source', 'from_user', 'is_incoming', 'prospect_id', 'creator_id', 'created_at');
             },
             'sms.creator' => function($query) {
                 $query->select('id', 'name');
@@ -669,7 +669,7 @@ class ProspectController extends Controller
             ->when(in_array('sms', $fields), function($query) {
                 $query->with([
                     'sms' => function($query) {
-                        $query->select('id', 'source', 'prospect_id', 'message', 'error', 'created_at', 'creator_id');
+                        $query->select('id', 'source', 'from_user', 'is_incoming', 'prospect_id', 'message', 'error', 'created_at', 'creator_id');
                     },
                     'sms.creator' => function($query) {
                         $query->select('id', 'name');
