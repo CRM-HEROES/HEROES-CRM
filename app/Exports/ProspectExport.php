@@ -54,6 +54,40 @@ class ProspectExport implements FromCollection
     }
 
     /**
+     * Read and map a bounded batch at a time for streaming XLSX writers.
+     */
+    public function rows(): \Generator
+    {
+        $this->count = 0;
+        $offset = $this->skip;
+
+        yield $this->header();
+
+        while ($this->limit <= 0 || $this->count < $this->limit) {
+            $take = $this->limit > 0 ? min(250, $this->limit - $this->count) : 250;
+            $batch = clone $this;
+            $batch->limit = $take;
+            $batch->skip = $offset;
+            $rows = $batch->body();
+            $size = $rows->count();
+            $this->count += $size;
+
+            foreach ($rows as $row) {
+                yield $row;
+            }
+
+            unset($rows, $batch, $row);
+            gc_collect_cycles();
+
+            if ($size < $take) {
+                break;
+            }
+
+            $offset += $size;
+        }
+    }
+
+    /**
      * 
      */
     protected function header()

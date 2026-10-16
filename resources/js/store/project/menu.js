@@ -21,11 +21,15 @@ const actions = {
      * @returns
      */
     async [FETCH_MENUS](context, params) {
-        const { data } = await menuService.get(
-            context.state.project.slug,
-            params
-        );
-        context.commit(SET_MENUS, data);
+        const projectSlug = context.state.project?.slug;
+        if (!projectSlug) {
+            return [];
+        }
+
+        const { data } = await menuService.get(projectSlug, params);
+        if (context.state.project?.slug === projectSlug) {
+            context.commit(SET_MENUS, data);
+        }
         return data;
     },
 

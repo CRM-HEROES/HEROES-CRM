@@ -36372,6 +36372,33 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
   state.projects = _toConsumableArray(projects);
 }), _defineProperty(_objectSpread4, _actions_project__WEBPACK_IMPORTED_MODULE_1__.SET_PROJECT, function (state, project) {
   if (project) {
+    var _state$project;
+    var previousProject = ((_state$project = state.project) === null || _state$project === void 0 ? void 0 : _state$project.slug) === project.slug ? state.project : state.projects.find(function (o) {
+      return o.slug === project.slug;
+    });
+
+    // The project response omits menu counts loaded by FETCH_MENUS.
+    // Keep them regardless of which request finishes first.
+    if (Array.isArray(project.menus) && Array.isArray(previousProject === null || previousProject === void 0 ? void 0 : previousProject.menus)) {
+      var previousMenus = new Map(previousProject.menus.map(function (menu) {
+        return [menu.id, menu];
+      }));
+      project = _objectSpread(_objectSpread({}, project), {}, {
+        menus: project.menus.map(function (menu) {
+          var previousMenu = previousMenus.get(menu.id);
+          var mergedMenu = _objectSpread(_objectSpread({}, previousMenu), menu);
+          if (menu.count == null) {
+            var _menu$filters, _previousMenu$filters;
+            if (JSON.stringify((_menu$filters = menu.filters) !== null && _menu$filters !== void 0 ? _menu$filters : {}) === JSON.stringify((_previousMenu$filters = previousMenu === null || previousMenu === void 0 ? void 0 : previousMenu.filters) !== null && _previousMenu$filters !== void 0 ? _previousMenu$filters : {}) && (previousMenu === null || previousMenu === void 0 ? void 0 : previousMenu.count) != null) {
+              mergedMenu.count = previousMenu.count;
+            } else {
+              delete mergedMenu.count;
+            }
+          }
+          return mergedMenu;
+        })
+      });
+    }
     if (state.projects.find(function (o) {
       return o.slug == project.slug;
     })) {
@@ -41898,18 +41925,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
  */
 var actions = (_actions = {}, _defineProperty(_actions, _actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.FETCH_MENUS, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var _yield$menuService$ge, data;
+    var _context$state$projec, _context$state$projec2;
+    var projectSlug, _yield$menuService$ge, data;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
-          _context.next = 2;
-          return _apis_project_menu__WEBPACK_IMPORTED_MODULE_0__["default"].get(context.state.project.slug, params);
-        case 2:
+          projectSlug = (_context$state$projec = context.state.project) === null || _context$state$projec === void 0 ? void 0 : _context$state$projec.slug;
+          if (projectSlug) {
+            _context.next = 3;
+            break;
+          }
+          return _context.abrupt("return", []);
+        case 3:
+          _context.next = 5;
+          return _apis_project_menu__WEBPACK_IMPORTED_MODULE_0__["default"].get(projectSlug, params);
+        case 5:
           _yield$menuService$ge = _context.sent;
           data = _yield$menuService$ge.data;
-          context.commit(_actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.SET_MENUS, data);
+          if (((_context$state$projec2 = context.state.project) === null || _context$state$projec2 === void 0 ? void 0 : _context$state$projec2.slug) === projectSlug) {
+            context.commit(_actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.SET_MENUS, data);
+          }
           return _context.abrupt("return", data);
-        case 6:
+        case 9:
         case "end":
           return _context.stop();
       }

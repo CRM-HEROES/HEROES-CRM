@@ -12,13 +12,32 @@
                 class="hc-user-agenda-week-pagination"
                 id="hc-user-agenda-week-pagination-prev"
             >
-                <a class="fa fa-caret-left" @click.prevent="prevDate"></a>
+                <a
+                    class="fa fa-angle-left"
+                    @click.prevent="scrollLeft"
+                    title="Jour précédent"
+                ></a>
+                <a
+                    class="fa fa-angle-double-left"
+                    @click.prevent="prevDate"
+                    title="Semaine précédente"
+                ></a>
             </div>
+
             <div
                 class="hc-user-agenda-week-pagination"
                 id="hc-user-agenda-week-pagination-next"
             >
-                <a class="fa fa-caret-left" @click.prevent="nextDate"></a>
+                <a
+                    class="fa fa-angle-right"
+                    @click.prevent="scrollRight"
+                    title="Jour suivant"
+                ></a>
+                <a
+                    class="fa fa-angle-double-right"
+                    @click.prevent="nextDate"
+                    title="Semaine suivante"
+                ></a>
             </div>
 
             <users />
@@ -80,43 +99,93 @@
 
 .hc-user-agenda-week-pagination {
     position: absolute;
-    height: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+
     display: flex;
-    top: 0;
     align-items: center;
-    justify-content: center;
-    z-index: 1;
-    pointer-events: none;
+    gap: 3px;
+
+    width: auto;
+    height: auto;
+    padding: 4px;
+
+    background: rgba(255, 255, 255, 0.94);
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.10);
+    backdrop-filter: blur(8px);
+
+    transition: left 100ms ease-out, right 100ms ease-out;
 }
 
-.agenda-list .hc-user-agenda-week-pagination {
-    display: none;
+/*
+ * Quand le panneau des filtres (Users.vue) est affiché, il occupe
+ * la gauche de #hc-user-agenda-week-body : on décale la pagination
+ * précédente d'autant pour qu'elle reste visible.
+ */
+#hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
+    left: 240px;
 }
+
+/* .agenda-list .hc-user-agenda-week-pagination {
+    display: none;
+} */
 
 .hc-user-agenda-week-pagination > a {
-    background-color: #eee;
-    width: 36px;
-    height: 50px;
     display: flex;
     align-items: center;
-    font-size: 18px;
-    color: black;
     justify-content: center;
+
+    width: 30px;
+    height: 34px;
+    padding: 0;
+
+    background: transparent;
+    border-radius: 7px;
+
+    color: #475569;
+    font-size: 17px;
     text-decoration: none;
     cursor: pointer;
-    pointer-events: all;
-}
 
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
 .hc-user-agenda-week-pagination > a:hover {
-    background-color: #ddd;
+    background: #eff6ff;
+    color: #2563eb;
 }
 
+/* Clic */
+.hc-user-agenda-week-pagination > a:active {
+    transform: scale(0.9);
+}
+
+/* Gauche */
 #hc-user-agenda-week-pagination-prev {
-    left: 0;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
+/* Droite */
 #hc-user-agenda-week-pagination-next {
-    right: 0;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 #hc-user-agenda-week-pagination-prev > a {
@@ -129,12 +198,94 @@
     padding-left: 6px;
 }
 
+.hc-user-agenda-week-scroll-btn-container {
+    position: absolute;
+    top: 0;
+    height: 50%;
+    width: 0;
+    z-index: 2;
+}
+
+.hc-user-agenda-week-scroll-btn-container:before {
+    content: "";
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+
+.hc-user-agenda-week-scroll-btn-container > div {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+}
+
+.hc-user-agenda-week-scroll-btn-container > div > a {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #ddda;
+    line-height: 60px;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.hc-user-agenda-week-scroll-btn-container > div > a:hover {
+    background-color: #ddd;
+}
+
+.hc-user-agenda-week-scroll-btn-container > div > a:before {
+    content: "";
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-radius: 2px;
+    position: absolute;
+    top: 24px;
+}
+
+.hc-user-agenda-week-scroll-btn-container.left {
+    left: 0;
+}
+
+.hc-user-agenda-week-scroll-btn-container.left > div > a {
+    left: -30px;
+}
+
+.hc-user-agenda-week-scroll-btn-container.left > div > a:before {
+    right: 15px;
+    border-top: 6px solid transparent;
+    border-right: 8px solid #000a;
+    border-bottom: 6px solid transparent;
+}
+
+.hc-user-agenda-week-scroll-btn-container.right {
+    right: 0;
+}
+
+.hc-user-agenda-week-scroll-btn-container.right > div > a {
+    right: -30px;
+}
+
+.hc-user-agenda-week-scroll-btn-container.right > div > a:before {
+    left: 15px;
+    border-top: 6px solid transparent;
+    border-left: 8px solid #000a;
+    border-bottom: 6px solid transparent;
+}
+
 @media (max-width: 767px) {
     .agenda-list #hc-user-agenda-week-table {
         flex-direction: column;
     }
     .agenda-list #hc-user-agenda-week-columns {
         white-space: normal;
+    }
+
+    #hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
+        left: 448px;
     }
 }
 </style>
@@ -496,6 +647,25 @@ export default {
             );
         },
 
+        /**
+         * Scroll horizontal d'une colonne (1 jour) vers la gauche
+         */
+        scrollLeft() {
+            this.$refs.body.scrollBy({
+                left: -this.width,
+                behavior: "smooth",
+            });
+        },
+
+        /**
+         * Scroll horizontal d'une colonne (1 jour) vers la droite
+         */
+        scrollRight() {
+        this.$refs.body.scrollBy({
+            left: this.width,
+            behavior: "smooth",
+        });
+    },
         /**
          *
          * @param {*} date
