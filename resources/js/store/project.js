@@ -262,6 +262,44 @@ export const mutations = {
      */
     [SET_PROJECT](state, project) {
         if (project) {
+            const previousProject =
+                state.project?.slug === project.slug
+                    ? state.project
+                    : state.projects.find((o) => o.slug === project.slug);
+
+            // The project response omits menu counts loaded by FETCH_MENUS.
+            // Keep them regardless of which request finishes first.
+            if (
+                Array.isArray(project.menus) &&
+                Array.isArray(previousProject?.menus)
+            ) {
+                const previousMenus = new Map(
+                    previousProject.menus.map((menu) => [menu.id, menu])
+                );
+
+                project = {
+                    ...project,
+                    menus: project.menus.map((menu) => {
+                        const previousMenu = previousMenus.get(menu.id);
+                        const mergedMenu = { ...previousMenu, ...menu };
+
+                        if (menu.count == null) {
+                            if (
+                                JSON.stringify(menu.filters ?? {}) ===
+                                JSON.stringify(previousMenu?.filters ?? {}) &&
+                                previousMenu?.count != null
+                            ) {
+                                mergedMenu.count = previousMenu.count;
+                            } else {
+                                delete mergedMenu.count;
+                            }
+                        }
+
+                        return mergedMenu;
+                    }),
+                };
+            }
+
             if (state.projects.find((o) => o.slug == project.slug)) {
                 state.projects = state.projects.map((o) =>
                     o.slug == project.slug ? { ...o, ...project } : o

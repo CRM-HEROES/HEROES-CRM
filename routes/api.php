@@ -491,6 +491,8 @@ Route::group([
         Route::get('product/{product}/image/{image}/thumbnail', [ProjectProductImageController::class, 'thumbnail'])->name("product.image.thumbnail");
 
         // Prospect Export
+        Route::get('export/{export}/status', [ProjectExportController::class, 'status'])->name('export.status');
+        Route::get('export/{export}/download', [ProjectExportController::class, 'download'])->name('export.download');
         Route::apiResource('export', ProjectExportController::class)->only('index', 'create', 'show', 'destroy');
 
         // Prospect bulk

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Project;
 
 use App\Exports\ProspectExport;
+use App\Exports\ProspectDownload;
 use App\Filters\ExportRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Jobs\ExportProspects;
@@ -11,7 +12,6 @@ use App\Models\Project;
 use App\Models\UserSetting;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
 class ExportController extends Controller
 {
@@ -31,6 +31,13 @@ class ExportController extends Controller
      */
     public function create(Request $request, Project $project)
     {
+        $request->validate([
+            'mode' => ['sometimes', 'required', 'in:email,download'],
+            'count' => ['sometimes', 'integer', 'min:0'],
+            'filters' => ['sometimes', 'json'],
+            'email' => ['exclude_unless:mode,email', 'required', 'email', 'max:255'],
+        ]);
+
         $fields = $this->getFields($request, $project);
 
         // Before exporting
@@ -45,14 +52,32 @@ class ExportController extends Controller
             'creator_id' => auth()->id(),
         ]);
         
-        // Send the export by email
-        // if no filters is applied
-        if (empty($export->filters)) {
+        // Keep the existing behavior for callers that do not specify a mode.
+        $mode = $request->input('mode', empty($export->filters) ? 'email' : 'download');
+
+        if ($mode === 'email') {
             dispatch((new ExportProspects($export))->onQueue('imports'));
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'Votre export est en cours de préparation. Vous le recevrez par email.',
+                ], 202);
+            }
+
             return back();
         }
 
-        return Excel::download(new ProspectExport($export, $this->getExportLimit($export)), $project->name . '.xlsx');
+        if ($request->input('mode') === 'download') {
+            app(ProspectDownload::class)->enqueue($export);
+
+            return response()->json([
+                'message' => 'Préparation du fichier Excel en cours…',
+                'status_url' => route('api.project.export.status', [$project, $export], false),
+                'download_url' => route('api.project.export.download', [$project, $export], false),
+            ], 202);
+        }
+
+        return app(ProspectDownload::class)->download(new ProspectExport($export, $this->getExportLimit($export)), $project->name . '.xlsx');
     }
 
     /**
@@ -63,14 +88,38 @@ class ExportController extends Controller
         // Export associated to the current project
         abort_unless($project->id == $export->project_id, 404);
 
+        if (app(ProspectDownload::class)->status($export)['status'] !== 'missing') {
+            return $this->download($project, $export);
+        }
+
         // Send the export by email
         // if no filters is applied
         if (empty($export->filters)) {
             dispatch((new ExportProspects($export))->onQueue('imports'));
             return back();
         } else {
-            return Excel::download(new ProspectExport($export, $this->getExportLimit($export)), $project->name . '.xlsx');
+            return app(ProspectDownload::class)->download(new ProspectExport($export, $this->getExportLimit($export)), $project->name . '.xlsx');
         }
+    }
+
+    public function status(Project $project, Export $export)
+    {
+        $this->authorizeDownload($project, $export);
+
+        return app(ProspectDownload::class)->status($export);
+    }
+
+    public function download(Project $project, Export $export)
+    {
+        $this->authorizeDownload($project, $export);
+
+        return app(ProspectDownload::class)->preparedFile($export);
+    }
+
+    protected function authorizeDownload(Project $project, Export $export): void
+    {
+        abort_unless($project->id == $export->project_id, 404);
+        abort_unless($export->creator_id == auth()->id(), 403);
     }
 
     /**
@@ -81,6 +130,7 @@ class ExportController extends Controller
         // Export associated to the current project
         abort_unless($project->id == $export->project_id, 404);
 
+        app(ProspectDownload::class)->delete($export);
         $export->delete();
 
         return ['message' => trans('common.success.deleted_resource')];

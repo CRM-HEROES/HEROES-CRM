@@ -63,6 +63,8 @@ class MenuController extends Controller
 
         $menu->users()->syncWithoutDetaching(auth()->id());
 
+        $menu->count = $this->countProspects($project, $menu);
+
         return $menu;
     }
 
