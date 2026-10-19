@@ -412,31 +412,8 @@
 
                                     <!-- List of SMS -->
 
-                                    <div
-                                        style="
-                                            display: flex;
-                                            flex-direction: column;
-                                            width: 100%;
-                                            flex: 1;
-                                            position: relative;
-                                        "
-                                    >
-                                        <div
-                                            style="
-                                                display: flex;
-                                                flex-direction: column;
-                                                width: 100%;
-                                                text-align: right;
-                                                max-height: 100%;
-                                                padding: 15px;
-                                                gap: 12px;
-                                                position: absolute;
-                                                bottom: 0;
-                                                overflow: auto;
-                                                scroll-behavior: smooth;
-                                            "
-                                            ref="sms"
-                                        >
+                                    <div class="hc-prospect-sms-list">
+                                        <div  class="hc-prospect-sms-messages" ref="sms">
                                             <sms-row
                                                 v-for="c in smss"
                                                 :key="c.id"
@@ -449,12 +426,8 @@
                                     <!-- Sms form -->
 
                                     <form
-                                        class="hc-flex-column"
+                                        class="hc-flex-column hc-prospect-sms-form"
                                         @submit.prevent="sendSMS"
-                                        style="
-                                            padding: 0 10px;
-                                            position: relative;
-                                        "
                                     >
                                         <!-- Sms textarea -->
 
@@ -662,6 +635,59 @@ button.hc-prospect-sms-refresh:disabled:hover {
     height: 35px;
     overflow: hidden;
 }
+
+
+/* Liste des SMS : hauteur selon le contenu */
+.hc-prospect-sms-list {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 60%;
+    width: 100%;
+    position: relative;
+}
+
+/* Messages avec scroll si nécessaire */
+.hc-prospect-sms-messages {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    padding: 15px;
+    gap: 12px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+/* Formulaire : occupe l'espace restant */
+.hc-prospect-sms-form {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+/* Textarea : s'agrandit avec le formulaire */
+#hc-prospect-sms-textarea {
+    flex: 0 0 auto;
+    height: 80px;
+    min-height: 50px;
+    max-height: 400px;
+    width: 100%;
+
+    resize: vertical;
+    overflow-y: auto;
+
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 </style>
 
 <script>

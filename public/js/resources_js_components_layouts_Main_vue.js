@@ -87239,28 +87239,10 @@ var _hoisted_34 = {
   id: "hc-prospect-sms-selected-prospects-list"
 };
 var _hoisted_35 = {
-  style: {
-    "display": "flex",
-    "flex-direction": "column",
-    "width": "100%",
-    "flex": "1",
-    "position": "relative"
-  }
+  "class": "hc-prospect-sms-list"
 };
 var _hoisted_36 = {
-  style: {
-    "display": "flex",
-    "flex-direction": "column",
-    "width": "100%",
-    "text-align": "right",
-    "max-height": "100%",
-    "padding": "15px",
-    "gap": "12px",
-    "position": "absolute",
-    "bottom": "0",
-    "overflow": "auto",
-    "scroll-behavior": "smooth"
-  },
+  "class": "hc-prospect-sms-messages",
   ref: "sms"
 };
 var _hoisted_37 = ["placeholder"];
@@ -87612,14 +87594,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
                     loading: $data.fetchingSms
                   }, null, 8 /* PROPS */, ["loading"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms form "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-                    "class": "hc-flex-column",
+                    "class": "hc-flex-column hc-prospect-sms-form",
                     onSubmit: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                       return $options.sendSMS && $options.sendSMS.apply($options, arguments);
-                    }, ["prevent"])),
-                    style: {
-                      "padding": "0 10px",
-                      "position": "relative"
-                    }
+                    }, ["prevent"]))
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms textarea "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
                     ref: "textarea",
                     id: "hc-prospect-sms-textarea",
@@ -111471,7 +111449,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n    display: flex;\n    flex-direction: column;\n    flex: 0 1 auto;\n    min-height: 0;\n    max-height: 60%;\n    width: 100%;\n    position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    min-height: 0;\n    padding: 15px;\n    gap: 12px;\n    overflow-y: auto;\n    scroll-behavior: smooth;\n}\n\n/* Formulaire : occupe l'espace restant */\n.hc-prospect-sms-form {\n    flex: 1 1 auto;\n    min-height: 0;\n    padding: 10px;\n    position: relative;\n    display: flex;\n    flex-direction: column;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n    flex: 0 0 auto;\n    height: 80px;\n    min-height: 50px;\n    max-height: 400px;\n    width: 100%;\n\n    resize: vertical;\n    overflow-y: auto;\n\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    box-sizing: border-box;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
