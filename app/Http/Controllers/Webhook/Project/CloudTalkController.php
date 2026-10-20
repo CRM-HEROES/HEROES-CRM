@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Webhook for CloudTalk message and call recording events.
@@ -21,7 +22,12 @@ class CloudTalkController extends Controller
      */
     public function store(Request $request, Project $project)
     {
+
         $payload = $request->all();
+        Log::info('CloudTalk Webhook - Payload reçu', [
+            'project_id' => $project->id,
+            'payload' => $payload,
+        ]);
         $event = data_get($payload, 'type');
 
         if (in_array($event, ['call.recording_ready', 'call.ended'], true)) {

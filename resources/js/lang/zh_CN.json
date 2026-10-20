@@ -349,7 +349,8 @@
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
             "call_by_cloudtalk": "通过 CloudTalk 呼叫",
-            "history": "历史"
+            "history": "历史",
+            "voicemail": "语音留言"
         },
         "message": {
             "title": "消息（{潜在客户}）",

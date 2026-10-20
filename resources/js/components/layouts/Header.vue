@@ -622,7 +622,9 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import store from "@/store";
-import ProspectService from "@/apis/project/prospect";
+import IncomingCommunicationService from "@/apis/project/incoming-communication";
+import EventBus from "@/utils/event-bus";
+import { COMMUNICATIONS_READ } from "@/utils/incoming-communications";
 
 import HeaderMenu from "./Menu.vue";
 import GlobalSearch from "./Search.vue";
@@ -642,7 +644,21 @@ export default {
         return {
             showMenus: false,
             incomingCommunicationsCount: 0,
+            incomingCommunicationsRequest: 0,
+            incomingCommunicationsInterval: null,
         };
+    },
+
+    mounted() {
+        EventBus.on(COMMUNICATIONS_READ, this.onCommunicationsRead);
+        this.incomingCommunicationsInterval = setInterval(() => {
+            if (!document.hidden) this.fetchIncomingCommunicationsCount();
+        }, 120000);
+    },
+
+    beforeUnmount() {
+        clearInterval(this.incomingCommunicationsInterval);
+        EventBus.off(COMMUNICATIONS_READ, this.onCommunicationsRead);
     },
 
     methods: {
@@ -683,23 +699,28 @@ export default {
             }
         },
         async fetchIncomingCommunicationsCount() {
+            const request = ++this.incomingCommunicationsRequest;
             const projectSlug = this.project?.slug;
             if (!projectSlug) {
                 return;
             }
 
             try {
-                const { data } = await ProspectService.count(projectSlug, {
-                    params: { filters: JSON.stringify(this.incomingCommunicationsFilters) },
-                });
+                const { data } = await IncomingCommunicationService.count(projectSlug);
 
-                if (this.project?.slug === projectSlug) {
-                    this.incomingCommunicationsCount = data;
+                if (this.project?.slug === projectSlug && request === this.incomingCommunicationsRequest) {
+                    this.incomingCommunicationsCount = data.count;
                 }
             } catch (error) {
-                if (this.project?.slug === projectSlug) {
+                if (this.project?.slug === projectSlug && request === this.incomingCommunicationsRequest) {
                     this.incomingCommunicationsCount = 0;
                 }
+            }
+        },
+        onCommunicationsRead({ projectSlug, count }) {
+            if (this.project?.slug === projectSlug) {
+                ++this.incomingCommunicationsRequest;
+                this.incomingCommunicationsCount = count;
             }
         },
     },

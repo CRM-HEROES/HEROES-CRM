@@ -412,7 +412,10 @@
 
                                     <!-- List of SMS -->
 
-                                    <div class="hc-prospect-sms-list">
+                                    <div
+                                        v-show="smss.length > 0 || fetchingSms"
+                                        class="hc-prospect-sms-list"
+                                    >
                                         <div  class="hc-prospect-sms-messages" ref="sms">
                                             <sms-row
                                                 v-for="c in smss"
@@ -660,15 +663,15 @@ button.hc-prospect-sms-refresh:disabled:hover {
     scroll-behavior: smooth;
 }
 
-/* Formulaire : occupe l'espace restant */
+/* Formulaire : suit directement les messages */
 .hc-prospect-sms-form {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     min-height: 0;
     padding: 10px;
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
 }
 
 /* Textarea : s'agrandit avec le formulaire */
@@ -691,6 +694,7 @@ button.hc-prospect-sms-refresh:disabled:hover {
 </style>
 
 <script>
+import { markCommunicationsRead } from "@/utils/incoming-communications";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
@@ -742,6 +746,17 @@ export default {
     },
 
     methods: {
+        async markDisplayedSmsRead(records = this.prospectSms) {
+            const projectSlug = this.project?.slug;
+            const prospectId = this.prospect?.id;
+            await this.$nextTick();
+            if (this.project?.slug === projectSlug && this.prospect?.id === prospectId
+                && this.slideOpen(this.name) && this.tab === 1 && this.frameTab === 0 && this.selectedProspectsTab === 0) {
+                return markCommunicationsRead(projectSlug, prospectId, "sms",
+                    (records || []).filter(sms => sms.prospect_id == prospectId));
+            }
+        },
+
         newSMS() {
             return {
                 message: "",
@@ -907,18 +922,28 @@ export default {
             if (newValue.length != oldValue.length && this.$refs.sms) {
                 this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
             }
+            this.markDisplayedSmsRead(newValue);
         },
 
         async tab(newValue) {
             await this.$nextTick();
 
             if (newValue == 1) {
+                this.markDisplayedSmsRead();
                 if (this.$refs.sms) {
                     this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
                 }
             } else if (newValue == 2) {
                 this.fetchSmsTemplates();
             }
+        },
+
+        frameTab() {
+            this.markDisplayedSmsRead();
+        },
+
+        selectedProspectsTab() {
+            this.markDisplayedSmsRead();
         },
 
         async prospect(newValue) {

@@ -349,7 +349,8 @@
             "call_by_aircall": "Chiama tramite Aircall",
             "call_by_ringover": "Chiama tramite Ringover",
             "call_by_cloudtalk": "Chiama tramite CloudTalk",
-            "history": "Storia"
+            "history": "Storia",
+            "voicemail": "Messaggio vocale"
         },
         "message": {
             "title": "Messaggio ({prospettivo})",

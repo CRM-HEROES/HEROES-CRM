@@ -13,8 +13,8 @@ const { code } = transformSync(descriptor.script.content, {
     plugins: ['@babel/plugin-transform-modules-commonjs'],
 });
 
-function header(handler = async () => ({ data: 6 })) {
-    const commits = [], dispatches = [], requests = [];
+function header(handler = async () => ({ data: { count: 6, sms: 3, email: 2, voicemail: 1 } })) {
+    const commits = [], dispatches = [], requests = [], events = [], timers = [], cleared = [];
     const module = { exports: {} };
     const dependencies = {
         vuex: { mapGetters: () => ({}), mapActions: () => ({}) },
@@ -22,16 +22,22 @@ function header(handler = async () => ({ data: 6 })) {
             commit: (...args) => commits.push(args),
             dispatch: (...args) => { dispatches.push(args); return Promise.resolve(); },
         },
-        '@/apis/project/prospect': {
+        '@/apis/project/incoming-communication': {
             count: (...args) => { requests.push(args); return handler(...args); },
         },
+        '@/utils/event-bus': {
+            on: (...args) => events.push(['on', ...args]),
+            off: (...args) => events.push(['off', ...args]),
+        },
+        '@/utils/incoming-communications': { COMMUNICATIONS_READ: 'incoming-communications-read' },
     };
-    new Function('require', 'module', 'exports', code)(key => {
+    new Function('require', 'module', 'exports', 'setInterval', 'clearInterval', 'document', code)(key => {
         if (key in dependencies) return dependencies[key];
         if (key.startsWith('@/actions/')) return new Proxy({}, { get: (_, name) => name });
         if (key.endsWith('.vue')) return {};
         throw new Error(`Unexpected dependency: ${key}`);
-    }, module, module.exports);
+    }, module, module.exports, (callback, delay) => { timers.push({ callback, delay }); return 1; },
+    id => cleared.push(id), { hidden: false });
     const component = module.exports.default;
     const vm = {
         ...component.data(), ...component.methods,
@@ -40,7 +46,7 @@ function header(handler = async () => ({ data: 6 })) {
     Object.defineProperty(vm, 'incomingCommunicationsFilters', {
         get: () => component.computed.incomingCommunicationsFilters.call(vm),
     });
-    return { vm, component, commits, dispatches, requests };
+    return { vm, component, commits, dispatches, requests, events, timers, cleared };
 }
 
 test('header link uses the same incoming filter as the prospect list', () => {
@@ -79,13 +85,11 @@ test('click clears old filters and fetches prospects with received communication
     assert.equal(countRefreshes, 1);
 });
 
-test('badge counts the prospects using the same filter', async () => {
+test('badge uses the unread communication count endpoint instead of the prospect count', async () => {
     const h = header();
     await h.vm.fetchIncomingCommunicationsCount();
     assert.equal(h.vm.incomingCommunicationsCount, 6);
-    assert.deepEqual(h.requests, [['test', {
-        params: { filters: JSON.stringify({ incomingCommunications: true }) },
-    }]]);
+    assert.deepEqual(h.requests, [['test']]);
 });
 
 test('missing project makes no count request', async () => {
@@ -101,9 +105,19 @@ test('a delayed count cannot replace the badge of another project', async () => 
     const pending = h.vm.fetchIncomingCommunicationsCount();
     h.vm.project = { slug: 'other' };
     h.vm.incomingCommunicationsCount = 3;
-    resolve({ data: 99 });
+    resolve({ data: { count: 99 } });
     await pending;
     assert.equal(h.vm.incomingCommunicationsCount, 3);
+});
+
+test('read receipts update the badge and invalidate an older count response', async () => {
+    let resolve;
+    const h = header(() => new Promise(done => { resolve = done; }));
+    const pending = h.vm.fetchIncomingCommunicationsCount();
+    h.vm.onCommunicationsRead({ projectSlug: 'test', count: 4 });
+    resolve({ data: { count: 6 } });
+    await pending;
+    assert.equal(h.vm.incomingCommunicationsCount, 4);
 });
 
 test('project changes reset the badge and request a fresh count', () => {
@@ -115,4 +129,19 @@ test('project changes reset the badge and request a fresh count', () => {
     assert.equal(h.vm.incomingCommunicationsCount, 0);
     assert.equal(refreshes, 1);
     assert.equal(h.component.watch['project.slug'].immediate, true);
+});
+
+test('the header polls for arrivals and removes its timer and listener on unmount', () => {
+    const h = header();
+    let refreshes = 0;
+    h.vm.fetchIncomingCommunicationsCount = () => { refreshes++; };
+    h.component.mounted.call(h.vm);
+    assert.equal(h.timers[0].delay, 120000);
+    h.timers[0].callback();
+    assert.equal(refreshes, 1);
+    h.component.beforeUnmount.call(h.vm);
+    assert.deepEqual(h.cleared, [1]);
+    assert.deepEqual(h.events.map(([action, name]) => [action, name]), [
+        ['on', 'incoming-communications-read'], ['off', 'incoming-communications-read'],
+    ]);
 });

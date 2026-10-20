@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Services\IncomingCommunications;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -336,41 +337,9 @@ class ProspectFilters extends Filters
         }
 
         return $builder->where(function ($query) {
-            $query->whereHas('messages', fn ($messages) => $messages->where('from_user', false))
-                ->orWhereHas('sms', function ($sms) {
-                    $sms->where(function ($incoming) {
-                        $incoming->where('is_incoming', true)->orWhere('from_user', false);
-                    });
-                })
-                ->orWhereHas('interactions', function ($interactions) {
-                    $interactions->where('from_user', false)->where(function ($voicemail) {
-                        $statuses = ['voicemail', 'voice_mail', 'voice mail', 'messagerie'];
-                        $voicemail->whereIn('status', $statuses);
-
-                        foreach (['outcome', 'cloudtalk_call->outcome', 'cloudtalk_call->status', 'cloudtalk_history->Cdr->status'] as $path) {
-                            $voicemail->orWhereIn('data->' . $path, $statuses);
-                        }
-
-                        foreach ([
-                            'has_voicemail', 'is_voicemail', 'voicemail',
-                            'cloudtalk_ended->data->is_voicemail',
-                            'cloudtalk_call->has_voicemail', 'cloudtalk_call->is_voicemail', 'cloudtalk_call->voicemail',
-                            'cloudtalk_history->Cdr->has_voicemail', 'cloudtalk_history->Cdr->is_voicemail', 'cloudtalk_history->Cdr->voicemail',
-                        ] as $path) {
-                            $voicemail->orWhere('data->' . $path, true);
-                        }
-
-                        foreach ([
-                            'voicemail_link', 'voicemail_url',
-                            'cloudtalk_call->voicemail_link', 'cloudtalk_call->voicemail_url',
-                            'cloudtalk_history->Cdr->voicemail_link', 'cloudtalk_history->Cdr->voicemail_url',
-                        ] as $path) {
-                            $voicemail->orWhere(function ($recording) use ($path) {
-                                $recording->whereNotNull('data->' . $path)->where('data->' . $path, '!=', '');
-                            });
-                        }
-                    });
-                });
+            $query->whereHas('messages', fn ($messages) => IncomingCommunications::incoming($messages, 'email'))
+                ->orWhereHas('sms', fn ($sms) => IncomingCommunications::incoming($sms, 'sms'))
+                ->orWhereHas('interactions', fn ($interactions) => IncomingCommunications::incoming($interactions, 'voicemail'));
         });
     }
 
