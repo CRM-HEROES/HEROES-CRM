@@ -6,6 +6,7 @@ use App\Models\Line;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 class CloudTalk
@@ -122,7 +123,7 @@ class CloudTalk
      * Send an outbound SMS through the CloudTalk sender number configured
      * on the agent line.
      */
-    public function sendSms(Line $line, string $recipient, string $message): array
+    public function sendSms(Line $line, string $recipient, string $message, array $media = []): array
     {
         $config = $line->config ?: [];
 
@@ -132,22 +133,45 @@ class CloudTalk
         $recipient = $this->formatSmsNumber($recipient);
         $message = trim($message);
 
-        if ($message === '') {
+        if ($message === '' && $media === []) {
             throw new RuntimeException('Le message SMS CloudTalk est vide.', 422);
         }
 
+        $streams = [];
+
         try {
-            $response = Http::timeout(30)
+            $request = Http::timeout(30)
                 ->acceptJson()
-                ->asJson()
-                ->withBasicAuth($config['api_key_id'], $config['api_key_secret'])
-                ->post(self::SEND_SMS_URL, [
-                    'recipient' => $recipient,
-                    'sender' => $sender,
-                    'message' => $message,
-                ]);
+                ->withBasicAuth($config['api_key_id'], $config['api_key_secret']);
+
+            if ($media === []) {
+                $request->asJson();
+            } else {
+                foreach ($media as $index => $attachment) {
+                    $stream = Storage::disk('sms')->readStream($attachment['path']);
+                    if (!is_resource($stream)) {
+                        throw new RuntimeException('Piece jointe CloudTalk introuvable.', 422);
+                    }
+                    $streams[] = $stream;
+                    $request->attach('images[' . $index . ']', $stream, $attachment['file_name'], [
+                        'Content-Type' => $attachment['mime_type'],
+                    ]);
+                }
+            }
+
+            $response = $request->post(self::SEND_SMS_URL, [
+                'recipient' => $recipient,
+                'sender' => $sender,
+                'message' => $message,
+            ]);
         } catch (ConnectionException $e) {
             throw new RuntimeException("Impossible de joindre l'API CloudTalk.", 503);
+        } finally {
+            foreach ($streams as $stream) {
+                if (is_resource($stream)) {
+                    fclose($stream);
+                }
+            }
         }
 
         $body = $response->json();

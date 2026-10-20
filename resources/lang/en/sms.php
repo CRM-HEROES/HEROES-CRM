@@ -2,6 +2,10 @@
 
 return [
 
+    'cloudtalk' => [
+        'attachments_size' => 'Attachments must not exceed 5 MB in total.',
+    ],
+
     'smsbox' => [
 
         'error' => [

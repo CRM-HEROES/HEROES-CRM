@@ -67,8 +67,9 @@ class CloudTalkController extends Controller
 
         $number = $this->extractPhoneNumber($payload);
         $message = $this->extractMessage($payload);
+        $media = $this->extractMedia($payload);
 
-        if ($number === null || $message === null) {
+        if ($number === null || ($message === null && $media === [])) {
             return [
                 'message' => 'ignored',
                 'reason' => 'missing_number_or_message',
@@ -89,12 +90,16 @@ class CloudTalkController extends Controller
 
         $receivedAt = $this->extractDate($payload);
         $attributes = [
-            'message' => $message,
+            'message' => $message ?? '',
             'source' => 'cloudtalk',
             'from_user' => 0,
             'is_incoming' => 1,
             'creator_id' => null,
         ];
+
+        if ($media !== []) {
+            $attributes['media'] = $media;
+        }
 
         if ($receivedAt) {
             $attributes['created_at'] = $receivedAt;
@@ -397,6 +402,30 @@ class CloudTalkController extends Controller
             'from_number',
             'value',
         ]);
+    }
+
+    /**
+     * Preserve the media references provided by CloudTalk message events.
+     */
+    protected function extractMedia(array $payload): array
+    {
+        $media = data_get($payload, 'data.media', []);
+        if (!is_array($media)) {
+            return [];
+        }
+
+        return collect($media)->filter(function ($attachment) {
+            $url = is_array($attachment) ? ($attachment['url'] ?? null) : null;
+            return is_string($url) && filter_var($url, FILTER_VALIDATE_URL)
+                && in_array(strtolower((string) parse_url($url, PHP_URL_SCHEME)), ['http', 'https'], true);
+        })->map(function (array $attachment) {
+            return [
+                'url' => $attachment['url'],
+                'file_name' => is_string($attachment['file_name'] ?? null)
+                    ? $attachment['file_name'] : basename(parse_url($attachment['url'], PHP_URL_PATH) ?: 'attachment'),
+                'extension' => is_string($attachment['extension'] ?? null) ? $attachment['extension'] : null,
+            ];
+        })->values()->all();
     }
 
     /**

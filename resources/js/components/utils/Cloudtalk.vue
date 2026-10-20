@@ -127,6 +127,7 @@
     z-index: 1;
     transition: filter 150ms ease-out;
     margin-bottom: 50px;
+    zoom: 65%;
 }
 
 .hc-cloudtalk-iframe-loading {

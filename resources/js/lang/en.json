@@ -519,7 +519,10 @@
             "via_cloudtalk": "SMS via CloudTalk",
             "via_source": "SMS via {source}",
             "templates": "SMS templates",
-            "enter_text_message": "Enter a text message"
+            "enter_text_message": "Enter a text message",
+            "add_attachment": "Attach an image",
+            "attachments_limits": "CloudTalk MMS: up to 5 JPG, PNG or GIF images, 5 MB in total.",
+            "send_error": "Unable to send the message. Please try again."
         },
         "file": {
             "title": "Files ({prospect})"

@@ -591,6 +591,8 @@ Route::group([
             // Revision
             Route::get('revision', [ProspectRevisionController::class, 'index']);
             // Sms
+            Route::get('sms/{sms}/attachment/{attachment}', [ProspectSmsController::class, 'attachment'])
+                ->whereNumber('attachment')->name('sms.attachment.show');
             Route::apiResource('sms', ProspectSmsController::class)->only('index', 'store', 'destroy');
             // Thread
             Route::get('thread', [ProspectThreadController::class, 'index']);

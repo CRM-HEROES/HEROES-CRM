@@ -45,6 +45,7 @@ class CloudTalkWebhookTest extends TestCase
             $table->id();
             $table->unsignedBigInteger('prospect_id')->nullable();
             $table->text('message');
+            $table->json('media')->nullable();
             $table->string('source')->nullable();
             $table->boolean('from_user')->default(true);
             $table->boolean('is_incoming')->default(false);
@@ -115,6 +116,34 @@ class CloudTalkWebhookTest extends TestCase
         ])->assertCreated();
 
         $this->assertSame('Ancien format', Sms::query()->sole()->message);
+    }
+
+    public function test_incoming_media_without_text_is_saved_and_displayable_without_sending_it_back(): void
+    {
+        $payload = $this->messagePayload();
+        unset($payload['data']['body']);
+        $payload['data']['channel'] = 'mms';
+        $payload['data']['media'] = [[
+            'url' => 'https://media.example.test/photo.png', 'file_name' => 'photo.png', 'extension' => 'png',
+        ]];
+        $this->postJson($this->endpoint(), $payload)->assertCreated();
+
+        $sms = Sms::query()->sole();
+        $this->assertSame('', $sms->message);
+        $this->assertSame($payload['data']['media'][0]['url'], $sms->attachments[0]['url']);
+        $this->assertSame('photo.png', $sms->attachments[0]['file_name']);
+        $this->assertTrue($sms->is_incoming);
+        Notification::assertNothingSent();
+        Http::assertNothingSent();
+    }
+
+    public function test_webhook_rejects_unsafe_media_links(): void
+    {
+        $payload = $this->messagePayload();
+        unset($payload['data']['body']);
+        $payload['data']['media'] = [['url' => 'javascript:alert(1)'], ['url' => 'file:///etc/passwd']];
+        $this->postJson($this->endpoint(), $payload)->assertOk()->assertJson(['message' => 'ignored']);
+        $this->assertSame(0, Sms::query()->count());
     }
 
     public function test_real_incoming_sms_preserves_multiline_text_and_iso_date(): void

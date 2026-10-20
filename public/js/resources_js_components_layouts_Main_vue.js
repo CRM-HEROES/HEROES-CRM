@@ -37926,7 +37926,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _utils_incoming_communications__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/utils/incoming-communications */ "./resources/js/utils/incoming-communications.js");
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
 /* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
@@ -37938,21 +37938,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _TemplateRow_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./TemplateRow.vue */ "./resources/js/components/prospect/sms/TemplateRow.vue");
 /* harmony import */ var _SelectedProspect_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./SelectedProspect.vue */ "./resources/js/components/prospect/sms/SelectedProspect.vue");
 /* harmony import */ var _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ../select/Select.vue */ "./resources/js/components/prospect/select/Select.vue");
+/* harmony import */ var _message_UploadingAttachmentRow_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../message/UploadingAttachmentRow.vue */ "./resources/js/components/prospect/message/UploadingAttachmentRow.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
 
@@ -37968,13 +37969,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     Ringover: _components_utils_Ringover_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
     SelectProspect: _select_Select_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
     SmsRow: _SmsRow_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
     TemplateRow: _TemplateRow_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    SelectedProspect: _SelectedProspect_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
+    SelectedProspect: _SelectedProspect_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+    UploadingAttachmentRow: _message_UploadingAttachmentRow_vue__WEBPACK_IMPORTED_MODULE_12__["default"]
   },
   data: function data() {
     return {
@@ -37989,10 +37992,37 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       selectedProspects: [],
       selectedProspectsFolded: true,
       fetchingSms: false,
-      addingSms: false
+      addingSms: false,
+      attachments: [],
+      sendError: ""
     };
   },
   methods: {
+    addAttachments: function addAttachments(event) {
+      var files = [].concat(_toConsumableArray(this.attachments), _toConsumableArray(event.target.files));
+      event.target.value = "";
+      if (this.addingSms || !this.canSendCloudtalkSms) {
+        return;
+      }
+      if (files.length > 5 || files.some(function (file) {
+        return !["image/jpeg", "image/png", "image/gif"].includes(file.type);
+      }) || files.reduce(function (size, file) {
+        return size + file.size;
+      }, 0) > 5 * 1024 * 1024) {
+        this.sendError = this.$t("prospect.sms.attachments_limits");
+        return;
+      }
+      this.attachments = files;
+      this.sendError = "";
+    },
+    removeAttachment: function removeAttachment(attachment) {
+      if (!this.addingSms) {
+        this.attachments = this.attachments.filter(function (file) {
+          return file !== attachment;
+        });
+        this.sendError = "";
+      }
+    },
     markDisplayedSmsRead: function markDisplayedSmsRead() {
       var _arguments = arguments,
         _this = this;
@@ -38140,47 +38170,65 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     sendSMS: function sendSMS() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var payload, result, _error$response, _error$response2, errors;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              if (_this4.canSendSms) {
+              if (!(!_this4.canSendSms || _this4.addingSms)) {
                 _context4.next = 2;
                 break;
               }
               return _context4.abrupt("return");
             case 2:
               _this4.addingSms = true;
-              _context4.prev = 3;
+              _this4.sendError = "";
+              payload = _objectSpread({}, _this4.sms);
+              if (payload.source === "cloudtalk" && _this4.attachments.length) {
+                payload.attachments = _toConsumableArray(_this4.attachments);
+              }
+              _context4.prev = 6;
               if (!_this4.prospect) {
-                _context4.next = 9;
+                _context4.next = 12;
                 break;
               }
-              _context4.next = 7;
-              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_SMS, _this4.sms);
-            case 7:
-              _context4.next = 13;
+              _context4.next = 10;
+              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT_SMS, payload);
+            case 10:
+              _context4.next = 17;
               break;
-            case 9:
+            case 12:
               if (!(_this4.prospectsSelected.length > 0)) {
-                _context4.next = 13;
+                _context4.next = 17;
                 break;
               }
-              _context4.next = 12;
-              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_4__.BULK_PROSPECT_SMS, _objectSpread(_objectSpread({}, _this4.sms), {}, {
+              _context4.next = 15;
+              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_4__.BULK_PROSPECT_SMS, _objectSpread(_objectSpread({}, payload), {}, {
                 prospects: _this4.prospectsSelected
               }));
-            case 12:
-              _this4.bulkSms = [].concat(_toConsumableArray(_this4.bulkSms), [_objectSpread({}, _this4.sms)]);
-            case 13:
-              _context4.prev = 13;
-              _this4.addingSms = false;
-              _this4.sms.message = "";
-              return _context4.finish(13);
+            case 15:
+              result = _context4.sent;
+              _this4.bulkSms = [].concat(_toConsumableArray(_this4.bulkSms), [_objectSpread(_objectSpread({}, _this4.sms), {}, {
+                attachments: (result === null || result === void 0 ? void 0 : result.attachments) || []
+              })]);
             case 17:
+              _this4.sms.message = "";
+              _this4.attachments = [];
+              _context4.next = 25;
+              break;
+            case 21:
+              _context4.prev = 21;
+              _context4.t0 = _context4["catch"](6);
+              errors = (_error$response = _context4.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
+              _this4.sendError = errors && Object.values(errors).flat()[0] || ((_error$response2 = _context4.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _this4.$t("prospect.sms.send_error");
+            case 25:
+              _context4.prev = 25;
+              _this4.addingSms = false;
+              return _context4.finish(25);
+            case 28:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[3,, 13, 17]]);
+        }, _callee4, null, [[6, 21, 25, 28]]);
       }))();
     },
     configureSmsbox: function configureSmsbox() {
@@ -38223,6 +38271,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   watch: {
+    "sms.source": function smsSource() {
+      this.attachments = [];
+      this.sendError = "";
+    },
+    "project.slug": function projectSlug() {
+      this.attachments = [];
+      this.sendError = "";
+    },
     prospectSms: function prospectSms(newValue, oldValue) {
       var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
@@ -38273,16 +38329,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     selectedProspectsTab: function selectedProspectsTab() {
       this.markDisplayedSmsRead();
     },
-    prospect: function prospect(newValue) {
+    prospect: function prospect(newValue, oldValue) {
       var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
+              if ((newValue === null || newValue === void 0 ? void 0 : newValue.id) !== (oldValue === null || oldValue === void 0 ? void 0 : oldValue.id)) {
+                _this7.attachments = [];
+                _this7.sendError = "";
+              }
               if (newValue && _this7.slideOpen(_this7.name)) {
                 _this7.fetchSms();
               }
-            case 1:
+            case 2:
             case "end":
               return _context7.stop();
           }
@@ -38310,7 +38370,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_12__.mapGetters)(["project", "prospect", "prospectsSelected", "prospectFullName", "prospectSms", "slideOpen", "smsTemplates", "lines", "can"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_13__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_13__.mapGetters)(["project", "prospect", "prospectsSelected", "prospectFullName", "prospectSms", "slideOpen", "smsTemplates", "lines", "can"])), {}, {
     /**
      *
      */
@@ -38359,7 +38419,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     canSendSms: function canSendSms() {
       if (this.sms.source == "cloudtalk") {
-        return this.canSendCloudtalkSms;
+        return this.canSendCloudtalkSms && (!!this.sms.message.trim() || this.attachments.length > 0);
       }
       return true;
     },
@@ -38392,6 +38452,11 @@ __webpack_require__.r(__webpack_exports__);
   props: {
     sms: {
       type: Object
+    }
+  },
+  methods: {
+    isImageAttachment: function isImageAttachment(attachment) {
+      return ["image/jpeg", "image/png", "image/gif"].includes(attachment.mime_type) || ["jpg", "jpeg", "png", "gif"].includes((attachment.extension || "").toLowerCase());
     }
   },
   computed: {
@@ -87307,21 +87372,26 @@ var _hoisted_36 = {
 };
 var _hoisted_37 = ["placeholder"];
 var _hoisted_38 = {
-  "class": "hc-flex-row"
+  key: 0,
+  "class": "hc-prospect-sms-attachments"
 };
 var _hoisted_39 = ["textContent"];
 var _hoisted_40 = {
-  "class": "hc-flex-column"
+  "class": "hc-flex-row"
 };
 var _hoisted_41 = ["textContent"];
 var _hoisted_42 = {
+  "class": "hc-flex-column"
+};
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_43 = ["textContent"];
-var _hoisted_44 = ["textContent"];
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -87329,6 +87399,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_selected_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("selected-prospect");
   var _component_sms_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("sms-row");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_uploading_attachment_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("uploading-attachment-row");
   var _component_select_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("select-prospect");
   var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
   var _component_ringover = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("ringover");
@@ -87340,7 +87411,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[20] || (_cache[20] = function ($event) {
+    onOpen: _cache[22] || (_cache[22] = function ($event) {
       return $options.fetchSms(), $options.fetchSelectedProspects();
     }),
     title: _ctx.prospectsSelected.length > 0 ? _ctx.$t('prospect.sms.bulk_title', {
@@ -87655,7 +87726,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     loading: $data.fetchingSms
                   }, null, 8 /* PROPS */, ["loading"])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.smss.length > 0 || $data.fetchingSms]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms form "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
                     "class": "hc-flex-column hc-prospect-sms-form",
-                    onSubmit: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                    onSubmit: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                       return $options.sendSMS && $options.sendSMS.apply($options, arguments);
                     }, ["prevent"]))
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms textarea "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
@@ -87665,7 +87736,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
                       return $data.sms.message = $event;
                     })
-                  }, null, 8 /* PROPS */, _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), $data.sms.source === 'cloudtalk' && $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_38, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (attachment, index) {
+                    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_uploading_attachment_row, {
+                      key: attachment.name + ':' + attachment.lastModified + ':' + index,
+                      attachment: attachment,
+                      onRemove: $options.removeAttachment
+                    }, null, 8 /* PROPS */, ["attachment", "onRemove"]);
+                  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                    key: 1,
+                    "class": "hc-prospect-sms-error",
+                    role: "alert",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
+                  }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
@@ -87687,16 +87769,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       "align-items": "center"
                     },
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.charsCount + '/' + $options.page)
-                  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
                     onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.tab = 2;
                     }, ["prevent"]))
-                  }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Modèle de SMS']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Send "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Modèle de SMS']]), $data.sms.source === 'cloudtalk' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                    key: 2,
+                    tag: "button",
+                    type: "button",
+                    "class": "fa fa-paperclip hc-prospect-sms-attach",
+                    "aria-label": _ctx.$t('prospect.sms.add_attachment'),
+                    disabled: !$options.canSendCloudtalkSms || $data.addingSms,
+                    onClick: _cache[13] || (_cache[13] = function ($event) {
+                      return _ctx.$refs.attachmentsInput.click();
+                    })
+                  }, null, 8 /* PROPS */, ["aria-label", "disabled"])), [[_directive_tooltip, _ctx.$t('prospect.sms.add_attachment')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sms.source === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+                    key: 3,
+                    ref: "attachmentsInput",
+                    type: "file",
+                    accept: "image/jpeg,image/png,image/gif",
+                    multiple: "",
+                    hidden: "",
+                    onChange: _cache[14] || (_cache[14] = function () {
+                      return $options.addAttachments && $options.addAttachments.apply($options, arguments);
+                    })
+                  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Send "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "button",
                     "class": "fa fa-paper-plane hc-prospect-sms-send",
-                    disabled: !$options.canSendSms
+                    disabled: !$options.canSendSms || $data.addingSms
                   }, null, 8 /* PROPS */, ["disabled"]), [[_directive_tooltip, 'Envoyer']])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
                     loading: $data.addingSms
                   }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)])];
@@ -87704,7 +87806,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
                     "search-fields": ['first_name', 'last_name', 'mobile_phone_number'],
-                    onBack: _cache[14] || (_cache[14] = function ($event) {
+                    onBack: _cache[16] || (_cache[16] = function ($event) {
                       return $data.selectedProspectsTab = 0;
                     }),
                     onProspectSelected: $options.addSelectedProspect
@@ -87715,7 +87817,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[16] || (_cache[16] = function ($event) {
+                onBack: _cache[18] || (_cache[18] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setSmsProspect
@@ -87725,8 +87827,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.prospect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[15] || (_cache[15] = function ($event) {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[17] || (_cache[17] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -87739,7 +87841,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                       source: $options.source
                     }))
-                  }, null, 8 /* PROPS */, _hoisted_41)];
+                  }, null, 8 /* PROPS */, _hoisted_43)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
@@ -87758,8 +87860,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[17] || (_cache[17] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[19] || (_cache[19] = function ($event) {
               return $data.tab = 1;
             }),
             "class": "bordered"
@@ -87770,12 +87872,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.templates'))
-              }, null, 8 /* PROPS */, _hoisted_43)];
+              }, null, 8 /* PROPS */, _hoisted_45)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.smsTemplateKeyword,
-            "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+            "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
               return $data.smsTemplateKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -87798,11 +87900,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [_ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
                 key: 0,
-                onClick: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onClick: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.addSmsTemplate && $options.addSmsTemplate.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              }, null, 8 /* PROPS */, _hoisted_46)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })])];
@@ -87834,8 +87936,15 @@ var _hoisted_1 = {
 };
 var _hoisted_2 = ["textContent"];
 var _hoisted_3 = ["textContent"];
-var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["textContent"];
+var _hoisted_4 = {
+  key: 2,
+  "class": "hc-prospect-sms-media"
+};
+var _hoisted_5 = ["href"];
+var _hoisted_6 = ["src", "alt"];
+var _hoisted_7 = ["textContent"];
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-sms', 'hc-flex-row', $options.isIncoming ? 'hc-prospect-sms-from-prospect' : ''])
@@ -87843,17 +87952,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "hc-prospect-sms-header",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.sms.creator.name)
-  }, null, 8 /* PROPS */, _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.sms.message ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 1,
     "class": "hc-prospect-sms-message",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.sms.message)
-  }, null, 8 /* PROPS */, _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.sms.attachments && $props.sms.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.sms.attachments, function (attachment) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+      key: attachment.url,
+      href: attachment.url,
+      target: "_blank",
+      rel: "noopener noreferrer"
+    }, [$options.isImageAttachment(attachment) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+      key: 0,
+      src: attachment.url,
+      alt: attachment.file_name,
+      loading: "lazy"
+    }, null, 8 /* PROPS */, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(attachment.file_name)
+    }, null, 8 /* PROPS */, _hoisted_7)], 8 /* PROPS */, _hoisted_5);
+  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-sms-footer",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.footer)
-  }, null, 8 /* PROPS */, _hoisted_4), $props.sms.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-    key: 1,
+  }, null, 8 /* PROPS */, _hoisted_8), $props.sms.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 3,
     "class": "hc-prospect-sms-error",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.sms.error)
-  }, null, 8 /* PROPS */, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2 /* CLASS */);
 }
 
 /***/ }),
@@ -111622,7 +111746,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n    display: flex;\n    flex-direction: column;\n    flex: 0 1 auto;\n    min-height: 0;\n    max-height: 60%;\n    width: 100%;\n    position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    min-height: 0;\n    padding: 15px;\n    gap: 12px;\n    overflow-y: auto;\n    scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n    flex: 0 0 auto;\n    min-height: 0;\n    padding: 10px;\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n    flex: 0 0 auto;\n    height: 80px;\n    min-height: 50px;\n    max-height: 400px;\n    width: 100%;\n\n    resize: vertical;\n    overflow-y: auto;\n\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    box-sizing: border-box;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n    display: flex;\n    overflow-x: auto;\n    max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n    display: flex;\n    flex-direction: column;\n    flex: 0 1 auto;\n    min-height: 0;\n    max-height: 60%;\n    width: 100%;\n    position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    min-height: 0;\n    padding: 15px;\n    gap: 12px;\n    overflow-y: auto;\n    scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n    flex: 0 0 auto;\n    min-height: 0;\n    padding: 10px;\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n    flex: 0 0 auto;\n    height: 80px;\n    min-height: 50px;\n    max-height: 400px;\n    width: 100%;\n\n    resize: vertical;\n    overflow-y: auto;\n\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    box-sizing: border-box;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -111646,7 +111770,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms {\n    justify-content: end;\n}\n.hc-prospect-sms-content {\n    align-items: end;\n    width: 100%;\n}\n.hc-prospect-sms-from-prospect .hc-prospect-sms-content {\n    align-items: start;\n}\n.hc-prospect-sms-content > * {\n    max-width: 90%;\n    white-space: normal;\n}\n.hc-prospect-sms-header {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-message {\n    background-color: #7939b8;\n    color: #e6deef;\n    padding: 7px 10px;\n    border-radius: 15px;\n    box-shadow: 0 3px 20px -3px #0005;\n    position: relative;\n    font-size: 11px;\n}\n.hc-prospect-sms-from-prospect .hc-prospect-sms-message {\n    background-color: #eeeeee;\n    color: #333333;\n    border-radius: 7px 7px 7px 0;\n    text-align: left;\n}\n.hc-prospect-sms-error {\n    color: #b75959;\n    font-size: 11px;\n    text-align: right;\n}\n.hc-prospect-sms-footer {\n    font-size: 11px;\n    color: #999999;\n    text-align: right;\n    margin-top: 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms {\n    justify-content: end;\n}\n.hc-prospect-sms-content {\n    align-items: end;\n    width: 100%;\n}\n.hc-prospect-sms-from-prospect .hc-prospect-sms-content {\n    align-items: start;\n}\n.hc-prospect-sms-content > * {\n    max-width: 90%;\n    white-space: normal;\n}\n.hc-prospect-sms-header {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-message {\n    background-color: #7939b8;\n    color: #e6deef;\n    padding: 7px 10px;\n    border-radius: 15px;\n    box-shadow: 0 3px 20px -3px #0005;\n    position: relative;\n    font-size: 11px;\n}\n.hc-prospect-sms-media {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 6px;\n}\n.hc-prospect-sms-media a {\n    display: flex;\n    flex-direction: column;\n    max-width: 120px;\n    overflow-wrap: anywhere;\n    font-size: 11px;\n}\n.hc-prospect-sms-media img {\n    width: 120px;\n    height: 100px;\n    max-width: 120px;\n    max-height: 120px;\n    -o-object-fit: contain;\n       object-fit: contain;\n    border-radius: 6px;\n}\n.hc-prospect-sms-from-prospect .hc-prospect-sms-message {\n    background-color: #eeeeee;\n    color: #333333;\n    border-radius: 7px 7px 7px 0;\n    text-align: left;\n}\n.hc-prospect-sms-error {\n    color: #b75959;\n    font-size: 11px;\n    text-align: right;\n}\n.hc-prospect-sms-footer {\n    font-size: 11px;\n    color: #999999;\n    text-align: right;\n    margin-top: 5px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

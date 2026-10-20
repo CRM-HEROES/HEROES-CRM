@@ -63,6 +63,7 @@ export const actions = {
             context.state.project.slug,
             params
         );
+        return data;
     },
 };
 
