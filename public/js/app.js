@@ -34761,6 +34761,9 @@ var Stat = function Stat() {
 var Stat2 = function Stat2() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_stat2_Stat_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/stat2/Stat.vue */ "./resources/js/components/stat2/Stat.vue"));
 };
+var StatBuilder = function StatBuilder() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_stat-builder_StatBuilder_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/stat-builder/StatBuilder.vue */ "./resources/js/components/stat-builder/StatBuilder.vue"));
+};
 // Order
 var Order = function Order() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_order_Table_Layout_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/order/Table/Layout.vue */ "./resources/js/components/order/Table/Layout.vue"));
@@ -34946,6 +34949,15 @@ var routes = [].concat(_toConsumableArray(_router_auth_js__WEBPACK_IMPORTED_MODU
   }, {
     name: "stat",
     path: "stat",
+    component: StatBuilder,
+    meta: {
+      middleware: "auth",
+      page: "stat.index",
+      title: "Statistique"
+    }
+  }, {
+    name: "stat-classic",
+    path: "stat-classic",
     component: Stat2,
     meta: {
       middleware: "auth",
@@ -97510,7 +97522,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"app_name":"英雄CRM","add":"添加"
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_layouts_Main_vue":1,"resources_js_components_dashboard_Dashboard_vue":1,"resources_js_components_prospect_table_Layout_vue":1,"resources_js_components_prospect_profile_Profile_vue":1,"resources_js_components_project_table_Layout_vue":1,"resources_js_components_project_profile_Profile_vue":1,"resources_js_components_user_table_Layout_vue":1,"resources_js_components_user_profile_Profile_vue":1,"resources_js_components_map_Map_vue":1,"resources_js_components_document_Document_vue":1,"resources_js_components_campaign_Campaign_vue":1,"resources_js_components_event_Agenda_vue":1,"resources_js_components_pipeline_list_Pipeline_vue":1,"resources_js_components_stat_Stat_vue":1,"resources_js_components_stat2_Stat_vue":1,"resources_js_components_order_Table_Layout_vue":1,"resources_js_components_404_vue":1,"resources_js_components_global_user_table_Layout_vue":1,"resources_js_components_global_user_profile_Profile_vue":1,"resources_js_components_auth_Login_vue":1,"resources_js_components_auth_Register_vue":1,"resources_js_components_auth_password_Reset_vue":1,"resources_js_components_auth_password_Request_vue":1,"resources_js_components_auth_two-factors_Enable_vue":1,"resources_js_components_auth_two-factors_Login_vue":1,"resources_js_components_auth_registration_Registration_vue":1,"resources_js_components_auth_registration_Step_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_layouts_Main_vue":1,"resources_js_components_dashboard_Dashboard_vue":1,"resources_js_components_prospect_table_Layout_vue":1,"resources_js_components_prospect_profile_Profile_vue":1,"resources_js_components_project_table_Layout_vue":1,"resources_js_components_project_profile_Profile_vue":1,"resources_js_components_user_table_Layout_vue":1,"resources_js_components_user_profile_Profile_vue":1,"resources_js_components_map_Map_vue":1,"resources_js_components_document_Document_vue":1,"resources_js_components_campaign_Campaign_vue":1,"resources_js_components_event_Agenda_vue":1,"resources_js_components_pipeline_list_Pipeline_vue":1,"resources_js_components_stat_Stat_vue":1,"resources_js_components_stat2_Stat_vue":1,"resources_js_components_stat-builder_StatBuilder_vue":1,"resources_js_components_order_Table_Layout_vue":1,"resources_js_components_404_vue":1,"resources_js_components_global_user_table_Layout_vue":1,"resources_js_components_global_user_profile_Profile_vue":1,"resources_js_components_auth_Login_vue":1,"resources_js_components_auth_Register_vue":1,"resources_js_components_auth_password_Reset_vue":1,"resources_js_components_auth_password_Request_vue":1,"resources_js_components_auth_two-factors_Enable_vue":1,"resources_js_components_auth_two-factors_Login_vue":1,"resources_js_components_auth_registration_Registration_vue":1,"resources_js_components_auth_registration_Step_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};
