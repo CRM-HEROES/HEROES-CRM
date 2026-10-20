@@ -126,6 +126,12 @@ return [
             'url' => env('APP_URL') . '/storage'
         ],
 
+        'sms' => [
+            'driver' => 'local',
+            'root' => storage_path('app/sms'),
+            'throw' => true,
+        ],
+
         /**
          * OCR disk
          */

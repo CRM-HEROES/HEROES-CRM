@@ -6,6 +6,7 @@ use App\Models\Sms;
 use App\Utils\Field\Renderer\ProjectFieldRenderer;
 use App\Utils\Field\Renderer\ProspectFieldRenderer;
 use App\Utils\ProjectSetting;
+use Illuminate\Support\Facades\Storage;
 
 class SmsObserver
 {
@@ -31,6 +32,14 @@ class SmsObserver
         }
 
         $this->send($sms);
+    }
+
+    public function deleted(Sms $sms): void
+    {
+        $paths = array_column($sms->media ?? [], 'path');
+        if ($paths) {
+            Storage::disk('sms')->delete($paths);
+        }
     }
 
     /**

@@ -184,10 +184,14 @@ class Interaction extends Model
 
         foreach ([
             data_get($this->data, 'has_voicemail'),
+            data_get($this->data, 'is_voicemail'),
             data_get($this->data, 'voicemail'),
+            data_get($this->data, 'cloudtalk_ended.data.is_voicemail'),
             data_get($this->data, 'cloudtalk_call.has_voicemail'),
+            data_get($this->data, 'cloudtalk_call.is_voicemail'),
             data_get($this->data, 'cloudtalk_call.voicemail'),
             data_get($this->data, 'cloudtalk_history.Cdr.has_voicemail'),
+            data_get($this->data, 'cloudtalk_history.Cdr.is_voicemail'),
             data_get($this->data, 'cloudtalk_history.Cdr.voicemail'),
         ] as $value) {
             if ($value !== null && $value !== '' && filter_var($value, FILTER_VALIDATE_BOOLEAN)) {

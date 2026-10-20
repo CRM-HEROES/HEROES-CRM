@@ -135,6 +135,7 @@
         "appointments": "RDV",
         "map": "MAP",
         "mail": "Mails",
+        "incoming_communications": "Communications reçues",
         "order": "Devis",
         "documents": "Documents",
         "campaigns": "Campagnes",
@@ -447,7 +448,8 @@
             "call_by_ringover": "Appeler via Ringover",
             "call_by_cloudtalk": "Appeler via CloudTalk",
             "call_by_kavkom": "Appeler via Kavkom",
-            "history": "Historique"
+            "history": "Historique",
+            "voicemail": "Message vocal"
         },
         "message": {
             "title": "Message ({prospect})",
@@ -517,7 +519,10 @@
             "via_cloudtalk": "SMS via CloudTalk",
             "via_source": "SMS via {source}",
             "templates": "Templates SMS",
-            "enter_text_message": "Saisir un SMS"
+            "enter_text_message": "Saisir un SMS",
+            "add_attachment": "Joindre une image",
+            "attachments_limits": "CloudTalk MMS : 5 images JPG, PNG ou GIF maximum, 5 Mo au total.",
+            "send_error": "Impossible d’envoyer le message. Réessayez."
         },
         "file": {
             "title": "Fichiers ({prospect})"

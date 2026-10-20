@@ -2,6 +2,10 @@
 
 return [
 
+    'cloudtalk' => [
+        'attachments_size' => 'Les pièces jointes ne doivent pas dépasser 5 Mo au total.',
+    ],
+
     'smsbox' => [
 
         'error' => [

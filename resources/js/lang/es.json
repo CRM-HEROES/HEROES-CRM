@@ -122,6 +122,7 @@
         "appointments": "Equipo",
         "map": "MAPA",
         "mail": "Correos",
+        "incoming_communications": "Comunicaciones recibidas",
         "order": "Pedidos",
         "documents": "Documentos",
         "campaigns": "Campañas",
@@ -377,7 +378,8 @@
             "call_by_aircall": "Llamar por Aircall",
             "call_by_ringover": "Llamar por Ringover",
             "call_by_cloudtalk": "Llamar por CloudTalk",
-            "history": "Historia"
+            "history": "Historia",
+            "voicemail": "Mensaje de voz"
         },
         "message": {
             "title": "Mensaje ({prospecto})",
@@ -447,7 +449,10 @@
             "via_cloudtalk": "SMS a través de CloudTalk",
             "via_source": "SMS a través de {fuente}",
             "templates": "Plantillas de SMS",
-            "enter_text_message": "Introduce un mensaje de texto"
+            "enter_text_message": "Introduce un mensaje de texto",
+            "add_attachment": "Adjuntar una imagen",
+            "attachments_limits": "CloudTalk MMS: hasta 5 imágenes JPG, PNG o GIF, 5 MB en total.",
+            "send_error": "No se pudo enviar el mensaje. Inténtalo de nuevo."
         },
         "file": {
             "title": "Archivos ({prospecto})"

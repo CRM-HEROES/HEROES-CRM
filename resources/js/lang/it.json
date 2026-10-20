@@ -118,6 +118,7 @@
         "appointments": "Appuntamenti",
         "map": "CARTA GEOGRAFICA",
         "mail": "Mail",
+        "incoming_communications": "Comunicazioni ricevute",
         "order": "Ordini",
         "documents": "Documenti",
         "campaigns": "Campagne",
@@ -348,7 +349,8 @@
             "call_by_aircall": "Chiama tramite Aircall",
             "call_by_ringover": "Chiama tramite Ringover",
             "call_by_cloudtalk": "Chiama tramite CloudTalk",
-            "history": "Storia"
+            "history": "Storia",
+            "voicemail": "Messaggio vocale"
         },
         "message": {
             "title": "Messaggio ({prospettivo})",
@@ -415,7 +417,10 @@
             "via_cloudtalk": "SMS tramite CloudTalk",
             "via_source": "SMS tramite {fonte}",
             "templates": "Modelli SMS",
-            "enter_text_message": "Inserisci un messaggio di testo"
+            "enter_text_message": "Inserisci un messaggio di testo",
+            "add_attachment": "Allega un’immagine",
+            "attachments_limits": "CloudTalk MMS: fino a 5 immagini JPG, PNG o GIF, 5 MB in totale.",
+            "send_error": "Impossibile inviare il messaggio. Riprova."
         },
         "file": {
             "title": "File ({prospettivo potenziale})"

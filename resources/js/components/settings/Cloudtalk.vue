@@ -11,14 +11,14 @@
                     <!-- En-tête -->
                     <div class="hc-cloudtalk-webhook-header">
                         <icon class="fa fa-link" />
-                        <span>Recevoir les nouveaux SMS</span>
+                        <span>Recevoir les SMS, appels et messages vocaux</span>
                     </div>
 
                     <!-- Description -->
                     <p class="hc-cloudtalk-webhook-help">
                         Configurez un webhook CloudTalk pour
                         recevoir automatiquement les nouveaux
-                        SMS dans votre CRM.
+                        SMS, les messages vocaux et les enregistrements des appels dans votre CRM.
                     </p>
 
                     <!-- URL du webhook -->
@@ -26,14 +26,14 @@
                         <input
                             type="text"
                             readonly
-                            :value="cloudtalkSmsWebhookUrl"
+                            :value="cloudtalkWebhookUrl"
                             @focus="$event.target.select()"
                         />
 
                         <button
                             type="button"
                             class="hc-button-secondary"
-                            @click.prevent="copyCloudtalkSmsWebhookUrl"
+                            @click.prevent="copyCloudtalkWebhookUrl"
                         >
                             <icon class="fa fa-copy" />
                             <span>Copier</span>
@@ -45,7 +45,7 @@
                         class="hc-cloudtalk-webhook-instructions"
                     >
                         <div class="hc-cloudtalk-webhook-instructions-title">
-                            Comment configurer la réception des SMS ?
+                            Comment configurer les événements CloudTalk ?
                         </div>
 
                         <ol>
@@ -72,9 +72,10 @@
                             </li>
 
                             <li>
-                                Sélectionnez uniquement
-                                l'événement
-                                <strong>message.received</strong>.
+                                Sélectionnez les événements
+                                <strong>message.received</strong>,
+                                <strong>call.ended</strong> et
+                                <strong>call.recording_ready</strong>.
                             </li>
 
                             <li>
@@ -84,8 +85,10 @@
 
                         <p class="hc-cloudtalk-webhook-note">
                             <icon class="fa fa-info-circle" />
-                            Les nouveaux SMS reçus seront
-                            automatiquement transmis au CRM.
+                            Les SMS reçus seront transmis au CRM et les
+                            enregistrements seront rattachés aux interactions existantes.
+                            Les appels et messages vocaux créeront une interaction si le
+                            numéro correspond à un prospect du projet.
                         </p>
                     </div>
 
@@ -239,17 +242,17 @@ export default {
     },
 
     methods: {
-        copyCloudtalkSmsWebhookUrl() {
-            if (!this.cloudtalkSmsWebhookUrl) {
+        copyCloudtalkWebhookUrl() {
+            if (!this.cloudtalkWebhookUrl) {
                 return;
             }
 
             navigator.clipboard
-                .writeText(this.cloudtalkSmsWebhookUrl)
+                .writeText(this.cloudtalkWebhookUrl)
                 .then(() => {
                     flashInfo({
                         title: "CloudTalk",
-                        body: "URL Webhook SMS CloudTalk copiée",
+                        body: "URL du webhook CloudTalk copiée",
                         duration: 5000,
                     });
                 })
@@ -268,9 +271,9 @@ export default {
 
         /**
          * URL du webhook CloudTalk pour
-         * recevoir les SMS entrants.
+         * recevoir les SMS entrants et les références des enregistrements.
          */
-        cloudtalkSmsWebhookUrl() {
+        cloudtalkWebhookUrl() {
             if (!this.project || !this.project.slug) {
                 return "";
             }
@@ -279,7 +282,7 @@ export default {
                 window.location.origin +
                 "/webhook/project/" +
                 this.project.slug +
-                "/cloudtalk/sms"
+                "/cloudtalk"
             );
         },
     },

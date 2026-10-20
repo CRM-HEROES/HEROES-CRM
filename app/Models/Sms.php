@@ -25,6 +25,7 @@ class Sms extends Model
         'from_user',
         'is_incoming',
         'message',
+        'media',
         'error',
         'project_id',
         'source',
@@ -34,8 +35,34 @@ class Sms extends Model
     protected $casts = [
         'from_user' => 'boolean',
         'is_incoming' => 'boolean',
+        'media' => 'array',
         'sent_at' => 'datetime'
     ];
+
+    protected $hidden = ['media', 'prospect'];
+
+    protected $appends = ['attachments'];
+
+    public function getAttachmentsAttribute(): array
+    {
+        return collect($this->media ?? [])->map(function (array $media, int $index) {
+            $url = isset($media['path'])
+                ? route('api.project.prospect.sms.attachment.show', [
+                    'project' => $this->prospect->project,
+                    'prospect' => $this->prospect_id,
+                    'sms' => $this->id,
+                    'attachment' => $index,
+                ], false)
+                : ($media['url'] ?? null);
+
+            return [
+                'url' => $url,
+                'file_name' => $media['file_name'] ?? 'attachment',
+                'mime_type' => $media['mime_type'] ?? null,
+                'extension' => $media['extension'] ?? null,
+            ];
+        })->all();
+    }
 
 
     // Attributes

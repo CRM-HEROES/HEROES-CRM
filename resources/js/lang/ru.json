@@ -118,6 +118,7 @@
         "appointments": "Назначения",
         "map": "КАРТА",
         "mail": "Почта",
+        "incoming_communications": "Входящие сообщения",
         "order": "Заказы",
         "documents": "Документы",
         "campaigns": "Кампании",
@@ -348,7 +349,8 @@
             "call_by_aircall": "Звонок по воздуху",
             "call_by_ringover": "Звонок через Ringover",
             "call_by_cloudtalk": "Звонок через CloudTalk",
-            "history": "История"
+            "history": "История",
+            "voicemail": "Голосовое сообщение"
         },
         "message": {
             "title": "Сообщение ({потенциальный клиент})",
@@ -415,7 +417,10 @@
             "via_cloudtalk": "SMS через CloudTalk",
             "via_source": "SMS через {источник}",
             "templates": "Шаблоны СМС",
-            "enter_text_message": "Введите текстовое сообщение"
+            "enter_text_message": "Введите текстовое сообщение",
+            "add_attachment": "Прикрепить изображение",
+            "attachments_limits": "CloudTalk MMS: до 5 изображений JPG, PNG или GIF, всего 5 МБ.",
+            "send_error": "Не удалось отправить сообщение. Попробуйте ещё раз."
         },
         "file": {
             "title": "Файлы ({перспективный})"

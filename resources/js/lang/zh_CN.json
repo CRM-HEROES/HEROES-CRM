@@ -118,6 +118,7 @@
         "appointments": "预约",
         "map": "地图",
         "mail": "邮件",
+        "incoming_communications": "收到的消息",
         "order": "命令",
         "documents": "文件",
         "campaigns": "活动",
@@ -348,7 +349,8 @@
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
             "call_by_cloudtalk": "通过 CloudTalk 呼叫",
-            "history": "历史"
+            "history": "历史",
+            "voicemail": "语音留言"
         },
         "message": {
             "title": "消息（{潜在客户}）",
@@ -415,7 +417,10 @@
             "via_cloudtalk": "通过 CloudTalk 发送短信",
             "via_source": "通过{source}发送短信",
             "templates": "短信模板",
-            "enter_text_message": "输入短信"
+            "enter_text_message": "输入短信",
+            "add_attachment": "添加图片附件",
+            "attachments_limits": "CloudTalk MMS：最多 5 张 JPG、PNG 或 GIF 图片，总大小不超过 5 MB。",
+            "send_error": "无法发送消息，请重试。"
         },
         "file": {
             "title": "文件（{前景}）"

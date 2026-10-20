@@ -51,6 +51,13 @@
         </div>
 
         <div class="hc-item-main-content hc-flex-column">
+            <span
+                v-if="callOutcome === 'voicemail'"
+                class="hc-prospect-interaction-voicemail"
+            >
+                <i class="fa fa-voicemail" aria-hidden="true"></i>
+                <span>{{ $t("prospect.interaction.voicemail") }}</span>
+            </span>
             <div
                 class="hc-prospect-interaction-creator"
                 v-text="
@@ -96,6 +103,7 @@
             :src="interaction.audio"
             preload="none"
             @play="playingAudio = true"
+            @playing="markVoicemailRead"
             @pause="playingAudio = false"
             @ended="playingAudio = false"
         ></audio>
@@ -125,6 +133,20 @@
 .hc-prospect-interaction-creator {
     color: #333333;
 }
+.hc-prospect-interaction-voicemail {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 5px;
+    margin-bottom: 4px;
+    padding: 3px 7px;
+    border-radius: 10px;
+    background: #f3e5f5;
+    color: #7b1fa2;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.3;
+}
 .hc-prospect-interaction-date {
     font-size: 11px;
     color: #999999;
@@ -143,6 +165,9 @@
 </style>
 
 <script>
+import { mapGetters } from "vuex";
+import { markCommunicationsRead } from "@/utils/incoming-communications";
+
 export default {
     props: {
         interaction: {
@@ -153,10 +178,12 @@ export default {
     data() {
         return {
             playingAudio: false,
+            lastReadVoicemailId: null,
         };
     },
 
     computed: {
+        ...mapGetters(["project"]),
         /**
          *
          */
@@ -307,6 +334,16 @@ export default {
     },
 
     methods: {
+        async markVoicemailRead() {
+            const interaction = this.interaction;
+            if (this.callOutcome !== "voicemail" || interaction.from_user || this.lastReadVoicemailId === interaction.id) {
+                return;
+            }
+            if (await markCommunicationsRead(this.project?.slug, interaction.prospect_id, "voicemail", [interaction])) {
+                this.lastReadVoicemailId = interaction.id;
+            }
+        },
+
         toggleAudio() {
             const audio = this.$refs.audio;
 

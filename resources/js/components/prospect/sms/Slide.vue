@@ -413,30 +413,10 @@
                                     <!-- List of SMS -->
 
                                     <div
-                                        style="
-                                            display: flex;
-                                            flex-direction: column;
-                                            width: 100%;
-                                            flex: 1;
-                                            position: relative;
-                                        "
+                                        v-show="smss.length > 0 || fetchingSms"
+                                        class="hc-prospect-sms-list"
                                     >
-                                        <div
-                                            style="
-                                                display: flex;
-                                                flex-direction: column;
-                                                width: 100%;
-                                                text-align: right;
-                                                max-height: 100%;
-                                                padding: 15px;
-                                                gap: 12px;
-                                                position: absolute;
-                                                bottom: 0;
-                                                overflow: auto;
-                                                scroll-behavior: smooth;
-                                            "
-                                            ref="sms"
-                                        >
+                                        <div  class="hc-prospect-sms-messages" ref="sms">
                                             <sms-row
                                                 v-for="c in smss"
                                                 :key="c.id"
@@ -449,12 +429,8 @@
                                     <!-- Sms form -->
 
                                     <form
-                                        class="hc-flex-column"
+                                        class="hc-flex-column hc-prospect-sms-form"
                                         @submit.prevent="sendSMS"
-                                        style="
-                                            padding: 0 10px;
-                                            position: relative;
-                                        "
                                     >
                                         <!-- Sms textarea -->
 
@@ -468,6 +444,19 @@
                                             "
                                             v-model="sms.message"
                                         ></textarea>
+
+                                        <div
+                                            v-if="sms.source === 'cloudtalk' && attachments.length"
+                                            class="hc-prospect-sms-attachments"
+                                        >
+                                            <uploading-attachment-row
+                                                v-for="(attachment, index) in attachments"
+                                                :key="attachment.name + ':' + attachment.lastModified + ':' + index"
+                                                :attachment="attachment"
+                                                @remove="removeAttachment"
+                                            />
+                                        </div>
+                                        <div v-if="sendError" class="hc-prospect-sms-error" role="alert" v-text="sendError"></div>
 
                                         <!-- Fold -->
 
@@ -510,13 +499,33 @@
                                                 @click.prevent="tab = 2"
                                             />
 
+                                            <icon
+                                                v-if="sms.source === 'cloudtalk'"
+                                                tag="button"
+                                                type="button"
+                                                class="fa fa-paperclip hc-prospect-sms-attach"
+                                                v-tooltip="$t('prospect.sms.add_attachment')"
+                                                :aria-label="$t('prospect.sms.add_attachment')"
+                                                :disabled="!canSendCloudtalkSms || addingSms"
+                                                @click="$refs.attachmentsInput.click()"
+                                            />
+                                            <input
+                                                v-if="sms.source === 'cloudtalk'"
+                                                ref="attachmentsInput"
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/gif"
+                                                multiple
+                                                hidden
+                                                @change="addAttachments"
+                                            />
+
                                             <!-- Send -->
 
                                             <icon
                                                 tag="button"
                                                 class="fa fa-paper-plane hc-prospect-sms-send"
                                                 v-tooltip="'Envoyer'"
-                                                :disabled="!canSendSms"
+                                                :disabled="!canSendSms || addingSms"
                                             />
                                         </div>
                                         <loading :loading="addingSms" />
@@ -624,10 +633,18 @@ button.hc-prospect-sms-send {
 }
 
 button.hc-prospect-sms-send:disabled,
-button.hc-prospect-sms-send:disabled:hover {
+button.hc-prospect-sms-send:disabled:hover,
+button.hc-prospect-sms-attach:disabled,
+button.hc-prospect-sms-attach:disabled:hover {
     color: #bbbbbb;
     cursor: not-allowed;
     text-shadow: none;
+}
+
+.hc-prospect-sms-attachments {
+    display: flex;
+    overflow-x: auto;
+    max-height: 120px;
 }
 
 button.hc-prospect-sms-refresh:disabled,
@@ -662,9 +679,63 @@ button.hc-prospect-sms-refresh:disabled:hover {
     height: 35px;
     overflow: hidden;
 }
+
+
+/* Liste des SMS : hauteur selon le contenu */
+.hc-prospect-sms-list {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 60%;
+    width: 100%;
+    position: relative;
+}
+
+/* Messages avec scroll si nécessaire */
+.hc-prospect-sms-messages {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    padding: 15px;
+    gap: 12px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+/* Formulaire : suit directement les messages */
+.hc-prospect-sms-form {
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Textarea : s'agrandit avec le formulaire */
+#hc-prospect-sms-textarea {
+    flex: 0 0 auto;
+    height: 80px;
+    min-height: 50px;
+    max-height: 400px;
+    width: 100%;
+
+    resize: vertical;
+    overflow-y: auto;
+
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 </style>
 
 <script>
+import { markCommunicationsRead } from "@/utils/incoming-communications";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
@@ -688,6 +759,7 @@ import SmsRow from "./SmsRow.vue";
 import TemplateRow from "./TemplateRow.vue";
 import SelectedProspect from "./SelectedProspect.vue";
 import SelectProspect from "../select/Select.vue";
+import UploadingAttachmentRow from "../message/UploadingAttachmentRow.vue";
 
 export default {
     components: {
@@ -696,6 +768,7 @@ export default {
         SmsRow,
         TemplateRow,
         SelectedProspect,
+        UploadingAttachmentRow,
     },
 
     data() {
@@ -712,10 +785,46 @@ export default {
             selectedProspectsFolded: true,
             fetchingSms: false,
             addingSms: false,
+            attachments: [],
+            sendError: "",
         };
     },
 
     methods: {
+        addAttachments(event) {
+            const files = [...this.attachments, ...event.target.files];
+            event.target.value = "";
+            if (this.addingSms || !this.canSendCloudtalkSms) {
+                return;
+            }
+
+            if (files.length > 5 || files.some(file => !["image/jpeg", "image/png", "image/gif"].includes(file.type))
+                || files.reduce((size, file) => size + file.size, 0) > 5 * 1024 * 1024) {
+                this.sendError = this.$t("prospect.sms.attachments_limits");
+                return;
+            }
+            this.attachments = files;
+            this.sendError = "";
+        },
+
+        removeAttachment(attachment) {
+            if (!this.addingSms) {
+                this.attachments = this.attachments.filter(file => file !== attachment);
+                this.sendError = "";
+            }
+        },
+
+        async markDisplayedSmsRead(records = this.prospectSms) {
+            const projectSlug = this.project?.slug;
+            const prospectId = this.prospect?.id;
+            await this.$nextTick();
+            if (this.project?.slug === projectSlug && this.prospect?.id === prospectId
+                && this.slideOpen(this.name) && this.tab === 1 && this.frameTab === 0 && this.selectedProspectsTab === 0) {
+                return markCommunicationsRead(projectSlug, prospectId, "sms",
+                    (records || []).filter(sms => sms.prospect_id == prospectId));
+            }
+        },
+
         newSMS() {
             return {
                 message: "",
@@ -804,26 +913,36 @@ export default {
         },
 
         async sendSMS() {
-            if (!this.canSendSms) {
+            if (!this.canSendSms || this.addingSms) {
                 return;
             }
 
             this.addingSms = true;
+            this.sendError = "";
+            const payload = { ...this.sms };
+            if (payload.source === "cloudtalk" && this.attachments.length) {
+                payload.attachments = [...this.attachments];
+            }
 
             try {
                 if (this.prospect) {
-                    await store.dispatch(ADD_PROSPECT_SMS, this.sms);
+                    await store.dispatch(ADD_PROSPECT_SMS, payload);
                 } else if (this.prospectsSelected.length > 0) {
-                    await store.dispatch(BULK_PROSPECT_SMS, {
-                        ...this.sms,
+                    const result = await store.dispatch(BULK_PROSPECT_SMS, {
+                        ...payload,
                         prospects: this.prospectsSelected,
                     });
 
-                    this.bulkSms = [...this.bulkSms, { ...this.sms }];
+                    this.bulkSms = [...this.bulkSms, { ...this.sms, attachments: result?.attachments || [] }];
                 }
+                this.sms.message = "";
+                this.attachments = [];
+            } catch (error) {
+                const errors = error.response?.data?.errors;
+                this.sendError = (errors && Object.values(errors).flat()[0])
+                    || error.response?.data?.message || this.$t("prospect.sms.send_error");
             } finally {
                 this.addingSms = false;
-                this.sms.message = "";
             }
         },
 
@@ -875,18 +994,30 @@ export default {
     },
 
     watch: {
+        "sms.source"() {
+            this.attachments = [];
+            this.sendError = "";
+        },
+
+        "project.slug"() {
+            this.attachments = [];
+            this.sendError = "";
+        },
+
         async prospectSms(newValue, oldValue) {
             await this.$nextTick();
 
             if (newValue.length != oldValue.length && this.$refs.sms) {
                 this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
             }
+            this.markDisplayedSmsRead(newValue);
         },
 
         async tab(newValue) {
             await this.$nextTick();
 
             if (newValue == 1) {
+                this.markDisplayedSmsRead();
                 if (this.$refs.sms) {
                     this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
                 }
@@ -895,7 +1026,19 @@ export default {
             }
         },
 
-        async prospect(newValue) {
+        frameTab() {
+            this.markDisplayedSmsRead();
+        },
+
+        selectedProspectsTab() {
+            this.markDisplayedSmsRead();
+        },
+
+        async prospect(newValue, oldValue) {
+            if (newValue?.id !== oldValue?.id) {
+                this.attachments = [];
+                this.sendError = "";
+            }
             if (newValue && this.slideOpen(this.name)) {
                 this.fetchSms();
             }
@@ -983,7 +1126,7 @@ export default {
 
         canSendSms() {
             if (this.sms.source == "cloudtalk") {
-                return this.canSendCloudtalkSms;
+                return this.canSendCloudtalkSms && (!!this.sms.message.trim() || this.attachments.length > 0);
             }
 
             return true;

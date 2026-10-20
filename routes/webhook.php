@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('aircall', [AircallController::class, 'store'])->name('aircall.store');
 Route::post('ringover', [RingoverController::class, 'store'])->name('ringover.store');
+Route::post('project/{project}/cloudtalk', [CloudTalkController::class, 'store'])->name('project.cloudtalk.store');
 Route::post('project/{project}/cloudtalk/sms', [CloudTalkController::class, 'sms'])->name('project.cloudtalk.sms');
 Route::post('project/{project}/pipedrive/person/store', [PipedriveController::class, 'personStore'])->name('project.pipedrive.person.store');
 Route::post('project/{project}/pipedrive/person/update', [PipedriveController::class, 'personUpdate'])->name('project.pipedrive.person.update');
