@@ -132,6 +132,7 @@ use App\Http\Controllers\API\Project\Role\UserController as ProjectRoleUserContr
 use App\Http\Controllers\API\Project\SettingController as ProjectSettingController;
 use App\Http\Controllers\API\Project\SmsTemplateController as ProjectSmsTemplateController;
 use App\Http\Controllers\API\Project\StatController as ProjectStatController;
+use App\Http\Controllers\API\Project\StatDashboardController as ProjectStatDashboardController;
 use App\Http\Controllers\API\Project\Stat\MetricController as ProjectStatMetricController;
 use App\Http\Controllers\API\Project\StatChartController as ProjectStatChartController;
 use App\Http\Controllers\API\Project\ThreadController as ProjectThreadController;
@@ -672,6 +673,12 @@ Route::group([
             Route::apiResource('assignable-user', ProjectRoleUserController::class)->only('index', 'update', 'destroy');
 
         });
+
+        // Stat dashboard builder
+        Route::get('stat-dashboard', [ProjectStatDashboardController::class, 'show']);
+        Route::put('stat-dashboard', [ProjectStatDashboardController::class, 'update']);
+        Route::get('stat-dashboard/meta', [ProjectStatDashboardController::class, 'meta']);
+        Route::post('stat-dashboard/query', [ProjectStatDashboardController::class, 'query']);
 
         // Stat
         Route::get('stat', [ProjectStatController::class, 'index']);
