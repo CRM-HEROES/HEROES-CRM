@@ -244,7 +244,7 @@
                 <!-- Mail -->
 
                 <header-menu
-                    :label="$t('header.mail')"
+                    :label="$t('header.incoming_communications')"
                     color="#12a0f3"
                     :to="{
                         name: 'prospect',
@@ -252,46 +252,19 @@
                             project: project.slug,
                         },
                         query: {
-                            filters: JSON.stringify({
-                                waitingUsers: [user.id],
-                            }),
+                            filters: JSON.stringify(incomingCommunicationsFilters),
                         },
                     }"
-                    @click.prevent="showWaitingUsers"
+                    @click.prevent="showIncomingCommunications"
                 >
                     <img
-                        v-if="projectUserSettingsMenuIconUrl('mails')"
-                        :src="projectUserSettingsMenuIconUrl('mails')"
+                        src="/images/comunication.png"
+                        :alt="$t('header.incoming_communications')"
+                        style="height: 34px;"
                     />
-                    <svg
-                        v-else
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="52 42 88 66"
-                    >
-                        <path
-                            fill="#4285f4"
-                            d="M58 108h14V74L52 59v43c0 3.32 2.69 6 6 6"
-                        />
-                        <path
-                            fill="#34a853"
-                            d="M120 108h14c3.32 0 6-2.69 6-6V59l-20 15"
-                        />
-                        <path
-                            fill="#fbbc04"
-                            d="M120 48v26l20-15v-8c0-7.42-8.47-11.65-14.4-7.2"
-                        />
-                        <path
-                            fill="#ea4335"
-                            d="M72 74V48l24 18 24-18v26L96 92"
-                        />
-                        <path
-                            fill="#c5221f"
-                            d="M52 51v8l20 15V48l-5.6-4.2c-5.94-4.45-14.4-.22-14.4 7.2"
-                        />
-                    </svg>
                     <div
-                        v-if="waitingUser"
-                        v-text="waitingUser"
+                        v-if="incomingCommunicationsCount"
+                        v-text="incomingCommunicationsCount"
                         style="
                             display: inline-block;
                             position: absolute;
@@ -649,6 +622,9 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import store from "@/store";
+import IncomingCommunicationService from "@/apis/project/incoming-communication";
+import EventBus from "@/utils/event-bus";
+import { COMMUNICATIONS_READ } from "@/utils/incoming-communications";
 
 import HeaderMenu from "./Menu.vue";
 import GlobalSearch from "./Search.vue";
@@ -667,12 +643,22 @@ export default {
     data() {
         return {
             showMenus: false,
-            waitingUser: 0,
+            incomingCommunicationsCount: 0,
+            incomingCommunicationsRequest: 0,
+            incomingCommunicationsInterval: null,
         };
     },
 
     mounted() {
-        this.fetchWaitingUser();
+        EventBus.on(COMMUNICATIONS_READ, this.onCommunicationsRead);
+        this.incomingCommunicationsInterval = setInterval(() => {
+            if (!document.hidden) this.fetchIncomingCommunicationsCount();
+        }, 120000);
+    },
+
+    beforeUnmount() {
+        clearInterval(this.incomingCommunicationsInterval);
+        EventBus.off(COMMUNICATIONS_READ, this.onCommunicationsRead);
     },
 
     methods: {
@@ -699,15 +685,12 @@ export default {
         toggleMenu() {
             this.showMenus = !this.showMenus;
         },
-        showWaitingUsers() {
-            let params = {
-                waitingUsers: [this.user.id],
-            };
-
+        showIncomingCommunications() {
             store.commit(INIT_PROSPECT_PARAMS);
 
-            store.commit(SET_PROSPECT_PARAMS, params);
+            store.commit(SET_PROSPECT_PARAMS, this.incomingCommunicationsFilters);
             store.dispatch(FETCH_PROSPECTS);
+            this.fetchIncomingCommunicationsCount();
         },
         initProspectsParam() {
             if (this.$route.name == "prospect") {
@@ -715,24 +698,40 @@ export default {
                 store.dispatch(FETCH_PROSPECTS);
             }
         },
-        async fetchWaitingUser() {
-            if (!this.project) {
+        async fetchIncomingCommunicationsCount() {
+            const request = ++this.incomingCommunicationsRequest;
+            const projectSlug = this.project?.slug;
+            if (!projectSlug) {
                 return;
             }
 
             try {
-                const { data } = await axios.get(
-                    `/api/project/${
-                        this.project.slug
-                    }/prospect/count?filters=${JSON.stringify({
-                        waitingUsers: [this.user.id],
-                    })}`
-                );
+                const { data } = await IncomingCommunicationService.count(projectSlug);
 
-                this.waitingUser = data;
-            } finally {
-                this.fetchingQrcode = false;
+                if (this.project?.slug === projectSlug && request === this.incomingCommunicationsRequest) {
+                    this.incomingCommunicationsCount = data.count;
+                }
+            } catch (error) {
+                if (this.project?.slug === projectSlug && request === this.incomingCommunicationsRequest) {
+                    this.incomingCommunicationsCount = 0;
+                }
             }
+        },
+        onCommunicationsRead({ projectSlug, count }) {
+            if (this.project?.slug === projectSlug) {
+                ++this.incomingCommunicationsRequest;
+                this.incomingCommunicationsCount = count;
+            }
+        },
+    },
+
+    watch: {
+        "project.slug": {
+            immediate: true,
+            handler() {
+                this.incomingCommunicationsCount = 0;
+                this.fetchIncomingCommunicationsCount();
+            },
         },
     },
 
@@ -746,6 +745,10 @@ export default {
             "menus",
             "can",
         ]),
+
+        incomingCommunicationsFilters() {
+            return { incomingCommunications: true };
+        },
 
         defaultMenuParams() {
             const query = { count: 50 };

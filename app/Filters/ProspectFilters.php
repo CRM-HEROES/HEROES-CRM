@@ -2,6 +2,7 @@
 
 namespace App\Filters;
 
+use App\Services\IncomingCommunications;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
@@ -323,6 +324,22 @@ class ProspectFilters extends Filters
                     $query->whereIn('id', $value);
                 });
             });
+        });
+    }
+
+    /**
+     * Prospects that sent at least one SMS, email or voicemail to the CRM.
+     */
+    public function incomingCommunications(Builder $builder, $value)
+    {
+        if (!filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+            return $builder;
+        }
+
+        return $builder->where(function ($query) {
+            $query->whereHas('messages', fn ($messages) => IncomingCommunications::incoming($messages, 'email'))
+                ->orWhereHas('sms', fn ($sms) => IncomingCommunications::incoming($sms, 'sms'))
+                ->orWhereHas('interactions', fn ($interactions) => IncomingCommunications::incoming($interactions, 'voicemail'));
         });
     }
 

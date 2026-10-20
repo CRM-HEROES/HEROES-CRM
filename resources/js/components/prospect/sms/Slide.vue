@@ -413,30 +413,10 @@
                                     <!-- List of SMS -->
 
                                     <div
-                                        style="
-                                            display: flex;
-                                            flex-direction: column;
-                                            width: 100%;
-                                            flex: 1;
-                                            position: relative;
-                                        "
+                                        v-show="smss.length > 0 || fetchingSms"
+                                        class="hc-prospect-sms-list"
                                     >
-                                        <div
-                                            style="
-                                                display: flex;
-                                                flex-direction: column;
-                                                width: 100%;
-                                                text-align: right;
-                                                max-height: 100%;
-                                                padding: 15px;
-                                                gap: 12px;
-                                                position: absolute;
-                                                bottom: 0;
-                                                overflow: auto;
-                                                scroll-behavior: smooth;
-                                            "
-                                            ref="sms"
-                                        >
+                                        <div  class="hc-prospect-sms-messages" ref="sms">
                                             <sms-row
                                                 v-for="c in smss"
                                                 :key="c.id"
@@ -449,12 +429,8 @@
                                     <!-- Sms form -->
 
                                     <form
-                                        class="hc-flex-column"
+                                        class="hc-flex-column hc-prospect-sms-form"
                                         @submit.prevent="sendSMS"
-                                        style="
-                                            padding: 0 10px;
-                                            position: relative;
-                                        "
                                     >
                                         <!-- Sms textarea -->
 
@@ -662,9 +638,63 @@ button.hc-prospect-sms-refresh:disabled:hover {
     height: 35px;
     overflow: hidden;
 }
+
+
+/* Liste des SMS : hauteur selon le contenu */
+.hc-prospect-sms-list {
+    display: flex;
+    flex-direction: column;
+    flex: 0 1 auto;
+    min-height: 0;
+    max-height: 60%;
+    width: 100%;
+    position: relative;
+}
+
+/* Messages avec scroll si nécessaire */
+.hc-prospect-sms-messages {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    padding: 15px;
+    gap: 12px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+}
+
+/* Formulaire : suit directement les messages */
+.hc-prospect-sms-form {
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* Textarea : s'agrandit avec le formulaire */
+#hc-prospect-sms-textarea {
+    flex: 0 0 auto;
+    height: 80px;
+    min-height: 50px;
+    max-height: 400px;
+    width: 100%;
+
+    resize: vertical;
+    overflow-y: auto;
+
+    border: 1px solid #dddddd;
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
 </style>
 
 <script>
+import { markCommunicationsRead } from "@/utils/incoming-communications";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
@@ -716,6 +746,17 @@ export default {
     },
 
     methods: {
+        async markDisplayedSmsRead(records = this.prospectSms) {
+            const projectSlug = this.project?.slug;
+            const prospectId = this.prospect?.id;
+            await this.$nextTick();
+            if (this.project?.slug === projectSlug && this.prospect?.id === prospectId
+                && this.slideOpen(this.name) && this.tab === 1 && this.frameTab === 0 && this.selectedProspectsTab === 0) {
+                return markCommunicationsRead(projectSlug, prospectId, "sms",
+                    (records || []).filter(sms => sms.prospect_id == prospectId));
+            }
+        },
+
         newSMS() {
             return {
                 message: "",
@@ -881,18 +922,28 @@ export default {
             if (newValue.length != oldValue.length && this.$refs.sms) {
                 this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
             }
+            this.markDisplayedSmsRead(newValue);
         },
 
         async tab(newValue) {
             await this.$nextTick();
 
             if (newValue == 1) {
+                this.markDisplayedSmsRead();
                 if (this.$refs.sms) {
                     this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
                 }
             } else if (newValue == 2) {
                 this.fetchSmsTemplates();
             }
+        },
+
+        frameTab() {
+            this.markDisplayedSmsRead();
+        },
+
+        selectedProspectsTab() {
+            this.markDisplayedSmsRead();
         },
 
         async prospect(newValue) {

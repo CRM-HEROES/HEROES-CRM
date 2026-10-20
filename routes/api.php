@@ -32,6 +32,7 @@ use App\Http\Controllers\API\Project\Campaign\OrderController as ProjectCampaign
 use App\Http\Controllers\API\Project\Campaign\RuleController as ProjectCampaignRuleController;
 
 use App\Http\Controllers\API\Project\DefaultMenuController as ProjectDefaultMenuController;
+use App\Http\Controllers\API\Project\IncomingCommunicationController;
 
 use App\Http\Controllers\API\Project\DocumentController as ProjectDocumentController;
 use App\Http\Controllers\API\Project\DuplicateController as ProjectDuplicateController;
@@ -511,6 +512,8 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
+        Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
+        Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 

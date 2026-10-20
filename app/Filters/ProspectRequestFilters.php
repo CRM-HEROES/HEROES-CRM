@@ -54,6 +54,7 @@ class ProspectRequestFilters extends ProspectFilters
         'withThreads',
         'withoutThreads',
         'waitingUsers',
+        'incomingCommunications',
         'archivedWaitingUsers',
     ];
 

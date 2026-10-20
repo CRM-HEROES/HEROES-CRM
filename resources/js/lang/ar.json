@@ -118,6 +118,7 @@
         "appointments": "تعيينات",
         "map": "خريطة",
         "mail": "رسائل",
+        "incoming_communications": "الرسائل الواردة",
         "order": "طلبات",
         "documents": "وثائق",
         "campaigns": "الحملات",
@@ -348,7 +349,8 @@
             "call_by_aircall": "الاتصال عن طريق Aircall",
             "call_by_ringover": "الاتصال عن طريق Ringover",
             "call_by_cloudtalk": "الاتصال عن طريق CloudTalk",
-            "history": "تاريخ"
+            "history": "تاريخ",
+            "voicemail": "رسالة صوتية"
         },
         "message": {
             "title": "الرسالة ({المحتمل})",

@@ -475,7 +475,6 @@ import ApiService from "@/apis/api.service";
 import EventBus from "@/utils/event-bus";
 import kavkomPhone, { KAVKOM_EVENTS } from "@/utils/kavkom-phone";
 import ProspectService from "@/apis/project/prospect";
-import ProspectInteractionService from "@/apis/project/prospect/interaction";
 
 import { OPEN_MODAL } from "@/actions/modal";
 import {
@@ -836,9 +835,8 @@ export default {
             this.interaction.from_user = true;
             this.interaction.number = number;
             this.interaction.data = { direction: "outgoing" };
-            await this.addInteraction();
             this.fetchCloudtalkCallContext({ external_number: number });
-            this.makeCloudtalkCall();
+            return this.makeCloudtalkCall();
         },
 
         async makeCloudtalkCall() {
@@ -853,20 +851,12 @@ export default {
             this.clearCloudtalkEventTimeout();
 
             try {
-                if (!this.interaction.id && this.interactionProspect) {
-                    await this.addInteraction();
-                }
-
                 const params = {
                     number: this.interaction.number,
                 };
 
                 if (this.cloudtalkLine) {
                     params.line_id = this.cloudtalkLine.id;
-                }
-
-                if (this.interaction.id) {
-                    params.interaction_id = this.interaction.id;
                 }
 
                 const response = await store.dispatch(
@@ -883,16 +873,6 @@ export default {
                     direction: "outgoing",
                     ...(callId ? { id: callId, call_id: callId } : {}),
                 };
-
-                if (response.interaction) {
-                    this.interaction = response.interaction;
-                    store.commit(UPDATE_PROSPECT_INTERACTION, {
-                        prospectId: response.interaction.prospect_id,
-                        interaction: response.interaction,
-                    });
-                } else {
-                    await this.updateInteraction();
-                }
 
                 if (this.cloudtalkWaitingForEvent) {
                     this.startCloudtalkEventTimeout();
@@ -926,7 +906,6 @@ export default {
                     ...(this.interaction.data || {}),
                     error: message,
                 };
-                this.updateInteraction();
 
                 flashError({
                     title: "CloudTalk",
@@ -968,7 +947,6 @@ export default {
             if (this.isCurrentCloudtalkInteractionEvent(callInfos)) {
                 this.setCloudtalkCallData(callInfos);
                 this.fetchCloudtalkCallContext(callInfos);
-                this.updateInteraction();
                 return;
             }
 
@@ -1089,7 +1067,6 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
-            this.updateInteraction();
         },
 
         cloudtalkCallOutgoing(callInfos) {
@@ -1100,7 +1077,6 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
-            this.updateInteraction();
         },
 
         cloudtalkCallAnswered(callInfos) {
@@ -1111,7 +1087,6 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
-            this.updateInteraction();
         },
 
         async cloudtalkCallHangup(callInfos) {
@@ -1122,7 +1097,6 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
-            await this.updateInteraction();
         },
 
         async cloudtalkCallEnded(callInfos) {
@@ -1133,7 +1107,6 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
-            await this.updateInteraction();
             this.scheduleCloudtalkHistorySync(
                 callInfos,
                 1,
@@ -1174,20 +1147,6 @@ export default {
                     resolved: true,
                 };
 
-                if (
-                    this.interaction &&
-                    this.interaction.source == "cloudtalk" &&
-                    !this.interaction.id
-                ) {
-                    try {
-                        await this.addInteraction();
-                    } catch (error) {
-                        this.interaction.data = {
-                            ...(this.interaction.data || {}),
-                            error: error.message,
-                        };
-                    }
-                }
             } finally {
                 this.cloudtalkCreatingProspect = false;
             }
@@ -1591,21 +1550,6 @@ export default {
 
                 if (data.prospect) {
                     this.setActiveInteractionProspect(data.prospect);
-
-                    if (
-                        this.interaction &&
-                        this.interaction.source == "cloudtalk" &&
-                        !this.interaction.id
-                    ) {
-                        try {
-                            await this.addInteraction();
-                        } catch (error) {
-                            this.interaction.data = {
-                                ...(this.interaction.data || {}),
-                                error: error.message,
-                            };
-                        }
-                    }
                 }
             } catch (error) {
                 if (request == this.cloudtalkLookupRequest) {
@@ -1662,14 +1606,14 @@ export default {
             prospectId = null
         ) {
             const targetInteraction = interaction || this.interaction;
+            if (!targetInteraction || targetInteraction.source != "cloudtalk") {
+                return;
+            }
+
             let targetProspectId =
                 prospectId ||
                 targetInteraction.prospect_id ||
                 (this.interactionProspect ? this.interactionProspect.id : null);
-
-            if (!targetInteraction || targetInteraction.source != "cloudtalk") {
-                return;
-            }
 
             const number =
                 this.cloudtalkCallNumber(callInfos, false) ||
@@ -1729,64 +1673,18 @@ export default {
                         ? this.interactionProspect.id
                         : null);
 
-                    if (
-                        !updatedInteraction.id &&
-                        this.interaction &&
-                        this.interaction.id &&
-                        this.isCurrentCloudtalkInteractionEvent(data.call)
-                    ) {
-                        updatedInteraction.id = this.interaction.id;
-                    }
                 }
 
-                if (!targetProspectId) {
-                    return;
+                if (this.isCurrentCloudtalkInteractionEvent(data.call)) {
+                    this.interaction = updatedInteraction;
                 }
 
-                if (!updatedInteraction.id) {
-                    const { data: savedInteraction } =
-                        await ProspectInteractionService.create(
-                            this.project.slug,
-                            targetProspectId,
-                            updatedInteraction
-                        );
-
-                    if (this.isCurrentCloudtalkInteractionEvent(data.call)) {
-                        this.interaction = savedInteraction;
-                    }
-
-                    if (
-                        this.interactionProspect &&
-                        this.interactionProspect.id == targetProspectId
-                    ) {
-                        await this.fetchInteractions();
-                    }
-
-                    return;
-                }
-
-                if (updatedInteraction.id) {
-                    const { data: savedInteraction } =
-                        await ProspectInteractionService.update(
-                            this.project.slug,
-                            targetProspectId,
-                            updatedInteraction.id,
-                            updatedInteraction
-                        );
-
-                    if (
-                        this.interaction &&
-                        this.interaction.id == updatedInteraction.id
-                    ) {
-                        this.interaction = savedInteraction;
-                    }
-
-                    if (
-                        this.interactionProspect &&
-                        this.interactionProspect.id == targetProspectId
-                    ) {
-                        await this.fetchInteractions();
-                    }
+                // CloudTalk interactions are persisted by webhooks; refresh the CRM list only.
+                if (
+                    this.interactionProspect &&
+                    this.interactionProspect.id == targetProspectId
+                ) {
+                    await this.fetchInteractions();
                 }
             } catch (error) {
                 if (attempt < 3) {
@@ -1947,6 +1845,10 @@ export default {
          *
          */
         async addInteraction() {
+            if (this.interaction?.source == "cloudtalk") {
+                return this.interaction;
+            }
+
             this.addingInteraction = true;
 
             try {
@@ -1965,6 +1867,10 @@ export default {
         async updateInteraction() {
             if (!this.interaction) {
                 return null;
+            }
+
+            if (this.interaction.source == "cloudtalk") {
+                return this.interaction;
             }
 
             if (!this.interaction.prospect_id && this.interactionProspect) {

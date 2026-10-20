@@ -118,6 +118,7 @@
         "appointments": "Назначения",
         "map": "КАРТА",
         "mail": "Почта",
+        "incoming_communications": "Входящие сообщения",
         "order": "Заказы",
         "documents": "Документы",
         "campaigns": "Кампании",
@@ -348,7 +349,8 @@
             "call_by_aircall": "Звонок по воздуху",
             "call_by_ringover": "Звонок через Ringover",
             "call_by_cloudtalk": "Звонок через CloudTalk",
-            "history": "История"
+            "history": "История",
+            "voicemail": "Голосовое сообщение"
         },
         "message": {
             "title": "Сообщение ({потенциальный клиент})",

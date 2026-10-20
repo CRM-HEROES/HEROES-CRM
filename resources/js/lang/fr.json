@@ -135,6 +135,7 @@
         "appointments": "RDV",
         "map": "MAP",
         "mail": "Mails",
+        "incoming_communications": "Communications reçues",
         "order": "Devis",
         "documents": "Documents",
         "campaigns": "Campagnes",
@@ -447,7 +448,8 @@
             "call_by_ringover": "Appeler via Ringover",
             "call_by_cloudtalk": "Appeler via CloudTalk",
             "call_by_kavkom": "Appeler via Kavkom",
-            "history": "Historique"
+            "history": "Historique",
+            "voicemail": "Message vocal"
         },
         "message": {
             "title": "Message ({prospect})",
