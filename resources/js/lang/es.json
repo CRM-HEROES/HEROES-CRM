@@ -449,7 +449,10 @@
             "via_cloudtalk": "SMS a través de CloudTalk",
             "via_source": "SMS a través de {fuente}",
             "templates": "Plantillas de SMS",
-            "enter_text_message": "Introduce un mensaje de texto"
+            "enter_text_message": "Introduce un mensaje de texto",
+            "add_attachment": "Adjuntar una imagen",
+            "attachments_limits": "CloudTalk MMS: hasta 5 imágenes JPG, PNG o GIF, 5 MB en total.",
+            "send_error": "No se pudo enviar el mensaje. Inténtalo de nuevo."
         },
         "file": {
             "title": "Archivos ({prospecto})"

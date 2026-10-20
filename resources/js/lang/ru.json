@@ -417,7 +417,10 @@
             "via_cloudtalk": "SMS через CloudTalk",
             "via_source": "SMS через {источник}",
             "templates": "Шаблоны СМС",
-            "enter_text_message": "Введите текстовое сообщение"
+            "enter_text_message": "Введите текстовое сообщение",
+            "add_attachment": "Прикрепить изображение",
+            "attachments_limits": "CloudTalk MMS: до 5 изображений JPG, PNG или GIF, всего 5 МБ.",
+            "send_error": "Не удалось отправить сообщение. Попробуйте ещё раз."
         },
         "file": {
             "title": "Файлы ({перспективный})"

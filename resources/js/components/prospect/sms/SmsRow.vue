@@ -12,7 +12,19 @@
                 v-if="sms.creator"
                 v-text="sms.creator.name"
             ></div>
-            <div class="hc-prospect-sms-message" v-text="sms.message"></div>
+            <div v-if="sms.message" class="hc-prospect-sms-message" v-text="sms.message"></div>
+            <div v-if="sms.attachments && sms.attachments.length" class="hc-prospect-sms-media">
+                <a
+                    v-for="attachment in sms.attachments"
+                    :key="attachment.url"
+                    :href="attachment.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                >
+                    <img v-if="isImageAttachment(attachment)" :src="attachment.url" :alt="attachment.file_name" loading="lazy" />
+                    <span v-text="attachment.file_name"></span>
+                </a>
+            </div>
             <div class="hc-prospect-sms-footer" v-text="footer"></div>
             <div
                 class="hc-prospect-sms-error"
@@ -57,6 +69,29 @@
     font-size: 11px;
 }
 
+.hc-prospect-sms-media {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.hc-prospect-sms-media a {
+    display: flex;
+    flex-direction: column;
+    max-width: 120px;
+    overflow-wrap: anywhere;
+    font-size: 11px;
+}
+
+.hc-prospect-sms-media img {
+    width: 120px;
+    height: 100px;
+    max-width: 120px;
+    max-height: 120px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
 .hc-prospect-sms-from-prospect .hc-prospect-sms-message {
     background-color: #eeeeee;
     color: #333333;
@@ -83,6 +118,13 @@ export default {
     props: {
         sms: {
             type: Object,
+        },
+    },
+
+    methods: {
+        isImageAttachment(attachment) {
+            return ["image/jpeg", "image/png", "image/gif"].includes(attachment.mime_type)
+                || ["jpg", "jpeg", "png", "gif"].includes((attachment.extension || "").toLowerCase());
         },
     },
 

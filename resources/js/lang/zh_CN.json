@@ -417,7 +417,10 @@
             "via_cloudtalk": "通过 CloudTalk 发送短信",
             "via_source": "通过{source}发送短信",
             "templates": "短信模板",
-            "enter_text_message": "输入短信"
+            "enter_text_message": "输入短信",
+            "add_attachment": "添加图片附件",
+            "attachments_limits": "CloudTalk MMS：最多 5 张 JPG、PNG 或 GIF 图片，总大小不超过 5 MB。",
+            "send_error": "无法发送消息，请重试。"
         },
         "file": {
             "title": "文件（{前景}）"

@@ -42,7 +42,8 @@ class CloudTalk implements ShouldQueue
             $cloudTalk->sendSms(
                 $line,
                 (string) $this->sms->prospect->mobile_phone_number,
-                (string) $this->sms->message
+                (string) $this->sms->message,
+                $this->sms->media ?? []
             );
 
             $this->sms->update(['sent_at' => Carbon::now()]);

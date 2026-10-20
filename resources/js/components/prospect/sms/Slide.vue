@@ -445,6 +445,19 @@
                                             v-model="sms.message"
                                         ></textarea>
 
+                                        <div
+                                            v-if="sms.source === 'cloudtalk' && attachments.length"
+                                            class="hc-prospect-sms-attachments"
+                                        >
+                                            <uploading-attachment-row
+                                                v-for="(attachment, index) in attachments"
+                                                :key="attachment.name + ':' + attachment.lastModified + ':' + index"
+                                                :attachment="attachment"
+                                                @remove="removeAttachment"
+                                            />
+                                        </div>
+                                        <div v-if="sendError" class="hc-prospect-sms-error" role="alert" v-text="sendError"></div>
+
                                         <!-- Fold -->
 
                                         <div class="hc-flex-row">
@@ -486,13 +499,33 @@
                                                 @click.prevent="tab = 2"
                                             />
 
+                                            <icon
+                                                v-if="sms.source === 'cloudtalk'"
+                                                tag="button"
+                                                type="button"
+                                                class="fa fa-paperclip hc-prospect-sms-attach"
+                                                v-tooltip="$t('prospect.sms.add_attachment')"
+                                                :aria-label="$t('prospect.sms.add_attachment')"
+                                                :disabled="!canSendCloudtalkSms || addingSms"
+                                                @click="$refs.attachmentsInput.click()"
+                                            />
+                                            <input
+                                                v-if="sms.source === 'cloudtalk'"
+                                                ref="attachmentsInput"
+                                                type="file"
+                                                accept="image/jpeg,image/png,image/gif"
+                                                multiple
+                                                hidden
+                                                @change="addAttachments"
+                                            />
+
                                             <!-- Send -->
 
                                             <icon
                                                 tag="button"
                                                 class="fa fa-paper-plane hc-prospect-sms-send"
                                                 v-tooltip="'Envoyer'"
-                                                :disabled="!canSendSms"
+                                                :disabled="!canSendSms || addingSms"
                                             />
                                         </div>
                                         <loading :loading="addingSms" />
@@ -600,10 +633,18 @@ button.hc-prospect-sms-send {
 }
 
 button.hc-prospect-sms-send:disabled,
-button.hc-prospect-sms-send:disabled:hover {
+button.hc-prospect-sms-send:disabled:hover,
+button.hc-prospect-sms-attach:disabled,
+button.hc-prospect-sms-attach:disabled:hover {
     color: #bbbbbb;
     cursor: not-allowed;
     text-shadow: none;
+}
+
+.hc-prospect-sms-attachments {
+    display: flex;
+    overflow-x: auto;
+    max-height: 120px;
 }
 
 button.hc-prospect-sms-refresh:disabled,
@@ -718,6 +759,7 @@ import SmsRow from "./SmsRow.vue";
 import TemplateRow from "./TemplateRow.vue";
 import SelectedProspect from "./SelectedProspect.vue";
 import SelectProspect from "../select/Select.vue";
+import UploadingAttachmentRow from "../message/UploadingAttachmentRow.vue";
 
 export default {
     components: {
@@ -726,6 +768,7 @@ export default {
         SmsRow,
         TemplateRow,
         SelectedProspect,
+        UploadingAttachmentRow,
     },
 
     data() {
@@ -742,10 +785,35 @@ export default {
             selectedProspectsFolded: true,
             fetchingSms: false,
             addingSms: false,
+            attachments: [],
+            sendError: "",
         };
     },
 
     methods: {
+        addAttachments(event) {
+            const files = [...this.attachments, ...event.target.files];
+            event.target.value = "";
+            if (this.addingSms || !this.canSendCloudtalkSms) {
+                return;
+            }
+
+            if (files.length > 5 || files.some(file => !["image/jpeg", "image/png", "image/gif"].includes(file.type))
+                || files.reduce((size, file) => size + file.size, 0) > 5 * 1024 * 1024) {
+                this.sendError = this.$t("prospect.sms.attachments_limits");
+                return;
+            }
+            this.attachments = files;
+            this.sendError = "";
+        },
+
+        removeAttachment(attachment) {
+            if (!this.addingSms) {
+                this.attachments = this.attachments.filter(file => file !== attachment);
+                this.sendError = "";
+            }
+        },
+
         async markDisplayedSmsRead(records = this.prospectSms) {
             const projectSlug = this.project?.slug;
             const prospectId = this.prospect?.id;
@@ -845,26 +913,36 @@ export default {
         },
 
         async sendSMS() {
-            if (!this.canSendSms) {
+            if (!this.canSendSms || this.addingSms) {
                 return;
             }
 
             this.addingSms = true;
+            this.sendError = "";
+            const payload = { ...this.sms };
+            if (payload.source === "cloudtalk" && this.attachments.length) {
+                payload.attachments = [...this.attachments];
+            }
 
             try {
                 if (this.prospect) {
-                    await store.dispatch(ADD_PROSPECT_SMS, this.sms);
+                    await store.dispatch(ADD_PROSPECT_SMS, payload);
                 } else if (this.prospectsSelected.length > 0) {
-                    await store.dispatch(BULK_PROSPECT_SMS, {
-                        ...this.sms,
+                    const result = await store.dispatch(BULK_PROSPECT_SMS, {
+                        ...payload,
                         prospects: this.prospectsSelected,
                     });
 
-                    this.bulkSms = [...this.bulkSms, { ...this.sms }];
+                    this.bulkSms = [...this.bulkSms, { ...this.sms, attachments: result?.attachments || [] }];
                 }
+                this.sms.message = "";
+                this.attachments = [];
+            } catch (error) {
+                const errors = error.response?.data?.errors;
+                this.sendError = (errors && Object.values(errors).flat()[0])
+                    || error.response?.data?.message || this.$t("prospect.sms.send_error");
             } finally {
                 this.addingSms = false;
-                this.sms.message = "";
             }
         },
 
@@ -916,6 +994,16 @@ export default {
     },
 
     watch: {
+        "sms.source"() {
+            this.attachments = [];
+            this.sendError = "";
+        },
+
+        "project.slug"() {
+            this.attachments = [];
+            this.sendError = "";
+        },
+
         async prospectSms(newValue, oldValue) {
             await this.$nextTick();
 
@@ -946,7 +1034,11 @@ export default {
             this.markDisplayedSmsRead();
         },
 
-        async prospect(newValue) {
+        async prospect(newValue, oldValue) {
+            if (newValue?.id !== oldValue?.id) {
+                this.attachments = [];
+                this.sendError = "";
+            }
             if (newValue && this.slideOpen(this.name)) {
                 this.fetchSms();
             }
@@ -1034,7 +1126,7 @@ export default {
 
         canSendSms() {
             if (this.sms.source == "cloudtalk") {
-                return this.canSendCloudtalkSms;
+                return this.canSendCloudtalkSms && (!!this.sms.message.trim() || this.attachments.length > 0);
             }
 
             return true;

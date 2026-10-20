@@ -417,7 +417,10 @@
             "via_cloudtalk": "CloudTalk के माध्यम से एसएमएस करें",
             "via_source": "{स्रोत} के माध्यम से एसएमएस",
             "templates": "एसएमएस टेम्प्लेट",
-            "enter_text_message": "एक टेक्स्ट संदेश दर्ज करें"
+            "enter_text_message": "एक टेक्स्ट संदेश दर्ज करें",
+            "add_attachment": "चित्र संलग्न करें",
+            "attachments_limits": "CloudTalk MMS: अधिकतम 5 JPG, PNG या GIF चित्र, कुल 5 MB।",
+            "send_error": "संदेश नहीं भेजा जा सका। फिर से कोशिश करें।"
         },
         "file": {
             "title": "फ़ाइलें ({संभावना})"
