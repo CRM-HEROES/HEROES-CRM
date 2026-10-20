@@ -300,6 +300,16 @@
                 </icon>
             </card-menu>
             <card-menu
+                v-if="!selectedProspectsProcessed && can('all.prospect.interaction.view') && can('all.prospect.interaction.add')"
+                :label="$t('prospect.interaction.call_by_cloudtalk')"
+                :disabled="!cloudtalkLine"
+                @click="bulkCloudtalkInteraction"
+            >
+                <icon>
+                    <img src="/images/partenaire-ext/cloudtalk.png" alt="CloudTalk" style="max-width: 25px; max-height: 25px" />
+                </icon>
+            </card-menu>
+            <card-menu
                 v-if="!selectedProspectsProcessed"
                 icon="fa fa-phone"
                 :label="$t('prospect.table.footer.bulk_ringover_interactions')"
@@ -453,6 +463,7 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import EventBus from "@/utils/event-bus";
 
 import { OPEN_MODAL } from "@/actions/modal";
 import { OPEN_SLIDE, OPEN_LEFT_SLIDE } from "@/actions/slide";
@@ -858,6 +869,16 @@ export default {
             store.commit(SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
         },
 
+        bulkCloudtalkInteraction() {
+            if (!this.cloudtalkLine || !this.prospectsSelected.length
+                || !this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
+
+            EventBus.emit('cloudtalk:start-sequence', {
+                projectSlug: this.project.slug,
+                prospectIds: [...this.prospectsSelected],
+            });
+        },
+
         /**
          * Call prospects one after the other
          */
@@ -956,7 +977,12 @@ export default {
             "prospectsMenus",
             "prospectsOptions",
             "can",
+            "lines",
         ]),
+
+        cloudtalkLine() {
+            return this.lines.find(line => line.operator === 'cloudtalk' && this.user && line.user_id == this.user.id);
+        },
 
         /**
          * Check if there are

@@ -24,8 +24,8 @@
                 </button>
             </div>
         </div> -->
-        <div v-if="loading" class="hc-cloudtalk-loading">
-            <loading :loading="loading" />
+        <div v-if="showLoading" class="hc-cloudtalk-loading">
+            <loading :loading="showLoading" />
             <div
                 v-if="showSlowLoadingMessage"
                 class="hc-cloudtalk-loading-help"
@@ -51,10 +51,11 @@
             </div>
         </div>
         <iframe
+            ref="phoneFrame"
             :src="src"
             :class="[
                 'hc-cloudtalk-iframe',
-                { 'hc-cloudtalk-iframe-loading': loading },
+                { 'hc-cloudtalk-iframe-loading': showLoading },
             ]"
             allow="microphone *; camera *; display-capture *; autoplay *; clipboard-read *; clipboard-write *; fullscreen *"
             allowfullscreen
@@ -236,7 +237,7 @@ export default {
 
         slowLoadingDelay: {
             type: Number,
-            default: 8000,
+            default: 16000,
         },
     },
 
@@ -244,6 +245,7 @@ export default {
         return {
             origin: "https://phone.cloudtalk.io",
             allowedOrigin: /^https:\/\/([a-z0-9-]+\.)*cloudtalk\.io$/i,
+            eventReceived: false,
             slowLoadingTimeout: null,
             showSlowLoadingMessage: false,
         };
@@ -263,7 +265,7 @@ export default {
         syncSlowLoadingMessage() {
             this.clearSlowLoadingTimer();
 
-            if (!this.loading) {
+            if (!this.showLoading) {
                 return;
             }
 
@@ -316,11 +318,13 @@ export default {
          * Handle events sent by the CloudTalk Phone iframe
          */
         handleMessage(event) {
-            if (event.origin !== this.origin) {
+            if (event.origin !== this.origin || (this.$refs.phoneFrame
+                && event.source !== this.$refs.phoneFrame.contentWindow)) {
                 return;
             }
 
             let data = event.data;
+            console.log(data)
 
             if (typeof data === "string") {
                 try {
@@ -330,17 +334,20 @@ export default {
                 }
             }
 
-            if (!data || !data.event) {
+            if (!data || typeof data.event !== "string" || !data.event.trim()) {
                 return;
             }
-            
+
+            this.eventReceived = true;
+            this.clearSlowLoadingTimer();
+
             const eventName = this.normalizeEventName(data.event);
             const properties = this.normalizeProperties(
                 data.properties || {},
                 eventName
             );
 
-            if (this.isCallActivity(eventName)) {
+            if (this.isCallActivity(eventName) && !["hangup", "ended"].includes(eventName)) {
                 this.$emit("call-activity", {
                     event: eventName,
                     properties,
@@ -419,12 +426,17 @@ export default {
     },
 
     watch: {
-        loading() {
+        loading(value) {
+            if (value) this.eventReceived = false;
             this.syncSlowLoadingMessage();
         },
     },
 
     computed: {
+        showLoading() {
+            return this.loading && !this.eventReceived;
+        },
+
         agentLabel() {
             return this.agentName || "l'utilisateur CloudTalk";
         },

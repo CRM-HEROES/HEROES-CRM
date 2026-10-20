@@ -200,6 +200,11 @@ export default {
             type: Boolean,
             default: false,
         },
+
+        beforeClose: {
+            type: Function,
+            default: null,
+        },
     },
 
     data() {
@@ -213,6 +218,9 @@ export default {
          * Close slide
          */
         close() {
+            if (this.beforeClose && this.beforeClose() === false) {
+                return;
+            }
             this.open = false;
         },
     },

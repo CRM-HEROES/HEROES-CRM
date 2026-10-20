@@ -2,7 +2,8 @@
     <slide
         :name="name"
         @open="fetchInteractions(), fetchSelectedProspects()"
-        @closed="resetCloudtalkSlideState"
+        :before-close="beforeCloudtalkSlideClose"
+        @closed="handleCloudtalkSlideClosed"
         :title="
             $t('prospect.interaction.title', {
                 prospect: interactionTitleProspect
@@ -27,6 +28,20 @@
         :style="{ width: slideWidth }"
     >
         <div class="hc-prospect-interaction-root">
+            <loading :loading="!!cloudtalkSequence?.loading" />
+            <cloudtalk-sequence-controls
+                :sequence="cloudtalkSequence"
+                :next-name="cloudtalkSequenceName(cloudtalkSequenceNextProspect)"
+                :next-number="cloudtalkSequenceNumber(cloudtalkSequenceNextProspect)"
+                :busy="callingCloudtalk"
+                :login-required="cloudtalkLoginRequired"
+                @request-stop="requestStopCloudtalkSequence"
+                @cancel-stop="cancelStopCloudtalkSequence"
+                @confirm-stop="confirmStopCloudtalkSequence"
+                @retry="retryCloudtalkSequenceCall"
+                @next="nextCloudtalkSequenceCall"
+                @stop="stopCloudtalkSequence"
+            />
             <cloudtalk-panel
                 :displayed="cloudtalkPhoneDisplayed"
                 :context-visible="cloudtalkCallContextVisible"
@@ -499,12 +514,16 @@ import {
 
 // Components
 import CloudtalkPanel from "./components/CloudtalkPanel.vue";
+import CloudtalkSequenceControls from "./components/CloudtalkSequenceControls.vue";
+import cloudtalkSequence from "./cloudtalk-sequence";
 import InteractionFrames from "./components/InteractionFrames.vue";
 import InteractionList from "./components/InteractionList.vue";
 
 export default {
+    mixins: [cloudtalkSequence],
     components: {
         CloudtalkPanel,
+        CloudtalkSequenceControls,
         InteractionFrames,
         InteractionList,
     },
@@ -525,6 +544,7 @@ export default {
             updatingPhoneNumber: false,
             updatingMobilePhoneNumber: false,
             callingCloudtalk: false,
+            cloudtalkCallRequest: 0,
             cloudtalkWaitingForEvent: false,
             cloudtalkLoginRequired: false,
             cloudtalkPhoneVisible: false,
@@ -849,6 +869,9 @@ export default {
             this.cloudtalkWaitingForEvent = true;
             this.cloudtalkLoginRequired = false;
             this.clearCloudtalkEventTimeout();
+            const request = ++this.cloudtalkCallRequest;
+            const interaction = this.interaction;
+            const sequence = this.cloudtalkSequence;
 
             try {
                 const params = {
@@ -865,6 +888,17 @@ export default {
                 );
 
                 const callId = this.cloudtalkCallId(response, false);
+                if (sequence && callId) {
+                    if (sequence !== this.cloudtalkSequence || request !== this.cloudtalkCallRequest) {
+                        this.rememberIgnoredCloudtalkSequenceIds([callId]);
+                    } else if (sequence.awaitingChoice) {
+                        sequence.completedIds = [...new Set([...sequence.completedIds, String(callId)])];
+                    } else {
+                        sequence.attempt.callIds.push(String(callId));
+                    }
+                }
+                if (request !== this.cloudtalkCallRequest || interaction !== this.interaction
+                    || (sequence && (sequence !== this.cloudtalkSequence || sequence.awaitingChoice))) return;
                 this.interaction.status = "initiated";
                 this.interaction.from_user = true;
                 this.interaction.data = {
@@ -878,6 +912,8 @@ export default {
                     this.startCloudtalkEventTimeout();
                 }
             } catch (error) {
+                if (request !== this.cloudtalkCallRequest || interaction !== this.interaction
+                    || (sequence && (sequence !== this.cloudtalkSequence || sequence.awaitingChoice))) return;
                 this.cloudtalkWaitingForEvent = false;
                 this.clearCloudtalkEventTimeout();
 
@@ -912,8 +948,9 @@ export default {
                     body: message,
                     duration: 7000,
                 });
+                if (sequence) this.completeCloudtalkSequenceCall({}, message);
             } finally {
-                this.callingCloudtalk = false;
+                if (request === this.cloudtalkCallRequest) this.callingCloudtalk = false;
             }
         },
 
@@ -928,7 +965,12 @@ export default {
         },
 
         displayCloudtalkPhoneFromIframe(payload = {}) {
-            this.prepareCloudtalkInteractionFromIframe(payload.properties || {});
+            let callInfos = payload.properties || {};
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, payload.event);
+                if (!callInfos) return;
+            }
+            this.prepareCloudtalkInteractionFromIframe(callInfos);
 
             if (!this.leftSlideOpen(this.name)) {
                 store.commit(OPEN_LEFT_SLIDE, this.name);
@@ -936,8 +978,9 @@ export default {
 
             this.showCloudtalkPhone();
 
+            const request = this.cloudtalkCallRequest;
             setTimeout(() => {
-                this.showCloudtalkPhone();
+                if (request === this.cloudtalkCallRequest) this.showCloudtalkPhone();
             }, 0);
         },
 
@@ -981,6 +1024,10 @@ export default {
         },
 
         backFromInteractionFrame() {
+            if (this.cloudtalkSequence) {
+                this.requestStopCloudtalkSequence("back");
+                return;
+            }
             if (this.interactionProspect) {
                 this.tab = 0;
                 this.frameTab = 0;
@@ -1020,6 +1067,10 @@ export default {
         },
 
         resetCloudtalkSlideState() {
+            if (this.cloudtalkSequence) {
+                this.requestStopCloudtalkSequence("back");
+                return;
+            }
             if (this.interaction.source != "cloudtalk" && this.frameTab != 5) {
                 return;
             }
@@ -1035,9 +1086,10 @@ export default {
 
         startCloudtalkEventTimeout() {
             this.clearCloudtalkEventTimeout();
+            const request = this.cloudtalkCallRequest;
 
             this.cloudtalkEventTimeout = setTimeout(() => {
-                if (!this.cloudtalkWaitingForEvent) {
+                if (request !== this.cloudtalkCallRequest || !this.cloudtalkWaitingForEvent) {
                     return;
                 }
 
@@ -1060,6 +1112,10 @@ export default {
         },
 
         cloudtalkCallRinging(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "ringing");
+                if (!callInfos) return;
+            }
             this.showCloudtalkPhone();
             this.interaction.status = this.cloudtalkCallStatus(
                 callInfos,
@@ -1070,6 +1126,10 @@ export default {
         },
 
         cloudtalkCallOutgoing(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "dialing");
+                if (!callInfos) return;
+            }
             this.showCloudtalkPhone();
             this.interaction.status = this.cloudtalkCallStatus(
                 callInfos,
@@ -1080,6 +1140,10 @@ export default {
         },
 
         cloudtalkCallAnswered(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "calling");
+                if (!callInfos) return;
+            }
             this.showCloudtalkPhone();
             this.interaction.status = this.cloudtalkCallStatus(
                 callInfos,
@@ -1090,6 +1154,10 @@ export default {
         },
 
         async cloudtalkCallHangup(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "hangup");
+                if (!callInfos) return;
+            }
             this.showCloudtalkPhone();
             this.interaction.status = this.cloudtalkCallStatus(
                 callInfos,
@@ -1097,9 +1165,14 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
+            if (this.cloudtalkSequence) this.completeCloudtalkSequenceCall(callInfos);
         },
 
         async cloudtalkCallEnded(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "ended");
+                if (!callInfos) return;
+            }
             this.showCloudtalkPhone();
             this.interaction.status = this.cloudtalkCallStatus(
                 callInfos,
@@ -1107,6 +1180,10 @@ export default {
             );
             this.setCloudtalkCallData(callInfos);
             this.fetchCloudtalkCallContext(callInfos);
+            if (this.cloudtalkSequence) {
+                this.completeCloudtalkSequenceCall(callInfos);
+                return;
+            }
             this.scheduleCloudtalkHistorySync(
                 callInfos,
                 1,
@@ -1116,6 +1193,10 @@ export default {
         },
 
         cloudtalkCallContactInfo(callInfos) {
+            if (this.cloudtalkSequenceFiltering) {
+                callInfos = this.cloudtalkSequenceEvent(callInfos, "contact_info");
+                if (!callInfos) return;
+            }
             this.fetchCloudtalkCallContext(callInfos);
         },
 
@@ -1391,7 +1472,10 @@ export default {
 
             const eventCallId = this.cloudtalkCallId(callInfos, false);
             const normalizedEventCallId = eventCallId ? String(eventCallId) : "";
-            const currentCallIds = this.currentCloudtalkCallIds();
+            const currentCallIds = [
+                ...this.currentCloudtalkCallIds(),
+                ...(this.cloudtalkSequence?.attempt?.callIds || []),
+            ];
 
             if (
                 !normalizedEventCallId ||
@@ -1538,18 +1622,20 @@ export default {
                     return;
                 }
 
+                const prospect = this.cloudtalkSequenceProspect || data.prospect || null;
+                const sameProspect = !prospect || !data.prospect || prospect.id == data.prospect.id;
                 this.cloudtalkLookup = {
                     number: data.number || number,
                     numberKey,
                     callId,
-                    prospect: data.prospect || null,
-                    threads: data.threads || [],
-                    messages: data.messages || [],
+                    prospect,
+                    threads: sameProspect ? data.threads || [] : [],
+                    messages: sameProspect ? data.messages || [] : [],
                     resolved: true,
                 };
 
-                if (data.prospect) {
-                    this.setActiveInteractionProspect(data.prospect);
+                if (prospect) {
+                    this.setActiveInteractionProspect(prospect);
                 }
             } catch (error) {
                 if (request == this.cloudtalkLookupRequest) {
@@ -1605,6 +1691,9 @@ export default {
             interaction = null,
             prospectId = null
         ) {
+            const sequence = this.cloudtalkSequence;
+            const sequenceAttempt = sequence?.attempt;
+            const callRequest = this.cloudtalkCallRequest;
             const targetInteraction = interaction || this.interaction;
             if (!targetInteraction || targetInteraction.source != "cloudtalk") {
                 return;
@@ -1648,6 +1737,8 @@ export default {
                     FETCH_CLOUDTALK_CALL_HISTORY,
                     params
                 );
+                if (callRequest !== this.cloudtalkCallRequest
+                    || (sequence && (sequence !== this.cloudtalkSequence || sequenceAttempt !== sequence.attempt))) return;
 
                 if (!data.call) {
                     if (attempt < 3) {
@@ -1687,6 +1778,8 @@ export default {
                     await this.fetchInteractions();
                 }
             } catch (error) {
+                if (callRequest !== this.cloudtalkCallRequest
+                    || (sequence && (sequence !== this.cloudtalkSequence || sequenceAttempt !== sequence.attempt))) return;
                 if (attempt < 3) {
                     this.scheduleCloudtalkHistorySync(
                         callInfos,
@@ -1952,20 +2045,24 @@ export default {
         },
 
         async fetchSelectedProspects() {
+            if (this.cloudtalkSequence) return;
             if (this.prospectsSelected.length == 0) {
                 this.selectedProspects = [];
                 return;
             }
 
+            const projectSlug = this.project.slug;
+            const ids = [...this.prospectsSelected];
             try {
-                const { data } = await ProspectService.get(this.project.slug, {
+                const { data } = await ProspectService.get(projectSlug, {
                     params: {
                         filters: JSON.stringify({
-                            ids: this.prospectsSelected,
+                            ids,
                         }),
                         fields: "first_name,last_name,phone_number,mobile_phone_number",
                     },
                 });
+                if (this.cloudtalkSequence || projectSlug !== this.project.slug) return;
                 this.selectedProspects = data.data.filter(
                     (prospect) =>
                         prospect.phone_number || prospect.mobile_phone_number
@@ -1997,6 +2094,7 @@ export default {
         async interactionProspect(newValue, oldValue) {
             if (newValue && this.leftSlideOpen(this.name)) {
                 this.fetchInteractions();
+                if (this.cloudtalkSequence) return;
 
                 if (
                     newValue.phone_number &&
@@ -2025,9 +2123,11 @@ export default {
         },
 
         currentProspect(newValue) {
-            if (newValue) {
+            if (newValue && !this.cloudtalkSequence) {
                 setTimeout(() => {
-                    this.setActiveInteractionProspect(newValue);
+                    if (!this.cloudtalkSequence && this.currentProspect === newValue && this.leftSlideOpen(this.name)) {
+                        this.setActiveInteractionProspect(newValue);
+                    }
                 }, 1000);
             }
         },
