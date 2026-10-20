@@ -135,6 +135,7 @@
         "appointments": "RDV",
         "map": "MAP",
         "mail": "Mails",
+        "incoming_communications": "Communications reçues",
         "order": "Devis",
         "documents": "Documents",
         "campaigns": "Campagnes",
