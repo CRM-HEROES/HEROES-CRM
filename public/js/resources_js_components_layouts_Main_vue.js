@@ -32355,7 +32355,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   data: function data() {
     return {
-      contextPanelVisible: false
+      contextPanelVisible: false,
+      recallAvailable: false
     };
   },
   computed: {
@@ -32392,6 +32393,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     displayed: function displayed(value) {
       if (!value) {
+        this.recallAvailable = false;
         this.closeContextPanel();
       }
     },
@@ -32399,6 +32401,7 @@ __webpack_require__.r(__webpack_exports__);
       this.closeContextPanel();
     },
     number: function number() {
+      this.recallAvailable = false;
       this.closeContextPanel();
     }
   },
@@ -32418,6 +32421,11 @@ __webpack_require__.r(__webpack_exports__);
       this.$emit("context-panel-visible", nextValue);
     },
     emitPanelEvent: function emitPanelEvent(eventName, payload) {
+      if (eventName === "login-cloudtalk") {
+        this.recallAvailable = true;
+      } else if (eventName === "call-activity") {
+        this.recallAvailable = false;
+      }
       this.closeContextPanel();
       this.$emit(eventName, payload);
     },
@@ -55378,6 +55386,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       type: Boolean,
       "default": false
     },
+    recallAvailable: {
+      type: Boolean,
+      "default": false
+    },
     agentName: {
       type: String,
       "default": ""
@@ -55393,7 +55405,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       allowedOrigin: /^https:\/\/([a-z0-9-]+\.)*cloudtalk\.io$/i,
       eventReceived: false,
       slowLoadingTimeout: null,
-      showSlowLoadingMessage: false
+      showSlowLoadingMessage: false,
+      callEnded: false,
+      callActive: false
     };
   },
   mounted: function mounted() {
@@ -55423,7 +55437,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.showSlowLoadingMessage = false;
     },
     requestCall: function requestCall() {
-      if (!this.number || this.calling) {
+      if (!this.number || this.calling || this.loading || this.callActive) {
         return;
       }
       this.$emit("make-call", this.number);
@@ -55468,6 +55482,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.eventReceived = true;
       this.clearSlowLoadingTimer();
       var eventName = this.normalizeEventName(data.event);
+      if (this.isCallActivity(eventName)) {
+        this.callEnded = ["hangup", "ended"].includes(eventName);
+        this.callActive = !this.callEnded;
+      }
       var properties = this.normalizeProperties(data.properties || {}, eventName);
       if (this.isCallActivity(eventName) && !["hangup", "ended"].includes(eventName)) {
         this.$emit("call-activity", {
@@ -55530,6 +55548,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     }
   },
   computed: {
+    showRecallButton: function showRecallButton() {
+      return !!this.number && !this.callActive && (this.recallAvailable || this.callEnded);
+    },
     showLoading: function showLoading() {
       return this.loading && !this.eventReceived;
     },
@@ -82185,6 +82206,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     number: $props.number,
     calling: $props.calling,
     loading: $props.loading,
+    "recall-available": $data.recallAvailable,
     "agent-name": $props.agentName,
     onMakeCall: _cache[1] || (_cache[1] = function ($event) {
       return $options.emitPanelEvent('make-call');
@@ -82210,7 +82232,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onContactInfo: _cache[8] || (_cache[8] = function ($event) {
       return $options.emitPanelEvent('contact-info', $event);
     })
-  }, null, 8 /* PROPS */, ["number", "calling", "loading", "agent-name"]), $props.retryVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["number", "calling", "loading", "recall-available", "agent-name"]), $props.retryVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-interaction-cloudtalk-retry-title",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("L'appel CloudTalk n'est pas passe.")
   }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
@@ -101933,30 +101955,48 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = ["id"];
 var _hoisted_2 = {
   key: 0,
+  "class": "hc-cloudtalk-recall"
+};
+var _hoisted_3 = ["disabled"];
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = {
+  key: 1,
   "class": "hc-cloudtalk-loading"
 };
-var _hoisted_3 = {
+var _hoisted_6 = {
   key: 0,
   "class": "hc-cloudtalk-loading-help"
 };
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-cloudtalk-loading-help-title"
 }, " En attente de connexion à CloudTalk ", -1 /* HOISTED */);
-var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Vérifiez que "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "vous êtes déjà connecté à CloudTalk dans le CRM"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et fermez les autres fenêtres "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Vérifiez que "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "vous êtes déjà connecté à CloudTalk dans le CRM"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et fermez les autres fenêtres "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "https://phone.cloudtalk.io/",
   target: "_blank",
   rel: "noopener noreferrer"
 }, " https://phone.cloudtalk.io/ "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" connectées à ce compte. ")], -1 /* HOISTED */);
-var _hoisted_6 = [_hoisted_4, _hoisted_5];
-var _hoisted_7 = ["src"];
+var _hoisted_9 = [_hoisted_7, _hoisted_8];
+var _hoisted_10 = ["src"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     id: $props.id,
     "class": "hc-cloudtalk"
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"number\" class=\"hc-cloudtalk-header\">\n            <div class=\"hc-cloudtalk-number\" v-text=\"number\"></div>\n            <div class=\"hc-cloudtalk-actions\">\n                <button\n                    type=\"button\"\n                    class=\"hc-cloudtalk-action\"\n                    :disabled=\"calling\"\n                    @click=\"requestCall\"\n                    aria-label=\"Appeler via CloudTalk\"\n                    title=\"Appeler via CloudTalk\"\n                >\n                    <icon class=\"fa fa-phone\" />\n                </button>\n                <button\n                    type=\"button\"\n                    class=\"hc-cloudtalk-action\"\n                    @click=\"copyNumber\"\n                    aria-label=\"Copier le numéro\"\n                    title=\"Copier le numéro\"\n                >\n                    <icon class=\"fa fa-copy\" />\n                </button>\n            </div>\n        </div> "), $options.showLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div v-if=\"number\" class=\"hc-cloudtalk-header\">\n            <div class=\"hc-cloudtalk-number\" v-text=\"number\"></div>\n            <div class=\"hc-cloudtalk-actions\">\n                <button\n                    type=\"button\"\n                    class=\"hc-cloudtalk-action\"\n                    :disabled=\"calling\"\n                    @click=\"requestCall\"\n                    aria-label=\"Appeler via CloudTalk\"\n                    title=\"Appeler via CloudTalk\"\n                >\n                    <icon class=\"fa fa-phone\" />\n                </button>\n                <button\n                    type=\"button\"\n                    class=\"hc-cloudtalk-action\"\n                    @click=\"copyNumber\"\n                    aria-label=\"Copier le numéro\"\n                    title=\"Copier le numéro\"\n                >\n                    <icon class=\"fa fa-copy\" />\n                </button>\n            </div>\n        </div> "), $options.showRecallButton ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": "hc-cloudtalk-recall-button",
+    disabled: $props.calling || $props.loading,
+    onClick: _cache[0] || (_cache[0] = function () {
+      return $options.requestCall && $options.requestCall.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    "class": "fa fa-phone"
+  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)("Rappel ".concat($props.number))
+  }, null, 8 /* PROPS */, _hoisted_4)], 8 /* PROPS */, _hoisted_3)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.showLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: $options.showLoading
-  }, null, 8 /* PROPS */, ["loading"]), $data.showSlowLoadingMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("iframe", {
+  }, null, 8 /* PROPS */, ["loading"]), $data.showSlowLoadingMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("iframe", {
     ref: "phoneFrame",
     src: $options.src,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-cloudtalk-iframe', {
@@ -101965,7 +102005,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     allow: "microphone *; camera *; display-capture *; autoplay *; clipboard-read *; clipboard-write *; fullscreen *",
     allowfullscreen: "",
     referrerpolicy: "origin"
-  }, null, 10 /* CLASS, PROPS */, _hoisted_7)], 8 /* PROPS */, _hoisted_1);
+  }, null, 10 /* CLASS, PROPS */, _hoisted_10)], 8 /* PROPS */, _hoisted_1);
 }
 
 /***/ }),
@@ -113128,7 +113168,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk {\n    display: flex;\n    flex-direction: column;\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow: hidden;\n}\n.hc-cloudtalk-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    min-height: 42px;\n    padding: 8px 12px;\n    background: #f5f5f5;\n    border-bottom: 1px solid #e5e5e5;\n}\n.hc-cloudtalk-number {\n    flex: 1;\n    font-weight: 600;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-cloudtalk-actions {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n.hc-cloudtalk-action {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    padding: 0;\n    background: transparent;\n    border: none;\n    color: #666;\n    cursor: pointer;\n}\n.hc-cloudtalk-action:hover {\n    color: #000;\n}\n.hc-cloudtalk-action:disabled {\n    color: #aaa;\n    cursor: wait;\n}\n.hc-cloudtalk-iframe {\n    border: none;\n    width: 100%;\n    height: 100%;\n    flex: 1;\n    position: relative;\n    z-index: 1;\n    transition: filter 150ms ease-out;\n    margin-bottom: 50px;\n    zoom: 65%;\n}\n.hc-cloudtalk-iframe-loading {\n    filter: blur(2px);\n}\n.hc-cloudtalk-loading {\n    position: absolute;\n    top: 0;\n    right: 0;\n    left: 0;\n    z-index: 2;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    min-height: 52px;\n    height: auto;\n    padding: 8px 10px 10px;\n    background: rgba(255, 255, 255, 0.86);\n}\n.hc-cloudtalk-loading .hc-loading-overlay {\n    background-color: transparent;\n    position: relative;\n    height: 28px;\n    opacity: 1;\n    visibility: visible;\n}\n.hc-cloudtalk-loading .hc-loading-overlay::before {\n    height: 28px;\n}\n.hc-cloudtalk-loading-help {\n    padding: 8px 10px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n    color: #334155;\n    font-size: 12px;\n    line-height: 1.4;\n}\n.hc-cloudtalk-loading-help-title {\n    margin-bottom: 4px;\n    font-weight: 700;\n}\n.hc-cloudtalk-loading-help a {\n    color: #12a0f3;\n    overflow-wrap: anywhere;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk {\n    display: flex;\n    flex-direction: column;\n    position: relative;\n    width: 100%;\n    height: 100%;\n    overflow: hidden;\n}\n.hc-cloudtalk-header {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    min-height: 42px;\n    padding: 8px 12px;\n    background: #f5f5f5;\n    border-bottom: 1px solid #e5e5e5;\n}\n.hc-cloudtalk-number {\n    flex: 1;\n    font-weight: 600;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-cloudtalk-actions {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n.hc-cloudtalk-action {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    padding: 0;\n    background: transparent;\n    border: none;\n    color: #666;\n    cursor: pointer;\n}\n.hc-cloudtalk-action:hover {\n    color: #000;\n}\n.hc-cloudtalk-action:disabled {\n    color: #aaa;\n    cursor: wait;\n}\n.hc-cloudtalk-recall {\n    flex-shrink: 0;\n    padding: 4px 6px;\n    border-bottom: 1px solid #e5e5e5;\n}\n.hc-cloudtalk-recall-button {\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    width: 100%;\n    border: none;\n    border-radius: 6px;\n    background: #12a0f3;\n    color: #fff;\n    cursor: pointer;\n    overflow-wrap: anywhere;\n}\n.hc-cloudtalk-recall-button:disabled {\n    opacity: 0.6;\n    cursor: wait;\n}\n.hc-cloudtalk-iframe {\n    border: none;\n    width: 100%;\n    height: 100%;\n    flex: 1;\n    position: relative;\n    z-index: 1;\n    transition: filter 150ms ease-out;\n    margin-bottom: 50px;\n    zoom: 65%;\n}\n.hc-cloudtalk-iframe-loading {\n    filter: blur(2px);\n}\n.hc-cloudtalk-loading {\n    position: absolute;\n    top: 0;\n    right: 0;\n    left: 0;\n    z-index: 2;\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    min-height: 52px;\n    height: auto;\n    padding: 8px 10px 10px;\n    background: rgba(255, 255, 255, 0.86);\n}\n.hc-cloudtalk-loading .hc-loading-overlay {\n    background-color: transparent;\n    position: relative;\n    height: 28px;\n    opacity: 1;\n    visibility: visible;\n}\n.hc-cloudtalk-loading .hc-loading-overlay::before {\n    height: 28px;\n}\n.hc-cloudtalk-loading-help {\n    padding: 8px 10px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n    color: #334155;\n    font-size: 12px;\n    line-height: 1.4;\n}\n.hc-cloudtalk-loading-help-title {\n    margin-bottom: 4px;\n    font-weight: 700;\n}\n.hc-cloudtalk-loading-help a {\n    color: #12a0f3;\n    overflow-wrap: anywhere;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

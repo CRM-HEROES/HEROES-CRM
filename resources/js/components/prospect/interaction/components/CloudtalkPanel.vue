@@ -27,6 +27,7 @@
                 :number="number"
                 :calling="calling"
                 :loading="loading"
+                :recall-available="recallAvailable"
                 :agent-name="agentName"
                 @make-call="emitPanelEvent('make-call')"
                 @call-activity="emitPanelEvent('call-activity', $event)"
@@ -392,6 +393,7 @@ export default {
     data() {
         return {
             contextPanelVisible: false,
+            recallAvailable: false,
         };
     },
 
@@ -445,6 +447,7 @@ export default {
 
         displayed(value) {
             if (!value) {
+                this.recallAvailable = false;
                 this.closeContextPanel();
             }
         },
@@ -454,6 +457,7 @@ export default {
         },
 
         number() {
+            this.recallAvailable = false;
             this.closeContextPanel();
         },
     },
@@ -479,6 +483,12 @@ export default {
         },
 
         emitPanelEvent(eventName, payload) {
+            if (eventName === "login-cloudtalk") {
+                this.recallAvailable = true;
+            } else if (eventName === "call-activity") {
+                this.recallAvailable = false;
+            }
+
             this.closeContextPanel();
             this.$emit(eventName, payload);
         },

@@ -24,6 +24,17 @@
                 </button>
             </div>
         </div> -->
+        <div v-if="showRecallButton" class="hc-cloudtalk-recall">
+            <button
+                type="button"
+                class="hc-cloudtalk-recall-button"
+                :disabled="calling || loading"
+                @click="requestCall"
+            >
+                <icon class="fa fa-phone" />
+                <span v-text="`Rappel ${number}`"></span>
+            </button>
+        </div>
         <div v-if="showLoading" class="hc-cloudtalk-loading">
             <loading :loading="showLoading" />
             <div
@@ -116,6 +127,31 @@
 
 .hc-cloudtalk-action:disabled {
     color: #aaa;
+    cursor: wait;
+}
+
+.hc-cloudtalk-recall {
+    flex-shrink: 0;
+    padding: 4px 6px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.hc-cloudtalk-recall-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    border: none;
+    border-radius: 6px;
+    background: #12a0f3;
+    color: #fff;
+    cursor: pointer;
+    overflow-wrap: anywhere;
+}
+
+.hc-cloudtalk-recall-button:disabled {
+    opacity: 0.6;
     cursor: wait;
 }
 
@@ -230,6 +266,11 @@ export default {
             default: false,
         },
 
+        recallAvailable: {
+            type: Boolean,
+            default: false,
+        },
+
         agentName: {
             type: String,
             default: "",
@@ -248,6 +289,8 @@ export default {
             eventReceived: false,
             slowLoadingTimeout: null,
             showSlowLoadingMessage: false,
+            callEnded: false,
+            callActive: false,
         };
     },
 
@@ -284,7 +327,7 @@ export default {
         },
 
         requestCall() {
-            if (!this.number || this.calling) {
+            if (!this.number || this.calling || this.loading || this.callActive) {
                 return;
             }
 
@@ -342,6 +385,11 @@ export default {
             this.clearSlowLoadingTimer();
 
             const eventName = this.normalizeEventName(data.event);
+            if (this.isCallActivity(eventName)) {
+                this.callEnded = ["hangup", "ended"].includes(eventName);
+                this.callActive = !this.callEnded;
+            }
+
             const properties = this.normalizeProperties(
                 data.properties || {},
                 eventName
@@ -433,6 +481,14 @@ export default {
     },
 
     computed: {
+        showRecallButton() {
+            return (
+                !!this.number &&
+                !this.callActive &&
+                (this.recallAvailable || this.callEnded)
+            );
+        },
+
         showLoading() {
             return this.loading && !this.eventReceived;
         },
