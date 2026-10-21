@@ -44,25 +44,15 @@ export default {
 
     methods: {
         change(event) {
-            let isChecked = event.target.checked;
-            let newValue = { ...this.modelValue };
-            if (isChecked) {
-                if (!Array.isArray(newValue[this.label.category_id])) {
-                    newValue[this.label.category_id] = [];
-                }
-                newValue[this.label.category_id].push(this.value);
-            } else {
-                if (Array.isArray(newValue[this.label.category_id])) {
-                    newValue[this.label.category_id].splice(
-                        newValue[this.label.category_id].indexOf(this.value),
-                        1
-                    );
-                }
+            const newValue = { ...this.modelValue };
+            const category = this.label.category_id;
+            const selected = Array.isArray(newValue[category]) ? [...newValue[category]] : [];
+            const index = selected.findIndex((id) => String(id) === String(this.value));
+            if (event.target.checked && index === -1) selected.push(this.value);
+            if (!event.target.checked && index !== -1) selected.splice(index, 1);
 
-                if (newValue[this.label.category_id].length == 0) {
-                    delete newValue[this.label.category_id];
-                }
-            }
+            if (selected.length) newValue[category] = selected;
+            else delete newValue[category];
             this.$emit("update:modelValue", newValue);
         },
 
@@ -87,8 +77,8 @@ export default {
          */
         isChecked() {
             return (
-                Array.isArray(this.modelValue[this.label.category_id]) &&
-                this.modelValue[this.label.category_id].includes(this.value)
+                Array.isArray(this.modelValue?.[this.label.category_id]) &&
+                this.modelValue[this.label.category_id].some((id) => String(id) === String(this.value))
             );
         },
 

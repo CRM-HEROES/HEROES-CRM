@@ -428,7 +428,7 @@ export default {
             },
             set(value) {
                 store.commit(SET_EVENT_PARAMS, value);
-                store.dispatch(FETCH_EVENTS);
+                store.dispatch(FETCH_EVENTS, { incremental: false });
             },
         },
 

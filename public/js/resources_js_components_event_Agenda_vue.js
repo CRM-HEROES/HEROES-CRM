@@ -11,19 +11,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _agenda_day_Day_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./agenda/day/Day.vue */ "./resources/js/components/event/agenda/day/Day.vue");
 /* harmony import */ var _agenda_week_Week_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./agenda/week/Week.vue */ "./resources/js/components/event/agenda/week/Week.vue");
 /* harmony import */ var _agenda_month_Month_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./agenda/month/Month.vue */ "./resources/js/components/event/agenda/month/Month.vue");
 /* harmony import */ var _agenda_planning_Planning_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./agenda/planning/Planning.vue */ "./resources/js/components/event/agenda/planning/Planning.vue");
 /* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -56,7 +58,26 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       displayType: "week"
     };
   },
-  computed: _objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["agendaDisplayMode"]))
+  watch: {
+    selectedUsers: {
+      deep: true,
+      handler: function handler() {
+        var _this$project;
+        if ((_this$project = this.project) !== null && _this$project !== void 0 && _this$project.slug && this.agendaOtherProjects && this.agendaDisplayMode !== "planning") {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_GLOBAL_EVENTS);
+        }
+      }
+    }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["agendaDisplayMode", "project", "agendaOtherProjects", "eventsParamsValue"])), {}, {
+    selectedUsers: function selectedUsers() {
+      return this.eventsParamsValue("withUsers");
+    },
+    projectKey: function projectKey() {
+      var _this$project2, _this$project3;
+      return ((_this$project2 = this.project) === null || _this$project2 === void 0 ? void 0 : _this$project2.id) || ((_this$project3 = this.project) === null || _this$project3 === void 0 ? void 0 : _this$project3.slug) || "agenda";
+    }
+  })
 });
 
 /***/ }),
@@ -71,24 +92,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _filters_Users_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../filters/Users.vue */ "./resources/js/components/event/filters/Users.vue");
-/* harmony import */ var _week_Column_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../week/Column.vue */ "./resources/js/components/event/agenda/week/Column.vue");
-/* harmony import */ var _week_TimeSlots_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../week/TimeSlots.vue */ "./resources/js/components/event/agenda/week/TimeSlots.vue");
-/* harmony import */ var _week_CardMenus_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../week/CardMenus.vue */ "./resources/js/components/event/agenda/week/CardMenus.vue");
-/* harmony import */ var _slides_daily_direction_Slide_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../slides/daily-direction/Slide.vue */ "./resources/js/components/event/slides/daily-direction/Slide.vue");
-/* harmony import */ var _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/components/ocr/Modal.vue */ "./resources/js/components/ocr/Modal.vue");
+/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
+/* harmony import */ var _filters_Users_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../filters/Users.vue */ "./resources/js/components/event/filters/Users.vue");
+/* harmony import */ var _week_Column_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../week/Column.vue */ "./resources/js/components/event/agenda/week/Column.vue");
+/* harmony import */ var _week_TimeSlots_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../week/TimeSlots.vue */ "./resources/js/components/event/agenda/week/TimeSlots.vue");
+/* harmony import */ var _week_CardMenus_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../week/CardMenus.vue */ "./resources/js/components/event/agenda/week/CardMenus.vue");
+/* harmony import */ var _slides_daily_direction_Slide_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../slides/daily-direction/Slide.vue */ "./resources/js/components/event/slides/daily-direction/Slide.vue");
+/* harmony import */ var _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/components/ocr/Modal.vue */ "./resources/js/components/ocr/Modal.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 
 
@@ -98,29 +117,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
+function localDate(value) {
+  return new Date(typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value + "T12:00:00" : value);
+}
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Users: _filters_Users_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
-    Column: _week_Column_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-    TimeSlots: _week_TimeSlots_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-    CardMenus: _week_CardMenus_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    UserDailyDirectionSlide: _slides_daily_direction_Slide_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
-    OcrModal: _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_7__["default"]
-  },
-  data: function data() {
-    return {
-      currentDate: null
-    };
+    Users: _filters_Users_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    Column: _week_Column_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    TimeSlots: _week_TimeSlots_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    CardMenus: _week_CardMenus_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+    UserDailyDirectionSlide: _slides_daily_direction_Slide_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
+    OcrModal: _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_8__["default"]
   },
   created: function created() {
-    this.currentDate = new Date();
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS, []);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_NEW_EVENT, null);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_DRAGGED_EVENT, null);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_RESIZED_EVENT, null);
     this.updateParamsFromUrl();
   },
-  mounted: function mounted() {},
   methods: {
     updateParamsFromUrl: function updateParamsFromUrl() {
       var url = new URL(window.location.href);
@@ -137,36 +153,53 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       });
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENT_PARAMS, filters);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.SET_GLOBAL_EVENT_PARAMS, _objectSpread(_objectSpread({}, filters), {}, {
+        withoutProjects: [this.project.id]
+      }));
+      var fields = ["calendar", "prospect", "user", "users"];
+      if (this.projectUserSettingsEventsColorByLabel) {
+        fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
+      }
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS_FIELDS, fields.join(","));
+      this.setDateRange();
+      this.fetchEvents();
+    },
+    setDateRange: function setDateRange() {
+      var selected = localDate(this.agendaDate);
+      var date = dateToString(Number.isNaN(selected.getTime()) ? new Date() : selected).substring(0, 10);
+      for (var _i = 0, _arr = ["startedAt", "endedAt"]; _i < _arr.length; _i++) {
+        var key = _arr[_i];
+        var param = {
+          key: key,
+          value: date
+        };
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, param);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, param);
+      }
+    },
+    fetchEvents: function fetchEvents() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
+      this.fetchGlobalEvents();
+    },
+    fetchGlobalEvents: function fetchGlobalEvents() {
+      if (this.agendaOtherProjects) {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+      }
     }
   },
   watch: {
     agendaDate: function agendaDate() {
-      var _this = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: _this.agendaDate
-              });
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: _this.agendaDate
-              });
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
-            case 3:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }))();
+      this.setDateRange();
+      this.fetchEvents();
+    },
+    agendaOtherProjects: function agendaOtherProjects(enabled) {
+      if (enabled) this.fetchGlobalEvents();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_8__.mapGetters)(["draggedEvent", "resizedEvent", "eventsParamsValue", "eventsParamExists", "agendaFilter", "agendaList", "agendaWeekEnd", "agendaDate"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "draggedEvent", "resizedEvent", "eventsParamsValue", "eventsParamExists", "agendaFilter", "agendaList", "agendaWeekEnd", "agendaDate", "agendaOtherProjects", "projectUserSettingsEventsColorByLabel"])), {}, {
     currentDate: function currentDate() {
-      return new Date(this.agendaDate);
+      var date = localDate(this.agendaDate);
+      return Number.isNaN(date.getTime()) ? new Date() : date;
     }
   })
 });
@@ -205,7 +238,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * Previous week
      */
     previousPage: function previousPage() {
-      var date = new Date(this.paramsStartedAt);
+      var date = new Date(this.agendaDate);
       date.setDate(date.getDate() - 7);
       this.setDate(date);
     },
@@ -225,26 +258,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * Next week
      */
     nextPage: function nextPage() {
-      var date = new Date(this.paramsStartedAt);
+      var date = new Date(this.agendaDate);
       date.setDate(date.getDate() + 7);
       this.setDate(date);
     },
     setDate: function setDate(date) {
-      // Start date
-      var startDate = new Date(date);
-
-      // End date
-      var endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 6);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(startDate).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(endDate).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_DATE, dateToString(date).substring(0, 10));
     },
     toggleAgendaFilter: function toggleAgendaFilter() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_FILTER, !this.agendaFilter);
@@ -870,6 +889,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+function localDate(value) {
+  return new Date(typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value + "T12:00:00" : value);
+}
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     HeaderCell: _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -880,7 +902,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     OcrModal: _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_10__["default"]
   },
   data: function data() {
-    var date = new Date();
+    var selected = localDate(_store__WEBPACK_IMPORTED_MODULE_0__["default"].getters.agendaDate);
+    var date = Number.isNaN(selected.getTime()) ? new Date() : selected;
     return {
       date: {
         year: date.getFullYear(),
@@ -894,9 +917,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   created: function created() {
     this.updateParamsFromUrl();
-    var date = new Date();
-    date.setDate(0);
-    this.currentDate = this.dateToString(date);
+    this.fetchEvents();
   },
   methods: {
     updateParamsFromUrl: function updateParamsFromUrl() {
@@ -917,8 +938,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.SET_GLOBAL_EVENT_PARAMS, _objectSpread(_objectSpread({}, filters), {}, {
         withoutProjects: [this.project.id]
       }));
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+      var fields = ["calendar", "prospect", "user", "users"];
+      if (this.projectUserSettingsEventsColorByLabel) {
+        fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
+      }
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS_FIELDS, fields.join(","));
     },
     fetchEvents: function fetchEvents() {
       if (this.weeks.length == 0) {
@@ -936,10 +960,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       };
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, endedAtParam);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, endedAtParam);
-
-      // this.setDate(date);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+      this.fetchGlobalEvents();
+    },
+    fetchGlobalEvents: function fetchGlobalEvents() {
+      if (this.agendaOtherProjects) {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+      }
     },
     dateToString: function (_dateToString) {
       function dateToString(_x) {
@@ -954,9 +981,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     }),
     scrollLeft: function scrollLeft() {
       var _this = this;
-      var date = new Date();
-      date.setYear(this.date.year);
-      date.setMonth(this.date.month - 1);
+      var date = new Date(this.date.year, this.date.month - 1, 1);
       this.scrollingOldLeft = true;
       setTimeout(function () {
         _this.currentDate = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-01";
@@ -969,9 +994,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     scrollRight: function scrollRight() {
       var _this2 = this;
-      var date = new Date();
-      date.setYear(this.date.year);
-      date.setMonth(this.date.month + 1);
+      var date = new Date(this.date.year, this.date.month + 1, 1);
       this.scrollingOldRight = true;
       setTimeout(function () {
         _this2.currentDate = date.getFullYear() + "-" + (date.getMonth() < 9 ? "0" : "") + (date.getMonth() + 1) + "-01";
@@ -1003,14 +1026,19 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.fetchEvents();
     },
     agendaDate: function agendaDate() {
-      var date = new Date(this.agendaDate);
-      this.date = {
-        year: date.getFullYear(),
-        month: date.getMonth()
-      };
+      var date = localDate(this.agendaDate);
+      if (!Number.isNaN(date.getTime()) && (date.getFullYear() !== this.date.year || date.getMonth() !== this.date.month)) {
+        this.date = {
+          year: date.getFullYear(),
+          month: date.getMonth()
+        };
+      }
+    },
+    agendaOtherProjects: function agendaOtherProjects(enabled) {
+      if (enabled) this.fetchGlobalEvents();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "events", "agendaList", "agendaFilter", "agendaDate", "agendaWeekEnd"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "events", "agendaList", "agendaFilter", "agendaDate", "agendaWeekEnd", "agendaOtherProjects", "projectUserSettingsEventsColorByLabel"])), {}, {
     currentDate: {
       get: function get() {
         return this.agendaDate;
@@ -1024,7 +1052,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     previousSunday: function previousSunday() {
       // Get the first day of the month
-      var firstDayOfMonth = new Date(this.date.year, this.date.month, 1);
+      var firstDayOfMonth = new Date(this.date.year, this.date.month, 1, 12);
 
       // Calculate the difference in days from Sunday (0)
       var dayOfWeek = firstDayOfMonth.getDay();
@@ -1046,7 +1074,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       var weeks = [];
 
       // Loop through days in the month
-      for (var currentMonth = this.previousSunday; currentMonth.getFullYear() * 100 + currentMonth.getMonth() <= this.date.year * 100 + this.date.month;) {
+      for (var currentMonth = new Date(this.previousSunday); currentMonth.getFullYear() * 100 + currentMonth.getMonth() <= this.date.year * 100 + this.date.month;) {
         weeks.push([]);
         for (var i = 0; i < (this.agendaWeekEnd ? 7 : 5); i++) {
           weeks[weeks.length - 1].push(new Date(currentMonth));
@@ -1460,7 +1488,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * Previous week
      */
     previousPage: function previousPage() {
-      var date = new Date(this.paramsStartedAt);
+      var date = new Date(this.agendaDate);
       date.setDate(date.getDate() - 7);
       this.setDate(date);
     },
@@ -1488,26 +1516,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * Next week
      */
     nextPage: function nextPage() {
-      var date = new Date(this.paramsStartedAt);
+      var date = new Date(this.agendaDate);
       date.setDate(date.getDate() + 7);
       this.setDate(date);
     },
     setDate: function setDate(date) {
-      // Start date
-      var startDate = new Date(date);
-
-      // End date
-      var endDate = new Date(startDate);
-      endDate.setDate(startDate.getDate() + 6);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(startDate).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(endDate).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_DATE, dateToString(date).substring(0, 10));
     },
     toggleAgendaFilter: function toggleAgendaFilter() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_FILTER, !this.agendaFilter);
@@ -1523,11 +1537,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      */
     ocr: function ocr() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "prospects-table-ocr");
-    }
-  },
-  watch: {
-    agendaDate: function agendaDate() {
-      this.setDate(new Date(this.agendaDate));
     }
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["eventsParamsValue", "eventsParamExists", "agendaFilter", "agendaList", "agendaDisplayMode", "agendaDate", "can"])), {}, {
@@ -2704,12 +2713,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _CardMenus_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./CardMenus.vue */ "./resources/js/components/event/agenda/week/CardMenus.vue");
 /* harmony import */ var _slides_daily_direction_Slide_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../../slides/daily-direction/Slide.vue */ "./resources/js/components/event/slides/daily-direction/Slide.vue");
 /* harmony import */ var _components_ocr_Modal_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/components/ocr/Modal.vue */ "./resources/js/components/ocr/Modal.vue");
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -2735,11 +2750,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   data: function data() {
     return {
       currentDate: null,
-      eventsToAddCount: 3
+      windowStartedAt: null,
+      windowEndedAt: null,
+      eventsToAddCount: 3,
+      shiftingWindow: false
     };
   },
   created: function created() {
-    this.currentDate = new Date();
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS, []);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_NEW_EVENT, null);
     _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_DRAGGED_EVENT, null);
@@ -2748,341 +2765,272 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   mounted: function mounted() {
     var _this = this;
-    var body = this.$refs.body;
-    var columns = this.$refs.columns;
-    var sl = 0;
-    body.addEventListener("scroll", /*#__PURE__*/function () {
-      var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(event) {
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              if (!(window.innerWidth > 767 || !_this.agendaList)) {
-                _context.next = 4;
-                break;
-              }
-              if (body.scrollLeft >= columns.getBoundingClientRect().width - body.getBoundingClientRect().width - 20) {
-                _this.addFutureEvents(false);
-                body.scrollLeft -= _this.width * _this.eventsToAddCount;
-              } else if ((sl = body.scrollLeft) <= 20) {
-                _this.addPastEvents();
-                body.scrollLeft = _this.width * _this.eventsToAddCount + sl;
-              }
-              _context.next = 13;
-              break;
-            case 4:
-              if (!(body.scrollTop >= columns.getBoundingClientRect().height - body.getBoundingClientRect().height - 20)) {
-                _context.next = 8;
-                break;
-              }
-              _this.addMobileFutureEvents();
-              // body.scrollTop -= this.width * this.eventsToAddCount;
-              _context.next = 13;
-              break;
-            case 8:
-              if (!(body.scrollTop <= 0)) {
-                _context.next = 13;
-                break;
-              }
-              _this.addMobilePastEvents();
-              _context.next = 12;
-              return _this.$nextTick();
-            case 12:
-              body.scrollTop = 34 * 8;
-            case 13:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }));
-      return function (_x) {
-        return _ref.apply(this, arguments);
-      };
-    }());
-    var date = new Date();
-    this.scrollToDate(date);
-    this.scrollToTime(date.getHours(), date.getMinutes());
+    return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+      var now;
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            _this.scrollHandler = function () {
+              return _this.scheduleVisibleLoad();
+            };
+            _this.resizeHandler = function () {
+              return _this.scheduleVisibleLoad();
+            };
+            _this.$refs.body.addEventListener("scroll", _this.scrollHandler, {
+              passive: true
+            });
+            window.addEventListener("resize", _this.resizeHandler);
+            _context.next = 6;
+            return _this.$nextTick();
+          case 6:
+            _this.scrollToDate(_this.currentDate);
+            now = new Date();
+            _this.scrollToTime(now.getHours(), now.getMinutes());
+            _this.fetchEvents();
+          case 10:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee);
+    }))();
+  },
+  beforeUnmount: function beforeUnmount() {
+    var _this$$refs$body;
+    this.agendaDisposed = true;
+    (_this$$refs$body = this.$refs.body) === null || _this$$refs$body === void 0 ? void 0 : _this$$refs$body.removeEventListener("scroll", this.scrollHandler);
+    window.removeEventListener("resize", this.resizeHandler);
+    if (this.scrollFrame != null) cancelAnimationFrame(this.scrollFrame);
   },
   methods: {
     updateParamsFromUrl: function updateParamsFromUrl() {
-      var url = new URL(window.location.href);
-      var searchParams = new URLSearchParams(url.search);
       var filters = {};
-      searchParams.forEach(function (value, param) {
-        if (param == "filters") {
-          try {
-            value = JSON.parse(value);
-            for (var key in value) {
-              filters[key] = value[key];
-            }
-          } catch (e) {}
+      var searchParams = new URL(window.location.href).searchParams;
+      try {
+        var value = JSON.parse(searchParams.get("filters") || "{}");
+        if (value && _typeof(value) === "object" && !Array.isArray(value)) {
+          Object.assign(filters, value);
         }
-      });
+      } catch (e) {}
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENT_PARAMS, filters);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.SET_GLOBAL_EVENT_PARAMS, _objectSpread(_objectSpread({}, filters), {}, {
         withoutProjects: [this.project.id]
       }));
-      if (!this.eventsParamExists("startedAt") || !this.eventsParamExists("endedAt")) {
-        this.setWeekDate(new Date());
-      }
+      this.setEventsFields();
       this.setMinMaxHour();
-      this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+      var date = this.selectedDate(this.agendaDate);
+      if (filters.startedAt && filters.endedAt && (this.columnKey(date) < filters.startedAt || this.columnKey(date) > filters.endedAt)) {
+        date = this.selectedDate(filters.startedAt);
+      }
+      this.setWeekDate(date);
+      // Child filters can fetch in their mounted hook, before this view mounts.
+      this.setVisibleRange(this.estimatedVisibleRange());
     },
-    fetchEvents: function fetchEvents() {
+    selectedDate: function selectedDate(value) {
+      var match = typeof value === "string" && /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+      var date = match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12) : new Date(value || Date.now());
+      if (Number.isNaN(date.getTime())) return new Date();
+      while (!this.agendaWeekEnd && (date.getDay() === 0 || date.getDay() === 6)) {
+        date.setDate(date.getDate() + 1);
+      }
+      return date;
+    },
+    setEventsFields: function setEventsFields() {
       var fields = ["calendar", "prospect", "user", "users"];
       if (this.projectUserSettingsEventsColorByLabel) {
         fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
       }
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS_FIELDS, fields.join(","));
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS);
     },
-    addPastEvents: function addPastEvents(add) {
-      var date = new Date(this.weekDates[0]);
-      date = this.getDateAddDays(date, -this.eventsToAddCount);
-      // date.setDate(date.getDate() - this.eventsToAddCount);
-      this.setDate(date);
-      this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
-    },
-    /**
-     *
-     */
-    addFutureEvents: function addFutureEvents() {
-      var date = new Date(this.weekDates[this.weekDates.length - 1]);
-      date = this.getDateAddDays(date, this.eventsToAddCount);
-      // date.setDate(date.getDate() + this.eventsToAddCount);
-
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-      date = new Date(this.weekDates[this.weekDates.length - 1]);
-      date = this.getDateAddDays(date, -9);
-      // date.setDate(date.getDate() - 9);
-
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-
-      // this.setDate(date);
-      this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
-    },
-    /**
-     *
-     */
-    addMobilePastEvents: function addMobilePastEvents() {
-      var date = new Date(this.eventsParamsValue("startedAt"));
-      date = this.getDateAddDays(date, -8);
-      // date.setDate(date.getDate() + this.eventsToAddCount);
-
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "startedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-
-      // this.setDate(date);
-      this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
-    },
-    /**
-     *
-     */
-    addMobileFutureEvents: function addMobileFutureEvents() {
-      var date = new Date(this.eventsParamsValue("endedAt"));
-      date = this.getDateAddDays(date, 8);
-      // date.setDate(date.getDate() + this.eventsToAddCount);
-
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "endedAt",
-        value: dateToString(date).substring(0, 10)
-      });
-
-      // this.setDate(date);
-      this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
-    },
-    /**
-     *
-     * @param {*} date
-     */
-    setMinMaxHour: function setMinMaxHour() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedAfterTime",
-        value: (this.projectUserSettingsAgendaMinimumHour < 10 ? "0" : "") + this.projectUserSettingsAgendaMinimumHour + ":00:00"
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-        key: "startedBeforeTime",
-        value: (this.projectUserSettingsAgendaMaximumHour < 10 ? "0" : "") + this.projectUserSettingsAgendaMaximumHour + ":00:00"
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "startedAfterTime",
-        value: (this.projectUserSettingsAgendaMinimumHour < 10 ? "0" : "") + this.projectUserSettingsAgendaMinimumHour + ":00:00"
-      });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-        key: "startedBeforeTime",
-        value: (this.projectUserSettingsAgendaMaximumHour < 10 ? "0" : "") + this.projectUserSettingsAgendaMaximumHour + ":00:00"
-      });
-    },
-    /**
-     *
-     * @param {*} date
-     */
-    setWeekDate: function setWeekDate(date) {
-      var currentDate = new Date(date);
-      if (deviceType() == "desktop") {
-        currentDate = this.getDateAddDays(date, -4);
+    setVisibleRange: function setVisibleRange(range) {
+      if (!range) return;
+      for (var _i = 0, _arr = ["startedAt", "endedAt"]; _i < _arr.length; _i++) {
+        var key = _arr[_i];
+        var param = {
+          key: key,
+          value: range[key]
+        };
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, param);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, param);
       }
-      this.setDate(currentDate);
     },
-    /**
-     *
-     * @param {*} date
-     */
-    setDate: function setDate(date) {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var sundayDate, saturdayDate;
+    fetchEvents: function fetchEvents() {
+      if (this.agendaDisposed) return;
+      var range = this.visibleRange();
+      if (!range) return;
+      this.setVisibleRange(range);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_EVENTS, {
+        range: range,
+        retainRange: {
+          startedAt: this.windowStartedAt,
+          endedAt: this.windowEndedAt
+        }
+      });
+      this.fetchGlobalEvents(range);
+    },
+    fetchGlobalEvents: function fetchGlobalEvents() {
+      var range = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.visibleRange();
+      if (this.agendaOtherProjects && range && !this.agendaDisposed) {
+        this.setVisibleRange(range);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS, {
+          range: range,
+          retainRange: {
+            startedAt: this.windowStartedAt,
+            endedAt: this.windowEndedAt
+          }
+        });
+      }
+    },
+    estimatedVisibleRange: function estimatedVisibleRange() {
+      var _this2 = this,
+        _this$$refs$body2;
+      var dates = this.weekDates;
+      if (!dates.length) return null;
+      var selected = Math.max(0, dates.findIndex(function (date) {
+        return _this2.columnKey(date) === _this2.columnKey(_this2.currentDate);
+      }));
+      var availableWidth = ((_this$$refs$body2 = this.$refs.body) === null || _this$$refs$body2 === void 0 ? void 0 : _this$$refs$body2.clientWidth) || window.innerWidth - (this.agendaFilter ? 240 : 0) - 50;
+      var count = this.isVerticalList() ? 1 : Math.max(1, Math.ceil(availableWidth / this.width));
+      var first = Math.max(0, selected - Math.floor(count / 2));
+      return this.rangeWithMargin(first, Math.min(dates.length - 1, first + count - 1));
+    },
+    visibleColumns: function visibleColumns() {
+      var _this3 = this;
+      var body = this.$refs.body;
+      if (!body) return [];
+      var viewport = body.getBoundingClientRect();
+      var vertical = this.isVerticalList();
+      return this.weekDates.map(function (date, index) {
+        var element = document.getElementById("hc-agenda-column-" + _this3.columnKey(date));
+        return element ? {
+          date: date,
+          index: index,
+          element: element,
+          rect: element.getBoundingClientRect()
+        } : null;
+      }).filter(function (column) {
+        return column && (vertical ? column.rect.bottom > viewport.top && column.rect.top < viewport.bottom : column.rect.right > viewport.left && column.rect.left < viewport.right);
+      });
+    },
+    visibleRange: function visibleRange() {
+      var visible = this.visibleColumns();
+      return visible.length ? this.rangeWithMargin(visible[0].index, visible[visible.length - 1].index) : this.estimatedVisibleRange();
+    },
+    rangeWithMargin: function rangeWithMargin(first, last) {
+      var dates = this.weekDates;
+      if (!dates.length) return null;
+      return {
+        startedAt: this.columnKey(dates[Math.max(0, first - 1)]),
+        endedAt: this.columnKey(dates[Math.min(dates.length - 1, last + 1)])
+      };
+    },
+    isVerticalList: function isVerticalList() {
+      return window.innerWidth <= 767 && this.agendaList;
+    },
+    scheduleVisibleLoad: function scheduleVisibleLoad() {
+      var _this4 = this;
+      if (this.scrollFrame != null || this.agendaDisposed) return;
+      this.scrollFrame = requestAnimationFrame(/*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var body, vertical, position, size, total;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this2.currentDate = date;
-              sundayDate = new Date(date);
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(sundayDate).substring(0, 10)
-              });
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(sundayDate).substring(0, 10)
-              });
-              saturdayDate = new Date(sundayDate);
-              saturdayDate = _this2.getDateAddDays(saturdayDate, 9);
-              // saturdayDate.setDate(sundayDate.getDate() + 9);
-
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(saturdayDate).substring(0, 10)
-              });
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(saturdayDate).substring(0, 10)
-              });
-              _this2.scrollToDate(date);
-            case 9:
+              _this4.scrollFrame = null;
+              if (!(_this4.agendaDisposed || _this4.shiftingWindow)) {
+                _context2.next = 3;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 3:
+              body = _this4.$refs.body;
+              if (body) {
+                _context2.next = 6;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 6:
+              vertical = _this4.isVerticalList();
+              position = vertical ? body.scrollTop : body.scrollLeft;
+              size = vertical ? body.clientHeight : body.clientWidth;
+              total = vertical ? body.scrollHeight : body.scrollWidth;
+              if (!(total > size + 20 && position >= total - size - 20)) {
+                _context2.next = 15;
+                break;
+              }
+              _context2.next = 13;
+              return _this4.shiftWindow(_this4.eventsToAddCount);
+            case 13:
+              _context2.next = 18;
+              break;
+            case 15:
+              if (!(total > size + 20 && position <= 20)) {
+                _context2.next = 18;
+                break;
+              }
+              _context2.next = 18;
+              return _this4.shiftWindow(-_this4.eventsToAddCount);
+            case 18:
+              _this4.fetchEvents();
+            case 19:
             case "end":
               return _context2.stop();
           }
         }, _callee2);
-      }))();
+      })));
     },
-    /**
-     *
-     */
-    prevDate: function prevDate() {
-      this.setDate(this.getDateAddDays(this.currentDate, this.agendaWeekEnd ? -7 : -5));
-    },
-    /**
-     *
-     */
-    nextDate: function nextDate() {
-      var _this3 = this;
+    shiftWindow: function shiftWindow(days) {
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var body, vertical, anchor, element, rect;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this3.setDate(_this3.getDateAddDays(_this3.currentDate, _this3.agendaWeekEnd ? 7 : 5));
-            case 1:
+              if (!(_this5.shiftingWindow || _this5.agendaDisposed || !_this5.weekDates.length)) {
+                _context3.next = 2;
+                break;
+              }
+              return _context3.abrupt("return");
+            case 2:
+              _this5.shiftingWindow = true;
+              body = _this5.$refs.body;
+              vertical = _this5.isVerticalList();
+              anchor = _this5.visibleColumns()[0];
+              _context3.prev = 6;
+              _this5.setDate(_this5.getDateAddDays(_this5.weekDates[0], days));
+              _context3.next = 10;
+              return _this5.$nextTick();
+            case 10:
+              if (!(_this5.agendaDisposed || !anchor)) {
+                _context3.next = 12;
+                break;
+              }
+              return _context3.abrupt("return");
+            case 12:
+              element = document.getElementById("hc-agenda-column-" + _this5.columnKey(anchor.date));
+              if (element) {
+                rect = element.getBoundingClientRect();
+                if (vertical) body.scrollTop += rect.top - anchor.rect.top;else body.scrollLeft += rect.left - anchor.rect.left;
+              }
+            case 14:
+              _context3.prev = 14;
+              _this5.shiftingWindow = false;
+              return _context3.finish(14);
+            case 17:
             case "end":
               return _context3.stop();
           }
-        }, _callee3);
+        }, _callee3, null, [[6,, 14, 17]]);
       }))();
     },
-    /**
-     * Scroll horizontal d'une colonne (1 jour) vers la gauche
-     */
-    scrollLeft: function scrollLeft() {
-      this.$refs.body.scrollBy({
-        left: -this.width,
-        behavior: "smooth"
-      });
-    },
-    /**
-     * Scroll horizontal d'une colonne (1 jour) vers la droite
-     */
-    scrollRight: function scrollRight() {
-      this.$refs.body.scrollBy({
-        left: this.width,
-        behavior: "smooth"
-      });
-    },
-    /**
-     *
-     * @param {*} date
-     */
-    scrollToDate: function scrollToDate(date) {
-      var column = document.getElementById("hc-agenda-column-" + dateToString(date).substring(0, 10));
-      if (!column) {
-        return;
-      }
-      this.$refs.body.scrollLeft = -25 + column.offsetLeft - (this.$refs.body.getBoundingClientRect().width - column.getBoundingClientRect().width) / 2;
-    },
-    /**
-     * Scroll to time
-     */
-    scrollToTime: function scrollToTime(hour, minute) {
-      if (this.agendaList) {
-        return;
-      }
-      var mn = (hour - 8) * 60 + minute;
-      mn -= mn % 15;
-      this.$refs.body.scrollTop = mn * 2;
-    },
-    columnKey: function columnKey(date) {
-      return dateToString(date).substring(0, 10);
-    },
-    getDateAddDays: function getDateAddDays(date, days) {
-      var increment = days < 0 ? -1 : 1;
-      days = days < 0 ? -days : days;
-      var d = new Date(date);
-      for (var i = 0; i < days;) {
-        d.setDate(d.getDate() + increment);
-        if (this.agendaWeekEnd || d.getDay() != 0 && d.getDay() != 6) {
-          ++i;
-        }
-      }
-      return d;
-    }
-  },
-  watch: {
-    agendaDate: function agendaDate() {
-      var _this4 = this;
+    addPastEvents: function addPastEvents() {
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return _this4.$nextTick();
+              return _this6.shiftWindow(-_this6.eventsToAddCount);
             case 2:
-              _this4.scrollToDate(new Date(_this4.agendaDate));
+              _this6.fetchEvents();
             case 3:
             case "end":
               return _context4.stop();
@@ -3090,60 +3038,196 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee4);
       }))();
     },
+    addFutureEvents: function addFutureEvents() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              _context5.next = 2;
+              return _this7.shiftWindow(_this7.eventsToAddCount);
+            case 2:
+              _this7.fetchEvents();
+            case 3:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
+      }))();
+    },
+    addMobilePastEvents: function addMobilePastEvents() {
+      return this.addPastEvents();
+    },
+    addMobileFutureEvents: function addMobileFutureEvents() {
+      return this.addFutureEvents();
+    },
+    setMinMaxHour: function setMinMaxHour() {
+      var hours = {
+        startedAfterTime: this.projectUserSettingsAgendaMinimumHour,
+        startedBeforeTime: this.projectUserSettingsAgendaMaximumHour
+      };
+      for (var _i2 = 0, _Object$entries = Object.entries(hours); _i2 < _Object$entries.length; _i2++) {
+        var _Object$entries$_i = _slicedToArray(_Object$entries[_i2], 2),
+          key = _Object$entries$_i[0],
+          hour = _Object$entries$_i[1];
+        var param = {
+          key: key,
+          value: String(hour).padStart(2, "0") + ":00:00"
+        };
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT_PARAMS, param);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_event__WEBPACK_IMPORTED_MODULE_2__.ADD_GLOBAL_EVENT_PARAMS, param);
+      }
+    },
+    setWeekDate: function setWeekDate(date) {
+      this.currentDate = this.selectedDate(date);
+      this.setDate(this.getDateAddDays(this.currentDate, -3));
+    },
+    setDate: function setDate(date) {
+      var count = Math.max(10, Math.ceil(window.innerWidth / this.width) + 6);
+      this.windowStartedAt = this.columnKey(date);
+      this.windowEndedAt = this.columnKey(this.getDateAddDays(date, count - 1));
+    },
+    jumpToDate: function jumpToDate(value) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              _this8.setWeekDate(_this8.selectedDate(value));
+              _this8.setVisibleRange(_this8.estimatedVisibleRange());
+              _context6.next = 4;
+              return _this8.$nextTick();
+            case 4:
+              if (!_this8.agendaDisposed) {
+                _context6.next = 6;
+                break;
+              }
+              return _context6.abrupt("return");
+            case 6:
+              _this8.scrollToDate(_this8.currentDate);
+              _this8.fetchEvents();
+            case 8:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6);
+      }))();
+    },
+    prevDate: function prevDate() {
+      var date = this.getDateAddDays(this.navigationDate(), this.agendaWeekEnd ? -7 : -5);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_DATE, this.columnKey(date));
+    },
+    nextDate: function nextDate() {
+      var date = this.getDateAddDays(this.navigationDate(), this.agendaWeekEnd ? 7 : 5);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_AGENDA_DATE, this.columnKey(date));
+    },
+    navigationDate: function navigationDate() {
+      var visible = this.visibleColumns();
+      if (!visible.length) return this.currentDate;
+      if (this.isVerticalList()) return visible[0].date;
+      var viewport = this.$refs.body.getBoundingClientRect();
+      var center = (viewport.left + viewport.right) / 2;
+      var column = visible.find(function (_ref2) {
+        var rect = _ref2.rect;
+        return rect.left <= center && rect.right > center;
+      });
+      return (column || visible[Math.floor(visible.length / 2)]).date;
+    },
+    scrollLeft: function scrollLeft() {
+      this.$refs.body.scrollBy(this.isVerticalList() ? {
+        top: -this.$refs.body.clientHeight,
+        behavior: "smooth"
+      } : {
+        left: -this.width,
+        behavior: "smooth"
+      });
+    },
+    scrollRight: function scrollRight() {
+      this.$refs.body.scrollBy(this.isVerticalList() ? {
+        top: this.$refs.body.clientHeight,
+        behavior: "smooth"
+      } : {
+        left: this.width,
+        behavior: "smooth"
+      });
+    },
+    scrollToDate: function scrollToDate(date) {
+      var body = this.$refs.body;
+      var column = document.getElementById("hc-agenda-column-" + this.columnKey(date));
+      if (!body || !column) return;
+      if (this.isVerticalList()) {
+        body.scrollTop += column.getBoundingClientRect().top - body.getBoundingClientRect().top;
+      } else {
+        body.scrollLeft = -25 + column.offsetLeft - (body.getBoundingClientRect().width - column.getBoundingClientRect().width) / 2;
+      }
+    },
+    scrollToTime: function scrollToTime(hour, minute) {
+      if (this.agendaList || !this.$refs.body) return;
+      var minutes = (hour - 8) * 60 + minute;
+      this.$refs.body.scrollTop = (minutes - minutes % 15) * 2;
+    },
+    columnKey: function columnKey(date) {
+      return dateToString(date).substring(0, 10);
+    },
+    getDateAddDays: function getDateAddDays(date, days) {
+      var increment = days < 0 ? -1 : 1;
+      var remaining = Math.abs(days);
+      var result = new Date(date);
+      while (remaining > 0) {
+        result.setDate(result.getDate() + increment);
+        if (this.agendaWeekEnd || result.getDay() !== 0 && result.getDay() !== 6) remaining--;
+      }
+      return result;
+    }
+  },
+  watch: {
+    agendaDate: function agendaDate(value) {
+      this.jumpToDate(value);
+    },
+    agendaOtherProjects: function agendaOtherProjects(enabled) {
+      if (enabled) this.fetchGlobalEvents();
+    },
+    agendaWeekEnd: function agendaWeekEnd() {
+      this.jumpToDate(this.currentDate);
+    },
+    agendaList: function agendaList() {
+      var _this9 = this;
+      this.$nextTick(function () {
+        return _this9.scheduleVisibleLoad();
+      });
+    },
+    agendaFilter: function agendaFilter() {
+      var _this10 = this;
+      this.$nextTick(function () {
+        return _this10.scheduleVisibleLoad();
+      });
+    },
     projectUserSettingsAgendaMinimumHour: function projectUserSettingsAgendaMinimumHour() {
       this.setMinMaxHour();
       this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
     },
     projectUserSettingsAgendaMaximumHour: function projectUserSettingsAgendaMaximumHour() {
       this.setMinMaxHour();
       this.fetchEvents();
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_GLOBAL_EVENTS);
+    },
+    projectUserSettingsEventsColorByLabel: function projectUserSettingsEventsColorByLabel() {
+      this.setEventsFields();
+      this.fetchEvents();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "draggedEvent", "resizedEvent", "eventsParamsValue", "eventsParamExists", "agendaFilter", "agendaList", "agendaWeekEnd", "agendaDate", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsColorByLabel"])), {}, {
-    /**
-     *
-     */
-    paramsStartedAt: function paramsStartedAt() {
-      return this.eventsParamsValue("startedAt");
-    },
-    /**
-     *
-     */
-    paramsEndedAt: function paramsEndedAt() {
-      return this.eventsParamsValue("endedAt");
-    },
-    /**
-     * List of date of the week of the current date
-     * from sunday to saturday
-     */
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "draggedEvent", "resizedEvent", "agendaFilter", "agendaList", "agendaWeekEnd", "agendaDate", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsColorByLabel"])), {}, {
     weekDates: function weekDates() {
-      if (!this.paramsEndedAt || !this.paramsEndedAt) {
-        return null;
-      }
-      if (this.paramsStartedAt > this.paramsEndedAt) {
-        return null;
-      }
-
-      // Create an array to store the dates for each day of the week
-      var weekDates = [];
-      var date = new Date(this.paramsStartedAt);
-      var endDate = dateToString(new Date(this.paramsEndedAt)).substring(0, 10);
-
-      // Loop through the days of the week and add the corresponding dates
-      while (dateToString(date).substring(0, 10) <= endDate) {
-        if (this.agendaWeekEnd || date.getDay() != 0 && date.getDay() != 6) {
-          weekDates.push(new Date(date));
-        }
+      if (!this.windowStartedAt || !this.windowEndedAt || this.windowStartedAt > this.windowEndedAt) return [];
+      var dates = [];
+      var date = this.selectedDate(this.windowStartedAt);
+      while (this.columnKey(date) <= this.windowEndedAt) {
+        if (this.agendaWeekEnd || date.getDay() !== 0 && date.getDay() !== 6) dates.push(new Date(date));
         date.setDate(date.getDate() + 1);
       }
-      return weekDates;
+      return dates;
     },
     width: function width() {
-      return 330; /*window.innerWidth <= 767
-                  ? window.innerWidth - 50
-                  : Math.max((window.innerWidth - 50) / 7, 330);*/
+      return 330;
     }
   })
 });
@@ -3442,6 +3526,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
 /* harmony import */ var _actions_project_label__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/label */ "./resources/js/actions/project/label.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -3464,21 +3554,16 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   methods: {
     change: function change(event) {
-      var isChecked = event.target.checked;
+      var _this = this;
       var newValue = _objectSpread({}, this.modelValue);
-      if (isChecked) {
-        if (!Array.isArray(newValue[this.label.category_id])) {
-          newValue[this.label.category_id] = [];
-        }
-        newValue[this.label.category_id].push(this.value);
-      } else {
-        if (Array.isArray(newValue[this.label.category_id])) {
-          newValue[this.label.category_id].splice(newValue[this.label.category_id].indexOf(this.value), 1);
-        }
-        if (newValue[this.label.category_id].length == 0) {
-          delete newValue[this.label.category_id];
-        }
-      }
+      var category = this.label.category_id;
+      var selected = Array.isArray(newValue[category]) ? _toConsumableArray(newValue[category]) : [];
+      var index = selected.findIndex(function (id) {
+        return String(id) === String(_this.value);
+      });
+      if (event.target.checked && index === -1) selected.push(this.value);
+      if (!event.target.checked && index !== -1) selected.splice(index, 1);
+      if (selected.length) newValue[category] = selected;else delete newValue[category];
       this.$emit("update:modelValue", newValue);
     },
     edit: function edit() {
@@ -3497,7 +3582,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     isChecked: function isChecked() {
-      return Array.isArray(this.modelValue[this.label.category_id]) && this.modelValue[this.label.category_id].includes(this.value);
+      var _this$modelValue,
+        _this2 = this;
+      return Array.isArray((_this$modelValue = this.modelValue) === null || _this$modelValue === void 0 ? void 0 : _this$modelValue[this.label.category_id]) && this.modelValue[this.label.category_id].some(function (id) {
+        return String(id) === String(_this2.value);
+      });
     },
     /**
      *
@@ -3661,9 +3750,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
 /* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -3850,27 +3940,42 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           return {};
         }
         return Object.fromEntries(Object.entries(eventsParams.withProspects).filter(function (_ref) {
-          var _ref2 = _slicedToArray(_ref, 2),
-            k = _ref2[0],
-            v = _ref2[1];
-          return k.indexOf("withCategory_") == 0;
+          var _ref2 = _slicedToArray(_ref, 1),
+            key = _ref2[0];
+          return key.startsWith("withCategory_");
         }).map(function (_ref3) {
           var _ref4 = _slicedToArray(_ref3, 2),
-            k = _ref4[0],
-            v = _ref4[1];
-          return [k.substring(0, 13), v];
+            key = _ref4[0],
+            labels = _ref4[1];
+          return [key.substring("withCategory_".length), labels];
         }));
       },
       set: function set(value) {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.ADD_EVENT_PARAMS, {
-          key: "withProspects",
-          value: Object.fromEntries(Object.entries(value).map(function (_ref5) {
-            var _ref6 = _slicedToArray(_ref5, 2),
-              k = _ref6[0],
-              v = _ref6[1];
-            return ["withCategory_" + k, v];
-          }))
-        });
+        var _this$eventsParams;
+        var filters = Object.fromEntries([].concat(_toConsumableArray(Object.entries(((_this$eventsParams = this.eventsParams) === null || _this$eventsParams === void 0 ? void 0 : _this$eventsParams.withProspects) || {}).filter(function (_ref5) {
+          var _ref6 = _slicedToArray(_ref5, 1),
+            key = _ref6[0];
+          return !key.startsWith("withCategory_");
+        })), _toConsumableArray(Object.entries(value || {}).filter(function (_ref7) {
+          var _ref8 = _slicedToArray(_ref7, 2),
+            labels = _ref8[1];
+          return Array.isArray(labels) && labels.length > 0;
+        }).map(function (_ref9) {
+          var _ref10 = _slicedToArray(_ref9, 2),
+            category = _ref10[0],
+            labels = _ref10[1];
+          return ["withCategory_" + category, _toConsumableArray(labels)];
+        }))));
+        if (Object.keys(filters).length) {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.ADD_EVENT_PARAMS, {
+            key: "withProspects",
+            value: filters
+          });
+        } else {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.REMOVE_EVENT_PARAMS, {
+            key: "withProspects"
+          });
+        }
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.FETCH_EVENTS);
       }
     },
@@ -3998,37 +4103,20 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         }
         return true;
       },
-      set: function () {
-        var _set = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(value) {
-          return _regeneratorRuntime().wrap(function _callee$(_context) {
-            while (1) switch (_context.prev = _context.next) {
-              case 0:
-                if (value) {
-                  _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.ADD_EVENT_PARAMS, {
-                    key: "withUsers",
-                    value: this.filteredUsers.map(function (user) {
-                      return user.id;
-                    })
-                  });
-                  _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.FETCH_EVENTS);
-                } else {
-                  _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.ADD_EVENT_PARAMS, {
-                    key: "withUsers",
-                    value: []
-                  });
-                  _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.FETCH_EVENTS);
-                }
-              case 1:
-              case "end":
-                return _context.stop();
-            }
-          }, _callee, this);
-        }));
-        function set(_x2) {
-          return _set.apply(this, arguments);
-        }
-        return set;
-      }()
+      set: function set(value) {
+        var users = value ? this.filteredUsers.map(function (user) {
+          return user.id;
+        }) : [];
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.ADD_EVENT_PARAMS, {
+          key: "withUsers",
+          value: users
+        });
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_7__.FETCH_EVENTS);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_8__.UPDATE_PROJECT_USER_SETTING, {
+          key: "events.agenda.filters.users",
+          value: users
+        });
+      }
     }
   })
 });
@@ -5439,15 +5527,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_month = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("month");
   var _component_planning = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("planning");
   var _component_week = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("week");
-  return _ctx.agendaDisplayMode == 'day' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_day, {
+  return _ctx.project && _ctx.project.slug ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
+  }, [_ctx.agendaDisplayMode == 'day' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_day, {
+    key: 'day-' + $options.projectKey
   })) : _ctx.agendaDisplayMode == 'month' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_month, {
-    key: 1
+    key: 'month-' + $options.projectKey
   })) : _ctx.agendaDisplayMode == 'planning' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_planning, {
-    key: 2
+    key: 'planning-' + $options.projectKey
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_week, {
-    key: 3
-  }));
+    key: 'week-' + $options.projectKey
+  }))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
 }
 
 /***/ }),

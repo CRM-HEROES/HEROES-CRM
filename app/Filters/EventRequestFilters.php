@@ -24,6 +24,7 @@ class EventRequestFilters extends EventFilters
         'withoutDoneBy',
         'startedAt',
         'endedAt',
+        'overlapping',
         'startedBeforeTime',
         'startedAfterTime',
         'endedBeforeTime',

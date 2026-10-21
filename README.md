@@ -132,6 +132,21 @@ L’API détail renvoie `202` avec `pending` pendant le calcul, puis `200` avec
 `ready` ou `empty`. Les endpoints de statut et de résumés groupés lisent les
 résultats disponibles sans déclencher de calcul Google.
 
+#### Chargement des agendas
+
+Les vues jour et mois chargent leurs dates affichées dès le premier appel. La
+semaine charge les colonnes visibles avec un jour de marge de chaque côté. Le
+cache navigateur conserve jusqu’à 90 jours pendant une minute : les plages qui
+se chevauchent partagent leurs requêtes en cours et seuls les jours manquants
+sont demandés. Une modification de rendez-vous ou de calendrier invalide ce
+cache. Les événements des autres projets sont chargés lorsque leur affichage
+est activé.
+
+Ces requêtes utilisent `filters.overlapping={startedAt,endedAt}` pour inclure
+les rendez-vous traversant les limites d’une journée. La carte conserve ses
+filtres de dates habituels avec
+`store.dispatch(FETCH_EVENTS, { incremental: false })`.
+
 #### Backup de la base de production
 
 Le script `scripts/backup-heroescrm.sh` fait un `mysqldump` compressé dans `/home/heroes/backup` (7 jours de rétention).

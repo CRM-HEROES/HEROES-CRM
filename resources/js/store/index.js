@@ -1,6 +1,7 @@
 import { createStore } from "vuex";
 import createPersistedState from "vuex-persistedstate";
 import eventDailyDirectionCache from "@/store/event-daily-direction-cache";
+import agendaEventRangeCache from "@/store/agenda-event-range-cache";
 
 import auth from "@/store/auth";
 import event from "@/store/event";
@@ -15,7 +16,7 @@ import route from "@/store/route";
 import user from "@/store/user";
 
 const store = createStore({
-    plugins: [createPersistedState(), eventDailyDirectionCache],
+    plugins: [createPersistedState(), eventDailyDirectionCache, agendaEventRangeCache],
     modules: {
         auth,
         event,

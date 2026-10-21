@@ -493,7 +493,7 @@ export default {
             store.commit(SET_EVENTS_SORT_BY, "started_at");
             store.commit(SET_EVENTS_COUNT, count ? count : 1000);
 
-            store.dispatch(FETCH_EVENTS);
+            store.dispatch(FETCH_EVENTS, { incremental: false });
         },
 
         /**

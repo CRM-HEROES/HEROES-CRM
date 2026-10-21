@@ -267,7 +267,9 @@ var hcMapUserDailyDirectionsInfoWindow = {};
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_SORT_ORDER, "desc");
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_SORT_BY, "started_at");
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_COUNT, count ? count : 1000);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENTS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENTS, {
+        incremental: false
+      });
     },
     /**
      * Show google map
@@ -1472,7 +1474,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       },
       set: function set(value) {
         _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENT_PARAMS, value);
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENTS);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENTS, {
+          incremental: false
+        });
       }
     },
     /**

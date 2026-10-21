@@ -78,7 +78,14 @@ import {
     SET_DRAGGED_EVENT,
     SET_RESIZED_EVENT,
     SET_EVENT_PARAMS,
+    SET_EVENTS_FIELDS,
 } from "@/actions/project/event";
+
+import {
+    FETCH_GLOBAL_EVENTS,
+    ADD_GLOBAL_EVENT_PARAMS,
+    SET_GLOBAL_EVENT_PARAMS,
+} from "@/actions/event";
 
 import Users from "../../filters/Users.vue";
 import Column from "../week/Column.vue";
@@ -86,6 +93,12 @@ import TimeSlots from "../week/TimeSlots.vue";
 import CardMenus from "../week/CardMenus.vue";
 import UserDailyDirectionSlide from "../../slides/daily-direction/Slide.vue";
 import OcrModal from "@/components/ocr/Modal.vue";
+
+function localDate(value) {
+    return new Date(typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+        ? value + "T12:00:00"
+        : value);
+}
 
 export default {
     components: {
@@ -97,14 +110,7 @@ export default {
         OcrModal,
     },
 
-    data() {
-        return {
-            currentDate: null,
-        };
-    },
-
     created() {
-        this.currentDate = new Date();
         store.commit(SET_EVENTS, []);
         store.commit(SET_NEW_EVENT, null);
         store.commit(SET_DRAGGED_EVENT, null);
@@ -112,8 +118,6 @@ export default {
 
         this.updateParamsFromUrl();
     },
-
-    mounted() {},
 
     methods: {
         updateParamsFromUrl() {
@@ -134,28 +138,58 @@ export default {
             });
 
             store.commit(SET_EVENT_PARAMS, filters);
+            store.commit(SET_GLOBAL_EVENT_PARAMS, {
+                ...filters,
+                withoutProjects: [this.project.id],
+            });
+            const fields = ["calendar", "prospect", "user", "users"];
+            if (this.projectUserSettingsEventsColorByLabel) {
+                fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
+            }
+            store.commit(SET_EVENTS_FIELDS, fields.join(","));
+            this.setDateRange();
+            this.fetchEvents();
+        },
 
+        setDateRange() {
+            const selected = localDate(this.agendaDate);
+            const date = dateToString(
+                Number.isNaN(selected.getTime()) ? new Date() : selected
+            ).substring(0, 10);
+
+            for (const key of ["startedAt", "endedAt"]) {
+                const param = { key, value: date };
+                store.commit(ADD_EVENT_PARAMS, param);
+                store.commit(ADD_GLOBAL_EVENT_PARAMS, param);
+            }
+        },
+
+        fetchEvents() {
             store.dispatch(FETCH_EVENTS);
+            this.fetchGlobalEvents();
+        },
+
+        fetchGlobalEvents() {
+            if (this.agendaOtherProjects) {
+                store.dispatch(FETCH_GLOBAL_EVENTS);
+            }
         },
     },
 
     watch: {
-        async agendaDate() {
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: this.agendaDate,
-            });
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: this.agendaDate,
-            });
+        agendaDate() {
+            this.setDateRange();
+            this.fetchEvents();
+        },
 
-            store.dispatch(FETCH_EVENTS);
+        agendaOtherProjects(enabled) {
+            if (enabled) this.fetchGlobalEvents();
         },
     },
 
     computed: {
         ...mapGetters([
+            "project",
             "draggedEvent",
             "resizedEvent",
             "eventsParamsValue",
@@ -164,10 +198,13 @@ export default {
             "agendaList",
             "agendaWeekEnd",
             "agendaDate",
+            "agendaOtherProjects",
+            "projectUserSettingsEventsColorByLabel",
         ]),
 
         currentDate() {
-            return new Date(this.agendaDate);
+            const date = localDate(this.agendaDate);
+            return Number.isNaN(date.getTime()) ? new Date() : date;
         },
     },
 };

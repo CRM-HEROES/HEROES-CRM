@@ -2,6 +2,8 @@ import EventService from "@/apis/project/event";
 import dailyDirectionCache, { dailyDirectionCacheScope, dailyDirectionContextEvents } from "@/utils/event-daily-direction-cache";
 import summaryBatcher, { summaryCache, toDailyDirectionSummary } from "@/utils/event-daily-direction-summary";
 import { loadDailyDirection } from "@/utils/event-daily-direction-loader";
+import { agendaEventScope, projectEventRange } from "@/utils/agenda-event-range-cache";
+import { filterEventsByUsers } from "@/utils/event-user-filter";
 
 import {
     FETCH_EVENTS,
@@ -59,28 +61,43 @@ const actions = {
      * @param {*} context
      * @returns
      */
-    async [FETCH_EVENTS](context) {
-        let params = {};
-
-        if (
-            context.state.project.eventsParams &&
-            Object.keys(context.state.project.eventsParams).length > 0
-        ) {
-            params.filters = JSON.stringify(
-                context.state.project.eventsParams
-                    ? context.state.project.eventsParams
-                    : {}
-            );
+    async [FETCH_EVENTS](context, { range, retainRange, incremental = true } = {}) {
+        const project = context.state.project;
+        if (!project?.slug) return [];
+        const scope = agendaEventScope(context.rootState);
+        const filters = JSON.stringify(project.eventsParams || {});
+        const fields = project.eventsFields;
+        const publish = (data) => {
+            if (scope === agendaEventScope(context.rootState) &&
+                filters === JSON.stringify(context.state.project.eventsParams || {}) &&
+                fields === context.state.project.eventsFields) context.commit(SET_EVENTS, data);
+        };
+        if (Array.isArray(project.eventsParams?.withUsers) && project.eventsParams.withUsers.length === 0) {
+            projectEventRange.clear();
+            publish([]);
+            return [];
         }
-
-        if (context.state.project.eventsFields) {
-            params.fields = context.state.project.eventsFields;
-        }
-
-        const { data } = await EventService.get(context.state.project.slug, {
-            params: params,
+        const load = async (requestedFilters) => (await EventService.get(project.slug, {
+            params: {
+                filters: JSON.stringify(requestedFilters),
+                ...(fields ? { fields } : {}),
+            },
+        })).data;
+        let data;
+        // Map filters also use this action and can intentionally omit calendar dates.
+        if (!incremental || (!range && (!project.eventsParams?.startedAt || !project.eventsParams?.endedAt))) {
+            projectEventRange.clear();
+            data = await load(JSON.parse(filters));
+            publish(data);
+        } else data = await projectEventRange.fetch({
+            scope,
+            filters: JSON.parse(filters),
+            fields,
+            range,
+            retainRange,
+            load,
+            onData: publish,
         });
-        context.commit(SET_EVENTS, data);
         return data;
     },
 
@@ -469,7 +486,7 @@ const mutations = {
                     ])
                 );
 
-                if (state.project.eventsParams[key].length == 0) {
+                if (state.project.eventsParams[key].length == 0 && key !== "withUsers") {
                     state.project.eventsParams = Object.fromEntries(
                         Object.entries(state.project.eventsParams).filter(
                             ([k]) => k != key
@@ -540,7 +557,7 @@ const getters = {
      */
     events: (state) =>
         state.project && Array.isArray(state.project.events)
-            ? state.project.events
+            ? filterEventsByUsers(state.project.events, state.project.eventsParams)
             : [],
 
     /**

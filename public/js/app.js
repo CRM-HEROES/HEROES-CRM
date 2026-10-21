@@ -35303,6 +35303,63 @@ const UserRegistrationStepSettingProspectsTable = () =>
 
 /***/ }),
 
+/***/ "./resources/js/store/agenda-event-range-cache.js":
+/*!********************************************************!*\
+  !*** ./resources/js/store/agenda-event-range-cache.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ agendaEventRangeCache)
+/* harmony export */ });
+/* harmony import */ var _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/utils/agenda-event-range-cache */ "./resources/js/utils/agenda-event-range-cache.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/prospect/event */ "./resources/js/actions/project/prospect/event.js");
+/* harmony import */ var _actions_project_calendar__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/calendar */ "./resources/js/actions/project/calendar.js");
+
+
+
+
+var edits = new Set([_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_1__.UPDATE_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_1__.REMOVE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.ADD_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_EVENT, _actions_project_calendar__WEBPACK_IMPORTED_MODULE_3__.ADD_CALENDAR, _actions_project_calendar__WEBPACK_IMPORTED_MODULE_3__.UPDATE_CALENDAR, _actions_project_calendar__WEBPACK_IMPORTED_MODULE_3__.REMOVE_CALENDAR]);
+function agendaEventRangeCache(store) {
+  var scope = (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.agendaEventScope)(store.state);
+  var writes = new WeakMap();
+  store.subscribe(function (mutation, state) {
+    var next = (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.agendaEventScope)(state);
+    if (next !== scope || mutation.type === "RESET") {
+      scope = next;
+      _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.projectEventRange.clear();
+      _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.globalEventRange.clear();
+    } else if (edits.has(mutation.type)) {
+      _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.projectEventRange.invalidate();
+      _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.globalEventRange.invalidate();
+    }
+  });
+  function finish(action) {
+    var release = writes.get(action);
+    if (!release) return;
+    writes["delete"](action);
+    release();
+  }
+  store.subscribeAction({
+    before: function before(action) {
+      if (!edits.has(action.type)) return;
+      var projectDone = _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.projectEventRange.beginWrite();
+      var globalDone = _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_0__.globalEventRange.beginWrite();
+      writes.set(action, function () {
+        projectDone();
+        globalDone();
+      });
+    },
+    after: finish,
+    error: finish
+  });
+}
+
+/***/ }),
+
 /***/ "./resources/js/store/auth.js":
 /*!************************************!*\
   !*** ./resources/js/store/auth.js ***!
@@ -35723,11 +35780,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   state: () => (/* binding */ state)
 /* harmony export */ });
 /* harmony import */ var _apis_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/event */ "./resources/js/apis/event.js");
-/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
+/* harmony import */ var _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/agenda-event-range-cache */ "./resources/js/utils/agenda-event-range-cache.js");
+/* harmony import */ var _utils_event_user_filter__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-user-filter */ "./resources/js/utils/event-user-filter.js");
+/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
 var _mutations;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
@@ -35738,12 +35795,16 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
 
 
 
@@ -35758,42 +35819,95 @@ var state = {
 /**
  * event Store Actions
  */
-var actions = _defineProperty({}, _actions_event__WEBPACK_IMPORTED_MODULE_1__.FETCH_GLOBAL_EVENTS, function (context) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var params, _yield$EventService$g, data;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
+var actions = _defineProperty({}, _actions_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_GLOBAL_EVENTS, function (context) {
+  var _arguments = arguments;
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+    var _context$rootState$pr;
+    var _ref, range, retainRange, scope, paramsSnapshot, selectedUsers, selectionSnapshot, requestedFilters, filters, data;
+    return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+      while (1) switch (_context2.prev = _context2.next) {
         case 0:
-          params = {};
-          if (context.state.globalEventsParams && Object.keys(context.state.globalEventsParams).length > 0) {
-            params.filters = JSON.stringify(context.state.globalEventsParams ? context.state.globalEventsParams : {});
+          _ref = _arguments.length > 1 && _arguments[1] !== undefined ? _arguments[1] : {}, range = _ref.range, retainRange = _ref.retainRange;
+          if (!(context.rootGetters.agendaOtherProjects === false)) {
+            _context2.next = 5;
+            break;
           }
-          _context.next = 4;
-          return _apis_event__WEBPACK_IMPORTED_MODULE_0__["default"].get({
-            params: params
+          _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__.globalEventRange.clear();
+          context.commit(_actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS, []);
+          return _context2.abrupt("return", []);
+        case 5:
+          scope = (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__.agendaEventScope)(context.rootState);
+          paramsSnapshot = JSON.stringify(context.state.globalEventsParams || {});
+          selectedUsers = (_context$rootState$pr = context.rootState.project) === null || _context$rootState$pr === void 0 || (_context$rootState$pr = _context$rootState$pr.project) === null || _context$rootState$pr === void 0 || (_context$rootState$pr = _context$rootState$pr.eventsParams) === null || _context$rootState$pr === void 0 ? void 0 : _context$rootState$pr.withUsers;
+          selectionSnapshot = JSON.stringify(selectedUsers);
+          requestedFilters = _objectSpread({}, context.state.globalEventsParams); // The selection belongs to the active project, including an explicit empty list.
+          if (selectedUsers === undefined) delete requestedFilters.withUsers;else requestedFilters.withUsers = selectedUsers;
+          if (!(Array.isArray(selectedUsers) && selectedUsers.length === 0)) {
+            _context2.next = 15;
+            break;
+          }
+          _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__.globalEventRange.clear();
+          context.commit(_actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS, []);
+          return _context2.abrupt("return", []);
+        case 15:
+          filters = JSON.stringify(requestedFilters);
+          _context2.next = 18;
+          return _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__.globalEventRange.fetch({
+            scope: scope,
+            filters: JSON.parse(filters),
+            range: range,
+            retainRange: retainRange,
+            load: function () {
+              var _load = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(requestedFilters) {
+                return _regeneratorRuntime().wrap(function _callee$(_context) {
+                  while (1) switch (_context.prev = _context.next) {
+                    case 0:
+                      _context.next = 2;
+                      return _apis_event__WEBPACK_IMPORTED_MODULE_0__["default"].get({
+                        params: {
+                          filters: JSON.stringify(requestedFilters)
+                        }
+                      });
+                    case 2:
+                      return _context.abrupt("return", _context.sent.data);
+                    case 3:
+                    case "end":
+                      return _context.stop();
+                  }
+                }, _callee);
+              }));
+              function load(_x) {
+                return _load.apply(this, arguments);
+              }
+              return load;
+            }(),
+            onData: function onData(data) {
+              var _context$rootState$pr2;
+              if (scope === (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_1__.agendaEventScope)(context.rootState) && context.rootGetters.agendaOtherProjects !== false && paramsSnapshot === JSON.stringify(context.state.globalEventsParams || {}) && selectionSnapshot === JSON.stringify((_context$rootState$pr2 = context.rootState.project) === null || _context$rootState$pr2 === void 0 || (_context$rootState$pr2 = _context$rootState$pr2.project) === null || _context$rootState$pr2 === void 0 || (_context$rootState$pr2 = _context$rootState$pr2.eventsParams) === null || _context$rootState$pr2 === void 0 ? void 0 : _context$rootState$pr2.withUsers)) {
+                context.commit(_actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS, data);
+              }
+            }
           });
-        case 4:
-          _yield$EventService$g = _context.sent;
-          data = _yield$EventService$g.data;
-          context.commit(_actions_event__WEBPACK_IMPORTED_MODULE_1__.SET_GLOBAL_EVENTS, data);
-          return _context.abrupt("return", data);
-        case 8:
+        case 18:
+          data = _context2.sent;
+          return _context2.abrupt("return", data);
+        case 20:
         case "end":
-          return _context.stop();
+          return _context2.stop();
       }
-    }, _callee);
+    }, _callee2);
   }))();
 });
 
 /**
  * event Store Mutations
  */
-var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.SET_GLOBAL_EVENTS, function (state, events) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS, function (state, events) {
   state.globalEvents = _toConsumableArray(events);
-}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.ADD_GLOBAL_EVENT_PARAMS, function (state, _ref) {
-  var key = _ref.key,
-    value = _ref.value,
-    multiple = _ref.multiple;
+}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.ADD_GLOBAL_EVENT_PARAMS, function (state, _ref2) {
+  var key = _ref2.key,
+    value = _ref2.value,
+    multiple = _ref2.multiple;
   state.prospectsPage = 1;
   if (!state.globalEventsParams) {
     state.globalEventsParams = {};
@@ -35809,57 +35923,57 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_event__WE
     if (state.globalEventsParams[key] !== "") {
       values = [].concat(_toConsumableArray(state.globalEventsParams[key]), [value]);
     }
-    state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).map(function (_ref2) {
-      var _ref3 = _slicedToArray(_ref2, 2),
-        k = _ref3[0],
-        v = _ref3[1];
+    state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).map(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+        k = _ref4[0],
+        v = _ref4[1];
       return [k, k == key ? values : v];
     }));
   } else {
     state.globalEventsParams = _objectSpread(_objectSpread({}, state.globalEventsParams), {}, _defineProperty({}, key, value));
   }
-}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.REMOVE_GLOBAL_EVENT_PARAMS, function (state, _ref4) {
-  var key = _ref4.key,
-    value = _ref4.value;
+}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_GLOBAL_EVENT_PARAMS, function (state, _ref5) {
+  var key = _ref5.key,
+    value = _ref5.value;
   state.prospectsPage = 1;
   if (!state.globalEventsParams) {
     state.globalEventsParams = {};
   }
   if (value !== undefined) {
     if (state.globalEventsParams[key]) {
-      state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).map(function (_ref5) {
-        var _ref6 = _slicedToArray(_ref5, 2),
-          k = _ref6[0],
-          v = _ref6[1];
+      state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).map(function (_ref6) {
+        var _ref7 = _slicedToArray(_ref6, 2),
+          k = _ref7[0],
+          v = _ref7[1];
         return [k, k == key ? state.globalEventsParams[k].filter(function (val) {
           return val != value;
         }) : v];
       }));
       if (state.globalEventsParams[key].length == 0) {
-        state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).filter(function (_ref7) {
-          var _ref8 = _slicedToArray(_ref7, 1),
-            k = _ref8[0];
+        state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).filter(function (_ref8) {
+          var _ref9 = _slicedToArray(_ref8, 1),
+            k = _ref9[0];
           return k != key;
         }));
       }
     }
   } else {
-    state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).filter(function (_ref9) {
-      var _ref10 = _slicedToArray(_ref9, 1),
-        k = _ref10[0];
+    state.globalEventsParams = Object.fromEntries(Object.entries(state.globalEventsParams).filter(function (_ref10) {
+      var _ref11 = _slicedToArray(_ref10, 1),
+        k = _ref11[0];
       return k != key;
     }));
   }
-}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.SET_GLOBAL_EVENT_PARAMS, function (state, params) {
+}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENT_PARAMS, function (state, params) {
   if (_typeof(params) === "object") {
     state.globalEventsParams = params;
   }
-}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.INIT_GLOBAL_EVENT_PARAMS, function (state) {
+}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.INIT_GLOBAL_EVENT_PARAMS, function (state) {
   state.prospectsPage = 1;
   state.globalEventsParams = {}; /*Object.fromEntries(
                                  Object.entries(state.globalEventsParams).filter(([k]) => k == "count")
                                  );*/
-}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_1__.SET_GLOBAL_EVENTS_COUNT, function (state, count) {
+}), _defineProperty(_mutations, _actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS_COUNT, function (state, count) {
   state.globalEventsCount = count;
 }), _mutations);
 
@@ -35873,8 +35987,9 @@ var getters = {
    * @param {*} state
    * @returns
    */
-  globalEvents: function globalEvents(state) {
-    return state.globalEvents ? state.globalEvents : [];
+  globalEvents: function globalEvents(state, getters, rootState) {
+    var _rootState$project;
+    return (0,_utils_event_user_filter__WEBPACK_IMPORTED_MODULE_2__.filterEventsByUsers)(state.globalEvents || [], (_rootState$project = rootState.project) === null || _rootState$project === void 0 || (_rootState$project = _rootState$project.project) === null || _rootState$project === void 0 ? void 0 : _rootState$project.eventsParams);
   },
   /**
    * @param {*} state
@@ -35952,20 +36067,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vuex_persistedstate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex-persistedstate */ "./node_modules/vuex-persistedstate/dist/vuex-persistedstate.es.js");
 /* harmony import */ var _store_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/store/event-daily-direction-cache */ "./resources/js/store/event-daily-direction-cache.js");
-/* harmony import */ var _store_auth__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store/auth */ "./resources/js/store/auth.js");
-/* harmony import */ var _store_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/store/event */ "./resources/js/store/event.js");
-/* harmony import */ var _store_default_field__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/store/default-field */ "./resources/js/store/default-field.js");
-/* harmony import */ var _store_locale__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/store/locale */ "./resources/js/store/locale.js");
-/* harmony import */ var _store_modal__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/store/modal */ "./resources/js/store/modal.js");
-/* harmony import */ var _store_permission__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/store/permission */ "./resources/js/store/permission.js");
-/* harmony import */ var _store_project__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/store/project */ "./resources/js/store/project.js");
-/* harmony import */ var _store_slide__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/store/slide */ "./resources/js/store/slide.js");
-/* harmony import */ var _store_stat_chart__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/store/stat-chart */ "./resources/js/store/stat-chart.js");
-/* harmony import */ var _store_route__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/store/route */ "./resources/js/store/route.js");
-/* harmony import */ var _store_user__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/store/user */ "./resources/js/store/user.js");
+/* harmony import */ var _store_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store/agenda-event-range-cache */ "./resources/js/store/agenda-event-range-cache.js");
+/* harmony import */ var _store_auth__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/store/auth */ "./resources/js/store/auth.js");
+/* harmony import */ var _store_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/store/event */ "./resources/js/store/event.js");
+/* harmony import */ var _store_default_field__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/store/default-field */ "./resources/js/store/default-field.js");
+/* harmony import */ var _store_locale__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/store/locale */ "./resources/js/store/locale.js");
+/* harmony import */ var _store_modal__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/store/modal */ "./resources/js/store/modal.js");
+/* harmony import */ var _store_permission__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/store/permission */ "./resources/js/store/permission.js");
+/* harmony import */ var _store_project__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/store/project */ "./resources/js/store/project.js");
+/* harmony import */ var _store_slide__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/store/slide */ "./resources/js/store/slide.js");
+/* harmony import */ var _store_stat_chart__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/store/stat-chart */ "./resources/js/store/stat-chart.js");
+/* harmony import */ var _store_route__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/store/route */ "./resources/js/store/route.js");
+/* harmony import */ var _store_user__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/store/user */ "./resources/js/store/user.js");
 
 
 
@@ -35980,20 +36096,21 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var store = (0,vuex__WEBPACK_IMPORTED_MODULE_13__.createStore)({
-  plugins: [(0,vuex_persistedstate__WEBPACK_IMPORTED_MODULE_0__["default"])(), _store_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"]],
+
+var store = (0,vuex__WEBPACK_IMPORTED_MODULE_14__.createStore)({
+  plugins: [(0,vuex_persistedstate__WEBPACK_IMPORTED_MODULE_0__["default"])(), _store_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"], _store_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_2__["default"]],
   modules: {
-    auth: _store_auth__WEBPACK_IMPORTED_MODULE_2__["default"],
-    event: _store_event__WEBPACK_IMPORTED_MODULE_3__["default"],
-    defaultField: _store_default_field__WEBPACK_IMPORTED_MODULE_4__["default"],
-    locale: _store_locale__WEBPACK_IMPORTED_MODULE_5__["default"],
-    modal: _store_modal__WEBPACK_IMPORTED_MODULE_6__["default"],
-    permission: _store_permission__WEBPACK_IMPORTED_MODULE_7__["default"],
-    project: _store_project__WEBPACK_IMPORTED_MODULE_8__["default"],
-    route: _store_route__WEBPACK_IMPORTED_MODULE_11__["default"],
-    slide: _store_slide__WEBPACK_IMPORTED_MODULE_9__["default"],
-    statChart: _store_stat_chart__WEBPACK_IMPORTED_MODULE_10__["default"],
-    user: _store_user__WEBPACK_IMPORTED_MODULE_12__["default"]
+    auth: _store_auth__WEBPACK_IMPORTED_MODULE_3__["default"],
+    event: _store_event__WEBPACK_IMPORTED_MODULE_4__["default"],
+    defaultField: _store_default_field__WEBPACK_IMPORTED_MODULE_5__["default"],
+    locale: _store_locale__WEBPACK_IMPORTED_MODULE_6__["default"],
+    modal: _store_modal__WEBPACK_IMPORTED_MODULE_7__["default"],
+    permission: _store_permission__WEBPACK_IMPORTED_MODULE_8__["default"],
+    project: _store_project__WEBPACK_IMPORTED_MODULE_9__["default"],
+    route: _store_route__WEBPACK_IMPORTED_MODULE_12__["default"],
+    slide: _store_slide__WEBPACK_IMPORTED_MODULE_10__["default"],
+    statChart: _store_stat_chart__WEBPACK_IMPORTED_MODULE_11__["default"],
+    user: _store_user__WEBPACK_IMPORTED_MODULE_13__["default"]
   },
   mutations: {
     RESET: function RESET(state) {
@@ -39722,7 +39839,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
 /* harmony import */ var _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-daily-direction-summary */ "./resources/js/utils/event-daily-direction-summary.js");
 /* harmony import */ var _utils_event_daily_direction_loader__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils/event-daily-direction-loader */ "./resources/js/utils/event-daily-direction-loader.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils/agenda-event-range-cache */ "./resources/js/utils/agenda-event-range-cache.js");
+/* harmony import */ var _utils_event_user_filter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils/event-user-filter */ "./resources/js/utils/event-user-filter.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
 var _actions, _mutations;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -39735,14 +39854,16 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
 
 
 
@@ -39764,65 +39885,106 @@ var state = {
 /**
  * event Store Actions
  */
-var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENTS, function (context) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-    var params, _yield$EventService$g, data;
-    return _regeneratorRuntime().wrap(function _callee$(_context) {
-      while (1) switch (_context.prev = _context.next) {
-        case 0:
-          params = {};
-          if (context.state.project.eventsParams && Object.keys(context.state.project.eventsParams).length > 0) {
-            params.filters = JSON.stringify(context.state.project.eventsParams ? context.state.project.eventsParams : {});
-          }
-          if (context.state.project.eventsFields) {
-            params.fields = context.state.project.eventsFields;
-          }
-          _context.next = 5;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].get(context.state.project.slug, {
-            params: params
-          });
-        case 5:
-          _yield$EventService$g = _context.sent;
-          data = _yield$EventService$g.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS, data);
-          return _context.abrupt("return", data);
-        case 9:
-        case "end":
-          return _context.stop();
-      }
-    }, _callee);
-  }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SHOW_EVENT, function (context, slug) {
+var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_EVENTS, function (context) {
+  var _arguments = arguments;
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-    var _yield$EventService$s, data;
+    var _project$eventsParams, _project$eventsParams2, _project$eventsParams3;
+    var _ref, range, retainRange, _ref$incremental, incremental, project, scope, filters, fields, publish, load, data;
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
       while (1) switch (_context2.prev = _context2.next) {
         case 0:
-          _context2.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].show(context.state.project.slug, slug);
-        case 2:
-          _yield$EventService$s = _context2.sent;
-          data = _yield$EventService$s.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENT, data);
+          _ref = _arguments.length > 1 && _arguments[1] !== undefined ? _arguments[1] : {}, range = _ref.range, retainRange = _ref.retainRange, _ref$incremental = _ref.incremental, incremental = _ref$incremental === void 0 ? true : _ref$incremental;
+          project = context.state.project;
+          if (project !== null && project !== void 0 && project.slug) {
+            _context2.next = 4;
+            break;
+          }
+          return _context2.abrupt("return", []);
+        case 4:
+          scope = (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__.agendaEventScope)(context.rootState);
+          filters = JSON.stringify(project.eventsParams || {});
+          fields = project.eventsFields;
+          publish = function publish(data) {
+            if (scope === (0,_utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__.agendaEventScope)(context.rootState) && filters === JSON.stringify(context.state.project.eventsParams || {}) && fields === context.state.project.eventsFields) context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS, data);
+          };
+          if (!(Array.isArray((_project$eventsParams = project.eventsParams) === null || _project$eventsParams === void 0 ? void 0 : _project$eventsParams.withUsers) && project.eventsParams.withUsers.length === 0)) {
+            _context2.next = 12;
+            break;
+          }
+          _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__.projectEventRange.clear();
+          publish([]);
+          return _context2.abrupt("return", []);
+        case 12:
+          load = /*#__PURE__*/function () {
+            var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(requestedFilters) {
+              return _regeneratorRuntime().wrap(function _callee$(_context) {
+                while (1) switch (_context.prev = _context.next) {
+                  case 0:
+                    _context.next = 2;
+                    return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].get(project.slug, {
+                      params: _objectSpread({
+                        filters: JSON.stringify(requestedFilters)
+                      }, fields ? {
+                        fields: fields
+                      } : {})
+                    });
+                  case 2:
+                    return _context.abrupt("return", _context.sent.data);
+                  case 3:
+                  case "end":
+                    return _context.stop();
+                }
+              }, _callee);
+            }));
+            return function load(_x) {
+              return _ref2.apply(this, arguments);
+            };
+          }();
+          if (!(!incremental || !range && (!((_project$eventsParams2 = project.eventsParams) !== null && _project$eventsParams2 !== void 0 && _project$eventsParams2.startedAt) || !((_project$eventsParams3 = project.eventsParams) !== null && _project$eventsParams3 !== void 0 && _project$eventsParams3.endedAt)))) {
+            _context2.next = 21;
+            break;
+          }
+          _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__.projectEventRange.clear();
+          _context2.next = 17;
+          return load(JSON.parse(filters));
+        case 17:
+          data = _context2.sent;
+          publish(data);
+          _context2.next = 24;
+          break;
+        case 21:
+          _context2.next = 23;
+          return _utils_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_4__.projectEventRange.fetch({
+            scope: scope,
+            filters: JSON.parse(filters),
+            fields: fields,
+            range: range,
+            retainRange: retainRange,
+            load: load,
+            onData: publish
+          });
+        case 23:
+          data = _context2.sent;
+        case 24:
           return _context2.abrupt("return", data);
-        case 6:
+        case 25:
         case "end":
           return _context2.stop();
       }
     }, _callee2);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.ADD_EVENT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SHOW_EVENT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-    var _yield$EventService$c, data;
+    var _yield$EventService$s, data;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
       while (1) switch (_context3.prev = _context3.next) {
         case 0:
           _context3.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].create(context.state.project.slug, params);
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].show(context.state.project.slug, slug);
         case 2:
-          _yield$EventService$c = _context3.sent;
-          data = _yield$EventService$c.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.ADD_EVENT, data);
+          _yield$EventService$s = _context3.sent;
+          data = _yield$EventService$s.data;
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENT, data);
           return _context3.abrupt("return", data);
         case 6:
         case "end":
@@ -39830,74 +39992,93 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
       }
     }, _callee3);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.UPDATE_EVENT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var _yield$EventService$c, data;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
           _context4.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].create(context.state.project.slug, params);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.UPDATE_EVENT, params);
-        case 3:
+          _yield$EventService$c = _context4.sent;
+          data = _yield$EventService$c.data;
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT, data);
+          return _context4.abrupt("return", data);
+        case 6:
         case "end":
           return _context4.stop();
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REMOVE_EVENT, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REMOVE_EVENT, slug);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, params);
         case 3:
         case "end":
           return _context5.stop();
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENT_USER_DAILY_DIRECTION, function (context, _ref) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-    var _context$state$projec, _context$rootState$au;
-    var user, direction_at, _ref$events, events, scope, project, can, canReadSummary, routeEvents, result;
-    return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-      while (1) switch (_context8.prev = _context8.next) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, function (context, slug) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
         case 0:
-          user = _ref.user, direction_at = _ref.direction_at, _ref$events = _ref.events, events = _ref$events === void 0 ? [] : _ref$events;
+          _context6.next = 2;
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
+        case 2:
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, slug);
+        case 3:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6);
+  }))();
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_EVENT_USER_DAILY_DIRECTION, function (context, _ref3) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+    var _context$state$projec, _context$rootState$au;
+    var user, direction_at, _ref3$events, events, scope, project, can, canReadSummary, routeEvents, result;
+    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+      while (1) switch (_context9.prev = _context9.next) {
+        case 0:
+          user = _ref3.user, direction_at = _ref3.direction_at, _ref3$events = _ref3.events, events = _ref3$events === void 0 ? [] : _ref3$events;
           if (user !== null && user !== void 0 && user.id) {
-            _context8.next = 3;
+            _context9.next = 3;
             break;
           }
-          return _context8.abrupt("return", null);
+          return _context9.abrupt("return", null);
         case 3:
           scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
           project = (_context$state$projec = context.state.project) === null || _context$state$projec === void 0 ? void 0 : _context$state$projec.slug;
           can = context.rootGetters.can;
           canReadSummary = project && (typeof can !== "function" || ((_context$rootState$au = context.rootState.auth) === null || _context$rootState$au === void 0 || (_context$rootState$au = _context$rootState$au.user) === null || _context$rootState$au === void 0 ? void 0 : _context$rootState$au.id) == user.id || can("all.project.user.agenda.".concat(user.id)));
           routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
-          _context8.next = 10;
+          _context9.next = 10;
           return _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].fetch(scope, user.id, direction_at, routeEvents, function (control) {
             return (0,_utils_event_daily_direction_loader__WEBPACK_IMPORTED_MODULE_3__.loadDailyDirection)(_objectSpread(_objectSpread({}, control), {}, {
               userId: user.id,
               date: direction_at,
               loadDetail: function () {
-                var _loadDetail = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-                  return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-                    while (1) switch (_context6.prev = _context6.next) {
+                var _loadDetail = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+                  return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+                    while (1) switch (_context7.prev = _context7.next) {
                       case 0:
-                        _context6.next = 2;
+                        _context7.next = 2;
                         return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].dailyDirection(user, direction_at);
                       case 2:
-                        return _context6.abrupt("return", _context6.sent.data);
+                        return _context7.abrupt("return", _context7.sent.data);
                       case 3:
                       case "end":
-                        return _context6.stop();
+                        return _context7.stop();
                     }
-                  }, _callee6);
+                  }, _callee7);
                 }));
                 function loadDetail() {
                   return _loadDetail.apply(this, arguments);
@@ -39905,29 +40086,29 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
                 return loadDetail;
               }(),
               loadSummary: function () {
-                var _loadSummary = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-                  return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-                    while (1) switch (_context7.prev = _context7.next) {
+                var _loadSummary = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+                  return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+                    while (1) switch (_context8.prev = _context8.next) {
                       case 0:
                         if (!canReadSummary) {
-                          _context7.next = 4;
+                          _context8.next = 4;
                           break;
                         }
-                        _context7.t0 = _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
-                        _context7.next = 7;
+                        _context8.t0 = _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
+                        _context8.next = 7;
                         break;
                       case 4:
-                        _context7.next = 6;
+                        _context8.next = 6;
                         return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].dailyDirectionStatus(user, direction_at);
                       case 6:
-                        _context7.t0 = _context7.sent.data;
+                        _context8.t0 = _context8.sent.data;
                       case 7:
-                        return _context7.abrupt("return", _context7.t0);
+                        return _context8.abrupt("return", _context8.t0);
                       case 8:
                       case "end":
-                        return _context7.stop();
+                        return _context8.stop();
                     }
-                  }, _callee7);
+                  }, _callee8);
                 }));
                 function loadSummary() {
                   return _loadSummary.apply(this, arguments);
@@ -39937,91 +40118,91 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
             }));
           });
         case 10:
-          result = _context8.sent;
+          result = _context9.sent;
           if (result && (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState) === scope && _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents) === result) {
-            context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
+            context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
               user_id: user.id,
               started_at: direction_at
             });
           }
-          return _context8.abrupt("return", result);
+          return _context9.abrupt("return", result);
         case 13:
         case "end":
-          return _context8.stop();
+          return _context9.stop();
       }
-    }, _callee8);
+    }, _callee9);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (context, _ref2) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (context, _ref4) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
     var _context$state$projec2, _context$rootState$au2;
-    var user, direction_at, _ref2$events, events, project, can, scope, routeEvents;
-    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-      while (1) switch (_context9.prev = _context9.next) {
+    var user, direction_at, _ref4$events, events, project, can, scope, routeEvents;
+    return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+      while (1) switch (_context10.prev = _context10.next) {
         case 0:
-          user = _ref2.user, direction_at = _ref2.direction_at, _ref2$events = _ref2.events, events = _ref2$events === void 0 ? [] : _ref2$events;
+          user = _ref4.user, direction_at = _ref4.direction_at, _ref4$events = _ref4.events, events = _ref4$events === void 0 ? [] : _ref4$events;
           project = (_context$state$projec2 = context.state.project) === null || _context$state$projec2 === void 0 ? void 0 : _context$state$projec2.slug;
           if (!(!(user !== null && user !== void 0 && user.id) || !project)) {
-            _context9.next = 4;
+            _context10.next = 4;
             break;
           }
-          return _context9.abrupt("return", null);
+          return _context10.abrupt("return", null);
         case 4:
           can = context.rootGetters.can;
           if (!(typeof can === "function" && ((_context$rootState$au2 = context.rootState.auth) === null || _context$rootState$au2 === void 0 || (_context$rootState$au2 = _context$rootState$au2.user) === null || _context$rootState$au2 === void 0 ? void 0 : _context$rootState$au2.id) != user.id && !can("all.project.user.agenda.".concat(user.id)))) {
-            _context9.next = 7;
+            _context10.next = 7;
             break;
           }
-          return _context9.abrupt("return", null);
+          return _context10.abrupt("return", null);
         case 7:
           scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
           routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
-          return _context9.abrupt("return", _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.fetch(scope, user.id, direction_at, routeEvents, function () {
+          return _context10.abrupt("return", _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.fetch(scope, user.id, direction_at, routeEvents, function () {
             var detail = _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents);
             return detail ? Promise.resolve((0,_utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.toDailyDirectionSummary)(detail)) : _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
           }));
         case 10:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
-    }, _callee9);
+    }, _callee10);
   }))();
 }), _actions);
 
 /**
  * event Store Mutations
  */
-var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS, function (state, events) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS, function (state, events) {
   state.project.events = _toConsumableArray(events);
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENT, function (state, event) {
   state.project.event = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_FIELDS, function (state, fields) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS_FIELDS, function (state, fields) {
   state.project.eventsFields = fields;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.ADD_EVENT_USER, function (state, user) {}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REMOVE_EVENT_USER, function (state, _ref3) {
-  var event = _ref3.event,
-    user = _ref3.user;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_NEW_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT_USER, function (state, user) {}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT_USER, function (state, _ref5) {
+  var event = _ref5.event,
+    user = _ref5.user;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_NEW_EVENT, function (state, event) {
   state.project.newEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_DRAGGED_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_DRAGGED_EVENT, function (state, event) {
   state.project.draggedEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_AGENDA_DATE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_AGENDA_DATE, function (state, value) {
   state.project.agendaDate = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_AGENDA_FILTER, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_AGENDA_FILTER, function (state, value) {
   state.project.agendaFilter = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_AGENDA_LIST, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_AGENDA_LIST, function (state, value) {
   state.project.agendaList = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SHOW_AGENDA_TABLE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SHOW_AGENDA_TABLE, function (state, value) {
   state.project.agendaTable = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SHOW_AGENDA_WEEK_END, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SHOW_AGENDA_WEEK_END, function (state, value) {
   state.project.agendaWeekEnd = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SHOW_AGENDA_OTHER_PROJECTS, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SHOW_AGENDA_OTHER_PROJECTS, function (state, value) {
   state.project.agendaOtherProjects = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_AGENDA_DISPLAY_MODE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_AGENDA_DISPLAY_MODE, function (state, value) {
   state.project.agendaDisplayMode = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_RESIZED_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_RESIZED_EVENT, function (state, event) {
   state.project.resizedEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.ADD_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT, function (state, event) {
   state.project.events = [].concat(_toConsumableArray(state.project.events), [event]);
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.UPDATE_EVENT, function (state, params) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, function (state, params) {
   if (!state.project.events) {
     return;
   }
@@ -40030,25 +40211,25 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_e
   }).map(function (o) {
     return o.id == params.id ? _objectSpread(_objectSpread({}, o), params) : o;
   });
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REMOVE_EVENT, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, function (state, slug) {
   state.project.events = state.project.events.filter(function (o) {
     return o.id != slug;
   });
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, function (state, events) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, function (state, events) {
   _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].invalidate(events);
   _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.invalidate(events);
   if (state.project) {
     state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (state, event) {
   _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.invalidate([event]);
   if (state.project) {
     state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.ADD_EVENT_PARAMS, function (state, _ref4) {
-  var key = _ref4.key,
-    value = _ref4.value,
-    multiple = _ref4.multiple;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT_PARAMS, function (state, _ref6) {
+  var key = _ref6.key,
+    value = _ref6.value,
+    multiple = _ref6.multiple;
   if (!state.project) {
     return;
   }
@@ -40067,61 +40248,61 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_e
     if (state.project.eventsParams[key] !== "") {
       values = [].concat(_toConsumableArray(state.project.eventsParams[key]), [value]);
     }
-    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref5) {
-      var _ref6 = _slicedToArray(_ref5, 2),
-        k = _ref6[0],
-        v = _ref6[1];
+    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2),
+        k = _ref8[0],
+        v = _ref8[1];
       return [k, k == key ? values : v];
     }));
   } else {
     state.project.eventsParams = _objectSpread(_objectSpread({}, state.project.eventsParams), {}, _defineProperty({}, key, value));
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.REMOVE_EVENT_PARAMS, function (state, _ref7) {
-  var key = _ref7.key,
-    value = _ref7.value;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT_PARAMS, function (state, _ref9) {
+  var key = _ref9.key,
+    value = _ref9.value;
   state.project.prospectsPage = 1;
   if (!state.project.eventsParams) {
     state.project.eventsParams = {};
   }
   if (value !== undefined) {
     if (state.project.eventsParams[key]) {
-      state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref8) {
-        var _ref9 = _slicedToArray(_ref8, 2),
-          k = _ref9[0],
-          v = _ref9[1];
+      state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref10) {
+        var _ref11 = _slicedToArray(_ref10, 2),
+          k = _ref11[0],
+          v = _ref11[1];
         return [k, k == key ? state.project.eventsParams[k].filter(function (val) {
           return val != value;
         }) : v];
       }));
-      if (state.project.eventsParams[key].length == 0) {
-        state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref10) {
-          var _ref11 = _slicedToArray(_ref10, 1),
-            k = _ref11[0];
+      if (state.project.eventsParams[key].length == 0 && key !== "withUsers") {
+        state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref12) {
+          var _ref13 = _slicedToArray(_ref12, 1),
+            k = _ref13[0];
           return k != key;
         }));
       }
     }
   } else {
-    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref12) {
-      var _ref13 = _slicedToArray(_ref12, 1),
-        k = _ref13[0];
+    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref14) {
+      var _ref15 = _slicedToArray(_ref14, 1),
+        k = _ref15[0];
       return k != key;
     }));
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENT_PARAMS, function (state, params) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENT_PARAMS, function (state, params) {
   if (_typeof(params) === "object") {
     state.project.eventsParams = params;
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.INIT_EVENT_PARAMS, function (state) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.INIT_EVENT_PARAMS, function (state) {
   state.project.prospectsPage = 1;
   state.project.eventsParams = {}; /*Object.fromEntries(
                                    Object.entries(state.project.eventsParams).filter(([k]) => k == "count")
                                    );*/
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_COUNT, function (state, count) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS_COUNT, function (state, count) {
   state.project.eventsCount = count;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_SORT_BY, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS_SORT_BY, function (state, column) {
   state.project.eventsSortBy = column;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENTS_SORT_ORDER, function (state, order) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENTS_SORT_ORDER, function (state, order) {
   state.project.eventsSortOrder = order;
 }), _mutations);
 
@@ -40136,7 +40317,7 @@ var getters = {
    * @returns
    */
   events: function events(state) {
-    return state.project && Array.isArray(state.project.events) ? state.project.events : [];
+    return state.project && Array.isArray(state.project.events) ? (0,_utils_event_user_filter__WEBPACK_IMPORTED_MODULE_5__.filterEventsByUsers)(state.project.events, state.project.eventsParams) : [];
   },
   /**
    * Get current event
@@ -55864,7 +56045,7 @@ var getters = {
    */
   projectUserSettingsAgendaUsers: function projectUserSettingsAgendaUsers(state, getters) {
     var setting = getters.projectUserSetting("events.agenda.filters.users");
-    return !setting || !Array.isArray(setting) || setting.length == 0 ? null : setting;
+    return Array.isArray(setting) ? setting : null;
   },
   /**
    * Get prospects table row max lines
@@ -58102,6 +58283,371 @@ var getters = {
 
 /***/ }),
 
+/***/ "./resources/js/utils/agenda-event-range-cache.js":
+/*!********************************************************!*\
+  !*** ./resources/js/utils/agenda-event-range-cache.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   agendaEventScope: () => (/* binding */ agendaEventScope),
+/* harmony export */   createAgendaEventRangeCache: () => (/* binding */ createAgendaEventRangeCache),
+/* harmony export */   globalEventRange: () => (/* binding */ globalEventRange),
+/* harmony export */   projectEventRange: () => (/* binding */ projectEventRange)
+/* harmony export */ });
+var _excluded = ["startedAt", "endedAt", "overlapping"];
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
+function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+var dayMilliseconds = 24 * 60 * 60 * 1000;
+function dayNumber(value) {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  var timestamp = Date.parse("".concat(value, "T00:00:00Z"));
+  return Number.isFinite(timestamp) && new Date(timestamp).toISOString().slice(0, 10) === value ? timestamp / dayMilliseconds : null;
+}
+var dateString = function dateString(day) {
+  return new Date(day * dayMilliseconds).toISOString().slice(0, 10);
+};
+var validRange = function validRange(range) {
+  var start = dayNumber(range === null || range === void 0 ? void 0 : range.startedAt);
+  var end = dayNumber(range === null || range === void 0 ? void 0 : range.endedAt);
+  return start !== null && end !== null && start <= end ? {
+    start: start,
+    end: end
+  } : null;
+};
+function stable(value) {
+  if (Array.isArray(value)) return value.map(stable);
+  if (value && _typeof(value) === "object") {
+    return Object.fromEntries(Object.keys(value).sort().map(function (key) {
+      return [key, stable(value[key])];
+    }));
+  }
+  return value;
+}
+function intersects(event, day) {
+  var _event$started_at, _event$ended_at;
+  return (event === null || event === void 0 || (_event$started_at = event.started_at) === null || _event$started_at === void 0 ? void 0 : _event$started_at.slice(0, 10)) <= dateString(day) && (event === null || event === void 0 || (_event$ended_at = event.ended_at) === null || _event$ended_at === void 0 ? void 0 : _event$ended_at.slice(0, 10)) >= dateString(day);
+}
+
+// Runtime data only: never persist requests or copies of an entire agenda in Vuex.
+function createAgendaEventRangeCache() {
+  var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+    _ref$ttl = _ref.ttl,
+    ttl = _ref$ttl === void 0 ? 60000 : _ref$ttl,
+    _ref$maxDays = _ref.maxDays,
+    maxDays = _ref$maxDays === void 0 ? 90 : _ref$maxDays,
+    _ref$now = _ref.now,
+    now = _ref$now === void 0 ? Date.now : _ref$now;
+  var days = new Map();
+  var records = new Map();
+  var pending = new Map();
+  var writes = new Set();
+  var queryKey;
+  var lastRange;
+  var generation = 0;
+  function invalidate() {
+    ++generation;
+    days.clear();
+    records.clear();
+    pending.clear();
+  }
+  function clear() {
+    invalidate();
+    queryKey = lastRange = undefined;
+  }
+  function beginWrite() {
+    invalidate();
+    var resolve;
+    var write = {
+      promise: new Promise(function (done) {
+        resolve = done;
+      })
+    };
+    writes.add(write);
+    return function () {
+      invalidate();
+      writes["delete"](write);
+      resolve();
+    };
+  }
+  function fetch(_x) {
+    return _fetch.apply(this, arguments);
+  }
+  function _fetch() {
+    _fetch = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(_ref2) {
+      var scope, _ref2$filters, filters, fields, range, retainRange, load, onData, dates, requested, bounds, retained, startedAt, endedAt, overlapping, otherFilters, key, selection, isSelected, retry, version, dependencies, gaps, gap, day, entry, _loop, _i, _gaps, events, _day4, _entry, _iterator2, _step2, id, event, retainedIds, _iterator3, _step3, _id, result;
+      return _regeneratorRuntime().wrap(function _callee$(_context2) {
+        while (1) switch (_context2.prev = _context2.next) {
+          case 0:
+            scope = _ref2.scope, _ref2$filters = _ref2.filters, filters = _ref2$filters === void 0 ? {} : _ref2$filters, fields = _ref2.fields, range = _ref2.range, retainRange = _ref2.retainRange, load = _ref2.load, onData = _ref2.onData;
+            dates = range || filters;
+            requested = {
+              startedAt: dates.startedAt,
+              endedAt: dates.endedAt
+            };
+            bounds = validRange(requested);
+            retained = validRange(retainRange) || bounds; // An agenda request must always have both dates, including its first request.
+            if (bounds) {
+              _context2.next = 8;
+              break;
+            }
+            clear();
+            return _context2.abrupt("return", null);
+          case 8:
+            startedAt = filters.startedAt, endedAt = filters.endedAt, overlapping = filters.overlapping, otherFilters = _objectWithoutProperties(filters, _excluded);
+            key = JSON.stringify([scope, stable(otherFilters), fields || ""]);
+            if (queryKey !== key) {
+              invalidate();
+              queryKey = key;
+            }
+            selection = JSON.stringify([requested, retained]);
+            lastRange = selection;
+            isSelected = function isSelected() {
+              return queryKey === key && lastRange === selection;
+            };
+            retry = function retry() {
+              return fetch({
+                scope: scope,
+                filters: filters,
+                fields: fields,
+                range: range,
+                retainRange: retainRange,
+                load: load,
+                onData: onData
+              });
+            };
+          case 15:
+            if (!writes.size) {
+              _context2.next = 20;
+              break;
+            }
+            _context2.next = 18;
+            return Promise.all(_toConsumableArray(writes).map(function (write) {
+              return write.promise;
+            }));
+          case 18:
+            _context2.next = 15;
+            break;
+          case 20:
+            if (isSelected()) {
+              _context2.next = 22;
+              break;
+            }
+            return _context2.abrupt("return", null);
+          case 22:
+            version = generation;
+            dependencies = new Set();
+            gaps = [];
+            for (day = bounds.start; day <= bounds.end; day++) {
+              entry = days.get(day);
+              if (entry && entry.expiresAt <= now()) days["delete"](day);
+              if (days.has(day) || pending.has(day)) {
+                if (pending.has(day)) dependencies.add(pending.get(day));
+                gap = null;
+              } else {
+                if (!gap) {
+                  gap = {
+                    start: day,
+                    end: day
+                  };
+                  gaps.push(gap);
+                } else gap.end = day;
+              }
+            }
+            _loop = /*#__PURE__*/_regeneratorRuntime().mark(function _loop() {
+              var missing, promise, _day3;
+              return _regeneratorRuntime().wrap(function _loop$(_context) {
+                while (1) switch (_context.prev = _context.next) {
+                  case 0:
+                    missing = _gaps[_i];
+                    // Defer I/O until every day has been associated with its shared promise.
+                    promise = Promise.resolve().then(function () {
+                      return load(_objectSpread(_objectSpread({}, otherFilters), {}, {
+                        overlapping: {
+                          startedAt: dateString(missing.start),
+                          endedAt: dateString(missing.end)
+                        }
+                      }), fields);
+                    }).then(function (events) {
+                      if (version !== generation) return;
+                      if (!Array.isArray(events)) throw new TypeError("Expected an array of agenda events");
+                      var _iterator = _createForOfIteratorHelper(events),
+                        _step;
+                      try {
+                        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                          var event = _step.value;
+                          records.set(String(event.id), event);
+                        }
+                      } catch (err) {
+                        _iterator.e(err);
+                      } finally {
+                        _iterator.f();
+                      }
+                      var _loop2 = function _loop2(_day) {
+                        days.set(_day, {
+                          ids: events.filter(function (event) {
+                            return intersects(event, _day);
+                          }).map(function (event) {
+                            return String(event.id);
+                          }),
+                          expiresAt: now() + ttl
+                        });
+                      };
+                      for (var _day = missing.start; _day <= missing.end; _day++) {
+                        _loop2(_day);
+                      }
+                    })["finally"](function () {
+                      for (var _day2 = missing.start; _day2 <= missing.end; _day2++) {
+                        if (pending.get(_day2) === promise) pending["delete"](_day2);
+                      }
+                    });
+                    for (_day3 = missing.start; _day3 <= missing.end; _day3++) pending.set(_day3, promise);
+                    dependencies.add(promise);
+                  case 4:
+                  case "end":
+                    return _context.stop();
+                }
+              }, _loop);
+            });
+            _i = 0, _gaps = gaps;
+          case 28:
+            if (!(_i < _gaps.length)) {
+              _context2.next = 33;
+              break;
+            }
+            return _context2.delegateYield(_loop(), "t0", 30);
+          case 30:
+            _i++;
+            _context2.next = 28;
+            break;
+          case 33:
+            _context2.prev = 33;
+            _context2.next = 36;
+            return Promise.all(dependencies);
+          case 36:
+            _context2.next = 43;
+            break;
+          case 38:
+            _context2.prev = 38;
+            _context2.t1 = _context2["catch"](33);
+            if (!(version !== generation && isSelected())) {
+              _context2.next = 42;
+              break;
+            }
+            return _context2.abrupt("return", retry());
+          case 42:
+            throw _context2.t1;
+          case 43:
+            if (!(version !== generation)) {
+              _context2.next = 45;
+              break;
+            }
+            return _context2.abrupt("return", isSelected() ? retry() : null);
+          case 45:
+            if (isSelected()) {
+              _context2.next = 47;
+              break;
+            }
+            return _context2.abrupt("return", null);
+          case 47:
+            events = new Map();
+            _day4 = retained.start;
+          case 49:
+            if (!(_day4 <= retained.end)) {
+              _context2.next = 60;
+              break;
+            }
+            _entry = days.get(_day4);
+            if (_entry) {
+              _context2.next = 53;
+              break;
+            }
+            return _context2.abrupt("continue", 57);
+          case 53:
+            // Touch visible days before evicting the least recently used days.
+            days["delete"](_day4);
+            days.set(_day4, _entry);
+            _iterator2 = _createForOfIteratorHelper(_entry.ids);
+            try {
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                id = _step2.value;
+                event = records.get(id);
+                if (event && intersects(event, _day4)) events.set(id, event);
+              }
+            } catch (err) {
+              _iterator2.e(err);
+            } finally {
+              _iterator2.f();
+            }
+          case 57:
+            _day4++;
+            _context2.next = 49;
+            break;
+          case 60:
+            while (days.size > maxDays) days["delete"](days.keys().next().value);
+            retainedIds = new Set(_toConsumableArray(days.values()).flatMap(function (entry) {
+              return entry.ids;
+            }));
+            _iterator3 = _createForOfIteratorHelper(records.keys());
+            try {
+              for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+                _id = _step3.value;
+                if (!retainedIds.has(_id)) records["delete"](_id);
+              }
+              // Only the latest requested range may replace the visible list.
+            } catch (err) {
+              _iterator3.e(err);
+            } finally {
+              _iterator3.f();
+            }
+            result = _toConsumableArray(events.values()).sort(function (a, b) {
+              return a.started_at.localeCompare(b.started_at) || String(a.id).localeCompare(String(b.id));
+            }); // Publish in this continuation: a later save cannot slip between the validity
+            // check and a caller's Vuex commit after awaiting the returned promise.
+            onData === null || onData === void 0 ? void 0 : onData(result);
+            return _context2.abrupt("return", result);
+          case 67:
+          case "end":
+            return _context2.stop();
+        }
+      }, _callee, null, [[33, 38]]);
+    }));
+    return _fetch.apply(this, arguments);
+  }
+  return {
+    fetch: fetch,
+    invalidate: invalidate,
+    clear: clear,
+    beginWrite: beginWrite
+  };
+}
+var projectEventRange = createAgendaEventRangeCache();
+var globalEventRange = createAgendaEventRangeCache();
+var agendaEventScope = function agendaEventScope(state) {
+  var _state$auth$user$id, _state$auth, _state$auth$authentic, _state$auth2, _state$auth$impersona, _state$auth3, _state$auth$impersona2, _state$auth4, _state$project$projec, _state$project;
+  return JSON.stringify([(_state$auth$user$id = (_state$auth = state.auth) === null || _state$auth === void 0 || (_state$auth = _state$auth.user) === null || _state$auth === void 0 ? void 0 : _state$auth.id) !== null && _state$auth$user$id !== void 0 ? _state$auth$user$id : null, (_state$auth$authentic = (_state$auth2 = state.auth) === null || _state$auth2 === void 0 ? void 0 : _state$auth2.authenticated) !== null && _state$auth$authentic !== void 0 ? _state$auth$authentic : false, (_state$auth$impersona = (_state$auth3 = state.auth) === null || _state$auth3 === void 0 ? void 0 : _state$auth3.impersonating) !== null && _state$auth$impersona !== void 0 ? _state$auth$impersona : false, (_state$auth$impersona2 = (_state$auth4 = state.auth) === null || _state$auth4 === void 0 ? void 0 : _state$auth4.impersonate_project) !== null && _state$auth$impersona2 !== void 0 ? _state$auth$impersona2 : null, (_state$project$projec = (_state$project = state.project) === null || _state$project === void 0 || (_state$project = _state$project.project) === null || _state$project === void 0 ? void 0 : _state$project.slug) !== null && _state$project$projec !== void 0 ? _state$project$projec : null]);
+};
+
+/***/ }),
+
 /***/ "./resources/js/utils/event-bus.js":
 /*!*****************************************!*\
   !*** ./resources/js/utils/event-bus.js ***!
@@ -58935,6 +59481,34 @@ function createDailyDirectionSummaryBatcher(loadBatch) {
     pairs: pairs
   });
 }));
+
+/***/ }),
+
+/***/ "./resources/js/utils/event-user-filter.js":
+/*!*************************************************!*\
+  !*** ./resources/js/utils/event-user-filter.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   filterEventsByUsers: () => (/* binding */ filterEventsByUsers)
+/* harmony export */ });
+// Keep the same owner-or-participant semantics as the API's withUsers filter.
+function filterEventsByUsers() {
+  var events = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  if (!Array.isArray(params === null || params === void 0 ? void 0 : params.withUsers)) return events;
+  if (params.withUsers.length === 0) return [];
+  var selected = new Set(params.withUsers.map(String));
+  return events.filter(function (event) {
+    var _event$user_id, _event$user, _event$users;
+    return selected.has(String((_event$user_id = event.user_id) !== null && _event$user_id !== void 0 ? _event$user_id : (_event$user = event.user) === null || _event$user === void 0 ? void 0 : _event$user.id)) || ((_event$users = event.users) === null || _event$users === void 0 ? void 0 : _event$users.some(function (user) {
+      return selected.has(String(user.id));
+    }));
+  });
+}
 
 /***/ }),
 

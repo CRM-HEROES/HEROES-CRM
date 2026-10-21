@@ -265,6 +265,7 @@ import {
     ADD_EVENT_PARAMS,
     SET_EVENT_PARAMS,
     SET_AGENDA_DATE,
+    SET_EVENTS_FIELDS,
 } from "@/actions/project/event";
 
 import {
@@ -287,6 +288,12 @@ import CardMenus from "./CardMenus.vue";
 import UserDailyDirectionSlide from "../../slides/daily-direction/Slide.vue";
 import OcrModal from "@/components/ocr/Modal.vue";
 
+function localDate(value) {
+    return new Date(typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)
+        ? value + "T12:00:00"
+        : value);
+}
+
 export default {
     components: {
         HeaderCell,
@@ -298,7 +305,8 @@ export default {
     },
 
     data() {
-        const date = new Date();
+        const selected = localDate(store.getters.agendaDate);
+        const date = Number.isNaN(selected.getTime()) ? new Date() : selected;
         return {
             date: { year: date.getFullYear(), month: date.getMonth() },
             scrollingOldLeft: false,
@@ -310,10 +318,7 @@ export default {
 
     created() {
         this.updateParamsFromUrl();
-
-        const date = new Date();
-        date.setDate(0);
-        this.currentDate = this.dateToString(date);
+        this.fetchEvents();
     },
 
     methods: {
@@ -340,8 +345,11 @@ export default {
                 withoutProjects: [this.project.id],
             });
 
-            store.dispatch(FETCH_EVENTS);
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+            const fields = ["calendar", "prospect", "user", "users"];
+            if (this.projectUserSettingsEventsColorByLabel) {
+                fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
+            }
+            store.commit(SET_EVENTS_FIELDS, fields.join(","));
         },
 
         fetchEvents() {
@@ -369,9 +377,14 @@ export default {
             store.commit(ADD_EVENT_PARAMS, endedAtParam);
             store.commit(ADD_GLOBAL_EVENT_PARAMS, endedAtParam);
 
-            // this.setDate(date);
             store.dispatch(FETCH_EVENTS);
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+            this.fetchGlobalEvents();
+        },
+
+        fetchGlobalEvents() {
+            if (this.agendaOtherProjects) {
+                store.dispatch(FETCH_GLOBAL_EVENTS);
+            }
         },
 
         dateToString(date) {
@@ -379,9 +392,7 @@ export default {
         },
 
         scrollLeft() {
-            let date = new Date();
-            date.setYear(this.date.year);
-            date.setMonth(this.date.month - 1);
+            const date = new Date(this.date.year, this.date.month - 1, 1);
 
             this.scrollingOldLeft = true;
             setTimeout(() => {
@@ -402,9 +413,7 @@ export default {
         },
 
         scrollRight() {
-            let date = new Date();
-            date.setYear(this.date.year);
-            date.setMonth(this.date.month + 1);
+            const date = new Date(this.date.year, this.date.month + 1, 1);
 
             this.scrollingOldRight = true;
             setTimeout(() => {
@@ -455,12 +464,18 @@ export default {
         },
 
         agendaDate() {
-            const date = new Date(this.agendaDate);
+            const date = localDate(this.agendaDate);
+            if (!Number.isNaN(date.getTime()) &&
+                (date.getFullYear() !== this.date.year || date.getMonth() !== this.date.month)) {
+                this.date = {
+                    year: date.getFullYear(),
+                    month: date.getMonth(),
+                };
+            }
+        },
 
-            this.date = {
-                year: date.getFullYear(),
-                month: date.getMonth(),
-            };
+        agendaOtherProjects(enabled) {
+            if (enabled) this.fetchGlobalEvents();
         },
     },
 
@@ -472,6 +487,8 @@ export default {
             "agendaFilter",
             "agendaDate",
             "agendaWeekEnd",
+            "agendaOtherProjects",
+            "projectUserSettingsEventsColorByLabel",
         ]),
 
         currentDate: {
@@ -489,7 +506,7 @@ export default {
 
         previousSunday() {
             // Get the first day of the month
-            var firstDayOfMonth = new Date(this.date.year, this.date.month, 1);
+            var firstDayOfMonth = new Date(this.date.year, this.date.month, 1, 12);
 
             // Calculate the difference in days from Sunday (0)
             var dayOfWeek = firstDayOfMonth.getDay();
@@ -518,7 +535,7 @@ export default {
 
             // Loop through days in the month
             for (
-                let currentMonth = this.previousSunday;
+                let currentMonth = new Date(this.previousSunday);
                 currentMonth.getFullYear() * 100 + currentMonth.getMonth() <=
                 this.date.year * 100 + this.date.month;
 
