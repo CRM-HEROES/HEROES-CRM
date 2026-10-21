@@ -76,9 +76,35 @@ export function createDailyDirectionCache({
         const signature = dailyDirectionEventsSignature(events);
         const previous = pending.get(key);
         if (previous?.signature === signature) return previous.promise;
+        previous?.cancel();
 
         const request = { userId: String(userId), date, signature, eventIds: eventIds(events) };
+        const waiters = new Set();
+        request.cancel = () => {
+            for (const finish of [...waiters]) finish(false);
+        };
         pending.set(key, request);
+        const control = {
+            isCurrent: () => pending.get(key) === request,
+            onCancel: (callback) => {
+                if (pending.get(key) !== request) {
+                    callback();
+                    return () => {};
+                }
+                waiters.add(callback);
+                return () => waiters.delete(callback);
+            },
+            wait: (milliseconds) => new Promise((resolve) => {
+                if (pending.get(key) !== request) return resolve(false);
+                const finish = (current) => {
+                    clearTimeout(timer);
+                    waiters.delete(finish);
+                    resolve(current);
+                };
+                const timer = setTimeout(() => finish(pending.get(key) === request), milliseconds);
+                waiters.add(finish);
+            }),
+        };
         request.promise = (async () => {
             try {
                 // Optimistic agenda edits must reach the server before reading its route.
@@ -91,7 +117,7 @@ export function createDailyDirectionCache({
                 const unsettled = new Set([...settling]
                     .filter(([, until]) => until > readStartedAt)
                     .map(([key]) => key));
-                const data = await load();
+                const data = await load(control);
                 if (pending.get(key) !== request || !data || data.searching) return null;
 
                 const ids = [...new Set([...request.eventIds, ...eventIds(data.events || [])])];
@@ -103,6 +129,7 @@ export function createDailyDirectionCache({
                 entries.set(key, {
                     ...request,
                     promise: undefined,
+                    cancel: undefined,
                     eventIds: ids,
                     data,
                     expiresAt: now() + (isReady(data) ? ttl : emptyTtl),
@@ -127,6 +154,7 @@ export function createDailyDirectionCache({
                 for (const [key, entry] of collection) {
                     if (entry.eventIds.includes(id) || (userId === entry.userId && date === entry.date)) {
                         collection.delete(key);
+                        entry.cancel?.();
                     }
                 }
             }
@@ -148,7 +176,7 @@ export function createDailyDirectionCache({
         for (const [key, until] of settling) {
             if (until <= now()) settling.delete(key);
         }
-        // The server starts its route recalculation after the save response.
+        // The server may still be recalculating immediately after a save.
         // Share immediate reads, but do not retain a possibly older result.
         for (const event of events.filter(Boolean)) {
             const id = event.id ?? (typeof event === "object" ? null : event);
@@ -166,6 +194,7 @@ export function createDailyDirectionCache({
 
     function clear() {
         entries.clear();
+        for (const request of pending.values()) request.cancel();
         pending.clear();
         settling.clear();
         for (const write of [...writes]) write.release();

@@ -1300,6 +1300,7 @@
         "email_to_prospect": "Отправить приглашение потенциальному клиенту",
         "choose_event_description_template": "Шаблоны описаний",
         "user_daily_directions": {
+            "pending_message": "Маршрут ещё рассчитывается. Повторите попытку через некоторое время.",
             "title": "Направления",
             "remove_from_map": "Удалить маршрут с карты",
             "remove_marker": "Удалить маркер",

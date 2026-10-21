@@ -1346,6 +1346,7 @@
         "email_to_prospect": "Enviar invitación al cliente potencial",
         "choose_event_description_template": "Plantillas de descripción",
         "user_daily_directions": {
+            "pending_message": "La ruta todavía se está calculando. Vuelve a intentarlo en unos instantes.",
             "title": "Direcciones",
             "remove_from_map": "Eliminar ruta del mapa",
             "remove_marker": "Quitar marcador",

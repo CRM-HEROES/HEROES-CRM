@@ -1181,16 +1181,21 @@ export default {
         async userEventsDailyDirection(user) {
             const direction_at = dateToString(new Date()).substring(0, 10);
 
-            const data = await store.dispatch(
-                FETCH_EVENT_USER_DAILY_DIRECTION,
-                {
-                    user,
-                    direction_at,
-                }
-            );
+            try {
+                const data = await store.dispatch(
+                    FETCH_EVENT_USER_DAILY_DIRECTION,
+                    { user, direction_at }
+                );
 
-            if (data && data.direction) {
-                this.addDirection({ ...data, color: "#55AAFF" });
+                if (data && data.direction) {
+                    this.addDirection({ ...data, color: "#55AAFF" });
+                }
+            } catch (error) {
+                if (error.code !== "DAILY_DIRECTION_TIMEOUT") throw error;
+                flashInfo({
+                    title: this.$t("event.user_daily_directions.title"),
+                    body: this.$t("event.user_daily_directions.pending_message"),
+                });
             }
         },
 

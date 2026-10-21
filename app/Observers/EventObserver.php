@@ -3,12 +3,12 @@
 namespace App\Observers;
 
 use App\Models\Event;
-use App\Models\User;
 use App\Jobs\EventGetLatLng;
-use App\Jobs\UserGetEventsDailyDirection;
+use App\Services\EventsDailyDirections;
 use App\Notifications\GoogleCalendarDeletedEvent;
 use App\Notifications\GoogleCalendarNewEvent;
 use App\Notifications\GoogleCalendarUpdatedEvent;
+use Illuminate\Support\Facades\DB;
 
 class EventObserver
 {
@@ -203,41 +203,28 @@ class EventObserver
      */
     protected function getUpdateUserEventsDailyDirection(Event $event)
     {
-        if ($event->calendar->type != 'physical') {
+        if (!$event->isDirty(['user_id', 'started_at', 'ended_at', 'location', 'calendar_id'])) {
             return;
         }
 
-        if (
-            $event->isDirty('user_id') || 
-            $event->isDirty('started_at') || 
-            $event->isDirty('location')
-        ) {
-            $oldUser = User::find($event->getOriginal('user_id'));
-            $oldDate = substr($event->getOriginal('started_at'), 0, 10);
-    
-            $event->syncOriginal(['user_id', 'started_at', 'location']);
-            UserGetEventsDailyDirection::dispatchAfterResponse(
-                // $event->calendar->project, 
-                $oldUser,
-                $oldDate
-            );
+        $types = DB::table('calendars')->whereIn('id', array_filter([
+            $event->getOriginal('calendar_id'), $event->calendar_id,
+        ]))->pluck('type', 'id');
+        $pairs = [];
 
-            ///////////////////////////////////////
-            
-            $newUser = $event->user;
-            $newDate = substr($event->started_at, 0, 10);
-            if (
-                $oldDate == $newDate && 
-                $oldUser->id == $newUser->id
-            ) {
-                return;
+        foreach ([
+            [$event->getOriginal('calendar_id'), $event->getOriginal('user_id'), $event->getOriginal('started_at')],
+            [$event->calendar_id, $event->user_id, $event->started_at],
+        ] as [$calendarId, $userId, $startedAt]) {
+            if ($types->get($calendarId) !== 'physical' || !$userId || !$startedAt) {
+                continue;
             }
-        
-            UserGetEventsDailyDirection::dispatchAfterResponse(
-                // $event->calendar->project, 
-                $newUser, 
-                $newDate
-            );
+            $date = substr((string) $startedAt, 0, 10);
+            $pairs[$userId . ':' . $date] = [(int) $userId, $date];
+        }
+
+        foreach ($pairs as [$userId, $date]) {
+            app(EventsDailyDirections::class)->invalidate($userId, $date);
         }
     }
     
@@ -251,15 +238,11 @@ class EventObserver
      */
     protected function getUserEventsDailyDirection(Event $event)
     {
-        if ($event->calendar->type != 'physical') {
+        if ($event->calendar->type != 'physical' || !$event->user_id || !$event->started_at) {
             return;
         }
 
-        UserGetEventsDailyDirection::dispatchAfterResponse(
-            // $event->calendar->project, 
-            $event->user, 
-            substr($event->started_at, 0, 10)
-        );
+        app(EventsDailyDirections::class)->invalidate((int) $event->user_id, substr((string) $event->started_at, 0, 10));
     }
     
     /**

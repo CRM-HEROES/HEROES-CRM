@@ -47,14 +47,21 @@ class Map
         // Other options
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, max(1, (int) config('google-map.connect_timeout', 5)));
+        curl_setopt($ch, CURLOPT_TIMEOUT, max(1, (int) config('google-map.request_timeout', 30)));
 
         // Send cURL
         $output = curl_exec($ch);
+        $errorCode = curl_errno($ch);
 
         // close cURL
         curl_close($ch);
 
         MapRequestSent::dispatch();
+
+        if ($output === false) {
+            throw new \RuntimeException("Google Maps request failed (cURL code {$errorCode}).");
+        }
 
         return $output;
     }

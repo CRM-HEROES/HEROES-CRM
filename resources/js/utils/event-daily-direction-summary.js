@@ -17,7 +17,7 @@ export function toDailyDirectionSummary(data) {
     return {
         user_id: data.user_id,
         direction_at: data.direction_at,
-        status: data.searching ? "pending" : direction?.status === "OK" ? "ready" : "empty",
+        status: data.status || (data.searching ? "pending" : direction?.status === "OK" ? "ready" : "empty"),
         events: data.events || [],
         legs: direction?.status === "OK" && Array.isArray(legs) ? legs.map((leg) => ({
             distance: metric(leg?.distance),

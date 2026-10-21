@@ -296,7 +296,7 @@ export default {
 
             store.commit(OPEN_SLIDE, "user-daily-direction");
             try {
-                await Promise.allSettled(users.map(async (user) => {
+                const results = await Promise.allSettled(users.map(async (user) => {
                     const selected = this.directionFor(user.id, date);
                     if (selected) {
                         store.commit(TOGGLE_USER_DAILY_DIRECTION, selected);
@@ -309,6 +309,13 @@ export default {
                         store.commit(TOGGLE_USER_DAILY_DIRECTION, data);
                     }
                 }));
+                if (requestId === this.directionsRequestId && signature === this.dailyDirectionSignature &&
+                    results.some((result) => result.status === "rejected" && result.reason?.code === "DAILY_DIRECTION_TIMEOUT")) {
+                    flashInfo({
+                        title: this.$t("event.user_daily_directions.title"),
+                        body: this.$t("event.user_daily_directions.pending_message"),
+                    });
+                }
             } finally {
                 if (requestId === this.directionsRequestId) this.fetchingDirection = false;
             }

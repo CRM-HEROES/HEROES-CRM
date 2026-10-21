@@ -1469,6 +1469,7 @@
         "email_to_prospect": "Send invitation to prospect",
         "choose_event_description_template": "Description templates",
         "user_daily_directions": {
+            "pending_message": "The route is still being calculated. Try again shortly.",
             "title": "Directions",
             "remove_from_map": "Remove route from map",
             "remove_marker": "Remove marker",

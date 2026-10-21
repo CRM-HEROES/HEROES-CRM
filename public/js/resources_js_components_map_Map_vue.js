@@ -873,23 +873,39 @@ var hcMapUserDailyDirectionsInfoWindow = {};
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
               direction_at = dateToString(new Date()).substring(0, 10);
-              _context8.next = 3;
+              _context8.prev = 1;
+              _context8.next = 4;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.FETCH_EVENT_USER_DAILY_DIRECTION, {
                 user: user,
                 direction_at: direction_at
               });
-            case 3:
+            case 4:
               data = _context8.sent;
               if (data && data.direction) {
                 _this9.addDirection(_objectSpread(_objectSpread({}, data), {}, {
                   color: "#55AAFF"
                 }));
               }
-            case 5:
+              _context8.next = 13;
+              break;
+            case 8:
+              _context8.prev = 8;
+              _context8.t0 = _context8["catch"](1);
+              if (!(_context8.t0.code !== "DAILY_DIRECTION_TIMEOUT")) {
+                _context8.next = 12;
+                break;
+              }
+              throw _context8.t0;
+            case 12:
+              flashInfo({
+                title: _this9.$t("event.user_daily_directions.title"),
+                body: _this9.$t("event.user_daily_directions.pending_message")
+              });
+            case 13:
             case "end":
               return _context8.stop();
           }
-        }, _callee8);
+        }, _callee8, null, [[1, 8]]);
       }))();
     },
     /**

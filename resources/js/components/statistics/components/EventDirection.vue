@@ -231,6 +231,12 @@ export default {
                     data.color = "#ea5d5d";
                     this.addDirection(data);
                 }
+            } catch (error) {
+                if (error.code !== "DAILY_DIRECTION_TIMEOUT") throw error;
+                flashInfo({
+                    title: this.$t("event.user_daily_directions.title"),
+                    body: this.$t("event.user_daily_directions.pending_message"),
+                });
             } finally {
                 this.fetchingDirection = false;
             }

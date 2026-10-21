@@ -1346,6 +1346,7 @@
         "email_to_prospect": "Enviar convite para prospect",
         "choose_event_description_template": "Modelos de descrição",
         "user_daily_directions": {
+            "pending_message": "O percurso ainda está a ser calculado. Tente novamente dentro de instantes.",
             "title": "instruções",
             "remove_from_map": "Remover rota do mapa",
             "remove_marker": "Remover marcador",

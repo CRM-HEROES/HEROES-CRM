@@ -1300,6 +1300,7 @@
         "email_to_prospect": "Invia invito al potenziale cliente",
         "choose_event_description_template": "Modelli di descrizione",
         "user_daily_directions": {
+            "pending_message": "Il percorso è ancora in fase di calcolo. Riprova tra qualche istante.",
             "title": "Indicazioni",
             "remove_from_map": "Rimuovi il percorso dalla mappa",
             "remove_marker": "Rimuovi il contrassegno",

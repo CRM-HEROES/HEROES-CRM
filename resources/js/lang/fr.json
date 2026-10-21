@@ -1470,6 +1470,7 @@
         "email_to_prospect": "Envoyer une invitation au prospect",
         "choose_event_description_template": "Templates de description",
         "user_daily_directions": {
+            "pending_message": "Le calcul de l’itinéraire est toujours en cours. Réessayez dans quelques instants.",
             "title": "Directions",
             "remove_from_map": "Enlever l'itinéraire de la carte",
             "remove_marker": "Supprimer le marqueur",

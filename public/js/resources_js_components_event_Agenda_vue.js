@@ -408,7 +408,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     showDirection: function showDirection() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var requestId, signature, date, users;
+        var requestId, signature, date, users, results;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -458,14 +458,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
               }()));
             case 11:
-              _context2.prev = 11;
+              results = _context2.sent;
+              if (requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature && results.some(function (result) {
+                var _result$reason;
+                return result.status === "rejected" && ((_result$reason = result.reason) === null || _result$reason === void 0 ? void 0 : _result$reason.code) === "DAILY_DIRECTION_TIMEOUT";
+              })) {
+                flashInfo({
+                  title: _this.$t("event.user_daily_directions.title"),
+                  body: _this.$t("event.user_daily_directions.pending_message")
+                });
+              }
+            case 13:
+              _context2.prev = 13;
               if (requestId === _this.directionsRequestId) _this.fetchingDirection = false;
-              return _context2.finish(11);
-            case 14:
+              return _context2.finish(13);
+            case 16:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[8,, 11, 14]]);
+        }, _callee2, null, [[8,, 13, 16]]);
       }))();
     },
     userEventsDailyDirection: function userEventsDailyDirection(user, requestId, signature) {
@@ -2476,7 +2487,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     showDirection: function showDirection() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var requestId, signature, date, users;
+        var requestId, signature, date, users, results;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -2536,14 +2547,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 };
               }()));
             case 11:
-              _context2.prev = 11;
+              results = _context2.sent;
+              if (requestId === _this.directionDetailsRequestId && signature === _this.directionDetailsSignature && results.some(function (result) {
+                var _result$reason;
+                return result.status === "rejected" && ((_result$reason = result.reason) === null || _result$reason === void 0 ? void 0 : _result$reason.code) === "DAILY_DIRECTION_TIMEOUT";
+              })) {
+                flashInfo({
+                  title: _this.$t("event.user_daily_directions.title"),
+                  body: _this.$t("event.user_daily_directions.pending_message")
+                });
+              }
+            case 13:
+              _context2.prev = 13;
               if (requestId === _this.directionDetailsRequestId) _this.fetchingDirectionDetails = false;
-              return _context2.finish(11);
-            case 14:
+              return _context2.finish(13);
+            case 16:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[8,, 11, 14]]);
+        }, _callee2, null, [[8,, 13, 16]]);
       }))();
     },
     bulkSms: function bulkSms() {

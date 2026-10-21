@@ -1758,15 +1758,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 data.color = "#ea5d5d";
                 _this4.addDirection(data);
               }
-            case 6:
-              _context3.prev = 6;
+              _context3.next = 13;
+              break;
+            case 8:
+              _context3.prev = 8;
+              _context3.t0 = _context3["catch"](1);
+              if (!(_context3.t0.code !== "DAILY_DIRECTION_TIMEOUT")) {
+                _context3.next = 12;
+                break;
+              }
+              throw _context3.t0;
+            case 12:
+              flashInfo({
+                title: _this4.$t("event.user_daily_directions.title"),
+                body: _this4.$t("event.user_daily_directions.pending_message")
+              });
+            case 13:
+              _context3.prev = 13;
               _this4.fetchingDirection = false;
-              return _context3.finish(6);
-            case 9:
+              return _context3.finish(13);
+            case 16:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[1,, 6, 9]]);
+        }, _callee3, null, [[1, 8, 13, 16]]);
       }))();
     },
     /**

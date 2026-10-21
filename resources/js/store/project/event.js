@@ -1,6 +1,7 @@
 import EventService from "@/apis/project/event";
 import dailyDirectionCache, { dailyDirectionCacheScope, dailyDirectionContextEvents } from "@/utils/event-daily-direction-cache";
 import summaryBatcher, { summaryCache, toDailyDirectionSummary } from "@/utils/event-daily-direction-summary";
+import { loadDailyDirection } from "@/utils/event-daily-direction-loader";
 
 import {
     FETCH_EVENTS,
@@ -153,23 +154,25 @@ const actions = {
         if (!user?.id) return null;
 
         const scope = dailyDirectionCacheScope(context.rootState);
+        const project = context.state.project?.slug;
+        const can = context.rootGetters.can;
+        const canReadSummary = project && (typeof can !== "function" ||
+            context.rootState.auth?.user?.id == user.id || can(`all.project.user.agenda.${user.id}`));
         const routeEvents = dailyDirectionContextEvents(context.rootState, user.id, direction_at, events);
         const result = await dailyDirectionCache.fetch(
             scope,
             user.id,
             direction_at,
             routeEvents,
-            async () => {
-                const { data } = await EventService.dailyDirection(user, direction_at);
-                const parse = (value, fallback) => typeof value === "string" ? JSON.parse(value) : value ?? fallback;
-                return {
-                    user_id: user.id,
-                    direction_at,
-                    events: parse(data?.events, []),
-                    direction: parse(data?.direction, null),
-                    searching: data?.searching === true || data?.searching == 1,
-                };
-            }
+            (control) => loadDailyDirection({
+                ...control,
+                userId: user.id,
+                date: direction_at,
+                loadDetail: async () => (await EventService.dailyDirection(user, direction_at)).data,
+                loadSummary: async () => canReadSummary ?
+                    summaryBatcher.request(scope, project, user.id, direction_at) :
+                    (await EventService.dailyDirectionStatus(user, direction_at)).data,
+            })
         );
 
         if (result && dailyDirectionCacheScope(context.rootState) === scope &&

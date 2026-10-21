@@ -118,6 +118,20 @@ php artisan view:cache
 php artisan queue:work --tries=3 --queue=google_event,google_map,google_drive,imports,emails,woocommerce,media,sms,documents
 ```
 
+Les calculs d’itinéraires utilisent la connexion `redis`, la file `google_map` et
+des verrous partagés dans le cache `redis`. Ces choix sont configurables via
+`EVENT_DIRECTIONS_QUEUE_CONNECTION`, `EVENT_DIRECTIONS_QUEUE` et
+`EVENT_DIRECTIONS_CACHE_STORE`. Le worker Supervisor écoute déjà `google_map` ;
+sa connexion doit correspondre à celle des itinéraires. Pour un worker manuel :
+
+```sh
+php artisan queue:work redis --queue=google_map --tries=3 --timeout=90
+```
+
+L’API détail renvoie `202` avec `pending` pendant le calcul, puis `200` avec
+`ready` ou `empty`. Les endpoints de statut et de résumés groupés lisent les
+résultats disponibles sans déclencher de calcul Google.
+
 #### Backup de la base de production
 
 Le script `scripts/backup-heroescrm.sh` fait un `mysqldump` compressé dans `/home/heroes/backup` (7 jours de rétention).

@@ -827,6 +827,7 @@ Route::group([
         Route::delete('/ban', [UserBanController::class, "destroy"])->name('ban.delete');
 
         // Events daily direction
+        Route::get('events-daily-direction/{date}/status', [UserEventsDailyDirectionController::class, 'status'])->withoutMiddleware("throttle:api");
         Route::get('events-daily-direction/{date}', [UserEventsDailyDirectionController::class, 'index'])->withoutMiddleware("throttle:api");
 
         // Impersonate
