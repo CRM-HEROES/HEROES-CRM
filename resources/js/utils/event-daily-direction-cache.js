@@ -44,6 +44,7 @@ export function createDailyDirectionCache({
     settleTime = 5 * 1000,
     maxEntries = 100,
     now = Date.now,
+    isReady = (data) => Boolean(data.direction),
 } = {}) {
     const entries = new Map();
     const pending = new Map();
@@ -104,7 +105,7 @@ export function createDailyDirectionCache({
                     promise: undefined,
                     eventIds: ids,
                     data,
-                    expiresAt: now() + (data.direction ? ttl : emptyTtl),
+                    expiresAt: now() + (isReady(data) ? ttl : emptyTtl),
                 });
                 while (entries.size > maxEntries) {
                     entries.delete(entries.keys().next().value);

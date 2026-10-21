@@ -27811,8 +27811,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ADD_EVENT_USER_DAILY_DIRECTION: () => (/* binding */ ADD_EVENT_USER_DAILY_DIRECTION),
 /* harmony export */   FETCH_EVENTS: () => (/* binding */ FETCH_EVENTS),
 /* harmony export */   FETCH_EVENT_USER_DAILY_DIRECTION: () => (/* binding */ FETCH_EVENT_USER_DAILY_DIRECTION),
+/* harmony export */   FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY: () => (/* binding */ FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY),
 /* harmony export */   INIT_EVENT_PARAMS: () => (/* binding */ INIT_EVENT_PARAMS),
 /* harmony export */   INVALIDATE_EVENT_USER_DAILY_DIRECTIONS: () => (/* binding */ INVALIDATE_EVENT_USER_DAILY_DIRECTIONS),
+/* harmony export */   REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY: () => (/* binding */ REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY),
 /* harmony export */   REMOVE_EVENT: () => (/* binding */ REMOVE_EVENT),
 /* harmony export */   REMOVE_EVENT_PARAMS: () => (/* binding */ REMOVE_EVENT_PARAMS),
 /* harmony export */   REMOVE_EVENT_USER: () => (/* binding */ REMOVE_EVENT_USER),
@@ -27862,6 +27864,8 @@ var SET_EVENTS_COUNT = "setEventsCount";
 var SET_EVENTS_SORT_BY = "setEventsSortBy";
 var SET_EVENTS_SORT_ORDER = "setEventsSortOrder";
 var FETCH_EVENT_USER_DAILY_DIRECTION = "fetchEventUserDailyDirection";
+var FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY = "fetchEventUserDailyDirectionSummary";
+var REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY = "refreshEventUserDailyDirectionSummary";
 var ADD_EVENT_USER_DAILY_DIRECTION = "addEventUserDailyDirection";
 var INVALIDATE_EVENT_USER_DAILY_DIRECTIONS = "invalidateEventUserDailyDirections";
 var ADD_EVENT_USER = "addEventUser";
@@ -30981,6 +30985,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   dailyDirection: function dailyDirection(/*project, */user, date) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("user/".concat(user.id, "/events-daily-direction/").concat(date));
+  },
+  dailyDirectionSummaries: function dailyDirectionSummaries(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/events-daily-directions"), params);
   },
   addUser: function addUser(project, event, user) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/user/").concat(user, "/event/").concat(event));
@@ -35549,9 +35556,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ eventDailyDirectionCache)
 /* harmony export */ });
 /* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/prospect/event */ "./resources/js/actions/project/prospect/event.js");
-/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
+/* harmony import */ var _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-summary */ "./resources/js/utils/event-daily-direction-summary.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect/event */ "./resources/js/actions/project/prospect/event.js");
+/* harmony import */ var _actions_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/event */ "./resources/js/actions/event.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -35569,12 +35577,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
-var edits = new Set([_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.ADD_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_1__.UPDATE_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_1__.REMOVE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.ADD_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_EVENT]);
+
+var edits = new Set([_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT_EVENT]);
 var routeFields = ["user_id", "calendar_id", "started_at", "ended_at", "location", "latitude", "longitude"];
 var affectsRoute = function affectsRoute(_ref) {
   var type = _ref.type,
     payload = _ref.payload;
-  return edits.has(type) && (![_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.UPDATE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_PROSPECT_EVENT].includes(type) || routeFields.some(function (field) {
+  return edits.has(type) && (![_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT_EVENT].includes(type) || routeFields.some(function (field) {
     return Object.prototype.hasOwnProperty.call(payload, field);
   }));
 };
@@ -35604,7 +35613,7 @@ function eventDailyDirectionCache(store) {
   var globalEvents = snapshot((_store$state$event = store.state.event) === null || _store$state$event === void 0 ? void 0 : _store$state$event.globalEvents);
   var writes = new WeakMap();
   var invalidate = function invalidate(events) {
-    return store.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, events);
+    return store.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, events);
   };
   store.subscribe(function (mutation, state) {
     var nextScope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__.dailyDirectionCacheScope)(state);
@@ -35612,6 +35621,8 @@ function eventDailyDirectionCache(store) {
       var _state$project, _state$event;
       scope = nextScope;
       _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__["default"].clear();
+      _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__.summaryCache.clear();
+      _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__["default"].clear();
       projectEvents = snapshot((_state$project = state.project) === null || _state$project === void 0 || (_state$project = _state$project.project) === null || _state$project === void 0 ? void 0 : _state$project.events);
       globalEvents = snapshot((_state$event = state.event) === null || _state$event === void 0 ? void 0 : _state$event.globalEvents);
       invalidate([]);
@@ -35622,7 +35633,7 @@ function eventDailyDirectionCache(store) {
       var event = mutation.payload;
       var id = String((_event$id = event === null || event === void 0 ? void 0 : event.id) !== null && _event$id !== void 0 ? _event$id : event);
       invalidate([projectEvents.get(id), globalEvents.get(id), event]);
-      if ([_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.REMOVE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_EVENT].includes(mutation.type)) {
+      if ([_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT, _actions_project_prospect_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT_EVENT].includes(mutation.type)) {
         projectEvents["delete"](id);
         globalEvents["delete"](id);
       } else if ((event === null || event === void 0 ? void 0 : event.id) != null) {
@@ -35633,8 +35644,8 @@ function eventDailyDirectionCache(store) {
         var next = snapshot([_objectSpread(_objectSpread(_objectSpread({}, projectEvents.get(id)), current), event)]).get(id);
         projectEvents.set(id, next);
       }
-    } else if ([_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS, _actions_event__WEBPACK_IMPORTED_MODULE_3__.SET_GLOBAL_EVENTS].includes(mutation.type)) {
-      var previous = mutation.type === _actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENTS ? projectEvents : globalEvents;
+    } else if ([_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS, _actions_event__WEBPACK_IMPORTED_MODULE_4__.SET_GLOBAL_EVENTS].includes(mutation.type)) {
+      var previous = mutation.type === _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS ? projectEvents : globalEvents;
       var _next = snapshot(mutation.payload);
       var changed = [];
       // A missing item may just be outside the new filters or a view reset.
@@ -35663,6 +35674,7 @@ function eventDailyDirectionCache(store) {
     writes["delete"](action);
     if (write.scope === scope) {
       _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__["default"].deferCaching([].concat(_toConsumableArray(write.events), [action.payload]));
+      _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__.summaryCache.deferCaching([].concat(_toConsumableArray(write.events), [action.payload]));
       invalidate([action.payload]);
     }
     write.release();
@@ -35674,10 +35686,16 @@ function eventDailyDirectionCache(store) {
         var id = String((_action$payload$id = (_action$payload = action.payload) === null || _action$payload === void 0 ? void 0 : _action$payload.id) !== null && _action$payload$id !== void 0 ? _action$payload$id : action.payload);
         var events = [projectEvents.get(id), globalEvents.get(id), action.payload];
         _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__["default"].deferCaching(events);
+        _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__.summaryCache.deferCaching(events);
+        var releaseDetail = _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__["default"].beginWrite();
+        var releaseSummary = _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_1__.summaryCache.beginWrite();
         writes.set(action, {
           scope: scope,
           events: events,
-          release: _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_0__["default"].beginWrite()
+          release: function release() {
+            releaseDetail();
+            releaseSummary();
+          }
         });
         invalidate([action.payload]);
       }
@@ -39699,7 +39717,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _apis_project_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/project/event */ "./resources/js/apis/project/event.js");
 /* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-daily-direction-summary */ "./resources/js/utils/event-daily-direction-summary.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
 var _actions, _mutations;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -39724,6 +39743,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /**
  * event Store state
  */
@@ -39739,7 +39759,7 @@ var state = {
 /**
  * event Store Actions
  */
-var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENTS, function (context) {
+var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENTS, function (context) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
     var params, _yield$EventService$g, data;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -39759,7 +39779,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
         case 5:
           _yield$EventService$g = _context.sent;
           data = _yield$EventService$g.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS, data);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS, data);
           return _context.abrupt("return", data);
         case 9:
         case "end":
@@ -39767,7 +39787,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
       }
     }, _callee);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SHOW_EVENT, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SHOW_EVENT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
     var _yield$EventService$s, data;
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
@@ -39778,7 +39798,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
         case 2:
           _yield$EventService$s = _context2.sent;
           data = _yield$EventService$s.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENT, data);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENT, data);
           return _context2.abrupt("return", data);
         case 6:
         case "end":
@@ -39786,7 +39806,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
       }
     }, _callee2);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.ADD_EVENT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
     var _yield$EventService$c, data;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -39797,7 +39817,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
         case 2:
           _yield$EventService$c = _context3.sent;
           data = _yield$EventService$c.data;
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT, data);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.ADD_EVENT, data);
           return _context3.abrupt("return", data);
         case 6:
         case "end":
@@ -39805,7 +39825,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
       }
     }, _callee3);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_EVENT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
@@ -39813,14 +39833,14 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
           _context4.next = 2;
           return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, params);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_EVENT, params);
         case 3:
         case "end":
           return _context4.stop();
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_EVENT, function (context, slug) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
@@ -39828,16 +39848,16 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
           _context5.next = 2;
           return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT, slug);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_EVENT, slug);
         case 3:
         case "end":
           return _context5.stop();
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENT_USER_DAILY_DIRECTION, function (context, _ref) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENT_USER_DAILY_DIRECTION, function (context, _ref) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-    var user, direction_at, _ref$events, events;
+    var user, direction_at, _ref$events, events, scope, routeEvents, result;
     return _regeneratorRuntime().wrap(function _callee7$(_context7) {
       while (1) switch (_context7.prev = _context7.next) {
         case 0:
@@ -39848,7 +39868,10 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
           }
           return _context7.abrupt("return", null);
         case 3:
-          return _context7.abrupt("return", _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].fetch((0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState), user.id, direction_at, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events), /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+          scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
+          routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
+          _context7.next = 7;
+          return _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].fetch(scope, user.id, direction_at, routeEvents, /*#__PURE__*/_asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
             var _yield$EventService$d, data, parse;
             return _regeneratorRuntime().wrap(function _callee6$(_context6) {
               while (1) switch (_context6.prev = _context6.next) {
@@ -39873,50 +39896,93 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
                   return _context6.stop();
               }
             }, _callee6);
-          }))));
-        case 4:
+          })));
+        case 7:
+          result = _context7.sent;
+          if (result && (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState) === scope && _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents) === result) {
+            context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
+              user_id: user.id,
+              started_at: direction_at
+            });
+          }
+          return _context7.abrupt("return", result);
+        case 10:
         case "end":
           return _context7.stop();
       }
     }, _callee7);
+  }))();
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (context, _ref3) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+    var _context$state$projec, _context$rootState$au;
+    var user, direction_at, _ref3$events, events, project, can, scope, routeEvents;
+    return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+      while (1) switch (_context8.prev = _context8.next) {
+        case 0:
+          user = _ref3.user, direction_at = _ref3.direction_at, _ref3$events = _ref3.events, events = _ref3$events === void 0 ? [] : _ref3$events;
+          project = (_context$state$projec = context.state.project) === null || _context$state$projec === void 0 ? void 0 : _context$state$projec.slug;
+          if (!(!(user !== null && user !== void 0 && user.id) || !project)) {
+            _context8.next = 4;
+            break;
+          }
+          return _context8.abrupt("return", null);
+        case 4:
+          can = context.rootGetters.can;
+          if (!(typeof can === "function" && ((_context$rootState$au = context.rootState.auth) === null || _context$rootState$au === void 0 || (_context$rootState$au = _context$rootState$au.user) === null || _context$rootState$au === void 0 ? void 0 : _context$rootState$au.id) != user.id && !can("all.project.user.agenda.".concat(user.id)))) {
+            _context8.next = 7;
+            break;
+          }
+          return _context8.abrupt("return", null);
+        case 7:
+          scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
+          routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
+          return _context8.abrupt("return", _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.fetch(scope, user.id, direction_at, routeEvents, function () {
+            var detail = _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents);
+            return detail ? Promise.resolve((0,_utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.toDailyDirectionSummary)(detail)) : _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
+          }));
+        case 10:
+        case "end":
+          return _context8.stop();
+      }
+    }, _callee8);
   }))();
 }), _actions);
 
 /**
  * event Store Mutations
  */
-var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS, function (state, events) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS, function (state, events) {
   state.project.events = _toConsumableArray(events);
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENT, function (state, event) {
   state.project.event = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS_FIELDS, function (state, fields) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS_FIELDS, function (state, fields) {
   state.project.eventsFields = fields;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT_USER, function (state, user) {}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT_USER, function (state, _ref3) {
-  var event = _ref3.event,
-    user = _ref3.user;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_NEW_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.ADD_EVENT_USER, function (state, user) {}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_EVENT_USER, function (state, _ref4) {
+  var event = _ref4.event,
+    user = _ref4.user;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_NEW_EVENT, function (state, event) {
   state.project.newEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_DRAGGED_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_DRAGGED_EVENT, function (state, event) {
   state.project.draggedEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_AGENDA_DATE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_AGENDA_DATE, function (state, value) {
   state.project.agendaDate = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_AGENDA_FILTER, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_AGENDA_FILTER, function (state, value) {
   state.project.agendaFilter = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_AGENDA_LIST, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_AGENDA_LIST, function (state, value) {
   state.project.agendaList = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SHOW_AGENDA_TABLE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SHOW_AGENDA_TABLE, function (state, value) {
   state.project.agendaTable = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SHOW_AGENDA_WEEK_END, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SHOW_AGENDA_WEEK_END, function (state, value) {
   state.project.agendaWeekEnd = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SHOW_AGENDA_OTHER_PROJECTS, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SHOW_AGENDA_OTHER_PROJECTS, function (state, value) {
   state.project.agendaOtherProjects = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_AGENDA_DISPLAY_MODE, function (state, value) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_AGENDA_DISPLAY_MODE, function (state, value) {
   state.project.agendaDisplayMode = value;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_RESIZED_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_RESIZED_EVENT, function (state, event) {
   state.project.resizedEvent = event;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT, function (state, event) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.ADD_EVENT, function (state, event) {
   state.project.events = [].concat(_toConsumableArray(state.project.events), [event]);
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, function (state, params) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_EVENT, function (state, params) {
   if (!state.project.events) {
     return;
   }
@@ -39925,19 +39991,25 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_e
   }).map(function (o) {
     return o.id == params.id ? _objectSpread(_objectSpread({}, o), params) : o;
   });
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT, function (state, slug) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_EVENT, function (state, slug) {
   state.project.events = state.project.events.filter(function (o) {
     return o.id != slug;
   });
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, function (state, events) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.INVALIDATE_EVENT_USER_DAILY_DIRECTIONS, function (state, events) {
   _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].invalidate(events);
+  _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.invalidate(events);
   if (state.project) {
     state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.ADD_EVENT_PARAMS, function (state, _ref4) {
-  var key = _ref4.key,
-    value = _ref4.value,
-    multiple = _ref4.multiple;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (state, event) {
+  _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.invalidate([event]);
+  if (state.project) {
+    state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
+  }
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.ADD_EVENT_PARAMS, function (state, _ref5) {
+  var key = _ref5.key,
+    value = _ref5.value,
+    multiple = _ref5.multiple;
   if (!state.project) {
     return;
   }
@@ -39956,61 +40028,61 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_e
     if (state.project.eventsParams[key] !== "") {
       values = [].concat(_toConsumableArray(state.project.eventsParams[key]), [value]);
     }
-    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref5) {
-      var _ref6 = _slicedToArray(_ref5, 2),
-        k = _ref6[0],
-        v = _ref6[1];
+    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref6) {
+      var _ref7 = _slicedToArray(_ref6, 2),
+        k = _ref7[0],
+        v = _ref7[1];
       return [k, k == key ? values : v];
     }));
   } else {
     state.project.eventsParams = _objectSpread(_objectSpread({}, state.project.eventsParams), {}, _defineProperty({}, key, value));
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.REMOVE_EVENT_PARAMS, function (state, _ref7) {
-  var key = _ref7.key,
-    value = _ref7.value;
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.REMOVE_EVENT_PARAMS, function (state, _ref8) {
+  var key = _ref8.key,
+    value = _ref8.value;
   state.project.prospectsPage = 1;
   if (!state.project.eventsParams) {
     state.project.eventsParams = {};
   }
   if (value !== undefined) {
     if (state.project.eventsParams[key]) {
-      state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref8) {
-        var _ref9 = _slicedToArray(_ref8, 2),
-          k = _ref9[0],
-          v = _ref9[1];
+      state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).map(function (_ref9) {
+        var _ref10 = _slicedToArray(_ref9, 2),
+          k = _ref10[0],
+          v = _ref10[1];
         return [k, k == key ? state.project.eventsParams[k].filter(function (val) {
           return val != value;
         }) : v];
       }));
       if (state.project.eventsParams[key].length == 0) {
-        state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref10) {
-          var _ref11 = _slicedToArray(_ref10, 1),
-            k = _ref11[0];
+        state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref11) {
+          var _ref12 = _slicedToArray(_ref11, 1),
+            k = _ref12[0];
           return k != key;
         }));
       }
     }
   } else {
-    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref12) {
-      var _ref13 = _slicedToArray(_ref12, 1),
-        k = _ref13[0];
+    state.project.eventsParams = Object.fromEntries(Object.entries(state.project.eventsParams).filter(function (_ref13) {
+      var _ref14 = _slicedToArray(_ref13, 1),
+        k = _ref14[0];
       return k != key;
     }));
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENT_PARAMS, function (state, params) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENT_PARAMS, function (state, params) {
   if (_typeof(params) === "object") {
     state.project.eventsParams = params;
   }
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.INIT_EVENT_PARAMS, function (state) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.INIT_EVENT_PARAMS, function (state) {
   state.project.prospectsPage = 1;
   state.project.eventsParams = {}; /*Object.fromEntries(
                                    Object.entries(state.project.eventsParams).filter(([k]) => k == "count")
                                    );*/
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS_COUNT, function (state, count) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS_COUNT, function (state, count) {
   state.project.eventsCount = count;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS_SORT_BY, function (state, column) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS_SORT_BY, function (state, column) {
   state.project.eventsSortBy = column;
-}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENTS_SORT_ORDER, function (state, order) {
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENTS_SORT_ORDER, function (state, order) {
   state.project.eventsSortOrder = order;
 }), _mutations);
 
@@ -58122,7 +58194,11 @@ function createDailyDirectionCache() {
     _ref$maxEntries = _ref.maxEntries,
     maxEntries = _ref$maxEntries === void 0 ? 100 : _ref$maxEntries,
     _ref$now = _ref.now,
-    now = _ref$now === void 0 ? Date.now : _ref$now;
+    now = _ref$now === void 0 ? Date.now : _ref$now,
+    _ref$isReady = _ref.isReady,
+    isReady = _ref$isReady === void 0 ? function (data) {
+      return Boolean(data.direction);
+    } : _ref$isReady;
   var entries = new Map();
   var pending = new Map();
   var writes = new Set();
@@ -58221,7 +58297,7 @@ function createDailyDirectionCache() {
               promise: undefined,
               eventIds: ids,
               data: data,
-              expiresAt: now() + (data.direction ? ttl : emptyTtl)
+              expiresAt: now() + (isReady(data) ? ttl : emptyTtl)
             }));
             while (entries.size > maxEntries) {
               entries["delete"](entries.keys().next().value);
@@ -58351,6 +58427,240 @@ function createDailyDirectionCache() {
 
 // Keep Google responses and promises out of the persisted Vuex state.
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createDailyDirectionCache());
+
+/***/ }),
+
+/***/ "./resources/js/utils/event-daily-direction-summary.js":
+/*!*************************************************************!*\
+  !*** ./resources/js/utils/event-daily-direction-summary.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   createDailyDirectionSummaryBatcher: () => (/* binding */ createDailyDirectionSummaryBatcher),
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__),
+/* harmony export */   summaryCache: () => (/* binding */ summaryCache),
+/* harmony export */   toDailyDirectionSummary: () => (/* binding */ toDailyDirectionSummary)
+/* harmony export */ });
+/* harmony import */ var _apis_project_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/project/event */ "./resources/js/apis/project/event.js");
+/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+var summaryCache = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.createDailyDirectionCache)({
+  maxEntries: 1000,
+  emptyTtl: 5000,
+  isReady: function isReady(data) {
+    return data.status === "ready";
+  }
+});
+function toDailyDirectionSummary(data) {
+  var _direction$routes;
+  var direction = data.direction;
+  var legs = direction === null || direction === void 0 || (_direction$routes = direction.routes) === null || _direction$routes === void 0 || (_direction$routes = _direction$routes[0]) === null || _direction$routes === void 0 ? void 0 : _direction$routes.legs;
+  var metric = function metric(value) {
+    return {
+      text: typeof (value === null || value === void 0 ? void 0 : value.text) === "string" ? value.text : "",
+      value: (value === null || value === void 0 ? void 0 : value.value) != null && Number.isFinite(Number(value.value)) ? Number(value.value) : 0
+    };
+  };
+  return {
+    user_id: data.user_id,
+    direction_at: data.direction_at,
+    status: data.searching ? "pending" : (direction === null || direction === void 0 ? void 0 : direction.status) === "OK" ? "ready" : "empty",
+    events: data.events || [],
+    legs: (direction === null || direction === void 0 ? void 0 : direction.status) === "OK" && Array.isArray(legs) ? legs.map(function (leg) {
+      return {
+        distance: metric(leg === null || leg === void 0 ? void 0 : leg.distance),
+        duration: metric(leg === null || leg === void 0 ? void 0 : leg.duration)
+      };
+    }) : []
+  };
+}
+function createDailyDirectionSummaryBatcher(loadBatch) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+    _ref$delay = _ref.delay,
+    delay = _ref$delay === void 0 ? 20 : _ref$delay,
+    _ref$maxPairs = _ref.maxPairs,
+    maxPairs = _ref$maxPairs === void 0 ? 500 : _ref$maxPairs;
+  var groups = new Map();
+  var generation = 0;
+  var keyFor = function keyFor(userId, date) {
+    return JSON.stringify([String(userId), date]);
+  };
+  function flush(_x) {
+    return _flush.apply(this, arguments);
+  }
+  function _flush() {
+    _flush = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(group) {
+      var items, _iterator2, _step2, _item2, _response$data, response, summaries, byPair, _iterator3, _step3, item, _iterator4, _step4, _item;
+      return _regeneratorRuntime().wrap(function _callee$(_context) {
+        while (1) switch (_context.prev = _context.next) {
+          case 0:
+            group.timer = null;
+            group.running = true;
+            _context.prev = 2;
+          case 3:
+            if (!(group.queue.size && group.generation === generation)) {
+              _context.next = 29;
+              break;
+            }
+            items = _toConsumableArray(group.queue.values()).slice(0, maxPairs);
+            _iterator2 = _createForOfIteratorHelper(items);
+            try {
+              for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                _item2 = _step2.value;
+                group.queue["delete"](_item2.key);
+              }
+            } catch (err) {
+              _iterator2.e(err);
+            } finally {
+              _iterator2.f();
+            }
+            group.active = items;
+            _context.prev = 8;
+            _context.next = 11;
+            return loadBatch(group.project, items.map(function (item) {
+              return item.pair;
+            }));
+          case 11:
+            response = _context.sent;
+            summaries = response === null || response === void 0 || (_response$data = response.data) === null || _response$data === void 0 ? void 0 : _response$data.data;
+            if (Array.isArray(summaries)) {
+              _context.next = 15;
+              break;
+            }
+            throw new Error("Invalid daily direction summaries response");
+          case 15:
+            byPair = new Map(summaries.map(function (summary) {
+              return [keyFor(summary.user_id, summary.direction_at), summary];
+            }));
+            _iterator3 = _createForOfIteratorHelper(items);
+            try {
+              for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+                item = _step3.value;
+                item.resolve(group.generation === generation ? byPair.get(item.key) || null : null);
+              }
+            } catch (err) {
+              _iterator3.e(err);
+            } finally {
+              _iterator3.f();
+            }
+            _context.next = 24;
+            break;
+          case 20:
+            _context.prev = 20;
+            _context.t0 = _context["catch"](8);
+            _iterator4 = _createForOfIteratorHelper(items);
+            try {
+              for (_iterator4.s(); !(_step4 = _iterator4.n()).done;) {
+                _item = _step4.value;
+                _item.reject(_context.t0);
+              }
+            } catch (err) {
+              _iterator4.e(err);
+            } finally {
+              _iterator4.f();
+            }
+          case 24:
+            _context.prev = 24;
+            group.active = [];
+            return _context.finish(24);
+          case 27:
+            _context.next = 3;
+            break;
+          case 29:
+            _context.prev = 29;
+            group.running = false;
+            if (groups.get(group.key) === group) groups["delete"](group.key);
+            return _context.finish(29);
+          case 33:
+          case "end":
+            return _context.stop();
+        }
+      }, _callee, null, [[2,, 29, 33], [8, 20, 24, 27]]);
+    }));
+    return _flush.apply(this, arguments);
+  }
+  function request(scope, project, userId, date) {
+    var groupKey = JSON.stringify([scope, project]);
+    var group = groups.get(groupKey);
+    if (!group) {
+      group = {
+        key: groupKey,
+        project: project,
+        generation: generation,
+        queue: new Map(),
+        active: [],
+        running: false,
+        timer: null
+      };
+      groups.set(groupKey, group);
+    }
+    var key = keyFor(userId, date);
+    if (group.queue.has(key)) return group.queue.get(key).promise;
+    var item = {
+      key: key,
+      pair: {
+        user_id: Number(userId),
+        direction_at: date
+      }
+    };
+    item.promise = new Promise(function (resolve, reject) {
+      item.resolve = resolve;
+      item.reject = reject;
+    });
+    group.queue.set(key, item);
+    if (!group.running && group.timer === null) {
+      group.timer = setTimeout(function () {
+        return flush(group);
+      }, delay);
+    }
+    return item.promise;
+  }
+  function clear() {
+    ++generation;
+    var _iterator = _createForOfIteratorHelper(groups.values()),
+      _step;
+    try {
+      for (_iterator.s(); !(_step = _iterator.n()).done;) {
+        var group = _step.value;
+        clearTimeout(group.timer);
+        for (var _i = 0, _arr = [].concat(_toConsumableArray(group.queue.values()), _toConsumableArray(group.active)); _i < _arr.length; _i++) {
+          var item = _arr[_i];
+          item.resolve(null);
+        }
+        group.queue.clear();
+      }
+    } catch (err) {
+      _iterator.e(err);
+    } finally {
+      _iterator.f();
+    }
+    groups.clear();
+  }
+  return {
+    request: request,
+    clear: clear
+  };
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (createDailyDirectionSummaryBatcher(function (project, pairs) {
+  return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].dailyDirectionSummaries(project, {
+    pairs: pairs
+  });
+}));
 
 /***/ }),
 

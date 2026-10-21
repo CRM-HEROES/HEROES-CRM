@@ -408,43 +408,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     showDirection: function showDirection() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var i, _this$dayPhysicalEven, data, requestId, signature, users;
+        var requestId, signature, date, users;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              if (!_this.direction) {
-                _context2.next = 4;
+              if (!_this.fetchingDirection) {
+                _context2.next = 2;
                 break;
               }
-              for (i in _this.dayPhysicalEventsUsers) {
-                data = _this.dailyDirections[(_this$dayPhysicalEven = _this.dayPhysicalEventsUsers[i]) === null || _this$dayPhysicalEven === void 0 ? void 0 : _this$dayPhysicalEven.id];
-                if (data) _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_USER_DAILY_DIRECTION, data);
-              }
-              _context2.next = 16;
-              break;
-            case 4:
+              return _context2.abrupt("return");
+            case 2:
               requestId = ++_this.directionsRequestId;
               signature = _this.dailyDirectionSignature;
-              _this.dailyDirections = {};
-              users = _this.dayPhysicalEventsUsers.filter(Boolean);
+              date = _this.dateString;
+              users = _this.dayPhysicalEventsUsers;
               _this.fetchingDirection = users.length > 0;
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "user-daily-direction");
-              _context2.prev = 10;
-              _context2.next = 13;
+              _context2.prev = 8;
+              _context2.next = 11;
               return Promise.allSettled(users.map(/*#__PURE__*/function () {
                 var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(user) {
-                  var data;
+                  var selected, data;
                   return _regeneratorRuntime().wrap(function _callee$(_context) {
                     while (1) switch (_context.prev = _context.next) {
                       case 0:
-                        _context.next = 2;
+                        selected = _this.directionFor(user.id, date);
+                        if (!selected) {
+                          _context.next = 4;
+                          break;
+                        }
+                        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_USER_DAILY_DIRECTION, selected);
+                        return _context.abrupt("return");
+                      case 4:
+                        _context.next = 6;
                         return _this.userEventsDailyDirection(user, requestId, signature);
-                      case 2:
+                      case 6:
                         data = _context.sent;
-                        if (data && requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature) {
+                        if (data !== null && data !== void 0 && data.direction && requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature && !_this.directionFor(user.id, date)) {
                           _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_USER_DAILY_DIRECTION, data);
                         }
-                      case 4:
+                      case 8:
                       case "end":
                         return _context.stop();
                     }
@@ -454,15 +457,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   return _ref.apply(this, arguments);
                 };
               }()));
-            case 13:
-              _context2.prev = 13;
+            case 11:
+              _context2.prev = 11;
               if (requestId === _this.directionsRequestId) _this.fetchingDirection = false;
-              return _context2.finish(13);
-            case 16:
+              return _context2.finish(11);
+            case 14:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[10,, 13, 16]]);
+        }, _callee2, null, [[8,, 11, 14]]);
       }))();
     },
     userEventsDailyDirection: function userEventsDailyDirection(user, requestId, signature) {
@@ -517,13 +520,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   beforeUnmount: function beforeUnmount() {
     ++this.directionsRequestId;
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "events", "globalEvents", "draggedEvent", "eventUserDailyDirectionsVersion", "directionFor", "agendaOtherProjects"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "events", "globalEvents", "draggedEvent", "directionFor", "agendaOtherProjects"])), {}, {
     dateString: function dateString() {
       return dateToString(this.date).substring(0, 10);
     },
     dailyDirectionSignature: function dailyDirectionSignature() {
-      var _this$project;
-      return JSON.stringify([(_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.slug, this.dateString, this.eventUserDailyDirectionsVersion, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
+      return JSON.stringify([(0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(this.$store.state), this.dateString, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
     },
     dayEvents: function dayEvents() {
       var _this3 = this;
@@ -583,7 +585,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return event.user_id == e.user_id;
         }) == index;
       }).map(function (event) {
-        return event.user;
+        return event.user || {
+          id: event.user_id
+        };
       });
     },
     dayPhysicalEvents: function dayPhysicalEvents() {
@@ -1726,14 +1730,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
-/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _Cell_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Cell.vue */ "./resources/js/components/event/agenda/week/Cell.vue");
-/* harmony import */ var _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./HeaderCell.vue */ "./resources/js/components/event/agenda/week/HeaderCell.vue");
-/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/week/Event.vue");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
+/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _Cell_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Cell.vue */ "./resources/js/components/event/agenda/week/Cell.vue");
+/* harmony import */ var _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./HeaderCell.vue */ "./resources/js/components/event/agenda/week/HeaderCell.vue");
+/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/week/Event.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -1756,12 +1759,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
-
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Cell: _Cell_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-    HeaderCell: _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
+    Cell: _Cell_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+    HeaderCell: _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   props: {
     date: {},
@@ -1788,7 +1790,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENT_USER_DAILY_DIRECTION, {
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
                 user: user,
                 direction_at: _this.dateString,
                 events: _this.dayPhysicalEvents.filter(function (event) {
@@ -1797,7 +1799,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               });
             case 2:
               data = _context.sent;
-              if (requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature && data !== null && data !== void 0 && data.direction) {
+              if (requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature && data) {
                 _this.dailyDirections[user.id] = data;
               }
             case 4:
@@ -1847,13 +1849,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   beforeUnmount: function beforeUnmount() {
     ++this.directionsRequestId;
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "events", "globalEvents", "eventUserDailyDirectionsVersion", "newEvent", "draggedEvent", "resizedEvent", "agendaList", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "permissions", "events", "globalEvents", "eventUserDailyDirectionsVersion", "newEvent", "draggedEvent", "resizedEvent", "agendaList", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour"])), {}, {
     dateString: function dateString() {
       return dateToString(this.date).substring(0, 10);
     },
     dailyDirectionSignature: function dailyDirectionSignature() {
       var _this$project;
-      return JSON.stringify([(_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.slug, this.dateString, this.eventUserDailyDirectionsVersion, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_2__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
+      return JSON.stringify([(_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.slug, this.dateString, this.eventUserDailyDirectionsVersion, this.permissions, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
     },
     isWE: function isWE() {
       var day = this.date.getDay();
@@ -1865,7 +1867,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return event.user_id == e.user_id;
         }) == index;
       }).map(function (event) {
-        return event.user;
+        return event.user || {
+          id: event.user_id
+        };
       });
     },
     dayEvents: function dayEvents() {
@@ -2319,7 +2323,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }
     },
     eventDailyDirection: function eventDailyDirection() {
-      var _this4 = this;
+      var _this4 = this,
+        _userDirections$legs;
       if (!this.dailyDirections) {
         return null;
       }
@@ -2336,11 +2341,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       })) <= 0) {
         return null;
       }
-      var direction = userDirections.direction ? /*JSON.parse*/userDirections.direction : null;
-      if (!direction || direction.status !== "OK") {
+      if (userDirections.status !== "ready") {
         return null;
       }
-      return direction.routes[0].legs[index - 1];
+      return ((_userDirections$legs = userDirections.legs) === null || _userDirections$legs === void 0 ? void 0 : _userDirections$legs[index - 1]) || null;
     },
     direction: function direction() {
       var direction = this.eventDailyDirection;
@@ -2405,18 +2409,29 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/user/daily-direction */ "./resources/js/actions/project/user/daily-direction.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/user/daily-direction */ "./resources/js/actions/project/user/daily-direction.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 
 
 
@@ -2428,7 +2443,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     date: {
-      type: String
+      type: [Date, String]
     },
     events: {
       type: Array
@@ -2437,36 +2452,130 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       type: Object
     },
     fetchingDirection: {
-      type: Object
+      type: Boolean
     }
+  },
+  data: function data() {
+    return {
+      fetchingDirectionDetails: false,
+      directionDetailsRequestId: 0
+    };
   },
   methods: {
     addEvent: function addEvent() {
       var date = dateToString(this.date).substring(0, 10);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_1__.SET_EVENT, {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENT, {
         started_at: date + " 08:00:00",
         ended_at: date + " 09:00:00"
       });
 
       // Open event edit slide
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-events");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-events");
     },
     showDirection: function showDirection() {
-      for (var i in this.dailyDirections) {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_3__.TOGGLE_USER_DAILY_DIRECTION, this.dailyDirections[i]);
-      }
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "user-daily-direction");
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var requestId, signature, date, users;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!_this.fetchingDirectionDetails) {
+                _context2.next = 2;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 2:
+              requestId = ++_this.directionDetailsRequestId;
+              signature = _this.directionDetailsSignature;
+              date = _this.dateString;
+              users = _toConsumableArray(new Set(_this.dayPhysicalEvents.map(function (event) {
+                return event.user_id;
+              })));
+              _this.fetchingDirectionDetails = users.length > 0;
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "user-daily-direction");
+              _context2.prev = 8;
+              _context2.next = 11;
+              return Promise.allSettled(users.map(/*#__PURE__*/function () {
+                var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(userId) {
+                  var selected, data;
+                  return _regeneratorRuntime().wrap(function _callee$(_context) {
+                    while (1) switch (_context.prev = _context.next) {
+                      case 0:
+                        selected = _this.directionFor(userId, date);
+                        if (!selected) {
+                          _context.next = 4;
+                          break;
+                        }
+                        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_USER_DAILY_DIRECTION, selected);
+                        return _context.abrupt("return");
+                      case 4:
+                        _context.next = 6;
+                        return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENT_USER_DAILY_DIRECTION, {
+                          user: {
+                            id: userId
+                          },
+                          direction_at: date,
+                          events: _this.dayPhysicalEvents.filter(function (event) {
+                            return event.user_id == userId;
+                          })
+                        });
+                      case 6:
+                        data = _context.sent;
+                        if (requestId === _this.directionDetailsRequestId && signature === _this.directionDetailsSignature && data !== null && data !== void 0 && data.direction && !_this.directionFor(userId, date)) {
+                          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_USER_DAILY_DIRECTION, data);
+                        }
+                      case 8:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }, _callee);
+                }));
+                return function (_x) {
+                  return _ref.apply(this, arguments);
+                };
+              }()));
+            case 11:
+              _context2.prev = 11;
+              if (requestId === _this.directionDetailsRequestId) _this.fetchingDirectionDetails = false;
+              return _context2.finish(11);
+            case 14:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[8,, 11, 14]]);
+      }))();
     },
     bulkSms: function bulkSms() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, this.prospects.map(function (p) {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, this.prospects.map(function (p) {
         return p.id;
       }));
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-sms");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-sms");
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "directionFor"])), {}, {
+  watch: {
+    directionDetailsSignature: function directionDetailsSignature() {
+      ++this.directionDetailsRequestId;
+      this.fetchingDirectionDetails = false;
+    }
+  },
+  beforeUnmount: function beforeUnmount() {
+    ++this.directionDetailsRequestId;
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "directionFor"])), {}, {
+    dateString: function dateString() {
+      return dateToString(this.date).substring(0, 10);
+    },
+    dayPhysicalEvents: function dayPhysicalEvents() {
+      return this.events.filter(function (event) {
+        var _event$calendar;
+        return ((_event$calendar = event.calendar) === null || _event$calendar === void 0 ? void 0 : _event$calendar.type) === "physical" && event.location;
+      });
+    },
+    directionDetailsSignature: function directionDetailsSignature() {
+      return JSON.stringify([(0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(this.$store.state), this.dateString, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
+    },
     dateLabel: function dateLabel() {
       return dayjs(this.date).format("ddd, DD MMM YYYY");
     },
@@ -6545,7 +6654,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "hc-agenda-event-header-cell-events-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.events.length)
-  }, null, 8 /* PROPS */, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.fetchingDirection || Object.keys($props.dailyDirections).length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+  }, null, 8 /* PROPS */, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.dayPhysicalEvents.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
     key: 1,
     "class": "fa fa-route",
     tag: "a",
@@ -6557,7 +6666,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
-        loading: $props.fetchingDirection
+        loading: $props.fetchingDirection || $data.fetchingDirectionDetails
       }, null, 8 /* PROPS */, ["loading"])];
     }),
     _: 1 /* STABLE */

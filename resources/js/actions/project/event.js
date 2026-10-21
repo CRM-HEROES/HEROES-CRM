@@ -30,6 +30,8 @@ export const SET_EVENTS_SORT_BY = "setEventsSortBy";
 export const SET_EVENTS_SORT_ORDER = "setEventsSortOrder";
 
 export const FETCH_EVENT_USER_DAILY_DIRECTION = "fetchEventUserDailyDirection";
+export const FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY = "fetchEventUserDailyDirectionSummary";
+export const REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY = "refreshEventUserDailyDirectionSummary";
 export const ADD_EVENT_USER_DAILY_DIRECTION = "addEventUserDailyDirection";
 export const INVALIDATE_EVENT_USER_DAILY_DIRECTIONS = "invalidateEventUserDailyDirections";
 

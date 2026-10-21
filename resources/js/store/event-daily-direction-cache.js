@@ -1,4 +1,5 @@
 import cache, { dailyDirectionCacheScope, dailyDirectionEventsSignature } from "@/utils/event-daily-direction-cache";
+import summaryBatcher, { summaryCache } from "@/utils/event-daily-direction-summary";
 import {
     ADD_EVENT, UPDATE_EVENT, REMOVE_EVENT, SET_EVENTS,
     INVALIDATE_EVENT_USER_DAILY_DIRECTIONS,
@@ -38,6 +39,8 @@ export default function eventDailyDirectionCache(store) {
             (mutation.type === "auth/SET_AUTHENTICATED" && !mutation.payload)) {
             scope = nextScope;
             cache.clear();
+            summaryCache.clear();
+            summaryBatcher.clear();
             projectEvents = snapshot(state.project?.project?.events);
             globalEvents = snapshot(state.event?.globalEvents);
             invalidate([]);
@@ -78,6 +81,7 @@ export default function eventDailyDirectionCache(store) {
         writes.delete(action);
         if (write.scope === scope) {
             cache.deferCaching([...write.events, action.payload]);
+            summaryCache.deferCaching([...write.events, action.payload]);
             invalidate([action.payload]);
         }
         write.release();
@@ -89,7 +93,10 @@ export default function eventDailyDirectionCache(store) {
                 const id = String(action.payload?.id ?? action.payload);
                 const events = [projectEvents.get(id), globalEvents.get(id), action.payload];
                 cache.deferCaching(events);
-                writes.set(action, { scope, events, release: cache.beginWrite() });
+                summaryCache.deferCaching(events);
+                const releaseDetail = cache.beginWrite();
+                const releaseSummary = summaryCache.beginWrite();
+                writes.set(action, { scope, events, release() { releaseDetail(); releaseSummary(); } });
                 invalidate([action.payload]);
             }
         },

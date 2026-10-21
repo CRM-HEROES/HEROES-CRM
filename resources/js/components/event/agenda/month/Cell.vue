@@ -183,7 +183,10 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
-import { dailyDirectionEventsSignature } from "@/utils/event-daily-direction-cache";
+import {
+    dailyDirectionCacheScope,
+    dailyDirectionEventsSignature,
+} from "@/utils/event-daily-direction-cache";
 
 import { OPEN_SLIDE } from "@/actions/slide";
 import {
@@ -284,29 +287,30 @@ export default {
         },
 
         async showDirection() {
-            if (this.direction) {
-                for (let i in this.dayPhysicalEventsUsers) {
-                    const data = this.dailyDirections[this.dayPhysicalEventsUsers[i]?.id];
-                    if (data) store.commit(TOGGLE_USER_DAILY_DIRECTION, data);
-                }
-            } else {
-                const requestId = ++this.directionsRequestId;
-                const signature = this.dailyDirectionSignature;
-                this.dailyDirections = {};
-                const users = this.dayPhysicalEventsUsers.filter(Boolean);
-                this.fetchingDirection = users.length > 0;
+            if (this.fetchingDirection) return;
+            const requestId = ++this.directionsRequestId;
+            const signature = this.dailyDirectionSignature;
+            const date = this.dateString;
+            const users = this.dayPhysicalEventsUsers;
+            this.fetchingDirection = users.length > 0;
 
-                store.commit(OPEN_SLIDE, "user-daily-direction");
-                try {
-                    await Promise.allSettled(users.map(async (user) => {
-                        const data = await this.userEventsDailyDirection(user, requestId, signature);
-                        if (data && requestId === this.directionsRequestId && signature === this.dailyDirectionSignature) {
-                            store.commit(TOGGLE_USER_DAILY_DIRECTION, data);
-                        }
-                    }));
-                } finally {
-                    if (requestId === this.directionsRequestId) this.fetchingDirection = false;
-                }
+            store.commit(OPEN_SLIDE, "user-daily-direction");
+            try {
+                await Promise.allSettled(users.map(async (user) => {
+                    const selected = this.directionFor(user.id, date);
+                    if (selected) {
+                        store.commit(TOGGLE_USER_DAILY_DIRECTION, selected);
+                        return;
+                    }
+
+                    const data = await this.userEventsDailyDirection(user, requestId, signature);
+                    if (data?.direction && requestId === this.directionsRequestId &&
+                        signature === this.dailyDirectionSignature && !this.directionFor(user.id, date)) {
+                        store.commit(TOGGLE_USER_DAILY_DIRECTION, data);
+                    }
+                }));
+            } finally {
+                if (requestId === this.directionsRequestId) this.fetchingDirection = false;
             }
         },
 
@@ -351,7 +355,6 @@ export default {
             "events",
             "globalEvents",
             "draggedEvent",
-            "eventUserDailyDirectionsVersion",
             "directionFor",
             "agendaOtherProjects",
         ]),
@@ -361,7 +364,7 @@ export default {
         },
 
         dailyDirectionSignature() {
-            return JSON.stringify([this.project?.slug, this.dateString, this.eventUserDailyDirectionsVersion,
+            return JSON.stringify([dailyDirectionCacheScope(this.$store.state), this.dateString,
                 dailyDirectionEventsSignature(this.dayPhysicalEvents)]);
         },
 
@@ -444,7 +447,7 @@ export default {
                         array.findIndex((e) => event.user_id == e.user_id) ==
                         index
                 )
-                .map((event) => event.user);
+                .map((event) => event.user || { id: event.user_id });
         },
 
         dayPhysicalEvents() {

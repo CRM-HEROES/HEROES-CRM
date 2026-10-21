@@ -43,6 +43,7 @@ use App\Http\Controllers\API\Project\Document\PageController as ProjectDocumentP
 use App\Http\Controllers\API\Project\DocumentTemplateController as ProjectDocumentTemplateController;
 
 use App\Http\Controllers\API\Project\EventController as ProjectEventController;
+use App\Http\Controllers\API\Project\EventsDailyDirectionsController as ProjectEventsDailyDirectionsController;
 use App\Http\Controllers\API\Project\EventDescriptionTemplateController as ProjectEventDescriptionTemplateController;
 use App\Http\Controllers\API\Project\ExportController as ProjectExportController;
 use App\Http\Controllers\API\Project\FolderController as ProjectFolderController;
@@ -735,6 +736,7 @@ Route::group([
         Route::match(['PUT', 'PATCH'], 'user/assignable-user/bulk', [ProjectUserUserController::class, 'bulk']);
 
         // User events daily direction
+        Route::post('events-daily-directions', [ProjectEventsDailyDirectionsController::class, 'index']);
         Route::get('user/{user}/events-daily-direction/{date}', [ProjectUserEventsDailyDirectionController::class, 'index'])->withoutMiddleware("throttle:api");
 
         Route::match(['PUT', 'PATCH'], 'user/bulk', [ProjectUserController::class, 'bulk']);

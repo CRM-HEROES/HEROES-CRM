@@ -19,6 +19,9 @@ export default {
     dailyDirection(/*project, */ user, date) {
         return ApiService.get(`user/${user.id}/events-daily-direction/${date}`);
     },
+    dailyDirectionSummaries(project, params) {
+        return ApiService.post(`project/${project}/events-daily-directions`, params);
+    },
     addUser(project, event, user) {
         return ApiService.put(`project/${project}/user/${user}/event/${event}`);
     },

@@ -191,12 +191,11 @@
 </style>
 
 <script>
-import ApiService from "@/apis/api.service";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import { dailyDirectionEventsSignature } from "@/utils/event-daily-direction-cache";
 
-import { FETCH_EVENT_USER_DAILY_DIRECTION } from "@/actions/project/event";
+import { FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY } from "@/actions/project/event";
 
 import Cell from "./Cell.vue";
 import HeaderCell from "./HeaderCell.vue";
@@ -229,13 +228,13 @@ export default {
 
     methods: {
         async userEventsDailyDirection(user, requestId, signature) {
-            const data = await store.dispatch(FETCH_EVENT_USER_DAILY_DIRECTION, {
+            const data = await store.dispatch(FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
                 user,
                 direction_at: this.dateString,
                 events: this.dayPhysicalEvents.filter((event) => event.user_id == user.id),
             });
 
-            if (requestId === this.directionsRequestId && signature === this.dailyDirectionSignature && data?.direction) {
+            if (requestId === this.directionsRequestId && signature === this.dailyDirectionSignature && data) {
                 this.dailyDirections[user.id] = data;
             }
         },
@@ -271,6 +270,7 @@ export default {
     computed: {
         ...mapGetters([
             "project",
+            "permissions",
             "events",
             "globalEvents",
             "eventUserDailyDirectionsVersion",
@@ -289,7 +289,7 @@ export default {
 
         dailyDirectionSignature() {
             return JSON.stringify([this.project?.slug, this.dateString, this.eventUserDailyDirectionsVersion,
-                dailyDirectionEventsSignature(this.dayPhysicalEvents)]);
+                this.permissions, dailyDirectionEventsSignature(this.dayPhysicalEvents)]);
         },
 
         isWE() {
@@ -304,7 +304,7 @@ export default {
                         array.findIndex((e) => event.user_id == e.user_id) ==
                         index
                 )
-                .map((event) => event.user);
+                .map((event) => event.user || { id: event.user_id });
         },
 
         dayEvents() {

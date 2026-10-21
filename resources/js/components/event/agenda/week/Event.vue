@@ -1114,14 +1114,11 @@ export default {
                 return null;
             }
 
-            const direction = userDirections.direction
-                ? /*JSON.parse*/ userDirections.direction
-                : null;
-            if (!direction || direction.status !== "OK") {
+            if (userDirections.status !== "ready") {
                 return null;
             }
 
-            return direction.routes[0].legs[index - 1];
+            return userDirections.legs?.[index - 1] || null;
         },
 
         direction() {

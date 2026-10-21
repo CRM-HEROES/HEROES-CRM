@@ -1,5 +1,6 @@
 import EventService from "@/apis/project/event";
 import dailyDirectionCache, { dailyDirectionCacheScope, dailyDirectionContextEvents } from "@/utils/event-daily-direction-cache";
+import summaryBatcher, { summaryCache, toDailyDirectionSummary } from "@/utils/event-daily-direction-summary";
 
 import {
     FETCH_EVENTS,
@@ -28,6 +29,8 @@ import {
     SET_EVENTS_SORT_BY,
     SET_EVENTS_SORT_ORDER,
     FETCH_EVENT_USER_DAILY_DIRECTION,
+    FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY,
+    REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY,
     INVALIDATE_EVENT_USER_DAILY_DIRECTIONS,
     ADD_EVENT_USER,
     REMOVE_EVENT_USER,
@@ -149,11 +152,13 @@ const actions = {
     async [FETCH_EVENT_USER_DAILY_DIRECTION](context, { user, direction_at, events = [] }) {
         if (!user?.id) return null;
 
-        return dailyDirectionCache.fetch(
-            dailyDirectionCacheScope(context.rootState),
+        const scope = dailyDirectionCacheScope(context.rootState);
+        const routeEvents = dailyDirectionContextEvents(context.rootState, user.id, direction_at, events);
+        const result = await dailyDirectionCache.fetch(
+            scope,
             user.id,
             direction_at,
-            dailyDirectionContextEvents(context.rootState, user.id, direction_at, events),
+            routeEvents,
             async () => {
                 const { data } = await EventService.dailyDirection(user, direction_at);
                 const parse = (value, fallback) => typeof value === "string" ? JSON.parse(value) : value ?? fallback;
@@ -166,6 +171,31 @@ const actions = {
                 };
             }
         );
+
+        if (result && dailyDirectionCacheScope(context.rootState) === scope &&
+            dailyDirectionCache.get(scope, user.id, direction_at, routeEvents) === result) {
+            context.commit(REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
+                user_id: user.id, started_at: direction_at,
+            });
+        }
+        return result;
+    },
+
+    async [FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY](context, { user, direction_at, events = [] }) {
+        const project = context.state.project?.slug;
+        if (!user?.id || !project) return null;
+        const can = context.rootGetters.can;
+        if (typeof can === "function" && context.rootState.auth?.user?.id != user.id &&
+            !can(`all.project.user.agenda.${user.id}`)) {
+            return null;
+        }
+        const scope = dailyDirectionCacheScope(context.rootState);
+        const routeEvents = dailyDirectionContextEvents(context.rootState, user.id, direction_at, events);
+        return summaryCache.fetch(scope, user.id, direction_at, routeEvents, () => {
+            const detail = dailyDirectionCache.get(scope, user.id, direction_at, routeEvents);
+            return detail ? Promise.resolve(toDailyDirectionSummary(detail)) :
+                summaryBatcher.request(scope, project, user.id, direction_at);
+        });
     },
 };
 
@@ -359,6 +389,14 @@ const mutations = {
      */
     [INVALIDATE_EVENT_USER_DAILY_DIRECTIONS](state, events) {
         dailyDirectionCache.invalidate(events);
+        summaryCache.invalidate(events);
+        if (state.project) {
+            state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
+        }
+    },
+
+    [REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY](state, event) {
+        summaryCache.invalidate([event]);
         if (state.project) {
             state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
         }
