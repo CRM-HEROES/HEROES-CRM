@@ -284,8 +284,15 @@
         white-space: normal;
     }
 
-    #hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
+    /* #hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
         left: 448px;
+    } */
+     
+    .fa-angle-left {
+        display: none !important;
+    }
+    .fa-angle-right {
+        display: none !important;
     }
 }
 </style>
