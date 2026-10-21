@@ -27,6 +27,7 @@ function slide(handler = async () => ({})) {
         '@/apis/api.service': {},
         '@/apis/project/prospect': {},
         '@/utils/event-bus': {},
+        './cloudtalk-sequence': {},
         '@/utils/kavkom-phone': { state: { status: 'registered' } },
     };
     const module = { exports: {} };

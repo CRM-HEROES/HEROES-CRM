@@ -3028,21 +3028,26 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
-/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
-/* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
-/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
-/* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
+/* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
+/* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
+/* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
+/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
+/* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -3052,6 +3057,7 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -3092,7 +3098,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Deselect selected prospect
      */
     bulkDeselect: function bulkDeselect() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, []);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
     },
     /**
      * Create new prospect line
@@ -3159,10 +3165,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             case 0:
               // Create empty prospect
               prospect = _this.newProspect();
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT, prospect);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT, prospect);
               _context.prev = 2;
               _context.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT, prospect);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT, prospect);
             case 5:
               createdProspect = _context.sent;
               // Get updated values from empty created prospect
@@ -3171,14 +3177,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               })); // Dispatch updated values
               if (Object.keys(updatedProspect).length > 0) {
                 updatedProspect.id = createdProspect.id;
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_PROSPECT, updatedProspect);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, updatedProspect);
               }
             case 8:
               _context.prev = 8;
               // Remove empty created prospect from the table
               // it will be replaced by the prospect
               // created from the database
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT, prospect.id);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.REMOVE_PROSPECT, prospect.id);
               return _context.finish(8);
             case 11:
             case "end":
@@ -3192,14 +3198,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * in the table
      */
     addColumn: function addColumn() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user__WEBPACK_IMPORTED_MODULE_6__.SET_USER, this.user);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospects-table-columns-setting");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user__WEBPACK_IMPORTED_MODULE_7__.SET_USER, this.user);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospects-table-columns-setting");
     },
     /**
      * Scan CIN
      */
     ocr: function ocr() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "prospects-table-ocr");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "prospects-table-ocr");
     },
     /**
      * Previous page
@@ -3210,13 +3216,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_PAGE, parseInt(_this2.prospectsPage) - 1);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, parseInt(_this2.prospectsPage) - 1);
 
               // Refresh prospects list
               _this2.fetchingPreviousPage = true;
               _context2.prev = 2;
               _context2.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
             case 5:
               _context2.prev = 5;
               _this2.fetchingPreviousPage = false;
@@ -3237,13 +3243,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_PAGE, parseInt(_this3.prospectsPage) + 1);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, parseInt(_this3.prospectsPage) + 1);
 
               // Refresh prospects list
               _this3.fetchingNextPage = true;
               _context3.prev = 2;
               _context3.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
             case 5:
               _context3.prev = 5;
               _this3.fetchingNextPage = false;
@@ -3267,14 +3273,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Toggle prospects menus
      */
     toggleProspectsMenus: function toggleProspectsMenus() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.TOGGLE_PROSPECTS_MENUS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_PROSPECTS_MENUS);
     },
     /**
      * Init filters
      */
     initParams: function initParams() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.INIT_PROSPECT_PARAMS);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.INIT_PROSPECT_PARAMS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
     },
     /**
      * Toggle prospects options
@@ -3282,50 +3288,50 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * from the prospects table
      */
     toggleProspectsOptions: function toggleProspectsOptions() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.TOGGLE_PROSPECTS_OPTIONS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_PROSPECTS_OPTIONS);
     },
     /**
      * Import prospects (XLSX, CSV)
      */
     importProspects: function importProspects() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "import");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "import-add");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "import");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "import-add");
     },
     /**
      * Bulk groups for selected prospects
      * See: @/components/prospect/bulk/group/Slide.vue
      */
     bulkGroup: function bulkGroup() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-bulk-manage-groups");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-manage-groups");
     },
     /**
      * Bulk labels for selected prospects
      * See: @/components/prospect/bulk/label/Slide.vue
      */
     bulkLabel: function bulkLabel() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-bulk-manage-labels");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-manage-labels");
     },
     /**
      * Bulk project for selected prospects
      * See: @/components/prospect/bulk/project/Slide.vue
      */
     bulkProject: function bulkProject() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-bulk-manage-project");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-manage-project");
     },
     /**
      * Bulk sms for selected prospects
      * See: @/components/prospect/sms/Slide.vue
      */
     bulkSms: function bulkSms() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-sms");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-sms");
     },
     /**
      * Bulk users for selected prospects
      * See: @/components/prospect/bulk/user/Slide.vue
      */
     bulkUser: function bulkUser() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-bulk-manage-users");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-manage-users");
     },
     /**
      * Remove multiple prospects
@@ -3345,13 +3351,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
                       // Selected prospects
                       prospectsSelected = _this4.prospectsSelected;
-                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, []);
+                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
                       _context4.prev = 3;
                       _context4.next = 6;
-                      return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.BULK_REMOVE_PROSPECT, prospectsSelected);
+                      return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_REMOVE_PROSPECT, prospectsSelected);
                     case 6:
                       // Refresh prospects list
-                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
                     case 7:
                       _context4.prev = 7;
                       _this4.bulkingRemove = false;
@@ -3383,13 +3389,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this5.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
               _context6.prev = 3;
               _context6.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.BULK_RESTORE_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_RESTORE_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
             case 7:
               _context6.prev = 7;
               _this5.bulkingRestore = false;
@@ -3409,8 +3415,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, null);
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-messages");
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-messages");
             case 2:
             case "end":
               return _context7.stop();
@@ -3426,8 +3432,8 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, null);
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-bulk-update");
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-update");
             case 2:
             case "end":
               return _context8.stop();
@@ -3449,13 +3455,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this6.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
               _context9.prev = 3;
               _context9.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.BULK_PROCESSED_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_PROCESSED_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
             case 7:
               _context9.prev = 7;
               _this6.bulkingProcessed = false;
@@ -3481,13 +3487,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this7.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
               _context10.prev = 3;
               _context10.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.BULK_NOT_PROCESSED_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_NOT_PROCESSED_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
             case 7:
               _context10.prev = 7;
               _this7.bulkingNotProcessed = false;
@@ -3503,19 +3509,26 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Call prospects one after the other
      */
     bulkAircallInteraction: function bulkAircallInteraction() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_TAB, 1);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+    },
+    bulkCloudtalkInteraction: function bulkCloudtalkInteraction() {
+      if (!this.cloudtalkLine || !this.prospectsSelected.length || !this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
+      _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__["default"].emit('cloudtalk:start-sequence', {
+        projectSlug: this.project.slug,
+        prospectIds: _toConsumableArray(this.prospectsSelected)
+      });
     },
     /**
      * Call prospects one after the other
      */
     bulkRingoverInteraction: function bulkRingoverInteraction() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_INTERACTION_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_TAB, 1);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT_INTERACTION_FRAME_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 1);
     },
     /**
      * Show Map
@@ -3577,7 +3590,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 params = JSON.stringify(params);
 
                 // Download prospects list
-                location.href = "".concat(_apis_common__WEBPACK_IMPORTED_MODULE_7__.API_URL, "/project/").concat(_this9.project.slug, "/export/create") + (params ? "?filters=" + params : "");
+                location.href = "".concat(_apis_common__WEBPACK_IMPORTED_MODULE_8__.API_URL, "/project/").concat(_this9.project.slug, "/export/create") + (params ? "?filters=" + params : "");
               }; // We also add selected prospects
               // as filter for the list of prospects
               // do download
@@ -3589,7 +3602,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                     "Vous êtes en train d'exporter tous les prospects filtrés, sans avoir sélectionné aucun prospect.<br>Les fichiers d'export vous seront envoyés par email.<br>Etes-vous sûr d'effectuer cette action ?",
                     action
                 );*/
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "prospect-export");
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "prospect-export");
               }
             case 3:
             case "end":
@@ -3599,9 +3612,15 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_8__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_8__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
   // "prospectsMaxLinesPerRow",
-  "projectUserSettingsProspectsMaxRowLines", "prospectsParams", "prospectsParamsUrl", "prospectsSortOrder", "prospectsSortBy", "prospectsMenus", "prospectsOptions", "can"])), {}, {
+  "projectUserSettingsProspectsMaxRowLines", "prospectsParams", "prospectsParamsUrl", "prospectsSortOrder", "prospectsSortBy", "prospectsMenus", "prospectsOptions", "can", "lines"])), {}, {
+    cloudtalkLine: function cloudtalkLine() {
+      var _this10 = this;
+      return this.lines.find(function (line) {
+        return line.operator === 'cloudtalk' && _this10.user && line.user_id == _this10.user.id;
+      });
+    },
     /**
      * Check if there are
      * selected prospects
@@ -3615,9 +3634,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * is processed
      */
     selectedProspectsProcessed: function selectedProspectsProcessed() {
-      var _this10 = this;
+      var _this11 = this;
       return this.prospects.filter(function (p) {
-        return _this10.prospectsSelected.indexOf(p.id) >= 0 && p.processed_at;
+        return _this11.prospectsSelected.indexOf(p.id) >= 0 && p.processed_at;
       }).length == this.prospectsSelected.length;
     },
     /**
@@ -3626,9 +3645,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * is not processed
      */
     selectedProspectsNotProcessed: function selectedProspectsNotProcessed() {
-      var _this11 = this;
+      var _this12 = this;
       return this.prospects.filter(function (p) {
-        return _this11.prospectsSelected.indexOf(p.id) >= 0 && !p.processed_at;
+        return _this12.prospectsSelected.indexOf(p.id) >= 0 && !p.processed_at;
       }).length == this.prospectsSelected.length;
     },
     /**
@@ -3647,11 +3666,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee13$(_context13) {
             while (1) switch (_context13.prev = _context13.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_COUNT, value);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_COUNT, value);
                 this.settingProspectsCount = true;
                 _context13.prev = 2;
                 _context13.next = 5;
-                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
               case 5:
                 _context13.prev = 5;
                 this.settingProspectsCount = false;
@@ -3677,11 +3696,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee14$(_context14) {
             while (1) switch (_context14.prev = _context14.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECTS_PAGE, value);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, value);
                 this.settingProspectsPage = true;
                 _context14.prev = 2;
                 _context14.next = 5;
-                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECTS);
+                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
               case 5:
                 _context14.prev = 5;
                 this.settingProspectsPage = false;
@@ -3707,7 +3726,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee15$(_context15) {
             while (1) switch (_context15.prev = _context15.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROJECT_USER_SETTING, {
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__.UPDATE_PROJECT_USER_SETTING, {
                   key: "prospects.max-row-lines",
                   value: value
                 });
@@ -11323,6 +11342,16 @@ var _hoisted_15 = /*#__PURE__*/_withScopeId(function () {
   })], -1 /* HOISTED */);
 });
 var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+    src: "/images/partenaire-ext/cloudtalk.png",
+    alt: "CloudTalk",
+    style: {
+      "max-width": "25px",
+      "max-height": "25px"
+    }
+  }, null, -1 /* HOISTED */);
+});
+var _hoisted_17 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
     viewBox: "0 0 40 40"
   }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
@@ -11596,8 +11625,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
+      }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed && _ctx.can('all.prospect.interaction.view') && _ctx.can('all.prospect.interaction.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
         key: 9,
+        label: _ctx.$t('prospect.interaction.call_by_cloudtalk'),
+        disabled: !$options.cloudtalkLine,
+        onClick: $options.bulkCloudtalkInteraction
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [_hoisted_16];
+            }),
+            _: 1 /* STABLE */
+          })];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["label", "disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
+        key: 10,
         icon: "fa fa-phone",
         label: _ctx.$t('prospect.table.footer.bulk_ringover_interactions'),
         onClick: $options.bulkRingoverInteraction
@@ -11605,7 +11649,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [_hoisted_16];
+              return [_hoisted_17];
             }),
             _: 1 /* STABLE */
           })];

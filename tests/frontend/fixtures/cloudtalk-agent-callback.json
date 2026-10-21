@@ -1,0 +1,8 @@
+[
+    {"event":"ringing","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"0b103596-10da-4301-bf5d-cb749387312b"}},
+    {"event":"calling","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"0b103596-10da-4301-bf5d-cb749387312b"}},
+    {"event":"hangup","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"0b103596-10da-4301-bf5d-cb749387312b"}},
+    {"event":"ringing","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"21ebd0ab-f828-403c-afb5-3b891fb12da9"}},
+    {"event":"calling","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"21ebd0ab-f828-403c-afb5-3b891fb12da9"}},
+    {"event":"hangup","properties":{"internal_number":null,"external_number":"365811021001","call_uuid":"21ebd0ab-f828-403c-afb5-3b891fb12da9"}}
+]
