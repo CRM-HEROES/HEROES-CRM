@@ -50,6 +50,7 @@ const Pipeline = () => import("@/components/pipeline/list/Pipeline.vue");
 const Stat = () => import("@/components/stat/Stat.vue");
 // Stat
 const Stat2 = () => import("@/components/stat2/Stat.vue");
+const StatBuilder = () => import("@/components/stat-builder/StatBuilder.vue");
 // Order
 const Order = () => import("@/components/order/Table/Layout.vue");
 
@@ -252,6 +253,16 @@ const routes = [
             {
                 name: "stat",
                 path: "stat",
+                component: StatBuilder,
+                meta: {
+                    middleware: "auth",
+                    page: "stat.index",
+                    title: `Statistique`,
+                },
+            },
+            {
+                name: "stat-classic",
+                path: "stat-classic",
                 component: Stat2,
                 meta: {
                     middleware: "auth",
