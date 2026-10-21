@@ -309,13 +309,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
-/* harmony import */ var _actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/user/daily-direction */ "./resources/js/actions/project/user/daily-direction.js");
-/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/month/Event.vue");
+/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/user/daily-direction */ "./resources/js/actions/project/user/daily-direction.js");
+/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/month/Event.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -339,9 +340,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
+    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
   },
   props: {
     date: {},
@@ -359,6 +361,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       showEventsFrom: 0,
       maxShownEvents: 4,
       dailyDirections: {},
+      directionsRequestId: 0,
       directions: [],
       fetchingDirection: false
     };
@@ -371,13 +374,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       var endDate = new Date(this.date);
       endDate.setHours(9);
       endDate.setMinutes(0);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_EVENT, {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_EVENT, {
         user: this.$store.state.auth.user,
         started_at: dateToString(startDate),
         ended_at: dateToString(endDate)
       });
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-events");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-events");
     },
     dragEnter: function dragEnter() {
       if (this.draggedEvent) {
@@ -390,12 +393,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     dragEnd: function dragEnd() {
       if (this.draggedEvent) {
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.UPDATE_EVENT, {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.UPDATE_EVENT, {
           id: this.draggedEvent.id,
           started_at: this.draggedEvent.started_at,
           ended_at: this.draggedEvent.ended_at
         });
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.SET_DRAGGED_EVENT, null);
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.SET_DRAGGED_EVENT, null);
       }
     },
     getEventDelayInMinutes: function getEventDelayInMinutes(start, end) {
@@ -403,93 +406,141 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return Math.floor(ms / 1000 / 60);
     },
     showDirection: function showDirection() {
-      if (this.direction) {
-        for (var i in this.dayPhysicalEventsUsers) {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_USER_DAILY_DIRECTION, this.dailyDirections[this.dayPhysicalEventsUsers[i].id]);
-        }
-      } else {
-        this.dailyDirections = {};
-        for (var _i in this.dayPhysicalEventsUsers) {
-          var userId = this.dayPhysicalEventsUsers[_i];
-          this.userEventsDailyDirection(userId).then(function (value) {
-            _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_USER_DAILY_DIRECTION, value);
-          });
-        }
-        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "user-daily-direction");
-      }
-    },
-    userEventsDailyDirection: function userEventsDailyDirection(user) {
       var _this = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var direction_at, data;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var i, _this$dayPhysicalEven, data, requestId, signature, users;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this.fetchingDirection = true;
-              _context.prev = 1;
-              direction_at = _this.dateString;
-              data = _this.getEventUserDailyDirection(user, direction_at, _this.dayPhysicalEvents.filter(function (event) {
-                return event.user_id == user.id;
-              }).map(function (event) {
-                return event.id;
-              }));
-              if (data) {
-                _context.next = 8;
+              if (!_this.direction) {
+                _context2.next = 4;
                 break;
               }
-              _context.next = 7;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENT_USER_DAILY_DIRECTION, {
-                user: user,
-                direction_at: direction_at
-              });
-            case 7:
-              data = _context.sent;
-            case 8:
-              if (data && data.direction) {
-                _this.dailyDirections[user.id] = data;
+              for (i in _this.dayPhysicalEventsUsers) {
+                data = _this.dailyDirections[(_this$dayPhysicalEven = _this.dayPhysicalEventsUsers[i]) === null || _this$dayPhysicalEven === void 0 ? void 0 : _this$dayPhysicalEven.id];
+                if (data) _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_USER_DAILY_DIRECTION, data);
               }
-              return _context.abrupt("return", data);
-            case 10:
-              _context.prev = 10;
-              _this.fetchingDirection = false;
-              return _context.finish(10);
+              _context2.next = 16;
+              break;
+            case 4:
+              requestId = ++_this.directionsRequestId;
+              signature = _this.dailyDirectionSignature;
+              _this.dailyDirections = {};
+              users = _this.dayPhysicalEventsUsers.filter(Boolean);
+              _this.fetchingDirection = users.length > 0;
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "user-daily-direction");
+              _context2.prev = 10;
+              _context2.next = 13;
+              return Promise.allSettled(users.map(/*#__PURE__*/function () {
+                var _ref = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee(user) {
+                  var data;
+                  return _regeneratorRuntime().wrap(function _callee$(_context) {
+                    while (1) switch (_context.prev = _context.next) {
+                      case 0:
+                        _context.next = 2;
+                        return _this.userEventsDailyDirection(user, requestId, signature);
+                      case 2:
+                        data = _context.sent;
+                        if (data && requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature) {
+                          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user_daily_direction__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_USER_DAILY_DIRECTION, data);
+                        }
+                      case 4:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }, _callee);
+                }));
+                return function (_x) {
+                  return _ref.apply(this, arguments);
+                };
+              }()));
             case 13:
-              return _context.abrupt("return", null);
-            case 14:
+              _context2.prev = 13;
+              if (requestId === _this.directionsRequestId) _this.fetchingDirection = false;
+              return _context2.finish(13);
+            case 16:
             case "end":
-              return _context.stop();
+              return _context2.stop();
           }
-        }, _callee, null, [[1,, 10, 13]]);
+        }, _callee2, null, [[10,, 13, 16]]);
+      }))();
+    },
+    userEventsDailyDirection: function userEventsDailyDirection(user, requestId, signature) {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var data;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _context3.next = 2;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENT_USER_DAILY_DIRECTION, {
+                user: user,
+                direction_at: _this2.dateString,
+                events: _this2.dayPhysicalEvents.filter(function (event) {
+                  return event.user_id == user.id;
+                })
+              });
+            case 2:
+              data = _context3.sent;
+              if (!(requestId !== _this2.directionsRequestId || signature !== _this2.dailyDirectionSignature)) {
+                _context3.next = 5;
+                break;
+              }
+              return _context3.abrupt("return", null);
+            case 5:
+              if (data !== null && data !== void 0 && data.direction) {
+                _this2.dailyDirections[user.id] = data;
+              }
+              return _context3.abrupt("return", data);
+            case 7:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3);
       }))();
     },
     bulkSms: function bulkSms() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT, null);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_3__.UPDATE_SELECTED_PROSPECTS, this.prospects.map(function (p) {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, this.prospects.map(function (p) {
         return p.id;
       }));
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_1__.OPEN_SLIDE, "prospect-manage-sms");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-sms");
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "events", "globalEvents", "draggedEvent", "getEventUserDailyDirection", "directionFor", "agendaOtherProjects"])), {}, {
+  watch: {
+    dailyDirectionSignature: function dailyDirectionSignature() {
+      ++this.directionsRequestId;
+      this.dailyDirections = {};
+      this.fetchingDirection = false;
+    }
+  },
+  beforeUnmount: function beforeUnmount() {
+    ++this.directionsRequestId;
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "events", "globalEvents", "draggedEvent", "eventUserDailyDirectionsVersion", "directionFor", "agendaOtherProjects"])), {}, {
     dateString: function dateString() {
       return dateToString(this.date).substring(0, 10);
     },
+    dailyDirectionSignature: function dailyDirectionSignature() {
+      var _this$project;
+      return JSON.stringify([(_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.slug, this.dateString, this.eventUserDailyDirectionsVersion, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
+    },
     dayEvents: function dayEvents() {
-      var _this2 = this;
+      var _this3 = this;
       return this.events.filter(function (event) {
-        return event.started_at.substring(0, 10) == _this2.dateString;
+        return event.started_at.substring(0, 10) == _this3.dateString;
       }).sort(function (event1, event2) {
         return event1.started_at < event2.started_at ? -1 : 1;
       });
     },
     dayGlobalEvents: function dayGlobalEvents() {
-      var _this3 = this;
+      var _this4 = this;
       return this.globalEvents.filter(function (event) {
-        return event.started_at.substring(0, 10) <= _this3.dateString && _this3.dateString <= event.ended_at.substring(0, 10);
+        return event.started_at.substring(0, 10) <= _this4.dateString && _this4.dateString <= event.ended_at.substring(0, 10);
       });
     },
     allDayEvents: function allDayEvents() {
-      var _this4 = this;
+      var _this5 = this;
       var events = [].concat(_toConsumableArray(this.dayEvents), _toConsumableArray(this.agendaOtherProjects ? this.dayGlobalEvents : []));
 
       // If an event is being dragged
@@ -497,7 +548,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         if (
         // If the event being dragged is not from the current cell
         !events.find(function (event) {
-          return event.id == _this4.draggedEvent.id;
+          return event.id == _this5.draggedEvent.id;
         }) &&
         // and it is being dragged into the current cell
         this.draggedEvent.started_at.substring(0, 10) == this.dateString) {
@@ -506,13 +557,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         } else if (
         // If the event being dragged is from the current cell
         events.find(function (event) {
-          return event.id == _this4.draggedEvent.id;
+          return event.id == _this5.draggedEvent.id;
         }) &&
         // and it is being dragged outside the current cell
         this.draggedEvent.started_at.substring(0, 10) != this.dateString) {
           // Remove the event being dragged from the current cell
           events = events.filter(function (event) {
-            return event.id != _this4.draggedEvent.id;
+            return event.id != _this5.draggedEvent.id;
           });
         }
       }
@@ -536,7 +587,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
     },
     dayPhysicalEvents: function dayPhysicalEvents() {
-      return this.events.filter(function (event) {
+      return this.dayEvents.filter(function (event) {
         return event.calendar.type == "physical" && event.location;
       });
     },
@@ -1676,12 +1727,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
-/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
-/* harmony import */ var _Cell_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Cell.vue */ "./resources/js/components/event/agenda/week/Cell.vue");
-/* harmony import */ var _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./HeaderCell.vue */ "./resources/js/components/event/agenda/week/HeaderCell.vue");
-/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/week/Event.vue");
+/* harmony import */ var _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/event-daily-direction-cache */ "./resources/js/utils/event-daily-direction-cache.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _Cell_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Cell.vue */ "./resources/js/components/event/agenda/week/Cell.vue");
+/* harmony import */ var _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./HeaderCell.vue */ "./resources/js/components/event/agenda/week/HeaderCell.vue");
+/* harmony import */ var _Event_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Event.vue */ "./resources/js/components/event/agenda/week/Event.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -1704,11 +1756,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    Cell: _Cell_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
-    HeaderCell: _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
+    Cell: _Cell_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
+    HeaderCell: _HeaderCell_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    Event: _Event_vue__WEBPACK_IMPORTED_MODULE_6__["default"]
   },
   props: {
     date: {},
@@ -1722,83 +1775,85 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       directions: [],
       dailyDirections: {},
       fetchingDirection: false,
+      directionsRequestId: 0,
       contextMenu: false
     };
   },
   methods: {
-    userEventsDailyDirection: function userEventsDailyDirection(user) {
+    userEventsDailyDirection: function userEventsDailyDirection(user, requestId, signature) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var direction_at, data;
+        var data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              _this.fetchingDirection = true;
-              _context.prev = 1;
-              direction_at = _this.dateString;
-              data = _this.getEventUserDailyDirection(user, direction_at, _this.dayPhysicalEvents.filter(function (event) {
-                return event.user_id == user.id;
-              }).map(function (event) {
-                return event.id;
-              }));
-              if (data) {
-                _context.next = 8;
-                break;
-              }
-              _context.next = 7;
-              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_2__.FETCH_EVENT_USER_DAILY_DIRECTION, {
+              _context.next = 2;
+              return _store__WEBPACK_IMPORTED_MODULE_1__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_3__.FETCH_EVENT_USER_DAILY_DIRECTION, {
                 user: user,
-                direction_at: direction_at
+                direction_at: _this.dateString,
+                events: _this.dayPhysicalEvents.filter(function (event) {
+                  return event.user_id == user.id;
+                })
               });
-            case 7:
+            case 2:
               data = _context.sent;
-            case 8:
-              if (data && data.direction) {
+              if (requestId === _this.directionsRequestId && signature === _this.dailyDirectionSignature && data !== null && data !== void 0 && data.direction) {
                 _this.dailyDirections[user.id] = data;
               }
-            case 9:
-              _context.prev = 9;
-              _this.fetchingDirection = false;
-              return _context.finish(9);
-            case 12:
+            case 4:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[1,, 9, 12]]);
+        }, _callee);
       }))();
     },
     fetchDailyDirection: function fetchDailyDirection() {
-      this.dailyDirections = {};
-      for (var i in this.dayPhysicalEventsUsers) {
-        this.userEventsDailyDirection(this.dayPhysicalEventsUsers[i]);
-      }
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var requestId, signature, users;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              requestId = ++_this2.directionsRequestId;
+              signature = _this2.dailyDirectionSignature;
+              _this2.dailyDirections = {};
+              users = _this2.dayPhysicalEventsUsers.filter(Boolean);
+              _this2.fetchingDirection = users.length > 0;
+              _context2.prev = 5;
+              _context2.next = 8;
+              return Promise.allSettled(users.map(function (user) {
+                return _this2.userEventsDailyDirection(user, requestId, signature);
+              }));
+            case 8:
+              _context2.prev = 8;
+              if (requestId === _this2.directionsRequestId) _this2.fetchingDirection = false;
+              return _context2.finish(8);
+            case 11:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[5,, 8, 11]]);
+      }))();
     }
   },
   watch: {
-    dayPhysicalEvents: function dayPhysicalEvents(newValue, oldValue) {
-      if (newValue.length == 0) {
-        this.dailyDirections = {};
-        return;
+    dailyDirectionSignature: {
+      immediate: true,
+      handler: function handler() {
+        this.fetchDailyDirection();
       }
-      var newDates = newValue.sort(function (a, b) {
-        return a.started_at > b.started_at ? 1 : -1;
-      }).map(function (event) {
-        return event.location;
-      }).join(";");
-      var oldDates = oldValue.sort(function (a, b) {
-        return a.started_at > b.started_at ? 1 : -1;
-      }).map(function (event) {
-        return event.location;
-      }).join(";");
-      if (newDates == oldDates) {
-        return;
-      }
-      this.fetchDailyDirection();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "events", "globalEvents", "getEventUserDailyDirection", "newEvent", "draggedEvent", "resizedEvent", "agendaList", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour"])), {}, {
+  beforeUnmount: function beforeUnmount() {
+    ++this.directionsRequestId;
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "events", "globalEvents", "eventUserDailyDirectionsVersion", "newEvent", "draggedEvent", "resizedEvent", "agendaList", "agendaOtherProjects", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour"])), {}, {
     dateString: function dateString() {
       return dateToString(this.date).substring(0, 10);
+    },
+    dailyDirectionSignature: function dailyDirectionSignature() {
+      var _this$project;
+      return JSON.stringify([(_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.slug, this.dateString, this.eventUserDailyDirectionsVersion, (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_2__.dailyDirectionEventsSignature)(this.dayPhysicalEvents)]);
     },
     isWE: function isWE() {
       var day = this.date.getDay();
@@ -1814,19 +1869,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
     },
     dayEvents: function dayEvents() {
-      var _this2 = this;
-      return this.events.filter(function (event) {
-        return event.started_at.substring(0, 10) <= _this2.dateString && _this2.dateString <= event.ended_at.substring(0, 10);
-      });
-    },
-    dayGlobalEvents: function dayGlobalEvents() {
       var _this3 = this;
-      return this.globalEvents.filter(function (event) {
+      return this.events.filter(function (event) {
         return event.started_at.substring(0, 10) <= _this3.dateString && _this3.dateString <= event.ended_at.substring(0, 10);
       });
     },
-    allDayEvents: function allDayEvents() {
+    dayGlobalEvents: function dayGlobalEvents() {
       var _this4 = this;
+      return this.globalEvents.filter(function (event) {
+        return event.started_at.substring(0, 10) <= _this4.dateString && _this4.dateString <= event.ended_at.substring(0, 10);
+      });
+    },
+    allDayEvents: function allDayEvents() {
+      var _this5 = this;
       var events = [].concat(_toConsumableArray(this.dayEvents), _toConsumableArray(this.agendaOtherProjects ? this.dayGlobalEvents : []));
 
       // If an event is being dragged
@@ -1834,11 +1889,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         if (
         // If the event being dragged is from the current cell
         events.find(function (event) {
-          return event.id == _this4.draggedEvent.id;
+          return event.id == _this5.draggedEvent.id;
         })) {
           // Remove the event being dragged from the current cell
           events = events.filter(function (event) {
-            return event.id != _this4.draggedEvent.id;
+            return event.id != _this5.draggedEvent.id;
           });
         }
         if (
@@ -1854,11 +1909,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         if (
         // If the event being resized is from the current cell
         events.find(function (event) {
-          return event.id == _this4.resizedEvent.id;
+          return event.id == _this5.resizedEvent.id;
         })) {
           // Remove the event being resized from the current cell
           events = events.filter(function (event) {
-            return event.id != _this4.resizedEvent.id;
+            return event.id != _this5.resizedEvent.id;
           });
         }
         if (

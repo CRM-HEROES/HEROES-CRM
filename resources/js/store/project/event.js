@@ -1,4 +1,5 @@
 import EventService from "@/apis/project/event";
+import dailyDirectionCache, { dailyDirectionCacheScope, dailyDirectionContextEvents } from "@/utils/event-daily-direction-cache";
 
 import {
     FETCH_EVENTS,
@@ -27,7 +28,7 @@ import {
     SET_EVENTS_SORT_BY,
     SET_EVENTS_SORT_ORDER,
     FETCH_EVENT_USER_DAILY_DIRECTION,
-    ADD_EVENT_USER_DAILY_DIRECTION,
+    INVALIDATE_EVENT_USER_DAILY_DIRECTIONS,
     ADD_EVENT_USER,
     REMOVE_EVENT_USER,
 } from "@/actions/project/event";
@@ -145,27 +146,26 @@ const actions = {
      * @param {Number} params event id
      * @returns event
      */
-    async [FETCH_EVENT_USER_DAILY_DIRECTION](context, { user, direction_at }) {
-        let { data } = await EventService.dailyDirection(
-            // context.state.project.slug,
-            user,
-            direction_at
-        );
+    async [FETCH_EVENT_USER_DAILY_DIRECTION](context, { user, direction_at, events = [] }) {
+        if (!user?.id) return null;
 
-        data = {
-            user_id: user.id,
-            direction_at: direction_at,
-            events: data.events ? JSON.parse(data.events) : [],
-            direction: data.direction ? JSON.parse(data.direction) : null,
-        };
-
-        /*context.commit(ADD_EVENT_USER_DAILY_DIRECTION, {
-            user,
+        return dailyDirectionCache.fetch(
+            dailyDirectionCacheScope(context.rootState),
+            user.id,
             direction_at,
-            data,
-        });*/
-
-        return data;
+            dailyDirectionContextEvents(context.rootState, user.id, direction_at, events),
+            async () => {
+                const { data } = await EventService.dailyDirection(user, direction_at);
+                const parse = (value, fallback) => typeof value === "string" ? JSON.parse(value) : value ?? fallback;
+                return {
+                    user_id: user.id,
+                    direction_at,
+                    events: parse(data?.events, []),
+                    direction: parse(data?.direction, null),
+                    searching: data?.searching === true || data?.searching == 1,
+                };
+            }
+        );
     },
 };
 
@@ -357,53 +357,10 @@ const mutations = {
      * @param {*} context
      * @param {Number} params event id
      */
-    [ADD_EVENT_USER_DAILY_DIRECTION](state, { user, direction_at, data }) {
-        if (data.searching) {
-            return;
-        }
-
-        if (!Array.isArray(state.project.eventUserDailyDirections)) {
-            state.project.eventUserDailyDirections = [];
-        }
-
-        const search = (direction) => {
-            if (
-                direction.user_id != user.id ||
-                direction.direction_at != direction_at ||
-                direction.events.length != data.events.length
-            ) {
-                return false;
-            }
-
-            for (let i in direction.events) {
-                if (direction.events[i] != data.events[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-        if (state.project.eventUserDailyDirections.find(search)) {
-            state.project.eventUserDailyDirections.map((direction) =>
-                search(direction)
-                    ? {
-                          ...direction,
-                          events: data.events,
-                          direction: data.direction,
-                      }
-                    : direction
-            );
-        } else {
-            state.project.eventUserDailyDirections = [
-                ...state.project.eventUserDailyDirections,
-                {
-                    direction_at,
-                    user_id: user.id,
-                    events: data.events,
-                    direction: data.direction,
-                },
-            ];
+    [INVALIDATE_EVENT_USER_DAILY_DIRECTIONS](state, events) {
+        dailyDirectionCache.invalidate(events);
+        if (state.project) {
+            state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
         }
     },
 
@@ -559,34 +516,11 @@ const getters = {
      * @param {*} state
      * @returns
      */
-    getEventUserDailyDirection: (state) => (user, direction_at, events) => {
-        return undefined;
+    getEventUserDailyDirection: (state, getters, rootState) => (user, direction_at, events = []) =>
+        user?.id ? dailyDirectionCache.get(dailyDirectionCacheScope(rootState), user.id, direction_at,
+            dailyDirectionContextEvents(rootState, user.id, direction_at, events)) : undefined,
 
-        if (!Array.isArray(state.project.eventUserDailyDirections)) {
-            return undefined;
-        }
-
-        const search = (direction) => {
-            if (
-                direction.user_id != user.id ||
-                direction.direction_at != direction_at ||
-                !Array.isArray(direction.events) ||
-                direction.events.length != events.length
-            ) {
-                return false;
-            }
-
-            for (let i in direction.events) {
-                if (direction.events[i] != events[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-        return state.project.eventUserDailyDirections.find(search);
-    },
+    eventUserDailyDirectionsVersion: (state) => state.project?.eventUserDailyDirectionsVersion || 0,
 
     /**
      * Get new event
