@@ -284,8 +284,15 @@
         white-space: normal;
     }
 
-    #hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
+    /* #hc-user-agenda-week.agenda-filter #hc-user-agenda-week-pagination-prev {
         left: 448px;
+    } */
+     
+    .fa-angle-left {
+        display: none !important;
+    }
+    .fa-angle-right {
+        display: none !important;
     }
 }
 </style>
@@ -303,6 +310,7 @@ import {
     SET_DRAGGED_EVENT,
     SET_RESIZED_EVENT,
     SET_EVENT_PARAMS,
+    SET_AGENDA_DATE,
 } from "@/actions/project/event";
 
 import {
@@ -331,375 +339,302 @@ export default {
     data() {
         return {
             currentDate: null,
+            windowStartedAt: null,
+            windowEndedAt: null,
             eventsToAddCount: 3,
+            shiftingWindow: false,
         };
     },
 
     created() {
-        this.currentDate = new Date();
         store.commit(SET_EVENTS, []);
         store.commit(SET_NEW_EVENT, null);
         store.commit(SET_DRAGGED_EVENT, null);
         store.commit(SET_RESIZED_EVENT, null);
-
         this.updateParamsFromUrl();
     },
 
-    mounted() {
-        let body = this.$refs.body;
-        let columns = this.$refs.columns;
-        let sl = 0;
+    async mounted() {
+        this.scrollHandler = () => this.scheduleVisibleLoad();
+        this.resizeHandler = () => this.scheduleVisibleLoad();
+        this.$refs.body.addEventListener("scroll", this.scrollHandler, { passive: true });
+        window.addEventListener("resize", this.resizeHandler);
+        await this.$nextTick();
+        this.scrollToDate(this.currentDate);
+        const now = new Date();
+        this.scrollToTime(now.getHours(), now.getMinutes());
+        this.fetchEvents();
+    },
 
-        body.addEventListener("scroll", async (event) => {
-            if (window.innerWidth > 767 || !this.agendaList) {
-                if (
-                    body.scrollLeft >=
-                    columns.getBoundingClientRect().width -
-                        body.getBoundingClientRect().width -
-                        20
-                ) {
-                    this.addFutureEvents(false);
-                    body.scrollLeft -= this.width * this.eventsToAddCount;
-                } else if ((sl = body.scrollLeft) <= 20) {
-                    this.addPastEvents();
-                    body.scrollLeft = this.width * this.eventsToAddCount + sl;
-                }
-            } else {
-                if (
-                    body.scrollTop >=
-                    columns.getBoundingClientRect().height -
-                        body.getBoundingClientRect().height -
-                        20
-                ) {
-                    this.addMobileFutureEvents();
-                    // body.scrollTop -= this.width * this.eventsToAddCount;
-                } else if (body.scrollTop <= 0) {
-                    this.addMobilePastEvents();
-                    await this.$nextTick();
-                    body.scrollTop = 34 * 8;
-                }
-            }
-        });
-
-        const date = new Date();
-
-        this.scrollToDate(date);
-        this.scrollToTime(date.getHours(), date.getMinutes());
+    beforeUnmount() {
+        this.agendaDisposed = true;
+        this.$refs.body?.removeEventListener("scroll", this.scrollHandler);
+        window.removeEventListener("resize", this.resizeHandler);
+        if (this.scrollFrame != null) cancelAnimationFrame(this.scrollFrame);
     },
 
     methods: {
         updateParamsFromUrl() {
-            const url = new URL(window.location.href);
-            const searchParams = new URLSearchParams(url.search);
             const filters = {};
-
-            searchParams.forEach(function (value, param) {
-                if (param == "filters") {
-                    try {
-                        value = JSON.parse(value);
-
-                        for (let key in value) {
-                            filters[key] = value[key];
-                        }
-                    } catch (e) {}
+            const searchParams = new URL(window.location.href).searchParams;
+            try {
+                const value = JSON.parse(searchParams.get("filters") || "{}");
+                if (value && typeof value === "object" && !Array.isArray(value)) {
+                    Object.assign(filters, value);
                 }
-            });
+            } catch (e) {}
 
             store.commit(SET_EVENT_PARAMS, filters);
             store.commit(SET_GLOBAL_EVENT_PARAMS, {
                 ...filters,
                 withoutProjects: [this.project.id],
             });
-
-            if (
-                !this.eventsParamExists("startedAt") ||
-                !this.eventsParamExists("endedAt")
-            ) {
-                this.setWeekDate(new Date());
-            }
-
+            this.setEventsFields();
             this.setMinMaxHour();
+            let date = this.selectedDate(this.agendaDate);
+            if (filters.startedAt && filters.endedAt &&
+                (this.columnKey(date) < filters.startedAt || this.columnKey(date) > filters.endedAt)) {
+                date = this.selectedDate(filters.startedAt);
+            }
+            this.setWeekDate(date);
+            // Child filters can fetch in their mounted hook, before this view mounts.
+            this.setVisibleRange(this.estimatedVisibleRange());
+        },
 
-            this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+        selectedDate(value) {
+            const match = typeof value === "string" && /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+            const date = match
+                ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12)
+                : new Date(value || Date.now());
+            if (Number.isNaN(date.getTime())) return new Date();
+            while (!this.agendaWeekEnd && (date.getDay() === 0 || date.getDay() === 6)) {
+                date.setDate(date.getDate() + 1);
+            }
+            return date;
+        },
+
+        setEventsFields() {
+            const fields = ["calendar", "prospect", "user", "users"];
+            if (this.projectUserSettingsEventsColorByLabel) {
+                fields.push("category->" + this.projectUserSettingsEventsColorByLabel);
+            }
+            store.commit(SET_EVENTS_FIELDS, fields.join(","));
+        },
+
+        setVisibleRange(range) {
+            if (!range) return;
+            for (const key of ["startedAt", "endedAt"]) {
+                const param = { key, value: range[key] };
+                store.commit(ADD_EVENT_PARAMS, param);
+                store.commit(ADD_GLOBAL_EVENT_PARAMS, param);
+            }
         },
 
         fetchEvents() {
-            let fields = ["calendar", "prospect", "user", "users"];
-            if (this.projectUserSettingsEventsColorByLabel) {
-                fields.push(
-                    "category->" + this.projectUserSettingsEventsColorByLabel
-                );
+            if (this.agendaDisposed) return;
+            const range = this.visibleRange();
+            if (!range) return;
+            this.setVisibleRange(range);
+            store.dispatch(FETCH_EVENTS, {
+                range,
+                retainRange: { startedAt: this.windowStartedAt, endedAt: this.windowEndedAt },
+            });
+            this.fetchGlobalEvents(range);
+        },
+
+        fetchGlobalEvents(range = this.visibleRange()) {
+            if (this.agendaOtherProjects && range && !this.agendaDisposed) {
+                this.setVisibleRange(range);
+                store.dispatch(FETCH_GLOBAL_EVENTS, {
+                    range,
+                    retainRange: { startedAt: this.windowStartedAt, endedAt: this.windowEndedAt },
+                });
             }
-
-            store.commit(SET_EVENTS_FIELDS, fields.join(","));
-            store.dispatch(FETCH_EVENTS);
         },
 
-        addPastEvents(add) {
-            let date = new Date(this.weekDates[0]);
-            date = this.getDateAddDays(date, -this.eventsToAddCount);
-            // date.setDate(date.getDate() - this.eventsToAddCount);
-            this.setDate(date);
+        estimatedVisibleRange() {
+            const dates = this.weekDates;
+            if (!dates.length) return null;
+            const selected = Math.max(0, dates.findIndex((date) => this.columnKey(date) === this.columnKey(this.currentDate)));
+            const availableWidth = this.$refs.body?.clientWidth ||
+                window.innerWidth - (this.agendaFilter ? 240 : 0) - 50;
+            const count = this.isVerticalList() ? 1 : Math.max(1, Math.ceil(availableWidth / this.width));
+            const first = Math.max(0, selected - Math.floor(count / 2));
+            return this.rangeWithMargin(first, Math.min(dates.length - 1, first + count - 1));
+        },
+
+        visibleColumns() {
+            const body = this.$refs.body;
+            if (!body) return [];
+            const viewport = body.getBoundingClientRect();
+            const vertical = this.isVerticalList();
+            return this.weekDates.map((date, index) => {
+                const element = document.getElementById("hc-agenda-column-" + this.columnKey(date));
+                return element ? { date, index, element, rect: element.getBoundingClientRect() } : null;
+            }).filter((column) => column && (vertical
+                ? column.rect.bottom > viewport.top && column.rect.top < viewport.bottom
+                : column.rect.right > viewport.left && column.rect.left < viewport.right));
+        },
+
+        visibleRange() {
+            const visible = this.visibleColumns();
+            return visible.length
+                ? this.rangeWithMargin(visible[0].index, visible[visible.length - 1].index)
+                : this.estimatedVisibleRange();
+        },
+
+        rangeWithMargin(first, last) {
+            const dates = this.weekDates;
+            if (!dates.length) return null;
+            return {
+                startedAt: this.columnKey(dates[Math.max(0, first - 1)]),
+                endedAt: this.columnKey(dates[Math.min(dates.length - 1, last + 1)]),
+            };
+        },
+
+        isVerticalList() {
+            return window.innerWidth <= 767 && this.agendaList;
+        },
+
+        scheduleVisibleLoad() {
+            if (this.scrollFrame != null || this.agendaDisposed) return;
+            this.scrollFrame = requestAnimationFrame(async () => {
+                this.scrollFrame = null;
+                if (this.agendaDisposed || this.shiftingWindow) return;
+                const body = this.$refs.body;
+                if (!body) return;
+                const vertical = this.isVerticalList();
+                const position = vertical ? body.scrollTop : body.scrollLeft;
+                const size = vertical ? body.clientHeight : body.clientWidth;
+                const total = vertical ? body.scrollHeight : body.scrollWidth;
+                if (total > size + 20 && position >= total - size - 20) {
+                    await this.shiftWindow(this.eventsToAddCount);
+                } else if (total > size + 20 && position <= 20) {
+                    await this.shiftWindow(-this.eventsToAddCount);
+                }
+                this.fetchEvents();
+            });
+        },
+
+        async shiftWindow(days) {
+            if (this.shiftingWindow || this.agendaDisposed || !this.weekDates.length) return;
+            this.shiftingWindow = true;
+            const body = this.$refs.body;
+            const vertical = this.isVerticalList();
+            const anchor = this.visibleColumns()[0];
+            try {
+                this.setDate(this.getDateAddDays(this.weekDates[0], days));
+                await this.$nextTick();
+                if (this.agendaDisposed || !anchor) return;
+                const element = document.getElementById("hc-agenda-column-" + this.columnKey(anchor.date));
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    if (vertical) body.scrollTop += rect.top - anchor.rect.top;
+                    else body.scrollLeft += rect.left - anchor.rect.left;
+                }
+            } finally {
+                this.shiftingWindow = false;
+            }
+        },
+
+        async addPastEvents() {
+            await this.shiftWindow(-this.eventsToAddCount);
             this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
         },
 
-        /**
-         *
-         */
-        addFutureEvents() {
-            let date = new Date(this.weekDates[this.weekDates.length - 1]);
-            date = this.getDateAddDays(date, this.eventsToAddCount);
-            // date.setDate(date.getDate() + this.eventsToAddCount);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            date = new Date(this.weekDates[this.weekDates.length - 1]);
-            date = this.getDateAddDays(date, -9);
-            // date.setDate(date.getDate() - 9);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            // this.setDate(date);
+        async addFutureEvents() {
+            await this.shiftWindow(this.eventsToAddCount);
             this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
         },
 
-        /**
-         *
-         */
         addMobilePastEvents() {
-            let date = new Date(this.eventsParamsValue("startedAt"));
-            date = this.getDateAddDays(date, -8);
-            // date.setDate(date.getDate() + this.eventsToAddCount);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            // this.setDate(date);
-            this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+            return this.addPastEvents();
         },
 
-        /**
-         *
-         */
         addMobileFutureEvents() {
-            let date = new Date(this.eventsParamsValue("endedAt"));
-            date = this.getDateAddDays(date, 8);
-            // date.setDate(date.getDate() + this.eventsToAddCount);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(date).substring(0, 10),
-            });
-
-            // this.setDate(date);
-            this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+            return this.addFutureEvents();
         },
 
-        /**
-         *
-         * @param {*} date
-         */
         setMinMaxHour() {
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAfterTime",
-                value:
-                    (this.projectUserSettingsAgendaMinimumHour < 10
-                        ? "0"
-                        : "") +
-                    this.projectUserSettingsAgendaMinimumHour +
-                    ":00:00",
-            });
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedBeforeTime",
-                value:
-                    (this.projectUserSettingsAgendaMaximumHour < 10
-                        ? "0"
-                        : "") +
-                    this.projectUserSettingsAgendaMaximumHour +
-                    ":00:00",
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedAfterTime",
-                value:
-                    (this.projectUserSettingsAgendaMinimumHour < 10
-                        ? "0"
-                        : "") +
-                    this.projectUserSettingsAgendaMinimumHour +
-                    ":00:00",
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedBeforeTime",
-                value:
-                    (this.projectUserSettingsAgendaMaximumHour < 10
-                        ? "0"
-                        : "") +
-                    this.projectUserSettingsAgendaMaximumHour +
-                    ":00:00",
-            });
+            const hours = {
+                startedAfterTime: this.projectUserSettingsAgendaMinimumHour,
+                startedBeforeTime: this.projectUserSettingsAgendaMaximumHour,
+            };
+            for (const [key, hour] of Object.entries(hours)) {
+                const param = { key, value: String(hour).padStart(2, "0") + ":00:00" };
+                store.commit(ADD_EVENT_PARAMS, param);
+                store.commit(ADD_GLOBAL_EVENT_PARAMS, param);
+            }
         },
 
-        /**
-         *
-         * @param {*} date
-         */
         setWeekDate(date) {
-            let currentDate = new Date(date);
-
-            if (deviceType() == "desktop") {
-                currentDate = this.getDateAddDays(date, -4);
-            }
-
-            this.setDate(currentDate);
+            this.currentDate = this.selectedDate(date);
+            this.setDate(this.getDateAddDays(this.currentDate, -3));
         },
 
-        /**
-         *
-         * @param {*} date
-         */
-        async setDate(date) {
-            this.currentDate = date;
-            const sundayDate = new Date(date);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(sundayDate).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(sundayDate).substring(0, 10),
-            });
-
-            let saturdayDate = new Date(sundayDate);
-            saturdayDate = this.getDateAddDays(saturdayDate, 9);
-            // saturdayDate.setDate(sundayDate.getDate() + 9);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(saturdayDate).substring(0, 10),
-            });
-
-            store.commit(ADD_GLOBAL_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(saturdayDate).substring(0, 10),
-            });
-
-            this.scrollToDate(date);
+        setDate(date) {
+            const count = Math.max(10, Math.ceil(window.innerWidth / this.width) + 6);
+            this.windowStartedAt = this.columnKey(date);
+            this.windowEndedAt = this.columnKey(this.getDateAddDays(date, count - 1));
         },
 
-        /**
-         *
-         */
+        async jumpToDate(value) {
+            this.setWeekDate(this.selectedDate(value));
+            this.setVisibleRange(this.estimatedVisibleRange());
+            await this.$nextTick();
+            if (this.agendaDisposed) return;
+            this.scrollToDate(this.currentDate);
+            this.fetchEvents();
+        },
+
         prevDate() {
-            this.setDate(
-                this.getDateAddDays(
-                    this.currentDate,
-                    this.agendaWeekEnd ? -7 : -5
-                )
-            );
+            const date = this.getDateAddDays(this.navigationDate(), this.agendaWeekEnd ? -7 : -5);
+            store.commit(SET_AGENDA_DATE, this.columnKey(date));
         },
 
-        /**
-         *
-         */
-        async nextDate() {
-            this.setDate(
-                this.getDateAddDays(
-                    this.currentDate,
-                    this.agendaWeekEnd ? 7 : 5
-                )
-            );
+        nextDate() {
+            const date = this.getDateAddDays(this.navigationDate(), this.agendaWeekEnd ? 7 : 5);
+            store.commit(SET_AGENDA_DATE, this.columnKey(date));
         },
 
-        /**
-         * Scroll horizontal d'une colonne (1 jour) vers la gauche
-         */
+        navigationDate() {
+            const visible = this.visibleColumns();
+            if (!visible.length) return this.currentDate;
+            if (this.isVerticalList()) return visible[0].date;
+            const viewport = this.$refs.body.getBoundingClientRect();
+            const center = (viewport.left + viewport.right) / 2;
+            const column = visible.find(({ rect }) => rect.left <= center && rect.right > center);
+            return (column || visible[Math.floor(visible.length / 2)]).date;
+        },
+
         scrollLeft() {
-            this.$refs.body.scrollBy({
-                left: -this.width,
-                behavior: "smooth",
-            });
+            this.$refs.body.scrollBy(this.isVerticalList()
+                ? { top: -this.$refs.body.clientHeight, behavior: "smooth" }
+                : { left: -this.width, behavior: "smooth" });
         },
 
-        /**
-         * Scroll horizontal d'une colonne (1 jour) vers la droite
-         */
         scrollRight() {
-        this.$refs.body.scrollBy({
-            left: this.width,
-            behavior: "smooth",
-        });
-    },
-        /**
-         *
-         * @param {*} date
-         */
-        scrollToDate(date) {
-            let column = document.getElementById(
-                "hc-agenda-column-" + dateToString(date).substring(0, 10)
-            );
-
-            if (!column) {
-                return;
-            }
-
-            this.$refs.body.scrollLeft =
-                -25 +
-                column.offsetLeft -
-                (this.$refs.body.getBoundingClientRect().width -
-                    column.getBoundingClientRect().width) /
-                    2;
+            this.$refs.body.scrollBy(this.isVerticalList()
+                ? { top: this.$refs.body.clientHeight, behavior: "smooth" }
+                : { left: this.width, behavior: "smooth" });
         },
 
-        /**
-         * Scroll to time
-         */
-        scrollToTime(hour, minute) {
-            if (this.agendaList) {
-                return;
+        scrollToDate(date) {
+            const body = this.$refs.body;
+            const column = document.getElementById("hc-agenda-column-" + this.columnKey(date));
+            if (!body || !column) return;
+            if (this.isVerticalList()) {
+                body.scrollTop += column.getBoundingClientRect().top - body.getBoundingClientRect().top;
+            } else {
+                body.scrollLeft = -25 + column.offsetLeft -
+                    (body.getBoundingClientRect().width - column.getBoundingClientRect().width) / 2;
             }
+        },
 
-            let mn = (hour - 8) * 60 + minute;
-
-            mn -= mn % 15;
-
-            this.$refs.body.scrollTop = mn * 2;
+        scrollToTime(hour, minute) {
+            if (this.agendaList || !this.$refs.body) return;
+            const minutes = (hour - 8) * 60 + minute;
+            this.$refs.body.scrollTop = (minutes - minutes % 15) * 2;
         },
 
         columnKey(date) {
@@ -708,112 +643,74 @@ export default {
 
         getDateAddDays(date, days) {
             const increment = days < 0 ? -1 : 1;
-            days = days < 0 ? -days : days;
-            let d = new Date(date);
-
-            for (let i = 0; i < days; ) {
-                d.setDate(d.getDate() + increment);
-
-                if (
-                    this.agendaWeekEnd ||
-                    (d.getDay() != 0 && d.getDay() != 6)
-                ) {
-                    ++i;
-                }
+            let remaining = Math.abs(days);
+            const result = new Date(date);
+            while (remaining > 0) {
+                result.setDate(result.getDate() + increment);
+                if (this.agendaWeekEnd || (result.getDay() !== 0 && result.getDay() !== 6)) remaining--;
             }
-
-            return d;
+            return result;
         },
     },
 
     watch: {
-        async agendaDate() {
-            await this.$nextTick();
-            this.scrollToDate(new Date(this.agendaDate));
+        agendaDate(value) {
+            this.jumpToDate(value);
+        },
+
+        agendaOtherProjects(enabled) {
+            if (enabled) this.fetchGlobalEvents();
+        },
+
+        agendaWeekEnd() {
+            this.jumpToDate(this.currentDate);
+        },
+
+        agendaList() {
+            this.$nextTick(() => this.scheduleVisibleLoad());
+        },
+
+        agendaFilter() {
+            this.$nextTick(() => this.scheduleVisibleLoad());
         },
 
         projectUserSettingsAgendaMinimumHour() {
             this.setMinMaxHour();
             this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
         },
 
         projectUserSettingsAgendaMaximumHour() {
             this.setMinMaxHour();
             this.fetchEvents();
-            store.dispatch(FETCH_GLOBAL_EVENTS);
+        },
+
+        projectUserSettingsEventsColorByLabel() {
+            this.setEventsFields();
+            this.fetchEvents();
         },
     },
 
     computed: {
         ...mapGetters([
-            "project",
-            "draggedEvent",
-            "resizedEvent",
-            "eventsParamsValue",
-            "eventsParamExists",
-            "agendaFilter",
-            "agendaList",
-            "agendaWeekEnd",
-            "agendaDate",
-            "projectUserSettingsAgendaMinimumHour",
-            "projectUserSettingsAgendaMaximumHour",
+            "project", "draggedEvent", "resizedEvent", "agendaFilter", "agendaList",
+            "agendaWeekEnd", "agendaDate", "agendaOtherProjects",
+            "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour",
             "projectUserSettingsEventsColorByLabel",
         ]),
 
-        /**
-         *
-         */
-        paramsStartedAt() {
-            return this.eventsParamsValue("startedAt");
-        },
-
-        /**
-         *
-         */
-        paramsEndedAt() {
-            return this.eventsParamsValue("endedAt");
-        },
-
-        /**
-         * List of date of the week of the current date
-         * from sunday to saturday
-         */
         weekDates() {
-            if (!this.paramsEndedAt || !this.paramsEndedAt) {
-                return null;
-            }
-
-            if (this.paramsStartedAt > this.paramsEndedAt) {
-                return null;
-            }
-
-            // Create an array to store the dates for each day of the week
-            const weekDates = [];
-
-            let date = new Date(this.paramsStartedAt);
-            const endDate = dateToString(
-                new Date(this.paramsEndedAt)
-            ).substring(0, 10);
-
-            // Loop through the days of the week and add the corresponding dates
-            while (dateToString(date).substring(0, 10) <= endDate) {
-                if (
-                    this.agendaWeekEnd ||
-                    (date.getDay() != 0 && date.getDay() != 6)
-                ) {
-                    weekDates.push(new Date(date));
-                }
+            if (!this.windowStartedAt || !this.windowEndedAt || this.windowStartedAt > this.windowEndedAt) return [];
+            const dates = [];
+            const date = this.selectedDate(this.windowStartedAt);
+            while (this.columnKey(date) <= this.windowEndedAt) {
+                if (this.agendaWeekEnd || (date.getDay() !== 0 && date.getDay() !== 6)) dates.push(new Date(date));
                 date.setDate(date.getDate() + 1);
             }
-
-            return weekDates;
+            return dates;
         },
 
         width() {
-            return 330; /*window.innerWidth <= 767
-                ? window.innerWidth - 50
-                : Math.max((window.innerWidth - 50) / 7, 330);*/
+            return 330;
         },
     },
 };

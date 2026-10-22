@@ -1,8 +1,10 @@
 <template>
-    <day v-if="agendaDisplayMode == 'day'" />
-    <month v-else-if="agendaDisplayMode == 'month'" />
-    <planning v-else-if="agendaDisplayMode == 'planning'" />
-    <week v-else />
+    <template v-if="project && project.slug">
+        <day v-if="agendaDisplayMode == 'day'" :key="'day-' + projectKey" />
+        <month v-else-if="agendaDisplayMode == 'month'" :key="'month-' + projectKey" />
+        <planning v-else-if="agendaDisplayMode == 'planning'" :key="'planning-' + projectKey" />
+        <week v-else :key="'week-' + projectKey" />
+    </template>
 </template>
 
 <script>
@@ -19,6 +21,7 @@ import {
     SET_AGENDA_DISPLAY_MODE,
     SET_AGENDA_FILTER,
 } from "@/actions/project/event";
+import { FETCH_GLOBAL_EVENTS } from "@/actions/event";
 
 export default {
     components: {
@@ -50,8 +53,27 @@ export default {
         };
     },
 
+    watch: {
+        selectedUsers: {
+            deep: true,
+            handler() {
+                if (this.project?.slug && this.agendaOtherProjects && this.agendaDisplayMode !== "planning") {
+                    store.dispatch(FETCH_GLOBAL_EVENTS);
+                }
+            },
+        },
+    },
+
     computed: {
-        ...mapGetters(["agendaDisplayMode"]),
+        ...mapGetters(["agendaDisplayMode", "project", "agendaOtherProjects", "eventsParamsValue"]),
+
+        selectedUsers() {
+            return this.eventsParamsValue("withUsers");
+        },
+
+        projectKey() {
+            return this.project?.id || this.project?.slug || "agenda";
+        },
     },
 };
 </script>

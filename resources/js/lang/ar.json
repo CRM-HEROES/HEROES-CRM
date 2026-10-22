@@ -1300,6 +1300,7 @@
         "email_to_prospect": "إرسال دعوة إلى احتمال",
         "choose_event_description_template": "قوالب الوصف",
         "user_daily_directions": {
+            "pending_message": "لا يزال حساب المسار جارياً. حاول مجدداً بعد قليل.",
             "title": "الاتجاهات",
             "remove_from_map": "إزالة الطريق من الخريطة",
             "remove_marker": "إزالة العلامة",

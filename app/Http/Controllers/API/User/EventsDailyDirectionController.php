@@ -3,36 +3,24 @@
 namespace App\Http\Controllers\API\User;
 
 use App\Http\Controllers\Controller;
-use App\Jobs\UserGetEventsDailyDirection;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
+use App\Services\EventsDailyDirections;
 
 class EventsDailyDirectionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(User $user, $date)
+    public function index(User $user, $date, EventsDailyDirections $directions)
     {
-        // $attempt = 0;
-    	// do {
-        $direction = $this->getUserEventDailyDirection($user, $date);
+        validator(['date' => $date], ['date' => ['required', 'date_format:Y-m-d']])->validate();
 
-        if (!$direction) {
-            dispatch((new UserGetEventsDailyDirection(/*$project, */$user, $date))->onConnection('sync'));
-            $direction = $this->getUserEventDailyDirection($user, $date);
-        }
+        $result = $directions->request($user->id, $date);
 
-		return $direction;
+        return response()->json($result, $result['status'] === 'pending' ? 202 : 200);
     }
 
-    protected function getUserEventDailyDirection(User $user, $date)
+    public function status(User $user, $date, EventsDailyDirections $directions)
     {
-        return DB::table('user_events_daily_directions')
-            ->where('user_id', $user->id)
-            ->where('direction_at', $date)
-            ->first();
+        validator(['date' => $date], ['date' => ['required', 'date_format:Y-m-d']])->validate();
+
+        return response()->json($directions->status($user->id, $date));
     }
 }

@@ -183,6 +183,10 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import {
+    dailyDirectionCacheScope,
+    dailyDirectionEventsSignature,
+} from "@/utils/event-daily-direction-cache";
 
 import { OPEN_SLIDE } from "@/actions/slide";
 import {
@@ -223,6 +227,7 @@ export default {
             showEventsFrom: 0,
             maxShownEvents: 4,
             dailyDirections: {},
+            directionsRequestId: 0,
             directions: [],
             fetchingDirection: false,
         };
@@ -281,59 +286,52 @@ export default {
             return Math.floor(ms / 1000 / 60);
         },
 
-        showDirection() {
-            if (this.direction) {
-                for (let i in this.dayPhysicalEventsUsers) {
-                    store.commit(
-                        TOGGLE_USER_DAILY_DIRECTION,
-                        this.dailyDirections[this.dayPhysicalEventsUsers[i].id]
-                    );
-                }
-            } else {
-                this.dailyDirections = {};
+        async showDirection() {
+            if (this.fetchingDirection) return;
+            const requestId = ++this.directionsRequestId;
+            const signature = this.dailyDirectionSignature;
+            const date = this.dateString;
+            const users = this.dayPhysicalEventsUsers;
+            this.fetchingDirection = users.length > 0;
 
-                for (let i in this.dayPhysicalEventsUsers) {
-                    const userId = this.dayPhysicalEventsUsers[i];
+            store.commit(OPEN_SLIDE, "user-daily-direction");
+            try {
+                const results = await Promise.allSettled(users.map(async (user) => {
+                    const selected = this.directionFor(user.id, date);
+                    if (selected) {
+                        store.commit(TOGGLE_USER_DAILY_DIRECTION, selected);
+                        return;
+                    }
 
-                    this.userEventsDailyDirection(userId).then((value) => {
-                        store.commit(TOGGLE_USER_DAILY_DIRECTION, value);
+                    const data = await this.userEventsDailyDirection(user, requestId, signature);
+                    if (data?.direction && requestId === this.directionsRequestId &&
+                        signature === this.dailyDirectionSignature && !this.directionFor(user.id, date)) {
+                        store.commit(TOGGLE_USER_DAILY_DIRECTION, data);
+                    }
+                }));
+                if (requestId === this.directionsRequestId && signature === this.dailyDirectionSignature &&
+                    results.some((result) => result.status === "rejected" && result.reason?.code === "DAILY_DIRECTION_TIMEOUT")) {
+                    flashInfo({
+                        title: this.$t("event.user_daily_directions.title"),
+                        body: this.$t("event.user_daily_directions.pending_message"),
                     });
                 }
-
-                store.commit(OPEN_SLIDE, "user-daily-direction");
+            } finally {
+                if (requestId === this.directionsRequestId) this.fetchingDirection = false;
             }
         },
 
-        async userEventsDailyDirection(user) {
-            this.fetchingDirection = true;
-
-            try {
-                const direction_at = this.dateString;
-                let data = this.getEventUserDailyDirection(
-                    user,
-                    direction_at,
-                    this.dayPhysicalEvents
-                        .filter((event) => event.user_id == user.id)
-                        .map((event) => event.id)
-                );
-
-                if (!data) {
-                    data = await store.dispatch(
-                        FETCH_EVENT_USER_DAILY_DIRECTION,
-                        { user, direction_at }
-                    );
-                }
-
-                if (data && data.direction) {
-                    this.dailyDirections[user.id] = data;
-                }
-
-                return data;
-            } finally {
-                this.fetchingDirection = false;
+        async userEventsDailyDirection(user, requestId, signature) {
+            const data = await store.dispatch(FETCH_EVENT_USER_DAILY_DIRECTION, {
+                user,
+                direction_at: this.dateString,
+                events: this.dayPhysicalEvents.filter((event) => event.user_id == user.id),
+            });
+            if (requestId !== this.directionsRequestId || signature !== this.dailyDirectionSignature) return null;
+            if (data?.direction) {
+                this.dailyDirections[user.id] = data;
             }
-
-            return null;
+            return data;
         },
 
         bulkSms() {
@@ -346,19 +344,35 @@ export default {
         },
     },
 
+    watch: {
+        dailyDirectionSignature() {
+            ++this.directionsRequestId;
+            this.dailyDirections = {};
+            this.fetchingDirection = false;
+        },
+    },
+
+    beforeUnmount() {
+        ++this.directionsRequestId;
+    },
+
     computed: {
         ...mapGetters([
             "project",
             "events",
             "globalEvents",
             "draggedEvent",
-            "getEventUserDailyDirection",
             "directionFor",
             "agendaOtherProjects",
         ]),
 
         dateString() {
             return dateToString(this.date).substring(0, 10);
+        },
+
+        dailyDirectionSignature() {
+            return JSON.stringify([dailyDirectionCacheScope(this.$store.state), this.dateString,
+                dailyDirectionEventsSignature(this.dayPhysicalEvents)]);
         },
 
         dayEvents() {
@@ -440,11 +454,11 @@ export default {
                         array.findIndex((e) => event.user_id == e.user_id) ==
                         index
                 )
-                .map((event) => event.user);
+                .map((event) => event.user || { id: event.user_id });
         },
 
         dayPhysicalEvents() {
-            return this.events.filter(
+            return this.dayEvents.filter(
                 (event) => event.calendar.type == "physical" && event.location
             );
         },

@@ -1300,6 +1300,7 @@
         "email_to_prospect": "向潜在客户发送邀请",
         "choose_event_description_template": "描述模板",
         "user_daily_directions": {
+            "pending_message": "路线仍在计算中，请稍后重试。",
             "title": "路线",
             "remove_from_map": "从地图中删除路线",
             "remove_marker": "删除标记",

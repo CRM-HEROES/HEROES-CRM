@@ -1300,6 +1300,7 @@
         "email_to_prospect": "संभावना को निमंत्रण भेजें",
         "choose_event_description_template": "विवरण टेम्पलेट्स",
         "user_daily_directions": {
+            "pending_message": "मार्ग की गणना जारी है। थोड़ी देर बाद फिर कोशिश करें।",
             "title": "दिशा-निर्देश",
             "remove_from_map": "मानचित्र से मार्ग हटाएँ",
             "remove_marker": "मार्कर हटाएँ",

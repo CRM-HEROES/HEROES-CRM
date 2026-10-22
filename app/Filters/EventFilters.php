@@ -3,6 +3,7 @@
 namespace App\Filters;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
 
 class EventFilters extends Filters
@@ -118,6 +119,10 @@ class EventFilters extends Filters
      * Filter by user
      */
     public function withUsers(Builder $builder, $value) {
+        if ($value === []) {
+            return $builder->whereRaw('1 = 0');
+        }
+
         return $builder->where(function($query) use($value) {
             $query
                 ->whereHas('user', function($query) use($value) {
@@ -251,6 +256,20 @@ class EventFilters extends Filters
      */
     public function endedAt(Builder $builder, $value) {
         $builder->where('ended_at', '<=', substr($value, 0, 10) . " 23:59:59");
+    }
+
+    /**
+     * Include events intersecting an agenda range, including overnight events.
+     */
+    public function overlapping(Builder $builder, $value) {
+        $range = Validator::make(['overlapping' => $value], [
+            'overlapping' => ['required', 'array:startedAt,endedAt'],
+            'overlapping.startedAt' => ['required', 'date_format:Y-m-d'],
+            'overlapping.endedAt' => ['required', 'date_format:Y-m-d', 'after_or_equal:overlapping.startedAt'],
+        ])->stopOnFirstFailure()->validate()['overlapping'];
+
+        $builder->where('started_at', '<=', $range['endedAt'] . ' 23:59:59')
+            ->where('ended_at', '>=', $range['startedAt'] . ' 00:00:00');
     }
     
     /**

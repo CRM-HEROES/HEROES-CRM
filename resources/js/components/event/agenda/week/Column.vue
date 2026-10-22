@@ -191,11 +191,11 @@
 </style>
 
 <script>
-import ApiService from "@/apis/api.service";
 import { mapGetters } from "vuex";
 import store from "@/store";
+import { dailyDirectionEventsSignature } from "@/utils/event-daily-direction-cache";
 
-import { FETCH_EVENT_USER_DAILY_DIRECTION } from "@/actions/project/event";
+import { FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY } from "@/actions/project/event";
 
 import Cell from "./Cell.vue";
 import HeaderCell from "./HeaderCell.vue";
@@ -221,78 +221,59 @@ export default {
             directions: [],
             dailyDirections: {},
             fetchingDirection: false,
+            directionsRequestId: 0,
             contextMenu: false,
         };
     },
 
     methods: {
-        async userEventsDailyDirection(user) {
-            this.fetchingDirection = true;
+        async userEventsDailyDirection(user, requestId, signature) {
+            const data = await store.dispatch(FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
+                user,
+                direction_at: this.dateString,
+                events: this.dayPhysicalEvents.filter((event) => event.user_id == user.id),
+            });
 
-            try {
-                const direction_at = this.dateString;
-                let data = this.getEventUserDailyDirection(
-                    user,
-                    direction_at,
-                    this.dayPhysicalEvents
-                        .filter((event) => event.user_id == user.id)
-                        .map((event) => event.id)
-                );
-
-                if (!data) {
-                    data = await store.dispatch(
-                        FETCH_EVENT_USER_DAILY_DIRECTION,
-                        { user, direction_at }
-                    );
-                }
-
-                if (data && data.direction) {
-                    this.dailyDirections[user.id] = data;
-                }
-            } finally {
-                this.fetchingDirection = false;
+            if (requestId === this.directionsRequestId && signature === this.dailyDirectionSignature && data) {
+                this.dailyDirections[user.id] = data;
             }
         },
 
-        fetchDailyDirection() {
+        async fetchDailyDirection() {
+            const requestId = ++this.directionsRequestId;
+            const signature = this.dailyDirectionSignature;
             this.dailyDirections = {};
+            const users = this.dayPhysicalEventsUsers.filter(Boolean);
+            this.fetchingDirection = users.length > 0;
 
-            for (let i in this.dayPhysicalEventsUsers) {
-                this.userEventsDailyDirection(this.dayPhysicalEventsUsers[i]);
+            try {
+                await Promise.allSettled(users.map((user) => this.userEventsDailyDirection(user, requestId, signature)));
+            } finally {
+                if (requestId === this.directionsRequestId) this.fetchingDirection = false;
             }
         },
     },
 
     watch: {
-        dayPhysicalEvents(newValue, oldValue) {
-            if (newValue.length == 0) {
-                this.dailyDirections = {};
-                return;
-            }
-
-            const newDates = newValue
-                .sort((a, b) => (a.started_at > b.started_at ? 1 : -1))
-                .map((event) => event.location)
-                .join(";");
-            const oldDates = oldValue
-                .sort((a, b) => (a.started_at > b.started_at ? 1 : -1))
-                .map((event) => event.location)
-                .join(";");
-
-            if (newDates == oldDates) {
-                return;
-            }
-
-            this.fetchDailyDirection();
+        dailyDirectionSignature: {
+            immediate: true,
+            handler() {
+                this.fetchDailyDirection();
+            },
         },
+    },
+
+    beforeUnmount() {
+        ++this.directionsRequestId;
     },
 
     computed: {
         ...mapGetters([
             "project",
+            "permissions",
             "events",
             "globalEvents",
-            "getEventUserDailyDirection",
+            "eventUserDailyDirectionsVersion",
             "newEvent",
             "draggedEvent",
             "resizedEvent",
@@ -304,6 +285,11 @@ export default {
 
         dateString() {
             return dateToString(this.date).substring(0, 10);
+        },
+
+        dailyDirectionSignature() {
+            return JSON.stringify([this.project?.slug, this.dateString, this.eventUserDailyDirectionsVersion,
+                this.permissions, dailyDirectionEventsSignature(this.dayPhysicalEvents)]);
         },
 
         isWE() {
@@ -318,7 +304,7 @@ export default {
                         array.findIndex((e) => event.user_id == e.user_id) ==
                         index
                 )
-                .map((event) => event.user);
+                .map((event) => event.user || { id: event.user_id });
         },
 
         dayEvents() {

@@ -493,7 +493,7 @@ export default {
             store.commit(SET_EVENTS_SORT_BY, "started_at");
             store.commit(SET_EVENTS_COUNT, count ? count : 1000);
 
-            store.dispatch(FETCH_EVENTS);
+            store.dispatch(FETCH_EVENTS, { incremental: false });
         },
 
         /**
@@ -1181,16 +1181,21 @@ export default {
         async userEventsDailyDirection(user) {
             const direction_at = dateToString(new Date()).substring(0, 10);
 
-            const data = await store.dispatch(
-                FETCH_EVENT_USER_DAILY_DIRECTION,
-                {
-                    user,
-                    direction_at,
-                }
-            );
+            try {
+                const data = await store.dispatch(
+                    FETCH_EVENT_USER_DAILY_DIRECTION,
+                    { user, direction_at }
+                );
 
-            if (data && data.direction) {
-                this.addDirection({ ...data, color: "#55AAFF" });
+                if (data && data.direction) {
+                    this.addDirection({ ...data, color: "#55AAFF" });
+                }
+            } catch (error) {
+                if (error.code !== "DAILY_DIRECTION_TIMEOUT") throw error;
+                flashInfo({
+                    title: this.$t("event.user_daily_directions.title"),
+                    body: this.$t("event.user_daily_directions.pending_message"),
+                });
             }
         },
 

@@ -441,9 +441,7 @@ const getters = {
     projectUserSettingsAgendaUsers(state, getters) {
         let setting = getters.projectUserSetting("events.agenda.filters.users");
 
-        return !setting || !Array.isArray(setting) || setting.length == 0
-            ? null
-            : setting;
+        return Array.isArray(setting) ? setting : null;
     },
 
     /**

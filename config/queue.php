@@ -15,6 +15,15 @@ return [
 
     'default' => env('QUEUE_CONNECTION', 'sync'),
 
+    'events_daily_directions' => [
+        'connection' => env('EVENT_DIRECTIONS_QUEUE_CONNECTION', 'redis'),
+        'queue' => env('EVENT_DIRECTIONS_QUEUE', 'google_map'),
+        'cache_store' => env('EVENT_DIRECTIONS_CACHE_STORE', 'redis'),
+        'state_ttl' => 600,
+        'mutex_ttl' => 10,
+        'running_lock_ttl' => 120,
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Queue Connections

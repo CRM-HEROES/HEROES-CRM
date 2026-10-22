@@ -745,20 +745,23 @@ export default {
 
                 return Object.fromEntries(
                     Object.entries(eventsParams.withProspects)
-                        .filter(([k, v]) => k.indexOf("withCategory_") == 0)
-                        .map(([k, v]) => [k.substring(0, 13), v])
+                        .filter(([key]) => key.startsWith("withCategory_"))
+                        .map(([key, labels]) => [key.substring("withCategory_".length), labels])
                 );
             },
             set(value) {
-                store.commit(ADD_EVENT_PARAMS, {
-                    key: "withProspects",
-                    value: Object.fromEntries(
-                        Object.entries(value).map(([k, v]) => [
-                            "withCategory_" + k,
-                            v,
-                        ])
-                    ),
-                });
+                const filters = Object.fromEntries([
+                    ...Object.entries(this.eventsParams?.withProspects || {})
+                        .filter(([key]) => !key.startsWith("withCategory_")),
+                    ...Object.entries(value || {})
+                        .filter(([, labels]) => Array.isArray(labels) && labels.length > 0)
+                        .map(([category, labels]) => ["withCategory_" + category, [...labels]]),
+                ]);
+                if (Object.keys(filters).length) {
+                    store.commit(ADD_EVENT_PARAMS, { key: "withProspects", value: filters });
+                } else {
+                    store.commit(REMOVE_EVENT_PARAMS, { key: "withProspects" });
+                }
                 store.dispatch(FETCH_EVENTS);
             },
         },
@@ -927,21 +930,17 @@ export default {
 
                 return true;
             },
-            set: async function (value) {
-                if (value) {
-                    store.commit(ADD_EVENT_PARAMS, {
-                        key: "withUsers",
-                        value: this.filteredUsers.map((user) => user.id),
-                    });
-                    store.dispatch(FETCH_EVENTS);
-                } else {
-                    store.commit(ADD_EVENT_PARAMS, {
-                        key: "withUsers",
-                        value: [],
-                    });
-
-                    store.dispatch(FETCH_EVENTS);
-                }
+            set: function (value) {
+                const users = value ? this.filteredUsers.map((user) => user.id) : [];
+                store.commit(ADD_EVENT_PARAMS, {
+                    key: "withUsers",
+                    value: users,
+                });
+                store.dispatch(FETCH_EVENTS);
+                store.dispatch(UPDATE_PROJECT_USER_SETTING, {
+                    key: "events.agenda.filters.users",
+                    value: users,
+                });
             },
         },
     },

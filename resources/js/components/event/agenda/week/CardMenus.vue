@@ -67,9 +67,7 @@ import { mapGetters } from "vuex";
 import store from "@/store";
 
 import {
-    FETCH_EVENTS,
     SET_EVENT,
-    ADD_EVENT_PARAMS,
     SET_AGENDA_FILTER,
     SET_AGENDA_LIST,
     SHOW_AGENDA_TABLE,
@@ -86,7 +84,7 @@ export default {
          * Previous week
          */
         previousPage() {
-            let date = new Date(this.paramsStartedAt);
+            let date = new Date(this.agendaDate);
             date.setDate(date.getDate() - 7);
 
             this.setDate(date);
@@ -121,31 +119,14 @@ export default {
          * Next week
          */
         nextPage() {
-            let date = new Date(this.paramsStartedAt);
+            let date = new Date(this.agendaDate);
             date.setDate(date.getDate() + 7);
 
             this.setDate(date);
         },
 
         setDate(date) {
-            // Start date
-            let startDate = new Date(date);
-
-            // End date
-            let endDate = new Date(startDate);
-            endDate.setDate(startDate.getDate() + 6);
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "startedAt",
-                value: dateToString(startDate).substring(0, 10),
-            });
-
-            store.commit(ADD_EVENT_PARAMS, {
-                key: "endedAt",
-                value: dateToString(endDate).substring(0, 10),
-            });
-
-            store.dispatch(FETCH_EVENTS);
+            store.commit(SET_AGENDA_DATE, dateToString(date).substring(0, 10));
         },
 
         toggleAgendaFilter() {
@@ -165,12 +146,6 @@ export default {
          */
         ocr() {
             store.commit(OPEN_MODAL, "prospects-table-ocr");
-        },
-    },
-
-    watch: {
-        agendaDate() {
-            this.setDate(new Date(this.agendaDate));
         },
     },
 

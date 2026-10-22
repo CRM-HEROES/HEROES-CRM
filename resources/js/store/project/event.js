@@ -1,4 +1,9 @@
 import EventService from "@/apis/project/event";
+import dailyDirectionCache, { dailyDirectionCacheScope, dailyDirectionContextEvents } from "@/utils/event-daily-direction-cache";
+import summaryBatcher, { summaryCache, toDailyDirectionSummary } from "@/utils/event-daily-direction-summary";
+import { loadDailyDirection } from "@/utils/event-daily-direction-loader";
+import { agendaEventScope, projectEventRange } from "@/utils/agenda-event-range-cache";
+import { filterEventsByUsers } from "@/utils/event-user-filter";
 
 import {
     FETCH_EVENTS,
@@ -27,7 +32,9 @@ import {
     SET_EVENTS_SORT_BY,
     SET_EVENTS_SORT_ORDER,
     FETCH_EVENT_USER_DAILY_DIRECTION,
-    ADD_EVENT_USER_DAILY_DIRECTION,
+    FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY,
+    REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY,
+    INVALIDATE_EVENT_USER_DAILY_DIRECTIONS,
     ADD_EVENT_USER,
     REMOVE_EVENT_USER,
 } from "@/actions/project/event";
@@ -54,28 +61,43 @@ const actions = {
      * @param {*} context
      * @returns
      */
-    async [FETCH_EVENTS](context) {
-        let params = {};
-
-        if (
-            context.state.project.eventsParams &&
-            Object.keys(context.state.project.eventsParams).length > 0
-        ) {
-            params.filters = JSON.stringify(
-                context.state.project.eventsParams
-                    ? context.state.project.eventsParams
-                    : {}
-            );
+    async [FETCH_EVENTS](context, { range, retainRange, incremental = true } = {}) {
+        const project = context.state.project;
+        if (!project?.slug) return [];
+        const scope = agendaEventScope(context.rootState);
+        const filters = JSON.stringify(project.eventsParams || {});
+        const fields = project.eventsFields;
+        const publish = (data) => {
+            if (scope === agendaEventScope(context.rootState) &&
+                filters === JSON.stringify(context.state.project.eventsParams || {}) &&
+                fields === context.state.project.eventsFields) context.commit(SET_EVENTS, data);
+        };
+        if (Array.isArray(project.eventsParams?.withUsers) && project.eventsParams.withUsers.length === 0) {
+            projectEventRange.clear();
+            publish([]);
+            return [];
         }
-
-        if (context.state.project.eventsFields) {
-            params.fields = context.state.project.eventsFields;
-        }
-
-        const { data } = await EventService.get(context.state.project.slug, {
-            params: params,
+        const load = async (requestedFilters) => (await EventService.get(project.slug, {
+            params: {
+                filters: JSON.stringify(requestedFilters),
+                ...(fields ? { fields } : {}),
+            },
+        })).data;
+        let data;
+        // Map filters also use this action and can intentionally omit calendar dates.
+        if (!incremental || (!range && (!project.eventsParams?.startedAt || !project.eventsParams?.endedAt))) {
+            projectEventRange.clear();
+            data = await load(JSON.parse(filters));
+            publish(data);
+        } else data = await projectEventRange.fetch({
+            scope,
+            filters: JSON.parse(filters),
+            fields,
+            range,
+            retainRange,
+            load,
+            onData: publish,
         });
-        context.commit(SET_EVENTS, data);
         return data;
     },
 
@@ -145,27 +167,55 @@ const actions = {
      * @param {Number} params event id
      * @returns event
      */
-    async [FETCH_EVENT_USER_DAILY_DIRECTION](context, { user, direction_at }) {
-        let { data } = await EventService.dailyDirection(
-            // context.state.project.slug,
-            user,
-            direction_at
+    async [FETCH_EVENT_USER_DAILY_DIRECTION](context, { user, direction_at, events = [] }) {
+        if (!user?.id) return null;
+
+        const scope = dailyDirectionCacheScope(context.rootState);
+        const project = context.state.project?.slug;
+        const can = context.rootGetters.can;
+        const canReadSummary = project && (typeof can !== "function" ||
+            context.rootState.auth?.user?.id == user.id || can(`all.project.user.agenda.${user.id}`));
+        const routeEvents = dailyDirectionContextEvents(context.rootState, user.id, direction_at, events);
+        const result = await dailyDirectionCache.fetch(
+            scope,
+            user.id,
+            direction_at,
+            routeEvents,
+            (control) => loadDailyDirection({
+                ...control,
+                userId: user.id,
+                date: direction_at,
+                loadDetail: async () => (await EventService.dailyDirection(user, direction_at)).data,
+                loadSummary: async () => canReadSummary ?
+                    summaryBatcher.request(scope, project, user.id, direction_at) :
+                    (await EventService.dailyDirectionStatus(user, direction_at)).data,
+            })
         );
 
-        data = {
-            user_id: user.id,
-            direction_at: direction_at,
-            events: data.events ? JSON.parse(data.events) : [],
-            direction: data.direction ? JSON.parse(data.direction) : null,
-        };
+        if (result && dailyDirectionCacheScope(context.rootState) === scope &&
+            dailyDirectionCache.get(scope, user.id, direction_at, routeEvents) === result) {
+            context.commit(REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
+                user_id: user.id, started_at: direction_at,
+            });
+        }
+        return result;
+    },
 
-        /*context.commit(ADD_EVENT_USER_DAILY_DIRECTION, {
-            user,
-            direction_at,
-            data,
-        });*/
-
-        return data;
+    async [FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY](context, { user, direction_at, events = [] }) {
+        const project = context.state.project?.slug;
+        if (!user?.id || !project) return null;
+        const can = context.rootGetters.can;
+        if (typeof can === "function" && context.rootState.auth?.user?.id != user.id &&
+            !can(`all.project.user.agenda.${user.id}`)) {
+            return null;
+        }
+        const scope = dailyDirectionCacheScope(context.rootState);
+        const routeEvents = dailyDirectionContextEvents(context.rootState, user.id, direction_at, events);
+        return summaryCache.fetch(scope, user.id, direction_at, routeEvents, () => {
+            const detail = dailyDirectionCache.get(scope, user.id, direction_at, routeEvents);
+            return detail ? Promise.resolve(toDailyDirectionSummary(detail)) :
+                summaryBatcher.request(scope, project, user.id, direction_at);
+        });
     },
 };
 
@@ -357,53 +407,18 @@ const mutations = {
      * @param {*} context
      * @param {Number} params event id
      */
-    [ADD_EVENT_USER_DAILY_DIRECTION](state, { user, direction_at, data }) {
-        if (data.searching) {
-            return;
+    [INVALIDATE_EVENT_USER_DAILY_DIRECTIONS](state, events) {
+        dailyDirectionCache.invalidate(events);
+        summaryCache.invalidate(events);
+        if (state.project) {
+            state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
         }
+    },
 
-        if (!Array.isArray(state.project.eventUserDailyDirections)) {
-            state.project.eventUserDailyDirections = [];
-        }
-
-        const search = (direction) => {
-            if (
-                direction.user_id != user.id ||
-                direction.direction_at != direction_at ||
-                direction.events.length != data.events.length
-            ) {
-                return false;
-            }
-
-            for (let i in direction.events) {
-                if (direction.events[i] != data.events[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-        if (state.project.eventUserDailyDirections.find(search)) {
-            state.project.eventUserDailyDirections.map((direction) =>
-                search(direction)
-                    ? {
-                          ...direction,
-                          events: data.events,
-                          direction: data.direction,
-                      }
-                    : direction
-            );
-        } else {
-            state.project.eventUserDailyDirections = [
-                ...state.project.eventUserDailyDirections,
-                {
-                    direction_at,
-                    user_id: user.id,
-                    events: data.events,
-                    direction: data.direction,
-                },
-            ];
+    [REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY](state, event) {
+        summaryCache.invalidate([event]);
+        if (state.project) {
+            state.project.eventUserDailyDirectionsVersion = (state.project.eventUserDailyDirectionsVersion || 0) + 1;
         }
     },
 
@@ -471,7 +486,7 @@ const mutations = {
                     ])
                 );
 
-                if (state.project.eventsParams[key].length == 0) {
+                if (state.project.eventsParams[key].length == 0 && key !== "withUsers") {
                     state.project.eventsParams = Object.fromEntries(
                         Object.entries(state.project.eventsParams).filter(
                             ([k]) => k != key
@@ -542,7 +557,7 @@ const getters = {
      */
     events: (state) =>
         state.project && Array.isArray(state.project.events)
-            ? state.project.events
+            ? filterEventsByUsers(state.project.events, state.project.eventsParams)
             : [],
 
     /**
@@ -559,34 +574,11 @@ const getters = {
      * @param {*} state
      * @returns
      */
-    getEventUserDailyDirection: (state) => (user, direction_at, events) => {
-        return undefined;
+    getEventUserDailyDirection: (state, getters, rootState) => (user, direction_at, events = []) =>
+        user?.id ? dailyDirectionCache.get(dailyDirectionCacheScope(rootState), user.id, direction_at,
+            dailyDirectionContextEvents(rootState, user.id, direction_at, events)) : undefined,
 
-        if (!Array.isArray(state.project.eventUserDailyDirections)) {
-            return undefined;
-        }
-
-        const search = (direction) => {
-            if (
-                direction.user_id != user.id ||
-                direction.direction_at != direction_at ||
-                !Array.isArray(direction.events) ||
-                direction.events.length != events.length
-            ) {
-                return false;
-            }
-
-            for (let i in direction.events) {
-                if (direction.events[i] != events[i]) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
-
-        return state.project.eventUserDailyDirections.find(search);
-    },
+    eventUserDailyDirectionsVersion: (state) => state.project?.eventUserDailyDirectionsVersion || 0,
 
     /**
      * Get new event

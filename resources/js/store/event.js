@@ -1,4 +1,6 @@
 import EventService from "@/apis/event";
+import { agendaEventScope, globalEventRange } from "@/utils/agenda-event-range-cache";
+import { filterEventsByUsers } from "@/utils/event-user-filter";
 
 import {
     FETCH_GLOBAL_EVENTS,
@@ -28,24 +30,43 @@ const actions = {
      * @param {*} context
      * @returns
      */
-    async [FETCH_GLOBAL_EVENTS](context) {
-        let params = {};
-
-        if (
-            context.state.globalEventsParams &&
-            Object.keys(context.state.globalEventsParams).length > 0
-        ) {
-            params.filters = JSON.stringify(
-                context.state.globalEventsParams
-                    ? context.state.globalEventsParams
-                    : {}
-            );
+    async [FETCH_GLOBAL_EVENTS](context, { range, retainRange } = {}) {
+        if (context.rootGetters.agendaOtherProjects === false) {
+            globalEventRange.clear();
+            context.commit(SET_GLOBAL_EVENTS, []);
+            return [];
         }
-
-        const { data } = await EventService.get({
-            params: params,
+        const scope = agendaEventScope(context.rootState);
+        const paramsSnapshot = JSON.stringify(context.state.globalEventsParams || {});
+        const selectedUsers = context.rootState.project?.project?.eventsParams?.withUsers;
+        const selectionSnapshot = JSON.stringify(selectedUsers);
+        const requestedFilters = { ...context.state.globalEventsParams };
+        // The selection belongs to the active project, including an explicit empty list.
+        if (selectedUsers === undefined) delete requestedFilters.withUsers;
+        else requestedFilters.withUsers = selectedUsers;
+        if (Array.isArray(selectedUsers) && selectedUsers.length === 0) {
+            globalEventRange.clear();
+            context.commit(SET_GLOBAL_EVENTS, []);
+            return [];
+        }
+        const filters = JSON.stringify(requestedFilters);
+        const data = await globalEventRange.fetch({
+            scope,
+            filters: JSON.parse(filters),
+            range,
+            retainRange,
+            load: async (requestedFilters) => (await EventService.get({
+                params: { filters: JSON.stringify(requestedFilters) },
+            })).data,
+            onData(data) {
+                if (scope === agendaEventScope(context.rootState) &&
+                    context.rootGetters.agendaOtherProjects !== false &&
+                    paramsSnapshot === JSON.stringify(context.state.globalEventsParams || {}) &&
+                    selectionSnapshot === JSON.stringify(context.rootState.project?.project?.eventsParams?.withUsers)) {
+                    context.commit(SET_GLOBAL_EVENTS, data);
+                }
+            },
         });
-        context.commit(SET_GLOBAL_EVENTS, data);
         return data;
     },
 };
@@ -180,7 +201,9 @@ const getters = {
      * @param {*} state
      * @returns
      */
-    globalEvents: (state) => (state.globalEvents ? state.globalEvents : []),
+    globalEvents: (state, getters, rootState) => filterEventsByUsers(
+        state.globalEvents || [], rootState.project?.project?.eventsParams
+    ),
 
     /**
      * @param {*} state
