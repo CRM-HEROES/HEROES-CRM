@@ -261,10 +261,10 @@ export default {
     top: 0;
     left: 0;
     z-index: 3;
-    width: 480px;
+    width: 350px;
     min-width: 100%;
     max-width: 80vw;
-    max-height: 300px;
+    max-height: 400px;
     overflow-y: auto;
     overflow-x: hidden;
     overscroll-behavior: contain;
