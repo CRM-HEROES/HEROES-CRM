@@ -13,6 +13,9 @@ export default {
     show(project, prospect) {
         return ApiService.get(`project/${project}/prospect/${prospect}`);
     },
+    history(project, prospect) {
+        return ApiService.get(`project/${project}/prospect/${prospect}/history`);
+    },
     duplicate(project, prospect) {
         return ApiService.post(
             `project/${project}/prospect/${prospect}/duplicate`

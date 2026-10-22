@@ -62,6 +62,10 @@
             :prospect="prospect"
             @click="manageInteractions"
         />
+        <history-cell
+            v-else-if="category == 'history'"
+            :prospect="prospect"
+        />
         <sms-cell
             v-else-if="category == 'sms'"
             :prospect="prospect"
@@ -138,6 +142,7 @@ import DefaultCell from "./cell/DefaultCell.vue";
 import EventCell from "./cell/EventCell.vue";
 import EventFieldCell from "./cell/EventFieldCell.vue";
 import InteractionCell from "./cell/InteractionCell.vue";
+import HistoryCell from "./cell/HistoryCell.vue";
 import MetaCell from "./cell/MetaCell.vue";
 import RelationCell from "./cell/RelationCell.vue";
 import SmsCell from "./cell/SmsCell.vue";
@@ -150,6 +155,7 @@ export default {
         EventCell,
         EventFieldCell,
         InteractionCell,
+        HistoryCell,
         MetaCell,
         RelationCell,
         SmsCell,

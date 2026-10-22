@@ -4,8 +4,8 @@
         :date="item.started_at"
         :user="item.user"
         icon="fa fa-calendar"
-        :color="item.calendar.color"
-        :bgcolor="item.calendar.bgcolor"
+        :color="item.calendar ? item.calendar.color : undefined"
+        :bgcolor="item.calendar ? item.calendar.bgcolor : undefined"
     >
         <div class="hc-prospect-profile-history-event">
             <b

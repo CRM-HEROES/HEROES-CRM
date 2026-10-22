@@ -177,6 +177,7 @@
                     "others": "Otros"
                 },
                 "others": {
+                    "history": "Historial",
                     "appointments": "Equipo",
                     "calls": "llamadas",
                     "sms": "SMS",
@@ -190,6 +191,12 @@
                 }
             },
             "cell": {
+                "history": {
+                    "loading": "Cargando historial…",
+                    "error": "No se pudo cargar el historial.",
+                    "retry": "Reintentar",
+                    "empty": "No hay historial."
+                },
                 "event": {
                     "add": "Añadir evento"
                 },

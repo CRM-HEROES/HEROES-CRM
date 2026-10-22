@@ -12,7 +12,7 @@
         <div class="hc-prospect-profile-history-row-footer">
             <div
                 class="hc-prospect-profile-history-row-date"
-                v-text="date"
+                v-text="formattedDate"
             ></div>
             <i
                 class="hc-prospect-profile-history-row-footer-separator fa fa-circle"
@@ -100,6 +100,8 @@
 </style>
 
 <script>
+import dayjs from "dayjs";
+
 export default {
     props: {
         item: {
@@ -126,14 +128,18 @@ export default {
     },
 
     computed: {
-        date() {
-            const date = dayjs(new Date(this.date)).format("DD MMM YYYY HH:mm");
-
-            if (date == "Invalid date") {
-                return this.date;
+        formattedDate() {
+            if (!this.date) {
+                return "";
             }
 
-            return date;
+            const date = dayjs(new Date(this.date));
+
+            if (!date.isValid()) {
+                return this.date || "";
+            }
+
+            return date.format("DD MMM YYYY HH:mm");
         },
     },
 };

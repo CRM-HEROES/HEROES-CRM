@@ -914,6 +914,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     columns: function columns() {
       var _this12 = this;
       return [
+      // History
+      {
+        type: "other",
+        name: this.$t("prospect.table.column.others.history"),
+        icon: "fa fa-clock icon-brown",
+        columnId: "history",
+        headerId: "hc-prospects-table-header-history-history"
+      },
       // Events
       {
         type: "other",

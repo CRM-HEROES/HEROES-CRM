@@ -172,6 +172,7 @@
                     "others": "其他的"
                 },
                 "others": {
+                    "history": "历史记录",
                     "appointments": "预约",
                     "calls": "通话",
                     "sms": "短信",
@@ -184,6 +185,12 @@
                 }
             },
             "cell": {
+                "history": {
+                    "loading": "正在加载历史记录…",
+                    "error": "无法加载历史记录。",
+                    "retry": "重试",
+                    "empty": "暂无历史记录。"
+                },
                 "event": {
                     "add": "添加事件"
                 },

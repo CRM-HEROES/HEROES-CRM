@@ -9,9 +9,16 @@
         :style="style"
         :id="id"
     >
+        <label
+            v-if="column.category == 'history'"
+            class="hc-relation-header-cell-label"
+        >
+            <span v-text="column.name"></span>
+        </label>
+
         <!-- Users -->
         <relation-header-cell
-            v-if="column.category == 'users'"
+            v-else-if="column.category == 'users'"
             :column="column"
             @click.stop="filterUser"
         />

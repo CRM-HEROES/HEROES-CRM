@@ -172,6 +172,7 @@
                     "others": "Altri"
                 },
                 "others": {
+                    "history": "Cronologia",
                     "appointments": "Appuntamenti",
                     "calls": "Chiamate",
                     "sms": "sms",
@@ -184,6 +185,12 @@
                 }
             },
             "cell": {
+                "history": {
+                    "loading": "Caricamento della cronologia…",
+                    "error": "Impossibile caricare la cronologia.",
+                    "retry": "Riprova",
+                    "empty": "Nessuna cronologia."
+                },
                 "event": {
                     "add": "Aggiungi evento"
                 },

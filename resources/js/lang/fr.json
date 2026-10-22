@@ -197,6 +197,7 @@
                     "others": "Autres"
                 },
                 "others": {
+                    "history": "Historique",
                     "appointments": "RDV",
                     "calls": "Appels",
                     "sms": "SMS",
@@ -235,6 +236,12 @@
             },
 
             "cell": {
+                "history": {
+                    "loading": "Chargement de l’historique…",
+                    "error": "Impossible de charger l’historique.",
+                    "retry": "Réessayer",
+                    "empty": "Aucun historique."
+                },
                 "event": {
                     "add": "Ajouter un RDV"
                 },

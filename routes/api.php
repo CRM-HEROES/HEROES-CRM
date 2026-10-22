@@ -528,6 +528,9 @@ Route::group([
             // Auth
             Route::get('auth', [ProspectAuthController::class, 'index']);
 
+            // History
+            Route::get('history', [ProjectProspectController::class, 'history'])->name('history');
+
             // Available Event
             Route::apiResource('available-event', ProspectAvailableEventController::class);
 
