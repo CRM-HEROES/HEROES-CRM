@@ -14,6 +14,20 @@ return [
         'sms' => "SMS",
         'orders' => "Orders",
         'links' => "External links",
+        'history' => "History",
+        'history_types' => [
+            'event' => "Appointment",
+            'file' => "File",
+            'group' => "Group",
+            'interaction' => "Call",
+            'label' => "Label",
+            'link' => "Link",
+            'message' => "Message",
+            'order' => "Quote",
+            'revision' => "Change",
+            'sms' => "SMS",
+            'user' => "User assignment",
+        ],
     ],
 
     'fields' => [

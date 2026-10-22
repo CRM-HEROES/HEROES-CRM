@@ -265,8 +265,11 @@ export default {
                     let required = false;
                     let format = null;
 
-                    // Users
-                    if (key == "users") {
+                    // History
+                    if (key == "history") {
+                        name = this.$t("prospect.table.column.others.history");
+                        // Users
+                    } else if (key == "users") {
                         name = this.$t(
                             "prospect.table.column.others.affected_users"
                         );

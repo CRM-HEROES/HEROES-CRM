@@ -177,6 +177,7 @@
                     "others": "Outros"
                 },
                 "others": {
+                    "history": "Histórico",
                     "appointments": "Compromissos",
                     "calls": "Chamadas",
                     "sms": "SMS",
@@ -190,6 +191,12 @@
                 }
             },
             "cell": {
+                "history": {
+                    "loading": "Carregando histórico…",
+                    "error": "Não foi possível carregar o histórico.",
+                    "retry": "Tentar novamente",
+                    "empty": "Nenhum histórico."
+                },
                 "event": {
                     "add": "Adicionar Evento"
                 },

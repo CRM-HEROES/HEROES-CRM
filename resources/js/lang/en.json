@@ -197,6 +197,7 @@
                     "others": "Others"
                 },
                 "others": {
+                    "history": "History",
                     "appointments": "Appointments",
                     "calls": "Calls",
                     "sms": "SMS",
@@ -235,6 +236,12 @@
             },
 
             "cell": {
+                "history": {
+                    "loading": "Loading history…",
+                    "error": "Unable to load history.",
+                    "retry": "Retry",
+                    "empty": "No history."
+                },
                 "event": {
                     "add": "Add event"
                 },

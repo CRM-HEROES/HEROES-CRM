@@ -203,12 +203,34 @@ const actions = {
      * @param {Object} params new prospect field values
      */
     async [UPDATE_PROSPECT](context, params) {
-        context.commit(UPDATE_PROSPECT, params);
-        await ProspectService.update(
-            context.state.project.slug,
-            params.id,
-            params
+        const projectSlug = context.state.project.slug;
+        const prospect = (context.state.project.prospects || []).find(
+            (item) => item.id == params.id
         );
+        const withHistory = !!prospect && Object.prototype.hasOwnProperty.call(
+            prospect,
+            "history_count"
+        );
+
+        context.commit(UPDATE_PROSPECT, params);
+        const { data } = await ProspectService.update(
+            projectSlug,
+            params.id,
+            withHistory ? { ...params, withHistory: true } : params
+        );
+
+        if (
+            withHistory &&
+            context.state.project.slug === projectSlug &&
+            Number.isInteger(data.history_count) &&
+            Object.prototype.hasOwnProperty.call(data, "history_latest")
+        ) {
+            context.commit(UPDATE_PROSPECT, {
+                id: params.id,
+                history_latest: data.history_latest,
+                history_count: data.history_count,
+            });
+        }
     },
 
     /**

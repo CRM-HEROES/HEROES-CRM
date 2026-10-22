@@ -1087,6 +1087,14 @@ export default {
 
         columns() {
             return [
+                // History
+                {
+                    type: "other",
+                    name: this.$t("prospect.table.column.others.history"),
+                    icon: "fa fa-clock icon-brown",
+                    columnId: "history",
+                    headerId: "hc-prospects-table-header-history-history",
+                },
                 // Events
                 {
                     type: "other",

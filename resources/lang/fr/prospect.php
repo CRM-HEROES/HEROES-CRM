@@ -16,6 +16,20 @@ return [
         'sms' => "SMS",
         'orders' => "Devis",
         'links' => "Liens externes",
+        'history' => "Historique",
+        'history_types' => [
+            'event' => "RDV",
+            'file' => "Fichier",
+            'group' => "Groupe",
+            'interaction' => "Appel",
+            'label' => "Étiquette",
+            'link' => "Lien",
+            'message' => "Message",
+            'order' => "Devis",
+            'revision' => "Modification",
+            'sms' => "SMS",
+            'user' => "Affectation utilisateur",
+        ],
     ],
 
     'fields' => [

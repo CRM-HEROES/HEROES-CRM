@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
+use App\Services\ProspectHistory;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -160,6 +161,18 @@ class ProspectController extends Controller
     }
 
     /**
+     * Load the complete timeline when the history cell is opened.
+     */
+    public function history(Project $project, Prospect $prospect)
+    {
+        abort_unless($prospect->project_id == $project->id, 404);
+
+        app(ProspectHistory::class)->append($prospect->newCollection([$prospect]), $project);
+
+        return $prospect->history;
+    }
+
+    /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, Project $project, Prospect $prospect)
@@ -186,7 +199,15 @@ class ProspectController extends Controller
             $defaultFieldValues, ['meta' => array_merge($prospect->meta ?: [], $metaFieldValues)]
         ));
 
-        return ['message' => trans('common.success.updated_resource')];
+        $response = ['message' => trans('common.success.updated_resource')];
+
+        if ($request->boolean('withHistory')) {
+            app(ProspectHistory::class)->appendSummary($prospect->newCollection([$prospect]), $project);
+            $response['history_latest'] = $prospect->history_latest;
+            $response['history_count'] = $prospect->history_count;
+        }
+
+        return $response;
     }
 
     /**
@@ -462,14 +483,20 @@ class ProspectController extends Controller
         if ($userSetting) {
             return array_map(function($field) {
                 return $field['key'];
-            }, $userSetting->value);
+            }, array_filter($userSetting->value, function ($field) {
+                return $field['key'] !== 'history' || empty($field['hidden']);
+            }));
         }
 
         // From project settings
         $projectSetting = collect(ProjectSetting::get($project, 'prospects-table'));
 
         if ($projectSetting) {
-            return $projectSetting->map(function($field) {
+            return $projectSetting->filter(function ($field) {
+                $field = (array) $field;
+                return $field['key'] !== 'history' || empty($field['hidden']);
+            })->map(function($field) {
+                $field = (array) $field;
                 return $field['key'];
             })->toArray();
         }
@@ -783,6 +810,10 @@ class ProspectController extends Controller
             })
             ->skip(($request->input('page', 1) - 1) * $count)
             ->paginate($count);
+
+        if (in_array('history', $fields)) {
+            app(ProspectHistory::class)->appendSummary($data->getCollection(), $project);
+        }
 
         $data->setCollection($data
             ->map(function($data) use($fields) {
