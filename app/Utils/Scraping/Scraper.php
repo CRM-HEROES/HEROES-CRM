@@ -36,6 +36,8 @@ class Scraper
         
         // Return the transfer as a string instead of outputting it
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         
         // Execute the request
         $html = curl_exec($ch);

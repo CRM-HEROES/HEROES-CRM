@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 
 class RoutePathRepository
 {
+    use RemembersIds;
+
     protected $model;
     protected $routeRepository;
 
@@ -38,14 +40,20 @@ class RoutePathRepository
 
     public function getId($route, $request)
     {
-        $route_id = $this->getRouteId(
-            $this->getRouteName($route),
-            $this->getRouteAction($route) ?: 'closure'
+        $name = $this->getRouteName($route);
+        $action = $this->getRouteAction($route) ?: 'closure';
+
+        $route_id = $this->rememberId(
+            'tracker.route.' . md5($name . '|' . $action),
+            fn () => $this->getRouteId($name, $action)
         );
 
-        $route_path = $this->getRoutePath($route_id, $this->getRequestPath($request), $route);
+        $path = $this->getRequestPath($request);
 
-        return $route_path->id;
+        return $this->rememberId(
+            'tracker.route_path.' . $route_id . '.' . md5($path),
+            fn () => $this->getRoutePath($route_id, $path, $route)->id
+        );
     }
 
     protected function getRoutePath($route_id, $path, $route)

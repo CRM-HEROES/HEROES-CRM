@@ -8,6 +8,8 @@ use Illuminate\Routing\Router;
 
 class Tracker
 {
+    const SESSION_DATA_ATTRIBUTE = 'tracker.session_data';
+
 
     protected $agentRepository;
     protected $cookieRepository;
@@ -108,6 +110,14 @@ class Tracker
 
     public function makeSessionData()
     {
+        // Computed once per request: the Authenticated listener and the tracking middleware
+        // both need it, and each call resolves agent, device and cookie.
+        // (reused only for the same user, e.g. not across a login done inside the request)
+        $cached = $this->request->attributes->get(static::SESSION_DATA_ATTRIBUTE);
+        if ($cached && $cached['user_id'] === $this->getUserId()) {
+            return $cached;
+        }
+
         $sessionData = [
             'user_id'      => $this->getUserId(),
             'device_id'    => $this->getDeviceId(),
@@ -116,6 +126,8 @@ class Tracker
             'agent_id'     => $this->getAgentId(),
             'cookie_id'    => $this->getCookieId(),
         ];
+
+        $this->request->attributes->set(static::SESSION_DATA_ATTRIBUTE, $sessionData);
 
         return $sessionData;
     }

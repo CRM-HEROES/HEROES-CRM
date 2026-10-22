@@ -47,7 +47,9 @@ class GouvFr
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request

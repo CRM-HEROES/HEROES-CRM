@@ -78,6 +78,8 @@ class Docusign
 
         curl_setopt($ch, CURLOPT_URL, env('DOCUSIGN_AUTH_BASE_URL') . '/oauth/token');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         curl_setopt($ch, CURLOPT_POST, 1);
         $post = array(
             'grant_type' => 'authorization_code',
@@ -163,6 +165,8 @@ class Docusign
         curl_setopt_array($curl, [
             CURLOPT_URL => env('DOCUSIGN_AUTH_BASE_URL') . "/oauth/token",
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30,
             CURLOPT_CUSTOMREQUEST => "POST",
             CURLOPT_POSTFIELDS => [
                 'grant_type' => 'refresh_token',
@@ -282,6 +286,8 @@ class Docusign
         curl_setopt($ch, CURLOPT_URL, $endpoint_url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $response = curl_exec($ch);
         curl_close($ch);
 
@@ -308,6 +314,8 @@ class Docusign
         curl_setopt($ch, CURLOPT_URL, $endpoint_url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
         $response = curl_exec($ch);
         curl_close($ch);
 

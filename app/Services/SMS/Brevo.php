@@ -109,7 +109,7 @@ class Brevo
             throw new \Exception(trans('sms.brevo.error.empty_number'));
         }
 
-        $response = Http::withHeaders([
+        $response = Http::timeout(30)->connectTimeout(5)->withHeaders([
             'api-key' => $this->config['apikey'],
             'accept' => 'application/json',
             'content-type' => 'application/json',

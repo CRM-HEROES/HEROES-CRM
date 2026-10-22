@@ -52,7 +52,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -90,7 +92,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -135,7 +139,9 @@ class Pipedrive
             CURLOPT_CUSTOMREQUEST  => "POST",
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $params,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -179,7 +185,9 @@ class Pipedrive
             ],
             CURLOPT_CUSTOMREQUEST  => "PUT",
             CURLOPT_POSTFIELDS     => $params,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -217,7 +225,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -262,7 +272,9 @@ class Pipedrive
             CURLOPT_CUSTOMREQUEST  => "POST",
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $params,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -300,7 +312,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -338,7 +352,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -383,7 +399,9 @@ class Pipedrive
             CURLOPT_CUSTOMREQUEST  => "POST",
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => $params,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -427,7 +445,9 @@ class Pipedrive
             ],
             CURLOPT_CUSTOMREQUEST  => "PUT",
             CURLOPT_POSTFIELDS     => $params,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -465,7 +485,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -505,7 +527,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request
@@ -543,7 +567,9 @@ class Pipedrive
             CURLOPT_URL => $url,
             CURLOPT_CUSTOMREQUEST => "GET",
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 30
         );
 
         // Set all options for the cURL request

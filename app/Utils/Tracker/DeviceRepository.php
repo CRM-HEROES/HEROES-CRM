@@ -11,6 +11,8 @@ use Jenssegers\Agent\Agent;
 
 class DeviceRepository
 {
+    use RemembersIds;
+
     protected $model;
     protected $request;
     protected $agent;
@@ -49,7 +51,12 @@ class DeviceRepository
 
     public function getId()
     {
-        return $this->firstOrCreate($this->getCurrentDevice(), ['kind', 'model', 'platform', 'platform_version'])->id;
+        $device = $this->getCurrentDevice();
+
+        return $this->rememberId(
+            'tracker.device.' . md5(json_encode($device)),
+            fn () => $this->firstOrCreate($device, ['kind', 'model', 'platform', 'platform_version'])->id
+        );
     }
 
     protected function getCurrentDevice()

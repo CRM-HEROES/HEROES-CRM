@@ -116,7 +116,8 @@ class MenuController extends Controller
         $cacheKey = 
             'project.' . $project->slug . '.' .
             'user.' . (auth()->user() ? auth()->id() : 0) . '.' .
-            'menu.' . $menu . '.' .
+            // id + filters hash: casting the model to string would put its whole JSON in the key
+            'menu.' . $menu->id . '.' . md5(json_encode($menu->filters)) . '.' .
             'prospects-count';
 
         return cache()->remember(

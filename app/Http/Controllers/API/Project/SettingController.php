@@ -104,13 +104,13 @@ class SettingController extends Controller
         try {
             $apiKey = data_get($settings, 'api_key');
             $headers = ['api-key' => $apiKey, 'accept' => 'application/json'];
-            $accountResponse = Http::withHeaders($headers)->get('https://api.brevo.com/v3/account');
+            $accountResponse = Http::timeout(15)->connectTimeout(5)->withHeaders($headers)->get('https://api.brevo.com/v3/account');
 
             if (!$accountResponse->successful()) {
                 throw new \Exception($accountResponse->json('message', $accountResponse->body()));
             }
 
-            $sendersResponse = Http::withHeaders($headers)->get('https://api.brevo.com/v3/senders');
+            $sendersResponse = Http::timeout(15)->connectTimeout(5)->withHeaders($headers)->get('https://api.brevo.com/v3/senders');
 
             if (!$sendersResponse->successful()) {
                 throw new \Exception($sendersResponse->json('message', $sendersResponse->body()));
