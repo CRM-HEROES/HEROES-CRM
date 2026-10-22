@@ -9,11 +9,12 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
-use Throwable;
+use RuntimeException;
 
 class ExportProspects implements ShouldQueue
 {
@@ -41,8 +42,22 @@ class ExportProspects implements ShouldQueue
         $skip = 0;
         $page = 1;
         $exportedRows = 0;
+        $previousUser = Auth::user();
+        $previousInput = request()->all();
+        $previousTeam = getPermissionsTeamId();
 
         try {
+            $creator = $this->export->creator;
+
+            if (!$creator || !$this->export->project) {
+                throw new RuntimeException('Le créateur ou le projet de l’export est introuvable.');
+            }
+
+            // Timeline visibility uses the same user and project as the export request.
+            Auth::setUser($creator);
+            setPermissionsTeamId($this->export->project_id);
+            request()->merge(['project' => $this->export->project]);
+
             // Chunk data
             do {
                 if ($this->export->count && $this->export->count == $skip) {
@@ -68,8 +83,15 @@ class ExportProspects implements ShouldQueue
             // Notify export finished
             $this->notifyExportFinished();
 
-        } catch (Throwable $exception) {
-            throw $exception;
+        } finally {
+            if ($previousUser) {
+                Auth::setUser($previousUser);
+            } else {
+                Auth::forgetUser();
+            }
+
+            setPermissionsTeamId($previousTeam);
+            request()->replace($previousInput);
         }
     }
 

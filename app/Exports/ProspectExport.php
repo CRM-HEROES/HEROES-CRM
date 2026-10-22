@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Filters\ProspectFilters;
 use App\Models\Export;
+use App\Services\ProspectHistory;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
@@ -21,6 +22,7 @@ class ProspectExport implements FromCollection
     const MAPPING_FIELD_LINK = 8;
     const MAPPING_FIELD_USER = 9;
     const MAPPING_FIELD_GROUP = 10;
+    const MAPPING_FIELD_HISTORY = 11;
 
     
     protected Export $export;
@@ -28,6 +30,7 @@ class ProspectExport implements FromCollection
     protected $limit;
     protected $skip;
     protected $count = 0;
+    protected ?ProspectHistoryFormatter $historyFormatter = null;
 
     public function __construct(Export $export, $limit = 1000, $skip = 0)
     {
@@ -116,6 +119,8 @@ class ProspectExport implements FromCollection
                     return trans('prospect.export.orders');
                 case ProspectExport::MAPPING_FIELD_LINK:
                     return trans('prospect.export.links');
+                case ProspectExport::MAPPING_FIELD_HISTORY:
+                    return trans('prospect.export.history');
                 default:
                     return "";
             }
@@ -155,6 +160,8 @@ class ProspectExport implements FromCollection
                         return $this->exportOrders($prospect);
                     case ProspectExport::MAPPING_FIELD_LINK:
                         return $this->exportLinks($prospect);
+                    case ProspectExport::MAPPING_FIELD_HISTORY:
+                        return $this->exportHistory($prospect);
                     default:
                         return "";
                 }
@@ -199,6 +206,13 @@ class ProspectExport implements FromCollection
                 return [
                     'type'  => ProspectExport::MAPPING_FIELD_MESSAGE,
                     'field' => $thread
+                ];
+            }
+
+            // History
+            else if ($field == 'history') {
+                return [
+                    'type' => ProspectExport::MAPPING_FIELD_HISTORY,
                 ];
             }
 
@@ -282,6 +296,13 @@ class ProspectExport implements FromCollection
                 ];
             }
         }, $this->export->fields));
+    }
+
+    protected function exportHistory($prospect): string
+    {
+        $this->historyFormatter ??= new ProspectHistoryFormatter($this->export->project);
+
+        return $this->historyFormatter->format($prospect->history ?? []);
     }
 
     /**
@@ -552,7 +573,7 @@ class ProspectExport implements FromCollection
             return Str::startsWith($field, 'thread->');
         }));
         
-        return $this->export->project
+        $prospects = $this->export->project
             ->prospects()
             ->when(!empty($categories), function($query) use($categories) {
                 $query->with([
@@ -630,5 +651,11 @@ class ProspectExport implements FromCollection
             })
             ->filter($this->getFilters())
             ->get();
+
+        if (in_array('history', $this->export->fields, true)) {
+            app(ProspectHistory::class)->append($prospects, $this->export->project);
+        }
+
+        return $prospects;
     }
 }
