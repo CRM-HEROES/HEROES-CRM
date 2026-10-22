@@ -136,11 +136,52 @@ class SessionRepository
             return false;
         }
 
-        if (! $this->findByUuid($this->getSessionData('uuid'))) {
+        if (! $this->sessionExists($this->getSessionData('uuid'))) {
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Does the tracked session still exist? Only a positive answer is cached
+     * (a missing session is created right after).
+     */
+    protected function sessionExists($uuid)
+    {
+        $key = 'tracker.session.exists.' . md5($uuid);
+
+        try {
+            if (Cache::has($key)) {
+                return true;
+            }
+        } catch (\Throwable $e) {
+            return (bool) $this->findByUuid($uuid);
+        }
+
+        if (! $this->findByUuid($uuid)) {
+            return false;
+        }
+
+        try {
+            Cache::put($key, true, 300);
+        } catch (\Throwable $e) {
+            // ignored
+        }
+
+        return true;
+    }
+
+    /**
+     * At most one "last seen" write per session and per minute.
+     */
+    protected function shouldTouchSession($id)
+    {
+        try {
+            return Cache::add('tracker.session.touch.' . $id, 1, 60);
+        } catch (\Throwable $e) {
+            return true;
+        }
     }
 
     protected function createSessionIfNew()
@@ -151,12 +192,15 @@ class SessionRepository
 
             $this->sessionSetId($model->id);
         } else {
-            DB::table('tracker_sessions')
-                ->where('id', $this->getSessionData('id'))
-                ->limit(1)
-                ->update([
-                    'updated_at' => strval(Carbon::now())
-                ]);/*
+            // updated_at is only a "last seen" marker: once a minute is enough
+            if ($this->shouldTouchSession($this->getSessionData('id'))) {
+                DB::table('tracker_sessions')
+                    ->where('id', $this->getSessionData('id'))
+                    ->limit(1)
+                    ->update([
+                        'updated_at' => strval(Carbon::now())
+                    ]);
+            }/*
             $session = $this->find($this->getSessionData('id'));
 
             $session->updated_at = Carbon::now();

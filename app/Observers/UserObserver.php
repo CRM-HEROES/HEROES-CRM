@@ -3,11 +3,11 @@
 namespace App\Observers;
 
 use App\Jobs\ImportProspects;
+use App\Jobs\UserGetLocation;
 use App\Models\User;
 use App\Models\UserSetting;
 use App\Notifications\UserRegistration;
 use Illuminate\Support\Facades\DB;
-use Stevebauman\Location\Facades\Location;
 
 class UserObserver
 {
@@ -155,44 +155,12 @@ class UserObserver
 
         $user->syncOriginal(['ip_address']);
 
-        // $ip = "115.99.96.19";
-        $ip = $user->ip_address;
-        $address = Location::get($ip);
-
-        if (!$address) {
+        if (!$user->ip_address) {
             return;
         }
 
-        $user->update([
-            'ip_country' => $address->countryName,
-            'ip_state' => $address->regionName,
-            'ip_city' => $address->cityName,
-            'ip_postal_code' => $address->postalCode ? $address->postalCode : $address->zipCode,
-            'ip_latitude' => $address->latitude,
-            'ip_longitude' => $address->longitude,
-        ]);
-
-        /*
-        {#2168 // app\Observers\UserObserver.php:154
-        +ip: "115.99.96.19"
-        +driver: "Stevebauman\Location\Drivers\IpApi"
-        +currencyCode: "INR"
-        +countryCode: "IN"
-        +regionCode: "KA"
-
-        ++++ countryName: "India"
-        ++++ regionName: "Karnataka"
-        ++++ cityName: "Bengaluru"
-        ++++ zipCode: "562130"
-        ++++ postalCode: null
-        ++++ latitude: "12.9634"
-        ++++ longitude: "77.5855"
-
-        +isoCode: null
-        +metroCode: null
-        +areaCode: "KA"
-        +timezone: "Asia/Kolkata"
-        }*/
+        // The location lookup is an external HTTP call: never do it inside the user's request
+        UserGetLocation::dispatch($user->id, $user->ip_address);
     }
     
 }

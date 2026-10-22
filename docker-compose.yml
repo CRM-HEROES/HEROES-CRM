@@ -27,6 +27,9 @@ services:
     image: "redis:alpine"
     container_name: redis-heroes
     restart: unless-stopped
+    # Used as the application cache (permissions, menus, tracker ids, scheduler locks):
+    # bounded memory, only keys with a TTL are evicted (import locks keep their TTL too).
+    command: redis-server --maxmemory 256mb --maxmemory-policy volatile-lru
     networks:
       - heroes-network
     volumes:

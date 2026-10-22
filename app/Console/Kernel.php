@@ -15,20 +15,25 @@ class Kernel extends ConsoleKernel
         // Daily stat
         $schedule->command('app:stat')->dailyAt('0:10');
 
+        // The aggregation commands below are heavy: they are staggered (not all on the hour),
+        // never overlap with themselves (the lock expires after N minutes; it needs a shared
+        // cache driver such as redis/file, not "array") and run in the background so a slow
+        // one does not delay the other scheduled tasks.
+
         // User Tracking
-        $schedule->command('app:user-tracker')->hourly();
+        $schedule->command('app:user-tracker')->hourlyAt(3)->withoutOverlapping(30)->runInBackground();
         
         // Vehicle Tracking
         // $schedule->command('app:vehicle-tracker')->hourly();
         
         // Label prospects count
-        $schedule->command('app:label-prospects-count')->hourly();
+        $schedule->command('app:label-prospects-count')->hourlyAt(8)->withoutOverlapping(15)->runInBackground();
         
         // User prospects count
-        $schedule->command('app:user-prospects-count')->hourly();
+        $schedule->command('app:user-prospects-count')->hourlyAt(13)->withoutOverlapping(15)->runInBackground();
         
         // Role users count
-        $schedule->command('app:role-users-count')->hourly();
+        $schedule->command('app:role-users-count')->hourlyAt(18)->withoutOverlapping(15)->runInBackground();
         
         // Relevance
         $schedule->command('app:relevance --days=120')->daily();

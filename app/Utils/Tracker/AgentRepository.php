@@ -8,6 +8,8 @@ use Jenssegers\Agent\Agent;
 
 class AgentRepository
 {
+    use RemembersIds;
+
     protected $model;
     protected $request;
     protected $agent;
@@ -42,7 +44,12 @@ class AgentRepository
 
     public function getId()
     {
-        return $this->firstOrCreate($this->getCurrentAgent())->id;
+        $agent = $this->getCurrentAgent();
+
+        return $this->rememberId(
+            'tracker.agent.' . md5(json_encode($agent)),
+            fn () => $this->firstOrCreate($agent)->id
+        );
     }
 
     protected function getCurrentAgent()

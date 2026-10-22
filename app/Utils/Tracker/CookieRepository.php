@@ -8,6 +8,8 @@ use Ramsey\Uuid\Uuid as UUID;
 
 class CookieRepository
 {
+    use RemembersIds;
+
     protected $model;
     protected $request;
     protected $cookieJar;
@@ -44,6 +46,9 @@ class CookieRepository
             $this->cookieJar->queue(cookie($this->cookieKey, $cookie, 0));
         }
 
-        return $this->firstOrCreate(['uuid' => $cookie])->id;
+        return $this->rememberId(
+            'tracker.cookie.' . md5($cookie),
+            fn () => $this->firstOrCreate(['uuid' => $cookie])->id
+        );
     }
 }

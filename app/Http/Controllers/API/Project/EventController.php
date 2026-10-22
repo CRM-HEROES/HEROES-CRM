@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API\Project;
 
 use App\Filters\EventRequestFilters;
 use App\Http\Controllers\Controller;
+use App\Models\Calendar;
 use App\Models\Event;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class EventController extends Controller
@@ -319,19 +321,20 @@ class EventController extends Controller
                 ->all();
         }
 
+        // Calendars of the project the authenticated user can see
+        // (Calendar global scope included), resolved once so the events query
+        // is a plain "calendar_id IN (...)" instead of nested correlated EXISTS.
+        $calendarIds = Calendar::where('project_id', $project->id)->pluck('id');
+
         // Result
         $events = Event
-            ::whereHas('calendar', function($query) use($project) {
-                $query->where('project_id', $project->id);
-            })
+            ::whereIn('events.calendar_id', $calendarIds)
             ->when(!$canViewOthersAgenda, function($query) use($agendaUserIds) {
                 $query->where(function($query) use($agendaUserIds) {
                     $query
-                        ->whereIn('user_id', $agendaUserIds)
-                        ->orWhere('creator_id', auth()->id())
-                        ->orWhereHas('users', function($query) use($agendaUserIds) {
-                            $query->whereIn('users.id', $agendaUserIds);
-                        });
+                        ->whereIn('events.user_id', $agendaUserIds)
+                        ->orWhere('events.creator_id', auth()->id())
+                        ->orWhereIn('events.id', DB::table('user_event')->whereIn('user_id', $agendaUserIds)->select('event_id'));
                 });
             })
             ->when(in_array('calendar', $fields), function($query) {

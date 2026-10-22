@@ -47,7 +47,9 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'retry_after' => 90,
+            // Must stay above the worker --timeout (3600, see supervisor/worker.conf),
+            // otherwise a long job is released and executed twice.
+            'retry_after' => 3700,
             'after_commit' => false,
         ],
 

@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\API\User;
 
 use App\Http\Controllers\Controller;
+use App\Listeners\UserAuthenticatedListener;
 use App\Models\User;
 use App\Notifications\UserDeviceBan;
 use App\Utils\Tracker\Session;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class SessionController extends Controller
@@ -141,6 +143,9 @@ class SessionController extends Controller
             ->where('device_id', $session->device_id)
             ->where('client_ip', $session->client_ip)
             ->update(['banned_at' => \Carbon\Carbon::now()]);
+
+        // The ban status is cached by the Authenticated listener
+        Cache::forget(UserAuthenticatedListener::banCacheKey($user->id, $session->device_id, $session->client_ip));
     }
 
     public function cancelBan(User $user, Session $session)
@@ -150,5 +155,7 @@ class SessionController extends Controller
             ->where('device_id', $session->device_id)
             ->where('client_ip', $session->client_ip)
             ->delete();
+
+        Cache::forget(UserAuthenticatedListener::banCacheKey($user->id, $session->device_id, $session->client_ip));
     }
 }

@@ -66,7 +66,9 @@ class Mindee
             CURLOPT_HTTPHEADER => $headers,
             CURLOPT_POSTFIELDS => $data,
             CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_RETURNTRANSFER => true
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 60
         );
 
         // Set all options for the cURL request

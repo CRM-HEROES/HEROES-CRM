@@ -2,6 +2,8 @@
 
 namespace App\Filters;
 
+use App\Models\Calendar;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
@@ -99,42 +101,46 @@ class EventFilters extends Filters
 
     /**
      * Filter by projects
+     *
+     * The calendars are selected with an IN sub-query instead of a correlated EXISTS,
+     * so MySQL can use the (calendar_id, ...) indexes of events.
+     * The Calendar global scopes still apply to the sub-query.
      */
     public function withProjects(Builder $builder, $value) {
-        return $builder->whereHas('calendar', function($query) use($value) {
-            $query->whereIn('project_id', $value);
-        });
+        return $builder->whereIn('events.calendar_id', Calendar::whereIn('project_id', $value)->select('calendars.id'));
     }
 
     /**
      * Filter by without projects
      */
     public function withoutProjects(Builder $builder, $value) {
-        return $builder->whereDoesntHave('calendar', function($query) use($value) {
-            $query->whereIn('project_id', $value);
-        });
+        return $builder->whereNotIn('events.calendar_id', Calendar::whereIn('project_id', $value)->select('calendars.id'));
     }
 
     /**
-     * Filter by user
+     * Filter by user (affected user or attendee)
+     *
+     * user_id IN (...) OR id IN (attendees sub-query): two indexable lookups
+     * instead of two correlated EXISTS combined with an OR.
      */
     public function withUsers(Builder $builder, $value) {
         if ($value === []) {
             return $builder->whereRaw('1 = 0');
         }
 
-        return $builder->where(function($query) use($value) {
+        $ids = Arr::flatten((array) $value);
+
+        return $builder->where(function($query) use($ids) {
+            if (empty($ids)) {
+                $query
+                    ->whereNotNull('events.user_id')
+                    ->orWhereIn('events.id', DB::table('user_event')->select('event_id'));
+                return;
+            }
+
             $query
-                ->whereHas('user', function($query) use($value) {
-                        $query->when(!empty($value), function($query) use($value) {
-                            $query->whereIn('id', $value);
-                    });
-                })
-                ->orWhereHas('users', function($query) use($value) {
-                        $query->when(!empty($value), function($query) use($value) {
-                            $query->whereIn('id', $value);
-                    });
-                });
+                ->whereIn('events.user_id', $ids)
+                ->orWhereIn('events.id', DB::table('user_event')->whereIn('user_id', $ids)->select('event_id'));
         });
     }
 
@@ -142,10 +148,14 @@ class EventFilters extends Filters
      * Filter by without user
      */
     public function withoutUsers(Builder $builder, $value) {
-        return $builder->whereDoesntHave('user', function($query) use($value) {
-            $query->when(!empty($value), function($query) use($value) {
-                $query->whereIn('id', $value);
-            });
+        $ids = Arr::flatten((array) $value);
+
+        return $builder->where(function($query) use($ids) {
+            $query->whereNull('events.user_id');
+
+            if (!empty($ids)) {
+                $query->orWhereNotIn('events.user_id', $ids);
+            }
         });
     }
 
