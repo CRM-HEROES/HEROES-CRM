@@ -64,6 +64,7 @@ use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
 use App\Http\Controllers\API\Project\LineController as ProjectLineController;
 use App\Http\Controllers\API\Project\Line\CloudTalkController as ProjectLineCloudTalkController;
 use App\Http\Controllers\API\Project\Line\CloudTalkExportController as ProjectLineCloudTalkExportController;
+use App\Http\Controllers\API\Project\SmsExportController as ProjectSmsExportController;
 use App\Http\Controllers\API\Project\LogoController as ProjectLogoController;
 use App\Http\Controllers\API\Project\MenuController as ProjectMenuController;
 use App\Http\Controllers\API\Project\MenuIconController as ProjectMenuIconController;
@@ -512,6 +513,11 @@ Route::group([
         // Message
         Route::post('thread/{thread}/message/bulk', [ProspectMessageController::class, 'bulk']);
         // SMS
+        Route::post('sms/export', [ProjectSmsExportController::class, 'create']);
+        Route::get('sms/export/{exportId}/status', [ProjectSmsExportController::class, 'status'])
+            ->name('sms.export.status');
+        Route::get('sms/export/{exportId}/download', [ProjectSmsExportController::class, 'download'])
+            ->name('sms.export.download');
         Route::post('sms/bulk', [ProspectSmsController::class, 'bulk']);
         // User
         Route::match(['PUT', 'PATCH'], 'prospect/user/bulk', [ProspectUserController::class, 'bulk']);

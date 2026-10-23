@@ -1,8 +1,9 @@
 <template>
     <modal :name="name" title="CloudTalk" :width="520" @open="resetExport" @closed="resetExport">
-        <tab :count="2" :tab="tab" @tab:change="(value) => (tab = value)">
+        <tab :count="3" :tab="tab" @tab:change="(value) => (tab = value)">
             <template #1>Configuration</template>
-            <template #2>Exportation CloudTalk</template>
+            <template #2>Exportation appel CloudTalk</template>
+            <template #3>Exportation SMS</template>
         </tab>
         <div class="hc-flex-column" style="flex: 1; min-height: 0; overflow: hidden">
             <item-list
@@ -143,9 +144,9 @@
                                 <input v-model="exportDateTo" type="date" required :min="exportDateFrom || undefined" :disabled="downloadingScript" />
                             </label>
                         </div>
-                        <p class="hc-cloudtalk-export-help">
+                        <!-- <p class="hc-cloudtalk-export-help">
                             Journées incluses, fuseau horaire : {{ exportTimezone }}.
-                        </p>
+                        </p> -->
                         <label class="hc-cloudtalk-export-checkbox">
                             <input v-model="exportDownloadAudio" type="checkbox" :disabled="downloadingScript" />
                             <span>Télécharger les audios disponibles</span>
@@ -177,6 +178,39 @@
             </div>
             <p v-else-if="tab === 1" class="hc-cloudtalk-export-help">
                 L’exportation CloudTalk est réservée aux administrateurs du projet.
+            </p>
+            <div v-if="tab === 2 && canCloudtalkExport" class="hc-cloudtalk-export">
+                <p>Exportez les SMS entrants et sortants enregistrés dans le CRM pour le projet actuel.</p>
+                <form @submit.prevent="downloadSmsExport">
+                    <div class="hc-cloudtalk-export-dates">
+                        <label class="hc-cloudtalk-export-field">
+                            <span>Date de début</span>
+                            <input v-model="smsDateFrom" type="date" required :max="smsDateTo || undefined" :disabled="downloadingSms" />
+                        </label>
+                        <label class="hc-cloudtalk-export-field">
+                            <span>Date de fin</span>
+                            <input v-model="smsDateTo" type="date" required :min="smsDateFrom || undefined" :disabled="downloadingSms" />
+                        </label>
+                    </div>
+                    <p class="hc-cloudtalk-export-help">
+                        Le CSV contient les messages, dates, sens, sources, prospects et auteurs.
+                        Toutes les sources de SMS enregistrées dans le CRM sont incluses.
+                    </p>
+                    <button class="hc-button-secondary" type="submit" :disabled="downloadingSms || !canDownloadSms">
+                        <icon :class="downloadingSms ? 'fa fa-spinner fa-spin' : 'fa fa-download'" />
+                        {{ downloadingSms ? 'Préparation du CSV…' : 'Télécharger les SMS en CSV' }}
+                    </button>
+                </form>
+                <p v-if="smsProgress" class="hc-cloudtalk-export-help" role="status">{{ smsProgress }}</p>
+                <p v-if="smsError" class="hc-cloudtalk-export-error" role="alert">{{ smsError }}</p>
+                <p v-if="downloadedSmsName" class="hc-cloudtalk-export-help" role="status">Fichier téléchargé : {{ downloadedSmsName }}</p>
+                <p class="hc-cloudtalk-export-help">
+                    Le fichier est préparé en arrière-plan depuis la base du CRM, puis téléchargé automatiquement.
+                    Choisissez une période plus courte pour limiter sa taille.
+                </p>
+            </div>
+            <p v-else-if="tab === 2" class="hc-cloudtalk-export-help">
+                L’exportation SMS est réservée aux administrateurs du projet.
             </p>
         </div>
     </modal>
@@ -391,6 +425,7 @@
 <script>
 import { mapGetters } from "vuex";
 import ApiService from "@/apis/api.service";
+import axios from "axios";
 
 export default {
     data() {
@@ -409,7 +444,7 @@ export default {
             exportLineId: null,
             exportApiKeyId: "",
             exportApiKeySecret: "",
-            exportDateFrom: dateTo.slice(0, 8) + "01",
+            exportDateFrom: dateTo,
             exportDateTo: dateTo,
             exportTimezone: timezone,
             exportDownloadAudio: false,
@@ -420,6 +455,15 @@ export default {
             downloadedScriptName: "",
             exportRequestVersion: 0,
             exportCredentialsVersion: 0,
+            smsDateFrom: dateTo,
+            smsDateTo: dateTo,
+            downloadingSms: false,
+            smsProgress: "",
+            smsError: "",
+            downloadedSmsName: "",
+            smsRequestVersion: 0,
+            smsPollTimer: null,
+            smsPollResolve: null,
         };
     },
 
@@ -540,8 +584,99 @@ export default {
             }
         },
 
+        async downloadSmsExport() {
+            if (!this.canDownloadSms || this.downloadingSms) return;
+            const version = ++this.smsRequestVersion;
+            const slug = this.projectSlug;
+            const filename = `sms-${this.smsDateFrom}-${this.smsDateTo}.csv`;
+            this.downloadingSms = true;
+            this.smsProgress = "Préparation de l’export SMS…";
+            this.smsError = "";
+            this.downloadedSmsName = "";
+            try {
+                const { data } = await ApiService.post(`project/${slug}/sms/export`, {
+                    date_from: this.smsDateFrom,
+                    date_to: this.smsDateTo,
+                    timezone: this.exportTimezone,
+                    count: 0,
+                });
+                if (!this.smsRequestIsCurrent(version, slug)) return;
+                if (!data || typeof data.status_url !== "string" || !data.status_url ||
+                    typeof data.download_url !== "string" || !data.download_url) {
+                    this.smsError = "La réponse de préparation de l’export SMS est invalide.";
+                    return;
+                }
+                this.smsProgress = data.message || "Export SMS en attente…";
+                const ready = await this.waitForSmsDownload(data.status_url, version, slug);
+                if (!ready || !this.smsRequestIsCurrent(version, slug)) return;
+                const link = document.createElement("a");
+                link.href = data.download_url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                this.downloadedSmsName = filename;
+            } catch (error) {
+                const message = await this.exportErrorMessage(error, "Impossible de télécharger les SMS du CRM.");
+                if (this.smsRequestIsCurrent(version, slug)) this.smsError = message;
+            } finally {
+                if (version === this.smsRequestVersion) {
+                    this.downloadingSms = false;
+                    this.smsProgress = "";
+                    this.cancelSmsPolling();
+                }
+            }
+        },
+
+        smsRequestIsCurrent(version, slug) {
+            return version === this.smsRequestVersion && slug === this.projectSlug && this.canCloudtalkExport;
+        },
+
+        cancelSmsPolling() {
+            if (this.smsPollTimer !== null) clearTimeout(this.smsPollTimer);
+            this.smsPollTimer = null;
+            const resolve = this.smsPollResolve;
+            this.smsPollResolve = null;
+            if (resolve) resolve(false);
+        },
+
+        waitForSmsPoll(version, slug) {
+            return new Promise((resolve) => {
+                if (!this.smsRequestIsCurrent(version, slug)) return resolve(false);
+                this.smsPollResolve = resolve;
+                this.smsPollTimer = setTimeout(() => {
+                    this.smsPollTimer = null;
+                    this.smsPollResolve = null;
+                    resolve(this.smsRequestIsCurrent(version, slug));
+                }, 3000);
+            });
+        },
+
+        async waitForSmsDownload(statusUrl, version, slug) {
+            while (this.smsRequestIsCurrent(version, slug)) {
+                const { data } = await axios.get(statusUrl);
+                if (!this.smsRequestIsCurrent(version, slug)) return false;
+                if (data && data.status === "ready") return true;
+                if (!data || !["queued", "processing"].includes(data.status)) {
+                    this.smsError = data && data.message || "La préparation de l’export SMS a échoué. Relancez l’exportation.";
+                    return false;
+                }
+                this.smsProgress = data.message || (data.status === "queued"
+                    ? "Export SMS en attente…"
+                    : "Préparation du CSV en cours…");
+                if (!await this.waitForSmsPoll(version, slug)) return false;
+            }
+            return false;
+        },
+
         resetExport() {
             this.exportRequestVersion++;
+            this.smsRequestVersion++;
+            this.cancelSmsPolling();
+            this.downloadingSms = false;
+            this.smsProgress = "";
+            this.smsError = "";
+            this.downloadedSmsName = "";
             this.tab = 0;
             this.exportConfigurations = [];
             this.exportLineId = null;
@@ -578,6 +713,8 @@ export default {
 
     beforeUnmount() {
         this.exportRequestVersion++;
+        this.smsRequestVersion++;
+        this.cancelSmsPolling();
         this.clearExportCredentials();
     },
 
@@ -617,6 +754,17 @@ export default {
                 /^\d{4}-\d{2}-\d{2}$/.test(this.exportDateFrom) &&
                 /^\d{4}-\d{2}-\d{2}$/.test(this.exportDateTo) &&
                 this.exportDateFrom <= this.exportDateTo;
+        },
+
+        canDownloadSms() {
+            const validDate = (value) => {
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+                const parsed = new Date(`${value}T00:00:00Z`);
+                return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+            };
+            return Boolean(this.canCloudtalkExport && this.projectSlug &&
+                validDate(this.smsDateFrom) && validDate(this.smsDateTo) &&
+                this.smsDateFrom <= this.smsDateTo);
         },
 
         /**
