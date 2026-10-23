@@ -63,6 +63,7 @@ use App\Http\Controllers\API\KavkomController;
 use App\Http\Controllers\API\Project\LabelController as ProjectLabelController;
 use App\Http\Controllers\API\Project\LineController as ProjectLineController;
 use App\Http\Controllers\API\Project\Line\CloudTalkController as ProjectLineCloudTalkController;
+use App\Http\Controllers\API\Project\Line\CloudTalkExportController as ProjectLineCloudTalkExportController;
 use App\Http\Controllers\API\Project\LogoController as ProjectLogoController;
 use App\Http\Controllers\API\Project\MenuController as ProjectMenuController;
 use App\Http\Controllers\API\Project\MenuIconController as ProjectMenuIconController;
@@ -436,6 +437,9 @@ Route::group([
         Route::delete('/import/{import}/mapping/{index}', [ProjectImportMappingController::class, 'destroy']);
 
         // Line
+        Route::get('line/cloudtalk/export-configurations', [ProjectLineCloudTalkExportController::class, 'configurations']);
+        Route::get('line/cloudtalk/export-credentials/{line}', [ProjectLineCloudTalkExportController::class, 'credentials']);
+        Route::post('line/cloudtalk/export-script', [ProjectLineCloudTalkExportController::class, 'download']);
         Route::post('line/cloudtalk/verify', [ProjectLineCloudTalkController::class, 'verify']);
         Route::post('line/cloudtalk/agents', [ProjectLineCloudTalkController::class, 'agents']);
         Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);

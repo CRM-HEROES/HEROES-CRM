@@ -44877,21 +44877,300 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
+    var today = new Date();
+    var dateTo = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"), String(today.getDate()).padStart(2, "0")].join("-");
+    var timezone = "UTC";
+    try {
+      timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    } catch (error) {
+      // UTC reste disponible si le navigateur ne fournit aucun fuseau horaire.
+    }
     return {
-      name: "setting-cloudtalk"
+      name: "setting-cloudtalk",
+      tab: 0,
+      exportConfigurations: [],
+      exportLineId: null,
+      exportApiKeyId: "",
+      exportApiKeySecret: "",
+      exportDateFrom: dateTo.slice(0, 8) + "01",
+      exportDateTo: dateTo,
+      exportTimezone: timezone,
+      exportDownloadAudio: false,
+      loadingConfigurations: false,
+      loadingCredentials: false,
+      downloadingScript: false,
+      exportError: "",
+      downloadedScriptName: "",
+      exportRequestVersion: 0,
+      exportCredentialsVersion: 0
     };
   },
   methods: {
+    configurationLabel: function configurationLabel(configuration) {
+      return [configuration.name || "Ligne " + configuration.id, configuration.numero, configuration.agent_name].filter(Boolean).join(" — ");
+    },
+    loadExportConfigurations: function loadExportConfigurations() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var version, slug, _yield$ApiService$get, data, message;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              if (!(!_this.canCloudtalkExport || !_this.projectSlug)) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
+              version = ++_this.exportRequestVersion;
+              slug = _this.projectSlug;
+              _this.loadingConfigurations = true;
+              _this.exportError = "";
+              _this.exportConfigurations = [];
+              _this.exportLineId = null;
+              _this.clearExportCredentials();
+              _context.prev = 9;
+              _context.next = 12;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(slug, "/line/cloudtalk/export-configurations"));
+            case 12:
+              _yield$ApiService$get = _context.sent;
+              data = _yield$ApiService$get.data;
+              if (!(version !== _this.exportRequestVersion || !_this.canCloudtalkExport)) {
+                _context.next = 16;
+                break;
+              }
+              return _context.abrupt("return");
+            case 16:
+              _this.exportConfigurations = data.configurations || [];
+              _this.exportLineId = _this.exportConfigurations.length ? _this.exportConfigurations[0].id : null;
+              _context.next = 20;
+              return _this.loadExportCredentials();
+            case 20:
+              _context.next = 28;
+              break;
+            case 22:
+              _context.prev = 22;
+              _context.t0 = _context["catch"](9);
+              _context.next = 26;
+              return _this.exportErrorMessage(_context.t0, "Impossible de charger les configurations CloudTalk.");
+            case 26:
+              message = _context.sent;
+              if (version === _this.exportRequestVersion) _this.exportError = message;
+            case 28:
+              _context.prev = 28;
+              if (version === _this.exportRequestVersion) _this.loadingConfigurations = false;
+              return _context.finish(28);
+            case 31:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[9, 22, 28, 31]]);
+      }))();
+    },
+    clearExportCredentials: function clearExportCredentials() {
+      this.exportCredentialsVersion++;
+      this.exportApiKeyId = "";
+      this.exportApiKeySecret = "";
+      this.loadingCredentials = false;
+    },
+    credentialsEdited: function credentialsEdited() {
+      this.exportCredentialsVersion++;
+      this.loadingCredentials = false;
+      this.downloadedScriptName = "";
+    },
+    loadExportCredentials: function loadExportCredentials() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var version, slug, lineId, _yield$ApiService$get2, data, message;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _this2.clearExportCredentials();
+              _this2.exportError = "";
+              _this2.downloadedScriptName = "";
+              if (!(!_this2.canCloudtalkExport || !_this2.projectSlug || _this2.exportLineId === null)) {
+                _context2.next = 5;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 5:
+              version = _this2.exportCredentialsVersion;
+              slug = _this2.projectSlug;
+              lineId = _this2.exportLineId;
+              _this2.loadingCredentials = true;
+              _context2.prev = 9;
+              _context2.next = 12;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(slug, "/line/cloudtalk/export-credentials/").concat(lineId));
+            case 12:
+              _yield$ApiService$get2 = _context2.sent;
+              data = _yield$ApiService$get2.data;
+              if (!(version !== _this2.exportCredentialsVersion || slug !== _this2.projectSlug || lineId !== _this2.exportLineId || !_this2.canCloudtalkExport)) {
+                _context2.next = 16;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 16:
+              _this2.exportApiKeyId = data.api_key_id || "";
+              _this2.exportApiKeySecret = data.api_key_secret || "";
+              _context2.next = 26;
+              break;
+            case 20:
+              _context2.prev = 20;
+              _context2.t0 = _context2["catch"](9);
+              _context2.next = 24;
+              return _this2.exportErrorMessage(_context2.t0, "Impossible de charger les identifiants. Vous pouvez les saisir manuellement.");
+            case 24:
+              message = _context2.sent;
+              if (version === _this2.exportCredentialsVersion) _this2.exportError = message;
+            case 26:
+              _context2.prev = 26;
+              if (version === _this2.exportCredentialsVersion) _this2.loadingCredentials = false;
+              return _context2.finish(26);
+            case 29:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[9, 20, 26, 29]]);
+      }))();
+    },
+    exportErrorMessage: function exportErrorMessage(error, fallback) {
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var data;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              data = error.response && error.response.data;
+              if (!(data instanceof Blob)) {
+                _context3.next = 13;
+                break;
+              }
+              _context3.prev = 2;
+              _context3.t0 = JSON;
+              _context3.next = 6;
+              return data.text();
+            case 6:
+              _context3.t1 = _context3.sent;
+              data = _context3.t0.parse.call(_context3.t0, _context3.t1);
+              _context3.next = 13;
+              break;
+            case 10:
+              _context3.prev = 10;
+              _context3.t2 = _context3["catch"](2);
+              return _context3.abrupt("return", fallback);
+            case 13:
+              if (!(data && data.errors)) {
+                _context3.next = 15;
+                break;
+              }
+              return _context3.abrupt("return", Object.values(data.errors).flat().join(" "));
+            case 15:
+              return _context3.abrupt("return", data && typeof data.message === "string" ? data.message : fallback);
+            case 16:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3, null, [[2, 10]]);
+      }))();
+    },
+    downloadExportScript: function downloadExportScript() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var version, slug, filename, _yield$ApiService$pos, data, url, link, message;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              if (!(!_this3.canDownloadExport || _this3.downloadingScript)) {
+                _context4.next = 2;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 2:
+              version = ++_this3.exportRequestVersion;
+              slug = _this3.projectSlug;
+              filename = "cloudtalk-export-".concat(_this3.exportDateFrom, "-").concat(_this3.exportDateTo, ".ps1");
+              _this3.downloadingScript = true;
+              _this3.exportError = "";
+              _this3.downloadedScriptName = "";
+              _context4.prev = 8;
+              _context4.next = 11;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(slug, "/line/cloudtalk/export-script"), {
+                line_id: _this3.exportLineId,
+                api_key_id: _this3.exportApiKeyId,
+                api_key_secret: _this3.exportApiKeySecret,
+                date_from: _this3.exportDateFrom,
+                date_to: _this3.exportDateTo,
+                download_audio: _this3.exportDownloadAudio,
+                timezone: _this3.exportTimezone
+              }, {
+                responseType: "blob"
+              });
+            case 11:
+              _yield$ApiService$pos = _context4.sent;
+              data = _yield$ApiService$pos.data;
+              if (!(version !== _this3.exportRequestVersion || !_this3.canCloudtalkExport)) {
+                _context4.next = 15;
+                break;
+              }
+              return _context4.abrupt("return");
+            case 15:
+              url = URL.createObjectURL(data);
+              link = document.createElement("a");
+              link.href = url;
+              link.download = filename;
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+              setTimeout(function () {
+                return URL.revokeObjectURL(url);
+              }, 1000);
+              _this3.downloadedScriptName = filename;
+              _context4.next = 32;
+              break;
+            case 26:
+              _context4.prev = 26;
+              _context4.t0 = _context4["catch"](8);
+              _context4.next = 30;
+              return _this3.exportErrorMessage(_context4.t0, "Impossible de télécharger le script CloudTalk.");
+            case 30:
+              message = _context4.sent;
+              if (version === _this3.exportRequestVersion) _this3.exportError = message;
+            case 32:
+              _context4.prev = 32;
+              if (version === _this3.exportRequestVersion) _this3.downloadingScript = false;
+              return _context4.finish(32);
+            case 35:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[8, 26, 32, 35]]);
+      }))();
+    },
+    resetExport: function resetExport() {
+      this.exportRequestVersion++;
+      this.tab = 0;
+      this.exportConfigurations = [];
+      this.exportLineId = null;
+      this.clearExportCredentials();
+      this.loadingConfigurations = false;
+      this.downloadingScript = false;
+      this.exportError = "";
+      this.downloadedScriptName = "";
+    },
     copyCloudtalkWebhookUrl: function copyCloudtalkWebhookUrl() {
       if (!this.cloudtalkWebhookUrl) {
         return;
@@ -44911,7 +45190,37 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(["project"])), {}, {
+  beforeUnmount: function beforeUnmount() {
+    this.exportRequestVersion++;
+    this.clearExportCredentials();
+  },
+  watch: {
+    tab: function tab(value) {
+      if (value === 1 && this.canCloudtalkExport && !this.exportConfigurations.length && !this.loadingConfigurations && !this.downloadingScript) this.loadExportConfigurations();
+    },
+    projectSlug: function projectSlug() {
+      this.resetExport();
+    },
+    user: function user(value, previous) {
+      if ((value && value.id) !== (previous && previous.id)) this.resetExport();
+    },
+    canCloudtalkExport: function canCloudtalkExport(value) {
+      if (!value) this.resetExport();else if (this.tab === 1) this.loadExportConfigurations();
+    }
+  },
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)(["project", "can"])), (0,vuex__WEBPACK_IMPORTED_MODULE_1__.mapGetters)("auth", ["user"])), {}, {
+    projectSlug: function projectSlug() {
+      return this.project && this.project.slug;
+    },
+    canCloudtalkExport: function canCloudtalkExport() {
+      return Boolean(this.can('all'));
+    },
+    canDownloadExport: function canDownloadExport() {
+      var _this4 = this;
+      return this.canCloudtalkExport && this.projectSlug && !this.loadingConfigurations && !this.loadingCredentials && (this.exportLineId === null || this.exportConfigurations.some(function (configuration) {
+        return configuration.id === _this4.exportLineId;
+      })) && this.exportApiKeyId.trim().length > 0 && this.exportApiKeySecret.trim().length > 0 && /^\d{4}-\d{2}-\d{2}$/.test(this.exportDateFrom) && /^\d{4}-\d{2}-\d{2}$/.test(this.exportDateTo) && this.exportDateFrom <= this.exportDateTo;
+    },
     /**
      * URL du webhook CloudTalk pour
      * recevoir les SMS entrants et les références des enregistrements.
@@ -93639,7 +93948,9 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "hc-flex-column",
   style: {
-    "height": "100%"
+    "flex": "1",
+    "min-height": "0",
+    "overflow": "hidden"
   }
 };
 var _hoisted_2 = {
@@ -93671,17 +93982,116 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_12 = {
   "class": "hc-cloudtalk-webhook-note"
 };
+var _hoisted_13 = {
+  key: 0,
+  "class": "hc-cloudtalk-export"
+};
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, " Téléchargez un script PowerShell pour exporter les appels du compte CloudTalk directement sur votre ordinateur. ", -1 /* HOISTED */);
+var _hoisted_15 = {
+  key: 0,
+  role: "status"
+};
+var _hoisted_16 = {
+  key: 0,
+  "class": "hc-cloudtalk-export-field"
+};
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Configuration CloudTalk", -1 /* HOISTED */);
+var _hoisted_18 = ["disabled"];
+var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: null
+}, "Saisie manuelle", -1 /* HOISTED */);
+var _hoisted_20 = ["value"];
+var _hoisted_21 = {
+  key: 1,
+  role: "status"
+};
+var _hoisted_22 = {
+  "class": "hc-cloudtalk-export-field"
+};
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Clé API", -1 /* HOISTED */);
+var _hoisted_24 = ["disabled"];
+var _hoisted_25 = {
+  "class": "hc-cloudtalk-export-field"
+};
+var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Secret API", -1 /* HOISTED */);
+var _hoisted_27 = ["disabled"];
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-export-help"
+}, " Les identifiants existants sont préremplis et modifiables. Les modifications servent uniquement au script et ne sont pas enregistrées dans la ligne. ", -1 /* HOISTED */);
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-export-help"
+}, " L’export couvre tous les appels accessibles sur ce compte CloudTalk, y compris ceux sans prospect dans le CRM. ", -1 /* HOISTED */);
+var _hoisted_30 = {
+  "class": "hc-cloudtalk-export-dates"
+};
+var _hoisted_31 = {
+  "class": "hc-cloudtalk-export-field"
+};
+var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de début", -1 /* HOISTED */);
+var _hoisted_33 = ["max", "disabled"];
+var _hoisted_34 = {
+  "class": "hc-cloudtalk-export-field"
+};
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de fin", -1 /* HOISTED */);
+var _hoisted_36 = ["min", "disabled"];
+var _hoisted_37 = {
+  "class": "hc-cloudtalk-export-help"
+};
+var _hoisted_38 = {
+  "class": "hc-cloudtalk-export-checkbox"
+};
+var _hoisted_39 = ["disabled"];
+var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Télécharger les audios disponibles", -1 /* HOISTED */);
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-export-help"
+}, " Résultat : appels.csv et, si demandé, un dossier audios/. La colonne audio_path indique le chemin relatif de chaque audio téléchargé. ", -1 /* HOISTED */);
+var _hoisted_42 = ["disabled"];
+var _hoisted_43 = {
+  key: 2,
+  "class": "hc-cloudtalk-export-error",
+  role: "alert"
+};
+var _hoisted_44 = ["disabled"];
+var _hoisted_45 = {
+  key: 4,
+  "class": "hc-cloudtalk-export-help",
+  role: "status"
+};
+var _hoisted_46 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-cloudtalk-webhook-note"
+}, " Le script contient la clé API et le secret CloudTalk. Conservez-le dans un endroit privé. Il s’exécute sous Windows avec PowerShell et télécharge les données directement depuis CloudTalk. ", -1 /* HOISTED */);
+var _hoisted_47 = {
+  key: 1,
+  "class": "hc-cloudtalk-export-help"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_tab = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab");
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
   var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_modal, {
     name: $data.name,
     title: "CloudTalk",
-    width: 520
+    width: 520,
+    onOpen: $options.resetExport,
+    onClosed: $options.resetExport
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab, {
+        count: 2,
+        tab: $data.tab,
+        "onTab:change": _cache[0] || (_cache[0] = function (value) {
+          return $data.tab = value;
+        })
+      }, {
+        "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Configuration")];
+        }),
+        "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Exportation CloudTalk")];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["tab"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
         gap: "5px",
         "class": "hc-flex-1",
         padding: "10px 0"
@@ -93693,13 +94103,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             type: "text",
             readonly: "",
             value: $options.cloudtalkWebhookUrl,
-            onFocus: _cache[0] || (_cache[0] = function ($event) {
+            onFocus: _cache[1] || (_cache[1] = function ($event) {
               return $event.target.select();
             })
           }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "button",
             "class": "hc-button-secondary",
-            onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.copyCloudtalkWebhookUrl && $options.copyCloudtalkWebhookUrl.apply($options, arguments);
             }, ["prevent"]))
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -93709,10 +94119,88 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Les SMS reçus seront transmis au CRM et les enregistrements seront rattachés aux interactions existantes. Les appels et messages vocaux créeront une interaction si le numéro correspond à un prospect du projet. ")])])])];
         }),
         _: 1 /* STABLE */
-      })])];
+      }, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.tab === 0]]), $data.tab === 1 && $options.canCloudtalkExport ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [_hoisted_14, $data.loadingConfigurations ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_15, "Chargement des configurations…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
+        key: 1,
+        autocomplete: "off",
+        onSubmit: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $options.downloadExportScript && $options.downloadExportScript.apply($options, arguments);
+        }, ["prevent"]))
+      }, [$data.exportConfigurations.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+          return $data.exportLineId = $event;
+        }),
+        disabled: $data.downloadingScript,
+        onChange: _cache[4] || (_cache[4] = function () {
+          return $options.loadExportCredentials && $options.loadExportCredentials.apply($options, arguments);
+        })
+      }, [_hoisted_19, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.exportConfigurations, function (configuration) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+          key: configuration.id,
+          value: configuration.id
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.configurationLabel(configuration)), 9 /* TEXT, PROPS */, _hoisted_20);
+      }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.exportLineId]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.loadingCredentials ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_21, "Chargement des identifiants…")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_22, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+          return $data.exportApiKeyId = $event;
+        }),
+        type: "text",
+        autocomplete: "off",
+        spellcheck: "false",
+        required: "",
+        disabled: $data.downloadingScript || $data.loadingCredentials,
+        onInput: _cache[6] || (_cache[6] = function () {
+          return $options.credentialsEdited && $options.credentialsEdited.apply($options, arguments);
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_24), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeyId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+          return $data.exportApiKeySecret = $event;
+        }),
+        type: "text",
+        autocomplete: "new-password",
+        required: "",
+        disabled: $data.downloadingScript || $data.loadingCredentials,
+        onInput: _cache[8] || (_cache[8] = function () {
+          return $options.credentialsEdited && $options.credentialsEdited.apply($options, arguments);
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeySecret]])]), _hoisted_28, _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+          return $data.exportDateFrom = $event;
+        }),
+        type: "date",
+        required: "",
+        max: $data.exportDateTo || undefined,
+        disabled: $data.downloadingScript
+      }, null, 8 /* PROPS */, _hoisted_33), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+          return $data.exportDateTo = $event;
+        }),
+        type: "date",
+        required: "",
+        min: $data.exportDateFrom || undefined,
+        disabled: $data.downloadingScript
+      }, null, 8 /* PROPS */, _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateTo]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_37, " Journées incluses, fuseau horaire : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportTimezone) + ". ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+          return $data.exportDownloadAudio = $event;
+        }),
+        type: "checkbox",
+        disabled: $data.downloadingScript
+      }, null, 8 /* PROPS */, _hoisted_39), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.exportDownloadAudio]]), _hoisted_40]), _hoisted_41, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "hc-button-secondary",
+        type: "submit",
+        disabled: $data.downloadingScript || !$options.canDownloadExport
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.downloadingScript ? 'fa fa-spinner fa-spin' : 'fa fa-download')
+      }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadingScript ? 'Préparation du script…' : 'Télécharger le script PowerShell'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_42)], 32 /* HYDRATE_EVENTS */)), $data.exportError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_43, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.exportError && !$data.exportConfigurations.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 3,
+        "class": "hc-button-secondary",
+        type: "button",
+        disabled: $data.loadingConfigurations,
+        onClick: _cache[13] || (_cache[13] = function () {
+          return $options.loadExportConfigurations && $options.loadExportConfigurations.apply($options, arguments);
+        })
+      }, " Réessayer ", 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.downloadedScriptName ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Script téléchargé. Ouvrez PowerShell dans votre dossier de téléchargement et lancez : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, ".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Si Windows bloque l’exécution, utilisez cette commande, valable uniquement pour ce lancement : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName) + "\"", 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_46])) : $data.tab === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_47, " L’exportation CloudTalk est réservée aux administrateurs du projet. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["name"]);
+  }, 8 /* PROPS */, ["name", "onOpen", "onClosed"]);
 }
 
 /***/ }),
@@ -112736,7 +113224,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n\n/* Instructions */\n.hc-cloudtalk-webhook-instructions {\n    padding: 10px 0 0;\n    border-top: 1px solid #d6e4f0;\n    font-size: 12px;\n    line-height: 1.6;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-instructions-title {\n    font-weight: 600;\n    margin-bottom: 8px;\n}\n.hc-cloudtalk-webhook-instructions ol {\n    margin: 0;\n    padding-left: 20px;\n}\n.hc-cloudtalk-webhook-instructions li {\n    margin-bottom: 7px;\n}\n.hc-cloudtalk-webhook-instructions strong {\n    color: #12a0f3;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a {\n    color: #12a0f3;\n    text-decoration: none;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a:hover {\n    text-decoration: underline;\n}\n.hc-cloudtalk-webhook-instructions a .fa {\n    font-size: 10px;\n    margin-left: 3px;\n}\n\n/* Note d'information */\n.hc-cloudtalk-webhook-note {\n    display: flex;\n    align-items: flex-start;\n    gap: 6px;\n    margin: 8px 0 0;\n    padding: 8px;\n    border-radius: 4px;\n    background: #e6f3ff;\n    color: #495057;\n    font-size: 11px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-webhook-note .fa {\n    color: #12a0f3;\n    margin-top: 2px;\n}\n\n/* Mode sombre */\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-webhook-instructions {\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-note {\n    background: #263b53;\n    color: #cccccc;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk-export {\n    padding: 10px;\n    overflow-y: auto;\n    font-size: 12px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-export > p:first-child {\n    margin-top: 0;\n}\n.hc-cloudtalk-export-field {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    gap: 5px;\n    min-width: 0;\n    margin-bottom: 10px;\n}\n.hc-cloudtalk-export-field input,\n.hc-cloudtalk-export-field select {\n    width: 100%;\n    padding: 7px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n}\n.hc-cloudtalk-export-dates {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 12px;\n}\n.hc-cloudtalk-export-checkbox {\n    display: flex;\n    align-items: center;\n    gap: 7px;\n}\n.hc-cloudtalk-export-help {\n    color: #666666;\n    margin: 8px 0 12px;\n}\n.hc-cloudtalk-export-help code {\n    display: block;\n    overflow-wrap: anywhere;\n    margin-top: 5px;\n}\n.hc-cloudtalk-export-error {\n    color: #c0392b;\n}\n.hc-cloudtalk-export button:disabled {\n    opacity: 0.6;\n    cursor: default;\n}\n.dark .hc-cloudtalk-export-field input,\n.dark .hc-cloudtalk-export-field select {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-export-help {\n    color: #bbbbbb;\n}\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n\n/* Instructions */\n.hc-cloudtalk-webhook-instructions {\n    padding: 10px 0 0;\n    border-top: 1px solid #d6e4f0;\n    font-size: 12px;\n    line-height: 1.6;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-instructions-title {\n    font-weight: 600;\n    margin-bottom: 8px;\n}\n.hc-cloudtalk-webhook-instructions ol {\n    margin: 0;\n    padding-left: 20px;\n}\n.hc-cloudtalk-webhook-instructions li {\n    margin-bottom: 7px;\n}\n.hc-cloudtalk-webhook-instructions strong {\n    color: #12a0f3;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a {\n    color: #12a0f3;\n    text-decoration: none;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a:hover {\n    text-decoration: underline;\n}\n.hc-cloudtalk-webhook-instructions a .fa {\n    font-size: 10px;\n    margin-left: 3px;\n}\n\n/* Note d'information */\n.hc-cloudtalk-webhook-note {\n    display: flex;\n    align-items: flex-start;\n    gap: 6px;\n    margin: 8px 0 0;\n    padding: 8px;\n    border-radius: 4px;\n    background: #e6f3ff;\n    color: #495057;\n    font-size: 11px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-webhook-note .fa {\n    color: #12a0f3;\n    margin-top: 2px;\n}\n\n/* Mode sombre */\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-webhook-instructions {\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-note {\n    background: #263b53;\n    color: #cccccc;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
