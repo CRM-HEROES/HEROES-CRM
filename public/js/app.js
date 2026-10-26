@@ -36070,7 +36070,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var vuex_persistedstate__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex-persistedstate */ "./node_modules/vuex-persistedstate/dist/vuex-persistedstate.es.js");
 /* harmony import */ var _store_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/store/event-daily-direction-cache */ "./resources/js/store/event-daily-direction-cache.js");
 /* harmony import */ var _store_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store/agenda-event-range-cache */ "./resources/js/store/agenda-event-range-cache.js");
@@ -36081,10 +36081,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _store_modal__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/store/modal */ "./resources/js/store/modal.js");
 /* harmony import */ var _store_permission__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/store/permission */ "./resources/js/store/permission.js");
 /* harmony import */ var _store_project__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/store/project */ "./resources/js/store/project.js");
-/* harmony import */ var _store_slide__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/store/slide */ "./resources/js/store/slide.js");
-/* harmony import */ var _store_stat_chart__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/store/stat-chart */ "./resources/js/store/stat-chart.js");
-/* harmony import */ var _store_route__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/store/route */ "./resources/js/store/route.js");
-/* harmony import */ var _store_user__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/store/user */ "./resources/js/store/user.js");
+/* harmony import */ var _store_prospect_email__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/store/prospect-email */ "./resources/js/store/prospect-email.js");
+/* harmony import */ var _store_slide__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @/store/slide */ "./resources/js/store/slide.js");
+/* harmony import */ var _store_stat_chart__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @/store/stat-chart */ "./resources/js/store/stat-chart.js");
+/* harmony import */ var _store_route__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @/store/route */ "./resources/js/store/route.js");
+/* harmony import */ var _store_user__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @/store/user */ "./resources/js/store/user.js");
 
 
 
@@ -36100,7 +36101,8 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var store = (0,vuex__WEBPACK_IMPORTED_MODULE_14__.createStore)({
+
+var store = (0,vuex__WEBPACK_IMPORTED_MODULE_15__.createStore)({
   plugins: [(0,vuex_persistedstate__WEBPACK_IMPORTED_MODULE_0__["default"])(), _store_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"], _store_agenda_event_range_cache__WEBPACK_IMPORTED_MODULE_2__["default"]],
   modules: {
     auth: _store_auth__WEBPACK_IMPORTED_MODULE_3__["default"],
@@ -36110,10 +36112,11 @@ var store = (0,vuex__WEBPACK_IMPORTED_MODULE_14__.createStore)({
     modal: _store_modal__WEBPACK_IMPORTED_MODULE_7__["default"],
     permission: _store_permission__WEBPACK_IMPORTED_MODULE_8__["default"],
     project: _store_project__WEBPACK_IMPORTED_MODULE_9__["default"],
-    route: _store_route__WEBPACK_IMPORTED_MODULE_12__["default"],
-    slide: _store_slide__WEBPACK_IMPORTED_MODULE_10__["default"],
-    statChart: _store_stat_chart__WEBPACK_IMPORTED_MODULE_11__["default"],
-    user: _store_user__WEBPACK_IMPORTED_MODULE_13__["default"]
+    prospectEmail: _store_prospect_email__WEBPACK_IMPORTED_MODULE_10__["default"],
+    route: _store_route__WEBPACK_IMPORTED_MODULE_13__["default"],
+    slide: _store_slide__WEBPACK_IMPORTED_MODULE_11__["default"],
+    statChart: _store_stat_chart__WEBPACK_IMPORTED_MODULE_12__["default"],
+    user: _store_user__WEBPACK_IMPORTED_MODULE_14__["default"]
   },
   mutations: {
     RESET: function RESET(state) {
@@ -56928,6 +56931,41 @@ var getters = {
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   state: state,
   actions: actions,
+  mutations: mutations,
+  getters: getters
+});
+
+/***/ }),
+
+/***/ "./resources/js/store/prospect-email.js":
+/*!**********************************************!*\
+  !*** ./resources/js/store/prospect-email.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+var state = {
+  draft: null
+};
+var mutations = {
+  SET_PROSPECT_EMAIL_DRAFT: function SET_PROSPECT_EMAIL_DRAFT(state, draft) {
+    state.draft = draft;
+  },
+  CLEAR_PROSPECT_EMAIL_DRAFT: function CLEAR_PROSPECT_EMAIL_DRAFT(state) {
+    state.draft = null;
+  }
+};
+var getters = {
+  prospectEmailDraft: function prospectEmailDraft(state) {
+    return state.draft;
+  }
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  state: state,
   mutations: mutations,
   getters: getters
 });

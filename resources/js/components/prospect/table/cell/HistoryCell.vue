@@ -260,7 +260,7 @@ export default {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: 3;
+    z-index: 9000;
     width: 350px;
     min-width: 100%;
     max-width: 80vw;

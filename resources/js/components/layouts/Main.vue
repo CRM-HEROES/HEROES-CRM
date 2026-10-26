@@ -201,6 +201,7 @@
 
             <protected-content>
                 <setting-email-modal />
+                <prospect-email-modal />
                 <setting-smsbox-modal />
                 <setting-ultramsg-modal />
                 <setting-m-target-modal />
@@ -410,6 +411,7 @@ import ManageProspectBulkProjectModal from "@/components/prospect/bulk/project/M
 
 import SettingCloudtalkModal from "@/components/settings/Cloudtalk.vue";
 import SettingEmailModal from "@/components/settings/Email.vue";
+import ProspectEmailModal from "@/components/prospect/email/Modal.vue";
 import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
 import SettingRingoverModal from "@/components/settings/Ringover.vue";
 import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
@@ -585,6 +587,7 @@ export default {
 
         SettingCloudtalkModal,
         SettingEmailModal,
+        ProspectEmailModal,
         SettingSmsboxModal,
         SettingRingoverModal,
         SettingUltramsgModal,

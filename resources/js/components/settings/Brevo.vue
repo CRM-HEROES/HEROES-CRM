@@ -16,7 +16,7 @@
                     ><input
                         :placeholder="label + ' ...'"
                         v-model="setting.sender"
-                        maxlength="15"
+                        maxlength="40"
                         required
                 /></v-field>
             </item-list>
