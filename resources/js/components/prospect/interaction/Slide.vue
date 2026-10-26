@@ -1294,6 +1294,16 @@ export default {
         },
 
         cloudtalkCallDirection(callInfos = {}, fallback = "") {
+            // A CRM outbound call also rings the agent's phone. Keep the local
+            // direction for that call, including later events without direction.
+            if (
+                this.interaction?.source == "cloudtalk" &&
+                this.interaction.number &&
+                this.isCurrentCloudtalkInteractionEvent(callInfos)
+            ) {
+                return this.interaction.from_user ? "outgoing" : "incoming";
+            }
+
             const direction = String(
                 callInfos.direction ||
                     callInfos.type ||
@@ -1548,6 +1558,13 @@ export default {
         },
 
         cloudtalkCandidateNumber(callInfos = {}) {
+            if (
+                this.isCloudtalkIncomingCall(callInfos) &&
+                callInfos.external_number
+            ) {
+                return callInfos.external_number;
+            }
+
             const directNumber =
                 callInfos.customer_number ||
                 callInfos.contact_phone ||
@@ -1566,7 +1583,7 @@ export default {
 
             // In the CloudTalk iframe message payload, external_number can be
             // a CloudTalk-side identifier/line number, not the called person.
-            // Only trust it when it is not paired with internal_number.
+            // Outside incoming calls, only trust it without internal_number.
             return callInfos.internal_number ? "" : callInfos.external_number || "";
         },
 
@@ -2095,6 +2112,14 @@ export default {
             if (newValue && this.leftSlideOpen(this.name)) {
                 this.fetchInteractions();
                 if (this.cloudtalkSequence) return;
+                if (
+                    this.cloudtalkPhoneVisible &&
+                    this.interaction.source == "cloudtalk" &&
+                    !this.interaction.from_user &&
+                    this.interaction.number
+                ) {
+                    return;
+                }
 
                 if (
                     newValue.phone_number &&

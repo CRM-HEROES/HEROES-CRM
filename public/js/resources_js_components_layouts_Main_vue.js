@@ -31488,9 +31488,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       } : {});
     },
     cloudtalkCallDirection: function cloudtalkCallDirection() {
-      var _callInfos$data, _callInfos$data2, _callInfos$cloudtalk_, _callInfos$cloudtalk_2;
+      var _this$interaction, _callInfos$data, _callInfos$data2, _callInfos$cloudtalk_, _callInfos$cloudtalk_2;
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       var fallback = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "";
+      // A CRM outbound call also rings the agent's phone. Keep the local
+      // direction for that call, including later events without direction.
+      if (((_this$interaction = this.interaction) === null || _this$interaction === void 0 ? void 0 : _this$interaction.source) == "cloudtalk" && this.interaction.number && this.isCurrentCloudtalkInteractionEvent(callInfos)) {
+        return this.interaction.from_user ? "outgoing" : "incoming";
+      }
       var direction = String(callInfos.direction || callInfos.type || callInfos.call_type || ((_callInfos$data = callInfos.data) === null || _callInfos$data === void 0 ? void 0 : _callInfos$data.direction) || ((_callInfos$data2 = callInfos.data) === null || _callInfos$data2 === void 0 ? void 0 : _callInfos$data2.type) || ((_callInfos$cloudtalk_ = callInfos.cloudtalk_call) === null || _callInfos$cloudtalk_ === void 0 ? void 0 : _callInfos$cloudtalk_.direction) || ((_callInfos$cloudtalk_2 = callInfos.cloudtalk_call) === null || _callInfos$cloudtalk_2 === void 0 ? void 0 : _callInfos$cloudtalk_2.type) || fallback || "").toLowerCase();
       if (["inbound", "incoming", "in"].includes(direction)) {
         return "incoming";
@@ -31610,6 +31615,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     cloudtalkCandidateNumber: function cloudtalkCandidateNumber() {
       var callInfos = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      if (this.isCloudtalkIncomingCall(callInfos) && callInfos.external_number) {
+        return callInfos.external_number;
+      }
       var directNumber = callInfos.customer_number || callInfos.contact_phone || callInfos.phone_number || callInfos.number || (this.cloudtalkCallDirection(callInfos) == "outgoing" ? callInfos.to : callInfos.from) || callInfos.from || callInfos.to || "";
       if (directNumber) {
         return directNumber;
@@ -31617,7 +31625,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       // In the CloudTalk iframe message payload, external_number can be
       // a CloudTalk-side identifier/line number, not the called person.
-      // Only trust it when it is not paired with internal_number.
+      // Outside incoming calls, only trust it without internal_number.
       return callInfos.internal_number ? "" : callInfos.external_number || "";
     },
     fetchCloudtalkCallContext: function fetchCloudtalkCallContext() {
@@ -32175,7 +32183,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) switch (_context16.prev = _context16.next) {
             case 0:
               if (!(newValue && _this20.leftSlideOpen(_this20.name))) {
-                _context16.next = 5;
+                _context16.next = 7;
                 break;
               }
               _this20.fetchInteractions();
@@ -32185,6 +32193,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
               return _context16.abrupt("return");
             case 4:
+              if (!(_this20.cloudtalkPhoneVisible && _this20.interaction.source == "cloudtalk" && !_this20.interaction.from_user && _this20.interaction.number)) {
+                _context16.next = 6;
+                break;
+              }
+              return _context16.abrupt("return");
+            case 6:
               if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this20.interaction.number)) {
                 _this20.interaction.number = newValue.phone_number;
               } else if (newValue.mobile_phone_number) {
@@ -32192,7 +32206,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // to resolve the context of the call in progress.
                 _this20.interaction.number = newValue.mobile_phone_number;
               }
-            case 5:
+            case 7:
             case "end":
               return _context16.stop();
           }
