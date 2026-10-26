@@ -524,6 +524,7 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
+        Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
         Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);
         Route::apiResource('prospect', ProjectProspectController::class);
@@ -567,6 +568,7 @@ Route::group([
             // Log
             Route::get('log', [ProspectLogController::class, 'index']);
             // Message
+            Route::post('email', [ProspectMessageController::class, 'email']);
             Route::apiResource('thread.message', ProspectMessageController::class);
             // Message User
             Route::match(['PUT', 'PATCH'], 'thread/{thread}/message/{message}/user/{user}', [ProspectMessageUserController::class, 'update']);

@@ -1,7 +1,7 @@
 <template>
     <slide
         :name="name"
-        @open="fetchThreads(), fetchSelectedProspects(), markDisplayedMessagesRead()"
+        @open="open"
         :title="$t('prospect.message.title', { prospect: prospectFullName })"
         :url="
             prospect
@@ -38,6 +38,21 @@
                                 class="hc-item-main-content"
                                 v-text="$t('prospect.message.email_setting')"
                             ></div>
+                            <icon
+                                v-if="emailSettingValidated"
+                                class="fa fa-check icon-green"
+                                v-tooltip="'Configuration Brevo validée'"
+                            />
+                        </item>
+                        <item
+                            v-if="(prospect && prospect.email) || selectedProspects.length"
+                            v-for="reason in emailReasons"
+                            :key="reason.key"
+                            tag="a"
+                            @click.prevent="openEmailComposer(reason)"
+                        >
+                            <icon class="fa fa-paper-plane icon-blue" />
+                            <div class="hc-item-main-content" v-text="reason.label"></div>
                         </item>
                         <thread-row
                             v-for="c in filteredThreads"
@@ -268,10 +283,24 @@
                     </template>
 
                     <template #2>
-                        <select-prospect
-                            @back="tab = 0"
-                            @prospect-selected="setMessageProspect"
-                        />
+                        <div class="hc-flex-column" style="height: 100%">
+                            <item-list v-if="selectedProspects.length" padding="5px">
+                                <item
+                                    v-for="reason in emailReasons"
+                                    :key="'bulk-' + reason.key"
+                                    tag="a"
+                                    @click.prevent="openEmailComposer(reason)"
+                                >
+                                    <icon class="fa fa-paper-plane icon-blue" />
+                                    <div class="hc-item-main-content" v-text="reason.label"></div>
+                                </item>
+                            </item-list>
+                            <select-prospect
+                                class="hc-flex-1"
+                                @back="tab = 0"
+                                @prospect-selected="setMessageProspect"
+                            />
+                        </div>
                     </template>
                 </frame-layout>
             </template>
@@ -405,6 +434,7 @@ import {
 } from "@/actions/project/prospect/message";
 import { FETCH_THREADS } from "@/actions/project/thread";
 import { OPEN_MODAL } from "@/actions/modal";
+import { GET_SETTING } from "@/actions/project/setting";
 import { FETCH_MESSAGE_TEMPLATES } from "@/actions/project/message-template";
 
 // Components
@@ -450,6 +480,11 @@ export default {
 
             addingMessage: false,
             fetchingMessages: false,
+            emailReasons: [
+                { key: "feedback", label: "Feedback prospect", subject: "Votre feedback nous intéresse" },
+                { key: "appointment", label: "Rendez-vous commerciaux", subject: "Échangeons au sujet de votre projet" },
+                { key: "follow-up", label: "Suivi prospect", subject: "Suivi de notre échange" },
+            ],
         };
     },
 
@@ -516,7 +551,7 @@ export default {
                         filters: JSON.stringify({
                             ids: this.prospectsSelected,
                         }),
-                        fields: "first_name,last_name",
+                        fields: "first_name,last_name,email",
                     },
                 });
                 this.selectedProspects = data.data;
@@ -722,6 +757,33 @@ export default {
             store.commit(OPEN_MODAL, "setting-email");
         },
 
+        async open() {
+            this.fetchThreads();
+            this.fetchSelectedProspects();
+            this.markDisplayedMessagesRead();
+            await store.dispatch(GET_SETTING, "email");
+        },
+
+        openEmailComposer(reason) {
+            const prospects = this.prospect
+                ? [this.prospect]
+                : this.selectedProspects;
+            const recipients = prospects.filter((item) => item.email);
+            const firstName = this.prospect
+                ? this.prospect.first_name || ""
+                : "";
+
+            store.commit("SET_PROSPECT_EMAIL_DRAFT", {
+                prospect: this.prospect ? this.prospect.id : null,
+                prospects: this.prospect ? null : recipients.map((item) => item.id),
+                to: recipients.map((item) => item.email).join(", "),
+                category: reason.label,
+                subject: reason.subject,
+                body: `Bonjour ${firstName},\n\n`,
+            });
+            store.commit(OPEN_MODAL, "prospect-email");
+        },
+
         /**
          *
          */
@@ -860,6 +922,7 @@ export default {
             "slideOpen",
             "waitingUserMessage",
             "can",
+            "settingsGet",
         ]),
 
         /**
@@ -869,6 +932,10 @@ export default {
             return this.prospect
                 ? this.prospectFullName
                 : this.prospectsSelected.length + " prospects";
+        },
+
+        emailSettingValidated() {
+            return Boolean(this.settingsGet("email")?.validated_at);
         },
 
         /**
