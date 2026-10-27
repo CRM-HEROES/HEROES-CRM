@@ -8,6 +8,7 @@
         <!-- To do: Move it in global layout -->
 
         <setting-slide />
+        <setting-claude-modal />
         <add-global-user-modal v-if="can('all')" />
 
         <template v-if="project">
@@ -418,6 +419,7 @@ import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
 import SettingMTargetModal from "@/components/settings/MTarget.vue";
 import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
 import SettingBrevoModal from "@/components/settings/Brevo.vue";
+import SettingClaudeModal from "@/components/settings/Claude.vue";
 
 import MenuIconSlide from "@/components/menu-icon/Slide.vue";
 import TrashSlide from "@/components/trash/Slide.vue";
@@ -594,6 +596,7 @@ export default {
         SettingMTargetModal,
         SettingPipedriveModal,
         SettingBrevoModal,
+        SettingClaudeModal,
 
         MenuIconSlide,
         TrashSlide,

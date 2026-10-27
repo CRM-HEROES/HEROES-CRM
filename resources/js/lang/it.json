@@ -1428,6 +1428,32 @@
             "title": "Calendario di Google",
             "description": "Associa un account Google Calendar ai tuoi appuntamenti"
         },
+        "claude": {
+            "checking": "Verifica della chiave con l’API Claude…",
+            "valid": "Chiave valida: connessione all’API Claude riuscita.",
+            "invalid": "La chiave API non è valida o è scaduta.",
+            "forbidden": "Questa chiave non consente l’accesso all’API Claude.",
+            "no_models": "Questa chiave non dà accesso ad alcun modello Claude.",
+            "rate_limited": "Troppe richieste. Riprova tra poco.",
+            "verification_unavailable": "Al momento non è possibile verificare la chiave. Riprova.",
+            "configuration_error": "L’API Claude ha rifiutato la verifica. Controlla la configurazione del tuo account.",
+            "help_title": "Come ottenere la chiave API",
+            "help_link": "Apri la pagina delle chiavi API",
+            "help_sign_in": "Accedi alla console Claude o crea un account.",
+            "help_create": "In «API keys», fai clic su «Create key».",
+            "help_details": "Assegna un nome alla chiave, scegli la scadenza e collegala al tuo account.",
+            "help_paste": "Copia la chiave, incollala nel campo qui sotto e fai clic su «Salva».",
+            "help_once": "La chiave completa viene mostrata una sola volta, al momento della creazione.",
+            "description": "Gestisci la mia chiave API di Claude",
+            "api_key": "Chiave API",
+            "configured": "Una chiave è salvata per il tuo account.",
+            "not_configured": "Nessuna chiave salvata.",
+            "replace_hint": "Inserisci una nuova chiave per sostituire quella già salvata.",
+            "save": "Salva",
+            "saving": "Salvataggio…",
+            "load_error": "Impossibile caricare le tue impostazioni di Claude.",
+            "save_error": "Impossibile salvare la tua chiave di Claude."
+        },
         "users": {
             "title": "Elenco utenti",
             "description": "Gestisci l'accesso degli utenti nel progetto {project}"

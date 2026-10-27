@@ -1428,6 +1428,32 @@
             "title": "谷歌日历",
             "description": "将 Google 日历帐户与您的约会关联"
         },
+        "claude": {
+            "checking": "正在通过 Claude API 验证密钥…",
+            "valid": "密钥有效：已成功连接 Claude API。",
+            "invalid": "API 密钥无效或已过期。",
+            "forbidden": "此密钥不允许访问 Claude API。",
+            "no_models": "此密钥无法访问任何 Claude 模型。",
+            "rate_limited": "请求过多，请稍后重试。",
+            "verification_unavailable": "暂时无法验证密钥，请重试。",
+            "configuration_error": "Claude API 拒绝了验证，请检查账户配置。",
+            "help_title": "如何获取 API 密钥",
+            "help_link": "打开 API 密钥页面",
+            "help_sign_in": "登录 Claude 控制台或创建账户。",
+            "help_create": "在“API keys”中点击“Create key”。",
+            "help_details": "为密钥命名，选择有效期，并关联到您的账户。",
+            "help_paste": "复制密钥，将其粘贴到下方输入框，然后点击“保存”。",
+            "help_once": "完整密钥仅在创建时显示一次。",
+            "description": "管理我的 Claude API 密钥",
+            "api_key": "API 密钥",
+            "configured": "你的账户已保存密钥。",
+            "not_configured": "尚未保存密钥。",
+            "replace_hint": "输入新密钥以替换已保存的密钥。",
+            "save": "保存",
+            "saving": "正在保存…",
+            "load_error": "无法加载你的 Claude 设置。",
+            "save_error": "无法保存你的 Claude 密钥。"
+        },
         "users": {
             "title": "用户列表",
             "description": "管理项目 {project} 中的用户访问权限"
