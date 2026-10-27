@@ -121,6 +121,138 @@ function harness(options = {}) {
         bus, windowListeners, load };
 }
 
+test('incoming ringing resolves the external number and opens the slide through ended without direction', async () => {
+    const incoming = { id: 99, phone_number: '+33123456789', mobile_phone_number: '+33631147502' };
+    const h = harness({ dispatch: (action, params) => action === 'LOOKUP_CLOUDTALK_CALL'
+        ? { number: params.number, prospect: incoming } : undefined });
+    h.vm.leftSlideOpen = () => false;
+    const properties = {
+        internal_number: '+33644605909', external_number: incoming.mobile_phone_number,
+        call_uuid: '46ff4c4e-fa38-4a2c-a980-bbdf908aef5f',
+    };
+
+    h.message('ringing', properties);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(h.calls.filter(c => c.action === 'LOOKUP_CLOUDTALK_CALL').map(c => c.params), [
+        { number: incoming.mobile_phone_number },
+    ]);
+    assert.equal(h.vm.interactionProspect.id, incoming.id);
+    assert.equal(h.vm.interaction.number, incoming.mobile_phone_number);
+    assert.equal(h.vm.interaction.from_user, false);
+    assert.equal(h.vm.cloudtalkPhoneVisible, true);
+    assert.equal(h.vm.tab, 1);
+    assert.equal(h.vm.frameTab, 5);
+    assert.equal(h.commits.some(([action, name]) => action === 'OPEN_LEFT_SLIDE'
+        && name === 'prospect-manage-interactions'), true);
+
+    h.vm.leftSlideOpen = () => true;
+    h.component.watch.interactionProspect.call(h.vm, incoming, null);
+    assert.equal(h.vm.interaction.number, incoming.mobile_phone_number);
+    h.message('ended', properties);
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(h.vm.interaction.number, incoming.mobile_phone_number);
+    assert.equal(h.vm.interaction.data.direction, 'incoming');
+    assert.equal(h.vm.interaction.from_user, false);
+    assert.equal(h.vm.interaction.status, 'ended');
+    assert.equal(h.vm.interactionProspect.id, incoming.id);
+    assert.equal(h.calls.filter(c => c.action === 'LOOKUP_CLOUDTALK_CALL').length, 1);
+});
+
+test('a new incoming UUID replaces the completed call prospect using external number before other fields', async () => {
+    const incoming = { id: 99, mobile_phone_number: '+33631147502' };
+    const h = harness({ dispatch: (action, params) => action === 'LOOKUP_CLOUDTALK_CALL'
+        ? { number: params.number, prospect: incoming } : undefined });
+    h.vm.interactionProspect = first;
+    h.vm.interaction = {
+        ...h.vm.newInteraction(), source: 'cloudtalk', number: first.mobile_phone_number, status: 'ended',
+        data: { call_uuid: 'old-outgoing-call', direction: 'outgoing' },
+    };
+    h.vm.cloudtalkLookup = {
+        number: first.mobile_phone_number, numberKey: h.vm.normalizePhone(first.mobile_phone_number),
+        prospect: first, resolved: true, callId: 'old-outgoing-call', threads: [], messages: [],
+    };
+
+    h.message('ringing', {
+        call_uuid: 'new-incoming-call', internal_number: '+33644605909',
+        external_number: incoming.mobile_phone_number, number: first.mobile_phone_number,
+        customer_number: first.mobile_phone_number, from: '+33644605909',
+    });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(h.vm.interaction.number, incoming.mobile_phone_number);
+    assert.equal(h.vm.interactionProspect.id, incoming.id);
+    assert.equal(h.vm.interaction.data.call_uuid, 'new-incoming-call');
+    assert.equal(h.vm.interaction.data.direction, 'incoming');
+    assert.deepEqual(h.calls.filter(c => c.action === 'LOOKUP_CLOUDTALK_CALL').map(c => c.params.number), [
+        incoming.mobile_phone_number,
+    ]);
+});
+
+test('individual outbound ringing keeps the CRM number and prospect despite inferred inbound direction', async () => {
+    const h = harness({ dispatch: (action, params) => action === 'LOOKUP_CLOUDTALK_CALL'
+        ? { number: params.number, prospect: first } : undefined });
+    h.vm.interactionProspect = first;
+    await h.vm.interactionViaCloudtalk(first.mobile_phone_number);
+    const properties = {
+        internal_number: '+33644605909', external_number: '365811021001', call_uuid: 'outgoing-agent-leg',
+    };
+
+    for (const event of ['ringing', 'calling', 'ended']) {
+        h.message(event, properties);
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(h.vm.interaction.number, first.mobile_phone_number, event);
+        assert.equal(h.vm.interaction.data.direction, 'outgoing', event);
+        assert.equal(h.vm.interaction.from_user, true, event);
+        assert.equal(h.vm.interactionProspect.id, first.id, event);
+    }
+    assert.equal(h.vm.interaction.status, 'ended');
+    assert.equal(h.calls.filter(c => c.action === 'LOOKUP_CLOUDTALK_CALL')
+        .every(c => c.params.number === first.mobile_phone_number), true);
+});
+
+test('an unmatched incoming external number clears the previous prospect', async () => {
+    const h = harness({ dispatch: (action, params) => action === 'LOOKUP_CLOUDTALK_CALL'
+        ? { number: params.number, prospect: null, threads: [], messages: [] } : undefined });
+    h.vm.interactionProspect = first;
+    h.vm.interaction = {
+        ...h.vm.newInteraction(), source: 'cloudtalk', number: first.mobile_phone_number, status: 'ended',
+        data: { call_uuid: 'completed-call', direction: 'outgoing' },
+    };
+    h.vm.cloudtalkLookup = {
+        number: first.mobile_phone_number, numberKey: h.vm.normalizePhone(first.mobile_phone_number),
+        prospect: first, resolved: true, callId: 'completed-call', threads: [], messages: [],
+    };
+
+    h.message('ringing', {
+        internal_number: '+33644605909', external_number: '+33631147502', call_uuid: 'unmatched-incoming-call',
+    });
+    await new Promise(resolve => setImmediate(resolve));
+    assert.equal(h.vm.interaction.number, '+33631147502');
+    assert.equal(h.vm.interactionProspect, null);
+    assert.equal(h.vm.cloudtalkLookup.prospect, null);
+    assert.equal(h.vm.cloudtalkLookup.resolved, true);
+});
+
+test('outbound callbacks without any call UUID keep the CRM number while waiting for activity', async () => {
+    const h = harness({ dispatch: (action, params) => {
+        if (action === 'MAKE_CLOUDTALK_CALL') return { call_id: null, responseData: { status: 200 } };
+        if (action === 'LOOKUP_CLOUDTALK_CALL') return { number: params.number, prospect: first };
+    } });
+    h.vm.interactionProspect = first;
+    await h.vm.interactionViaCloudtalk(first.mobile_phone_number);
+    assert.equal(h.vm.cloudtalkWaitingForEvent, true);
+
+    for (const event of ['ringing', 'calling', 'ended']) {
+        h.message(event, { internal_number: '+33644605909', external_number: '365811021001' });
+        await new Promise(resolve => setImmediate(resolve));
+        assert.equal(h.vm.interaction.number, first.mobile_phone_number, event);
+        assert.equal(h.vm.interaction.from_user, true, event);
+        assert.equal(h.vm.interaction.data.direction, 'outgoing', event);
+        assert.equal(h.vm.interactionProspect.id, first.id, event);
+    }
+    assert.equal(h.calls.filter(c => c.action === 'LOOKUP_CLOUDTALK_CALL')
+        .every(c => c.params.number === first.mobile_phone_number), true);
+});
+
 test('menu action starts an ordered sequence, preferring mobile and skipping unavailable numbers', async () => {
     const h = harness({ prospects: [second, { id: 3, mobile_phone_number: ' ' }, first] });
     const menu = h.load('components/prospect/table/CardMenus.vue').default;
