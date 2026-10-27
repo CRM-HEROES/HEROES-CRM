@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Interaction;
 use App\Models\Project;
 use App\Models\Prospect;
+use App\Services\CloudTalkCallAttribution;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -185,10 +186,7 @@ class CloudTalkController extends Controller
 
         $agentId = $this->firstFilled($payload, ['data.user.id']);
         if (!$interaction->creator_id && $agentId !== null) {
-            $line = $project->lines()->where('operator', 'cloudtalk')
-                ->get(['user_id', 'config'])
-                ->first(fn ($line) => (string) data_get($line->config, 'agent_id') === $agentId);
-            $interaction->creator_id = $line?->user_id;
+            $interaction->creator_id = (new CloudTalkCallAttribution($project))->userId($agentId);
         }
 
         $created = !$interaction->exists;

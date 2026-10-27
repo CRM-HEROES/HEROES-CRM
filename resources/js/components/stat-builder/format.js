@@ -9,6 +9,7 @@ export function formatNumber(v) {
 export function formatMinutes(v) {
     const n = Number(v);
     if (Number.isNaN(n)) return "—";
+    if (n > 0 && n < 1) return `${Math.max(1, Math.round(n * 60))} s`;
     if (n >= 120) {
         const h = Math.floor(n / 60);
         const m = Math.round(n % 60);

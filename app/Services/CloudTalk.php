@@ -285,9 +285,10 @@ class CloudTalk
             throw new RuntimeException("Impossible de joindre l'API CloudTalk.", 503);
         }
 
-        if (!$response->successful()) {
-            $body = $response->json();
-            $status = (int) data_get($body, 'responseData.status', $response->status());
+        $body = $response->json();
+        $providerStatus = (int) data_get($body, 'responseData.status', 0);
+        if (!$response->successful() || ($providerStatus && $providerStatus !== 200)) {
+            $status = $providerStatus ?: $response->status();
             $message = data_get($body, 'responseData.message');
 
             throw new RuntimeException(
@@ -296,10 +297,12 @@ class CloudTalk
             );
         }
 
-        return [
-            'body' => $response->body(),
-            'content_type' => $response->header('Content-Type') ?: 'audio/x-wav',
-        ];
+        $contentType = $response->header('Content-Type') ?: 'audio/x-wav';
+        if ($response->body() === '' || str_contains(strtolower($contentType), 'json') || str_starts_with(strtolower($contentType), 'text/')) {
+            throw new RuntimeException("L'enregistrement CloudTalk ne contient pas de média audio.", 503);
+        }
+
+        return ['body' => $response->body(), 'content_type' => $contentType];
     }
 
     /**
