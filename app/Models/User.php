@@ -79,6 +79,7 @@ class User extends Authenticatable // implements MustVerifyEmail
         'remember_token',
         'two_factors_secret',
         'two_factors_check_type',
+        'claude_api_key',
     ];
 
     /**
@@ -90,6 +91,7 @@ class User extends Authenticatable // implements MustVerifyEmail
         'last_activity' => 'datetime',
         'email_verified_at' => 'datetime',
         'default_projects' => 'json',
+        'claude_api_key' => 'encrypted',
     ];
 
 

@@ -1484,6 +1484,32 @@
             "title": "calendário do Google",
             "description": "Associe uma conta do Google Agenda aos seus compromissos"
         },
+        "claude": {
+            "checking": "A verificar a chave na API Claude…",
+            "valid": "Chave válida: ligação à API Claude efetuada com sucesso.",
+            "invalid": "A chave API é inválida ou expirou.",
+            "forbidden": "Esta chave não permite o acesso à API Claude.",
+            "no_models": "Esta chave não dá acesso a nenhum modelo Claude.",
+            "rate_limited": "Demasiados pedidos. Tente novamente dentro de instantes.",
+            "verification_unavailable": "Não é possível verificar a chave neste momento. Tente novamente.",
+            "configuration_error": "A API Claude recusou a verificação. Reveja a configuração da sua conta.",
+            "help_title": "Como obter a sua chave API",
+            "help_link": "Abrir a página de chaves API",
+            "help_sign_in": "Inicie sessão na consola Claude ou crie uma conta.",
+            "help_create": "Em «API keys», clique em «Create key».",
+            "help_details": "Dê um nome à chave, escolha a validade e associe-a à sua conta.",
+            "help_paste": "Copie a chave, cole-a no campo abaixo e clique em «Guardar».",
+            "help_once": "A chave completa é apresentada apenas uma vez, no momento da criação.",
+            "description": "Gerir a minha chave API do Claude",
+            "api_key": "Chave API",
+            "configured": "Existe uma chave guardada para a sua conta.",
+            "not_configured": "Nenhuma chave guardada.",
+            "replace_hint": "Introduza uma nova chave para substituir a que já está guardada.",
+            "save": "Guardar",
+            "saving": "A guardar…",
+            "load_error": "Não foi possível carregar as suas definições do Claude.",
+            "save_error": "Não foi possível guardar a sua chave do Claude."
+        },
         "users": {
             "title": "Lista de usuários",
             "description": "Gerenciar o acesso do usuário no projeto {project}"

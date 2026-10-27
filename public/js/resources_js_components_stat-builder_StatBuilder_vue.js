@@ -2085,6 +2085,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _format__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../format */ "./resources/js/components/stat-builder/format.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -2115,6 +2118,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     return {
       playing: null,
       audio: null,
+      loadingAudio: null,
+      audioError: null,
+      audioObjectUrl: null,
+      audioAbortController: null,
+      audioRequestId: 0,
+      unavailableAudio: {},
       searchTimer: null
     };
   },
@@ -2135,6 +2144,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       var start = (this.data.page - 1) * this.data.per_page + 1;
       var end = Math.min(this.data.total, start + this.data.rows.length - 1);
       return "".concat(start, "\u2013").concat(end, " sur ").concat(this.data.total);
+    }
+  },
+  watch: {
+    data: function data() {
+      this.unavailableAudio = {};
     }
   },
   beforeUnmount: function beforeUnmount() {
@@ -2201,29 +2215,121 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     togglePlay: function togglePlay(url) {
       var _this2 = this;
-      if (this.playing === url) {
-        this.stop();
-        return;
-      }
-      this.stop();
-      this.audio = new Audio(url);
-      this.audio.addEventListener("ended", function () {
-        return _this2.playing = null;
-      });
-      this.audio.addEventListener("error", function () {
-        return _this2.playing = null;
-      });
-      this.audio.play().then(function () {
-        return _this2.playing = url;
-      })["catch"](function () {
-        return _this2.playing = null;
-      });
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var requestId, controller, response, blob, audio;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              if (!(_this2.playing === url || _this2.loadingAudio === url)) {
+                _context.next = 3;
+                break;
+              }
+              _this2.stop();
+              return _context.abrupt("return");
+            case 3:
+              _this2.stop();
+              _this2.audioError = null;
+              _this2.loadingAudio = url;
+              requestId = _this2.audioRequestId;
+              controller = new AbortController();
+              _this2.audioAbortController = controller;
+              _context.prev = 9;
+              _context.next = 12;
+              return fetch(url, {
+                credentials: "same-origin",
+                signal: controller.signal
+              });
+            case 12:
+              response = _context.sent;
+              if (!(requestId !== _this2.audioRequestId)) {
+                _context.next = 15;
+                break;
+              }
+              return _context.abrupt("return");
+            case 15:
+              if (!(response.status === 204)) {
+                _context.next = 18;
+                break;
+              }
+              _this2.unavailableAudio[url] = true;
+              return _context.abrupt("return");
+            case 18:
+              if (response.ok) {
+                _context.next = 20;
+                break;
+              }
+              throw new Error("Audio indisponible");
+            case 20:
+              _context.next = 22;
+              return response.blob();
+            case 22:
+              blob = _context.sent;
+              if (!(requestId !== _this2.audioRequestId)) {
+                _context.next = 25;
+                break;
+              }
+              return _context.abrupt("return");
+            case 25:
+              if (blob.size) {
+                _context.next = 28;
+                break;
+              }
+              _this2.unavailableAudio[url] = true;
+              return _context.abrupt("return");
+            case 28:
+              _this2.audioObjectUrl = URL.createObjectURL(blob);
+              audio = new Audio(_this2.audioObjectUrl);
+              _this2.audio = audio;
+              audio.addEventListener("ended", function () {
+                if (_this2.audio === audio) _this2.stop();
+              });
+              audio.addEventListener("error", function () {
+                if (_this2.audio !== audio) return;
+                _this2.audioError = "Impossible de lire l’enregistrement. Réessayez.";
+                _this2.stop();
+              });
+              _context.next = 35;
+              return audio.play();
+            case 35:
+              if (requestId === _this2.audioRequestId && _this2.audio === audio) _this2.playing = url;
+              _context.next = 44;
+              break;
+            case 38:
+              _context.prev = 38;
+              _context.t0 = _context["catch"](9);
+              if (!(requestId !== _this2.audioRequestId || controller.signal.aborted)) {
+                _context.next = 42;
+                break;
+              }
+              return _context.abrupt("return");
+            case 42:
+              _this2.audioError = "Impossible de lire l’enregistrement. Réessayez.";
+              _this2.stop();
+            case 44:
+              _context.prev = 44;
+              if (requestId === _this2.audioRequestId) {
+                _this2.loadingAudio = null;
+                _this2.audioAbortController = null;
+              }
+              return _context.finish(44);
+            case 47:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[9, 38, 44, 47]]);
+      }))();
     },
     stop: function stop() {
+      this.audioRequestId++;
+      if (this.audioAbortController) this.audioAbortController.abort();
+      this.audioAbortController = null;
+      this.loadingAudio = null;
       if (this.audio) {
         this.audio.pause();
         this.audio = null;
       }
+      if (this.audioObjectUrl) URL.revokeObjectURL(this.audioObjectUrl);
+      this.audioObjectUrl = null;
       this.playing = null;
     }
   }
@@ -5181,10 +5287,11 @@ var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
     "class": "sb-dot"
   }, null, -1 /* HOISTED */);
 });
-var _hoisted_13 = ["onClick"];
+var _hoisted_13 = ["data-tip", "onClick"];
 var _hoisted_14 = {
   key: 1,
-  "class": "sb-muted"
+  "class": "sb-muted",
+  "data-tip": "Aucun enregistrement disponible"
 };
 var _hoisted_15 = {
   key: 0,
@@ -5197,25 +5304,30 @@ var _hoisted_17 = {
 var _hoisted_18 = ["colspan"];
 var _hoisted_19 = {
   key: 1,
-  "class": "sb-table-foot"
+  "class": "sb-audio-error",
+  role: "alert"
 };
 var _hoisted_20 = {
+  key: 2,
+  "class": "sb-table-foot"
+};
+var _hoisted_21 = {
   "class": "sb-pager"
 };
-var _hoisted_21 = ["disabled"];
-var _hoisted_22 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_22 = ["disabled"];
+var _hoisted_23 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "fa fa-chevron-left"
   }, null, -1 /* HOISTED */);
 });
-var _hoisted_23 = [_hoisted_22];
-var _hoisted_24 = ["disabled"];
-var _hoisted_25 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_24 = [_hoisted_23];
+var _hoisted_25 = ["disabled"];
+var _hoisted_26 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
     "class": "fa fa-chevron-right"
   }, null, -1 /* HOISTED */);
 });
-var _hoisted_26 = [_hoisted_25];
+var _hoisted_27 = [_hoisted_26];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [$props.config.search !== false ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "search",
@@ -5257,17 +5369,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["sb-badge", $options.statusClass(row[c.field])])
       }, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(row[c.field]), 1 /* TEXT */)], 2 /* CLASS */)) : c.type === 'audio_action' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 2
-      }, [row[c.field] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      }, [row[c.field] && !$data.unavailableAudio[row[c.field]] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 0,
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["sb-play", {
           'is-playing': $data.playing === row[c.field]
         }]),
-        "data-tip": "Écouter le dernier appel",
+        "data-tip": $data.loadingAudio === row[c.field] ? 'Annuler le chargement' : 'Écouter le dernier enregistrement disponible',
         onClick: function onClick($event) {
           return $options.togglePlay(row[c.field]);
         }
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
-        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["fa", $data.playing === row[c.field] ? 'fa-pause' : 'fa-play'])
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["fa", $data.loadingAudio === row[c.field] ? 'fa-spinner fa-spin' : $data.playing === row[c.field] ? 'fa-pause' : 'fa-play'])
       }, null, 2 /* CLASS */)], 10 /* CLASS, PROPS */, _hoisted_13)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "—"))], 64 /* STABLE_FRAGMENT */)) : c.type === 'datetime' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 3
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.fmtDate(row[c.field])), 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : c.format ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
@@ -5292,17 +5404,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }), 128 /* KEYED_FRAGMENT */)), !$props.data.rows.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
     colspan: $props.data.columns.length + ($options.actions.length ? 1 : 0),
     "class": "sb-empty-row"
-  }, "Aucun résultat", 8 /* PROPS */, _hoisted_18)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), $props.config.pagination ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rangeLabel), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, "Aucun résultat", 8 /* PROPS */, _hoisted_18)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])]), $data.audioError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.audioError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.config.pagination ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.rangeLabel), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     disabled: $props.data.page <= 1,
     onClick: _cache[1] || (_cache[1] = function ($event) {
       return $options["goto"]($props.data.page - 1);
     })
-  }, _hoisted_23, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.data.page) + " / " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.pages), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, _hoisted_24, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.data.page) + " / " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.pages), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     disabled: $props.data.page >= $options.pages,
     onClick: _cache[2] || (_cache[2] = function ($event) {
       return $options["goto"]($props.data.page + 1);
     })
-  }, _hoisted_26, 8 /* PROPS */, _hoisted_24)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, _hoisted_27, 8 /* PROPS */, _hoisted_25)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -6011,6 +6123,7 @@ function formatNumber(v) {
 function formatMinutes(v) {
   var n = Number(v);
   if (Number.isNaN(n)) return "—";
+  if (n > 0 && n < 1) return "".concat(Math.max(1, Math.round(n * 60)), " s");
   if (n >= 120) {
     var h = Math.floor(n / 60);
     var m = Math.round(n % 60);
@@ -6903,7 +7016,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.sb-table[data-v-2fa45492] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    gap: 8px;\n}\n.sb-table-search[data-v-2fa45492] {\n    position: relative;\n    max-width: 260px;\n}\n.sb-table-search i[data-v-2fa45492] {\n    position: absolute;\n    left: 10px;\n    top: 50%;\n    transform: translateY(-50%);\n    font-size: 12px;\n    color: var(--sb-muted);\n}\n.sb-table-search input[data-v-2fa45492] {\n    width: 100%;\n    height: 32px;\n    border: 1px solid var(--sb-border);\n    border-radius: 8px;\n    padding: 0 10px 0 30px;\n    font-size: 13px;\n    background: var(--sb-surface);\n    color: var(--sb-text);\n}\n.sb-table-search input[data-v-2fa45492]:focus {\n    outline: none;\n    border-color: var(--sb-accent);\n    box-shadow: 0 0 0 3px var(--sb-accent-soft);\n}\n.sb-table-wrap[data-v-2fa45492] {\n    flex: 1;\n    min-height: 0;\n    overflow: auto;\n    border: 1px solid var(--sb-border);\n    border-radius: 10px;\n}\ntable[data-v-2fa45492] {\n    width: 100%;\n    border-collapse: collapse;\n    font-size: 13px;\n}\nth[data-v-2fa45492] {\n    position: sticky;\n    top: 0;\n    background: var(--sb-bg-soft);\n    text-align: left;\n    font-size: 11px;\n    font-weight: 600;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    color: var(--sb-muted);\n    padding: 9px 12px;\n    white-space: nowrap;\n    z-index: 1;\n}\nth.is-sortable[data-v-2fa45492] { cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none;\n}\nth.is-sortable[data-v-2fa45492]:hover { color: var(--sb-text);\n}\n.sb-sort[data-v-2fa45492] { margin-left: 4px; font-size: 10px;\n}\n.sb-sort.is-idle[data-v-2fa45492] { opacity: 0.35;\n}\ntd[data-v-2fa45492] {\n    padding: 9px 12px;\n    border-top: 1px solid var(--sb-border);\n    color: var(--sb-text);\n    white-space: nowrap;\n}\ntbody tr:hover td[data-v-2fa45492] { background: var(--sb-bg-soft);\n}\n.is-num[data-v-2fa45492] { text-align: right; font-variant-numeric: tabular-nums;\n}\n.is-actions[data-v-2fa45492] { text-align: right; width: 1%;\n}\n.sb-empty-row[data-v-2fa45492] { text-align: center; color: var(--sb-muted); padding: 24px;\n}\n.sb-muted[data-v-2fa45492] { color: var(--sb-muted);\n}\n.sb-pct[data-v-2fa45492] { display: flex; align-items: center; gap: 8px; min-width: 110px;\n}\n.sb-pct-bar[data-v-2fa45492] { flex: 1; height: 6px; border-radius: 99px; background: var(--sb-border); overflow: hidden;\n}\n.sb-pct-bar span[data-v-2fa45492] { display: block; height: 100%; border-radius: 99px; transition: width 0.4s ease;\n}\n.sb-pct-val[data-v-2fa45492] { font-size: 12px; font-weight: 600; width: 38px; text-align: right;\n}\n.sb-badge[data-v-2fa45492] {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 2px 9px;\n    border-radius: 99px;\n    font-size: 12px;\n    font-weight: 500;\n    background: #f1f5f9;\n    color: #475569;\n}\n.sb-dot[data-v-2fa45492] { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8;\n}\n.sb-badge.is-on[data-v-2fa45492] { background: #d1fae5; color: #047857;\n}\n.sb-badge.is-on .sb-dot[data-v-2fa45492] { background: #10b981;\n}\n.sb-badge.is-away[data-v-2fa45492] { background: #fef3c7; color: #b45309;\n}\n.sb-badge.is-away .sb-dot[data-v-2fa45492] { background: #f59e0b;\n}\n.sb-play[data-v-2fa45492], .sb-action[data-v-2fa45492] {\n    width: 28px;\n    height: 28px;\n    border-radius: 50%;\n    border: 1px solid var(--sb-border);\n    background: var(--sb-surface);\n    color: var(--sb-text);\n    font-size: 11px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    text-decoration: none;\n    margin-left: 4px;\n    transition: all 0.15s;\n}\n.sb-play[data-v-2fa45492]:hover, .sb-action[data-v-2fa45492]:hover { background: var(--sb-accent); color: #fff; border-color: var(--sb-accent);\n}\n.sb-play.is-playing[data-v-2fa45492] { background: var(--sb-accent); color: #fff; border-color: var(--sb-accent);\n}\n.sb-table-foot[data-v-2fa45492] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    font-size: 12px;\n    color: var(--sb-muted);\n}\n.sb-pager[data-v-2fa45492] { display: flex; align-items: center; gap: 8px;\n}\n.sb-pager button[data-v-2fa45492] {\n    width: 28px;\n    height: 28px;\n    border-radius: 8px;\n    border: 1px solid var(--sb-border);\n    background: var(--sb-surface);\n    color: var(--sb-text);\n    cursor: pointer;\n}\n.sb-pager button[data-v-2fa45492]:disabled { opacity: 0.4; cursor: not-allowed;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.sb-table[data-v-2fa45492] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    gap: 8px;\n}\n.sb-table-search[data-v-2fa45492] {\n    position: relative;\n    max-width: 260px;\n}\n.sb-table-search i[data-v-2fa45492] {\n    position: absolute;\n    left: 10px;\n    top: 50%;\n    transform: translateY(-50%);\n    font-size: 12px;\n    color: var(--sb-muted);\n}\n.sb-table-search input[data-v-2fa45492] {\n    width: 100%;\n    height: 32px;\n    border: 1px solid var(--sb-border);\n    border-radius: 8px;\n    padding: 0 10px 0 30px;\n    font-size: 13px;\n    background: var(--sb-surface);\n    color: var(--sb-text);\n}\n.sb-table-search input[data-v-2fa45492]:focus {\n    outline: none;\n    border-color: var(--sb-accent);\n    box-shadow: 0 0 0 3px var(--sb-accent-soft);\n}\n.sb-table-wrap[data-v-2fa45492] {\n    flex: 1;\n    min-height: 0;\n    overflow: auto;\n    border: 1px solid var(--sb-border);\n    border-radius: 10px;\n}\ntable[data-v-2fa45492] {\n    width: 100%;\n    border-collapse: collapse;\n    font-size: 13px;\n}\nth[data-v-2fa45492] {\n    position: sticky;\n    top: 0;\n    background: var(--sb-bg-soft);\n    text-align: left;\n    font-size: 11px;\n    font-weight: 600;\n    text-transform: uppercase;\n    letter-spacing: 0.04em;\n    color: var(--sb-muted);\n    padding: 9px 12px;\n    white-space: nowrap;\n    z-index: 1;\n}\nth.is-sortable[data-v-2fa45492] { cursor: pointer; -webkit-user-select: none; -moz-user-select: none; user-select: none;\n}\nth.is-sortable[data-v-2fa45492]:hover { color: var(--sb-text);\n}\n.sb-sort[data-v-2fa45492] { margin-left: 4px; font-size: 10px;\n}\n.sb-sort.is-idle[data-v-2fa45492] { opacity: 0.35;\n}\ntd[data-v-2fa45492] {\n    padding: 9px 12px;\n    border-top: 1px solid var(--sb-border);\n    color: var(--sb-text);\n    white-space: nowrap;\n}\ntbody tr:hover td[data-v-2fa45492] { background: var(--sb-bg-soft);\n}\n.is-num[data-v-2fa45492] { text-align: right; font-variant-numeric: tabular-nums;\n}\n.is-actions[data-v-2fa45492] { text-align: right; width: 1%;\n}\n.sb-empty-row[data-v-2fa45492] { text-align: center; color: var(--sb-muted); padding: 24px;\n}\n.sb-muted[data-v-2fa45492] { color: var(--sb-muted);\n}\n.sb-audio-error[data-v-2fa45492] { color: #ef4444; font-size: 12px;\n}\n.sb-pct[data-v-2fa45492] { display: flex; align-items: center; gap: 8px; min-width: 110px;\n}\n.sb-pct-bar[data-v-2fa45492] { flex: 1; height: 6px; border-radius: 99px; background: var(--sb-border); overflow: hidden;\n}\n.sb-pct-bar span[data-v-2fa45492] { display: block; height: 100%; border-radius: 99px; transition: width 0.4s ease;\n}\n.sb-pct-val[data-v-2fa45492] { font-size: 12px; font-weight: 600; width: 38px; text-align: right;\n}\n.sb-badge[data-v-2fa45492] {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    padding: 2px 9px;\n    border-radius: 99px;\n    font-size: 12px;\n    font-weight: 500;\n    background: #f1f5f9;\n    color: #475569;\n}\n.sb-dot[data-v-2fa45492] { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8;\n}\n.sb-badge.is-on[data-v-2fa45492] { background: #d1fae5; color: #047857;\n}\n.sb-badge.is-on .sb-dot[data-v-2fa45492] { background: #10b981;\n}\n.sb-badge.is-away[data-v-2fa45492] { background: #fef3c7; color: #b45309;\n}\n.sb-badge.is-away .sb-dot[data-v-2fa45492] { background: #f59e0b;\n}\n.sb-play[data-v-2fa45492], .sb-action[data-v-2fa45492] {\n    width: 28px;\n    height: 28px;\n    border-radius: 50%;\n    border: 1px solid var(--sb-border);\n    background: var(--sb-surface);\n    color: var(--sb-text);\n    font-size: 11px;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    cursor: pointer;\n    text-decoration: none;\n    margin-left: 4px;\n    transition: all 0.15s;\n}\n.sb-play[data-v-2fa45492]:hover, .sb-action[data-v-2fa45492]:hover { background: var(--sb-accent); color: #fff; border-color: var(--sb-accent);\n}\n.sb-play.is-playing[data-v-2fa45492] { background: var(--sb-accent); color: #fff; border-color: var(--sb-accent);\n}\n.sb-table-foot[data-v-2fa45492] {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    font-size: 12px;\n    color: var(--sb-muted);\n}\n.sb-pager[data-v-2fa45492] { display: flex; align-items: center; gap: 8px;\n}\n.sb-pager button[data-v-2fa45492] {\n    width: 28px;\n    height: 28px;\n    border-radius: 8px;\n    border: 1px solid var(--sb-border);\n    background: var(--sb-surface);\n    color: var(--sb-text);\n    cursor: pointer;\n}\n.sb-pager button[data-v-2fa45492]:disabled { opacity: 0.4; cursor: not-allowed;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

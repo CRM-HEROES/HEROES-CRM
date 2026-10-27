@@ -34,7 +34,11 @@ class ProjectUserImpersonateCheck
     		return $next($request);
     	}
 
-        if (in_array($request->route()->getName(), ["api.auth", "api.event", "api.event.index", "api.user.impersonate.leave", "api.google.calendar.index", "api.google.authenticator.check", "api.user.email"])) {
+        if (in_array($request->route()->getName(), [
+            "api.auth", "api.event", "api.event.index", "api.user.impersonate.leave",
+            "api.google.calendar.index", "api.google.authenticator.check", "api.user.email",
+            "api.settings.claude.show", "api.settings.claude.update",
+        ])) {
     		return $next($request);
         }
 

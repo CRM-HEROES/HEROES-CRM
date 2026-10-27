@@ -179,6 +179,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\User\BanController as UserBanController;
+use App\Http\Controllers\API\User\ClaudeSettingController;
 use App\Http\Controllers\API\User\EventsDailyDirectionController as UserEventsDailyDirectionController;
 use App\Http\Controllers\API\User\ProjectController as UserProjectController;
 use App\Http\Controllers\API\User\SessionController as UserSessionController;
@@ -224,6 +225,10 @@ Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->na
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
+
+    // Personal Claude key, independent of the current project and role.
+    Route::get('/settings/claude', [ClaudeSettingController::class, 'show'])->name('settings.claude.show');
+    Route::put('/settings/claude', [ClaudeSettingController::class, 'update'])->name('settings.claude.update');
 
     // Kavkom
     Route::post('/settings/kavkom/test', [KavkomController::class, 'test'])->name('settings.kavkom.test');
