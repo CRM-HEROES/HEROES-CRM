@@ -75,6 +75,14 @@ class CloudTalkWebhookTest extends TestCase
             $table->string('operator');
             $table->json('config');
         });
+        $schema->create('user_project', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('user_id');
+        });
+        DB::table('user_project')->insert([
+            ['project_id' => 1, 'user_id' => 7],
+            ['project_id' => 2, 'user_id' => 9],
+        ]);
 
         DB::table('projects')->insert([
             ['id' => 1, 'slug' => 'cloudtalk-test'],

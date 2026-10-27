@@ -700,6 +700,8 @@ Route::group([
         Route::put('stat-dashboard', [ProjectStatDashboardController::class, 'update']);
         Route::get('stat-dashboard/meta', [ProjectStatDashboardController::class, 'meta']);
         Route::post('stat-dashboard/query', [ProjectStatDashboardController::class, 'query']);
+        Route::get('stat-dashboard/recording/{userId}', [ProjectStatDashboardController::class, 'recording'])
+            ->whereNumber('userId')->name('stat-dashboard.recording');
 
         // Stat
         Route::get('stat', [ProjectStatController::class, 'index']);

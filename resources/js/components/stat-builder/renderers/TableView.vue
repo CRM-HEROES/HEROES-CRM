@@ -44,15 +44,15 @@
                             </template>
                             <template v-else-if="c.type === 'audio_action'">
                                 <button
-                                    v-if="row[c.field]"
+                                    v-if="row[c.field] && !unavailableAudio[row[c.field]]"
                                     class="sb-play"
                                     :class="{ 'is-playing': playing === row[c.field] }"
-                                    data-tip="Écouter le dernier appel"
+                                    :data-tip="loadingAudio === row[c.field] ? 'Annuler le chargement' : 'Écouter le dernier enregistrement disponible'"
                                     @click="togglePlay(row[c.field])"
                                 >
-                                    <i class="fa" :class="playing === row[c.field] ? 'fa-pause' : 'fa-play'"></i>
+                                    <i class="fa" :class="loadingAudio === row[c.field] ? 'fa-spinner fa-spin' : playing === row[c.field] ? 'fa-pause' : 'fa-play'"></i>
                                 </button>
-                                <span v-else class="sb-muted">—</span>
+                                <span v-else class="sb-muted" data-tip="Aucun enregistrement disponible">—</span>
                             </template>
                             <template v-else-if="c.type === 'datetime'">{{ fmtDate(row[c.field]) }}</template>
                             <template v-else-if="c.format">{{ fmtValue(row[c.field], c.format) }}</template>
@@ -80,6 +80,8 @@
             </table>
         </div>
 
+        <div v-if="audioError" class="sb-audio-error" role="alert">{{ audioError }}</div>
+
         <div v-if="config.pagination" class="sb-table-foot">
             <span>{{ rangeLabel }}</span>
             <div class="sb-pager">
@@ -104,7 +106,17 @@ export default {
     emits: ["runtime"],
 
     data() {
-        return { playing: null, audio: null, searchTimer: null };
+        return {
+            playing: null,
+            audio: null,
+            loadingAudio: null,
+            audioError: null,
+            audioObjectUrl: null,
+            audioAbortController: null,
+            audioRequestId: 0,
+            unavailableAudio: {},
+            searchTimer: null,
+        };
     },
 
     computed: {
@@ -122,6 +134,12 @@ export default {
             const start = (this.data.page - 1) * this.data.per_page + 1;
             const end = Math.min(this.data.total, start + this.data.rows.length - 1);
             return `${start}–${end} sur ${this.data.total}`;
+        },
+    },
+
+    watch: {
+        data() {
+            this.unavailableAudio = {};
         },
     },
 
@@ -179,23 +197,73 @@ export default {
             return action.url.replace(/\{(\w+)\}/g, (_, k) => encodeURIComponent(row[k] ?? ""));
         },
 
-        togglePlay(url) {
-            if (this.playing === url) {
+        async togglePlay(url) {
+            if (this.playing === url || this.loadingAudio === url) {
                 this.stop();
                 return;
             }
             this.stop();
-            this.audio = new Audio(url);
-            this.audio.addEventListener("ended", () => (this.playing = null));
-            this.audio.addEventListener("error", () => (this.playing = null));
-            this.audio.play().then(() => (this.playing = url)).catch(() => (this.playing = null));
+            this.audioError = null;
+            this.loadingAudio = url;
+            const requestId = this.audioRequestId;
+            const controller = new AbortController();
+            this.audioAbortController = controller;
+
+            try {
+                const response = await fetch(url, {
+                    credentials: "same-origin",
+                    signal: controller.signal,
+                });
+                if (requestId !== this.audioRequestId) return;
+                if (response.status === 204) {
+                    this.unavailableAudio[url] = true;
+                    return;
+                }
+                if (!response.ok) throw new Error("Audio indisponible");
+
+                const blob = await response.blob();
+                if (requestId !== this.audioRequestId) return;
+                if (!blob.size) {
+                    this.unavailableAudio[url] = true;
+                    return;
+                }
+
+                this.audioObjectUrl = URL.createObjectURL(blob);
+                const audio = new Audio(this.audioObjectUrl);
+                this.audio = audio;
+                audio.addEventListener("ended", () => {
+                    if (this.audio === audio) this.stop();
+                });
+                audio.addEventListener("error", () => {
+                    if (this.audio !== audio) return;
+                    this.audioError = "Impossible de lire l’enregistrement. Réessayez.";
+                    this.stop();
+                });
+                await audio.play();
+                if (requestId === this.audioRequestId && this.audio === audio) this.playing = url;
+            } catch (error) {
+                if (requestId !== this.audioRequestId || controller.signal.aborted) return;
+                this.audioError = "Impossible de lire l’enregistrement. Réessayez.";
+                this.stop();
+            } finally {
+                if (requestId === this.audioRequestId) {
+                    this.loadingAudio = null;
+                    this.audioAbortController = null;
+                }
+            }
         },
 
         stop() {
+            this.audioRequestId++;
+            if (this.audioAbortController) this.audioAbortController.abort();
+            this.audioAbortController = null;
+            this.loadingAudio = null;
             if (this.audio) {
                 this.audio.pause();
                 this.audio = null;
             }
+            if (this.audioObjectUrl) URL.revokeObjectURL(this.audioObjectUrl);
+            this.audioObjectUrl = null;
             this.playing = null;
         },
     },
@@ -278,6 +346,7 @@ tbody tr:hover td { background: var(--sb-bg-soft); }
 .is-actions { text-align: right; width: 1%; }
 .sb-empty-row { text-align: center; color: var(--sb-muted); padding: 24px; }
 .sb-muted { color: var(--sb-muted); }
+.sb-audio-error { color: #ef4444; font-size: 12px; }
 .sb-pct { display: flex; align-items: center; gap: 8px; min-width: 110px; }
 .sb-pct-bar { flex: 1; height: 6px; border-radius: 99px; background: var(--sb-border); overflow: hidden; }
 .sb-pct-bar span { display: block; height: 100%; border-radius: 99px; transition: width 0.4s ease; }

@@ -155,7 +155,7 @@ class Interaction extends Model
         return (string) $callId;
     }
 
-    protected function hasCloudTalkRecording(): bool
+    public function hasCloudTalkRecording(): bool
     {
         if ($this->source !== 'cloudtalk' || !$this->cloudTalkCallId()) {
             return false;
