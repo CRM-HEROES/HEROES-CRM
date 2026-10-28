@@ -1243,6 +1243,29 @@ class ImportProspects implements ShouldQueue
             return false;
         }
 
+        // Les champs MAJ servent uniquement à détecter les doublons quand ils
+        // sont présents : leur absence ne doit pas empêcher l'import d'un lead
+        // qui porte par ailleurs des données (y compris des champs perso).
+        if (!empty($this->duplicateFieldDescriptors)) {
+            foreach ((array) ($prospect['meta'] ?? []) as $value) {
+                if ($value !== null && $value !== '' && $value !== []) {
+                    return false;
+                }
+            }
+
+            // Any other column filled by the mapping (not a bookkeeping value
+            // of an empty prospect) is data too.
+            foreach ($prospect as $key => $value) {
+                if (in_array($key, ['meta', 'created_at', 'updated_at'], true)) {
+                    continue;
+                }
+
+                if ($value !== null && $value !== '' && $value !== [] && $value !== ($this->emptyProspect[$key] ?? null)) {
+                    return false;
+                }
+            }
+        }
+
         foreach ([
             'email', 'phone_number', 'mobile_phone_number',
             'street', 'city', 'postal_code',
