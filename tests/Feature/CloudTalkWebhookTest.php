@@ -45,12 +45,17 @@ class CloudTalkWebhookTest extends TestCase
             $table->id();
             $table->unsignedBigInteger('prospect_id')->nullable();
             $table->text('message');
+            $table->text('error')->nullable();
             $table->json('media')->nullable();
             $table->string('source')->nullable();
             $table->boolean('from_user')->default(true);
             $table->boolean('is_incoming')->default(false);
             $table->unsignedBigInteger('creator_id')->nullable();
             $table->timestamp('sent_at')->nullable();
+            $table->string('cloudtalk_message_id', 191)->nullable()->index();
+            $table->string('cloudtalk_event_id', 191)->nullable()->index();
+            $table->string('cloudtalk_sender_number', 32)->nullable();
+            $table->timestamp('cloudtalk_send_started_at')->nullable();
             $table->timestamps();
         });
         $schema->create('interactions', function (Blueprint $table) {
@@ -216,16 +221,8 @@ class CloudTalkWebhookTest extends TestCase
         $this->assertSame('2026-10-19 08:18:39', $sms->sent_at->format('Y-m-d H:i:s'));
     }
 
-    public function test_outbound_messages_and_unmatched_or_incomplete_messages_are_ignored(): void
+    public function test_unmatched_or_incomplete_messages_are_ignored(): void
     {
-        $payload = $this->messagePayload();
-        $payload['data']['direction'] = 'outbound';
-        $this->postJson($this->endpoint(), $payload)->assertOk()->assertJson(['message' => 'ignored']);
-
-        $payload['type'] = 'message.sent';
-        unset($payload['data']['direction']);
-        $this->postJson($this->endpoint(), $payload)->assertOk()->assertJson(['message' => 'ignored']);
-
         $payload = $this->messagePayload();
         $payload['data']['external_number'] = '+33199999999';
         $this->postJson($this->endpoint(), $payload)->assertOk()->assertJson(['reason' => 'prospect_not_found']);

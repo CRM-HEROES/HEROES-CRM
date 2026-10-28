@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Interaction;
 use App\Models\Project;
 use App\Models\Prospect;
+use App\Models\Sms;
 use App\Services\CloudTalkCallAttribution;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -46,7 +47,31 @@ class CloudTalkController extends Controller
             return ['message' => 'ignored', 'reason' => 'unsupported_event'];
         }
 
-        return $this->storeIncomingMessage($payload, $project);
+        $messageEvent = strtolower(str_replace(['_', ' '], '.', (string) $this->firstFilled($payload, [
+            'type', 'event.type', 'event', 'name', 'action', 'event_type',
+            'payload.event', 'payload.type', 'data.event', 'data.type',
+        ])));
+        $outgoingEvents = ['message.sent', 'sms.sent', 'message.outgoing', 'sms.outgoing', 'message.outbound', 'sms.outbound'];
+        $incomingEvents = ['message.received', 'sms.received', 'message.incoming', 'sms.incoming', 'message.inbound', 'sms.inbound'];
+        if ($messageEvent !== '' && !in_array($messageEvent, array_merge($outgoingEvents, $incomingEvents, ['message', 'sms']), true)) {
+            return ['message' => 'ignored', 'reason' => 'unsupported_event'];
+        }
+
+        $outgoing = in_array($messageEvent, $outgoingEvents, true)
+            || ($messageEvent === '' && !$this->isIncomingMessage($payload));
+        if (!$outgoing && !$this->isIncomingMessage($payload)) {
+            return ['message' => 'ignored'];
+        }
+        if ($outgoing && !in_array(strtolower((string) data_get($payload, 'data.channel', 'sms')), ['sms', 'mms'], true)) {
+            return ['message' => 'ignored', 'reason' => 'unsupported_channel'];
+        }
+
+        return DB::transaction(function () use ($payload, $project, $outgoing) {
+            // Share the project lock with send completion, including callbacks arriving during the API request.
+            $project->newQuery()->whereKey($project->id)->lockForUpdate()->first();
+
+            return $this->storeMessage($payload, $project, !$outgoing);
+        }, 3);
     }
 
     /**
@@ -58,15 +83,33 @@ class CloudTalkController extends Controller
     }
 
     /**
-     * Store an incoming CloudTalk SMS when it can be matched to a prospect.
+     * Import a provider-confirmed SMS without sending it again.
      */
-    protected function storeIncomingMessage(array $payload, Project $project)
+    protected function storeMessage(array $payload, Project $project, bool $incoming)
     {
-        if (!$this->isIncomingMessage($payload)) {
-            return ['message' => 'ignored'];
+        $messageId = $this->firstFilled($payload, ['data.id', 'data.message_id', 'message_id', 'payload.message_id', 'message.id']);
+        $eventId = $this->firstFilled($payload, ['event_id', 'payload.event_id']);
+        if (strlen($messageId ?? '') > 191 || strlen($eventId ?? '') > 191) {
+            return ['message' => 'ignored', 'reason' => 'invalid_message_reference'];
+        }
+        if (!$incoming && $messageId === null && $eventId === null) {
+            return ['message' => 'ignored', 'reason' => 'missing_message_reference'];
         }
 
-        $number = $this->extractPhoneNumber($payload);
+        if ($messageId !== null || $eventId !== null) {
+            $existing = Sms::query()->where('source', 'cloudtalk')
+                ->whereIn('prospect_id', $project->prospects()->select('prospects.id'))
+                ->where(function ($query) use ($messageId, $eventId) {
+                    if ($messageId !== null) $query->orWhere('cloudtalk_message_id', $messageId);
+                    if ($eventId !== null) $query->orWhere('cloudtalk_event_id', $eventId);
+                })->first();
+            if ($existing) {
+                $this->recordMessageReferences($existing, $messageId, $eventId);
+                return $this->messageResponse($existing, false, $incoming);
+            }
+        }
+
+        $number = $incoming ? $this->extractPhoneNumber($payload) : $this->extractRecipientNumber($payload);
         $message = $this->extractMessage($payload);
         $media = $this->extractMedia($payload);
 
@@ -89,31 +132,126 @@ class CloudTalkController extends Controller
             ];
         }
 
-        $receivedAt = $this->extractDate($payload);
+        $sentAt = $this->extractDate($payload);
+        $sender = $incoming ? null : $this->firstFilled($payload, [
+            'data.internal_number.number_e164', 'internal_number.number_e164',
+            'data.from', 'data.from_number', 'from', 'from_number', 'sender', 'sender_number',
+            'payload.from', 'payload.from_number',
+        ], ['number_e164', 'number', 'phone_number', 'value']);
+        $sender = $sender !== null ? $this->normalizePhone($sender) : null;
+
+        if (!$incoming && $sentAt && $sender) {
+            $existing = $this->findOutgoingCrmMessage($project, $prospect, $message ?? '', $media, $sender, $sentAt);
+            if ($existing) {
+                $this->recordMessageReferences($existing, $messageId, $eventId);
+                if (!$existing->sent_at) $existing->sent_at = $sentAt;
+                if (!$existing->cloudtalk_sender_number) $existing->cloudtalk_sender_number = $sender;
+                $existing->saveQuietly();
+                return $this->messageResponse($existing, false, false);
+            }
+        }
+
         $attributes = [
             'message' => $message ?? '',
             'source' => 'cloudtalk',
-            'from_user' => 0,
-            'is_incoming' => 1,
+            'from_user' => !$incoming,
+            'is_incoming' => $incoming,
             'creator_id' => null,
+            'cloudtalk_message_id' => $messageId,
+            'cloudtalk_event_id' => $eventId,
+            'cloudtalk_sender_number' => $sender,
         ];
+        if (!$incoming) {
+            $agentId = $this->firstFilled($payload, ['data.user.id', 'data.agent.id', 'user.id']);
+            if ($agentId !== null) {
+                $attributes['creator_id'] = (new CloudTalkCallAttribution($project))->userId($agentId);
+            }
+        }
 
         if ($media !== []) {
             $attributes['media'] = $media;
         }
 
-        if ($receivedAt) {
-            $attributes['created_at'] = $receivedAt;
-            $attributes['sent_at'] = $receivedAt;
+        if ($sentAt) {
+            $attributes['created_at'] = $sentAt;
+        }
+        $attributes['sent_at'] = $sentAt ?? now();
+
+        // Outbound imports must bypass SmsObserver, which would otherwise send another SMS.
+        $sms = $prospect->sms()->make($attributes);
+        $sms->saveQuietly();
+
+        return $this->messageResponse($sms, true, $incoming);
+    }
+
+    protected function messageResponse(Sms $sms, bool $created, bool $incoming)
+    {
+        return response()->json([
+            'message' => $created
+                ? ($incoming ? 'SMS CloudTalk entrant enregistre.' : 'SMS CloudTalk sortant enregistre.')
+                : 'SMS CloudTalk deja enregistre.',
+            'sms_id' => $sms->id,
+            'prospect_id' => $sms->prospect_id,
+        ], $created ? 201 : 200);
+    }
+
+    protected function recordMessageReferences(Sms $sms, ?string $messageId, ?string $eventId): void
+    {
+        if (!$sms->cloudtalk_message_id && $messageId !== null) $sms->cloudtalk_message_id = $messageId;
+        if (!$sms->cloudtalk_event_id && $eventId !== null) $sms->cloudtalk_event_id = $eventId;
+        if ($sms->isDirty()) $sms->saveQuietly();
+    }
+
+    /**
+     * The legacy send API does not always return an ID. Claim only a matching,
+     * unlinked CRM send close to the provider timestamp, never an arbitrary old SMS.
+     */
+    protected function findOutgoingCrmMessage(Project $project, Prospect $prospect, string $message, array $media, string $sender, Carbon $sentAt): ?Sms
+    {
+        $from = $sentAt->copy()->subSeconds(120);
+        $to = $sentAt->copy()->addSeconds(120);
+        $candidates = $prospect->sms()->where('source', 'cloudtalk')
+            ->where('from_user', true)->where('is_incoming', false)
+            ->whereNull('cloudtalk_message_id')->whereNull('cloudtalk_event_id')
+            ->where(function ($query) use ($from, $to) {
+                $query->whereBetween('cloudtalk_send_started_at', [$from, $to])
+                    ->orWhere(fn ($legacy) => $legacy->whereNull('cloudtalk_send_started_at')->whereBetween('sent_at', [$from, $to]));
+            })->orderBy('id')->get();
+
+        foreach ($candidates as $candidate) {
+            if ($candidate->error || trim($candidate->message) !== trim($message)) continue;
+            $candidateMedia = $candidate->media ?? [];
+            if (count($candidateMedia) !== count($media)) continue;
+            if ($media !== []) {
+                $names = array_column($media, 'file_name');
+                $candidateNames = array_column($candidateMedia, 'file_name');
+                sort($names);
+                sort($candidateNames);
+                if ($names !== $candidateNames) continue;
+            }
+            if ($candidate->cloudtalk_sender_number) {
+                if ($this->normalizePhone($candidate->cloudtalk_sender_number) === $sender) return $candidate;
+                continue;
+            }
+            if ($candidate->creator_id) {
+                $lines = $project->lines()->where('operator', 'cloudtalk')->where('user_id', $candidate->creator_id)->get();
+                foreach ($lines as $line) {
+                    if ($this->normalizePhone($line->numero) === $sender) return $candidate;
+                }
+            }
         }
 
-        $sms = $prospect->sms()->create($attributes);
+        return null;
+    }
 
-        return response()->json([
-            'message' => 'SMS CloudTalk entrant enregistre.',
-            'sms_id' => $sms->id,
-            'prospect_id' => $prospect->id,
-        ], 201);
+    protected function extractRecipientNumber(array $payload): ?string
+    {
+        return $this->firstFilled($payload, [
+            'data.external_number', 'external_number', 'payload.external_number',
+            'data.to', 'data.to_number', 'data.recipient', 'data.recipient_number',
+            'to', 'to_number', 'recipient', 'recipient_number',
+            'payload.to', 'payload.to_number', 'payload.recipient', 'message.to', 'message.to_number',
+        ], ['number_e164', 'number', 'phone', 'phone_number', 'value']);
     }
 
     /**
@@ -471,6 +609,8 @@ class CloudTalkController extends Controller
     protected function extractDate(array $payload): ?Carbon
     {
         $value = $this->firstFilled($payload, [
+            'data.sent_at',
+            'sent_at',
             'received_at',
             'created_at',
             'timestamp',

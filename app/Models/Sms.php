@@ -30,16 +30,24 @@ class Sms extends Model
         'project_id',
         'source',
         'sent_at',
+        'cloudtalk_message_id',
+        'cloudtalk_event_id',
+        'cloudtalk_sender_number',
+        'cloudtalk_send_started_at',
     ];
     
     protected $casts = [
         'from_user' => 'boolean',
         'is_incoming' => 'boolean',
         'media' => 'array',
-        'sent_at' => 'datetime'
+        'sent_at' => 'datetime',
+        'cloudtalk_send_started_at' => 'datetime',
     ];
 
-    protected $hidden = ['media', 'prospect'];
+    protected $hidden = [
+        'media', 'prospect', 'cloudtalk_message_id', 'cloudtalk_event_id',
+        'cloudtalk_sender_number', 'cloudtalk_send_started_at',
+    ];
 
     protected $appends = ['attachments'];
 
