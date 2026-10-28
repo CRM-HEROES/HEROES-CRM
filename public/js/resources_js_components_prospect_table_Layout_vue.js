@@ -5410,6 +5410,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   methods: {
+    hasUnreadCommunication: function hasUnreadCommunication(type) {
+      var _this$prospect$unread;
+      return (((_this$prospect$unread = this.prospect.unread_communications) === null || _this$prospect$unread === void 0 || (_this$prospect$unread = _this$prospect$unread[type]) === null || _this$prospect$unread === void 0 ? void 0 : _this$prospect$unread.length) || 0) > 0;
+    },
     /**
      * Handle SHIFT
      * when clicking checkbox
@@ -13686,7 +13690,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, _hoisted_12, 2 /* CLASS */)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : menu == 'message' && _ctx.canMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 4
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Message "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isOptionFiltered('message') ? 'filtered' : '', $props.prospect.messages && $props.prospect.messages.length > 0 ? 'has-items' : '']),
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.hasUnreadCommunication('email') ? 'has-unread' : '', $options.isOptionFiltered('message') ? 'filtered' : '', $props.prospect.messages && $props.prospect.messages.length > 0 ? 'has-items' : '']),
       onClick: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
         return $options.manageMessages && $options.manageMessages.apply($options, arguments);
       }, ["prevent"]))
@@ -13700,7 +13704,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, _hoisted_16, 2 /* CLASS */)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : menu == 'interaction' && _ctx.can('all.prospect.interaction.view') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 6
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Interaction "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isOptionFiltered('interaction') ? 'filtered' : '', $props.prospect.interactions && $props.prospect.interactions.length > 0 ? 'has-items' : ''])
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.hasUnreadCommunication('voicemail') ? 'has-unread' : '', $options.isOptionFiltered('interaction') ? 'filtered' : '', $props.prospect.interactions && $props.prospect.interactions.length > 0 ? 'has-items' : ''])
     }, [$props.prospect.phone_number || $props.prospect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", {
       key: 0,
       onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
@@ -13710,7 +13714,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : menu == 'sms' && _ctx.can('all.prospect.sms.view') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 7
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SMS "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isOptionFiltered('sms') ? 'filtered' : '', $props.prospect.sms && $props.prospect.sms.length > 0 ? 'has-items' : ''])
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.hasUnreadCommunication('sms') ? 'has-unread' : '', $options.isOptionFiltered('sms') ? 'filtered' : '', $props.prospect.sms && $props.prospect.sms.length > 0 ? 'has-items' : ''])
     }, [$props.prospect.mobile_phone_number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", {
       key: 0,
       onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {

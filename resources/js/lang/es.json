@@ -1484,6 +1484,32 @@
             "title": "calendario de Google",
             "description": "Asocia una cuenta de Google Calendar con tus citas"
         },
+        "claude": {
+            "checking": "Verificando la clave con la API de Claude…",
+            "valid": "Clave válida: conexión con la API de Claude correcta.",
+            "invalid": "La clave API no es válida o ha caducado.",
+            "forbidden": "Esta clave no permite acceder a la API de Claude.",
+            "no_models": "Esta clave no da acceso a ningún modelo de Claude.",
+            "rate_limited": "Demasiadas solicitudes. Inténtalo de nuevo en unos instantes.",
+            "verification_unavailable": "No se puede verificar la clave ahora. Inténtalo de nuevo.",
+            "configuration_error": "La API de Claude ha rechazado la verificación. Revisa la configuración de tu cuenta.",
+            "help_title": "Cómo obtener tu clave API",
+            "help_link": "Abrir la página de claves API",
+            "help_sign_in": "Inicia sesión en la consola de Claude o crea una cuenta.",
+            "help_create": "En «API keys», haz clic en «Create key».",
+            "help_details": "Asigna un nombre a la clave, elige su caducidad y vincúlala a tu cuenta.",
+            "help_paste": "Copia la clave, pégala en el campo inferior y haz clic en «Guardar».",
+            "help_once": "La clave completa solo se muestra una vez, al crearla.",
+            "description": "Gestionar mi clave API de Claude",
+            "api_key": "Clave API",
+            "configured": "Hay una clave guardada para tu cuenta.",
+            "not_configured": "No hay ninguna clave guardada.",
+            "replace_hint": "Introduce una nueva clave para sustituir la que ya está guardada.",
+            "save": "Guardar",
+            "saving": "Guardando…",
+            "load_error": "No se ha podido cargar tu configuración de Claude.",
+            "save_error": "No se ha podido guardar tu clave de Claude."
+        },
         "users": {
             "title": "Lista de usuarios",
             "description": "Administrar el acceso de los usuarios en el proyecto {project}"

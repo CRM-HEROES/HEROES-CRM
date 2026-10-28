@@ -3,6 +3,7 @@
 namespace App\Utils\Stat\Builder;
 
 use App\Models\Project;
+use App\Services\DashboardRecordings;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -985,27 +986,7 @@ class DashboardEngine
             ->selectRaw('t.creator_id as uid, COUNT(*) as c')
             ->pluck('c', 'uid'), collect());
 
-        // Dernier enregistrement par utilisateur (dans la période)
-        $lastIds = DB::table('interactions as t')
-            ->join('prospects as p', 'p.id', '=', 't.prospect_id')
-            ->where('p.project_id', $pid)
-            ->whereIn('t.creator_id', $ids)
-            ->where(fn ($q) => $q->whereNotNull('t.path')->orWhere('t.source', 'cloudtalk'))
-            ->whereBetween(DB::raw('COALESCE(t.started_at, t.created_at)'), [$from, $to])
-            ->groupBy('t.creator_id')
-            ->selectRaw('t.creator_id as uid, MAX(t.id) as iid')
-            ->pluck('iid', 'uid');
-
-        $recordings = [];
-        if ($lastIds->isNotEmpty()) {
-            foreach (DB::table('interactions')->whereIn('id', $lastIds->values())->get(['id', 'prospect_id', 'creator_id']) as $i) {
-                $recordings[$i->creator_id] = route('api.project.prospect.interaction.audio', [
-                    'project' => $this->project->slug,
-                    'prospect' => $i->prospect_id,
-                    'interaction' => $i->id,
-                ]);
-            }
-        }
+        $recordings = (new DashboardRecordings($this->project))->urls($ids, $from, $to);
 
         $now = Carbon::now();
 
@@ -1023,7 +1004,7 @@ class DashboardEngine
                 'last_login' => $last ? Carbon::parse($last)->toIso8601String() : null,
                 'connection_status' => $minutes === null || $minutes > 30 ? 'Déconnecté' : ($minutes <= 5 ? 'Connecté' : 'Absent'),
                 'calls_count' => $count,
-                'call_duration' => $c ? round($c->secs / 60, 1) : 0,
+                'call_duration' => $c ? round($c->secs / 60, 4) : 0,
                 'sms_count' => (int) ($sms[$u->id] ?? 0),
                 'orders_count' => (int) ($orders[$u->id] ?? 0),
                 'prospects_count' => (int) $u->prospects_count,

@@ -567,6 +567,10 @@ td > .hc-table-selector {
             color: #e89118 !important;
         }
 
+        &.has-unread {
+            color: #d32f2f !important;
+        }
+
         > i {
             display: inline-block;
             width: 100%;
@@ -1901,6 +1905,14 @@ textarea.hc-default-cell-input {
     .hc-table-row-options > a {
         border-left: 1px solid #444444;
         color: rgb(136 171 135) !important;
+
+        &.has-items {
+            color: #e89118 !important;
+        }
+
+        &.has-unread {
+            color: #d32f2f !important;
+        }
     }
 
     .hc-default-cell-input {

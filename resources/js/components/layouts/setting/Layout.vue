@@ -303,6 +303,27 @@
             <icon v-if="googleContact" class="fa fa-check" :color="'green'" />
         </item>
 
+        <!-- Claude -->
+        <item class="hc-setting-item" @click="manageClaudeApi" tag="a">
+            <icon>
+                <img
+                    src="https://cdn.simpleicons.org/claude"
+                    alt="Claude AI"
+                    width="20"
+                    height="20"
+                />
+            </icon>
+            <div class="hc-item-main-content hc-flex-column">
+                <div class="hc-setting-item-name">claude.ai</div>
+                <div
+                    class="hc-setting-item-description"
+                    v-text="$t('setting.claude.description')"
+                ></div>
+            </div>
+            <icon v-if="claudeValid" class="fa fa-check" color="green" />
+            <icon v-else class="fa fa-caret-right" />
+        </item>
+
         <!-- Pipedrive -->
         <!--item
                 v-if="project && can('all.project')"
@@ -528,6 +549,7 @@ import GoogleCalendarService from "@/apis/google/calendar";
 import GoogleContactService from "@/apis/google/contact";
 import GoogleDriveService from "@/apis/project/google/drive";
 import GoogleAuthenticatorService from "@/apis/google/authenticator";
+import ClaudeService from "@/apis/user/claude";
 
 export default {
     data() {
@@ -545,6 +567,8 @@ export default {
             removingGoogleDrive: false,
 
             removingGoogleAuthenticator: false,
+            claudeValid: false,
+            claudeRequestId: 0,
         };
     },
 
@@ -553,6 +577,23 @@ export default {
         this.checkGoogleCalendarAccount();
         this.checkGoogleContactAccount();
         this.checkGoogleAuthenticator();
+        this.checkClaudeAccount();
+    },
+
+    watch: {
+        "user.id"() {
+            this.checkClaudeAccount();
+        },
+        claudeModalOpen(isOpen, wasOpen) {
+            if (!isOpen && wasOpen) this.checkClaudeAccount();
+        },
+        settingsOpen(isOpen) {
+            if (isOpen) this.checkClaudeAccount();
+        },
+    },
+
+    beforeUnmount() {
+        this.claudeRequestId++;
     },
 
     methods: {
@@ -560,6 +601,22 @@ export default {
             signIn: "auth/login",
             signOut: "auth/logout",
         }),
+
+        async checkClaudeAccount() {
+            const userId = this.user?.id;
+            const requestId = ++this.claudeRequestId;
+            this.claudeValid = false;
+            if (!userId) return;
+
+            try {
+                const { data } = await ClaudeService.show();
+                if (requestId === this.claudeRequestId && this.user?.id === userId) {
+                    this.claudeValid = data.configured === true && data.valid === true;
+                }
+            } catch (error) {
+                // A failed check must never display a valid-key badge.
+            }
+        },
 
         async leaveImpersonation() {
             this.leavingImpersonation = true;
@@ -799,6 +856,10 @@ export default {
             store.commit(OPEN_MODAL, "setting-pipedrive");
         },
 
+        manageClaudeApi() {
+            store.commit(OPEN_MODAL, "setting-claude");
+        },
+
         manageLocale() {
             store.commit(OPEN_SUB_SLIDE, "locales");
         },
@@ -814,7 +875,15 @@ export default {
 
     computed: {
         ...mapGetters("auth", ["user", "userFullName", "impersonating"]),
-        ...mapGetters(["project", "projectUserSettingsEventsReminder", "can"]),
+        ...mapGetters(["project", "projectUserSettingsEventsReminder", "can", "modalOpen", "slideOpen"]),
+
+        claudeModalOpen() {
+            return this.modalOpen('setting-claude');
+        },
+
+        settingsOpen() {
+            return this.slideOpen('settings');
+        },
 
         /**
          *

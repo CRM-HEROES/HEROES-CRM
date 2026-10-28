@@ -5,9 +5,13 @@ namespace App\Http\Controllers\API\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\UserSetting;
+use App\Services\CloudTalk;
+use App\Services\DashboardRecordings;
 use App\Utils\Stat\Builder\DashboardEngine;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 /**
  * Dashboard Builder : configuration (widgets + disposition + filtres globaux)
@@ -102,6 +106,34 @@ class StatDashboardController extends Controller
             $request->input('global', []),
             $request->input('runtime', [])
         );
+    }
+
+    public function recording(Request $request, Project $project, int $userId, CloudTalk $cloudTalk)
+    {
+        $this->validate($request, [
+            'from' => 'required|date_format:Y-m-d',
+            'to' => 'required|date_format:Y-m-d|after_or_equal:from',
+        ]);
+        abort_unless($project->users()->where('users.id', $userId)->exists(), 404);
+
+        try {
+            $media = (new DashboardRecordings($project))->media(
+                $userId,
+                Carbon::parse($request->input('from'))->startOfDay()->toDateTimeString(),
+                Carbon::parse($request->input('to'))->endOfDay()->toDateTimeString(),
+                $cloudTalk
+            );
+        } catch (RuntimeException $e) {
+            abort(in_array($e->getCode(), [403, 422, 500, 503], true) ? $e->getCode() : 500, $e->getMessage());
+        }
+
+        if ($media === null) {
+            return response()->noContent()->header('Cache-Control', 'no-store');
+        }
+
+        return response($media['body'])
+            ->header('Content-Type', $media['content_type'])
+            ->header('Cache-Control', 'private, no-store');
     }
 
     protected function defaultDashboard(): array

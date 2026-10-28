@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\UserSetting;
+use App\Services\IncomingCommunications;
 use App\Services\ProspectHistory;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
@@ -812,6 +813,8 @@ class ProspectController extends Controller
             })
             ->skip(($request->input('page', 1) - 1) * $count)
             ->paginate($count);
+
+        app(IncomingCommunications::class)->appendUnread($data->getCollection(), $project, $request->user()->id);
 
         if (in_array('history', $fields)) {
             app(ProspectHistory::class)->appendSummary($data->getCollection(), $project);

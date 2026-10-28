@@ -1612,6 +1612,32 @@
             "title": "Google Calendar",
             "description": "Associate a Google Calendar account with your appointments"
         },
+        "claude": {
+            "checking": "Checking the key with the Claude API…",
+            "valid": "Valid key: connection to the Claude API succeeded.",
+            "invalid": "The API key is invalid or expired.",
+            "forbidden": "This key does not allow access to the Claude API.",
+            "no_models": "This key does not provide access to any Claude models.",
+            "rate_limited": "Too many requests. Try again shortly.",
+            "verification_unavailable": "The key cannot be checked right now. Please try again.",
+            "configuration_error": "The Claude API rejected the check. Review your account configuration.",
+            "help_title": "How to get your API key",
+            "help_link": "Open the API keys page",
+            "help_sign_in": "Sign in to the Claude Console or create an account.",
+            "help_create": "Under “API keys”, click “Create key”.",
+            "help_details": "Name the key, choose its expiry and link it to your account.",
+            "help_paste": "Copy the key, paste it into the field below, then click “Save”.",
+            "help_once": "The full key is shown only once, when it is created.",
+            "description": "Manage my Claude API key",
+            "api_key": "API key",
+            "configured": "A key is saved for your account.",
+            "not_configured": "No key saved.",
+            "replace_hint": "Enter a new key to replace the one already saved.",
+            "save": "Save",
+            "saving": "Saving…",
+            "load_error": "Unable to load your Claude settings.",
+            "save_error": "Unable to save your Claude key."
+        },
         "pipedrive": {
             "title": "Pipedrive",
             "description": "Associate a Pipedrive account with your prospects list"

@@ -7,6 +7,7 @@ use App\Models\Message;
 use App\Models\Project;
 use App\Models\Sms;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class IncomingCommunications
@@ -63,23 +64,53 @@ class IncomingCommunications
         return $query;
     }
 
+    protected function unreadQuery(Project $project, string $type, int $userId): Builder
+    {
+        $model = self::TYPES[$type];
+        $table = (new $model())->getTable();
+        $query = $this->query($project, $type)->whereNotExists(function ($read) use ($type, $table, $userId) {
+            $read->selectRaw('1')->from('communication_reads')
+                ->where('user_id', $userId)->where('communication_type', $type)
+                ->whereColumn('communication_id', $table . '.id');
+        });
+        if ($type === 'email') {
+            $query->whereNull('archived_at')->whereNotExists(function ($archived) use ($userId) {
+                $archived->selectRaw('1')->from('user_message')->where('user_id', $userId)
+                    ->whereColumn('message_id', 'messages.id')->whereNotNull('archived_at');
+            });
+        }
+
+        return $query;
+    }
+
+    public function appendUnread(Collection $prospects, Project $project, int $userId): void
+    {
+        if ($prospects->isEmpty()) {
+            return;
+        }
+
+        // Load only the current page, with one query per communication type.
+        $unread = [];
+        foreach (self::TYPES as $type => $model) {
+            $unread[$type] = $this->unreadQuery($project, $type, $userId)
+                ->whereIn('prospect_id', $prospects->pluck('id'))
+                ->get(['id', 'prospect_id'])->groupBy('prospect_id');
+        }
+
+        foreach ($prospects as $prospect) {
+            $ids = [];
+            foreach (self::TYPES as $type => $model) {
+                $ids[$type] = $unread[$type]->get($prospect->id, collect())->pluck('id')->values()->all();
+            }
+            $prospect->unread_communications = $ids;
+        }
+    }
+
     public function counts(Project $project, int $userId): array
     {
         $counts = [];
         foreach (self::TYPES as $type => $model) {
-            $table = (new $model())->getTable();
-            $query = $this->query($project, $type)->whereNotExists(function ($read) use ($type, $table, $userId) {
-                $read->selectRaw('1')->from('communication_reads')
-                    ->where('user_id', $userId)->where('communication_type', $type)
-                    ->whereColumn('communication_id', $table . '.id');
-            });
-            if ($type === 'email') {
-                $query->whereNull('archived_at')->whereNotExists(function ($archived) use ($userId) {
-                    $archived->selectRaw('1')->from('user_message')->where('user_id', $userId)
-                        ->whereColumn('message_id', 'messages.id')->whereNotNull('archived_at');
-                });
-            }
-            $counts[$type] = $query->count();
+            $counts[$type] = $this->unreadQuery($project, $type, $userId)->count();
         }
 
         return ['count' => array_sum($counts)] + $counts;
