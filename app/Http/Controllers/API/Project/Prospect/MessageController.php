@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Project\Prospect;
 
+use App\Exceptions\BrevoTransportException;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Message;
@@ -139,17 +140,21 @@ class MessageController extends Controller
     protected function sendDirectEmail(Request $request, Project $project, Prospect $prospect, string $to, array $attachments): void
     {
         $subject = $this->personalizeEmail($request->input('subject'), $prospect);
-        Mail::send('emails.prospect-message', [
-            'body' => $this->personalizeEmail($request->input('body'), $prospect),
-            'category' => $request->input('category', 'Message'),
-            'project' => $project,
-            'subject' => $subject,
-        ], function ($message) use ($to, $subject, $attachments) {
-            $message->to($to)->subject($subject);
-            foreach ($attachments as $file) {
-                $message->attach($file['path'], ['as' => $file['name'], 'mime' => $file['type']]);
-            }
-        });
+        try {
+            Mail::send('emails.prospect-message', [
+                'body' => $this->personalizeEmail($request->input('body'), $prospect),
+                'category' => $request->input('category', 'Message'),
+                'project' => $project,
+                'subject' => $subject,
+            ], function ($message) use ($to, $subject, $attachments) {
+                $message->to($to)->subject($subject);
+                foreach ($attachments as $file) {
+                    $message->attach($file['path'], ['as' => $file['name'], 'mime' => $file['type']]);
+                }
+            });
+        } catch (BrevoTransportException $exception) {
+            throw ValidationException::withMessages(['email' => $exception->getMessage()]);
+        }
     }
 
     protected function personalizeEmail(string $text, Prospect $prospect): string
