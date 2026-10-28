@@ -581,6 +581,8 @@ class ProspectController extends Controller
                     'longitude',
                     'meta',
                     'prospects.creator_id',
+                'duplicate_group_id',
+                'duplicate_fields',
                 ],
                 $request->has('fields') ? [] : [
                     'valid_address',
@@ -832,6 +834,63 @@ class ProspectController extends Controller
                 return $data;
             })
         );
+
+        // Calculate highlights for the values on this page with one grouped
+        // query per enabled field. This keeps the UI accurate immediately,
+        // including after edits, without loading every project prospect.
+        $highlightFields = $project->fields()
+            ->where('for', 'prospect')
+            ->where('meta', false)
+            ->where('unique', true)
+            ->whereIn('slug', ['email', 'mobile_phone_number', 'phone_number'])
+            ->whereIn('slug', $fields)
+            ->get(['slug']);
+
+        $rows = $data->getCollection();
+        $monitoredSlugs = ['email', 'mobile_phone_number', 'phone_number'];
+        $duplicateGroups = [];
+
+        foreach ($highlightFields as $field) {
+            $slug = $field->slug;
+            $values = $rows->pluck($slug)->filter(fn ($value) => !blank($value))->unique()->values();
+            if ($values->isEmpty()) {
+                continue;
+            }
+
+            $duplicateGroups[$slug] = DB::table('prospects')
+                ->where('project_id', $project->id)
+                ->whereNull('deleted_at')
+                ->whereNotNull($slug)
+                ->where($slug, '<>', '')
+                ->whereIn($slug, $values)
+                ->select($slug)
+                ->selectRaw('MIN(id) AS group_id')
+                ->groupBy($slug)
+                ->havingRaw('COUNT(*) > 1')
+                ->get()
+                ->keyBy($slug);
+        }
+
+        $rows->transform(function ($prospect) use ($highlightFields, $duplicateGroups, $monitoredSlugs) {
+            $duplicateFields = collect($prospect->duplicate_fields ?: [])
+                ->reject(fn ($slug) => in_array($slug, $monitoredSlugs, true));
+            $groupId = $prospect->duplicate_group_id;
+
+            foreach ($highlightFields as $field) {
+                $slug = $field->slug;
+                $value = $prospect->{$slug};
+                if (blank($value) || !isset($duplicateGroups[$slug][$value])) {
+                    continue;
+                }
+
+                $duplicateFields->push($slug);
+                $groupId = $duplicateGroups[$slug][$value]->group_id;
+            }
+
+            $prospect->duplicate_fields = $duplicateFields->unique()->values()->all() ?: null;
+            $prospect->duplicate_group_id = $duplicateFields->isEmpty() ? null : $groupId;
+            return $prospect;
+        });
 
         return $data;
     }

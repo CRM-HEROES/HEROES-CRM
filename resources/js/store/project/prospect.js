@@ -231,6 +231,12 @@ const actions = {
                 history_count: data.history_count,
             });
         }
+
+        if (["email", "mobile_phone_number", "phone_number"].some((field) =>
+            Object.prototype.hasOwnProperty.call(params, field)
+        )) {
+            await context.dispatch(FETCH_PROSPECTS);
+        }
     },
 
     /**
