@@ -6,6 +6,7 @@ use App\Filters\ProjectRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProjectController extends Controller
 {
@@ -202,7 +203,22 @@ class ProjectController extends Controller
             $line->setAttribute('numero', $line->numero);
             $line->makeHidden('config');
         });
-        
+
+        // The cached user_project.prospects_count is only refreshed hourly,
+        // so use the exact number of (non deleted) prospects assigned to each user
+        $prospectsCounts = DB::table('prospect_user')
+            ->join('prospects', 'prospects.id', '=', 'prospect_user.prospect_id')
+            ->where('prospects.project_id', $project->id)
+            ->whereNull('prospects.deleted_at')
+            ->whereIn('prospect_user.user_id', $project->users->pluck('id'))
+            ->groupBy('prospect_user.user_id')
+            ->select('prospect_user.user_id', DB::raw('count(*) as prospects_count'))
+            ->pluck('prospects_count', 'user_id');
+
+        $project->users->each(function ($user) use ($prospectsCounts) {
+            $user->pivot->prospects_count = (int) ($prospectsCounts[$user->id] ?? 0);
+        });
+
         return $project;
     }
 

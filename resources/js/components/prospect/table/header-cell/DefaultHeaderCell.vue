@@ -27,6 +27,12 @@
             >
                 <span>Modifier le champ</span>
             </span>
+            <span
+                v-if="canToggleUnique"
+                :class="['fa', 'fa-clone', field.unique ? 'icon-green' : '']"
+                v-tooltip="field.unique ? 'Détection des doublons activée' : 'Détecter les doublons'"
+                @click.prevent.stop="toggleUnique"
+            ></span>
         </div>
 
         <input
@@ -97,7 +103,7 @@ import {
 } from "@/actions/project/prospect";
 
 import { OPEN_MODAL } from "@/actions/modal";
-import { SET_FIELD } from "@/actions/project/field";
+import { SET_FIELD, UPDATE_FIELD } from "@/actions/project/field";
 
 export default {
     props: {
@@ -179,6 +185,14 @@ export default {
         edit() {
             store.commit(OPEN_MODAL, "field-update");
             store.commit(SET_FIELD, this.field);
+        },
+
+        async toggleUnique() {
+            await store.dispatch(UPDATE_FIELD, {
+                id: this.field.id,
+                unique: !this.field.unique,
+            });
+            store.dispatch(FETCH_PROSPECTS);
         },
 
         /**
@@ -343,6 +357,13 @@ export default {
 
         isValidFilter() {
             return this.prospectsParamExists(this.isValidFilterKey);
+        },
+
+        canToggleUnique() {
+            return !!this.field &&
+                this.column.category == "default" &&
+                ["email", "mobile_phone_number", "phone_number"].includes(this.field.slug) &&
+                this.can("all.project.field.update");
         },
     },
 };
