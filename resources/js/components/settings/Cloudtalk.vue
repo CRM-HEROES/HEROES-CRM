@@ -17,14 +17,14 @@
                     <!-- En-tête -->
                     <div class="hc-cloudtalk-webhook-header">
                         <icon class="fa fa-link" />
-                        <span>Recevoir les SMS, appels et messages vocaux</span>
+                        <span>Synchroniser les SMS reçus et envoyés, les appels et messages vocaux</span>
                     </div>
 
                     <!-- Description -->
                     <p class="hc-cloudtalk-webhook-help">
-                        Configurez un webhook CloudTalk pour
-                        recevoir automatiquement les nouveaux
-                        SMS, les messages vocaux et les enregistrements des appels dans votre CRM.
+                        Configurez un webhook CloudTalk pour enregistrer les SMS reçus
+                        et ceux envoyés depuis CloudTalk Phone ou une autre application CloudTalk,
+                        ainsi que les messages vocaux et les enregistrements des appels.
                     </p>
 
                     <!-- URL du webhook -->
@@ -56,7 +56,8 @@
 
                         <ol>
                             <li>
-                                Accédez aux
+                                Connectez-vous à CloudTalk avec un compte administrateur,
+                                puis ouvrez <strong>Paramètres → Webhooks</strong> :
                                 <a
                                     href="https://dashboard.cloudtalk.io/menu/account/webhooks"
                                     target="_blank"
@@ -67,34 +68,35 @@
                             </li>
 
                             <li>
-                                Ajoutez un nouveau webhook
-                                dans votre compte CloudTalk.
+                                Ajoutez un nouveau webhook ou modifiez celui déjà configuré pour ce CRM.
                             </li>
 
                             <li>
                                 Copiez l'URL ci-dessus et
                                 collez-la dans le champ URL
-                                du webhook.
+                                du webhook. Utilisez une URL publique en HTTPS, accessible depuis CloudTalk.
                             </li>
 
                             <li>
                                 Sélectionnez les événements
                                 <strong>message.received</strong>,
+                                <strong>message.sent</strong>,
                                 <strong>call.ended</strong> et
                                 <strong>call.recording_ready</strong>.
                             </li>
 
                             <li>
-                                Enregistrez votre configuration.
+                                Enregistrez votre configuration, puis envoyez un SMS depuis CloudTalk
+                                vers le numéro d’un prospect du projet pour vérifier son apparition dans le CRM.
                             </li>
                         </ol>
 
                         <p class="hc-cloudtalk-webhook-note">
                             <icon class="fa fa-info-circle" />
-                            Les SMS reçus seront transmis au CRM et les
-                            enregistrements seront rattachés aux interactions existantes.
-                            Les appels et messages vocaux créeront une interaction si le
-                            numéro correspond à un prospect du projet.
+                            Les SMS sont rattachés au prospect dont le numéro correspond dans ce projet.
+                            Un SMS déjà enregistré lors d’un envoi depuis le CRM, ou un événement reçu
+                            plusieurs fois, est reconnu pour éviter les doublons. Les enregistrements
+                            restent rattachés aux appels correspondants.
                         </p>
                     </div>
 
@@ -108,28 +110,24 @@
                 <p v-if="loadingConfigurations" role="status">Chargement des configurations…</p>
                 <template v-else>
                     <form autocomplete="off" @submit.prevent="downloadExportScript">
-                        <label v-if="exportConfigurations.length" class="hc-cloudtalk-export-field">
-                            <span>Configuration CloudTalk</span>
-                            <select v-model="exportLineId" :disabled="downloadingScript" @change="loadExportCredentials">
-                                <option :value="null">Saisie manuelle</option>
-                                <option v-for="configuration in exportConfigurations" :key="configuration.id" :value="configuration.id">
-                                    {{ configurationLabel(configuration) }}
-                                </option>
-                            </select>
-                        </label>
-                        <p v-if="loadingCredentials" role="status">Chargement des identifiants…</p>
-                        <label class="hc-cloudtalk-export-field">
-                            <span>Clé API</span>
-                            <input v-model="exportApiKeyId" type="text" autocomplete="off" spellcheck="false" required :disabled="downloadingScript || loadingCredentials" @input="credentialsEdited" />
-                        </label>
-                        <label class="hc-cloudtalk-export-field">
-                            <span>Secret API</span>
-                            <input v-model="exportApiKeySecret" type="text" autocomplete="new-password" required :disabled="downloadingScript || loadingCredentials" @input="credentialsEdited" />
-                        </label>
-                        <p class="hc-cloudtalk-export-help">
-                            Les identifiants existants sont préremplis et modifiables.
-                            Les modifications servent uniquement au script et ne sont pas enregistrées dans la ligne.
-                        </p>
+                        <p v-if="loadingCredentials" role="status">Recherche d’identifiants CloudTalk valides…</p>
+                        <template v-if="showExportCredentials">
+                            <label class="hc-cloudtalk-export-field">
+                                <span>Clé API</span>
+                                <input v-model="exportApiKeyId" type="text" autocomplete="off" spellcheck="false" required :disabled="downloadingScript || loadingCredentials" @input="credentialsEdited" />
+                            </label>
+                            <label class="hc-cloudtalk-export-field">
+                                <span>Secret API</span>
+                                <input v-model="exportApiKeySecret" type="text" autocomplete="new-password" required :disabled="downloadingScript || loadingCredentials" @input="credentialsEdited" />
+                            </label>
+                            <p class="hc-cloudtalk-export-help">
+                                Les identifiants CloudTalk valides sont préremplis automatiquement et restent modifiables.
+                                Les modifications servent uniquement au script et ne sont pas enregistrées dans la ligne.
+                            </p>
+                        </template>
+                        <button v-else type="button" class="hc-cloudtalk-edit-key" :disabled="downloadingScript || loadingCredentials" @click="showExportCredentials = true">
+                            Modifier la clé
+                        </button>
                         <p class="hc-cloudtalk-export-help">
                             L’export couvre tous les appels accessibles sur ce compte CloudTalk,
                             y compris ceux sans prospect dans le CRM.
@@ -162,7 +160,7 @@
                     </form>
                 </template>
                 <p v-if="exportError" class="hc-cloudtalk-export-error" role="alert">{{ exportError }}</p>
-                <button v-if="exportError && !exportConfigurations.length" class="hc-button-secondary" type="button" :disabled="loadingConfigurations" @click="loadExportConfigurations">
+                <button v-if="exportError && !exportApiKeyId && !exportApiKeySecret" class="hc-button-secondary" type="button" :disabled="loadingConfigurations || loadingCredentials" @click="loadExportConfigurations">
                     Réessayer
                 </button>
                 <p v-if="downloadedScriptName" class="hc-cloudtalk-export-help" role="status">
@@ -237,14 +235,27 @@
     margin-bottom: 10px;
 }
 
-.hc-cloudtalk-export-field input,
-.hc-cloudtalk-export-field select {
+.hc-cloudtalk-export-field input {
     width: 100%;
     padding: 7px;
     border: 1px solid #dddddd;
     border-radius: 4px;
     background: #ffffff;
     color: #333333;
+}
+
+.hc-cloudtalk-edit-key {
+    border: 0;
+    background: none;
+    padding: 0;
+    margin-bottom: 10px;
+    color: #12a0f3;
+    font: inherit;
+    cursor: pointer;
+}
+
+.hc-cloudtalk-edit-key:hover {
+    text-decoration: underline;
 }
 
 .hc-cloudtalk-export-dates {
@@ -279,8 +290,7 @@
     cursor: default;
 }
 
-.dark .hc-cloudtalk-export-field input,
-.dark .hc-cloudtalk-export-field select {
+.dark .hc-cloudtalk-export-field input {
     border-color: #444444;
     background: #2a2a2a;
     color: #dddddd;
@@ -444,6 +454,7 @@ export default {
             exportLineId: null,
             exportApiKeyId: "",
             exportApiKeySecret: "",
+            showExportCredentials: true,
             exportDateFrom: dateTo,
             exportDateTo: dateTo,
             exportTimezone: timezone,
@@ -468,10 +479,6 @@ export default {
     },
 
     methods: {
-        configurationLabel(configuration) {
-            return [configuration.name || "Ligne " + configuration.id, configuration.numero, configuration.agent_name].filter(Boolean).join(" — ");
-        },
-
         async loadExportConfigurations() {
             if (!this.canCloudtalkExport || !this.projectSlug) {
                 return;
@@ -485,9 +492,8 @@ export default {
             this.clearExportCredentials();
             try {
                 const { data } = await ApiService.get(`project/${slug}/line/cloudtalk/export-configurations`);
-                if (version !== this.exportRequestVersion || !this.canCloudtalkExport) return;
+                if (version !== this.exportRequestVersion || slug !== this.projectSlug || !this.canCloudtalkExport) return;
                 this.exportConfigurations = data.configurations || [];
-                this.exportLineId = this.exportConfigurations.length ? this.exportConfigurations[0].id : null;
                 await this.loadExportCredentials();
             } catch (error) {
                 const message = await this.exportErrorMessage(error, "Impossible de charger les configurations CloudTalk.");
@@ -501,10 +507,12 @@ export default {
             this.exportCredentialsVersion++;
             this.exportApiKeyId = "";
             this.exportApiKeySecret = "";
+            this.showExportCredentials = true;
             this.loadingCredentials = false;
         },
 
         credentialsEdited() {
+            this.showExportCredentials = true;
             this.exportCredentialsVersion++;
             this.loadingCredentials = false;
             this.downloadedScriptName = "";
@@ -512,22 +520,57 @@ export default {
 
         async loadExportCredentials() {
             this.clearExportCredentials();
+            this.exportLineId = null;
             this.exportError = "";
             this.downloadedScriptName = "";
-            if (!this.canCloudtalkExport || !this.projectSlug || this.exportLineId === null) return;
+            if (!this.canCloudtalkExport || !this.projectSlug) return;
             const version = this.exportCredentialsVersion;
             const slug = this.projectSlug;
-            const lineId = this.exportLineId;
+            const isCurrent = () => version === this.exportCredentialsVersion && slug === this.projectSlug && this.canCloudtalkExport;
+            const checked = new Set();
             this.loadingCredentials = true;
             try {
-                const { data } = await ApiService.get(`project/${slug}/line/cloudtalk/export-credentials/${lineId}`);
-                if (version !== this.exportCredentialsVersion || slug !== this.projectSlug ||
-                    lineId !== this.exportLineId || !this.canCloudtalkExport) return;
-                this.exportApiKeyId = data.api_key_id || "";
-                this.exportApiKeySecret = data.api_key_secret || "";
+                for (const configuration of this.exportConfigurations) {
+                    if (!isCurrent()) return;
+                    let credentials;
+                    try {
+                        const { data } = await ApiService.get(`project/${slug}/line/cloudtalk/export-credentials/${configuration.id}`);
+                        credentials = {
+                            api_key_id: typeof data.api_key_id === "string" ? data.api_key_id.trim() : "",
+                            api_key_secret: typeof data.api_key_secret === "string" ? data.api_key_secret.trim() : "",
+                        };
+                    } catch (error) {
+                        if (!isCurrent()) return;
+                        if (error.response?.status === 404) continue;
+                        throw error;
+                    }
+                    if (!isCurrent()) return;
+                    if (!credentials.api_key_id || !credentials.api_key_secret) continue;
+                    const pair = JSON.stringify(credentials);
+                    if (checked.has(pair)) continue;
+                    checked.add(pair);
+                    try {
+                        const { data } = await ApiService.post(`project/${slug}/line/cloudtalk/verify`, credentials);
+                        if (!isCurrent()) return;
+                        if (data.valid !== true) continue;
+                    } catch (error) {
+                        if (!isCurrent()) return;
+                        const providerStatus = Number(error.response?.data?.status);
+                        if ([401, 403, 422].includes(providerStatus) || error.response?.status === 422) continue;
+                        throw error;
+                    }
+                    this.exportLineId = configuration.id;
+                    this.exportApiKeyId = credentials.api_key_id;
+                    this.exportApiKeySecret = credentials.api_key_secret;
+                    this.showExportCredentials = false;
+                    return;
+                }
+                if (isCurrent()) {
+                    this.exportError = "Aucune clé API CloudTalk valide n’a été trouvée. Vérifiez les clés configurées dans vos lignes ou saisissez-les manuellement.";
+                }
             } catch (error) {
-                const message = await this.exportErrorMessage(error, "Impossible de charger les identifiants. Vous pouvez les saisir manuellement.");
-                if (version === this.exportCredentialsVersion) this.exportError = message;
+                const message = await this.exportErrorMessage(error, "Impossible de vérifier les identifiants CloudTalk. Réessayez ou saisissez-les manuellement.");
+                if (isCurrent()) this.exportError = message;
             } finally {
                 if (version === this.exportCredentialsVersion) this.loadingCredentials = false;
             }
