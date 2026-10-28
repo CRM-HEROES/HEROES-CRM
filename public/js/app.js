@@ -28394,6 +28394,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   DUPLICATE_PROSPECT: () => (/* binding */ DUPLICATE_PROSPECT),
 /* harmony export */   FETCH_PROSPECTS: () => (/* binding */ FETCH_PROSPECTS),
 /* harmony export */   INIT_PROSPECT_PARAMS: () => (/* binding */ INIT_PROSPECT_PARAMS),
+/* harmony export */   MARK_PROSPECT_COMMUNICATIONS_READ: () => (/* binding */ MARK_PROSPECT_COMMUNICATIONS_READ),
 /* harmony export */   REMOVE_PROSPECT: () => (/* binding */ REMOVE_PROSPECT),
 /* harmony export */   REMOVE_PROSPECT_PARAMS: () => (/* binding */ REMOVE_PROSPECT_PARAMS),
 /* harmony export */   SET_PROSPECT: () => (/* binding */ SET_PROSPECT),
@@ -28429,6 +28430,7 @@ var ADD_PROSPECT = "addProspect";
 var SHOW_PROSPECT = "showProspect";
 var DUPLICATE_PROSPECT = "duplicateProspect";
 var UPDATE_PROSPECT = "updateProspect";
+var MARK_PROSPECT_COMMUNICATIONS_READ = "markProspectCommunicationsRead";
 var REMOVE_PROSPECT = "removeProspect";
 var UPDATE_SELECTED_PROSPECTS = "updateSelectedProspects";
 var TOGGLE_SELECTED_PROSPECTS = "toggleSelectedProspects";
@@ -44386,12 +44388,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _store_project_prospect_pipeline__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! @/store/project/prospect/pipeline */ "./resources/js/store/project/prospect/pipeline.js");
 /* harmony import */ var _store_project_prospect_sms__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/store/project/prospect/sms */ "./resources/js/store/project/prospect/sms.js");
 /* harmony import */ var _store_project_prospect_user__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/store/project/prospect/user */ "./resources/js/store/project/prospect/user.js");
-var _objectSpread2, _objectSpread6;
+var _objectSpread2, _objectSpread7;
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -44705,11 +44708,40 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
 /**
  * Prospect Store Mutations
  */
-var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread((_objectSpread6 = {}, _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS, function (state, prospects) {
+var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpread((_objectSpread7 = {}, _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.MARK_PROSPECT_COMMUNICATIONS_READ, function (state, _ref3) {
+  var _state$project;
+  var projectSlug = _ref3.projectSlug,
+    prospectId = _ref3.prospectId,
+    type = _ref3.type,
+    ids = _ref3.ids;
+  if (((_state$project = state.project) === null || _state$project === void 0 ? void 0 : _state$project.slug) !== projectSlug) {
+    return;
+  }
+  var readIds = new Set(ids.map(Number));
+  var prospects = [state.project.prospect].concat(_toConsumableArray(state.project.prospects || []));
+  var _iterator = _createForOfIteratorHelper(prospects),
+    _step;
+  try {
+    for (_iterator.s(); !(_step = _iterator.n()).done;) {
+      var _prospect$unread_comm;
+      var prospect = _step.value;
+      if ((prospect === null || prospect === void 0 ? void 0 : prospect.id) != prospectId || !((_prospect$unread_comm = prospect.unread_communications) !== null && _prospect$unread_comm !== void 0 && _prospect$unread_comm[type])) {
+        continue;
+      }
+      prospect.unread_communications = _objectSpread(_objectSpread({}, prospect.unread_communications), {}, _defineProperty({}, type, prospect.unread_communications[type].filter(function (id) {
+        return !readIds.has(Number(id));
+      })));
+    }
+  } catch (err) {
+    _iterator.e(err);
+  } finally {
+    _iterator.f();
+  }
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS, function (state, prospects) {
   state.project.prospects = _toConsumableArray(prospects);
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_TOTAL, function (state, total) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_TOTAL, function (state, total) {
   state.project.prospectsTotal = total;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT, function (state, prospect) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT, function (state, prospect) {
   if (!prospect) {
     state.project.prospect = prospect;
   } else {
@@ -44730,18 +44762,18 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
         o.id == prospect.id ? { ...o, ...prospect } : o
     );*/
   }
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.DUPLICATE_PROSPECT, function (state, _ref3) {
-  var slug = _ref3.slug,
-    data = _ref3.data;
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.DUPLICATE_PROSPECT, function (state, _ref4) {
+  var slug = _ref4.slug,
+    data = _ref4.data;
   var index = state.project.prospects.findIndex(function (prospect) {
     return prospect.id == slug;
   });
   if (index >= 0) {
     state.project.prospects = [].concat(_toConsumableArray(state.project.prospects.slice(0, index)), [data], _toConsumableArray(state.project.prospects.slice(index)));
   }
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT, function (state, prospect) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT, function (state, prospect) {
   state.project.prospects = [prospect].concat(_toConsumableArray(state.project.prospects));
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, function (state, params) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, function (state, params) {
   if (state.project.prospect && state.project.prospect.id == params.id) {
     state.project.prospect = _objectSpread(_objectSpread(_objectSpread({}, state.project.prospect), params), {}, {
       meta: _objectSpread(_objectSpread({}, state.project.prospect.meta), params.meta ? params.meta : {})
@@ -44770,16 +44802,16 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
   if (state.project.prospect.id == params.id) {
       state.project.prospect = { ...state.project.prospect, ...params };
   }*/
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT, function (state, slug) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT, function (state, slug) {
   state.project.prospects = state.project.prospects.filter(function (o) {
     return o.id != slug;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_SELECTED_PROSPECTS, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_SELECTED_PROSPECTS, function (state, value) {
   state.project.prospectsSelected = Array.isArray(value) ? value : [];
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_SELECTED_PROSPECTS, function (state, _ref4) {
-  var index = _ref4.index,
-    shift = _ref4.shift,
-    checked = _ref4.checked;
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_SELECTED_PROSPECTS, function (state, _ref5) {
+  var index = _ref5.index,
+    shift = _ref5.shift,
+    checked = _ref5.checked;
   var prospectsSelectedIndex = state.project.prospectsSelectedIndex;
   state.project.prospectsSelectedIndex = index;
   if (prospectsSelectedIndex === null || !shift || index === prospectsSelectedIndex) {
@@ -44793,32 +44825,32 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
   }))) : state.project.prospectsSelected.filter(function (id) {
     return subset.indexOf(id) == -1;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_PAGE, function (state, page) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_PAGE, function (state, page) {
   state.project.prospectsPage = page;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_VIEWED_PROSPECT, function (state, id) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_VIEWED_PROSPECT, function (state, id) {
   state.project.viewedProspect = id;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_MAX_LINES_PER_ROW, function (state, lines) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_MAX_LINES_PER_ROW, function (state, lines) {
   state.project.prospectsMaxLinesPerRow = lines;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_COUNT, function (state, count) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_COUNT, function (state, count) {
   state.project.prospectsCount = count;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_BY, function (state, column) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_BY, function (state, column) {
   state.project.prospectsSortBy = column;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_ORDER, function (state, order) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_SORT_ORDER, function (state, order) {
   state.project.prospectsSortOrder = order;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_FIELDS, function (state, fields) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_FIELDS, function (state, fields) {
   state.project.prospectsFields = fields;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PROFILE_SETTING_COLUMN_TAB, function (state, tab) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PROFILE_SETTING_COLUMN_TAB, function (state, tab) {
   state.project.prospectProfileSettingColumnTab = tab;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PROFILE_SETTING_BLOC_TAB, function (state, tab) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PROFILE_SETTING_BLOC_TAB, function (state, tab) {
   state.project.prospectProfileSettingBlocTab = tab;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PARAMS, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_PARAMS, function (state, value) {
   if (_typeof(value) == "object") {
     state.project.prospectsParams = value;
   }
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, function (state, _ref5) {
-  var key = _ref5.key,
-    value = _ref5.value,
-    multiple = _ref5.multiple;
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, function (state, _ref6) {
+  var key = _ref6.key,
+    value = _ref6.value,
+    multiple = _ref6.multiple;
   state.project.prospectsPage = 1;
   if (!state.project.prospectsParams) {
     state.project.prospectsParams = {};
@@ -44834,48 +44866,48 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
     if (state.project.prospectsParams[key] !== "") {
       values = [].concat(_toConsumableArray(state.project.prospectsParams[key]), [value]);
     }
-    state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).map(function (_ref6) {
-      var _ref7 = _slicedToArray(_ref6, 2),
-        k = _ref7[0],
-        v = _ref7[1];
+    state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).map(function (_ref7) {
+      var _ref8 = _slicedToArray(_ref7, 2),
+        k = _ref8[0],
+        v = _ref8[1];
       return [k, k == key ? values : v];
     }));
   } else {
     state.project.prospectsParams = _objectSpread(_objectSpread({}, state.project.prospectsParams), {}, _defineProperty({}, key, value));
   }
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, function (state, _ref8) {
-  var key = _ref8.key,
-    value = _ref8.value;
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, function (state, _ref9) {
+  var key = _ref9.key,
+    value = _ref9.value;
   state.project.prospectsPage = 1;
   if (!state.project.prospectsParams) {
     state.project.prospectsParams = {};
   }
   if (value !== undefined) {
     if (state.project.prospectsParams[key]) {
-      state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).map(function (_ref9) {
-        var _ref10 = _slicedToArray(_ref9, 2),
-          k = _ref10[0],
-          v = _ref10[1];
+      state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).map(function (_ref10) {
+        var _ref11 = _slicedToArray(_ref10, 2),
+          k = _ref11[0],
+          v = _ref11[1];
         return [k, k == key ? state.project.prospectsParams[k].filter(function (val) {
           return val != value;
         }) : v];
       }));
       if (state.project.prospectsParams[key].length == 0) {
-        state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).filter(function (_ref11) {
-          var _ref12 = _slicedToArray(_ref11, 1),
-            k = _ref12[0];
+        state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).filter(function (_ref12) {
+          var _ref13 = _slicedToArray(_ref12, 1),
+            k = _ref13[0];
           return k != key;
         }));
       }
     }
   } else {
-    state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).filter(function (_ref13) {
-      var _ref14 = _slicedToArray(_ref13, 1),
-        k = _ref14[0];
+    state.project.prospectsParams = Object.fromEntries(Object.entries(state.project.prospectsParams).filter(function (_ref14) {
+      var _ref15 = _slicedToArray(_ref14, 1),
+        k = _ref15[0];
       return k != key;
     }));
   }
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.INIT_PROSPECT_PARAMS, function (state) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.INIT_PROSPECT_PARAMS, function (state) {
   state.project.prospectsPage = 1;
   state.project.prospectsSortOrder = null;
   state.project.prospectsSortBy = null;
@@ -44883,42 +44915,42 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
   state.project.prospectsMenu = null; /*Object.fromEntries(
                                       Object.entries(state.project.prospectsParams).filter(([k]) => k == "count")
                                       );*/
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_CATEGORY, function (state, data) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_CATEGORY, function (state, data) {
   state.project.prospectCategory = data;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_FILTER_CATEGORY, function (state, data) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_FILTER_CATEGORY, function (state, data) {
   state.project.prospectFilterCategory = data;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_GROUPS, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_GROUPS, function (state, value) {
   state.project.prospectBulkGroups = value;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_LABELS, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_LABELS, function (state, value) {
   state.project.prospectBulkLabels = value;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_USERS, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT_BULK_USERS, function (state, value) {
   state.project.prospectBulkUsers = value;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_REMOVE_PROSPECT, function (state, prospects) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_REMOVE_PROSPECT, function (state, prospects) {
   state.project.prospects = state.project.prospects.map(function (prospect) {
     return prospects.indexOf(prospect.id) >= 0 ? _objectSpread(_objectSpread({}, prospect), {}, {
       deleted_at: new Date()
     }) : prospect;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_FORCE_REMOVE_PROSPECT, function (state, prospects) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_FORCE_REMOVE_PROSPECT, function (state, prospects) {
   state.project.prospects = state.project.prospects.filter(function (prospect) {
     return prospects.indexOf(prospect.id) < 0;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_PROCESSED_PROSPECT, function (state, prospects) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_PROCESSED_PROSPECT, function (state, prospects) {
   state.project.prospects = state.project.prospects.map(function (prospect) {
     return prospects.indexOf(prospect.id) >= 0 ? _objectSpread(_objectSpread({}, prospect), {}, {
       processed_at: new Date()
     }) : prospect;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_NOT_PROCESSED_PROSPECT, function (state, prospects) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_NOT_PROCESSED_PROSPECT, function (state, prospects) {
   state.project.prospects = state.project.prospects.map(function (prospect) {
     return prospects.indexOf(prospect.id) >= 0 ? _objectSpread(_objectSpread({}, prospect), {}, {
       processed_at: null
     }) : prospect;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_UPDATE_PROSPECT, function (state, _ref15) {
-  var prospects = _ref15.prospects,
-    field = _ref15.field,
-    value = _ref15.value;
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.BULK_UPDATE_PROSPECT, function (state, _ref16) {
+  var prospects = _ref16.prospects,
+    field = _ref16.field,
+    value = _ref16.value;
   var meta = field.indexOf("meta->") == 0;
   field = field.replace("meta->", "");
   state.project.prospects = state.project.prospects.map(function (prospect) {
@@ -44926,13 +44958,13 @@ var mutations = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectS
       meta: _objectSpread(_objectSpread({}, prospect.meta), {}, _defineProperty({}, field, value))
     }) : _objectSpread(_objectSpread({}, prospect), {}, _defineProperty({}, field, value)) : prospect;
   });
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_PROSPECTS_OPTIONS, function (state) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_PROSPECTS_OPTIONS, function (state) {
   state.project.prospectsOptions = state.project.prospectsOptions !== undefined ? !state.project.prospectsOptions : false;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_PROSPECTS_MENUS, function (state) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.TOGGLE_PROSPECTS_MENUS, function (state) {
   state.project.prospectsMenus = state.project.prospectsMenus !== undefined ? !state.project.prospectsMenus : false;
-}), _defineProperty(_objectSpread6, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_MENU, function (state, value) {
+}), _defineProperty(_objectSpread7, _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECTS_MENU, function (state, value) {
   state.project.prospectsMenu = value;
-}), _objectSpread6), _store_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__["default"].mutations), _store_project_prospect_file__WEBPACK_IMPORTED_MODULE_3__["default"].mutations), _store_project_prospect_group__WEBPACK_IMPORTED_MODULE_4__["default"].mutations), _store_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__["default"].mutations), _store_project_prospect_label__WEBPACK_IMPORTED_MODULE_6__["default"].mutations), _store_project_prospect_link__WEBPACK_IMPORTED_MODULE_7__["default"].mutations), _store_project_prospect_log__WEBPACK_IMPORTED_MODULE_8__["default"].mutations), _store_project_prospect_message__WEBPACK_IMPORTED_MODULE_9__["default"].mutations), _store_project_prospect_order__WEBPACK_IMPORTED_MODULE_10__["default"].mutations), _store_project_prospect_question__WEBPACK_IMPORTED_MODULE_12__["default"].mutations), _store_project_prospect_questionnaire__WEBPACK_IMPORTED_MODULE_13__["default"].mutations), _store_project_prospect_revision__WEBPACK_IMPORTED_MODULE_11__["default"].mutations), _store_project_prospect_pipeline__WEBPACK_IMPORTED_MODULE_14__["default"].mutations), _store_project_prospect_sms__WEBPACK_IMPORTED_MODULE_15__["default"].mutations), _store_project_prospect_user__WEBPACK_IMPORTED_MODULE_16__["default"].mutations);
+}), _objectSpread7), _store_project_prospect_event__WEBPACK_IMPORTED_MODULE_2__["default"].mutations), _store_project_prospect_file__WEBPACK_IMPORTED_MODULE_3__["default"].mutations), _store_project_prospect_group__WEBPACK_IMPORTED_MODULE_4__["default"].mutations), _store_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__["default"].mutations), _store_project_prospect_label__WEBPACK_IMPORTED_MODULE_6__["default"].mutations), _store_project_prospect_link__WEBPACK_IMPORTED_MODULE_7__["default"].mutations), _store_project_prospect_log__WEBPACK_IMPORTED_MODULE_8__["default"].mutations), _store_project_prospect_message__WEBPACK_IMPORTED_MODULE_9__["default"].mutations), _store_project_prospect_order__WEBPACK_IMPORTED_MODULE_10__["default"].mutations), _store_project_prospect_question__WEBPACK_IMPORTED_MODULE_12__["default"].mutations), _store_project_prospect_questionnaire__WEBPACK_IMPORTED_MODULE_13__["default"].mutations), _store_project_prospect_revision__WEBPACK_IMPORTED_MODULE_11__["default"].mutations), _store_project_prospect_pipeline__WEBPACK_IMPORTED_MODULE_14__["default"].mutations), _store_project_prospect_sms__WEBPACK_IMPORTED_MODULE_15__["default"].mutations), _store_project_prospect_user__WEBPACK_IMPORTED_MODULE_16__["default"].mutations);
 
 /**
  * Prospect Store Getters

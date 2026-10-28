@@ -26,8 +26,9 @@ function load(filename, dependencies) {
 }
 
 test('read receipts send only displayed ids, deduplicate and notify the badge', async () => {
-    const requests = [], events = [];
+    const requests = [], events = [], commits = [];
     const { markCommunicationsRead } = load('utils/incoming-communications.js', {
+        '@/store': { commit: (...args) => commits.push(args) },
         '@/apis/project/incoming-communication': { read: async (...args) => {
             requests.push(args); return { data: { count: 4 } };
         } },
@@ -35,23 +36,29 @@ test('read receipts send only displayed ids, deduplicate and notify the badge', 
     });
     assert.equal(await markCommunicationsRead('test', 2, 'sms', [{ id: 1 }, { id: '1' }, { id: 3 }]), true);
     assert.deepEqual(requests, [['test', 2, 'sms', [1, 3]]]);
+    assert.deepEqual(commits, [['MARK_PROSPECT_COMMUNICATIONS_READ', {
+        projectSlug: 'test', prospectId: 2, type: 'sms', ids: [1, 3],
+    }]]);
     assert.deepEqual(events, [['incoming-communications-read', { projectSlug: 'test', count: 4 }]]);
 });
 
 test('failed or empty receipts do not clear the badge or prevent reading', async () => {
-    const events = [];
+    const events = [], commits = [];
     const { markCommunicationsRead } = load('utils/incoming-communications.js', {
+        '@/store': { commit: (...args) => commits.push(args) },
         '@/apis/project/incoming-communication': { read: async () => { throw new Error('offline'); } },
         '@/utils/event-bus': { emit: (...args) => events.push(args) },
     });
     assert.equal(await markCommunicationsRead('test', 2, 'sms', []), false);
     assert.equal(await markCommunicationsRead('test', 2, 'sms', [{ id: 1 }]), false);
     assert.deepEqual(events, []);
+    assert.deepEqual(commits, []);
 });
 
 test('long conversations are marked in batches without marking unseen arrivals', async () => {
     const requests = [];
     const { markCommunicationsRead } = load('utils/incoming-communications.js', {
+        '@/store': { commit() {} },
         '@/apis/project/incoming-communication': { read: async (...args) => {
             requests.push(args); return { data: { count: 1 } };
         } },

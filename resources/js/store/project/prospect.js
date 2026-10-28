@@ -8,6 +8,7 @@ import {
     SHOW_PROSPECT,
     DUPLICATE_PROSPECT,
     UPDATE_PROSPECT,
+    MARK_PROSPECT_COMMUNICATIONS_READ,
     REMOVE_PROSPECT,
     UPDATE_SELECTED_PROSPECTS,
     TOGGLE_SELECTED_PROSPECTS,
@@ -374,6 +375,24 @@ const actions = {
  * Prospect Store Mutations
  */
 const mutations = {
+    [MARK_PROSPECT_COMMUNICATIONS_READ](state, { projectSlug, prospectId, type, ids }) {
+        if (state.project?.slug !== projectSlug) {
+            return;
+        }
+
+        const readIds = new Set(ids.map(Number));
+        const prospects = [state.project.prospect, ...(state.project.prospects || [])];
+        for (const prospect of prospects) {
+            if (prospect?.id != prospectId || !prospect.unread_communications?.[type]) {
+                continue;
+            }
+            prospect.unread_communications = {
+                ...prospect.unread_communications,
+                [type]: prospect.unread_communications[type].filter(id => !readIds.has(Number(id))),
+            };
+        }
+    },
+
     /**
      * Set prospects
      *

@@ -5,6 +5,7 @@ export const ADD_PROSPECT = "addProspect";
 export const SHOW_PROSPECT = "showProspect";
 export const DUPLICATE_PROSPECT = "duplicateProspect";
 export const UPDATE_PROSPECT = "updateProspect";
+export const MARK_PROSPECT_COMMUNICATIONS_READ = "markProspectCommunicationsRead";
 export const REMOVE_PROSPECT = "removeProspect";
 
 export const UPDATE_SELECTED_PROSPECTS = "updateSelectedProspects";

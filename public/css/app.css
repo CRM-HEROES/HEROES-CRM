@@ -758,6 +758,9 @@ td > .hc-table-selector > span {
 .hc-table-row-options > a.has-items {
   color: #e89118 !important;
 }
+.hc-table-row-options > a.has-unread {
+  color: #d32f2f !important;
+}
 .hc-table-row-options > a > i {
   display: inline-block;
   width: 100%;
@@ -1957,6 +1960,12 @@ textarea.hc-default-cell-input {
 .dark .hc-table-row-options > a {
   border-left: 1px solid #444444;
   color: rgb(136, 171, 135) !important;
+}
+.dark .hc-table-row-options > a.has-items {
+  color: #e89118 !important;
+}
+.dark .hc-table-row-options > a.has-unread {
+  color: #d32f2f !important;
 }
 .dark .hc-default-cell-input {
   color: #bbbbbb;

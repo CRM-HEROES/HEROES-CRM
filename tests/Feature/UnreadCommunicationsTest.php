@@ -7,6 +7,7 @@ use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\UserLastProjectCheck;
 use App\Http\Middleware\UserTrackActivity;
 use App\Models\Project;
+use App\Models\Prospect;
 use App\Models\User;
 use App\Services\IncomingCommunications;
 use Illuminate\Auth\Events\Authenticated;
@@ -156,6 +157,50 @@ class UnreadCommunicationsTest extends TestCase
         $service->markRead(Project::query()->findOrFail(1), 1, 1, 'sms', [1, 2, 3]);
         DB::table('sms')->insert(['prospect_id' => 1]);
         $this->assertSame(1, $this->counts(1)['sms']);
+    }
+
+    public function test_prospect_icons_receive_only_unread_incoming_ids_for_the_current_user(): void
+    {
+        $service = new IncomingCommunications();
+        $project = Project::query()->findOrFail(1);
+        $service->markRead($project, 1, 1, 'sms', [1, 2]);
+        $service->markRead($project, 1, 1, 'email', [1]);
+        $service->markRead($project, 1, 1, 'voicemail', [1]);
+        $prospects = Prospect::query()->whereIn('id', [1, 2])->orderBy('id')->get();
+
+        $service->appendUnread($prospects, $project, 1);
+        $this->assertSame(['sms' => [3], 'email' => [2], 'voicemail' => []], $prospects[0]->unread_communications);
+        $this->assertSame(['sms' => [], 'email' => [], 'voicemail' => []], $prospects[1]->unread_communications);
+
+        $service->appendUnread($prospects, $project, 2);
+        $this->assertSame(['sms' => [1, 2, 3], 'email' => [1, 2, 4], 'voicemail' => [1]], $prospects[0]->unread_communications);
+    }
+
+    public function test_prospect_unread_queries_are_batched_and_limited_to_the_current_page_and_project(): void
+    {
+        $service = new IncomingCommunications();
+        $project = Project::query()->findOrFail(1);
+        DB::table('sms')->insert(['id' => 7, 'prospect_id' => 2]);
+        $prospects = Prospect::withTrashed()->whereIn('id', [1, 2, 3, 4])->orderBy('id')->get();
+
+        DB::enableQueryLog();
+        DB::flushQueryLog();
+        $service->appendUnread($prospects, $project, 1);
+        $this->assertCount(3, DB::getQueryLog());
+        $this->assertSame([7], $prospects[1]->unread_communications['sms']);
+        $this->assertSame([], $prospects[2]->unread_communications['sms']);
+        $this->assertSame([], $prospects[3]->unread_communications['sms']);
+
+        DB::flushQueryLog();
+        $page = $prospects->take(1);
+        $service->appendUnread($page, $project, 1);
+        foreach (DB::getQueryLog() as $query) {
+            $this->assertStringContainsString('"prospect_id" in (?)', $query['query']);
+        }
+        DB::flushQueryLog();
+        $service->appendUnread(collect(), $project, 1);
+        $this->assertSame([], DB::getQueryLog());
+        DB::disableQueryLog();
     }
 
     public function test_cross_project_and_invalid_read_requests_are_rejected(): void
