@@ -17,7 +17,7 @@
         icon="fa fa-thread"
         style="width: 340px"
     >
-        <tab-layout :count="3" :tab="tab" class="hc-flex-1">
+        <tab-layout :count="4" :tab="tab" class="hc-flex-1">
             <!-- List of threads -->
             <template #1>
                 <div class="hc-flex-column" style="height: 100%">
@@ -373,6 +373,14 @@
                     </template>
                 </tab-layout>
             </template>
+            <template #4>
+                <email-composer
+                    v-if="emailDraft"
+                    :key="emailDraftKey"
+                    :initial-draft="emailDraft"
+                    @back="tab = emailReturnTab"
+                />
+            </template>
         </tab-layout>
     </slide>
 </template>
@@ -446,6 +454,7 @@ import InvoiceAttachment from "./InvoiceAttachment.vue";
 import UploadingAttachmentRow from "./UploadingAttachmentRow.vue";
 import SelectedProspect from "./SelectedProspect.vue";
 import SelectProspect from "../select/Select.vue";
+import EmailComposer from "../email/Composer.vue";
 
 export default {
     components: {
@@ -457,6 +466,7 @@ export default {
         UploadingAttachmentRow,
         SelectedProspect,
         SelectProspect,
+        EmailComposer,
     },
 
     data() {
@@ -477,9 +487,14 @@ export default {
 
             selectedProspects: [],
             selectedProspectsFolded: true,
+            fetchingProspects: false,
+            selectedProspectsRequestId: 0,
 
             addingMessage: false,
             fetchingMessages: false,
+            emailDraft: null,
+            emailDraftKey: 0,
+            emailReturnTab: 0,
             emailReasons: [
                 { key: "feedback", label: "Feedback prospect", subject: "Votre feedback nous intéresse" },
                 { key: "appointment", label: "Rendez-vous commerciaux", subject: "Échangeons au sujet de votre projet" },
@@ -540,23 +555,32 @@ export default {
         },
 
         async fetchSelectedProspects() {
-            if (this.prospectsSelected.length == 0) {
-                this.selectedProspects = [];
+            const requestId = ++this.selectedProspectsRequestId;
+            const projectSlug = this.project.slug;
+            const selectionKey = this.prospectsSelected.join(",");
+            const ids = [...this.prospectsSelected];
+            this.selectedProspects = [];
+            this.fetchingProspects = ids.length > 0;
+            if (!ids.length) {
                 return;
             }
 
             try {
-                const { data } = await ProspectService.get(this.project.slug, {
+                const { data } = await ProspectService.get(projectSlug, {
                     params: {
                         filters: JSON.stringify({
-                            ids: this.prospectsSelected,
+                            ids,
                         }),
                         fields: "first_name,last_name,email",
                     },
                 });
-                this.selectedProspects = data.data;
+                if (requestId === this.selectedProspectsRequestId
+                    && this.project.slug === projectSlug
+                    && this.prospectsSelected.join(",") === selectionKey) {
+                    this.selectedProspects = data.data;
+                }
             } finally {
-                this.fetchingProspect = false;
+                if (requestId === this.selectedProspectsRequestId) this.fetchingProspects = false;
             }
         },
 
@@ -765,6 +789,7 @@ export default {
         },
 
         openEmailComposer(reason) {
+            if (!this.prospect && this.fetchingProspects) return;
             const prospects = this.prospect
                 ? [this.prospect]
                 : this.selectedProspects;
@@ -773,15 +798,22 @@ export default {
                 ? this.prospect.first_name || ""
                 : "";
 
-            store.commit("SET_PROSPECT_EMAIL_DRAFT", {
+            this.emailDraft = {
                 prospect: this.prospect ? this.prospect.id : null,
                 prospects: this.prospect ? null : recipients.map((item) => item.id),
                 to: recipients.map((item) => item.email).join(", "),
                 category: reason.label,
                 subject: reason.subject,
                 body: `Bonjour ${firstName},\n\n`,
-            });
-            store.commit(OPEN_MODAL, "prospect-email");
+            };
+            this.emailDraftKey++;
+            this.emailReturnTab = this.tab;
+            this.tab = 3;
+        },
+
+        resetEmailComposer() {
+            this.emailDraft = null;
+            if (this.tab === 3) this.tab = 0;
         },
 
         /**
@@ -817,9 +849,23 @@ export default {
     },
 
     watch: {
+        "project.slug"() {
+            this.resetEmailComposer();
+            this.selectedProspectsRequestId++;
+            this.selectedProspects = [];
+            this.fetchingProspects = false;
+        },
+
+        emailSelectionKey() {
+            if (!this.prospect) {
+                this.resetEmailComposer();
+                if (this.slideOpen(this.name)) this.fetchSelectedProspects();
+            }
+        },
+
         async messageThread(newValue) {
             if (newValue) {
-                this.tab = 1;
+                if (this.tab !== 3) this.tab = 1;
 
                 if (this.prospect) {
                     await store.commit(SET_PROSPECT_MESSAGES, []);
@@ -838,7 +884,7 @@ export default {
                     this.bulkMessages = [];
                 }
             } else {
-                this.tab = 0;
+                if (this.tab !== 3) this.tab = 0;
             }
         },
 
@@ -850,7 +896,10 @@ export default {
             }
         },
 
-        async prospect(newValue) {
+        async prospect(newValue, oldValue) {
+            if (newValue?.id !== oldValue?.id && this.emailDraft) {
+                this.resetEmailComposer();
+            }
             this.removeInvoice();
             if (newValue && this.slideOpen(this.name)) {
                 this.fetchProspectThreads();
@@ -936,6 +985,10 @@ export default {
 
         emailSettingValidated() {
             return Boolean(this.settingsGet("email")?.validated_at);
+        },
+
+        emailSelectionKey() {
+            return this.prospectsSelected.join(",");
         },
 
         /**
