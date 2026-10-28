@@ -4,7 +4,7 @@
         style="height: 100%"
         @submit.prevent="storeMessageTemplate"
     >
-        <div class="hc-flex-column">
+        <div class="hc-flex-column hc-flex-1" style="overflow-y: auto">
             <v-field :label="$t('name')" required v-slot="{ label }"
                 ><input
                     ref="name"
@@ -12,6 +12,9 @@
                     v-model="messageTemplate.name"
                     required
             /></v-field>
+            <v-field label="Objet de l'e-mail" v-slot="{ label }">
+                <input v-model="messageTemplate.subject" :placeholder="label + ' ...'" maxlength="255" />
+            </v-field>
             <text-editor
                 style="padding: 5px"
                 ref="body"
@@ -19,9 +22,11 @@
                 v-model.lazy="messageTemplate.body"
                 :placeholder="$t('content')"
             />
+            <template-attachments v-model:attachments="messageTemplate.attachments" :disabled="addingMessageTemplate" />
+            <p v-if="saveError" role="alert" class="hc-message-template-error" v-text="saveError"></p>
         </div>
         <buttons>
-            <button v-text="$t('add')"></button>
+            <button :disabled="addingMessageTemplate" v-text="$t('add')"></button>
         </buttons>
         <loading :loading="addingMessageTemplate" />
     </form>
@@ -30,16 +35,19 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import TemplateAttachments from "../Attachments.vue";
 
 // Actions
 import { ADD_MESSAGE_TEMPLATE } from "@/actions/project/message-template";
 import { CLOSE_MODAL } from "@/actions/modal";
 
 export default {
+    components: { TemplateAttachments },
     data() {
         return {
             messageTemplate: this.newMessageTemplate(),
             addingMessageTemplate: false,
+            saveError: "",
 
             strategies: [
                 {
@@ -80,6 +88,8 @@ export default {
             return {
                 name: "",
                 body: "",
+                subject: "",
+                attachments: [],
             };
         },
 
@@ -87,6 +97,7 @@ export default {
          *
          */
         async storeMessageTemplate() {
+            if (this.addingMessageTemplate) return;
             if (!this.messageTemplate.name) {
                 this.$refs.name.focus();
                 return;
@@ -98,16 +109,20 @@ export default {
             }
 
             this.addingMessageTemplate = true;
+            this.saveError = "";
 
             try {
                 await store.dispatch(
                     ADD_MESSAGE_TEMPLATE,
                     this.messageTemplate
                 );
-            } finally {
-                this.addingMessageTemplate = false;
                 this.messageTemplate = this.newMessageTemplate();
                 store.commit(CLOSE_MODAL);
+            } catch (error) {
+                this.saveError = Object.values(error.response?.data?.errors || {}).flat()[0]
+                    || error.response?.data?.message || "Impossible d'enregistrer le modèle.";
+            } finally {
+                this.addingMessageTemplate = false;
             }
         },
     },

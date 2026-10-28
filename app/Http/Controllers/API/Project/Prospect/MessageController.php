@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Project\Prospect;
 use App\Http\Controllers\Controller;
 use App\Models\Invoice;
 use App\Models\Message;
+use App\Models\MessageTemplate;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\Thread;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class MessageController extends Controller
 {
@@ -23,23 +25,14 @@ class MessageController extends Controller
     {
         abort_unless($project->id == $prospect->project_id, 404);
 
-        $this->validate($request, [
+        $this->validate($request, array_merge($this->emailRules(), [
             'to' => 'required|email',
-            'subject' => 'required|string|max:255',
-            'body' => 'required|string',
-        ]);
+        ]));
+        $attachments = $this->emailAttachments($request, $project);
 
         abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
 
-        Mail::send('emails.prospect-message', [
-            'body' => $request->input('body'),
-            'category' => $request->input('category', 'Message'),
-            'project' => $project,
-            'subject' => $request->input('subject'),
-        ], function ($message) use ($request) {
-            $message->to($request->input('to'))
-                ->subject($request->input('subject'));
-        });
+        $this->sendDirectEmail($request, $project, $prospect, $request->input('to'), $attachments);
 
         return ['sent' => true];
     }
@@ -49,14 +42,11 @@ class MessageController extends Controller
      */
     public function bulkEmail(Request $request, Project $project)
     {
-        $this->validate($request, [
+        $this->validate($request, array_merge($this->emailRules(), [
             'prospects' => 'required|array|min:1',
-            'prospects.*' => 'integer',
-            'subject' => 'required|string|max:255',
-            'body' => 'required|string',
-        ]);
-
-        abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
+            'prospects.*' => 'required|integer|distinct',
+        ]));
+        $attachments = $this->emailAttachments($request, $project);
 
         $prospects = $project->prospects()
             ->whereIn('id', $request->input('prospects'))
@@ -64,19 +54,117 @@ class MessageController extends Controller
             ->where('email', '!=', '')
             ->get();
 
+        if ($prospects->isEmpty()) {
+            throw ValidationException::withMessages([
+                'prospects' => 'Aucun prospect sélectionné ne possède une adresse email dans ce projet.',
+            ]);
+        }
+
+        abort_unless(ProjectMail::configure($project), 422, trans('email.error.empty_setting'));
+
         foreach ($prospects as $prospect) {
-            Mail::send('emails.prospect-message', [
-                'body' => $request->input('body'),
-                'category' => $request->input('category', 'Message'),
-                'project' => $project,
-                'subject' => $request->input('subject'),
-            ], function ($message) use ($prospect, $request) {
-                $message->to($prospect->email)
-                    ->subject($request->input('subject'));
-            });
+            $this->sendDirectEmail($request, $project, $prospect, $prospect->email, $attachments);
         }
 
         return ['sent' => $prospects->count()];
+    }
+
+    protected function emailRules(): array
+    {
+        return [
+            'subject' => 'required|string|max:255',
+            'body' => 'required|string',
+            'category' => 'nullable|string|max:255',
+            'attachments' => 'sometimes|array|max:10',
+            'attachments.*' => 'required|file|max:10240',
+            'template_id' => 'nullable|integer|required_with:template_attachment_ids',
+            'template_attachment_ids' => 'sometimes|array|max:10',
+            'template_attachment_ids.*' => 'required|string|uuid|distinct',
+        ];
+    }
+
+    /**
+     * Resolve only server-owned template paths, never paths supplied by the client.
+     */
+    protected function emailAttachments(Request $request, Project $project): array
+    {
+        $uploads = $request->file('attachments', []);
+        $ids = $request->input('template_attachment_ids', []);
+
+        if (count($uploads) + count($ids) > 10) {
+            throw ValidationException::withMessages([
+                'attachments' => 'Vous pouvez joindre au maximum 10 fichiers.',
+            ]);
+        }
+
+        $attachments = array_map(fn ($file) => [
+            'path' => $file->getRealPath(),
+            'name' => $file->getClientOriginalName(),
+            'type' => $file->getMimeType(),
+        ], $uploads);
+
+        if (!$request->filled('template_id')) {
+            return $attachments;
+        }
+
+        $template = MessageTemplate::query()
+            ->where('project_id', $project->id)
+            ->find($request->input('template_id'));
+
+        if (!$template) {
+            throw ValidationException::withMessages([
+                'template_id' => 'Ce modèle de message est introuvable dans ce projet.',
+            ]);
+        }
+
+        $storedFiles = collect($template->attachments ?? [])->keyBy('id');
+        $disk = Storage::disk('local');
+        foreach ($ids as $id) {
+            $file = $storedFiles->get($id);
+            if (!$file || !$disk->exists($file['path']) || $disk->size($file['path']) > 10 * 1024 * 1024) {
+                throw ValidationException::withMessages([
+                    'template_attachment_ids' => 'Une pièce jointe du modèle est introuvable ou dépasse 10 Mo. Rechargez le modèle.',
+                ]);
+            }
+            $attachments[] = [
+                'path' => $disk->path($file['path']),
+                'name' => $file['name'],
+                'type' => $file['type'],
+            ];
+        }
+
+        return $attachments;
+    }
+
+    protected function sendDirectEmail(Request $request, Project $project, Prospect $prospect, string $to, array $attachments): void
+    {
+        $subject = $this->personalizeEmail($request->input('subject'), $prospect);
+        Mail::send('emails.prospect-message', [
+            'body' => $this->personalizeEmail($request->input('body'), $prospect),
+            'category' => $request->input('category', 'Message'),
+            'project' => $project,
+            'subject' => $subject,
+        ], function ($message) use ($to, $subject, $attachments) {
+            $message->to($to)->subject($subject);
+            foreach ($attachments as $file) {
+                $message->attach($file['path'], ['as' => $file['name'], 'mime' => $file['type']]);
+            }
+        });
+    }
+
+    protected function personalizeEmail(string $text, Prospect $prospect): string
+    {
+        return preg_replace_callback('/\{prospect\.([\w.-]+)\}/u', function ($matches) use ($prospect) {
+            $key = $matches[1];
+            // Resolve stored fields only; tokens must not traverse model relationships.
+            if (str_starts_with($key, 'meta.')) {
+                $value = data_get($prospect->meta, substr($key, 5));
+            } else {
+                $value = array_key_exists($key, $prospect->getAttributes()) ? $prospect->getAttribute($key) : null;
+            }
+
+            return is_scalar($value) ? (string) $value : '';
+        }, $text);
     }
 
     /**
