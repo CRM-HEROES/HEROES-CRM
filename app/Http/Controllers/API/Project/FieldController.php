@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Project;
 use App\Filters\FieldRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Jobs\FieldToCategory;
+use App\Jobs\RefreshProspectFieldDuplicates;
 use App\Models\Field;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -89,6 +90,7 @@ class FieldController extends Controller
         abort_unless($project->id == $field->project_id, 404);
         abort_unless(auth()->user()->can('projectFieldUpdate', $project), 404);
 
+        $wasUnique = (bool) $field->unique;
         $field->update($request->only(
             'name',
             'type',
@@ -100,6 +102,10 @@ class FieldController extends Controller
             'searchable',
             'order'
         ));
+
+        if ($wasUnique !== (bool) $field->unique && $field->for === 'prospect' && !$field->meta && in_array($field->slug, ['email', 'mobile_phone_number', 'phone_number'], true)) {
+            RefreshProspectFieldDuplicates::dispatch($field)->onQueue('imports');
+        }
 
         return ['message' => trans('common.success.updated_resource')];
     }

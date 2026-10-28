@@ -67,6 +67,7 @@ class Prospect extends Authenticatable
      */
     protected $casts = [
         'meta' => 'json',
+        'duplicate_fields' => 'json',
         'date_of_birth' => 'date',
         'processed_at' => 'datetime',
         'created_at' => 'datetime',

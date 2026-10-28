@@ -31479,18 +31479,49 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
 
+function templateFormData(params) {
+  var updating = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var data = new FormData();
+  for (var _i = 0, _arr = ["name", "body", "subject", "order"]; _i < _arr.length; _i++) {
+    var key = _arr[_i];
+    if (params[key] !== undefined) {
+      var _params$key;
+      data.append(key, (_params$key = params[key]) !== null && _params$key !== void 0 ? _params$key : "");
+    }
+  }
+  if (Array.isArray(params.attachments)) {
+    var retained = params.attachments.filter(function (attachment) {
+      return !(attachment instanceof File);
+    });
+    if (updating && retained.length === 0) {
+      data.append("retained_attachment_ids", "");
+    }
+    retained.forEach(function (attachment) {
+      return data.append("retained_attachment_ids[]", attachment.id);
+    });
+    params.attachments.filter(function (attachment) {
+      return attachment instanceof File;
+    }).forEach(function (file) {
+      return data.append("attachments[]", file, file.name);
+    });
+  }
+  if (updating) {
+    data.append("_method", "PUT");
+  }
+  return data;
+}
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   get: function get(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/message-template"), params);
   },
   create: function create(project, params) {
-    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/message-template"), params);
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/message-template"), templateFormData(params));
   },
   show: function show(project, messageTemplate) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/message-template/").concat(messageTemplate));
   },
   update: function update(project, messageTemplate, params) {
-    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/message-template/").concat(messageTemplate), params);
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/message-template/").concat(messageTemplate), templateFormData(params, true));
   },
   destroy: function destroy(project, messageTemplate) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/message-template/").concat(messageTemplate));
@@ -42671,14 +42702,19 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_message
   }))();
 }), _defineProperty(_actions, _actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var _yield$messageTemplat4, data;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
           _context4.next = 2;
           return _apis_project_message_template__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, params);
-        case 3:
+          _yield$messageTemplat4 = _context4.sent;
+          data = _yield$messageTemplat4.data;
+          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, data);
+          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.SET_MESSAGE_TEMPLATE, data);
+          return _context4.abrupt("return", data);
+        case 7:
         case "end":
           return _context4.stop();
       }
@@ -44602,7 +44638,15 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
               history_count: data.history_count
             });
           }
-        case 9:
+          if (!["email", "mobile_phone_number", "phone_number"].some(function (field) {
+            return Object.prototype.hasOwnProperty.call(params, field);
+          })) {
+            _context5.next = 12;
+            break;
+          }
+          _context5.next = 12;
+          return context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+        case 12:
         case "end":
           return _context5.stop();
       }

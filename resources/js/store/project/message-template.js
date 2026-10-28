@@ -68,12 +68,14 @@ const actions = {
      * @param {Object} params new messageTemplate messageTemplate values
      */
     async [UPDATE_MESSAGE_TEMPLATE](context, params) {
-        await messageTemplateService.update(
+        const { data } = await messageTemplateService.update(
             context.state.project.slug,
             params.id,
             params
         );
-        context.commit(UPDATE_MESSAGE_TEMPLATE, params);
+        context.commit(UPDATE_MESSAGE_TEMPLATE, data);
+        context.commit(SET_MESSAGE_TEMPLATE, data);
+        return data;
     },
 
     /**

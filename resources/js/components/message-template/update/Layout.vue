@@ -12,6 +12,9 @@
                     v-model="messageTemplateToUpdate.name"
                     required
             /></v-field>
+            <v-field label="Objet de l'e-mail" v-slot="{ label }">
+                <input v-model="messageTemplateToUpdate.subject" :placeholder="label + ' ...'" maxlength="255" />
+            </v-field>
             <text-editor
                 style="padding: 5px"
                 ref="body"
@@ -19,6 +22,11 @@
                 v-model.lazy="messageTemplateToUpdate.body"
                 :placeholder="$t('content')"
             />
+            <template-attachments
+                v-model:attachments="messageTemplateToUpdate.attachments"
+                :disabled="updatingMessageTemplate || removingMessageTemplate"
+            />
+            <p v-if="saveError" role="alert" class="hc-message-template-error" v-text="saveError"></p>
         </item-list>
         <buttons>
             <button
@@ -27,7 +35,7 @@
                 class="hc-button-danger"
                 v-text="$t('delete')"
             ></button>
-            <button v-text="$t('update')"></button>
+            <button :disabled="updatingMessageTemplate || removingMessageTemplate" v-text="$t('update')"></button>
         </buttons>
         <loading
             :loading="updatingMessageTemplate || removingMessageTemplate"
@@ -38,6 +46,7 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import TemplateAttachments from "../Attachments.vue";
 
 // Actions
 import {
@@ -48,25 +57,28 @@ import { CLOSE_MODAL } from "@/actions/modal";
 import { FETCH_PROSPECTS } from "@/actions/project/prospect";
 
 export default {
+    components: { TemplateAttachments },
     data() {
         return {
             updatingMessageTemplate: false,
             removingMessageTemplate: false,
             fetchingMessageTemplate: false,
-            messageTemplateToUpdate: this.messageTemplate,
+            messageTemplateToUpdate: this.copyTemplate(this.messageTemplate),
+            saveError: "",
         };
     },
 
-    created() {
-        this.messageTemplateToUpdate = this.messageTemplate;
-    },
-
     methods: {
+        copyTemplate(template) {
+            return template ? { ...template, attachments: [...(template.attachments || [])] } : null;
+        },
         /**
          *
          */
         async update() {
+            if (this.updatingMessageTemplate || this.removingMessageTemplate) return;
             this.updatingMessageTemplate = true;
+            this.saveError = "";
 
             try {
                 await store.dispatch(
@@ -74,9 +86,12 @@ export default {
                     this.messageTemplateToUpdate
                 );
                 store.dispatch(FETCH_PROSPECTS);
+                store.commit(CLOSE_MODAL);
+            } catch (error) {
+                this.saveError = Object.values(error.response?.data?.errors || {}).flat()[0]
+                    || error.response?.data?.message || "Impossible d'enregistrer le modèle.";
             } finally {
                 this.updatingMessageTemplate = false;
-                store.commit(CLOSE_MODAL);
             }
         },
 
@@ -84,8 +99,10 @@ export default {
          *
          */
         remove() {
+            if (this.updatingMessageTemplate || this.removingMessageTemplate) return;
             hcConfirm(this.$t("delete_confirm"), async () => {
                 this.removingMessageTemplate = true;
+                this.saveError = "";
 
                 try {
                     await store.dispatch(
@@ -93,9 +110,11 @@ export default {
                         this.messageTemplateToUpdate.id
                     );
                     store.dispatch(FETCH_PROSPECTS);
+                    store.commit(CLOSE_MODAL);
+                } catch (error) {
+                    this.saveError = error.response?.data?.message || "Impossible de supprimer le modèle.";
                 } finally {
                     this.removingMessageTemplate = false;
-                    store.commit(CLOSE_MODAL);
                 }
             });
         },
@@ -103,16 +122,8 @@ export default {
 
     watch: {
         async messageTemplate(newValue) {
-            if (newValue) {
-                this.messageTemplateToUpdate = { ...newValue };
-
-                /*this.fetchingMessageTemplate = true;
-                this.messageTemplateToUpdate = await store.dispatch(
-                    SHOW_MESSAGE_TEMPLATE,
-                    newValue.id
-                );
-                this.fetchingMessageTemplate = false;*/
-            }
+            this.messageTemplateToUpdate = this.copyTemplate(newValue);
+            this.saveError = "";
         },
     },
 
