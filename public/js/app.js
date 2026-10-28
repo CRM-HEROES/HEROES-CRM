@@ -44578,7 +44578,15 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
               history_count: data.history_count
             });
           }
-        case 9:
+          if (!["email", "mobile_phone_number", "phone_number"].some(function (field) {
+            return Object.prototype.hasOwnProperty.call(params, field);
+          })) {
+            _context5.next = 12;
+            break;
+          }
+          _context5.next = 12;
+          return context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+        case 12:
         case "end":
           return _context5.stop();
       }

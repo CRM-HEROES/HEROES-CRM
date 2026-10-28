@@ -1,5 +1,5 @@
 <template>
-    <component :is="tag" :class="[isFiltered ? 'filtered' : '']" :style="style">
+    <component :is="tag" :class="[isFiltered ? 'filtered' : '', isDuplicateField ? 'duplicate' : '']" :style="[style, duplicateStyle]">
         <street-cell
             v-if="column.key == 'street'"
             :prospect="prospect"
@@ -120,6 +120,7 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import { duplicateColor } from "@/utils/duplicateColor";
 
 // Actions
 import { OPEN_SLIDE } from "@/actions/slide";
@@ -378,6 +379,18 @@ export default {
          */
         category() {
             return this.column.category;
+        },
+
+        isDuplicateField() {
+            return this.category === "default" &&
+                Array.isArray(this.prospect.duplicate_fields) &&
+                this.prospect.duplicate_fields.includes(this.column.key);
+        },
+
+        duplicateStyle() {
+            if (!this.isDuplicateField) return {};
+            const color = duplicateColor(this.prospect.duplicate_group_id || this.prospect.id);
+            return { backgroundColor: color + "26", boxShadow: `inset 0 0 0 1px ${color}88` };
         },
 
         /**

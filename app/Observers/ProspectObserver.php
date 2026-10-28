@@ -8,6 +8,7 @@ use App\Notifications\GoogleContactDeletedProspect;
 use App\Notifications\GoogleContactNewProspect;
 use App\Notifications\PipedrivePersonNewProspect;
 use App\Notifications\PipedrivePersonUpdatedProspect;
+use App\Services\ProspectFieldDuplicateMarker;
 use Illuminate\Support\Facades\DB;
 use Venturecraft\Revisionable\Revision;
 
@@ -36,6 +37,9 @@ class ProspectObserver
         $this->getLatLng($prospect);
         $this->storeGoogleContact($prospect);
         $this->storePipedrivePerson($prospect);
+        if (!$prospect->import_id) {
+            app(ProspectFieldDuplicateMarker::class)->mark($prospect);
+        }
     }
 
     /**
@@ -61,6 +65,9 @@ class ProspectObserver
         $this->processed($prospect);
         $this->checkMetaFieldUpdated($prospect);
         $this->updatePipedrivePerson($prospect);
+        if (!$prospect->import_id && $prospect->wasChanged(['email', 'mobile_phone_number', 'phone_number'])) {
+            app(ProspectFieldDuplicateMarker::class)->mark($prospect);
+        }
     }
 
     /**
@@ -100,6 +107,12 @@ class ProspectObserver
                 ->get(['id', 'slug', 'name']) as $field
         ) {
             if (!$prospect->isDirty($field->slug) || empty($prospect->{$field->slug})) {
+                continue;
+            }
+
+            // These three fields are monitored and highlighted in the prospects table.
+            // Keep duplicates saveable so users can identify and resolve them there.
+            if (in_array($field->slug, ['email', 'mobile_phone_number', 'phone_number'], true)) {
                 continue;
             }
         
