@@ -1,0 +1,32 @@
+# Add this file to the same Compose invocation as your normal environment.
+services:
+  monitoring:
+    image: heroescrm:latest
+    restart: unless-stopped
+    working_dir: /var/www
+    user: "0:33"
+    command: ["php", "artisan", "monitoring:collect", "--loop"]
+    network_mode: none
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 64
+    environment:
+      MONITORING_HOST_PROC: /host/proc
+      MONITORING_HOST_SYS: /host/sys
+      MONITORING_HOST_ROOT: /host/root
+      MONITORING_DOCKER_SOCKET: /var/run/docker.sock
+      MONITORING_DOCKER_PROJECT: ${COMPOSE_PROJECT_NAME:-heroes-crm}
+    volumes:
+      - ./:/var/www:ro
+      - ./storage/app/server-monitoring:/var/www/storage/app/server-monitoring
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/host/root:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    tmpfs:
+      - /tmp:size=16m,mode=1777

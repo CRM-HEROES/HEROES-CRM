@@ -167,6 +167,7 @@ return [
         App\Providers\AuthServiceProvider::class,
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\ServerMonitoringServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         // Barryvdh\Debugbar\ServiceProvider::class,
         Lab404\Impersonate\ImpersonateServiceProvider::class,

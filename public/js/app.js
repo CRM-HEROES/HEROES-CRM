@@ -34736,6 +34736,9 @@ var Main = function Main() {
 var Dashboard = function Dashboard() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_dashboard_Dashboard_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/dashboard/Dashboard.vue */ "./resources/js/components/dashboard/Dashboard.vue"));
 };
+var ServerMonitoring = function ServerMonitoring() {
+  return __webpack_require__.e(/*! import() */ "resources_js_components_server-monitoring_Dashboard_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/server-monitoring/Dashboard.vue */ "./resources/js/components/server-monitoring/Dashboard.vue"));
+};
 // Prospect
 var ProspectTable = function ProspectTable() {
   return __webpack_require__.e(/*! import() */ "resources_js_components_prospect_table_Layout_vue").then(__webpack_require__.bind(__webpack_require__, /*! @/components/prospect/table/Layout.vue */ "./resources/js/components/prospect/table/Layout.vue"));
@@ -34826,6 +34829,15 @@ var routes = [].concat(_toConsumableArray(_router_auth_js__WEBPACK_IMPORTED_MODU
     middleware: "auth"
   },
   children: [{
+    component: ServerMonitoring,
+    name: "server-monitoring",
+    path: "server-monitoring",
+    meta: {
+      title: "Monitoring Serveur",
+      middleware: "auth",
+      superAdmin: true
+    }
+  }, {
     component: Dashboard,
     name: "dashboard",
     path: "",
@@ -35080,13 +35092,22 @@ router.beforeEach(/*#__PURE__*/function () {
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("route/setChanging", true);
           document.title = to.meta.title;
           if (!(to.meta.middleware == "auth")) {
-            _context3.next = 45;
+            _context3.next = 48;
             break;
           }
           if (!(_store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.user && _store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.user.id && _store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.authenticated)) {
-            _context3.next = 40;
+            _context3.next = 43;
             break;
           }
+          if (!(to.meta.superAdmin && !_store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.user.is_super_admin)) {
+            _context3.next = 7;
+            break;
+          }
+          next({
+            name: "dashboard"
+          });
+          return _context3.abrupt("return");
+        case 7:
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_6__.SET_GLOBAL_USER, null);
           if (_store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.impersonating && _store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.impersonate_project && (!to.params.project || to.params.project != _store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.impersonate_project)) {
             next({
@@ -35105,54 +35126,54 @@ router.beforeEach(/*#__PURE__*/function () {
             }
           }
           if (!(to.name == "document")) {
-            _context3.next = 12;
+            _context3.next = 15;
             break;
           }
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_document__WEBPACK_IMPORTED_MODULE_7__.SET_DOCUMENT, null);
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_document__WEBPACK_IMPORTED_MODULE_7__.FETCH_DOCUMENTS);
-          _context3.next = 36;
+          _context3.next = 39;
           break;
-        case 12:
+        case 15:
           if (!(to.name == "document.show")) {
-            _context3.next = 17;
+            _context3.next = 20;
             break;
           }
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_document__WEBPACK_IMPORTED_MODULE_7__.SET_DOCUMENT, null);
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_document__WEBPACK_IMPORTED_MODULE_7__.SHOW_DOCUMENT, to.params.document);
-          _context3.next = 36;
+          _context3.next = 39;
           break;
-        case 17:
+        case 20:
           if (!(to.name == "campaign" || to.name == "campaign.show")) {
-            _context3.next = 24;
+            _context3.next = 27;
             break;
           }
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_campaign__WEBPACK_IMPORTED_MODULE_9__.FETCH_CAMPAIGNS);
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_campaign__WEBPACK_IMPORTED_MODULE_9__.FETCH_CAMPAIGN_ACTIONS);
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_campaign__WEBPACK_IMPORTED_MODULE_9__.FETCH_CAMPAIGN_RULES);
           _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_campaign__WEBPACK_IMPORTED_MODULE_9__.FETCH_CAMPAIGN_OPERATORS);
-          _context3.next = 36;
+          _context3.next = 39;
           break;
-        case 24:
+        case 27:
           if (!(to.name == "prospect.show")) {
-            _context3.next = 35;
+            _context3.next = 38;
             break;
           }
-          _context3.prev = 25;
-          _context3.next = 28;
+          _context3.prev = 28;
+          _context3.next = 31;
           return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SHOW_PROSPECT, to.params.prospect);
-        case 28:
-          _context3.next = 33;
+        case 31:
+          _context3.next = 36;
           break;
-        case 30:
-          _context3.prev = 30;
-          _context3.t0 = _context3["catch"](25);
+        case 33:
+          _context3.prev = 33;
+          _context3.t0 = _context3["catch"](28);
           next({
             name: "NotFound"
           });
-        case 33:
-          _context3.next = 36;
+        case 36:
+          _context3.next = 39;
           break;
-        case 35:
+        case 38:
           if (to.name == "user.show") {
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user__WEBPACK_IMPORTED_MODULE_5__.SHOW_USER, to.params.user);
           } else if (to.name == "global.user.show") {
@@ -35163,18 +35184,21 @@ router.beforeEach(/*#__PURE__*/function () {
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_pipeline__WEBPACK_IMPORTED_MODULE_8__.SET_PIPELINE, null);
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_pipeline__WEBPACK_IMPORTED_MODULE_8__.SHOW_PIPELINE, to.params.pipeline);
           }
-        case 36:
+        case 39:
           next();
           return _context3.abrupt("return");
-        case 40:
-          _context3.next = 42;
+        case 43:
+          _context3.next = 45;
           return axios.get("/api/auth").then(function (_ref4) {
             var data = _ref4.data;
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_USER", data);
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_AUTHENTICATED", true);
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_IMPERSONATING", data.is_impersonating);
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_IMPERSONATE_PROJECT", data.impersonating_project);
-            next({
+            next(to.meta.superAdmin && data.is_super_admin ? {
+              path: to.fullPath,
+              replace: true
+            } : {
               name: "dashboard"
             });
           })["catch"](function (e) {
@@ -35182,31 +35206,31 @@ router.beforeEach(/*#__PURE__*/function () {
               name: "login"
             });
           });
-        case 42:
-          return _context3.abrupt("return");
-        case 43:
-          _context3.next = 51;
-          break;
         case 45:
+          return _context3.abrupt("return");
+        case 46:
+          _context3.next = 54;
+          break;
+        case 48:
           if (to.name == "password.request") {
             _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_PASSWORD_RESET_TOKEN", to.params.token);
           }
           if (!_store__WEBPACK_IMPORTED_MODULE_0__["default"].state.auth.authenticated) {
-            _context3.next = 49;
+            _context3.next = 52;
             break;
           }
           next({
             name: "dashboard"
           });
           return _context3.abrupt("return");
-        case 49:
+        case 52:
           next();
           return _context3.abrupt("return");
-        case 51:
+        case 54:
         case "end":
           return _context3.stop();
       }
-    }, _callee3, null, [[25, 30]]);
+    }, _callee3, null, [[28, 33]]);
   }));
   return function (_x3, _x4, _x5) {
     return _ref3.apply(this, arguments);
@@ -99211,7 +99235,7 @@ module.exports = /*#__PURE__*/JSON.parse('{"app_name":"英雄CRM","add":"添加"
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if ({"resources_js_components_layouts_Main_vue":1,"resources_js_components_dashboard_Dashboard_vue":1,"resources_js_components_prospect_table_Layout_vue":1,"resources_js_components_prospect_profile_Profile_vue":1,"resources_js_components_project_table_Layout_vue":1,"resources_js_components_project_profile_Profile_vue":1,"resources_js_components_user_table_Layout_vue":1,"resources_js_components_user_profile_Profile_vue":1,"resources_js_components_map_Map_vue":1,"resources_js_components_document_Document_vue":1,"resources_js_components_campaign_Campaign_vue":1,"resources_js_components_event_Agenda_vue":1,"resources_js_components_pipeline_list_Pipeline_vue":1,"resources_js_components_stat_Stat_vue":1,"resources_js_components_stat2_Stat_vue":1,"resources_js_components_stat-builder_StatBuilder_vue":1,"resources_js_components_order_Table_Layout_vue":1,"resources_js_components_404_vue":1,"resources_js_components_global_user_table_Layout_vue":1,"resources_js_components_global_user_profile_Profile_vue":1,"resources_js_components_auth_Login_vue":1,"resources_js_components_auth_Register_vue":1,"resources_js_components_auth_password_Reset_vue":1,"resources_js_components_auth_password_Request_vue":1,"resources_js_components_auth_two-factors_Enable_vue":1,"resources_js_components_auth_two-factors_Login_vue":1,"resources_js_components_auth_registration_Registration_vue":1,"resources_js_components_auth_registration_Step_vue":1}[chunkId]) return "js/" + chunkId + ".js";
+/******/ 			if ({"resources_js_components_layouts_Main_vue":1,"resources_js_components_dashboard_Dashboard_vue":1,"resources_js_components_server-monitoring_Dashboard_vue":1,"resources_js_components_prospect_table_Layout_vue":1,"resources_js_components_prospect_profile_Profile_vue":1,"resources_js_components_project_table_Layout_vue":1,"resources_js_components_project_profile_Profile_vue":1,"resources_js_components_user_table_Layout_vue":1,"resources_js_components_user_profile_Profile_vue":1,"resources_js_components_map_Map_vue":1,"resources_js_components_document_Document_vue":1,"resources_js_components_campaign_Campaign_vue":1,"resources_js_components_event_Agenda_vue":1,"resources_js_components_pipeline_list_Pipeline_vue":1,"resources_js_components_stat_Stat_vue":1,"resources_js_components_stat2_Stat_vue":1,"resources_js_components_stat-builder_StatBuilder_vue":1,"resources_js_components_order_Table_Layout_vue":1,"resources_js_components_404_vue":1,"resources_js_components_global_user_table_Layout_vue":1,"resources_js_components_global_user_profile_Profile_vue":1,"resources_js_components_auth_Login_vue":1,"resources_js_components_auth_Register_vue":1,"resources_js_components_auth_password_Reset_vue":1,"resources_js_components_auth_password_Request_vue":1,"resources_js_components_auth_two-factors_Enable_vue":1,"resources_js_components_auth_two-factors_Login_vue":1,"resources_js_components_auth_registration_Registration_vue":1,"resources_js_components_auth_registration_Step_vue":1}[chunkId]) return "js/" + chunkId + ".js";
 /******/ 			// return url for filenames based on template
 /******/ 			return undefined;
 /******/ 		};

@@ -26,6 +26,7 @@ import { CLOSE_SLIDES } from "@/actions/slide";
 /* Authenticated Component */
 const Main = () => import("@/components/layouts/Main.vue");
 const Dashboard = () => import("@/components/dashboard/Dashboard.vue");
+const ServerMonitoring = () => import("@/components/server-monitoring/Dashboard.vue");
 // Prospect
 const ProspectTable = () => import("@/components/prospect/table/Layout.vue");
 const ProspectProfile = () =>
@@ -85,6 +86,16 @@ const routes = [
             middleware: "auth",
         },
         children: [
+            {
+                component: ServerMonitoring,
+                name: "server-monitoring",
+                path: "server-monitoring",
+                meta: {
+                    title: "Monitoring Serveur",
+                    middleware: "auth",
+                    superAdmin: true,
+                },
+            },
             {
                 component: Dashboard,
                 name: "dashboard",
@@ -345,6 +356,10 @@ router.beforeEach(async (to, from, next) => {
             store.state.auth.user.id &&
             store.state.auth.authenticated
         ) {
+            if (to.meta.superAdmin && !store.state.auth.user.is_super_admin) {
+                next({ name: "dashboard" });
+                return;
+            }
             store.commit(SET_GLOBAL_USER, null);
 
             if (
@@ -418,7 +433,9 @@ router.beforeEach(async (to, from, next) => {
                         "auth/SET_IMPERSONATE_PROJECT",
                         data.impersonating_project
                     );
-                    next({ name: "dashboard" });
+                    next(to.meta.superAdmin && data.is_super_admin
+                        ? { path: to.fullPath, replace: true }
+                        : { name: "dashboard" });
                 })
                 .catch((e) => {
                     next({ name: "login" });
