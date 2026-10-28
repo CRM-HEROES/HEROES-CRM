@@ -8465,66 +8465,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.OPEN_MODAL, "field-update");
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.SET_FIELD, this.field);
     },
-    /**
-     *
-     */
-    toggleWithField: function toggleWithField() {
+    toggleUnique: function toggleUnique() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this3.$refs.search.focus();
-              _context3.prev = 1;
-              if (_this3.isRequiredFilter) {
-                _context3.next = 7;
-                break;
-              }
-              _context3.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this3.isRequiredFilterKey,
-                value: 1,
-                multiple: false
+              _context3.next = 2;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.UPDATE_FIELD, {
+                id: _this3.field.id,
+                unique: !_this3.field.unique
               });
-            case 5:
-              _context3.next = 14;
-              break;
-            case 7:
-              if (!(_this3.prospectsParamValue(_this3.isRequiredFilterKey) == 1)) {
-                _context3.next = 12;
-                break;
-              }
-              _context3.next = 10;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this3.isRequiredFilterKey,
-                value: 0,
-                multiple: false
-              });
-            case 10:
-              _context3.next = 14;
-              break;
-            case 12:
-              _context3.next = 14;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
-                key: _this3.isRequiredFilterKey
-              });
-            case 14:
-              // Update prospects list
+            case 2:
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
-            case 15:
-              _context3.prev = 15;
-              return _context3.finish(15);
-            case 17:
+            case 3:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[1,, 15, 17]]);
+        }, _callee3);
       }))();
     },
     /**
      *
      */
-    toggleValidField: function toggleValidField() {
+    toggleWithField: function toggleWithField() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
@@ -8532,13 +8496,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this4.$refs.search.focus();
               _context4.prev = 1;
-              if (_this4.isValidFilter) {
+              if (_this4.isRequiredFilter) {
                 _context4.next = 7;
                 break;
               }
               _context4.next = 5;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this4.isValidFilterKey,
+                key: _this4.isRequiredFilterKey,
                 value: 1,
                 multiple: false
               });
@@ -8546,13 +8510,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context4.next = 14;
               break;
             case 7:
-              if (!(_this4.prospectsParamValue(_this4.isValidFilterKey) == 1)) {
+              if (!(_this4.prospectsParamValue(_this4.isRequiredFilterKey) == 1)) {
                 _context4.next = 12;
                 break;
               }
               _context4.next = 10;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this4.isValidFilterKey,
+                key: _this4.isRequiredFilterKey,
                 value: 0,
                 multiple: false
               });
@@ -8562,7 +8526,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 12:
               _context4.next = 14;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
-                key: _this4.isValidFilterKey
+                key: _this4.isRequiredFilterKey
               });
             case 14:
               // Update prospects list
@@ -8578,6 +8542,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     /**
+     *
+     */
+    toggleValidField: function toggleValidField() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              _this5.$refs.search.focus();
+              _context5.prev = 1;
+              if (_this5.isValidFilter) {
+                _context5.next = 7;
+                break;
+              }
+              _context5.next = 5;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+                key: _this5.isValidFilterKey,
+                value: 1,
+                multiple: false
+              });
+            case 5:
+              _context5.next = 14;
+              break;
+            case 7:
+              if (!(_this5.prospectsParamValue(_this5.isValidFilterKey) == 1)) {
+                _context5.next = 12;
+                break;
+              }
+              _context5.next = 10;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+                key: _this5.isValidFilterKey,
+                value: 0,
+                multiple: false
+              });
+            case 10:
+              _context5.next = 14;
+              break;
+            case 12:
+              _context5.next = 14;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+                key: _this5.isValidFilterKey
+              });
+            case 14:
+              // Update prospects list
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+            case 15:
+              _context5.prev = 15;
+              return _context5.finish(15);
+            case 17:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[1,, 15, 17]]);
+      }))();
+    },
+    /**
      * Show asterisk sign for required search
      */
     showRequired: function showRequired() {
@@ -8587,17 +8607,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Hide asterisk sign for required search
      */
     hideRequired: function hideRequired() {
-      var _this5 = this;
+      var _this6 = this;
       setTimeout(function () {
-        _this5.requiredShown = false;
+        _this6.requiredShown = false;
       }, 200);
     },
     /**
      */
     hideOptions: function hideOptions() {
-      var _this6 = this;
+      var _this7 = this;
       setTimeout(function () {
-        _this6.showOptions = false;
+        _this7.showOptions = false;
       }, 200);
     }
   },
@@ -8626,9 +8646,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Current field
      */
     field: function field() {
-      var _this7 = this;
+      var _this8 = this;
       return this.fields.find(function (f) {
-        return f["for"] == "prospect" && (_this7.column.category == "meta" ? f.meta && f.slug == _this7.column.id : !f.meta && f.slug == _this7.column.id);
+        return f["for"] == "prospect" && (_this8.column.category == "meta" ? f.meta && f.slug == _this8.column.id : !f.meta && f.slug == _this8.column.id);
       });
     },
     isRequiredFilterKey: function isRequiredFilterKey() {
@@ -8642,6 +8662,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     isValidFilter: function isValidFilter() {
       return this.prospectsParamExists(this.isValidFilterKey);
+    },
+    canToggleUnique: function canToggleUnique() {
+      return !!this.field && this.column.category == "default" && ["email", "mobile_phone_number", "phone_number"].includes(this.field.slug) && this.can("all.project.field.update");
     }
   })
 });
@@ -14843,7 +14866,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-default-header-cell-label', $data.requiredShown ? 'required-shown' : '', $data.showOptions ? 'show-options' : ''])
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-default-header-cell-options",
-    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $data.showOptions = !$data.showOptions;
     }, ["stop"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -14859,27 +14882,33 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.edit && $options.edit.apply($options, arguments);
     }, ["prevent"]))
-  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canToggleUnique ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 1,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-clone', $options.field.unique ? 'icon-green' : '']),
+    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.toggleUnique && $options.toggleUnique.apply($options, arguments);
+    }, ["prevent", "stop"]))
+  }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.field.unique ? 'Détection des doublons activée' : 'Détecter les doublons']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     placeholder: $props.column.name + ' ...',
-    onFocus: _cache[3] || (_cache[3] = function ($event) {
+    onFocus: _cache[4] || (_cache[4] = function ($event) {
       return _ctx.$emit('focus'), $options.showRequired();
     }),
-    onBlur: _cache[4] || (_cache[4] = function ($event) {
+    onBlur: _cache[5] || (_cache[5] = function ($event) {
       return _ctx.$emit('blur'), $options.hideRequired(), $options.hideOptions();
     }),
-    onChange: _cache[5] || (_cache[5] = function () {
+    onChange: _cache[6] || (_cache[6] = function () {
       return $options.search && $options.search.apply($options, arguments);
     }),
     ref: "search"
   }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
-    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleWithField && $options.toggleWithField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */), [[_directive_tooltip, $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'Sans ' + $props.column.name : 'Tous' : 'Avec ' + $props.column.name]]), !$props.column.meta && $props.column.id == 'street' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
     key: 0,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-check', 'hc-default-header-cell-label-valid', $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? 'icon-red' : 'icon-grey' : 'icon-green']),
-    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleValidField && $options.toggleValidField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {

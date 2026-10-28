@@ -42702,14 +42702,19 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_message
   }))();
 }), _defineProperty(_actions, _actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+    var _yield$messageTemplat4, data;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
           _context4.next = 2;
           return _apis_project_message_template__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, params);
-        case 3:
+          _yield$messageTemplat4 = _context4.sent;
+          data = _yield$messageTemplat4.data;
+          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.UPDATE_MESSAGE_TEMPLATE, data);
+          context.commit(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_1__.SET_MESSAGE_TEMPLATE, data);
+          return _context4.abrupt("return", data);
+        case 7:
         case "end":
           return _context4.stop();
       }
@@ -44633,7 +44638,15 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
               history_count: data.history_count
             });
           }
-        case 9:
+          if (!["email", "mobile_phone_number", "phone_number"].some(function (field) {
+            return Object.prototype.hasOwnProperty.call(params, field);
+          })) {
+            _context5.next = 12;
+            break;
+          }
+          _context5.next = 12;
+          return context.dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+        case 12:
         case "end":
           return _context5.stop();
       }
