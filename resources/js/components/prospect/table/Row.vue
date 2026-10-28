@@ -72,6 +72,7 @@
                     <a
                         v-else-if="menu == 'message' && canMessage"
                         :class="[
+                            hasUnreadCommunication('email') ? 'has-unread' : '',
                             isOptionFiltered('message') ? 'filtered' : '',
                             prospect.messages && prospect.messages.length > 0
                                 ? 'has-items'
@@ -103,6 +104,7 @@
                             can('all.prospect.interaction.view')
                         "
                         :class="[
+                            hasUnreadCommunication('voicemail') ? 'has-unread' : '',
                             isOptionFiltered('interaction') ? 'filtered' : '',
                             prospect.interactions &&
                             prospect.interactions.length > 0
@@ -125,6 +127,7 @@
                             menu == 'sms' && can('all.prospect.sms.view')
                         "
                         :class="[
+                            hasUnreadCommunication('sms') ? 'has-unread' : '',
                             isOptionFiltered('sms') ? 'filtered' : '',
                             prospect.sms && prospect.sms.length > 0
                                 ? 'has-items'
@@ -251,6 +254,10 @@ export default {
     },
 
     methods: {
+        hasUnreadCommunication(type) {
+            return (this.prospect.unread_communications?.[type]?.length || 0) > 0;
+        },
+
         /**
          * Handle SHIFT
          * when clicking checkbox
