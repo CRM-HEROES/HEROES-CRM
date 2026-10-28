@@ -227,6 +227,21 @@ Route::group([
 ], function () {
 
     // Personal Claude key, independent of the current project and role.
+    Route::get('/server-monitoring', \App\Http\Controllers\API\ServerMonitoringController::class)
+        // Authenticate with Sanctum without the application's presence/activity write hook.
+        ->middleware(\Illuminate\Auth\Middleware\Authenticate::class.':sanctum')
+        ->withoutMiddleware([
+            'auth:sanctum',
+            \App\Http\Middleware\UserTrackActivity::class,
+            \App\Http\Middleware\UserLastProjectCheck::class,
+            \App\Http\Middleware\ProjectUserImpersonateCheck::class,
+            \App\Http\Middleware\ProjectUserAccessCheck::class,
+            \App\Http\Middleware\ProjectUserCheck::class,
+            \App\Http\Middleware\ProjectProspectCheck::class,
+            \App\Http\Middleware\ProjectRoleCheck::class,
+        ])
+        ->name('server-monitoring');
+
     Route::get('/settings/claude', [ClaudeSettingController::class, 'show'])->name('settings.claude.show');
     Route::put('/settings/claude', [ClaudeSettingController::class, 'update'])->name('settings.claude.update');
 

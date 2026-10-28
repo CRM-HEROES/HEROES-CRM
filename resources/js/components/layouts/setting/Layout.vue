@@ -497,6 +497,23 @@
             ></div>
             <icon class="fa fa-caret-right" />
         </item>
+
+        <!-- Server monitoring -->
+        <item
+            v-if="user && user.is_super_admin"
+            class="hc-setting-item"
+            tag="router-link"
+            :to="{ name: 'server-monitoring' }"
+        >
+            <icon class="fa fa-server" />
+            <div class="hc-item-main-content hc-flex-column">
+                <div class="hc-setting-item-name">Monitoring Serveur</div>
+                <div class="hc-setting-item-description">
+                    Ressources du serveur et état des services
+                </div>
+            </div>
+            <icon class="fa fa-caret-right" />
+        </item>
     </item-list>
 
     <!-- Copyright -->
