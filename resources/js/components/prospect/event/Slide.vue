@@ -142,7 +142,7 @@
 
                         <icon
                             tag="a"
-                            class="fa fa-comments icon-purple"
+                            class="fa fa-comment icon-purple"
                             v-if="
                                 eventProspect &&
                                 eventProspect.mobile_phone_number

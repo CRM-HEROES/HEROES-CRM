@@ -2,7 +2,7 @@
     <slide
         name="prospects-table-filter-thread"
         :title="$t('prospect.table.filters.threads.title')"
-        icon="fa fa-message"
+        icon="fa fa-envelope"
         style="width: 260px"
     >
         <layout />

@@ -141,7 +141,7 @@ export default {
                 {
                     filters: ["withSms", "withoutSms"],
                     name: "SMS",
-                    icon: "fa fa-comments icon-purple",
+                    icon: "fa fa-comment icon-purple",
                     slide: "prospects-table-filter-sms",
                 },
                 // User
