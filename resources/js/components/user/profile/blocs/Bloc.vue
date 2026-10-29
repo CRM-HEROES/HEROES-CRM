@@ -1,10 +1,11 @@
 <template>
     <tree-layout class="hc-user-profile-bloc" :tabulation="0" :open="open">
         <template #header>
-            <item class="hc-user-profile-bloc-header">
+            <item class="hc-user-profile-bloc-header bloc-handle">
                 <icon :class="icon" />
                 <div class="hc-item-main-content" v-text="name"></div>
                 <slot name="options"></slot>
+                <icon class="fa fa-arrows" color="#CCCCCC" />
             </item>
         </template>
         <template #body>
@@ -29,6 +30,12 @@
 
 .hc-user-profile-bloc-header > .hc-item-main-content {
     font-weight: bold;
+}
+
+@media (max-width: 767px) {
+    .hc-user-profile-bloc-header .fa-arrows {
+        display: none;
+    }
 }
 </style>
 
