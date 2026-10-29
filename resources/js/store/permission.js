@@ -98,6 +98,18 @@ const getters = {
         }
     },
 
+    /**
+     * Prospect fields are read-only
+     * when the user has the "view all prospects" permission
+     * (super admins and project creators are not concerned)
+     */
+    prospectReadOnly: (state, getters) => {
+        return (
+            !getters.canAll &&
+            getters.permissions.indexOf("all.prospect.view") >= 0
+        );
+    },
+
     canMessage: (state, getters, rootState) => {
         if (rootState.auth && rootState.auth.user) {
             if (
