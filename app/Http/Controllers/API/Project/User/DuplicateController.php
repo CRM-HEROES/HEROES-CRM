@@ -362,19 +362,28 @@ class DuplicateController extends Controller
             return false;
         }
 
+        $menus = DB::table('user_menu')
+            ->join('menus', 'menus.id', '=', 'user_menu.menu_id')
+            ->where('menus.project_id', $project->id)
+            ->where('user_menu.user_id', $user->id)
+            ->select('user_menu.menu_id', 'user_menu.order', 'user_menu.default')
+            ->get();
+
         $user2
             ->menus()
-            ->detach($user2->menus()->where('project_id', $project->id)->get()->pluck('id'));
+            ->detach($user2->menus()->where('menus.project_id', $project->id)->get()->pluck('id'));
 
-        $menus = [];
+        $sync = [];
 
-        foreach ($user2->menus()->where('project_id', $project->id)->get() as $menu) {
-            $menus[$menu->id] = [
-                'order' => $menu->pivot->order,
+        foreach ($menus as $menu) {
+            $sync[$menu->menu_id] = [
+                'order' => $menu->order,
+                'default' => $menu->default,
+                'creator_id' => auth()->id(),
             ];
         }
 
-        $user2->menus()->syncWithoutDetaching($menus);
+        $user2->menus()->syncWithoutDetaching($sync);
 
         return true;
     }
@@ -401,6 +410,12 @@ class DuplicateController extends Controller
             ->first();
 
         if (!$userSetting) {
+            UserSetting::where([
+                'project_id' => $project->id,
+                'user_id' => $user2->id,
+                'key' => $key,
+            ])->delete();
+
             return false;
         }
 
@@ -503,9 +518,14 @@ class DuplicateController extends Controller
     		return response('Aucun utilisateur avec un profil à dupliquer n\'a été trouvé.', 400);
     	}
 
+        if (!is_array($request->input('duplicatables')) || empty($request->input('duplicatables'))) {
+            return response('Aucun élément du profil à dupliquer n\'a été sélectionné.', 400);
+        }
+
         $users = $project
             ->users()
-            ->whereIn('id', $request->input('users'))
+            ->where('users.id', '!=', $user->id)
+            ->whereIn('users.id', $request->input('users'))
             ->get();
 
     	foreach ($users as $user2) {
