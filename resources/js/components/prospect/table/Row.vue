@@ -28,6 +28,7 @@
                     <router-link
                         v-if="menu == 'view'"
                         class="hc-table-prospect-option-view"
+                        target="_blank"
                         :to="{
                             name: 'prospect.show',
                             params: {
