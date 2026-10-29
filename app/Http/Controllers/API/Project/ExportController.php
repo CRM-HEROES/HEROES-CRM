@@ -4,14 +4,18 @@ namespace App\Http\Controllers\API\Project;
 
 use App\Exports\ProspectExport;
 use App\Exports\ProspectDownload;
+use App\Exports\ProspectSheet;
 use App\Filters\ExportRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Jobs\ExportProspects;
 use App\Models\Export;
+use App\Models\GoogleAccount;
 use App\Models\Project;
 use App\Models\UserSetting;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ExportController extends Controller
 {
@@ -32,11 +36,24 @@ class ExportController extends Controller
     public function create(Request $request, Project $project)
     {
         $request->validate([
-            'mode' => ['sometimes', 'required', 'in:email,download'],
+            'mode' => ['sometimes', 'required', 'in:email,sheet,download'],
             'count' => ['sometimes', 'integer', 'min:0'],
             'filters' => ['sometimes', 'json'],
             'email' => ['exclude_unless:mode,email', 'required', 'email', 'max:255'],
+            'sheet_name' => ['exclude_unless:mode,sheet', 'nullable', 'string', 'max:150'],
         ]);
+
+        $sheetAccount = null;
+        if ($request->input('mode') === 'sheet') {
+            $this->authorize('prospectExport', $project);
+            $sheetAccount = $this->sheetAccount($project);
+
+            if (!$sheetAccount) {
+                throw ValidationException::withMessages([
+                    'mode' => 'Connectez un compte Google Drive au projet dans les paramètres avant de créer un Google Sheet.',
+                ]);
+            }
+        }
 
         $fields = $this->getFields($request, $project);
 
@@ -54,6 +71,20 @@ class ExportController extends Controller
         
         // Keep the existing behavior for callers that do not specify a mode.
         $mode = $request->input('mode', empty($export->filters) ? 'email' : 'download');
+
+        if ($mode === 'sheet') {
+            $title = trim((string) $request->input('sheet_name'));
+            if ($title === '') {
+                $title = Str::limit($project->name . ' - Prospects', 150, '');
+            }
+
+            app(ProspectSheet::class)->enqueue($export, $sheetAccount, $title);
+
+            return response()->json([
+                'message' => 'Création du Google Sheet en cours…',
+                'status_url' => route('api.project.export.status', [$project, $export], false),
+            ], 202);
+        }
 
         if ($mode === 'email') {
             dispatch((new ExportProspects($export))->onQueue('imports'));
@@ -88,7 +119,21 @@ class ExportController extends Controller
         // Export associated to the current project
         abort_unless($project->id == $export->project_id, 404);
 
-        if (app(ProspectDownload::class)->status($export)['status'] !== 'missing') {
+        $status = app(ProspectDownload::class)->status($export);
+        if (($status['mode'] ?? null) === 'sheet') {
+            $this->authorizeDownload($project, $export);
+            abort_unless(
+                $status['status'] === 'ready'
+                    && is_string($status['sheet_id'] ?? null)
+                    && preg_match('/^[a-zA-Z0-9_-]+$/', $status['sheet_id']),
+                409,
+                $status['message'] ?? 'Le Google Sheet n’est pas encore disponible.'
+            );
+
+            return redirect()->away('https://docs.google.com/spreadsheets/d/' . $status['sheet_id'] . '/edit');
+        }
+
+        if ($status['status'] !== 'missing') {
             return $this->download($project, $export);
         }
 
@@ -107,6 +152,24 @@ class ExportController extends Controller
         $this->authorizeDownload($project, $export);
 
         return app(ProspectDownload::class)->status($export);
+    }
+
+    public function sheetConfiguration(Project $project): array
+    {
+        $this->authorize('prospectExport', $project);
+        $account = $this->sheetAccount($project);
+
+        return [
+            'connected' => $account !== null,
+            'account_name' => $account?->name,
+        ];
+    }
+
+    protected function sheetAccount(Project $project): ?GoogleAccount
+    {
+        return GoogleAccount::where('project_id', $project->id)
+            ->where('for', 'drive')
+            ->first();
     }
 
     public function download(Project $project, Export $export)

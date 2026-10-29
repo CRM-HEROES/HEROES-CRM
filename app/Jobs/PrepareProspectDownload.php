@@ -10,7 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Throwable;
 
@@ -45,9 +44,7 @@ class PrepareProspectDownload implements ShouldQueue
             setPermissionsTeamId($this->export->project_id);
             request()->merge(['project' => $this->export->project]);
 
-            Log::info('Prospect download: preparing', ['export_id' => $this->export->id]);
             $download->prepare($this->export);
-            Log::info('Prospect download: ready', ['export_id' => $this->export->id]);
         } finally {
             if ($previousUser) {
                 Auth::setUser($previousUser);
@@ -63,9 +60,5 @@ class PrepareProspectDownload implements ShouldQueue
     public function failed(?Throwable $exception): void
     {
         app(ProspectDownload::class)->setStatus($this->export, 'failed');
-        Log::error('Prospect download: failed', [
-            'export_id' => $this->export->id,
-            'exception' => $exception,
-        ]);
     }
 }

@@ -13,9 +13,40 @@
                 <v-field label="Mode d’export" required>
                     <select v-model="prospectExport.mode" :disabled="exporting">
                         <option value="email">Envoi par email</option>
+                        <option value="sheet">Google Sheets</option>
                         <option value="download">Télécharger</option>
                     </select>
                 </v-field>
+                <template v-if="prospectExport.mode === 'sheet'">
+                    <v-field label="Nom du Google Sheet">
+                        <input
+                            v-model.trim="prospectExport.sheet_name"
+                            type="text"
+                            maxlength="150"
+                            :disabled="exporting"
+                        />
+                    </v-field>
+                    <p v-if="sheetConfigurationLoading" role="status">
+                        Vérification du compte Google Drive…
+                    </p>
+                    <div v-else-if="sheetConfigurationError" role="alert">
+                        <p v-text="sheetConfigurationError"></p>
+                        <button type="button" @click="loadSheetConfiguration">
+                            Réessayer
+                        </button>
+                    </div>
+                    <p v-else-if="sheetConfiguration?.connected" role="status">
+                        Le document sera créé dans le compte Google Drive du projet<span v-if="sheetConfiguration.account_name"> : {{ sheetConfiguration.account_name }}</span>.
+                    </p>
+                    <p v-else role="status">
+                        Connectez un compte Google Drive au projet pour créer un Google Sheet.
+                        <a
+                            v-if="can('all.project')"
+                            :href="`/google/drive/auth?project=${encodeURIComponent(project.slug)}`"
+                        >Connecter Google Drive</a>
+                        <span v-else>Contactez un administrateur du projet.</span>
+                    </p>
+                </template>
                 <v-field
                     :label="'Nombre de prospects à exporter'"
                     required
@@ -81,9 +112,12 @@
                 </fieldset>
             </item-list>
             <p v-if="exportMessage" role="status" v-text="exportMessage"></p>
+            <p v-if="sheetUrl">
+                <a :href="sheetUrl" target="_blank" rel="noopener noreferrer">Ouvrir Google Sheets</a>
+            </p>
             <buttons>
-                <button type="submit" :disabled="exporting || !selectedExportFields.length">
-                    {{ exporting ? 'Préparation en cours…' : (prospectExport.mode === 'email' ? 'Envoyer par email' : 'Télécharger') }}
+                <button type="submit" :disabled="exportDisabled">
+                    {{ exporting ? 'Préparation en cours…' : exportButtonLabel }}
                 </button>
             </buttons>
         </form>
@@ -165,25 +199,43 @@ export default {
         return {
             exporting: false,
             exportMessage: "",
+            sheetUrl: "",
+            sheetConfiguration: null,
+            sheetConfigurationLoading: false,
+            sheetConfigurationError: "",
+            sheetConfigurationRequest: 0,
             prospectExport: {
                 mode: "email",
                 email: "",
                 count: 0,
                 fields: [],
+                sheet_name: "",
             },
         };
     },
 
     created() {
         this.prospectExport.email = this.user.email;
+        this.prospectExport.sheet_name = `${this.project.name} - Prospects`.slice(0, 150);
     },
 
     beforeUnmount() {
         this.exporting = false;
+        this.sheetConfigurationRequest += 1;
+    },
+
+    watch: {
+        "prospectExport.mode"(mode) {
+            this.sheetUrl = "";
+            this.exportMessage = "";
+            if (mode === "sheet") return this.loadSheetConfiguration();
+        },
     },
 
     methods: {
         resetExportFields() {
+            this.sheetUrl = "";
+            this.exportMessage = "";
             const visibleKeys = new Set(
                 this.projectUserSettingsProspectsTable
                     .filter((column) => !column.hidden)
@@ -193,10 +245,36 @@ export default {
             this.prospectExport.fields = this.exportColumns
                 .filter((column) => visibleKeys.has(column.key))
                 .map((column) => column.key);
+
+            if (this.prospectExport.mode === "sheet") return this.loadSheetConfiguration();
         },
 
         selectAllExportFields() {
             this.prospectExport.fields = this.exportColumns.map((column) => column.key);
+        },
+
+        async loadSheetConfiguration() {
+            const request = ++this.sheetConfigurationRequest;
+            this.sheetConfigurationLoading = true;
+            this.sheetConfigurationError = "";
+            this.sheetConfiguration = null;
+
+            try {
+                const { data } = await axios.get(
+                    `${API_URL}/project/${this.project.slug}/export/sheet-configuration`
+                );
+                if (request === this.sheetConfigurationRequest) {
+                    this.sheetConfiguration = data;
+                }
+            } catch {
+                if (request === this.sheetConfigurationRequest) {
+                    this.sheetConfigurationError = "Impossible de vérifier le compte Google Drive. Veuillez réessayer.";
+                }
+            } finally {
+                if (request === this.sheetConfigurationRequest) {
+                    this.sheetConfigurationLoading = false;
+                }
+            }
         },
 
         /**
@@ -210,8 +288,15 @@ export default {
                 return;
             }
 
+            const bySheet = this.prospectExport.mode === "sheet";
+            if (bySheet && (this.sheetConfigurationLoading || this.sheetConfigurationError || !this.sheetConfiguration?.connected)) {
+                flashError(this.sheetConfigurationError || "Connectez un compte Google Drive au projet avant de créer un Google Sheet.");
+                return;
+            }
+
             this.exporting = true;
             this.exportMessage = "";
+            this.sheetUrl = "";
 
             try {
                 const byEmail = this.prospectExport.mode === "email";
@@ -224,19 +309,33 @@ export default {
 
                 if (byEmail) {
                     params.email = this.prospectExport.email;
+                } else if (bySheet && this.prospectExport.sheet_name) {
+                    params.sheet_name = this.prospectExport.sheet_name;
                 }
 
                 const response = await axios.get(
                     `${API_URL}/project/${this.project.slug}/export/create`,
                     { params, responseType: "json" }
                 );
+                if (!this.exporting) return;
 
                 if (byEmail) {
                     flashInfo(response.data.message);
                 } else {
                     this.exportMessage = response.data.message;
 
-                    if (!(await this.waitForDownload(response.data.status_url))) return;
+                    const result = await this.waitForExport(response.data.status_url);
+                    if (!result) return;
+
+                    if (bySheet) {
+                        if (!result.sheet_url) {
+                            throw new Error("Le lien du Google Sheet est indisponible. Veuillez relancer l’export.");
+                        }
+                        this.sheetUrl = result.sheet_url;
+                        this.exportMessage = "Votre Google Sheet est prêt.";
+                        flashInfo(this.exportMessage);
+                        return;
+                    }
 
                     const link = document.createElement("a");
                     link.href = response.data.download_url;
@@ -248,6 +347,7 @@ export default {
 
                 store.commit(CLOSE_MODAL);
             } catch (error) {
+                if (!this.exporting) return;
                 let data = error.response?.data;
 
                 if (data instanceof Blob) {
@@ -262,32 +362,48 @@ export default {
                 flashError(validationError || data?.message || error.message || "Impossible d’exporter les prospects. Veuillez réessayer.");
             } finally {
                 this.exporting = false;
-                this.exportMessage = "";
+                if (!this.sheetUrl) this.exportMessage = "";
             }
         },
 
-        async waitForDownload(statusUrl) {
+        async waitForExport(statusUrl) {
             while (this.exporting) {
                 await new Promise((resolve) => setTimeout(resolve, 3000));
-                if (!this.exporting) return false;
+                if (!this.exporting) return null;
 
                 const { data } = await axios.get(statusUrl);
+                if (!this.exporting) return null;
 
-                if (data.status === "ready") return true;
+                if (data.status === "ready") return data;
                 if (data.status === "failed" || data.status === "missing") {
-                    throw new Error("La préparation du fichier a échoué. Veuillez relancer l’export.");
+                    throw new Error(data.message || "La préparation de l’export a échoué. Veuillez relancer l’export.");
                 }
 
                 this.exportMessage = data.status === "queued"
                     ? "Votre export est en attente de préparation…"
-                    : "Préparation du fichier Excel en cours…";
+                    : (this.prospectExport.mode === "sheet"
+                        ? "Création du Google Sheet en cours…"
+                        : "Préparation du fichier Excel en cours…");
             }
 
-            return false;
+            return null;
         },
     },
 
     computed: {
+        exportDisabled() {
+            return this.exporting || !this.selectedExportFields.length || (
+                this.prospectExport.mode === "sheet" && (
+                    this.sheetConfigurationLoading || !!this.sheetConfigurationError || !this.sheetConfiguration?.connected
+                )
+            );
+        },
+
+        exportButtonLabel() {
+            if (this.prospectExport.mode === "sheet") return "Créer le Google Sheet";
+            return this.prospectExport.mode === "email" ? "Envoyer par email" : "Télécharger";
+        },
+
         ...mapGetters("auth", ["user"]),
 
         ...mapGetters([

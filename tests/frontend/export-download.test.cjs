@@ -50,7 +50,7 @@ function modal(handler, timer = callback => callback(), fixtures = {}) {
         const getter = typeof computed === 'function' ? computed : computed.get;
         Object.defineProperty(vm, key, { get: () => getter.call(vm), configurable: true });
     }
-    vm.prospectExport.email = vm.user.email;
+    component.created.call(vm);
     vm.resetExportFields();
 
     return { vm, component, requests, commits, notices, downloads };
@@ -276,4 +276,186 @@ test('selecting all includes every available column, including hidden custom fie
     assert.deepEqual(m.vm.prospectExport.fields, m.vm.exportColumns.map(column => column.key));
     assert.ok(m.vm.selectedExportFields.includes('meta->score'));
     assert.ok(m.vm.selectedExportFields.includes('history'));
+});
+
+test('sheet creation preserves columns, filters, count and name without requiring an email', async () => {
+    const states = ['queued', 'processing', 'ready'];
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/new-sheet/edit';
+    const m = modal(url => url.endsWith('/create')
+        ? { status: 202, data: { message: 'Creation queued', status_url: '/sheet-status' } }
+        : { data: { status: states.shift(), mode: 'sheet', sheet_url: sheetUrl, rows: 2 } }, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+        ],
+        projectUserSettingsProspectsTable: [{ key: 'meta->score' }, { key: 'first_name' }],
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.email = '';
+    m.vm.prospectExport.count = 1000;
+    m.vm.prospectExport.sheet_name = 'Campagne automne';
+    m.vm.prospectExport.fields = ['first_name', 'deleted', 'meta->score'];
+    m.vm.sheetConfiguration = { connected: true, account_name: 'Project account' };
+
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 4);
+    assert.deepEqual(m.requests[0][1].params, {
+        mode: 'sheet', count: 1000, sheet_name: 'Campagne automne',
+        fields: 'meta->score,first_name', filters: JSON.stringify(m.vm.prospectsParams),
+    });
+    assert.equal(m.vm.sheetUrl, sheetUrl);
+    assert.equal(m.vm.exportMessage, 'Votre Google Sheet est prêt.');
+    assert.deepEqual(m.notices, [['info', 'Votre Google Sheet est prêt.']]);
+    assert.deepEqual(m.downloads, []);
+    assert.deepEqual(m.commits, []);
+    assert.equal(m.vm.exporting, false);
+});
+
+test('sheet default name uses the project and an empty name is optional', async () => {
+    const m = modal(url => url.endsWith('/create')
+        ? { data: { status_url: '/status' } }
+        : { data: { status: 'ready', sheet_url: 'https://docs.google.com/spreadsheets/d/example/edit' } });
+    assert.equal(m.vm.prospectExport.sheet_name, 'Prospects - Prospects');
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.sheet_name = '';
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.equal('sheet_name' in m.requests[0][1].params, false);
+    assert.equal('email' in m.requests[0][1].params, false);
+});
+
+test('selecting sheet verifies the project account and disables creation until the check ends', async () => {
+    let respond;
+    const m = modal(() => new Promise(resolve => { respond = resolve; }));
+    m.vm.prospectExport.mode = 'sheet';
+
+    const checking = m.component.watch['prospectExport.mode'].call(m.vm, 'sheet');
+
+    assert.equal(m.requests[0][0], '/api/project/test/export/sheet-configuration');
+    assert.equal(m.vm.sheetConfigurationLoading, true);
+    assert.equal(m.vm.exportDisabled, true);
+    respond({ data: { connected: true, account_name: 'Compte du projet' } });
+    await checking;
+
+    assert.equal(m.vm.sheetConfigurationLoading, false);
+    assert.deepEqual(m.vm.sheetConfiguration, { connected: true, account_name: 'Compte du projet' });
+    assert.equal(m.vm.exportDisabled, false);
+});
+
+test('disconnected sheets cannot be submitted', async () => {
+    const m = modal(() => ({ data: { connected: false, account_name: null } }));
+    m.vm.prospectExport.mode = 'sheet';
+    await m.vm.loadSheetConfiguration();
+
+    assert.equal(m.vm.exportDisabled, true);
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 1);
+    assert.deepEqual(m.commits, []);
+    assert.match(m.notices[0][1], /Connectez un compte Google Drive/);
+});
+
+test('a configuration failure is visible, prevents submission and can be retried', async () => {
+    let fail = true;
+    const m = modal(() => {
+        if (fail) throw new Error('offline');
+        return { data: { connected: true, account_name: 'Compte du projet' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    await m.vm.loadSheetConfiguration();
+
+    assert.match(m.vm.sheetConfigurationError, /Impossible de vérifier/);
+    assert.equal(m.vm.sheetConfigurationLoading, false);
+    assert.equal(m.vm.exportDisabled, true);
+    await m.vm.exportProspects();
+    assert.equal(m.requests.length, 1);
+
+    fail = false;
+    await m.vm.loadSheetConfiguration();
+
+    assert.equal(m.vm.sheetConfigurationError, '');
+    assert.equal(m.vm.sheetConfiguration.connected, true);
+    assert.equal(m.vm.exportDisabled, false);
+});
+
+test('opening sheet again clears its old result and refreshes the connection', async () => {
+    const m = modal(() => ({ data: { connected: false, account_name: null } }));
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true, account_name: 'Ancien compte' };
+    m.vm.sheetUrl = 'https://docs.google.com/spreadsheets/d/previous/edit';
+    m.vm.exportMessage = 'Previous result';
+
+    await m.vm.resetExportFields();
+
+    assert.equal(m.vm.sheetUrl, '');
+    assert.equal(m.vm.exportMessage, '');
+    assert.equal(m.requests.length, 1);
+    assert.equal(m.vm.sheetConfiguration.connected, false);
+});
+
+test('a new sheet request clears the previous result before starting', async () => {
+    let receivedUrl;
+    const m = modal(url => {
+        if (url.endsWith('/create')) {
+            receivedUrl = m.vm.sheetUrl;
+            return { data: { status_url: '/status' } };
+        }
+        return { data: { status: 'failed', message: 'Impossible de créer le document.' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true };
+    m.vm.sheetUrl = 'https://docs.google.com/spreadsheets/d/previous/edit';
+
+    await m.vm.exportProspects();
+
+    assert.equal(receivedUrl, '');
+    assert.equal(m.vm.sheetUrl, '');
+    assert.deepEqual(m.notices, [['error', 'Impossible de créer le document.']]);
+    assert.deepEqual(m.commits, []);
+    assert.deepEqual(m.downloads, []);
+});
+
+test('unmounting while a sheet status request runs ignores its result', async () => {
+    let m;
+    m = modal(url => {
+        if (url.endsWith('/create')) return { data: { status_url: '/status' } };
+        m.component.beforeUnmount.call(m.vm);
+        return { data: { status: 'ready', sheet_url: 'https://docs.google.com/spreadsheets/d/cancelled/edit' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 2);
+    assert.equal(m.vm.sheetUrl, '');
+    assert.deepEqual(m.notices, []);
+    assert.deepEqual(m.commits, []);
+    assert.deepEqual(m.downloads, []);
+});
+
+test('unmounting ignores a pending connection check', async () => {
+    let respond;
+    const m = modal(() => new Promise(resolve => { respond = resolve; }));
+    const pending = m.vm.loadSheetConfiguration();
+    m.component.beforeUnmount.call(m.vm);
+    respond({ data: { connected: true, account_name: 'Old account' } });
+    await pending;
+
+    assert.equal(m.vm.sheetConfiguration, null);
+});
+
+test('sheet refuses an empty column selection before creating a document', async () => {
+    const m = modal(() => { throw new Error('unexpected request'); });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.fields = [];
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.deepEqual(m.requests, []);
+    assert.deepEqual(m.notices, [['error', 'Sélectionnez au moins une colonne à exporter.']]);
 });

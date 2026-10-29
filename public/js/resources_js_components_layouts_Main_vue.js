@@ -39449,22 +39449,39 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       exporting: false,
       exportMessage: "",
+      sheetUrl: "",
+      sheetConfiguration: null,
+      sheetConfigurationLoading: false,
+      sheetConfigurationError: "",
+      sheetConfigurationRequest: 0,
       prospectExport: {
         mode: "email",
         email: "",
         count: 0,
-        fields: []
+        fields: [],
+        sheet_name: ""
       }
     };
   },
   created: function created() {
     this.prospectExport.email = this.user.email;
+    this.prospectExport.sheet_name = "".concat(this.project.name, " - Prospects").slice(0, 150);
   },
   beforeUnmount: function beforeUnmount() {
     this.exporting = false;
+    this.sheetConfigurationRequest += 1;
+  },
+  watch: {
+    "prospectExport.mode": function prospectExportMode(mode) {
+      this.sheetUrl = "";
+      this.exportMessage = "";
+      if (mode === "sheet") return this.loadSheetConfiguration();
+    }
   },
   methods: {
     resetExportFields: function resetExportFields() {
+      this.sheetUrl = "";
+      this.exportMessage = "";
       var visibleKeys = new Set(this.projectUserSettingsProspectsTable.filter(function (column) {
         return !column.hidden;
       }).map(function (column) {
@@ -39475,174 +39492,271 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }).map(function (column) {
         return column.key;
       });
+      if (this.prospectExport.mode === "sheet") return this.loadSheetConfiguration();
     },
     selectAllExportFields: function selectAllExportFields() {
       this.prospectExport.fields = this.exportColumns.map(function (column) {
         return column.key;
       });
     },
+    loadSheetConfiguration: function loadSheetConfiguration() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var request, _yield$axios$get, data;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              request = ++_this.sheetConfigurationRequest;
+              _this.sheetConfigurationLoading = true;
+              _this.sheetConfigurationError = "";
+              _this.sheetConfiguration = null;
+              _context.prev = 4;
+              _context.next = 7;
+              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this.project.slug, "/export/sheet-configuration"));
+            case 7:
+              _yield$axios$get = _context.sent;
+              data = _yield$axios$get.data;
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfiguration = data;
+              }
+              _context.next = 15;
+              break;
+            case 12:
+              _context.prev = 12;
+              _context.t0 = _context["catch"](4);
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfigurationError = "Impossible de vérifier le compte Google Drive. Veuillez réessayer.";
+              }
+            case 15:
+              _context.prev = 15;
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfigurationLoading = false;
+              }
+              return _context.finish(15);
+            case 18:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[4, 12, 15, 18]]);
+      }))();
+    },
     /**
      *
      */
     exportProspects: function exportProspects() {
-      var _this = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var byEmail, params, response, link, _error$response, _data, _data2, data, validationError;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              if (!_this.exporting) {
-                _context.next = 2;
-                break;
-              }
-              return _context.abrupt("return");
-            case 2:
-              if (_this.selectedExportFields.length) {
-                _context.next = 5;
-                break;
-              }
-              flashError("Sélectionnez au moins une colonne à exporter.");
-              return _context.abrupt("return");
-            case 5:
-              _this.exporting = true;
-              _this.exportMessage = "";
-              _context.prev = 7;
-              byEmail = _this.prospectExport.mode === "email";
-              params = {
-                mode: _this.prospectExport.mode,
-                count: _this.prospectExport.count,
-                fields: _this.selectedExportFields.join(","),
-                filters: JSON.stringify(_this.prospectsParams || {})
-              };
-              if (byEmail) {
-                params.email = _this.prospectExport.email;
-              }
-              _context.next = 13;
-              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this.project.slug, "/export/create"), {
-                params: params,
-                responseType: "json"
-              });
-            case 13:
-              response = _context.sent;
-              if (!byEmail) {
-                _context.next = 18;
-                break;
-              }
-              flashInfo(response.data.message);
-              _context.next = 29;
-              break;
-            case 18:
-              _this.exportMessage = response.data.message;
-              _context.next = 21;
-              return _this.waitForDownload(response.data.status_url);
-            case 21:
-              if (_context.sent) {
-                _context.next = 23;
-                break;
-              }
-              return _context.abrupt("return");
-            case 23:
-              link = document.createElement("a");
-              link.href = response.data.download_url;
-              link.download = "".concat(_this.project.name, ".xlsx");
-              document.body.appendChild(link);
-              link.click();
-              link.remove();
-            case 29:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context.next = 49;
-              break;
-            case 32:
-              _context.prev = 32;
-              _context.t0 = _context["catch"](7);
-              data = (_error$response = _context.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.data;
-              if (!(data instanceof Blob)) {
-                _context.next = 47;
-                break;
-              }
-              _context.prev = 36;
-              _context.t1 = JSON;
-              _context.next = 40;
-              return data.text();
-            case 40:
-              _context.t2 = _context.sent;
-              data = _context.t1.parse.call(_context.t1, _context.t2);
-              _context.next = 47;
-              break;
-            case 44:
-              _context.prev = 44;
-              _context.t3 = _context["catch"](36);
-              data = null;
-            case 47:
-              validationError = Object.values(((_data = data) === null || _data === void 0 ? void 0 : _data.errors) || {}).flat()[0];
-              flashError(validationError || ((_data2 = data) === null || _data2 === void 0 ? void 0 : _data2.message) || _context.t0.message || "Impossible d’exporter les prospects. Veuillez réessayer.");
-            case 49:
-              _context.prev = 49;
-              _this.exporting = false;
-              _this.exportMessage = "";
-              return _context.finish(49);
-            case 53:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee, null, [[7, 32, 49, 53], [36, 44]]);
-      }))();
-    },
-    waitForDownload: function waitForDownload(statusUrl) {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _yield$axios$get, data;
+        var _this2$sheetConfigura;
+        var bySheet, byEmail, params, response, result, link, _error$response, _data, _data2, data, validationError;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               if (!_this2.exporting) {
-                _context2.next = 16;
+                _context2.next = 2;
                 break;
               }
-              _context2.next = 3;
+              return _context2.abrupt("return");
+            case 2:
+              if (_this2.selectedExportFields.length) {
+                _context2.next = 5;
+                break;
+              }
+              flashError("Sélectionnez au moins une colonne à exporter.");
+              return _context2.abrupt("return");
+            case 5:
+              bySheet = _this2.prospectExport.mode === "sheet";
+              if (!(bySheet && (_this2.sheetConfigurationLoading || _this2.sheetConfigurationError || !((_this2$sheetConfigura = _this2.sheetConfiguration) !== null && _this2$sheetConfigura !== void 0 && _this2$sheetConfigura.connected)))) {
+                _context2.next = 9;
+                break;
+              }
+              flashError(_this2.sheetConfigurationError || "Connectez un compte Google Drive au projet avant de créer un Google Sheet.");
+              return _context2.abrupt("return");
+            case 9:
+              _this2.exporting = true;
+              _this2.exportMessage = "";
+              _this2.sheetUrl = "";
+              _context2.prev = 12;
+              byEmail = _this2.prospectExport.mode === "email";
+              params = {
+                mode: _this2.prospectExport.mode,
+                count: _this2.prospectExport.count,
+                fields: _this2.selectedExportFields.join(","),
+                filters: JSON.stringify(_this2.prospectsParams || {})
+              };
+              if (byEmail) {
+                params.email = _this2.prospectExport.email;
+              } else if (bySheet && _this2.prospectExport.sheet_name) {
+                params.sheet_name = _this2.prospectExport.sheet_name;
+              }
+              _context2.next = 18;
+              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this2.project.slug, "/export/create"), {
+                params: params,
+                responseType: "json"
+              });
+            case 18:
+              response = _context2.sent;
+              if (_this2.exporting) {
+                _context2.next = 21;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 21:
+              if (!byEmail) {
+                _context2.next = 25;
+                break;
+              }
+              flashInfo(response.data.message);
+              _context2.next = 44;
+              break;
+            case 25:
+              _this2.exportMessage = response.data.message;
+              _context2.next = 28;
+              return _this2.waitForExport(response.data.status_url);
+            case 28:
+              result = _context2.sent;
+              if (result) {
+                _context2.next = 31;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 31:
+              if (!bySheet) {
+                _context2.next = 38;
+                break;
+              }
+              if (result.sheet_url) {
+                _context2.next = 34;
+                break;
+              }
+              throw new Error("Le lien du Google Sheet est indisponible. Veuillez relancer l’export.");
+            case 34:
+              _this2.sheetUrl = result.sheet_url;
+              _this2.exportMessage = "Votre Google Sheet est prêt.";
+              flashInfo(_this2.exportMessage);
+              return _context2.abrupt("return");
+            case 38:
+              link = document.createElement("a");
+              link.href = response.data.download_url;
+              link.download = "".concat(_this2.project.name, ".xlsx");
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+            case 44:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
+              _context2.next = 66;
+              break;
+            case 47:
+              _context2.prev = 47;
+              _context2.t0 = _context2["catch"](12);
+              if (_this2.exporting) {
+                _context2.next = 51;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 51:
+              data = (_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.data;
+              if (!(data instanceof Blob)) {
+                _context2.next = 64;
+                break;
+              }
+              _context2.prev = 53;
+              _context2.t1 = JSON;
+              _context2.next = 57;
+              return data.text();
+            case 57:
+              _context2.t2 = _context2.sent;
+              data = _context2.t1.parse.call(_context2.t1, _context2.t2);
+              _context2.next = 64;
+              break;
+            case 61:
+              _context2.prev = 61;
+              _context2.t3 = _context2["catch"](53);
+              data = null;
+            case 64:
+              validationError = Object.values(((_data = data) === null || _data === void 0 ? void 0 : _data.errors) || {}).flat()[0];
+              flashError(validationError || ((_data2 = data) === null || _data2 === void 0 ? void 0 : _data2.message) || _context2.t0.message || "Impossible d’exporter les prospects. Veuillez réessayer.");
+            case 66:
+              _context2.prev = 66;
+              _this2.exporting = false;
+              if (!_this2.sheetUrl) _this2.exportMessage = "";
+              return _context2.finish(66);
+            case 70:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[12, 47, 66, 70], [53, 61]]);
+      }))();
+    },
+    waitForExport: function waitForExport(statusUrl) {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _yield$axios$get2, data;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!_this3.exporting) {
+                _context3.next = 18;
+                break;
+              }
+              _context3.next = 3;
               return new Promise(function (resolve) {
                 return setTimeout(resolve, 3000);
               });
             case 3:
-              if (_this2.exporting) {
-                _context2.next = 5;
+              if (_this3.exporting) {
+                _context3.next = 5;
                 break;
               }
-              return _context2.abrupt("return", false);
+              return _context3.abrupt("return", null);
             case 5:
-              _context2.next = 7;
+              _context3.next = 7;
               return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get(statusUrl);
             case 7:
-              _yield$axios$get = _context2.sent;
-              data = _yield$axios$get.data;
-              if (!(data.status === "ready")) {
-                _context2.next = 11;
+              _yield$axios$get2 = _context3.sent;
+              data = _yield$axios$get2.data;
+              if (_this3.exporting) {
+                _context3.next = 11;
                 break;
               }
-              return _context2.abrupt("return", true);
+              return _context3.abrupt("return", null);
             case 11:
-              if (!(data.status === "failed" || data.status === "missing")) {
-                _context2.next = 13;
+              if (!(data.status === "ready")) {
+                _context3.next = 13;
                 break;
               }
-              throw new Error("La préparation du fichier a échoué. Veuillez relancer l’export.");
+              return _context3.abrupt("return", data);
             case 13:
-              _this2.exportMessage = data.status === "queued" ? "Votre export est en attente de préparation…" : "Préparation du fichier Excel en cours…";
-              _context2.next = 0;
+              if (!(data.status === "failed" || data.status === "missing")) {
+                _context3.next = 15;
+                break;
+              }
+              throw new Error(data.message || "La préparation de l’export a échoué. Veuillez relancer l’export.");
+            case 15:
+              _this3.exportMessage = data.status === "queued" ? "Votre export est en attente de préparation…" : _this3.prospectExport.mode === "sheet" ? "Création du Google Sheet en cours…" : "Préparation du fichier Excel en cours…";
+              _context3.next = 0;
               break;
-            case 16:
-              return _context2.abrupt("return", false);
-            case 17:
+            case 18:
+              return _context3.abrupt("return", null);
+            case 19:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["prospectsParams", "project", "fields", "categories", "threads", "projectUserSettingsProspectsTable", "can", "canEvent"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({
+    exportDisabled: function exportDisabled() {
+      var _this$sheetConfigurat;
+      return this.exporting || !this.selectedExportFields.length || this.prospectExport.mode === "sheet" && (this.sheetConfigurationLoading || !!this.sheetConfigurationError || !((_this$sheetConfigurat = this.sheetConfiguration) !== null && _this$sheetConfigurat !== void 0 && _this$sheetConfigurat.connected));
+    },
+    exportButtonLabel: function exportButtonLabel() {
+      if (this.prospectExport.mode === "sheet") return "Créer le Google Sheet";
+      return this.prospectExport.mode === "email" ? "Envoyer par email" : "Télécharger";
+    }
+  }, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["prospectsParams", "project", "fields", "categories", "threads", "projectUserSettingsProspectsTable", "can", "canEvent"])), {}, {
     exportColumns: function exportColumns() {
-      var _this3 = this;
+      var _this4 = this;
       var columns = [].concat(_toConsumableArray(this.fields.filter(function (field) {
         return field["for"] === "prospect";
       }).map(function (field) {
@@ -39688,10 +39802,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         name: this.$t("prospect.profile.setting.external_links")
       }]).filter(function (column) {
         if (column.key === "events") {
-          return _this3.can("all.prospect.event.view") || _this3.canEvent;
+          return _this4.can("all.prospect.event.view") || _this4.canEvent;
         }
-        if (column.key === "sms") return _this3.can("all.prospect.sms.view");
-        if (column.key === "interactions") return _this3.can("all.prospect.interaction.view");
+        if (column.key === "sms") return _this4.can("all.prospect.sms.view");
+        if (column.key === "interactions") return _this4.can("all.prospect.interaction.view");
         return true;
       });
       var columnsByKey = new Map(columns.map(function (column) {
@@ -90726,38 +90840,72 @@ var _hoisted_2 = /*#__PURE__*/_withScopeId(function () {
 });
 var _hoisted_3 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "sheet"
+  }, "Google Sheets", -1 /* HOISTED */);
+});
+var _hoisted_4 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "download"
   }, "Télécharger", -1 /* HOISTED */);
 });
-var _hoisted_4 = [_hoisted_2, _hoisted_3];
-var _hoisted_5 = ["disabled"];
-var _hoisted_6 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_5 = [_hoisted_2, _hoisted_3, _hoisted_4];
+var _hoisted_6 = ["disabled"];
+var _hoisted_7 = {
+  key: 0,
+  role: "status"
+};
+var _hoisted_8 = {
+  key: 1,
+  role: "alert"
+};
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = {
+  key: 2,
+  role: "status"
+};
+var _hoisted_11 = {
+  key: 0
+};
+var _hoisted_12 = {
+  key: 3,
+  role: "status"
+};
+var _hoisted_13 = ["href"];
+var _hoisted_14 = {
+  key: 1
+};
+var _hoisted_15 = ["disabled"];
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "0"
   }, "Tous", -1 /* HOISTED */);
 });
-var _hoisted_7 = ["value", "textContent"];
-var _hoisted_8 = ["disabled"];
-var _hoisted_9 = ["disabled"];
-var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_17 = ["value", "textContent"];
+var _hoisted_18 = ["disabled"];
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("legend", null, "Colonnes à exporter *", -1 /* HOISTED */);
 });
-var _hoisted_11 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Les colonnes affichées dans le tableau sont présélectionnées.", -1 /* HOISTED */);
 });
-var _hoisted_12 = {
+var _hoisted_22 = {
   "class": "hc-prospect-export-column-actions"
 };
-var _hoisted_13 = {
+var _hoisted_23 = {
   "class": "hc-prospect-export-column-list"
 };
-var _hoisted_14 = ["value"];
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = {
+var _hoisted_24 = ["value"];
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = {
   role: "status"
 };
-var _hoisted_17 = ["textContent"];
-var _hoisted_18 = ["disabled"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = {
+  key: 1
+};
+var _hoisted_29 = ["href"];
+var _hoisted_30 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
@@ -90774,7 +90922,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         style: {
           "height": "100%"
         },
-        onSubmit: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.exportProspects && $options.exportProspects.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -90783,6 +90931,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         padding: "10px 0"
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          var _$data$sheetConfigura;
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
             label: "Mode d’export",
             required: ""
@@ -90793,42 +90942,70 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   return $data.prospectExport.mode = $event;
                 }),
                 disabled: $data.exporting
-              }, _hoisted_4, 8 /* PROPS */, _hoisted_1), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.mode]])];
+              }, _hoisted_5, 8 /* PROPS */, _hoisted_1), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.mode]])];
             }),
             _: 1 /* STABLE */
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+          }), $data.prospectExport.mode === 'sheet' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            key: 0
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+            label: "Nom du Google Sheet"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+                  return $data.prospectExport.sheet_name = $event;
+                }),
+                type: "text",
+                maxlength: "150",
+                disabled: $data.exporting
+              }, null, 8 /* PROPS */, _hoisted_6), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.sheet_name, void 0, {
+                trim: true
+              }]])];
+            }),
+            _: 1 /* STABLE */
+          }), $data.sheetConfigurationLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_7, " Vérification du compte Google Drive… ")) : $data.sheetConfigurationError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sheetConfigurationError)
+          }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            onClick: _cache[2] || (_cache[2] = function () {
+              return $options.loadSheetConfiguration && $options.loadSheetConfiguration.apply($options, arguments);
+            })
+          }, " Réessayer ")])) : (_$data$sheetConfigura = $data.sheetConfiguration) !== null && _$data$sheetConfigura !== void 0 && _$data$sheetConfigura.connected ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Le document sera créé dans le compte Google Drive du projet"), $data.sheetConfiguration.account_name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_11, " : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sheetConfiguration.account_name), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Connectez un compte Google Drive au projet pour créer un Google Sheet. "), _ctx.can('all.project') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+            key: 0,
+            href: "/google/drive/auth?project=".concat(encodeURIComponent(_ctx.project.slug))
+          }, "Connecter Google Drive", 8 /* PROPS */, _hoisted_13)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "Contactez un administrateur du projet."))]))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
             label: 'Nombre de prospects à exporter',
             required: ""
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
                   return $data.prospectExport.count = $event;
                 }),
                 disabled: $data.exporting
-              }, [_hoisted_6, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(10, function (i) {
+              }, [_hoisted_16, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(10, function (i) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
                   key: i,
                   value: 1000 * i,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(1000 * i)
-                }, null, 8 /* PROPS */, _hoisted_7);
-              }), 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.count]])];
+                }, null, 8 /* PROPS */, _hoisted_17);
+              }), 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_15), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.count]])];
             }),
             _: 1 /* STABLE */
           }), $data.prospectExport.mode === 'email' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_v_field, {
-            key: 0,
+            key: 1,
             label: "Adresse email de destination",
             required: ""
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
                   return $data.prospectExport.email = $event;
                 }),
                 type: "email",
                 required: "",
                 disabled: $data.exporting
-              }, null, 8 /* PROPS */, _hoisted_8), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.email, void 0, {
+              }, null, 8 /* PROPS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.email, void 0, {
                 trim: true
               }]])];
             }),
@@ -90836,44 +91013,48 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
             "class": "hc-prospect-export-columns",
             disabled: $data.exporting
-          }, [_hoisted_10, _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          }, [_hoisted_20, _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "button",
             "class": "hc-button-secondary",
-            onClick: _cache[3] || (_cache[3] = function () {
+            onClick: _cache[5] || (_cache[5] = function () {
               return $options.selectAllExportFields && $options.selectAllExportFields.apply($options, arguments);
             })
           }, " Tout sélectionner "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "button",
             "class": "hc-button-secondary",
-            onClick: _cache[4] || (_cache[4] = function ($event) {
+            onClick: _cache[6] || (_cache[6] = function ($event) {
               return $data.prospectExport.fields = [];
             })
-          }, " Tout désélectionner ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.exportColumns, function (column) {
+          }, " Tout désélectionner ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.exportColumns, function (column) {
             return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
               key: column.key,
               "class": "hc-prospect-export-column"
             }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-              "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+              "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
                 return $data.prospectExport.fields = $event;
               }),
               type: "checkbox",
               value: column.key
-            }, null, 8 /* PROPS */, _hoisted_14), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.prospectExport.fields]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            }, null, 8 /* PROPS */, _hoisted_24), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.prospectExport.fields]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
               textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(column.name)
-            }, null, 8 /* PROPS */, _hoisted_15)]);
-          }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.selectedExportFields.length ? "Colonnes s\xE9lectionn\xE9es : ".concat($options.selectedExportFields.length) : 'Sélectionnez au moins une colonne à exporter.'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_9)];
+            }, null, 8 /* PROPS */, _hoisted_25)]);
+          }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.selectedExportFields.length ? "Colonnes s\xE9lectionn\xE9es : ".concat($options.selectedExportFields.length) : 'Sélectionnez au moins une colonne à exporter.'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_19)];
         }),
         _: 1 /* STABLE */
       }), $data.exportMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         role: "status",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportMessage)
-      }, null, 8 /* PROPS */, _hoisted_17)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
+      }, null, 8 /* PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sheetUrl ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+        href: $data.sheetUrl,
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, "Ouvrir Google Sheets", 8 /* PROPS */, _hoisted_29)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "submit",
-            disabled: $data.exporting || !$options.selectedExportFields.length
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exporting ? 'Préparation en cours…' : $data.prospectExport.mode === 'email' ? 'Envoyer par email' : 'Télécharger'), 9 /* TEXT, PROPS */, _hoisted_18)];
+            disabled: $options.exportDisabled
+          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exporting ? 'Préparation en cours…' : $options.exportButtonLabel), 9 /* TEXT, PROPS */, _hoisted_30)];
         }),
         _: 1 /* STABLE */
       })], 32 /* HYDRATE_EVENTS */)];
