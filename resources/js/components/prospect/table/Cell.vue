@@ -351,6 +351,7 @@ export default {
             "prospectsParamExists",
             "threads",
             "canEvent",
+            "prospectReadOnly",
         ]),
 
         /**
@@ -359,7 +360,11 @@ export default {
          * on certain conditions applied to the prospect
          */
         disabled() {
-            return this.prospect.deleted_at || this.prospect.processed_at;
+            return (
+                this.prospectReadOnly ||
+                this.prospect.deleted_at ||
+                this.prospect.processed_at
+            );
         },
 
         /**
