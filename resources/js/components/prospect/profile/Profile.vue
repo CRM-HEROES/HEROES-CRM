@@ -13,7 +13,7 @@
             <div id="hc-prospect-profile-menus">
                 <icon
                     tag="a"
-                    class="fa fa-comments icon-purple"
+                    class="fa fa-comment icon-purple"
                     v-tooltip="$t('prospect.profile.menus.sms')"
                     :icon-size="16"
                     @click.prevent.stop="manageSms"
@@ -27,7 +27,7 @@
                 />
                 <icon
                     tag="a"
-                    class="fa fa-message icon-green"
+                    class="fa fa-envelope icon-green"
                     v-tooltip="$t('prospect.profile.menus.message')"
                     :icon-size="16"
                     @click.prevent.stop="manageMessages"

@@ -243,7 +243,7 @@
             />
             <card-menu
                 v-if="!selectedProspectsProcessed && can('all.prospect.sms')"
-                icon="fa fa-comments"
+                icon="fa fa-comment"
                 :label="$t('prospect.table.footer.bulk_sms')"
                 color="#7939b8"
                 @click="bulkSms"

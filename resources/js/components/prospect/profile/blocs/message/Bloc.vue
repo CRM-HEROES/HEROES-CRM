@@ -3,7 +3,7 @@
         <template #options>
             <icon
                 tag="a"
-                class="fa fa-comments"
+                class="fa fa-envelope"
                 @click.prevent.stop="manageMessages"
             />
         </template>
