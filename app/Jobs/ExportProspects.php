@@ -10,7 +10,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
@@ -41,7 +40,6 @@ class ExportProspects implements ShouldQueue
         $take = static::CHUNK_SIZE;
         $skip = 0;
         $page = 1;
-        $exportedRows = 0;
         $previousUser = Auth::user();
         $previousInput = request()->all();
         $previousTeam = getPermissionsTeamId();
@@ -69,9 +67,11 @@ class ExportProspects implements ShouldQueue
 
                 $exportCollection = new ProspectExport($this->export, $limit, $skip);
 
-                Excel::store($exportCollection, $filename, 'exports');
+                if (Excel::store($exportCollection, $filename, 'exports') === false) {
+                    throw new RuntimeException('Impossible d’enregistrer le fichier d’export.');
+                }
+
                 $exportedCount = $exportCollection->getCount();
-                $exportedRows += $exportedCount;
 
                 unset($exportCollection);
                 gc_collect_cycles();
