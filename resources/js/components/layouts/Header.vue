@@ -34,12 +34,12 @@
                 :to="{ name: 'dashboard' }"
             />
             <template v-if="project">
-                <header-menu
+                <!-- <header-menu
                     tag="a"
                     icon="fa fa-caret-left"
                     color="#888888"
                     @click.prevent.stop="$router.back()"
-                />
+                /> -->
                 <!-- Prospect -->
 
                 <header-menu
