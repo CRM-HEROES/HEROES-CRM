@@ -75,6 +75,7 @@ class CloudTalk
                     'name' => $name,
                     'email' => $email,
                     'extension' => $extension,
+                    'default_number' => $this->normalizeAgentDefaultNumber(data_get($agent, 'default_number')),
                     'label' => $this->agentLabel($name, $email, $extension),
                 ];
             })
@@ -544,6 +545,26 @@ class CloudTalk
                 throw new RuntimeException('Identifiants API CloudTalk incomplets.', 422);
             }
         }
+    }
+
+    protected function normalizeAgentDefaultNumber($number): ?string
+    {
+        if ((!is_string($number) && !is_int($number)) || (is_int($number) && $number <= 0)) {
+            return null;
+        }
+
+        $number = preg_replace('/[\s().-]+/u', '', (string) $number);
+        if ($number === null || $number === '') {
+            return null;
+        }
+
+        if (str_starts_with($number, '00')) {
+            $number = '+' . substr($number, 2);
+        } elseif (!str_starts_with($number, '+')) {
+            $number = '+' . $number;
+        }
+
+        return preg_match('/^\+[1-9]\d{1,14}$/', $number) ? $number : null;
     }
 
     protected function agentLabel(string $name, string $email, string $extension): string

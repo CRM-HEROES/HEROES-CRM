@@ -14388,13 +14388,38 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       fetchingCloudtalkAgents: false,
       cloudtalkCredentialsVerified: false,
       cloudtalkCredentialsKey: null,
+      cloudtalkAgentsRequestId: 0,
+      autoFilledCloudtalkSmsNumber: "",
+      confirmedCloudtalkSmsAgentId: "",
       editingFields: {}
     };
   },
   mounted: function mounted() {
     this.fetchInitialCloudtalkAgents();
   },
+  beforeUnmount: function beforeUnmount() {
+    this.cloudtalkAgentsRequestId += 1;
+  },
   methods: {
+    confirmCloudtalkSmsNumber: function confirmCloudtalkSmsNumber(checked) {
+      if (!checked) {
+        this.clearCloudtalkSmsConfirmation();
+        return;
+      }
+      var number = this.cloudtalkAgentSmsNumber;
+      if (!number) return;
+      this.autoFilledCloudtalkSmsNumber = number;
+      this.confirmedCloudtalkSmsAgentId = String(this.config.agent_id);
+      this.config.numero = number;
+    },
+    clearCloudtalkSmsConfirmation: function clearCloudtalkSmsConfirmation() {
+      var clearNumber = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      if (clearNumber && this.autoFilledCloudtalkSmsNumber && this.config.numero === this.autoFilledCloudtalkSmsNumber) {
+        this.config.numero = "";
+      }
+      this.autoFilledCloudtalkSmsNumber = "";
+      this.confirmedCloudtalkSmsAgentId = "";
+    },
     fieldDisabled: function fieldDisabled(field) {
       return this.operator === "cloudtalk" && field.key === "agent_id" && (!this.cloudtalkCredentialsReady || this.fetchingCloudtalkAgents || this.cloudtalkAgents.length === 0);
     },
@@ -14454,61 +14479,91 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       var _arguments = arguments,
         _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var showSuccessMessage, _yield$lineService$ge, data, _error$response;
+        var showSuccessMessage, requestId, credentialsKey, isCurrentRequest, _yield$lineService$ge, data, _error$response;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               showSuccessMessage = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : true;
+              if (!(_this2.operator !== "cloudtalk")) {
+                _context2.next = 3;
+                break;
+              }
+              return _context2.abrupt("return", false);
+            case 3:
               if (_this2.cloudtalkCredentialsReady) {
-                _context2.next = 4;
+                _context2.next = 6;
                 break;
               }
               _this2.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
               return _context2.abrupt("return", false);
-            case 4:
+            case 6:
+              requestId = ++_this2.cloudtalkAgentsRequestId;
+              credentialsKey = _this2.currentCloudtalkCredentialsKey;
+              isCurrentRequest = function isCurrentRequest() {
+                return requestId === _this2.cloudtalkAgentsRequestId && _this2.operator === "cloudtalk" && credentialsKey === _this2.currentCloudtalkCredentialsKey;
+              };
               _this2.fetchingCloudtalkAgents = true;
               _this2.cloudtalkMessage = "";
               _this2.cloudtalkMessageType = "";
-              _context2.prev = 7;
-              _context2.next = 10;
+              _context2.prev = 12;
+              _context2.next = 15;
               return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].getCloudtalkAgents(_this2.project.slug, {
                 api_key_id: _this2.config.api_key_id,
                 api_key_secret: _this2.config.api_key_secret
               });
-            case 10:
+            case 15:
               _yield$lineService$ge = _context2.sent;
               data = _yield$lineService$ge.data;
+              if (isCurrentRequest()) {
+                _context2.next = 19;
+                break;
+              }
+              return _context2.abrupt("return", false);
+            case 19:
               _this2.cloudtalkAgents = data.agents || [];
               _this2.cloudtalkCredentialsVerified = true;
-              _this2.cloudtalkCredentialsKey = _this2.currentCloudtalkCredentialsKey;
+              _this2.cloudtalkCredentialsKey = credentialsKey;
               if (_this2.config.agent_id && !_this2.cloudtalkAgents.some(function (agent) {
                 return agent.id == _this2.config.agent_id;
               })) {
+                _this2.clearCloudtalkSmsConfirmation();
                 _this2.config.agent_id = "";
+              }
+              if (_this2.autoFilledCloudtalkSmsNumber && _this2.autoFilledCloudtalkSmsNumber !== _this2.cloudtalkAgentSmsNumber) {
+                _this2.clearCloudtalkSmsConfirmation();
               }
               if (showSuccessMessage) {
                 _this2.cloudtalkMessage = _this2.cloudtalkAgents.length ? _this2.cloudtalkAgents.length + " agent(s) chargé(s)." : "Identifiants valides, mais aucun agent CloudTalk trouvé.";
                 _this2.cloudtalkMessageType = "success";
               }
               return _context2.abrupt("return", true);
-            case 20:
-              _context2.prev = 20;
-              _context2.t0 = _context2["catch"](7);
+            case 28:
+              _context2.prev = 28;
+              _context2.t0 = _context2["catch"](12);
+              if (isCurrentRequest()) {
+                _context2.next = 32;
+                break;
+              }
+              return _context2.abrupt("return", false);
+            case 32:
               _this2.cloudtalkAgents = [];
+              _this2.clearCloudtalkSmsConfirmation();
               _this2.config.agent_id = "";
               _this2.cloudtalkCredentialsVerified = false;
               _this2.cloudtalkCredentialsKey = null;
               _this2.setCloudtalkError(((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Impossible de vérifier les identifiants CloudTalk.");
               return _context2.abrupt("return", false);
-            case 28:
-              _context2.prev = 28;
-              _this2.fetchingCloudtalkAgents = false;
-              return _context2.finish(28);
-            case 31:
+            case 39:
+              _context2.prev = 39;
+              if (requestId === _this2.cloudtalkAgentsRequestId) {
+                _this2.fetchingCloudtalkAgents = false;
+              }
+              return _context2.finish(39);
+            case 42:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[7, 20, 28, 31]]);
+        }, _callee2, null, [[12, 28, 39, 42]]);
       }))();
     },
     validate: function validate() {
@@ -14562,6 +14617,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     resetCloudtalkAgents: function resetCloudtalkAgents() {
       var clearAgent = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
+      this.cloudtalkAgentsRequestId += 1;
+      this.fetchingCloudtalkAgents = false;
+      this.clearCloudtalkSmsConfirmation(clearAgent && this.operator === "cloudtalk");
       this.cloudtalkAgents = [];
       this.cloudtalkCredentialsVerified = false;
       this.cloudtalkCredentialsKey = null;
@@ -14581,6 +14639,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   watch: {
     operator: function operator() {
+      this.clearCloudtalkSmsConfirmation(false);
       this.editingFields = {};
       this.resetCloudtalkAgents();
       this.fetchInitialCloudtalkAgents();
@@ -14589,6 +14648,16 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.editingFields = {};
       this.resetCloudtalkAgents(false);
       this.fetchInitialCloudtalkAgents();
+    },
+    "config.agent_id": function configAgent_id(value, oldValue) {
+      if (value !== oldValue) {
+        this.clearCloudtalkSmsConfirmation();
+      }
+    },
+    "config.numero": function configNumero(value) {
+      if (this.autoFilledCloudtalkSmsNumber && value !== this.autoFilledCloudtalkSmsNumber) {
+        this.clearCloudtalkSmsConfirmation(false);
+      }
     },
     "config.api_key_id": function configApi_key_id(value, oldValue) {
       if (value !== oldValue && oldValue !== undefined) {
@@ -14602,6 +14671,23 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     }
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project"])), {}, {
+    selectedCloudtalkAgent: function selectedCloudtalkAgent() {
+      var _this4 = this;
+      if (this.operator !== "cloudtalk" || !this.cloudtalkCredentialsVerified || this.cloudtalkCredentialsKey !== this.currentCloudtalkCredentialsKey) {
+        return null;
+      }
+      return this.cloudtalkAgents.find(function (agent) {
+        return String(agent.id) === String(_this4.config.agent_id);
+      }) || null;
+    },
+    cloudtalkAgentSmsNumber: function cloudtalkAgentSmsNumber() {
+      var _this$selectedCloudta;
+      var number = (_this$selectedCloudta = this.selectedCloudtalkAgent) === null || _this$selectedCloudta === void 0 ? void 0 : _this$selectedCloudta.default_number;
+      return typeof number === "string" && /^\+[1-9]\d{1,14}$/.test(number) ? number : "";
+    },
+    cloudtalkSmsConfirmed: function cloudtalkSmsConfirmed() {
+      return !!this.cloudtalkAgentSmsNumber && this.autoFilledCloudtalkSmsNumber === this.cloudtalkAgentSmsNumber && this.confirmedCloudtalkSmsAgentId === String(this.config.agent_id) && this.config.numero === this.cloudtalkAgentSmsNumber;
+    },
     cloudtalkCredentialsReady: function cloudtalkCredentialsReady() {
       return !!this.config.api_key_id && !!this.config.api_key_secret;
     },
@@ -69755,10 +69841,17 @@ var _hoisted_9 = ["textContent"];
 var _hoisted_10 = ["title", "onClick"];
 var _hoisted_11 = ["type", "placeholder", "onUpdate:modelValue", "required"];
 var _hoisted_12 = {
-  key: 0
+  key: 0,
+  "class": "hc-cloudtalk-sms-confirmation"
 };
-var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "comment recevoir des SMS", -1 /* HOISTED */);
-var _hoisted_14 = [_hoisted_13];
+var _hoisted_13 = ["checked"];
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Je confirme que ce numéro peut envoyer des SMS.", -1 /* HOISTED */);
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.", -1 /* HOISTED */);
+var _hoisted_16 = {
+  key: 1
+};
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "comment recevoir des SMS", -1 /* HOISTED */);
+var _hoisted_18 = [_hoisted_17];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
@@ -69819,14 +69912,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }),
       _: 2 /* DYNAMIC */
     }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["label", "required"]);
-  }), 128 /* KEYED_FRAGMENT */)), $props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }), 128 /* KEYED_FRAGMENT */)), $options.cloudtalkAgentSmsNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Numéro de l’agent : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkAgentSmsNumber), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: $options.cloudtalkSmsConfirmed,
+    onChange: _cache[1] || (_cache[1] = function ($event) {
+      return $options.confirmCloudtalkSmsNumber($event.target.checked);
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_13), _hoisted_14]), _hoisted_15])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "hc-button-secondary hc-line-cloudtalk-webhook-button",
-    onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.openCloudtalkWebhookModal && $options.openCloudtalkWebhookModal.apply($options, arguments);
     }, ["prevent"]))
-  }, _hoisted_14)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
-    key: 1,
+  }, _hoisted_18)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
+    key: 2,
     config: $props.config
   }, null, 8 /* PROPS */, ["config"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
@@ -114409,7 +114508,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n.hc-line-cloudtalk-webhook {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 10px;\n    padding: 8px 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-line-cloudtalk-webhook-label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    min-width: 0;\n    font-size: 12px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-line-cloudtalk-webhook-label span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-line-cloudtalk-webhook-button {\n    flex: 0 0 auto;\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 12px;\n}\n.dark .hc-line-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n.hc-cloudtalk-sms-confirmation {\n    padding: 10px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n    color: #333333;\n    font-size: 12px;\n}\n.hc-cloudtalk-sms-confirmation > p {\n    margin: 0 0 8px;\n}\n.hc-cloudtalk-sms-confirmation > p:last-child {\n    margin: 8px 0 0;\n}\n.hc-cloudtalk-sms-confirmation > label {\n    display: flex;\n    align-items: flex-start;\n    gap: 8px;\n    cursor: pointer;\n}\n.hc-cloudtalk-sms-confirmation input {\n    flex-shrink: 0;\n    margin: 3px 0 0;\n}\n.dark .hc-cloudtalk-sms-confirmation {\n    background: #1e293b;\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.hc-line-cloudtalk-webhook {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 10px;\n    padding: 8px 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-line-cloudtalk-webhook-label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    min-width: 0;\n    font-size: 12px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-line-cloudtalk-webhook-label span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-line-cloudtalk-webhook-button {\n    flex: 0 0 auto;\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 12px;\n}\n.dark .hc-line-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
