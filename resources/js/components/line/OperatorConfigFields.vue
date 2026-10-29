@@ -73,6 +73,24 @@
             />
         </v-field>
 
+        <div
+            v-if="cloudtalkAgentSmsNumber"
+            class="hc-cloudtalk-sms-confirmation"
+        >
+            <p>
+                Numéro de l’agent : <strong>{{ cloudtalkAgentSmsNumber }}</strong>
+            </p>
+            <label>
+                <input
+                    type="checkbox"
+                    :checked="cloudtalkSmsConfirmed"
+                    @change="confirmCloudtalkSmsNumber($event.target.checked)"
+                />
+                <span>Je confirme que ce numéro peut envoyer des SMS.</span>
+            </label>
+            <p>Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.</p>
+        </div>
+
         <div v-if="operator === 'cloudtalk'">
             <button
                 type="button"
@@ -162,6 +180,41 @@
     color: #c62828;
 }
 
+.hc-cloudtalk-sms-confirmation {
+    padding: 10px;
+    border: 1px solid #d6e4f0;
+    border-radius: 6px;
+    background: #f4f9ff;
+    color: #333333;
+    font-size: 12px;
+}
+
+.hc-cloudtalk-sms-confirmation > p {
+    margin: 0 0 8px;
+}
+
+.hc-cloudtalk-sms-confirmation > p:last-child {
+    margin: 8px 0 0;
+}
+
+.hc-cloudtalk-sms-confirmation > label {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.hc-cloudtalk-sms-confirmation input {
+    flex-shrink: 0;
+    margin: 3px 0 0;
+}
+
+.dark .hc-cloudtalk-sms-confirmation {
+    background: #1e293b;
+    border-color: #334155;
+    color: #bbbbbb;
+}
+
 .hc-line-cloudtalk-webhook {
     display: flex;
     align-items: center;
@@ -242,6 +295,9 @@ export default {
             fetchingCloudtalkAgents: false,
             cloudtalkCredentialsVerified: false,
             cloudtalkCredentialsKey: null,
+            cloudtalkAgentsRequestId: 0,
+            autoFilledCloudtalkSmsNumber: "",
+            confirmedCloudtalkSmsAgentId: "",
             editingFields: {},
         };
     },
@@ -250,7 +306,38 @@ export default {
         this.fetchInitialCloudtalkAgents();
     },
 
+    beforeUnmount() {
+        this.cloudtalkAgentsRequestId += 1;
+    },
+
     methods: {
+        confirmCloudtalkSmsNumber(checked) {
+            if (!checked) {
+                this.clearCloudtalkSmsConfirmation();
+                return;
+            }
+
+            const number = this.cloudtalkAgentSmsNumber;
+            if (!number) return;
+
+            this.autoFilledCloudtalkSmsNumber = number;
+            this.confirmedCloudtalkSmsAgentId = String(this.config.agent_id);
+            this.config.numero = number;
+        },
+
+        clearCloudtalkSmsConfirmation(clearNumber = true) {
+            if (
+                clearNumber &&
+                this.autoFilledCloudtalkSmsNumber &&
+                this.config.numero === this.autoFilledCloudtalkSmsNumber
+            ) {
+                this.config.numero = "";
+            }
+
+            this.autoFilledCloudtalkSmsNumber = "";
+            this.confirmedCloudtalkSmsAgentId = "";
+        },
+
         fieldDisabled(field) {
             return (
                 this.operator === "cloudtalk" &&
@@ -317,12 +404,22 @@ export default {
         },
 
         async fetchCloudtalkAgents(showSuccessMessage = true) {
+            if (this.operator !== "cloudtalk") return false;
+
             if (!this.cloudtalkCredentialsReady) {
                 this.setCloudtalkError(
                     "Veuillez saisir l'identifiant et le secret de la clé API."
                 );
                 return false;
             }
+
+            const requestId = ++this.cloudtalkAgentsRequestId;
+            const credentialsKey = this.currentCloudtalkCredentialsKey;
+            const isCurrentRequest = () => (
+                requestId === this.cloudtalkAgentsRequestId &&
+                this.operator === "cloudtalk" &&
+                credentialsKey === this.currentCloudtalkCredentialsKey
+            );
 
             this.fetchingCloudtalkAgents = true;
             this.cloudtalkMessage = "";
@@ -337,9 +434,11 @@ export default {
                     }
                 );
 
+                if (!isCurrentRequest()) return false;
+
                 this.cloudtalkAgents = data.agents || [];
                 this.cloudtalkCredentialsVerified = true;
-                this.cloudtalkCredentialsKey = this.currentCloudtalkCredentialsKey;
+                this.cloudtalkCredentialsKey = credentialsKey;
 
                 if (
                     this.config.agent_id &&
@@ -347,7 +446,15 @@ export default {
                         (agent) => agent.id == this.config.agent_id
                     )
                 ) {
+                    this.clearCloudtalkSmsConfirmation();
                     this.config.agent_id = "";
+                }
+
+                if (
+                    this.autoFilledCloudtalkSmsNumber &&
+                    this.autoFilledCloudtalkSmsNumber !== this.cloudtalkAgentSmsNumber
+                ) {
+                    this.clearCloudtalkSmsConfirmation();
                 }
 
                 if (showSuccessMessage) {
@@ -359,7 +466,10 @@ export default {
 
                 return true;
             } catch (error) {
+                if (!isCurrentRequest()) return false;
+
                 this.cloudtalkAgents = [];
+                this.clearCloudtalkSmsConfirmation();
                 this.config.agent_id = "";
                 this.cloudtalkCredentialsVerified = false;
                 this.cloudtalkCredentialsKey = null;
@@ -370,7 +480,9 @@ export default {
 
                 return false;
             } finally {
-                this.fetchingCloudtalkAgents = false;
+                if (requestId === this.cloudtalkAgentsRequestId) {
+                    this.fetchingCloudtalkAgents = false;
+                }
             }
         },
 
@@ -406,6 +518,9 @@ export default {
         },
 
         resetCloudtalkAgents(clearAgent = true) {
+            this.cloudtalkAgentsRequestId += 1;
+            this.fetchingCloudtalkAgents = false;
+            this.clearCloudtalkSmsConfirmation(clearAgent && this.operator === "cloudtalk");
             this.cloudtalkAgents = [];
             this.cloudtalkCredentialsVerified = false;
             this.cloudtalkCredentialsKey = null;
@@ -429,6 +544,7 @@ export default {
 
     watch: {
         operator() {
+            this.clearCloudtalkSmsConfirmation(false);
             this.editingFields = {};
             this.resetCloudtalkAgents();
             this.fetchInitialCloudtalkAgents();
@@ -438,6 +554,21 @@ export default {
             this.editingFields = {};
             this.resetCloudtalkAgents(false);
             this.fetchInitialCloudtalkAgents();
+        },
+
+        "config.agent_id"(value, oldValue) {
+            if (value !== oldValue) {
+                this.clearCloudtalkSmsConfirmation();
+            }
+        },
+
+        "config.numero"(value) {
+            if (
+                this.autoFilledCloudtalkSmsNumber &&
+                value !== this.autoFilledCloudtalkSmsNumber
+            ) {
+                this.clearCloudtalkSmsConfirmation(false);
+            }
         },
 
         "config.api_key_id"(value, oldValue) {
@@ -455,6 +586,34 @@ export default {
 
     computed: {
         ...mapGetters(["project"]),
+
+        selectedCloudtalkAgent() {
+            if (
+                this.operator !== "cloudtalk" ||
+                !this.cloudtalkCredentialsVerified ||
+                this.cloudtalkCredentialsKey !== this.currentCloudtalkCredentialsKey
+            ) {
+                return null;
+            }
+
+            return this.cloudtalkAgents.find(
+                (agent) => String(agent.id) === String(this.config.agent_id)
+            ) || null;
+        },
+
+        cloudtalkAgentSmsNumber() {
+            const number = this.selectedCloudtalkAgent?.default_number;
+            return typeof number === "string" && /^\+[1-9]\d{1,14}$/.test(number)
+                ? number
+                : "";
+        },
+
+        cloudtalkSmsConfirmed() {
+            return !!this.cloudtalkAgentSmsNumber &&
+                this.autoFilledCloudtalkSmsNumber === this.cloudtalkAgentSmsNumber &&
+                this.confirmedCloudtalkSmsAgentId === String(this.config.agent_id) &&
+                this.config.numero === this.cloudtalkAgentSmsNumber;
+        },
 
         cloudtalkCredentialsReady() {
             return !!this.config.api_key_id && !!this.config.api_key_secret;
