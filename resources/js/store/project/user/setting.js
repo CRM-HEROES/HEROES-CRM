@@ -373,6 +373,46 @@ const getters = {
     },
 
     /**
+     * Get project profile setting
+     *
+     * @param {*} state
+     * @returns
+     */
+    projectUserSettingsProjectProfile(state, getters) {
+        let setting = getters.projectUserSetting("project-profile");
+
+        return !setting || !Array.isArray(setting)
+            ? [
+                  [
+                      { type: "user" },
+                      { type: "role" },
+                      { type: "group" },
+                      { type: "menu" },
+                      { type: "api" },
+                      { type: "import" },
+                  ],
+                  [
+                      { type: "info-profile" },
+                      { type: "info-contacts" },
+                      { type: "info-other" },
+                      { type: "document" },
+                      { type: "line" },
+                  ],
+                  [{ type: "category" }, { type: "field" }],
+                  [
+                      { type: "folder" },
+                      { type: "thread" },
+                      { type: "calendar" },
+                      { type: "product" },
+                      { type: "order-action" },
+                      { type: "order-step" },
+                      { type: "order-status" },
+                  ],
+              ]
+            : setting;
+    },
+
+    /**
      * Get agenda minimum hour
      *
      * @param {*} state

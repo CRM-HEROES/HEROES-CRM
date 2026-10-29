@@ -90,11 +90,21 @@
         </div>
         <div id="hc-user-profile-body">
             <div id="hc-user-profile-body-columns">
-                <div v-for="column in projectUserSettingsUserProfile">
-                    <template v-for="bloc in column">
-                        <profile-bloc :bloc="bloc" :open="openBlocs" />
+                <draggable
+                    v-for="(column, i) in projectUserSettingsUserProfile"
+                    :key="i"
+                    tag="div"
+                    :list="column"
+                    :disabled="!movable"
+                    group="user-profile-bloc"
+                    :item-key="blocKey"
+                    handle=".bloc-handle"
+                    @end="setBlocColumn"
+                >
+                    <template #item="{ element }">
+                        <profile-bloc :bloc="element" :open="openBlocs" />
                     </template>
-                </div>
+                </draggable>
             </div>
         </div>
 
@@ -148,6 +158,7 @@
 
 #hc-user-profile-body-columns > div {
     flex: 1;
+    min-height: 50px;
     display: flex;
     flex-direction: column;
     width: 25%;
@@ -186,6 +197,10 @@ import { mapActions, mapGetters } from "vuex";
 import store from "@/store";
 
 import { OPEN_SLIDE } from "@/actions/slide";
+import {
+    GET_PROJECT_USER_SETTING,
+    UPDATE_PROJECT_USER_SETTING,
+} from "@/actions/project/user/setting";
 
 import ManageUserTrackerStatSlide from "@/components/user/tracker/stat/Slide.vue";
 import UserProfileSettingSlide from "./slides/setting/Slide.vue";
@@ -207,11 +222,30 @@ export default {
     data() {
         return {
             impersonating: false,
+            movable: deviceType() == "desktop",
             openBlocs: deviceType() == "desktop",
         };
     },
 
+    created() {
+        store.dispatch(GET_PROJECT_USER_SETTING, { key: "user-profile" });
+    },
+
     methods: {
+        blocKey(bloc) {
+            return bloc.type + "|" + bloc.name;
+        },
+
+        /**
+         * Save blocs order
+         */
+        setBlocColumn() {
+            store.dispatch(UPDATE_PROJECT_USER_SETTING, {
+                key: "user-profile",
+                value: [...this.projectUserSettingsUserProfile],
+            });
+        },
+
         ...mapActions({
             signIn: "auth/loginWithoutRedirect",
         }),
