@@ -159,3 +159,7 @@ chmod +x scripts/backup-heroescrm.sh
 # cron (tous les jours à 02h00) :
 # 0 2 * * * /home/heroes/Heroescrm/scripts/backup-heroescrm.sh
 ```
+#### Log work:
+```sh
+php artisan queue:work --queue=imports --tries=1 --timeout=3600
+````

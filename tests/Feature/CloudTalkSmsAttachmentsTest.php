@@ -12,10 +12,12 @@ use App\Models\Sms;
 use App\Models\User;
 use App\Services\CloudTalk;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Contracts\Queue\Job as QueueJob;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Client\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Notification;
@@ -76,6 +78,7 @@ class CloudTalkSmsAttachmentsTest extends TestCase
             $table->timestamps();
         });
         (require database_path('migrations/2026_10_20_000001_add_media_to_sms_table.php'))->up();
+        (require database_path('migrations/2026_10_29_000002_add_cloudtalk_references_to_sms_table.php'))->up();
         $schema->create('lines', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
@@ -138,6 +141,122 @@ class CloudTalkSmsAttachmentsTest extends TestCase
         Http::assertSent(fn (Request $request) => $request->isJson() && $request->data() === [
             'recipient' => '+12025550143', 'sender' => '+12025550178', 'message' => 'Bonjour',
         ]);
+    }
+
+    public function test_job_records_provider_identity_and_does_not_resend_a_completed_sms(): void
+    {
+        $this->post($this->endpoint(), ['source' => 'cloudtalk', 'message' => 'Bonjour'], ['Accept' => 'application/json'])
+            ->assertCreated();
+        $sms = Sms::query()->sole();
+        Http::fake(['my.cloudtalk.io/api/sms/send.json' => Http::response([
+            'responseData' => ['success' => true, 'data' => ['message_id' => 'provider-message-1']],
+        ])]);
+
+        (new SendCloudTalk($sms))->handle(new CloudTalk());
+        $sent = $sms->fresh();
+        $this->assertSame('provider-message-1', $sent->cloudtalk_message_id);
+        $this->assertSame('12025550178', $sent->cloudtalk_sender_number);
+        $this->assertNotNull($sent->cloudtalk_send_started_at);
+        $this->assertNotNull($sent->sent_at);
+        (new SendCloudTalk($sms))->handle(new CloudTalk());
+        Http::assertSentCount(1);
+        $this->getJson($this->endpoint())->assertOk()->assertJsonMissingPath('0.cloudtalk_message_id')
+            ->assertJsonMissingPath('0.cloudtalk_sender_number');
+    }
+
+    public function test_duplicate_queue_delivery_is_discarded_while_a_send_owns_the_lock(): void
+    {
+        $this->post($this->endpoint(), ['source' => 'cloudtalk', 'message' => 'Bonjour'], ['Accept' => 'application/json'])
+            ->assertCreated();
+        $sms = Sms::query()->sole();
+        $job = new SendCloudTalk($sms);
+        $queueJob = \Mockery::mock(QueueJob::class);
+        $queueJob->shouldNotReceive('release');
+        $job->setJob($queueJob);
+        $middleware = $job->middleware()[0];
+        $lock = Cache::lock($middleware->getLockKey($job), 120);
+        $this->assertTrue($lock->get());
+        $deliveries = 0;
+        $handler = function () use (&$deliveries) { $deliveries++; };
+        try {
+            $middleware->handle($job, $handler);
+            $this->assertSame(0, $deliveries);
+        } finally {
+            $lock->release();
+        }
+        $middleware->handle($job, $handler);
+        $this->assertSame(1, $deliveries);
+        Http::assertNothingSent();
+    }
+
+    public function test_early_callback_identity_survives_a_send_response_without_an_id(): void
+    {
+        $this->post($this->endpoint(), ['source' => 'cloudtalk', 'message' => 'Bonjour'], ['Accept' => 'application/json'])
+            ->assertCreated();
+        $sms = Sms::query()->sole();
+        Http::fake(function () use ($sms) {
+            $inFlight = $sms->fresh();
+            $this->assertSame('12025550178', $inFlight->cloudtalk_sender_number);
+            $this->assertNotNull($inFlight->cloudtalk_send_started_at);
+            $this->assertNull($inFlight->sent_at);
+            DB::table('sms')->where('id', $sms->id)->update([
+                'cloudtalk_message_id' => 'early-provider-id', 'cloudtalk_event_id' => 'early-event-id',
+                'sent_at' => '2026-10-29 10:00:00',
+            ]);
+
+            return Http::response(['responseData' => ['success' => true]]);
+        });
+
+        (new SendCloudTalk($sms))->handle(new CloudTalk());
+        $sent = $sms->fresh();
+        $this->assertSame('early-provider-id', $sent->cloudtalk_message_id);
+        $this->assertSame('early-event-id', $sent->cloudtalk_event_id);
+        $this->assertSame('2026-10-29 10:00:00', $sent->sent_at->format('Y-m-d H:i:s'));
+        $this->assertNull($sent->error);
+        $this->assertDatabaseCount('sms', 1);
+    }
+
+    public function test_provider_response_merges_an_early_import_without_replacing_crm_id_or_uploaded_media(): void
+    {
+        $this->post($this->endpoint(), [
+            'source' => 'cloudtalk', 'message' => 'Photo', 'attachments' => [$this->image()],
+        ], ['Accept' => 'application/json'])->assertCreated();
+        $sms = Sms::query()->sole();
+        $path = $sms->media[0]['path'];
+        Http::fake(function () use ($sms) {
+            DB::table('sms')->insert([
+                'prospect_id' => $sms->prospect_id, 'source' => 'cloudtalk', 'message' => 'Photo',
+                'from_user' => true, 'is_incoming' => false, 'cloudtalk_message_id' => 'same-provider-id',
+                'cloudtalk_event_id' => 'same-event-id', 'sent_at' => now(),
+                'created_at' => now(), 'updated_at' => now(),
+            ]);
+
+            return Http::response(['responseData' => ['success' => true, 'data' => ['message_id' => 'same-provider-id']]]);
+        });
+
+        (new SendCloudTalk($sms))->handle(new CloudTalk());
+        $sent = Sms::query()->sole();
+        $this->assertSame($sms->id, $sent->id);
+        $this->assertSame(1, $sent->creator_id);
+        $this->assertSame($path, $sent->media[0]['path']);
+        $this->assertSame('same-provider-id', $sent->cloudtalk_message_id);
+        $this->assertSame('same-event-id', $sent->cloudtalk_event_id);
+        Storage::disk('sms')->assertExists($path);
+    }
+
+    public function test_message_reference_extractor_accepts_only_explicit_scalar_message_fields(): void
+    {
+        $service = new CloudTalk();
+        $this->assertSame('123', $service->smsMessageId(['responseData' => ['data' => ['message_id' => 123]]]));
+        $this->assertSame('message-uuid', $service->smsMessageId(['data' => ['id' => 'message-uuid']]));
+        foreach ([
+            ['id' => 'event-id', 'event_id' => 'event-id'],
+            ['responseData' => ['success' => true, 'data' => ['recipient' => '123', 'message' => 'text']]],
+            ['responseData' => ['data' => ['id' => ['nested' => 'not-an-id']]]],
+            ['message_id' => true], ['sms_id' => str_repeat('x', 192)],
+        ] as $response) {
+            $this->assertNull($service->smsMessageId($response));
+        }
     }
 
     public function test_cloudtalk_provider_rejection_is_not_reported_as_success(): void

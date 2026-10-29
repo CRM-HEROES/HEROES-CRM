@@ -39425,6 +39425,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -39443,172 +39449,391 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       exporting: false,
       exportMessage: "",
+      sheetUrl: "",
+      sheetConfiguration: null,
+      sheetConfigurationLoading: false,
+      sheetConfigurationError: "",
+      sheetConfigurationRequest: 0,
       prospectExport: {
         mode: "email",
         email: "",
-        count: 0
+        count: 0,
+        fields: [],
+        sheet_name: ""
       }
     };
   },
   created: function created() {
     this.prospectExport.email = this.user.email;
+    this.prospectExport.sheet_name = "".concat(this.project.name, " - Prospects").slice(0, 150);
   },
   beforeUnmount: function beforeUnmount() {
     this.exporting = false;
+    this.sheetConfigurationRequest += 1;
+  },
+  watch: {
+    "prospectExport.mode": function prospectExportMode(mode) {
+      this.sheetUrl = "";
+      this.exportMessage = "";
+      if (mode === "sheet") return this.loadSheetConfiguration();
+    }
   },
   methods: {
+    resetExportFields: function resetExportFields() {
+      this.sheetUrl = "";
+      this.exportMessage = "";
+      var visibleKeys = new Set(this.projectUserSettingsProspectsTable.filter(function (column) {
+        return !column.hidden;
+      }).map(function (column) {
+        return column.key;
+      }));
+      this.prospectExport.fields = this.exportColumns.filter(function (column) {
+        return visibleKeys.has(column.key);
+      }).map(function (column) {
+        return column.key;
+      });
+      if (this.prospectExport.mode === "sheet") return this.loadSheetConfiguration();
+    },
+    selectAllExportFields: function selectAllExportFields() {
+      this.prospectExport.fields = this.exportColumns.map(function (column) {
+        return column.key;
+      });
+    },
+    loadSheetConfiguration: function loadSheetConfiguration() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var request, _yield$axios$get, data;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              request = ++_this.sheetConfigurationRequest;
+              _this.sheetConfigurationLoading = true;
+              _this.sheetConfigurationError = "";
+              _this.sheetConfiguration = null;
+              _context.prev = 4;
+              _context.next = 7;
+              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this.project.slug, "/export/sheet-configuration"));
+            case 7:
+              _yield$axios$get = _context.sent;
+              data = _yield$axios$get.data;
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfiguration = data;
+              }
+              _context.next = 15;
+              break;
+            case 12:
+              _context.prev = 12;
+              _context.t0 = _context["catch"](4);
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfigurationError = "Impossible de vérifier le compte Google Drive. Veuillez réessayer.";
+              }
+            case 15:
+              _context.prev = 15;
+              if (request === _this.sheetConfigurationRequest) {
+                _this.sheetConfigurationLoading = false;
+              }
+              return _context.finish(15);
+            case 18:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[4, 12, 15, 18]]);
+      }))();
+    },
     /**
      *
      */
     exportProspects: function exportProspects() {
-      var _this = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var byEmail, params, response, link, _error$response, _data, _data2, data, validationError;
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              if (!_this.exporting) {
-                _context.next = 2;
-                break;
-              }
-              return _context.abrupt("return");
-            case 2:
-              _this.exporting = true;
-              _this.exportMessage = "";
-              _context.prev = 4;
-              byEmail = _this.prospectExport.mode === "email";
-              params = {
-                mode: _this.prospectExport.mode,
-                count: _this.prospectExport.count,
-                filters: JSON.stringify(_this.prospectsParams || {})
-              };
-              if (byEmail) {
-                params.email = _this.prospectExport.email;
-              }
-              _context.next = 10;
-              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this.project.slug, "/export/create"), {
-                params: params,
-                responseType: "json"
-              });
-            case 10:
-              response = _context.sent;
-              if (!byEmail) {
-                _context.next = 15;
-                break;
-              }
-              flashInfo(response.data.message);
-              _context.next = 26;
-              break;
-            case 15:
-              _this.exportMessage = response.data.message;
-              _context.next = 18;
-              return _this.waitForDownload(response.data.status_url);
-            case 18:
-              if (_context.sent) {
-                _context.next = 20;
-                break;
-              }
-              return _context.abrupt("return");
-            case 20:
-              link = document.createElement("a");
-              link.href = response.data.download_url;
-              link.download = "".concat(_this.project.name, ".xlsx");
-              document.body.appendChild(link);
-              link.click();
-              link.remove();
-            case 26:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context.next = 46;
-              break;
-            case 29:
-              _context.prev = 29;
-              _context.t0 = _context["catch"](4);
-              data = (_error$response = _context.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.data;
-              if (!(data instanceof Blob)) {
-                _context.next = 44;
-                break;
-              }
-              _context.prev = 33;
-              _context.t1 = JSON;
-              _context.next = 37;
-              return data.text();
-            case 37:
-              _context.t2 = _context.sent;
-              data = _context.t1.parse.call(_context.t1, _context.t2);
-              _context.next = 44;
-              break;
-            case 41:
-              _context.prev = 41;
-              _context.t3 = _context["catch"](33);
-              data = null;
-            case 44:
-              validationError = Object.values(((_data = data) === null || _data === void 0 ? void 0 : _data.errors) || {}).flat()[0];
-              flashError(validationError || ((_data2 = data) === null || _data2 === void 0 ? void 0 : _data2.message) || _context.t0.message || "Impossible d’exporter les prospects. Veuillez réessayer.");
-            case 46:
-              _context.prev = 46;
-              _this.exporting = false;
-              _this.exportMessage = "";
-              return _context.finish(46);
-            case 50:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee, null, [[4, 29, 46, 50], [33, 41]]);
-      }))();
-    },
-    waitForDownload: function waitForDownload(statusUrl) {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var _yield$axios$get, data;
+        var _this2$sheetConfigura;
+        var bySheet, byEmail, params, response, result, link, _error$response, _data, _data2, data, validationError;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               if (!_this2.exporting) {
-                _context2.next = 16;
+                _context2.next = 2;
                 break;
               }
-              _context2.next = 3;
+              return _context2.abrupt("return");
+            case 2:
+              if (_this2.selectedExportFields.length) {
+                _context2.next = 5;
+                break;
+              }
+              flashError("Sélectionnez au moins une colonne à exporter.");
+              return _context2.abrupt("return");
+            case 5:
+              bySheet = _this2.prospectExport.mode === "sheet";
+              if (!(bySheet && (_this2.sheetConfigurationLoading || _this2.sheetConfigurationError || !((_this2$sheetConfigura = _this2.sheetConfiguration) !== null && _this2$sheetConfigura !== void 0 && _this2$sheetConfigura.connected)))) {
+                _context2.next = 9;
+                break;
+              }
+              flashError(_this2.sheetConfigurationError || "Connectez un compte Google Drive au projet avant de créer un Google Sheet.");
+              return _context2.abrupt("return");
+            case 9:
+              _this2.exporting = true;
+              _this2.exportMessage = "";
+              _this2.sheetUrl = "";
+              _context2.prev = 12;
+              byEmail = _this2.prospectExport.mode === "email";
+              params = {
+                mode: _this2.prospectExport.mode,
+                count: _this2.prospectExport.count,
+                fields: _this2.selectedExportFields.join(","),
+                filters: JSON.stringify(_this2.prospectsParams || {})
+              };
+              if (byEmail) {
+                params.email = _this2.prospectExport.email;
+              } else if (bySheet && _this2.prospectExport.sheet_name) {
+                params.sheet_name = _this2.prospectExport.sheet_name;
+              }
+              _context2.next = 18;
+              return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get("".concat(_apis_common__WEBPACK_IMPORTED_MODULE_1__.API_URL, "/project/").concat(_this2.project.slug, "/export/create"), {
+                params: params,
+                responseType: "json"
+              });
+            case 18:
+              response = _context2.sent;
+              if (_this2.exporting) {
+                _context2.next = 21;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 21:
+              if (!byEmail) {
+                _context2.next = 25;
+                break;
+              }
+              flashInfo(response.data.message);
+              _context2.next = 44;
+              break;
+            case 25:
+              _this2.exportMessage = response.data.message;
+              _context2.next = 28;
+              return _this2.waitForExport(response.data.status_url);
+            case 28:
+              result = _context2.sent;
+              if (result) {
+                _context2.next = 31;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 31:
+              if (!bySheet) {
+                _context2.next = 38;
+                break;
+              }
+              if (result.sheet_url) {
+                _context2.next = 34;
+                break;
+              }
+              throw new Error("Le lien du Google Sheet est indisponible. Veuillez relancer l’export.");
+            case 34:
+              _this2.sheetUrl = result.sheet_url;
+              _this2.exportMessage = "Votre Google Sheet est prêt.";
+              flashInfo(_this2.exportMessage);
+              return _context2.abrupt("return");
+            case 38:
+              link = document.createElement("a");
+              link.href = response.data.download_url;
+              link.download = "".concat(_this2.project.name, ".xlsx");
+              document.body.appendChild(link);
+              link.click();
+              link.remove();
+            case 44:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
+              _context2.next = 66;
+              break;
+            case 47:
+              _context2.prev = 47;
+              _context2.t0 = _context2["catch"](12);
+              if (_this2.exporting) {
+                _context2.next = 51;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 51:
+              data = (_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.data;
+              if (!(data instanceof Blob)) {
+                _context2.next = 64;
+                break;
+              }
+              _context2.prev = 53;
+              _context2.t1 = JSON;
+              _context2.next = 57;
+              return data.text();
+            case 57:
+              _context2.t2 = _context2.sent;
+              data = _context2.t1.parse.call(_context2.t1, _context2.t2);
+              _context2.next = 64;
+              break;
+            case 61:
+              _context2.prev = 61;
+              _context2.t3 = _context2["catch"](53);
+              data = null;
+            case 64:
+              validationError = Object.values(((_data = data) === null || _data === void 0 ? void 0 : _data.errors) || {}).flat()[0];
+              flashError(validationError || ((_data2 = data) === null || _data2 === void 0 ? void 0 : _data2.message) || _context2.t0.message || "Impossible d’exporter les prospects. Veuillez réessayer.");
+            case 66:
+              _context2.prev = 66;
+              _this2.exporting = false;
+              if (!_this2.sheetUrl) _this2.exportMessage = "";
+              return _context2.finish(66);
+            case 70:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[12, 47, 66, 70], [53, 61]]);
+      }))();
+    },
+    waitForExport: function waitForExport(statusUrl) {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _yield$axios$get2, data;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              if (!_this3.exporting) {
+                _context3.next = 18;
+                break;
+              }
+              _context3.next = 3;
               return new Promise(function (resolve) {
                 return setTimeout(resolve, 3000);
               });
             case 3:
-              if (_this2.exporting) {
-                _context2.next = 5;
+              if (_this3.exporting) {
+                _context3.next = 5;
                 break;
               }
-              return _context2.abrupt("return", false);
+              return _context3.abrupt("return", null);
             case 5:
-              _context2.next = 7;
+              _context3.next = 7;
               return axios__WEBPACK_IMPORTED_MODULE_3__["default"].get(statusUrl);
             case 7:
-              _yield$axios$get = _context2.sent;
-              data = _yield$axios$get.data;
-              if (!(data.status === "ready")) {
-                _context2.next = 11;
+              _yield$axios$get2 = _context3.sent;
+              data = _yield$axios$get2.data;
+              if (_this3.exporting) {
+                _context3.next = 11;
                 break;
               }
-              return _context2.abrupt("return", true);
+              return _context3.abrupt("return", null);
             case 11:
-              if (!(data.status === "failed" || data.status === "missing")) {
-                _context2.next = 13;
+              if (!(data.status === "ready")) {
+                _context3.next = 13;
                 break;
               }
-              throw new Error("La préparation du fichier a échoué. Veuillez relancer l’export.");
+              return _context3.abrupt("return", data);
             case 13:
-              _this2.exportMessage = data.status === "queued" ? "Votre export est en attente de préparation…" : "Préparation du fichier Excel en cours…";
-              _context2.next = 0;
+              if (!(data.status === "failed" || data.status === "missing")) {
+                _context3.next = 15;
+                break;
+              }
+              throw new Error(data.message || "La préparation de l’export a échoué. Veuillez relancer l’export.");
+            case 15:
+              _this3.exportMessage = data.status === "queued" ? "Votre export est en attente de préparation…" : _this3.prospectExport.mode === "sheet" ? "Création du Google Sheet en cours…" : "Préparation du fichier Excel en cours…";
+              _context3.next = 0;
               break;
-            case 16:
-              return _context2.abrupt("return", false);
-            case 17:
+            case 18:
+              return _context3.abrupt("return", null);
+            case 19:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2);
+        }, _callee3);
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["prospectsParams", "project"]))
+  computed: _objectSpread(_objectSpread(_objectSpread({
+    exportDisabled: function exportDisabled() {
+      var _this$sheetConfigurat;
+      return this.exporting || !this.selectedExportFields.length || this.prospectExport.mode === "sheet" && (this.sheetConfigurationLoading || !!this.sheetConfigurationError || !((_this$sheetConfigurat = this.sheetConfiguration) !== null && _this$sheetConfigurat !== void 0 && _this$sheetConfigurat.connected));
+    },
+    exportButtonLabel: function exportButtonLabel() {
+      if (this.prospectExport.mode === "sheet") return "Créer le Google Sheet";
+      return this.prospectExport.mode === "email" ? "Envoyer par email" : "Télécharger";
+    }
+  }, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["prospectsParams", "project", "fields", "categories", "threads", "projectUserSettingsProspectsTable", "can", "canEvent"])), {}, {
+    exportColumns: function exportColumns() {
+      var _this4 = this;
+      var columns = [].concat(_toConsumableArray(this.fields.filter(function (field) {
+        return field["for"] === "prospect";
+      }).map(function (field) {
+        return {
+          key: field.meta ? "meta->".concat(field.slug) : field.slug,
+          name: field.name
+        };
+      })), _toConsumableArray(this.categories.filter(function (category) {
+        return category["for"] === "prospect";
+      }).map(function (category) {
+        return {
+          key: "category->".concat(category.id),
+          name: category.name
+        };
+      })), _toConsumableArray(this.threads.map(function (thread) {
+        return {
+          key: "thread->".concat(thread.id),
+          name: thread.name
+        };
+      })), [{
+        key: "history",
+        name: this.$t("prospect.table.column.others.history")
+      }, {
+        key: "users",
+        name: this.$t("prospect.table.column.others.affected_users")
+      }, {
+        key: "groups",
+        name: this.$t("prospect.table.column.others.affected_groups")
+      }, {
+        key: "events",
+        name: this.project.slug === "professionnel" ? "Missions" : this.$t("prospect.table.column.others.appointments")
+      }, {
+        key: "sms",
+        name: this.$t("prospect.table.column.others.sms")
+      }, {
+        key: "interactions",
+        name: this.$t("prospect.table.column.others.calls")
+      }, {
+        key: "orders",
+        name: this.$t("prospect.table.column.others.orders")
+      }, {
+        key: "links",
+        name: this.$t("prospect.profile.setting.external_links")
+      }]).filter(function (column) {
+        if (column.key === "events") {
+          return _this4.can("all.prospect.event.view") || _this4.canEvent;
+        }
+        if (column.key === "sms") return _this4.can("all.prospect.sms.view");
+        if (column.key === "interactions") return _this4.can("all.prospect.interaction.view");
+        return true;
+      });
+      var columnsByKey = new Map(columns.map(function (column) {
+        return [column.key, column];
+      }));
+      var visibleColumns = this.projectUserSettingsProspectsTable.filter(function (column) {
+        return !column.hidden;
+      });
+      var orderedKeys = [].concat(_toConsumableArray(visibleColumns.filter(function (column) {
+        return column.fixed;
+      })), _toConsumableArray(visibleColumns.filter(function (column) {
+        return !column.fixed;
+      }))).map(function (column) {
+        return column.key;
+      });
+      return _toConsumableArray(new Set([].concat(_toConsumableArray(orderedKeys), _toConsumableArray(columnsByKey.keys())))).map(function (key) {
+        return columnsByKey.get(key);
+      }).filter(Boolean);
+    },
+    selectedExportFields: function selectedExportFields() {
+      var selectedKeys = new Set(this.prospectExport.fields);
+      return this.exportColumns.filter(function (column) {
+        return selectedKeys.has(column.key);
+      }).map(function (column) {
+        return column.key;
+      });
+    }
+  })
 });
 
 /***/ }),
@@ -45713,6 +45938,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -45736,6 +45964,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       exportLineId: null,
       exportApiKeyId: "",
       exportApiKeySecret: "",
+      showExportCredentials: true,
       exportDateFrom: dateTo,
       exportDateTo: dateTo,
       exportTimezone: timezone,
@@ -45759,9 +45988,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   methods: {
-    configurationLabel: function configurationLabel(configuration) {
-      return [configuration.name || "Ligne " + configuration.id, configuration.numero, configuration.agent_name].filter(Boolean).join(" — ");
-    },
     loadExportConfigurations: function loadExportConfigurations() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -45788,45 +46014,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 12:
               _yield$ApiService$get = _context.sent;
               data = _yield$ApiService$get.data;
-              if (!(version !== _this.exportRequestVersion || !_this.canCloudtalkExport)) {
+              if (!(version !== _this.exportRequestVersion || slug !== _this.projectSlug || !_this.canCloudtalkExport)) {
                 _context.next = 16;
                 break;
               }
               return _context.abrupt("return");
             case 16:
               _this.exportConfigurations = data.configurations || [];
-              _this.exportLineId = _this.exportConfigurations.length ? _this.exportConfigurations[0].id : null;
-              _context.next = 20;
+              _context.next = 19;
               return _this.loadExportCredentials();
-            case 20:
-              _context.next = 28;
+            case 19:
+              _context.next = 27;
               break;
-            case 22:
-              _context.prev = 22;
+            case 21:
+              _context.prev = 21;
               _context.t0 = _context["catch"](9);
-              _context.next = 26;
+              _context.next = 25;
               return _this.exportErrorMessage(_context.t0, "Impossible de charger les configurations CloudTalk.");
-            case 26:
+            case 25:
               message = _context.sent;
               if (version === _this.exportRequestVersion) _this.exportError = message;
-            case 28:
-              _context.prev = 28;
+            case 27:
+              _context.prev = 27;
               if (version === _this.exportRequestVersion) _this.loadingConfigurations = false;
-              return _context.finish(28);
-            case 31:
+              return _context.finish(27);
+            case 30:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[9, 22, 28, 31]]);
+        }, _callee, null, [[9, 21, 27, 30]]);
       }))();
     },
     clearExportCredentials: function clearExportCredentials() {
       this.exportCredentialsVersion++;
       this.exportApiKeyId = "";
       this.exportApiKeySecret = "";
+      this.showExportCredentials = true;
       this.loadingCredentials = false;
     },
     credentialsEdited: function credentialsEdited() {
+      this.showExportCredentials = true;
       this.exportCredentialsVersion++;
       this.loadingCredentials = false;
       this.downloadedScriptName = "";
@@ -45834,56 +46061,173 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     loadExportCredentials: function loadExportCredentials() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var version, slug, lineId, _yield$ApiService$get2, data, message;
+        var version, slug, isCurrent, checked, _iterator, _step, configuration, credentials, _yield$ApiService$get2, data, _error$response, pair, _yield$ApiService$pos, _data, _error$response2, _error$response3, providerStatus, message;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               _this2.clearExportCredentials();
+              _this2.exportLineId = null;
               _this2.exportError = "";
               _this2.downloadedScriptName = "";
-              if (!(!_this2.canCloudtalkExport || !_this2.projectSlug || _this2.exportLineId === null)) {
-                _context2.next = 5;
+              if (!(!_this2.canCloudtalkExport || !_this2.projectSlug)) {
+                _context2.next = 6;
                 break;
               }
               return _context2.abrupt("return");
-            case 5:
+            case 6:
               version = _this2.exportCredentialsVersion;
               slug = _this2.projectSlug;
-              lineId = _this2.exportLineId;
+              isCurrent = function isCurrent() {
+                return version === _this2.exportCredentialsVersion && slug === _this2.projectSlug && _this2.canCloudtalkExport;
+              };
+              checked = new Set();
               _this2.loadingCredentials = true;
-              _context2.prev = 9;
-              _context2.next = 12;
-              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(slug, "/line/cloudtalk/export-credentials/").concat(lineId));
-            case 12:
-              _yield$ApiService$get2 = _context2.sent;
-              data = _yield$ApiService$get2.data;
-              if (!(version !== _this2.exportCredentialsVersion || slug !== _this2.projectSlug || lineId !== _this2.exportLineId || !_this2.canCloudtalkExport)) {
-                _context2.next = 16;
+              _context2.prev = 11;
+              _iterator = _createForOfIteratorHelper(_this2.exportConfigurations);
+              _context2.prev = 13;
+              _iterator.s();
+            case 15:
+              if ((_step = _iterator.n()).done) {
+                _context2.next = 69;
+                break;
+              }
+              configuration = _step.value;
+              if (isCurrent()) {
+                _context2.next = 19;
                 break;
               }
               return _context2.abrupt("return");
-            case 16:
-              _this2.exportApiKeyId = data.api_key_id || "";
-              _this2.exportApiKeySecret = data.api_key_secret || "";
-              _context2.next = 26;
-              break;
-            case 20:
+            case 19:
+              credentials = void 0;
               _context2.prev = 20;
-              _context2.t0 = _context2["catch"](9);
-              _context2.next = 24;
-              return _this2.exportErrorMessage(_context2.t0, "Impossible de charger les identifiants. Vous pouvez les saisir manuellement.");
-            case 24:
+              _context2.next = 23;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(slug, "/line/cloudtalk/export-credentials/").concat(configuration.id));
+            case 23:
+              _yield$ApiService$get2 = _context2.sent;
+              data = _yield$ApiService$get2.data;
+              credentials = {
+                api_key_id: typeof data.api_key_id === "string" ? data.api_key_id.trim() : "",
+                api_key_secret: typeof data.api_key_secret === "string" ? data.api_key_secret.trim() : ""
+              };
+              _context2.next = 35;
+              break;
+            case 28:
+              _context2.prev = 28;
+              _context2.t0 = _context2["catch"](20);
+              if (isCurrent()) {
+                _context2.next = 32;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 32:
+              if (!(((_error$response = _context2.t0.response) === null || _error$response === void 0 ? void 0 : _error$response.status) === 404)) {
+                _context2.next = 34;
+                break;
+              }
+              return _context2.abrupt("continue", 67);
+            case 34:
+              throw _context2.t0;
+            case 35:
+              if (isCurrent()) {
+                _context2.next = 37;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 37:
+              if (!(!credentials.api_key_id || !credentials.api_key_secret)) {
+                _context2.next = 39;
+                break;
+              }
+              return _context2.abrupt("continue", 67);
+            case 39:
+              pair = JSON.stringify(credentials);
+              if (!checked.has(pair)) {
+                _context2.next = 42;
+                break;
+              }
+              return _context2.abrupt("continue", 67);
+            case 42:
+              checked.add(pair);
+              _context2.prev = 43;
+              _context2.next = 46;
+              return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(slug, "/line/cloudtalk/verify"), credentials);
+            case 46:
+              _yield$ApiService$pos = _context2.sent;
+              _data = _yield$ApiService$pos.data;
+              if (isCurrent()) {
+                _context2.next = 50;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 50:
+              if (!(_data.valid !== true)) {
+                _context2.next = 52;
+                break;
+              }
+              return _context2.abrupt("continue", 67);
+            case 52:
+              _context2.next = 62;
+              break;
+            case 54:
+              _context2.prev = 54;
+              _context2.t1 = _context2["catch"](43);
+              if (isCurrent()) {
+                _context2.next = 58;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 58:
+              providerStatus = Number((_error$response2 = _context2.t1.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.status);
+              if (!([401, 403, 422].includes(providerStatus) || ((_error$response3 = _context2.t1.response) === null || _error$response3 === void 0 ? void 0 : _error$response3.status) === 422)) {
+                _context2.next = 61;
+                break;
+              }
+              return _context2.abrupt("continue", 67);
+            case 61:
+              throw _context2.t1;
+            case 62:
+              _this2.exportLineId = configuration.id;
+              _this2.exportApiKeyId = credentials.api_key_id;
+              _this2.exportApiKeySecret = credentials.api_key_secret;
+              _this2.showExportCredentials = false;
+              return _context2.abrupt("return");
+            case 67:
+              _context2.next = 15;
+              break;
+            case 69:
+              _context2.next = 74;
+              break;
+            case 71:
+              _context2.prev = 71;
+              _context2.t2 = _context2["catch"](13);
+              _iterator.e(_context2.t2);
+            case 74:
+              _context2.prev = 74;
+              _iterator.f();
+              return _context2.finish(74);
+            case 77:
+              if (isCurrent()) {
+                _this2.exportError = "Aucune clé API CloudTalk valide n’a été trouvée. Vérifiez les clés configurées dans vos lignes ou saisissez-les manuellement.";
+              }
+              _context2.next = 86;
+              break;
+            case 80:
+              _context2.prev = 80;
+              _context2.t3 = _context2["catch"](11);
+              _context2.next = 84;
+              return _this2.exportErrorMessage(_context2.t3, "Impossible de vérifier les identifiants CloudTalk. Réessayez ou saisissez-les manuellement.");
+            case 84:
               message = _context2.sent;
-              if (version === _this2.exportCredentialsVersion) _this2.exportError = message;
-            case 26:
-              _context2.prev = 26;
+              if (isCurrent()) _this2.exportError = message;
+            case 86:
+              _context2.prev = 86;
               if (version === _this2.exportCredentialsVersion) _this2.loadingCredentials = false;
-              return _context2.finish(26);
-            case 29:
+              return _context2.finish(86);
+            case 89:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[9, 20, 26, 29]]);
+        }, _callee2, null, [[11, 80, 86, 89], [13, 71, 74, 77], [20, 28], [43, 54]]);
       }))();
     },
     exportErrorMessage: function exportErrorMessage(error, fallback) {
@@ -45928,7 +46272,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     downloadExportScript: function downloadExportScript() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var version, slug, filename, _yield$ApiService$pos, data, url, link, message;
+        var version, slug, filename, _yield$ApiService$pos2, data, url, link, message;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -45958,8 +46302,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 responseType: "blob"
               });
             case 11:
-              _yield$ApiService$pos = _context4.sent;
-              data = _yield$ApiService$pos.data;
+              _yield$ApiService$pos2 = _context4.sent;
+              data = _yield$ApiService$pos2.data;
               if (!(version !== _this3.exportRequestVersion || !_this3.canCloudtalkExport)) {
                 _context4.next = 15;
                 break;
@@ -46001,7 +46345,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     downloadSmsExport: function downloadSmsExport() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var version, slug, filename, _yield$ApiService$pos2, data, ready, link, message;
+        var version, slug, filename, _yield$ApiService$pos3, data, ready, link, message;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
@@ -46027,8 +46371,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 count: 0
               });
             case 12:
-              _yield$ApiService$pos2 = _context5.sent;
-              data = _yield$ApiService$pos2.data;
+              _yield$ApiService$pos3 = _context5.sent;
+              data = _yield$ApiService$pos3.data;
               if (_this4.smsRequestIsCurrent(version, slug)) {
                 _context5.next = 16;
                 break;
@@ -90472,10 +90816,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02":
-/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02 ***!
-  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -90485,22 +90829,83 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
+var _withScopeId = function _withScopeId(n) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-79b93e02"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
+};
 var _hoisted_1 = ["disabled"];
-var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: "email"
-}, "Envoi par email", -1 /* HOISTED */);
-var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: "download"
-}, "Télécharger", -1 /* HOISTED */);
-var _hoisted_4 = [_hoisted_2, _hoisted_3];
-var _hoisted_5 = ["disabled"];
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: "0"
-}, "Tous", -1 /* HOISTED */);
-var _hoisted_7 = ["value", "textContent"];
-var _hoisted_8 = ["disabled"];
+var _hoisted_2 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "email"
+  }, "Envoi par email", -1 /* HOISTED */);
+});
+var _hoisted_3 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "sheet"
+  }, "Google Sheets", -1 /* HOISTED */);
+});
+var _hoisted_4 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "download"
+  }, "Télécharger", -1 /* HOISTED */);
+});
+var _hoisted_5 = [_hoisted_2, _hoisted_3, _hoisted_4];
+var _hoisted_6 = ["disabled"];
+var _hoisted_7 = {
+  key: 0,
+  role: "status"
+};
+var _hoisted_8 = {
+  key: 1,
+  role: "alert"
+};
 var _hoisted_9 = ["textContent"];
-var _hoisted_10 = ["disabled"];
+var _hoisted_10 = {
+  key: 2,
+  role: "status"
+};
+var _hoisted_11 = {
+  key: 0
+};
+var _hoisted_12 = {
+  key: 3,
+  role: "status"
+};
+var _hoisted_13 = ["href"];
+var _hoisted_14 = {
+  key: 1
+};
+var _hoisted_15 = ["disabled"];
+var _hoisted_16 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "0"
+  }, "Tous", -1 /* HOISTED */);
+});
+var _hoisted_17 = ["value", "textContent"];
+var _hoisted_18 = ["disabled"];
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("legend", null, "Colonnes à exporter *", -1 /* HOISTED */);
+});
+var _hoisted_21 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Les colonnes affichées dans le tableau sont présélectionnées.", -1 /* HOISTED */);
+});
+var _hoisted_22 = {
+  "class": "hc-prospect-export-column-actions"
+};
+var _hoisted_23 = {
+  "class": "hc-prospect-export-column-list"
+};
+var _hoisted_24 = ["value"];
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = {
+  role: "status"
+};
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = {
+  key: 1
+};
+var _hoisted_29 = ["href"];
+var _hoisted_30 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
@@ -90508,15 +90913,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal", true);
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_modal, {
     name: "prospect-export",
-    title: 'Exporter des prospects'
+    title: 'Exporter des prospects',
+    onOpen: $options.resetExportFields
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-        "class": "hc-flex-column",
+        "class": "hc-flex-column hc-prospect-export-form",
         style: {
           "height": "100%"
         },
-        onSubmit: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.exportProspects && $options.exportProspects.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -90525,6 +90931,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         padding: "10px 0"
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          var _$data$sheetConfigura;
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
             label: "Mode d’export",
             required: ""
@@ -90535,65 +90942,125 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   return $data.prospectExport.mode = $event;
                 }),
                 disabled: $data.exporting
-              }, _hoisted_4, 8 /* PROPS */, _hoisted_1), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.mode]])];
+              }, _hoisted_5, 8 /* PROPS */, _hoisted_1), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.mode]])];
             }),
             _: 1 /* STABLE */
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+          }), $data.prospectExport.mode === 'sheet' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            key: 0
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+            label: "Nom du Google Sheet"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+                  return $data.prospectExport.sheet_name = $event;
+                }),
+                type: "text",
+                maxlength: "150",
+                disabled: $data.exporting
+              }, null, 8 /* PROPS */, _hoisted_6), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.sheet_name, void 0, {
+                trim: true
+              }]])];
+            }),
+            _: 1 /* STABLE */
+          }), $data.sheetConfigurationLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_7, " Vérification du compte Google Drive… ")) : $data.sheetConfigurationError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sheetConfigurationError)
+          }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            onClick: _cache[2] || (_cache[2] = function () {
+              return $options.loadSheetConfiguration && $options.loadSheetConfiguration.apply($options, arguments);
+            })
+          }, " Réessayer ")])) : (_$data$sheetConfigura = $data.sheetConfiguration) !== null && _$data$sheetConfigura !== void 0 && _$data$sheetConfigura.connected ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Le document sera créé dans le compte Google Drive du projet"), $data.sheetConfiguration.account_name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_11, " : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sheetConfiguration.account_name), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Connectez un compte Google Drive au projet pour créer un Google Sheet. "), _ctx.can('all.project') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+            key: 0,
+            href: "/google/drive/auth?project=".concat(encodeURIComponent(_ctx.project.slug))
+          }, "Connecter Google Drive", 8 /* PROPS */, _hoisted_13)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_14, "Contactez un administrateur du projet."))]))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
             label: 'Nombre de prospects à exporter',
             required: ""
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-                "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+                "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
                   return $data.prospectExport.count = $event;
                 }),
                 disabled: $data.exporting
-              }, [_hoisted_6, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(10, function (i) {
+              }, [_hoisted_16, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(10, function (i) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
                   key: i,
                   value: 1000 * i,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(1000 * i)
-                }, null, 8 /* PROPS */, _hoisted_7);
-              }), 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.count]])];
+                }, null, 8 /* PROPS */, _hoisted_17);
+              }), 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_15), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.prospectExport.count]])];
             }),
             _: 1 /* STABLE */
           }), $data.prospectExport.mode === 'email' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_v_field, {
-            key: 0,
+            key: 1,
             label: "Adresse email de destination",
             required: ""
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-                "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+                "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
                   return $data.prospectExport.email = $event;
                 }),
                 type: "email",
                 required: "",
                 disabled: $data.exporting
-              }, null, 8 /* PROPS */, _hoisted_8), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.email, void 0, {
+              }, null, 8 /* PROPS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectExport.email, void 0, {
                 trim: true
               }]])];
             }),
             _: 1 /* STABLE */
-          })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
+            "class": "hc-prospect-export-columns",
+            disabled: $data.exporting
+          }, [_hoisted_20, _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "hc-button-secondary",
+            onClick: _cache[5] || (_cache[5] = function () {
+              return $options.selectAllExportFields && $options.selectAllExportFields.apply($options, arguments);
+            })
+          }, " Tout sélectionner "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "hc-button-secondary",
+            onClick: _cache[6] || (_cache[6] = function ($event) {
+              return $data.prospectExport.fields = [];
+            })
+          }, " Tout désélectionner ")]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.exportColumns, function (column) {
+            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+              key: column.key,
+              "class": "hc-prospect-export-column"
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+              "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+                return $data.prospectExport.fields = $event;
+              }),
+              type: "checkbox",
+              value: column.key
+            }, null, 8 /* PROPS */, _hoisted_24), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.prospectExport.fields]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(column.name)
+            }, null, 8 /* PROPS */, _hoisted_25)]);
+          }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.selectedExportFields.length ? "Colonnes s\xE9lectionn\xE9es : ".concat($options.selectedExportFields.length) : 'Sélectionnez au moins une colonne à exporter.'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_19)];
         }),
         _: 1 /* STABLE */
       }), $data.exportMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         role: "status",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportMessage)
-      }, null, 8 /* PROPS */, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
+      }, null, 8 /* PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sheetUrl ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+        href: $data.sheetUrl,
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, "Ouvrir Google Sheets", 8 /* PROPS */, _hoisted_29)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "submit",
-            disabled: $data.exporting
-          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exporting ? 'Préparation en cours…' : $data.prospectExport.mode === 'email' ? 'Envoyer par email' : 'Télécharger'), 9 /* TEXT, PROPS */, _hoisted_10)];
+            disabled: $options.exportDisabled
+          }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exporting ? 'Préparation en cours…' : $options.exportButtonLabel), 9 /* TEXT, PROPS */, _hoisted_30)];
         }),
         _: 1 /* STABLE */
       })], 32 /* HYDRATE_EVENTS */)];
     }),
     _: 1 /* STABLE */
-  });
+  }, 8 /* PROPS */, ["onOpen"]);
 }
 
 /***/ }),
@@ -95790,10 +96257,10 @@ var _hoisted_2 = {
 var _hoisted_3 = {
   "class": "hc-cloudtalk-webhook-header"
 };
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Recevoir les SMS, appels et messages vocaux", -1 /* HOISTED */);
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Synchroniser les SMS reçus et envoyés, les appels et messages vocaux", -1 /* HOISTED */);
 var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-webhook-help"
-}, " Configurez un webhook CloudTalk pour recevoir automatiquement les nouveaux SMS, les messages vocaux et les enregistrements des appels dans votre CRM. ", -1 /* HOISTED */);
+}, " Configurez un webhook CloudTalk pour enregistrer les SMS reçus et ceux envoyés depuis CloudTalk Phone ou une autre application CloudTalk, ainsi que les messages vocaux et les enregistrements des appels. ", -1 /* HOISTED */);
 var _hoisted_6 = {
   "class": "hc-cloudtalk-webhook-url"
 };
@@ -95805,11 +96272,11 @@ var _hoisted_9 = {
 var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-cloudtalk-webhook-instructions-title"
 }, " Comment configurer les événements CloudTalk ? ", -1 /* HOISTED */);
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Accédez aux "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Connectez-vous à CloudTalk avec un compte administrateur, puis ouvrez "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Paramètres → Webhooks"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" : "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
   href: "https://dashboard.cloudtalk.io/menu/account/webhooks",
   target: "_blank",
   rel: "noopener noreferrer"
-}, " https://dashboard.cloudtalk.io/menu/account/webhooks "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Ajoutez un nouveau webhook dans votre compte CloudTalk. "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Copiez l'URL ci-dessus et collez-la dans le champ URL du webhook. "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sélectionnez les événements "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "message.received"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(", "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "call.ended"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "call.recording_ready"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Enregistrez votre configuration. ")], -1 /* HOISTED */);
+}, " https://dashboard.cloudtalk.io/menu/account/webhooks "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Ajoutez un nouveau webhook ou modifiez celui déjà configuré pour ce CRM. "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Copiez l'URL ci-dessus et collez-la dans le champ URL du webhook. Utilisez une URL publique en HTTPS, accessible depuis CloudTalk. "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Sélectionnez les événements "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "message.received"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(", "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "message.sent"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(", "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "call.ended"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "call.recording_ready"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(". ")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, " Enregistrez votre configuration, puis envoyez un SMS depuis CloudTalk vers le numéro d’un prospect du projet pour vérifier son apparition dans le CRM. ")], -1 /* HOISTED */);
 var _hoisted_12 = {
   "class": "hc-cloudtalk-webhook-note"
 };
@@ -95824,115 +96291,106 @@ var _hoisted_15 = {
 };
 var _hoisted_16 = {
   key: 0,
-  "class": "hc-cloudtalk-export-field"
-};
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Configuration CloudTalk", -1 /* HOISTED */);
-var _hoisted_18 = ["disabled"];
-var _hoisted_19 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: null
-}, "Saisie manuelle", -1 /* HOISTED */);
-var _hoisted_20 = ["value"];
-var _hoisted_21 = {
-  key: 1,
   role: "status"
 };
-var _hoisted_22 = {
+var _hoisted_17 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Clé API", -1 /* HOISTED */);
-var _hoisted_24 = ["disabled"];
-var _hoisted_25 = {
+var _hoisted_18 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Clé API", -1 /* HOISTED */);
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_26 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Secret API", -1 /* HOISTED */);
-var _hoisted_27 = ["disabled"];
-var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Secret API", -1 /* HOISTED */);
+var _hoisted_22 = ["disabled"];
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-export-help"
-}, " Les identifiants existants sont préremplis et modifiables. Les modifications servent uniquement au script et ne sont pas enregistrées dans la ligne. ", -1 /* HOISTED */);
-var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+}, " Les identifiants CloudTalk valides sont préremplis automatiquement et restent modifiables. Les modifications servent uniquement au script et ne sont pas enregistrées dans la ligne. ", -1 /* HOISTED */);
+var _hoisted_24 = ["disabled"];
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-export-help"
 }, " L’export couvre tous les appels accessibles sur ce compte CloudTalk, y compris ceux sans prospect dans le CRM. ", -1 /* HOISTED */);
-var _hoisted_30 = {
+var _hoisted_26 = {
   "class": "hc-cloudtalk-export-dates"
 };
-var _hoisted_31 = {
+var _hoisted_27 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de début", -1 /* HOISTED */);
-var _hoisted_33 = ["max", "disabled"];
-var _hoisted_34 = {
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de début", -1 /* HOISTED */);
+var _hoisted_29 = ["max", "disabled"];
+var _hoisted_30 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de fin", -1 /* HOISTED */);
-var _hoisted_36 = ["min", "disabled"];
-var _hoisted_37 = {
+var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de fin", -1 /* HOISTED */);
+var _hoisted_32 = ["min", "disabled"];
+var _hoisted_33 = {
   "class": "hc-cloudtalk-export-checkbox"
 };
-var _hoisted_38 = ["disabled"];
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Télécharger les audios disponibles", -1 /* HOISTED */);
-var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+var _hoisted_34 = ["disabled"];
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Télécharger les audios disponibles", -1 /* HOISTED */);
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-export-help"
 }, " Résultat : appels.csv et, si demandé, un dossier audios/. La colonne audio_path indique le chemin relatif de chaque audio téléchargé. ", -1 /* HOISTED */);
-var _hoisted_41 = ["disabled"];
-var _hoisted_42 = {
+var _hoisted_37 = ["disabled"];
+var _hoisted_38 = {
   key: 2,
   "class": "hc-cloudtalk-export-error",
   role: "alert"
 };
-var _hoisted_43 = ["disabled"];
-var _hoisted_44 = {
+var _hoisted_39 = ["disabled"];
+var _hoisted_40 = {
   key: 4,
   "class": "hc-cloudtalk-export-help",
   role: "status"
 };
-var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-webhook-note"
 }, " Le script contient la clé API et le secret CloudTalk. Conservez-le dans un endroit privé. Il s’exécute sous Windows avec PowerShell et télécharge les données directement depuis CloudTalk. ", -1 /* HOISTED */);
-var _hoisted_46 = {
+var _hoisted_42 = {
   key: 1,
   "class": "hc-cloudtalk-export-help"
 };
-var _hoisted_47 = {
+var _hoisted_43 = {
   key: 2,
   "class": "hc-cloudtalk-export"
 };
-var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Exportez les SMS entrants et sortants enregistrés dans le CRM pour le projet actuel.", -1 /* HOISTED */);
-var _hoisted_49 = {
+var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Exportez les SMS entrants et sortants enregistrés dans le CRM pour le projet actuel.", -1 /* HOISTED */);
+var _hoisted_45 = {
   "class": "hc-cloudtalk-export-dates"
 };
-var _hoisted_50 = {
+var _hoisted_46 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_51 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de début", -1 /* HOISTED */);
-var _hoisted_52 = ["max", "disabled"];
-var _hoisted_53 = {
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de début", -1 /* HOISTED */);
+var _hoisted_48 = ["max", "disabled"];
+var _hoisted_49 = {
   "class": "hc-cloudtalk-export-field"
 };
-var _hoisted_54 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de fin", -1 /* HOISTED */);
-var _hoisted_55 = ["min", "disabled"];
-var _hoisted_56 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Date de fin", -1 /* HOISTED */);
+var _hoisted_51 = ["min", "disabled"];
+var _hoisted_52 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-export-help"
 }, " Le CSV contient les messages, dates, sens, sources, prospects et auteurs. Toutes les sources de SMS enregistrées dans le CRM sont incluses. ", -1 /* HOISTED */);
-var _hoisted_57 = ["disabled"];
-var _hoisted_58 = {
+var _hoisted_53 = ["disabled"];
+var _hoisted_54 = {
   key: 0,
   "class": "hc-cloudtalk-export-help",
   role: "status"
 };
-var _hoisted_59 = {
+var _hoisted_55 = {
   key: 1,
   "class": "hc-cloudtalk-export-error",
   role: "alert"
 };
-var _hoisted_60 = {
+var _hoisted_56 = {
   key: 2,
   "class": "hc-cloudtalk-export-help",
   role: "status"
 };
-var _hoisted_61 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
   "class": "hc-cloudtalk-export-help"
 }, " Le fichier est préparé en arrière-plan depuis la base du CRM, puis téléchargé automatiquement. Choisissez une période plus courte pour limiter sa taille. ", -1 /* HOISTED */);
-var _hoisted_62 = {
+var _hoisted_58 = {
   key: 3,
   "class": "hc-cloudtalk-export-help"
 };
@@ -95991,30 +96449,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "fa fa-copy"
           }), _hoisted_8])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Instructions détaillées "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [_hoisted_10, _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
             "class": "fa fa-info-circle"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Les SMS reçus seront transmis au CRM et les enregistrements seront rattachés aux interactions existantes. Les appels et messages vocaux créeront une interaction si le numéro correspond à un prospect du projet. ")])])])];
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Les SMS sont rattachés au prospect dont le numéro correspond dans ce projet. Un SMS déjà enregistré lors d’un envoi depuis le CRM, ou un événement reçu plusieurs fois, est reconnu pour éviter les doublons. Les enregistrements restent rattachés aux appels correspondants. ")])])])];
         }),
         _: 1 /* STABLE */
       }, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.tab === 0]]), $data.tab === 1 && $options.canCloudtalkExport ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [_hoisted_14, $data.loadingConfigurations ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_15, "Chargement des configurations…")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
         key: 1,
         autocomplete: "off",
-        onSubmit: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.downloadExportScript && $options.downloadExportScript.apply($options, arguments);
         }, ["prevent"]))
-      }, [$data.exportConfigurations.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      }, [$data.loadingCredentials ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_16, "Recherche d’identifiants CloudTalk valides…")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showExportCredentials ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+        key: 1
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_17, [_hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-          return $data.exportLineId = $event;
-        }),
-        disabled: $data.downloadingScript,
-        onChange: _cache[4] || (_cache[4] = function () {
-          return $options.loadExportCredentials && $options.loadExportCredentials.apply($options, arguments);
-        })
-      }, [_hoisted_19, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.exportConfigurations, function (configuration) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
-          key: configuration.id,
-          value: configuration.id
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.configurationLabel(configuration)), 9 /* TEXT, PROPS */, _hoisted_20);
-      }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $data.exportLineId]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.loadingCredentials ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_21, "Chargement des identifiants…")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_22, [_hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.exportApiKeyId = $event;
         }),
         type: "text",
@@ -96022,83 +96469,91 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         spellcheck: "false",
         required: "",
         disabled: $data.downloadingScript || $data.loadingCredentials,
-        onInput: _cache[6] || (_cache[6] = function () {
+        onInput: _cache[4] || (_cache[4] = function () {
           return $options.credentialsEdited && $options.credentialsEdited.apply($options, arguments);
         })
-      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_24), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeyId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_25, [_hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeyId]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
           return $data.exportApiKeySecret = $event;
         }),
         type: "text",
         autocomplete: "new-password",
         required: "",
         disabled: $data.downloadingScript || $data.loadingCredentials,
-        onInput: _cache[8] || (_cache[8] = function () {
+        onInput: _cache[6] || (_cache[6] = function () {
           return $options.credentialsEdited && $options.credentialsEdited.apply($options, arguments);
         })
-      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeySecret]])]), _hoisted_28, _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_22), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportApiKeySecret]])]), _hoisted_23], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 2,
+        type: "button",
+        "class": "hc-cloudtalk-edit-key",
+        disabled: $data.downloadingScript || $data.loadingCredentials,
+        onClick: _cache[7] || (_cache[7] = function ($event) {
+          return $data.showExportCredentials = true;
+        })
+      }, " Modifier la clé ", 8 /* PROPS */, _hoisted_24)), _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_27, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
           return $data.exportDateFrom = $event;
         }),
         type: "date",
         required: "",
         max: $data.exportDateTo || undefined,
         disabled: $data.downloadingScript
-      }, null, 8 /* PROPS */, _hoisted_33), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+      }, null, 8 /* PROPS */, _hoisted_29), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_30, [_hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
           return $data.exportDateTo = $event;
         }),
         type: "date",
         required: "",
         min: $data.exportDateFrom || undefined,
         disabled: $data.downloadingScript
-      }, null, 8 /* PROPS */, _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateTo]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <p class=\"hc-cloudtalk-export-help\">\n                            Journées incluses, fuseau horaire : {{ exportTimezone }}.\n                        </p> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+      }, null, 8 /* PROPS */, _hoisted_32), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.exportDateTo]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <p class=\"hc-cloudtalk-export-help\">\n                            Journées incluses, fuseau horaire : {{ exportTimezone }}.\n                        </p> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
           return $data.exportDownloadAudio = $event;
         }),
         type: "checkbox",
         disabled: $data.downloadingScript
-      }, null, 8 /* PROPS */, _hoisted_38), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.exportDownloadAudio]]), _hoisted_39]), _hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      }, null, 8 /* PROPS */, _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.exportDownloadAudio]]), _hoisted_35]), _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "hc-button-secondary",
         type: "submit",
         disabled: $data.downloadingScript || !$options.canDownloadExport
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.downloadingScript ? 'fa fa-spinner fa-spin' : 'fa fa-download')
-      }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadingScript ? 'Préparation du script…' : 'Télécharger le script PowerShell'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_41)], 32 /* HYDRATE_EVENTS */)), $data.exportError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.exportError && !$data.exportConfigurations.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadingScript ? 'Préparation du script…' : 'Télécharger le script PowerShell'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_37)], 32 /* HYDRATE_EVENTS */)), $data.exportError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.exportError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.exportError && !$data.exportApiKeyId && !$data.exportApiKeySecret ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 3,
         "class": "hc-button-secondary",
         type: "button",
-        disabled: $data.loadingConfigurations,
-        onClick: _cache[13] || (_cache[13] = function () {
+        disabled: $data.loadingConfigurations || $data.loadingCredentials,
+        onClick: _cache[12] || (_cache[12] = function () {
           return $options.loadExportConfigurations && $options.loadExportConfigurations.apply($options, arguments);
         })
-      }, " Réessayer ", 8 /* PROPS */, _hoisted_43)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.downloadedScriptName ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Script téléchargé. Ouvrez PowerShell dans votre dossier de téléchargement et lancez : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, ".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Si Windows bloque l’exécution, utilisez cette commande, valable uniquement pour ce lancement : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName) + "\"", 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_45])) : $data.tab === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_46, " L’exportation CloudTalk est réservée aux administrateurs du projet. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.tab === 2 && $options.canCloudtalkExport ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-        onSubmit: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      }, " Réessayer ", 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.downloadedScriptName ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Script téléchargé. Ouvrez PowerShell dans votre dossier de téléchargement et lancez : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, ".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Si Windows bloque l’exécution, utilisez cette commande, valable uniquement pour ce lancement : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", null, "powershell.exe -NoProfile -ExecutionPolicy Bypass -File \".\\" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedScriptName) + "\"", 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_41])) : $data.tab === 1 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_42, " L’exportation CloudTalk est réservée aux administrateurs du projet. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.tab === 2 && $options.canCloudtalkExport ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_43, [_hoisted_44, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+        onSubmit: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.downloadSmsExport && $options.downloadSmsExport.apply($options, arguments);
         }, ["prevent"]))
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_50, [_hoisted_51, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_46, [_hoisted_47, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
           return $data.smsDateFrom = $event;
         }),
         type: "date",
         required: "",
         max: $data.smsDateTo || undefined,
         disabled: $data.downloadingSms
-      }, null, 8 /* PROPS */, _hoisted_52), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.smsDateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_53, [_hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+      }, null, 8 /* PROPS */, _hoisted_48), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.smsDateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_49, [_hoisted_50, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
           return $data.smsDateTo = $event;
         }),
         type: "date",
         required: "",
         min: $data.smsDateFrom || undefined,
         disabled: $data.downloadingSms
-      }, null, 8 /* PROPS */, _hoisted_55), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.smsDateTo]])])]), _hoisted_56, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      }, null, 8 /* PROPS */, _hoisted_51), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.smsDateTo]])])]), _hoisted_52, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "hc-button-secondary",
         type: "submit",
         disabled: $data.downloadingSms || !$options.canDownloadSms
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.downloadingSms ? 'fa fa-spinner fa-spin' : 'fa fa-download')
-      }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadingSms ? 'Préparation du CSV…' : 'Télécharger les SMS en CSV'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_57)], 32 /* HYDRATE_EVENTS */), $data.smsProgress ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_58, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.smsProgress), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.smsError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_59, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.smsError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.downloadedSmsName ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_60, "Fichier téléchargé : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedSmsName), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_61])) : $data.tab === 2 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_62, " L’exportation SMS est réservée aux administrateurs du projet. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
+      }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadingSms ? 'Préparation du CSV…' : 'Télécharger les SMS en CSV'), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_53)], 32 /* HYDRATE_EVENTS */), $data.smsProgress ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_54, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.smsProgress), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.smsError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.smsError), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.downloadedSmsName ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_56, "Fichier téléchargé : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.downloadedSmsName), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_57])) : $data.tab === 2 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_58, " L’exportation SMS est réservée aux administrateurs du projet. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["name", "onOpen", "onClosed"]);
@@ -115089,6 +115544,30 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms {\n    justify-cont
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-export-form[data-v-79b93e02],\n.hc-prospect-export-form > .hc-item-list[data-v-79b93e02] {\n    min-height: 0;\n}\n.hc-prospect-export-columns[data-v-79b93e02] {\n    border: none;\n    flex-shrink: 0;\n    min-width: 0;\n    margin: 0;\n    padding: 5px;\n    font-size: 12px;\n}\n.hc-prospect-export-columns > legend[data-v-79b93e02] {\n    float: none;\n    width: auto;\n    margin: 0;\n    font-size: inherit;\n    font-weight: 600;\n    line-height: 20px;\n}\n.hc-prospect-export-columns > p[data-v-79b93e02] {\n    margin: 5px 0;\n}\n.hc-prospect-export-column-actions[data-v-79b93e02] {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 5px;\n    margin: 8px 0;\n}\n.hc-prospect-export-column-list[data-v-79b93e02] {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    max-height: 220px;\n    overflow-y: auto;\n    padding: 10px;\n    border: 1px solid #8884;\n    border-radius: 3px;\n}\n.hc-prospect-export-column[data-v-79b93e02] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    cursor: pointer;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-export-column > input[data-v-79b93e02] {\n    flex-shrink: 0;\n    width: 14px;\n    height: 14px;\n    margin: 0;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/questionnaire/SectionRow.vue?vue&type=style&index=0&id=47929b8c&lang=css":
 /*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/questionnaire/SectionRow.vue?vue&type=style&index=0&id=47929b8c&lang=css ***!
@@ -115178,7 +115657,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk-export {\n    padding: 10px;\n    overflow-y: auto;\n    font-size: 12px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-export > p:first-child {\n    margin-top: 0;\n}\n.hc-cloudtalk-export-field {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    gap: 5px;\n    min-width: 0;\n    margin-bottom: 10px;\n}\n.hc-cloudtalk-export-field input,\n.hc-cloudtalk-export-field select {\n    width: 100%;\n    padding: 7px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n}\n.hc-cloudtalk-export-dates {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 12px;\n}\n.hc-cloudtalk-export-checkbox {\n    display: flex;\n    align-items: center;\n    gap: 7px;\n}\n.hc-cloudtalk-export-help {\n    color: #666666;\n    margin: 8px 0 12px;\n}\n.hc-cloudtalk-export-help code {\n    display: block;\n    overflow-wrap: anywhere;\n    margin-top: 5px;\n}\n.hc-cloudtalk-export-error {\n    color: #c0392b;\n}\n.hc-cloudtalk-export button:disabled {\n    opacity: 0.6;\n    cursor: default;\n}\n.dark .hc-cloudtalk-export-field input,\n.dark .hc-cloudtalk-export-field select {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-export-help {\n    color: #bbbbbb;\n}\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n\n/* Instructions */\n.hc-cloudtalk-webhook-instructions {\n    padding: 10px 0 0;\n    border-top: 1px solid #d6e4f0;\n    font-size: 12px;\n    line-height: 1.6;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-instructions-title {\n    font-weight: 600;\n    margin-bottom: 8px;\n}\n.hc-cloudtalk-webhook-instructions ol {\n    margin: 0;\n    padding-left: 20px;\n}\n.hc-cloudtalk-webhook-instructions li {\n    margin-bottom: 7px;\n}\n.hc-cloudtalk-webhook-instructions strong {\n    color: #12a0f3;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a {\n    color: #12a0f3;\n    text-decoration: none;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a:hover {\n    text-decoration: underline;\n}\n.hc-cloudtalk-webhook-instructions a .fa {\n    font-size: 10px;\n    margin-left: 3px;\n}\n\n/* Note d'information */\n.hc-cloudtalk-webhook-note {\n    display: flex;\n    align-items: flex-start;\n    gap: 6px;\n    margin: 8px 0 0;\n    padding: 8px;\n    border-radius: 4px;\n    background: #e6f3ff;\n    color: #495057;\n    font-size: 11px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-webhook-note .fa {\n    color: #12a0f3;\n    margin-top: 2px;\n}\n\n/* Mode sombre */\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-webhook-instructions {\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-note {\n    background: #263b53;\n    color: #cccccc;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-cloudtalk-export {\n    padding: 10px;\n    overflow-y: auto;\n    font-size: 12px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-export > p:first-child {\n    margin-top: 0;\n}\n.hc-cloudtalk-export-field {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    gap: 5px;\n    min-width: 0;\n    margin-bottom: 10px;\n}\n.hc-cloudtalk-export-field input {\n    width: 100%;\n    padding: 7px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n}\n.hc-cloudtalk-edit-key {\n    border: 0;\n    background: none;\n    padding: 0;\n    margin-bottom: 10px;\n    color: #12a0f3;\n    font: inherit;\n    cursor: pointer;\n}\n.hc-cloudtalk-edit-key:hover {\n    text-decoration: underline;\n}\n.hc-cloudtalk-export-dates {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 12px;\n}\n.hc-cloudtalk-export-checkbox {\n    display: flex;\n    align-items: center;\n    gap: 7px;\n}\n.hc-cloudtalk-export-help {\n    color: #666666;\n    margin: 8px 0 12px;\n}\n.hc-cloudtalk-export-help code {\n    display: block;\n    overflow-wrap: anywhere;\n    margin-top: 5px;\n}\n.hc-cloudtalk-export-error {\n    color: #c0392b;\n}\n.hc-cloudtalk-export button:disabled {\n    opacity: 0.6;\n    cursor: default;\n}\n.dark .hc-cloudtalk-export-field input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-export-help {\n    color: #bbbbbb;\n}\n.hc-cloudtalk-webhook {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-cloudtalk-webhook-header {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-cloudtalk-webhook-help {\n    margin: 0;\n    font-size: 12px;\n    line-height: 1.4;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-url {\n    display: flex;\n    align-items: stretch;\n    gap: 6px;\n}\n.hc-cloudtalk-webhook-url input {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 6px;\n    background: #ffffff;\n    color: #333333;\n    font-size: 12px;\n}\n\n/* Instructions */\n.hc-cloudtalk-webhook-instructions {\n    padding: 10px 0 0;\n    border-top: 1px solid #d6e4f0;\n    font-size: 12px;\n    line-height: 1.6;\n    color: #495057;\n}\n.hc-cloudtalk-webhook-instructions-title {\n    font-weight: 600;\n    margin-bottom: 8px;\n}\n.hc-cloudtalk-webhook-instructions ol {\n    margin: 0;\n    padding-left: 20px;\n}\n.hc-cloudtalk-webhook-instructions li {\n    margin-bottom: 7px;\n}\n.hc-cloudtalk-webhook-instructions strong {\n    color: #12a0f3;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a {\n    color: #12a0f3;\n    text-decoration: none;\n    font-weight: 600;\n}\n.hc-cloudtalk-webhook-instructions a:hover {\n    text-decoration: underline;\n}\n.hc-cloudtalk-webhook-instructions a .fa {\n    font-size: 10px;\n    margin-left: 3px;\n}\n\n/* Note d'information */\n.hc-cloudtalk-webhook-note {\n    display: flex;\n    align-items: flex-start;\n    gap: 6px;\n    margin: 8px 0 0;\n    padding: 8px;\n    border-radius: 4px;\n    background: #e6f3ff;\n    color: #495057;\n    font-size: 11px;\n    line-height: 1.5;\n}\n.hc-cloudtalk-webhook-note .fa {\n    color: #12a0f3;\n    margin-top: 2px;\n}\n\n/* Mode sombre */\n.dark .hc-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-cloudtalk-webhook-help {\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-url input {\n    border-color: #444444;\n    background: #2a2a2a;\n    color: #dddddd;\n}\n.dark .hc-cloudtalk-webhook-instructions {\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.dark .hc-cloudtalk-webhook-note {\n    background: #263b53;\n    color: #cccccc;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -117542,6 +118021,36 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_SmsRow_vue_vue_type_style_index_0_id_7139acbf_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_style_index_0_id_79b93e02_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_style_index_0_id_79b93e02_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_style_index_0_id_79b93e02_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -127730,15 +128239,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Modal_vue_vue_type_template_id_79b93e02__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Modal.vue?vue&type=template&id=79b93e02 */ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02");
+/* harmony import */ var _Modal_vue_vue_type_template_id_79b93e02_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Modal.vue?vue&type=template&id=79b93e02&scoped=true */ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true");
 /* harmony import */ var _Modal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Modal.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _Modal_vue_vue_type_style_index_0_id_79b93e02_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css */ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_Modal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_Modal_vue_vue_type_template_id_79b93e02__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/table/modals/export/Modal.vue"]])
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_Modal_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_Modal_vue_vue_type_template_id_79b93e02_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render],['__scopeId',"data-v-79b93e02"],['__file',"resources/js/components/prospect/table/modals/export/Modal.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -146875,18 +147387,18 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02":
-/*!******************************************************************************************************!*\
-  !*** ./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02 ***!
-  \******************************************************************************************************/
+/***/ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true ***!
+  \******************************************************************************************************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_template_id_79b93e02__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_template_id_79b93e02_scoped_true__WEBPACK_IMPORTED_MODULE_0__.render)
 /* harmony export */ });
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_template_id_79b93e02__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Modal.vue?vue&type=template&id=79b93e02 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02");
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_template_id_79b93e02_scoped_true__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Modal.vue?vue&type=template&id=79b93e02&scoped=true */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=template&id=79b93e02&scoped=true");
 
 
 /***/ }),
@@ -150765,6 +151277,19 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_SmsRow_vue_vue_type_style_index_0_id_7139acbf_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader/dist/cjs.js!../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./SmsRow.vue?vue&type=style&index=0&id=7139acbf&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/sms/SmsRow.vue?vue&type=style&index=0&id=7139acbf&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css":
+/*!********************************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css ***!
+  \********************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_Modal_vue_vue_type_style_index_0_id_79b93e02_scoped_true_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/modals/export/Modal.vue?vue&type=style&index=0&id=79b93e02&scoped=true&lang=css");
 
 
 /***/ }),

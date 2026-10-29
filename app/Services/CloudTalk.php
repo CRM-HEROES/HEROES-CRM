@@ -199,6 +199,31 @@ class CloudTalk
     }
 
     /**
+     * Extract a message reference from a successful SMS response.
+     */
+    public function smsMessageId(array $response): ?string
+    {
+        foreach ([
+            'responseData.data.message_id', 'responseData.data.sms_id',
+            'responseData.data.id', 'responseData.data.Sms.id',
+            'responseData.data.Message.id', 'responseData.message_id',
+            'responseData.sms_id', 'data.message_id', 'data.sms_id',
+            'data.id', 'message_id', 'sms_id',
+        ] as $path) {
+            $value = data_get($response, $path);
+            if (!is_string($value) && !is_int($value)) {
+                continue;
+            }
+            $value = trim((string) $value);
+            if ($value !== '' && strlen($value) <= 191) {
+                return $value;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Extract the call id from a CloudTalk API response when the endpoint
      * provides one. Some Make a Call responses only confirm the request.
      */

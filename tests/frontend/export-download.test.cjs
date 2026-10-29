@@ -12,7 +12,7 @@ const { code } = transformSync(descriptor.script.content, {
     plugins: ['@babel/plugin-transform-modules-commonjs'],
 });
 
-function modal(handler, timer = callback => callback()) {
+function modal(handler, timer = callback => callback(), fixtures = {}) {
     const requests = [], commits = [], notices = [], downloads = [];
     const module = { exports: {} };
     const dependencies = {
@@ -36,8 +36,22 @@ function modal(handler, timer = callback => callback()) {
         ...component.data(), ...component.methods,
         project: { slug: 'test', name: 'Prospects' },
         prospectsParams: { keyword: 'A&B + C' },
+        fields: [{ for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false }],
+        categories: [],
+        threads: [],
+        projectUserSettingsProspectsTable: [{ key: 'first_name' }],
+        can: () => true,
+        canEvent: false,
+        $t: key => key,
+        user: { email: 'name+export@example.com' },
+        ...fixtures,
     };
-    vm.prospectExport.email = 'name+export@example.com';
+    for (const [key, computed] of Object.entries(component.computed)) {
+        const getter = typeof computed === 'function' ? computed : computed.get;
+        Object.defineProperty(vm, key, { get: () => getter.call(vm), configurable: true });
+    }
+    component.created.call(vm);
+    vm.resetExportFields();
 
     return { vm, component, requests, commits, notices, downloads };
 }
@@ -47,6 +61,7 @@ test('email keeps its own delivery flow and recipient', async () => {
     await m.vm.exportProspects();
     assert.equal(m.requests.length, 1);
     assert.equal(m.requests[0][1].params.email, 'name+export@example.com');
+    assert.equal(m.requests[0][1].params.fields, 'first_name');
     assert.deepEqual(JSON.parse(m.requests[0][1].params.filters), m.vm.prospectsParams);
     assert.deepEqual(m.notices, [['info', 'queued']]);
     assert.deepEqual(m.downloads, []);
@@ -62,6 +77,7 @@ test('download waits through queued and processing states and then starts once',
     await m.vm.exportProspects();
     assert.equal(m.requests.length, 4);
     assert.equal(m.requests[0][1].params.count, 0);
+    assert.equal(m.requests[0][1].params.fields, 'first_name');
     assert.equal('email' in m.requests[0][1].params, false);
     assert.deepEqual(m.downloads, ['/download']);
     assert.deepEqual(m.commits, ['close']);
@@ -99,4 +115,347 @@ test('duplicate submissions are ignored while preparing', async () => {
     m.vm.exporting = true;
     await m.vm.exportProspects();
     assert.deepEqual(m.requests, []);
+});
+
+test('only visible exportable table columns are preselected with pinned columns first', () => {
+    const m = modal(() => {}, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'last_name', name: 'Nom', meta: false },
+            { for: 'prospect', slug: 'email', name: 'Email', meta: false },
+            { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+        ],
+        projectUserSettingsProspectsTable: [
+            { key: 'first_name' },
+            { key: 'last_name', hidden: true, fixed: true },
+            { key: 'email', fixed: true },
+            { key: 'meta->score', fixed: true },
+            { key: 'creator' },
+            { key: 'import' },
+            { key: 'pipedrive-accounts' },
+            { key: 'calendar->1' },
+            { key: 'event->name' },
+            { key: 'deleted_field' },
+        ],
+    });
+
+    assert.deepEqual(m.vm.prospectExport.fields, ['email', 'meta->score', 'first_name']);
+    assert.deepEqual(m.vm.selectedExportFields, ['email', 'meta->score', 'first_name']);
+    assert.deepEqual(m.vm.exportColumns.slice(0, 3).map(column => column.key), ['email', 'meta->score', 'first_name']);
+    assert.ok(m.vm.exportColumns.some(column => column.key === 'last_name'));
+    for (const key of ['creator', 'import', 'pipedrive-accounts', 'calendar->1', 'event->name', 'deleted_field']) {
+        assert.ok(!m.vm.exportColumns.some(column => column.key === key), `${key} cannot be exported`);
+    }
+});
+
+test('all prospect custom fields, accessible categories and threads are offered', () => {
+    const m = modal(() => {}, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+            { for: 'event', slug: 'venue', name: 'Salle', meta: true },
+            { for: 'user', slug: 'badge', name: 'Badge', meta: true },
+        ],
+        categories: [
+            { id: 7, name: 'Statut', for: 'prospect' },
+            { id: 9, name: 'Équipe', for: 'user' },
+        ],
+        threads: [{ id: 8, name: 'Notes' }],
+    });
+
+    for (const column of [
+        { key: 'meta->score', name: 'Score' },
+        { key: 'category->7', name: 'Statut' },
+        { key: 'thread->8', name: 'Notes' },
+    ]) {
+        assert.ok(m.vm.exportColumns.some(candidate => candidate.key === column.key && candidate.name === column.name));
+    }
+    assert.ok(m.vm.exportColumns.some(column => column.key === 'links'));
+    assert.ok(!m.vm.exportColumns.some(column => column.key === 'meta->venue' || column.key === 'meta->badge'));
+    assert.ok(!m.vm.exportColumns.some(column => column.key === 'category->9'));
+    assert.deepEqual(m.vm.prospectExport.fields, ['first_name']);
+});
+
+test('appointments, calls and SMS follow the table visibility permissions', () => {
+    const settings = ['first_name', 'events', 'interactions', 'sms'].map(key => ({ key }));
+    const restricted = modal(() => {}, undefined, {
+        can: () => false,
+        projectUserSettingsProspectsTable: settings,
+    });
+    for (const key of ['events', 'interactions', 'sms']) {
+        assert.ok(!restricted.vm.exportColumns.some(column => column.key === key));
+    }
+    assert.deepEqual(restricted.vm.prospectExport.fields, ['first_name']);
+
+    const calendarAccess = modal(() => {}, undefined, { can: () => false, canEvent: true });
+    assert.ok(calendarAccess.vm.exportColumns.some(column => column.key === 'events'));
+    assert.ok(!calendarAccess.vm.exportColumns.some(column => column.key === 'sms' || column.key === 'interactions'));
+
+    for (const [permission, column] of [
+        ['all.prospect.event.view', 'events'],
+        ['all.prospect.interaction.view', 'interactions'],
+        ['all.prospect.sms.view', 'sms'],
+    ]) {
+        const allowed = modal(() => {}, undefined, { can: key => key === permission });
+        assert.ok(allowed.vm.exportColumns.some(candidate => candidate.key === column), permission);
+    }
+});
+
+for (const mode of ['email', 'download']) {
+    test(`${mode} sends only selected valid columns in export order`, async () => {
+        const m = modal(url => url.endsWith('/create')
+            ? { data: { message: 'queued', status_url: '/status', download_url: '/download' } }
+            : { data: { status: 'ready' } }, undefined, {
+            fields: [
+                { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+                { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+            ],
+            projectUserSettingsProspectsTable: [{ key: 'meta->score' }, { key: 'first_name' }],
+        });
+        m.vm.prospectExport.mode = mode;
+        m.vm.prospectExport.fields = ['first_name', 'deleted_field', 'meta->score', 'first_name'];
+
+        await m.vm.exportProspects();
+
+        assert.equal(m.requests[0][1].params.fields, 'meta->score,first_name');
+        assert.deepEqual(m.commits, ['close']);
+    });
+
+    test(`${mode} refuses an empty selection before making a request`, async () => {
+        const m = modal(() => { throw new Error('unexpected request'); });
+        m.vm.prospectExport.mode = mode;
+        m.vm.prospectExport.fields = [];
+
+        await m.vm.exportProspects();
+
+        assert.deepEqual(m.requests, []);
+        assert.deepEqual(m.notices, [['error', 'Sélectionnez au moins une colonne à exporter.']]);
+        assert.deepEqual(m.commits, []);
+        assert.equal(m.vm.exporting, false);
+    });
+}
+
+test('a selection containing only obsolete columns is rejected', async () => {
+    const m = modal(() => { throw new Error('unexpected request'); });
+    m.vm.prospectExport.fields = ['deleted_field'];
+
+    await m.vm.exportProspects();
+
+    assert.deepEqual(m.requests, []);
+    assert.deepEqual(m.notices, [['error', 'Sélectionnez au moins une colonne à exporter.']]);
+});
+
+test('opening the modal again resets selection from the latest table settings', () => {
+    const m = modal(() => {}, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'email', name: 'Email', meta: false },
+        ],
+    });
+    assert.match(descriptor.template.content, /@open\s*=\s*["']\s*resetExportFields(?:\(\))?\s*["']/);
+    m.vm.prospectExport.fields = ['history'];
+    m.vm.projectUserSettingsProspectsTable = [{ key: 'first_name', hidden: true }, { key: 'email' }];
+
+    m.vm.resetExportFields();
+
+    assert.deepEqual(m.vm.prospectExport.fields, ['email']);
+    assert.deepEqual(m.vm.selectedExportFields, ['email']);
+});
+
+test('selecting all includes every available column, including hidden custom fields', () => {
+    const m = modal(() => {}, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+        ],
+        projectUserSettingsProspectsTable: [{ key: 'first_name' }, { key: 'meta->score', hidden: true }],
+    });
+
+    m.vm.selectAllExportFields();
+
+    assert.deepEqual(m.vm.prospectExport.fields, m.vm.exportColumns.map(column => column.key));
+    assert.ok(m.vm.selectedExportFields.includes('meta->score'));
+    assert.ok(m.vm.selectedExportFields.includes('history'));
+});
+
+test('sheet creation preserves columns, filters, count and name without requiring an email', async () => {
+    const states = ['queued', 'processing', 'ready'];
+    const sheetUrl = 'https://docs.google.com/spreadsheets/d/new-sheet/edit';
+    const m = modal(url => url.endsWith('/create')
+        ? { status: 202, data: { message: 'Creation queued', status_url: '/sheet-status' } }
+        : { data: { status: states.shift(), mode: 'sheet', sheet_url: sheetUrl, rows: 2 } }, undefined, {
+        fields: [
+            { for: 'prospect', slug: 'first_name', name: 'Prénom', meta: false },
+            { for: 'prospect', slug: 'score', name: 'Score', meta: true },
+        ],
+        projectUserSettingsProspectsTable: [{ key: 'meta->score' }, { key: 'first_name' }],
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.email = '';
+    m.vm.prospectExport.count = 1000;
+    m.vm.prospectExport.sheet_name = 'Campagne automne';
+    m.vm.prospectExport.fields = ['first_name', 'deleted', 'meta->score'];
+    m.vm.sheetConfiguration = { connected: true, account_name: 'Project account' };
+
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 4);
+    assert.deepEqual(m.requests[0][1].params, {
+        mode: 'sheet', count: 1000, sheet_name: 'Campagne automne',
+        fields: 'meta->score,first_name', filters: JSON.stringify(m.vm.prospectsParams),
+    });
+    assert.equal(m.vm.sheetUrl, sheetUrl);
+    assert.equal(m.vm.exportMessage, 'Votre Google Sheet est prêt.');
+    assert.deepEqual(m.notices, [['info', 'Votre Google Sheet est prêt.']]);
+    assert.deepEqual(m.downloads, []);
+    assert.deepEqual(m.commits, []);
+    assert.equal(m.vm.exporting, false);
+});
+
+test('sheet default name uses the project and an empty name is optional', async () => {
+    const m = modal(url => url.endsWith('/create')
+        ? { data: { status_url: '/status' } }
+        : { data: { status: 'ready', sheet_url: 'https://docs.google.com/spreadsheets/d/example/edit' } });
+    assert.equal(m.vm.prospectExport.sheet_name, 'Prospects - Prospects');
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.sheet_name = '';
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.equal('sheet_name' in m.requests[0][1].params, false);
+    assert.equal('email' in m.requests[0][1].params, false);
+});
+
+test('selecting sheet verifies the project account and disables creation until the check ends', async () => {
+    let respond;
+    const m = modal(() => new Promise(resolve => { respond = resolve; }));
+    m.vm.prospectExport.mode = 'sheet';
+
+    const checking = m.component.watch['prospectExport.mode'].call(m.vm, 'sheet');
+
+    assert.equal(m.requests[0][0], '/api/project/test/export/sheet-configuration');
+    assert.equal(m.vm.sheetConfigurationLoading, true);
+    assert.equal(m.vm.exportDisabled, true);
+    respond({ data: { connected: true, account_name: 'Compte du projet' } });
+    await checking;
+
+    assert.equal(m.vm.sheetConfigurationLoading, false);
+    assert.deepEqual(m.vm.sheetConfiguration, { connected: true, account_name: 'Compte du projet' });
+    assert.equal(m.vm.exportDisabled, false);
+});
+
+test('disconnected sheets cannot be submitted', async () => {
+    const m = modal(() => ({ data: { connected: false, account_name: null } }));
+    m.vm.prospectExport.mode = 'sheet';
+    await m.vm.loadSheetConfiguration();
+
+    assert.equal(m.vm.exportDisabled, true);
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 1);
+    assert.deepEqual(m.commits, []);
+    assert.match(m.notices[0][1], /Connectez un compte Google Drive/);
+});
+
+test('a configuration failure is visible, prevents submission and can be retried', async () => {
+    let fail = true;
+    const m = modal(() => {
+        if (fail) throw new Error('offline');
+        return { data: { connected: true, account_name: 'Compte du projet' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    await m.vm.loadSheetConfiguration();
+
+    assert.match(m.vm.sheetConfigurationError, /Impossible de vérifier/);
+    assert.equal(m.vm.sheetConfigurationLoading, false);
+    assert.equal(m.vm.exportDisabled, true);
+    await m.vm.exportProspects();
+    assert.equal(m.requests.length, 1);
+
+    fail = false;
+    await m.vm.loadSheetConfiguration();
+
+    assert.equal(m.vm.sheetConfigurationError, '');
+    assert.equal(m.vm.sheetConfiguration.connected, true);
+    assert.equal(m.vm.exportDisabled, false);
+});
+
+test('opening sheet again clears its old result and refreshes the connection', async () => {
+    const m = modal(() => ({ data: { connected: false, account_name: null } }));
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true, account_name: 'Ancien compte' };
+    m.vm.sheetUrl = 'https://docs.google.com/spreadsheets/d/previous/edit';
+    m.vm.exportMessage = 'Previous result';
+
+    await m.vm.resetExportFields();
+
+    assert.equal(m.vm.sheetUrl, '');
+    assert.equal(m.vm.exportMessage, '');
+    assert.equal(m.requests.length, 1);
+    assert.equal(m.vm.sheetConfiguration.connected, false);
+});
+
+test('a new sheet request clears the previous result before starting', async () => {
+    let receivedUrl;
+    const m = modal(url => {
+        if (url.endsWith('/create')) {
+            receivedUrl = m.vm.sheetUrl;
+            return { data: { status_url: '/status' } };
+        }
+        return { data: { status: 'failed', message: 'Impossible de créer le document.' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true };
+    m.vm.sheetUrl = 'https://docs.google.com/spreadsheets/d/previous/edit';
+
+    await m.vm.exportProspects();
+
+    assert.equal(receivedUrl, '');
+    assert.equal(m.vm.sheetUrl, '');
+    assert.deepEqual(m.notices, [['error', 'Impossible de créer le document.']]);
+    assert.deepEqual(m.commits, []);
+    assert.deepEqual(m.downloads, []);
+});
+
+test('unmounting while a sheet status request runs ignores its result', async () => {
+    let m;
+    m = modal(url => {
+        if (url.endsWith('/create')) return { data: { status_url: '/status' } };
+        m.component.beforeUnmount.call(m.vm);
+        return { data: { status: 'ready', sheet_url: 'https://docs.google.com/spreadsheets/d/cancelled/edit' } };
+    });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.equal(m.requests.length, 2);
+    assert.equal(m.vm.sheetUrl, '');
+    assert.deepEqual(m.notices, []);
+    assert.deepEqual(m.commits, []);
+    assert.deepEqual(m.downloads, []);
+});
+
+test('unmounting ignores a pending connection check', async () => {
+    let respond;
+    const m = modal(() => new Promise(resolve => { respond = resolve; }));
+    const pending = m.vm.loadSheetConfiguration();
+    m.component.beforeUnmount.call(m.vm);
+    respond({ data: { connected: true, account_name: 'Old account' } });
+    await pending;
+
+    assert.equal(m.vm.sheetConfiguration, null);
+});
+
+test('sheet refuses an empty column selection before creating a document', async () => {
+    const m = modal(() => { throw new Error('unexpected request'); });
+    m.vm.prospectExport.mode = 'sheet';
+    m.vm.prospectExport.fields = [];
+    m.vm.sheetConfiguration = { connected: true };
+
+    await m.vm.exportProspects();
+
+    assert.deepEqual(m.requests, []);
+    assert.deepEqual(m.notices, [['error', 'Sélectionnez au moins une colonne à exporter.']]);
 });
