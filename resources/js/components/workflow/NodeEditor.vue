@@ -5,7 +5,7 @@
             <button type="button" class="hc-wfn-close" :title="$t('workflow.close')" @click="$emit('close')">×</button>
         </header>
 
-        <label class="hc-wfn-label" v-text="$t('workflow.step_name')"></label>
+        <label class="hc-wfn-label"><span v-text="$t('workflow.step_name')"></span><help-tip k="workflow.tip.step_name" /></label>
         <input
             type="text"
             maxlength="120"
@@ -17,7 +17,7 @@
 
         <!-- When -->
         <template v-if="node.type === 'trigger'">
-            <label class="hc-wfn-label" v-text="$t('workflow.node.trigger')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.node.trigger')"></span><help-tip k="workflow.tip.trigger" /></label>
             <select :value="config.trigger" :disabled="readOnly" @change="changeTrigger($event.target.value)">
                 <option v-for="trigger in catalog.triggers" :key="trigger.type" :value="trigger.type" v-text="$t('workflow.trigger.' + slug(trigger.type))"></option>
             </select>
@@ -25,13 +25,11 @@
 
             <template v-for="field in triggerFields" :key="field.key">
                 <template v-if="field.type === 'condition'">
-                    <label class="hc-wfn-label" v-text="$t('workflow.trigger_filter')"></label>
-                    <p class="hc-wfn-help" v-text="$t('workflow.trigger_filter_help')"></p>
+                    <label class="hc-wfn-label"><span v-text="$t('workflow.trigger_filter')"></span><help-tip k="workflow.trigger_filter_help" /></label>
                     <condition-group :model-value="tree" :subject="subject" :catalog="catalog" :read-only="readOnly" @update:model-value="setTree" />
                 </template>
                 <template v-else>
-                    <label class="hc-wfn-label" v-text="$t('workflow.field.' + field.key)"></label>
-                    <p v-if="help(field)" class="hc-wfn-help" v-text="help(field)"></p>
+                    <label class="hc-wfn-label"><span v-text="$t('workflow.field.' + field.key)"></span><help-tip :text="help(field) || ''" /></label>
                     <field-input
                         :model-value="config[field.key]"
                         :type="field.type"
@@ -45,13 +43,13 @@
 
         <!-- If -->
         <template v-else-if="node.type === 'condition'">
-            <label class="hc-wfn-label" v-text="$t('workflow.node_help.condition')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.node_help.condition')"></span></label>
             <condition-group :model-value="tree" :subject="subject" :catalog="catalog" :read-only="readOnly" @update:model-value="setTree" />
         </template>
 
         <!-- Do -->
         <template v-else-if="node.type === 'action'">
-            <label class="hc-wfn-label" v-text="$t('workflow.field.action')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.field.action')"></span><help-tip k="workflow.tip.action" /></label>
             <select :value="config.action || ''" :disabled="readOnly" @change="chooseAction($event.target.value)">
                 <option value="" v-text="$t('workflow.choose')"></option>
                 <option v-if="config.action && !actionDef" :value="config.action" v-text="actionLabel(config.action)"></option>
@@ -72,8 +70,8 @@
                     <label class="hc-wfn-label">
                         {{ $t("workflow.field." + fieldName(field)) }}
                         <span v-if="field.required" class="hc-wfn-required">*</span>
+                        <help-tip :text="help(field) || ''" />
                     </label>
-                    <p v-if="help(field)" class="hc-wfn-help" v-text="help(field)"></p>
                     <field-input
                         :model-value="getPath(field.key)"
                         :type="field.type"
@@ -89,7 +87,7 @@
 
         <!-- Wait -->
         <template v-else-if="node.type === 'wait'">
-            <label class="hc-wfn-label" v-text="$t('workflow.wait.mode')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.wait.mode')"></span><help-tip k="workflow.tip.wait_mode" /></label>
             <select :value="waitMode" :disabled="readOnly" @change="setWaitMode($event.target.value)">
                 <option value="duration" v-text="$t('workflow.wait.duration')"></option>
                 <option value="time" v-text="$t('workflow.wait.until_time')"></option>
@@ -125,26 +123,25 @@
 
         <!-- Wait for an event -->
         <template v-else-if="node.type === 'wait_event'">
-            <label class="hc-wfn-label" v-text="$t('workflow.field.event')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.field.event')"></span><help-tip k="workflow.tip.wait_event" /></label>
             <select :value="config.event" :disabled="readOnly" @change="setConfig({ event: $event.target.value })">
                 <option v-for="event in catalog.events" :key="event" :value="event" v-text="$t('workflow.event.' + event)"></option>
             </select>
 
-            <label class="hc-wfn-label" v-text="$t('workflow.wait.max')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.wait.max')"></span><help-tip k="workflow.wait.event_help" /></label>
             <div class="hc-wfn-duration">
                 <label v-for="unit in ['days', 'hours', 'minutes']" :key="unit">
                     <span v-text="$t('workflow.wait.' + unit)"></span>
                     <field-input :model-value="config[unit]" type="number" :read-only="readOnly" @update:model-value="setConfig({ [unit]: $event })" />
                 </label>
             </div>
-            <p class="hc-wfn-help" v-text="$t('workflow.wait.event_help')"></p>
         </template>
 
         <p v-else-if="node.type === 'end'" class="hc-wfn-help" v-text="$t('workflow.node_help.end')"></p>
 
         <!-- What follows -->
         <template v-if="outputList.length">
-            <label class="hc-wfn-label" v-text="$t('workflow.next')"></label>
+            <label class="hc-wfn-label"><span v-text="$t('workflow.next')"></span><help-tip k="workflow.tip.next" /></label>
             <div v-for="output in outputList" :key="String(output.branch)" class="hc-wfn-output">
                 <span v-if="output.branch" class="hc-wfn-branch" :class="output.branch" v-text="$t('workflow.' + output.branch)"></span>
                 <select :value="output.to || ''" :disabled="readOnly" @change="$emit('link', { branch: output.branch, to: $event.target.value || null })">
@@ -160,7 +157,7 @@
             </div>
         </template>
 
-        <button v-if="!readOnly && node.type !== 'trigger'" type="button" class="hc-wfn-delete" @click="$emit('remove')" v-text="$t('workflow.remove_node')"></button>
+        <button v-if="!readOnly && node.type !== 'trigger'" type="button" class="hc-wfn-delete" :title="$t('workflow.tip.remove_node')" @click="$emit('remove')" v-text="$t('workflow.remove_node')"></button>
     </aside>
 </template>
 
@@ -270,13 +267,14 @@
 
 <script>
 import ConditionGroup from "./ConditionGroup.vue";
+import HelpTip from "./HelpTip.vue";
 import FieldInput from "./FieldInput.vue";
 import { outputs, triggerNode, wouldCreateCycle } from "@/utils/workflow-graph";
 import { slug } from "@/utils/workflow-i18n";
 import { triggerConfig } from "@/utils/workflow-conditions";
 
 export default {
-    components: { ConditionGroup, FieldInput },
+    components: { HelpTip, ConditionGroup, FieldInput },
 
     props: {
         node: { type: Object, required: true },
