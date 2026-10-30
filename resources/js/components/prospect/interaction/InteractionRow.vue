@@ -103,7 +103,6 @@
             :src="interaction.audio"
             preload="none"
             @play="playingAudio = true"
-            @playing="markVoicemailRead"
             @pause="playingAudio = false"
             @ended="playingAudio = false"
         ></audio>
@@ -165,8 +164,6 @@
 </style>
 
 <script>
-import { mapGetters } from "vuex";
-import { markCommunicationsRead } from "@/utils/incoming-communications";
 
 export default {
     props: {
@@ -178,12 +175,10 @@ export default {
     data() {
         return {
             playingAudio: false,
-            lastReadVoicemailId: null,
         };
     },
 
     computed: {
-        ...mapGetters(["project"]),
         /**
          *
          */
@@ -334,16 +329,6 @@ export default {
     },
 
     methods: {
-        async markVoicemailRead() {
-            const interaction = this.interaction;
-            if (this.callOutcome !== "voicemail" || interaction.from_user || this.lastReadVoicemailId === interaction.id) {
-                return;
-            }
-            if (await markCommunicationsRead(this.project?.slug, interaction.prospect_id, "voicemail", [interaction])) {
-                this.lastReadVoicemailId = interaction.id;
-            }
-        },
-
         toggleAudio() {
             const audio = this.$refs.audio;
 

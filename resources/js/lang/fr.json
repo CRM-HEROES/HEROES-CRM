@@ -151,6 +151,10 @@
     },
 
     "prospect": {
+        "communications": {
+            "process": "Traiter",
+            "process_error": "Le traitement a échoué. Veuillez réessayer."
+        },
         "table": {
             "footer": {
                 "deselect": "Déselectionner les prospects",

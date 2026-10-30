@@ -131,14 +131,26 @@
                 </template>
             </tab-layout>
         </div>
+        <process-communications
+            v-if="interactionProspect && tab === 0 && !cloudtalkPhoneDisplayed && leftSlideOpen(name)"
+            :key="project.slug + ':' + interactionProspect.id"
+            :project-slug="project.slug"
+            :prospect="interactionProspect"
+            type="voicemail"
+            :records="prospectInteractions"
+            :disabled="fetchingInteraction"
+        />
     </slide>
 </template>
 
 <style>
 .hc-prospect-interaction-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
     position: relative;
     width: 100%;
-    height: 100%;
     overflow-y: hidden;
 }
 
@@ -518,6 +530,7 @@ import CloudtalkSequenceControls from "./components/CloudtalkSequenceControls.vu
 import cloudtalkSequence from "./cloudtalk-sequence";
 import InteractionFrames from "./components/InteractionFrames.vue";
 import InteractionList from "./components/InteractionList.vue";
+import ProcessCommunications from "../ProcessCommunications.vue";
 
 export default {
     mixins: [cloudtalkSequence],
@@ -526,6 +539,7 @@ export default {
         CloudtalkSequenceControls,
         InteractionFrames,
         InteractionList,
+        ProcessCommunications,
     },
 
     data() {

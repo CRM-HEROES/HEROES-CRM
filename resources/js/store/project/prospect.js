@@ -387,7 +387,7 @@ const mutations = {
         }
 
         const readIds = new Set(ids.map(Number));
-        const prospects = [state.project.prospect, ...(state.project.prospects || [])];
+        const prospects = [state.project.prospect, state.project.interactionProspect, ...(state.project.prospects || [])];
         for (const prospect of prospects) {
             if (prospect?.id != prospectId || !prospect.unread_communications?.[type]) {
                 continue;
