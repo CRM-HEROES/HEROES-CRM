@@ -12895,6 +12895,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_card_menu, {
         icon: $options.selectAllFiltered ? 'fa fa-check-square' : 'fa-regular fa-square',
         label: _ctx.$t('prospect.table.footer.select_all_filtered'),
+        title: _ctx.$t('prospect.table.footer.select_all_filtered'),
         disabled: $data.selectingAllFiltered,
         onClick: _cache[0] || (_cache[0] = function ($event) {
           return $options.selectAllFiltered = !$options.selectAllFiltered;
@@ -12906,7 +12907,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, null, 8 /* PROPS */, ["loading"])];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["icon", "label", "disabled"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      }, 8 /* PROPS */, ["icon", "label", "title", "disabled"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
         "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
           return $options.count = $event;
         })

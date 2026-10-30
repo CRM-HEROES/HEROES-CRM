@@ -57,6 +57,7 @@
                         : 'fa-regular fa-square'
                 "
                 :label="$t('prospect.table.footer.select_all_filtered')"
+                :title="$t('prospect.table.footer.select_all_filtered')"
                 :disabled="selectingAllFiltered"
                 @click="selectAllFiltered = !selectAllFiltered"
             >
