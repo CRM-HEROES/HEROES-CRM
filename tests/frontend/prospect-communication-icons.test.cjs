@@ -87,6 +87,16 @@ test('late receipts from another project leave the displayed icons unchanged', (
     assert.deepEqual(classes(p, 'sms'), ['has-unread', 'has-items']);
 });
 
+test('processing voicemails also updates the separate call panel prospect', () => {
+    const selected = prospect(), listed = prospect(), interactionProspect = prospect();
+    const state = { project: { slug: 'test', prospect: selected, interactionProspect, prospects: [listed] } };
+    store.mutations.MARK_PROSPECT_COMMUNICATIONS_READ(state, {
+        projectSlug: 'test', prospectId: 1, type: 'voicemail', ids: [5, 6],
+    });
+    assert.deepEqual(interactionProspect.unread_communications.voicemail, []);
+    assert.deepEqual(classes(listed, 'interaction'), ['has-items']);
+});
+
 test('a newly received message turns a previously consulted icon red again', () => {
     const p = prospect();
     p.unread_communications.sms = [];

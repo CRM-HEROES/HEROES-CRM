@@ -151,6 +151,10 @@
     },
 
     "prospect": {
+        "communications": {
+            "process": "Process",
+            "process_error": "Processing failed. Please try again."
+        },
         "table": {
             "footer": {
                 "deselect": "De-select prospects",

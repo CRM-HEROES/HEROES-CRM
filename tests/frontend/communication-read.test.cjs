@@ -3,6 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 const { parse } = require('@vue/compiler-sfc');
+const { baseParse } = require('@vue/compiler-dom');
 const { transformSync } = require('@babel/core');
 
 const sourceRoot = path.resolve(__dirname, '../../resources/js');
@@ -95,14 +96,14 @@ function panel(kind) {
     return { vm, calls };
 }
 
-test('SMS are consulted only when their conversation is visible', async () => {
+test('opening or refreshing SMS does not process incoming messages', async () => {
     const h = panel('sms');
-    h.vm.tab = 0;
-    await h.vm.markDisplayedSmsRead();
+    const component = load('components/prospect/sms/Slide.vue', { vuex: { mapGetters: () => ({}) } }).default;
+    h.vm.$refs = {};
+    await component.watch.prospectSms.call(h.vm, h.vm.prospectSms, []);
+    await component.watch.tab.call(h.vm, 1);
     assert.deepEqual(h.calls, []);
-    h.vm.tab = 1;
-    await h.vm.markDisplayedSmsRead();
-    assert.deepEqual(h.calls, [['test', 2, 'sms', [{ id: 1, prospect_id: 2 }]]]);
+    assert.equal(component.methods.markDisplayedSmsRead, undefined);
 });
 
 test('email receipts contain only the displayed prospect and thread', async () => {
@@ -111,37 +112,106 @@ test('email receipts contain only the displayed prospect and thread', async () =
     assert.deepEqual(h.calls, [['test', 2, 'email', [{ id: 3, prospect_id: 2, thread_id: 8 }]]]);
 });
 
-test('background panels and a changed prospect do not mark messages read', async () => {
-    for (const kind of ['sms', 'email']) {
-        const h = panel(kind);
-        const method = kind === 'sms' ? 'markDisplayedSmsRead' : 'markDisplayedMessagesRead';
-        h.vm.slideOpen = () => false;
-        await h.vm[method]();
-        assert.deepEqual(h.calls, []);
-        h.vm.slideOpen = () => true;
-        h.vm.$nextTick = async () => { h.vm.prospect = { id: 99 }; };
-        await h.vm[method]();
-        assert.deepEqual(h.calls, []);
-    }
+test('background email panels and a changed prospect do not mark messages read', async () => {
+    const h = panel('email');
+    h.vm.slideOpen = () => false;
+    await h.vm.markDisplayedMessagesRead();
+    assert.deepEqual(h.calls, []);
+    h.vm.slideOpen = () => true;
+    h.vm.$nextTick = async () => { h.vm.prospect = { id: 99 }; };
+    await h.vm.markDisplayedMessagesRead();
+    assert.deepEqual(h.calls, []);
 });
 
-test('a voicemail is marked only when playback starts, once per recording', async () => {
+test('playing a voicemail does not process it', () => {
     const h = panel('voicemail');
     h.vm.$refs = { audio: { play: () => Promise.resolve() } };
     h.vm.toggleAudio();
     assert.deepEqual(h.calls, []);
-    await h.vm.markVoicemailRead();
-    await h.vm.markVoicemailRead();
-    assert.equal(h.calls.length, 1);
-    assert.deepEqual(h.calls[0], ['test', 2, 'voicemail', [h.vm.interaction]]);
+    const source = fs.readFileSync(path.join(sourceRoot, 'components/prospect/interaction/InteractionRow.vue'), 'utf8');
+    assert.doesNotMatch(source, /markCommunicationsRead|markVoicemailRead/);
 });
 
-test('outgoing voicemails and ordinary call recordings are not marked as incoming voicemail', async () => {
-    const h = panel('voicemail');
-    h.vm.interaction.from_user = true;
-    await h.vm.markVoicemailRead();
-    h.vm.interaction.from_user = false;
-    h.vm.callOutcome = '';
-    await h.vm.markVoicemailRead();
+function processor(type, handler = async () => true) {
+    const calls = [];
+    const component = load('components/prospect/ProcessCommunications.vue', {
+        '@/utils/incoming-communications': { markCommunicationsRead: async (...args) => {
+            calls.push(args); return handler(...args);
+        } },
+    }).default;
+    const vm = {
+        ...component.data(), ...component.methods,
+        projectSlug: 'test', prospect: { id: 2 }, type, disabled: false,
+        records: [
+            { id: 1, prospect_id: 2, from_user: false, call_outcome: 'voicemail' },
+            { id: 2, prospect_id: 2, from_user: true, call_outcome: 'voicemail' },
+            { id: 3, prospect_id: 99, from_user: false, call_outcome: 'voicemail' },
+        ],
+    };
+    Object.defineProperty(vm, 'pendingRecords', { get: () => component.computed.pendingRecords.call(vm) });
+    return { vm, calls };
+}
+
+test('the process button handles only incoming messages of the displayed prospect', async () => {
+    for (const type of ['sms', 'voicemail']) {
+        const h = processor(type);
+        if (type === 'voicemail') h.vm.records.push({ id: 4, prospect_id: 2, from_user: false, call_outcome: 'missed' });
+        await h.vm.process();
+        assert.deepEqual(h.calls, [['test', 2, type, [h.vm.records[0]]]]);
+        assert.deepEqual(h.vm.pendingRecords, []);
+    }
+});
+
+test('messages received during processing still require a new click', async () => {
+    let finish;
+    const h = processor('sms', () => new Promise(resolve => { finish = resolve; }));
+    const request = h.vm.process();
+    h.vm.records.push({ id: 4, prospect_id: 2, is_incoming: true });
+    await h.vm.process(); // A double click must not start a second request.
+    finish(true);
+    await request;
+    assert.equal(h.calls.length, 1);
+    assert.deepEqual(h.vm.pendingRecords.map(record => record.id), [4]);
+});
+
+test('failed processing leaves messages pending and allows retrying', async () => {
+    let succeeds = false;
+    const h = processor('sms', async () => succeeds);
+    h.vm.disabled = true;
+    await h.vm.process();
     assert.deepEqual(h.calls, []);
+    h.vm.disabled = false;
+    await h.vm.process();
+    assert.equal(h.vm.error, true);
+    assert.equal(h.vm.processing, false);
+    assert.equal(h.vm.pendingRecords.length, 1);
+    succeeds = true;
+    await h.vm.process();
+    assert.equal(h.vm.error, false);
+    assert.equal(h.vm.pendingRecords.length, 0);
+});
+
+test('the unread metadata identifies voicemails even when provider fields differ', async () => {
+    const h = processor('voicemail');
+    h.vm.prospect.unread_communications = { voicemail: ['4'] };
+    h.vm.records.push({ id: 4, prospect_id: 2, data: { has_voicemail: true } });
+    await h.vm.process();
+    assert.deepEqual(h.calls[0][3].map(record => record.id), [4]);
+});
+
+test('SMS and call slides place manual processing at the bottom; email has no process button', () => {
+    for (const [kind, type] of [['sms', 'sms'], ['interaction', 'voicemail'], ['message', null]]) {
+        const source = fs.readFileSync(path.join(sourceRoot, `components/prospect/${kind}/Slide.vue`), 'utf8');
+        const template = baseParse(parse(source).descriptor.template.content);
+        const slide = template.children.find(node => node.tag === 'slide');
+        const children = slide.children.filter(node => node.type === 1);
+        const footer = children.find(node => node.tag === 'process-communications');
+        if (!type) {
+            assert.equal(footer, undefined);
+            continue;
+        }
+        assert.equal(children.at(-1), footer);
+        assert.equal(footer.props.find(prop => prop.name === 'type').value.content, type);
+        assert.ok(footer.props.some(prop => prop.name === 'if'));
+    }
 });
