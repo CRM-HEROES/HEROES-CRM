@@ -37,8 +37,8 @@
             <div class="hc-wfb-more">
                 <button type="button" class="hc-wfb-soft hc-wfb-more-toggle" :title="$t('workflow.more')" @click.stop="moreOpen = !moreOpen">⋯</button>
                 <div v-if="moreOpen" class="hc-wfb-more-menu" @click.stop>
-                    <button type="button" :disabled="busy" @click="moreOpen = false; check()" v-text="$t('workflow.action.validate')"></button>
-                    <button type="button" :disabled="readOnly" @click="moreOpen = false; arrange()" v-text="$t('workflow.action.arrange')"></button>
+                    <button type="button" :disabled="busy" :title="$t('workflow.tip.validate')" @click="moreOpen = false; check()" v-text="$t('workflow.action.validate')"></button>
+                    <button type="button" :disabled="readOnly" :title="$t('workflow.tip.arrange')" @click="moreOpen = false; arrange()" v-text="$t('workflow.action.arrange')"></button>
                     <button
                         v-if="canUpdate && status !== 'archived' && status !== 'active'"
                         type="button"
@@ -88,14 +88,15 @@
             <!-- Palette -->
             <nav class="hc-wfb-palette">
                 <!-- The trigger is the first step: one click to change it -->
-                <div class="hc-wfb-section" v-text="$t('workflow.section.trigger')"></div>
+                <div class="hc-wfb-section"><span v-text="$t('workflow.section.trigger')"></span></div>
+                <p class="hc-wfb-section-help" v-text="$t('workflow.section.trigger_help')"></p>
                 <button type="button" class="hc-wfb-palette-item type-trigger" :class="{ on: selectedId === triggerId }" @click="selectedId = triggerId">
                     <span class="hc-wfb-palette-dot"></span>
                     <span v-text="$t('workflow.section.trigger_change')"></span>
                 </button>
 
                 <template v-for="section in sections(false)" :key="section.key">
-                    <div class="hc-wfb-section" v-text="$t('workflow.section.' + section.key)"></div>
+                    <div class="hc-wfb-section"><span v-text="$t('workflow.section.' + section.key)"></span></div>
                     <p class="hc-wfb-section-help" v-text="$t('workflow.section.' + section.key + '_help')"></p>
                     <button
                         v-for="type in section.types"
@@ -182,7 +183,8 @@
                         <div class="hc-wfb-node-icon" v-text="icon(node.type)"></div>
                         <div class="hc-wfb-node-main" @mousedown="dragStart($event, node)">
                             <span class="hc-wfb-node-type" v-text="$t('workflow.node.' + node.type)"></span>
-                            <span class="hc-wfb-node-body" :title="describe(node)" v-text="describe(node)"></span>
+                            <span v-if="node.name" class="hc-wfb-node-name" :title="node.name" v-text="node.name"></span>
+                            <span class="hc-wfb-node-body" :class="{ small: node.name }" :title="describe(node)" v-text="describe(node)"></span>
                         </div>
                         <span v-if="!readOnly && node.type !== 'trigger'" class="hc-wfb-node-remove" :title="$t('workflow.remove_node')" @mousedown.stop @click.stop="removeNode(node)">×</span>
 
@@ -671,6 +673,23 @@
     line-height: 1.25;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+}
+
+.hc-wfb-node-name {
+    overflow: hidden;
+    color: #1f2330;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hc-wfb-node-body.small {
+    color: #6b7080;
+    font-size: 11px;
+    font-weight: 500;
+    -webkit-line-clamp: 1;
 }
 
 .hc-wfb-node-remove {

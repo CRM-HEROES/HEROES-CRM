@@ -6,6 +6,7 @@
                 <option value="and" v-text="$t('workflow.condition.all')"></option>
                 <option value="or" v-text="$t('workflow.condition.any')"></option>
             </select>
+            <help-tip k="workflow.tip.condition_op" />
             <button v-if="depth > 1 && !readOnly" type="button" class="hc-wfc-remove" :title="$t('workflow.condition.remove_group')" @click="$emit('remove')">×</button>
         </div>
 
@@ -69,9 +70,9 @@
         </div>
 
         <div v-if="!readOnly" class="hc-wfc-add">
-            <button v-if="filters.length" type="button" @click="add(newFilter(filters[0].name))" v-text="'+ ' + $t('workflow.condition.add_filter')"></button>
-            <button type="button" @click="add(newCheck('work_hours'))" v-text="'+ ' + $t('workflow.condition.add_check')"></button>
-            <button v-if="depth < catalog.conditions.max_depth" type="button" @click="add({ op: 'and', items: [] })" v-text="'+ ' + $t('workflow.condition.add_group')"></button>
+            <span v-if="filters.length" class="hc-wfc-addwrap"><button type="button" @click="add(newFilter(filters[0].name))" v-text="'+ ' + $t('workflow.condition.add_filter')"></button><help-tip k="workflow.tip.add_filter" /></span>
+            <span class="hc-wfc-addwrap"><button type="button" @click="add(newCheck('work_hours'))" v-text="'+ ' + $t('workflow.condition.add_check')"></button><help-tip k="workflow.tip.add_check" /></span>
+            <span v-if="depth < catalog.conditions.max_depth" class="hc-wfc-addwrap"><button type="button" @click="add({ op: 'and', items: [] })" v-text="'+ ' + $t('workflow.condition.add_group')"></button><help-tip k="workflow.tip.add_group" /></span>
         </div>
     </div>
 </template>
@@ -93,6 +94,20 @@
 .hc-wfc-remove { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; padding: 0; color: #8a8fa0; background: transparent; border: 0; border-radius: 50%; font-size: 16px; line-height: 1; cursor: pointer; }
 .hc-wfc-remove:hover { color: #c0341d; background: #fdecea; }
 .hc-wfc-head .hc-wfc-remove { position: static; }
+.hc-wfc-head {
+    gap: 6px;
+    justify-content: flex-start;
+}
+
+.hc-wfc-head .hc-wfc-remove {
+    margin-left: auto;
+}
+
+.hc-wfc-addwrap {
+    display: inline-flex;
+    align-items: center;
+}
+
 .hc-wfc-add { display: flex; flex-wrap: wrap; gap: 6px; }
 .hc-wfc-add button { padding: 5px 12px; color: #3a49c9; background: #eceefd; border: 1px dashed #aab2f5; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s; }
 .hc-wfc-add button:hover { background: #dde1fb; }
@@ -100,12 +115,13 @@
 
 <script>
 import FieldInput from "./FieldInput.vue";
+import HelpTip from "./HelpTip.vue";
 import { filtersFor, newCheckItem, newFilterItem } from "@/utils/workflow-conditions";
 
 export default {
     name: "ConditionGroup",
 
-    components: { FieldInput },
+    components: { FieldInput, HelpTip },
 
     props: {
         // { op: "and" | "or", items: [ { filters } | { check, ... } | { op, items } ] }
