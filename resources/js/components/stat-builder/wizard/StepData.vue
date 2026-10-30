@@ -10,7 +10,7 @@
         <template v-if="source">
             <DimensionSection v-if="has('dimension')" :config="config" :source="source" />
             <SeriesSection v-if="has('series')" :config="config" :source="source" />
-            <ColumnsSection v-if="has('columns')" :key="'cols-' + config.dataSource" :config="config" :source="source" />
+            <ColumnsSection v-if="has('columns')" :key="'cols-' + config.dataSource" :config="config" :source="source" :followups="(meta.options && meta.options.followup) || []" />
             <StepsSection v-if="has('steps')" :config="config" :sources="meta.sources" />
             <KpiSection v-if="has('kpi')" :config="config" />
         </template>

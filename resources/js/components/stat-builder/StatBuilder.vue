@@ -128,6 +128,8 @@ export default {
     data() {
         return {
             meta: null,
+            metaProject: null,
+            loadRequest: 0,
             dashboard: null,
             loading: true,
             loadError: null,
@@ -186,6 +188,7 @@ export default {
     },
 
     beforeUnmount() {
+        this.loadRequest++;
         document.removeEventListener("click", this.closePops);
         // Sauvegarde en attente avant de quitter la page
         if (this.saveState === "dirty") {
@@ -208,17 +211,27 @@ export default {
 
         async load(useDefault = false) {
             if (!this.project) return;
+            const project = this.project.slug;
+            const request = ++this.loadRequest;
+            const isCurrent = () => request === this.loadRequest && this.project && this.project.slug === project;
+            if (this.metaProject !== project) {
+                clearTimeout(this.saveTimer);
+                this.meta = null;
+                this.wizard.open = false;
+            }
             this.loading = true;
             this.loadError = null;
             this.ready = false;
 
             try {
-                const base = `project/${this.project.slug}/stat-dashboard`;
+                const base = `project/${project}/stat-dashboard`;
                 const [meta, dash] = await Promise.all([
-                    this.meta && !useDefault ? Promise.resolve({ data: this.meta }) : ApiService.get(`${base}/meta`),
+                    this.meta && this.metaProject === project && !useDefault ? Promise.resolve({ data: this.meta }) : ApiService.get(`${base}/meta`),
                     ApiService.get(base, { params: useDefault ? { default: 1 } : {} }),
                 ]);
+                if (!isCurrent()) return;
                 this.meta = meta.data;
+                this.metaProject = project;
                 const d = dash.data;
                 this.dashboard = {
                     widgets: d.widgets || [],
@@ -228,12 +241,15 @@ export default {
                 if (!this.dashboard.globalFilters.period) this.dashboard.globalFilters.period = { preset: "last_30_days" };
                 this.saveState = useDefault ? "dirty" : "saved";
             } catch (e) {
+                if (!isCurrent()) return;
                 const res = e.response && e.response.data;
                 this.loadError = (res && res.message) || "Erreur réseau.";
             } finally {
+                if (!isCurrent()) return;
                 this.loading = false;
                 // Évite de déclencher une sauvegarde à cause du chargement initial
                 this.$nextTick(() => {
+                    if (!isCurrent()) return;
                     this.ready = true;
                     if (useDefault) {
                         this.saveState = "dirty";
