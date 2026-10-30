@@ -17,6 +17,7 @@
                     v-for="(interaction, i) in prospectInteractions"
                     :key="interaction.id"
                     :interaction="interaction"
+                    :color-index="i"
                 />
             </div>
         </template>
