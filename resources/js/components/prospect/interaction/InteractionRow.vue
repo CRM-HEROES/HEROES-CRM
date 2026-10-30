@@ -7,6 +7,7 @@
                 ? ''
                 : 'hc-prospect-interaction-from-prospect',
         ]"
+        :style="{ '--hc-interaction-text-color': interactionTextColor }"
     >
         <div class="hc-prospect-interaction-icons">
             <icon v-if="interaction.source == 'aircall'" :size="24">
@@ -130,7 +131,7 @@
 }
 
 .hc-prospect-interaction-creator {
-    color: #333333;
+    color: var(--hc-interaction-text-color);
 }
 .hc-prospect-interaction-voicemail {
     display: inline-flex;
@@ -148,18 +149,18 @@
 }
 .hc-prospect-interaction-date {
     font-size: 11px;
-    color: #999999;
+    color: var(--hc-interaction-text-color);
 }
 .hc-prospect-interaction-duration {
-    color: #666666;
+    color: var(--hc-interaction-text-color);
 }
 .hc-prospect-interaction-number {
     font-size: 11px;
-    color: #999999;
+    color: var(--hc-interaction-text-color);
 }
 .hc-prospect-interaction-from-number {
     font-size: 11px;
-    color: #7939b8;
+    color: var(--hc-interaction-text-color);
 }
 </style>
 
@@ -179,6 +180,39 @@ export default {
     },
 
     computed: {
+        interactionTextColor() {
+            const colors = [
+                "#355c7d",
+                "#4f6d3a",
+                "#7a5a28",
+                "#6a4c7d",
+                "#2f6f6d",
+                "#8a4f5d",
+                "#56633a",
+                "#4c607a",
+            ];
+            const interactionId = this.interaction?.id;
+            const numericId = Number(interactionId);
+
+            if (
+                interactionId !== null &&
+                interactionId !== undefined &&
+                Number.isFinite(numericId)
+            ) {
+                return colors[Math.abs(numericId) % colors.length];
+            }
+
+            const fallbackId = String(
+                interactionId || this.interaction?.created_at || ""
+            );
+            const hash = [...fallbackId].reduce(
+                (value, character) => value * 31 + character.charCodeAt(0),
+                0
+            );
+
+            return colors[Math.abs(hash) % colors.length];
+        },
+
         /**
          *
          */
