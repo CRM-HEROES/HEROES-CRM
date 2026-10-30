@@ -14,13 +14,17 @@ class ProspectLabelAttached
 
     public Prospect $prospect;
     public Label $label;
+    public ?string $oldValue;
+    public ?string $createdAt;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Prospect $prospect, Label $label)
+    public function __construct(Prospect $prospect, Label $label, ?string $oldValue = null, ?string $createdAt = null)
     {
         $this->prospect = $prospect;
         $this->label = $label;
+        $this->oldValue = $oldValue;
+        $this->createdAt = $createdAt;
     }
 }

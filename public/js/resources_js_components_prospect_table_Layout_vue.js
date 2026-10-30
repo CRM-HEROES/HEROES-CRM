@@ -3256,12 +3256,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
     },
     user: function user() {
-      var _this2 = this;
-      if (!this.item.creator_id) {
+      if (this.item.creator) return this.item.creator;
+      var creatorId = this.item.pivot ? this.item.pivot.creator_id : this.item.creator_id;
+      if (!creatorId) {
         return null;
       }
       return this.users.find(function (user) {
-        return user.id == _this2.item.creator_id;
+        return user.id == creatorId;
       });
     }
   })
@@ -3380,8 +3381,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Row_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Row.vue */ "./resources/js/components/prospect/profile/blocs/history/Row.vue");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _utils_prospect_label_history__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/utils/prospect-label-history */ "./resources/js/utils/prospect-label-history.js");
+/* harmony import */ var _Row_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Row.vue */ "./resources/js/components/prospect/profile/blocs/history/Row.vue");
+/* harmony import */ var _LabelItem_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./LabelItem.vue */ "./resources/js/components/prospect/profile/blocs/history/LabelItem.vue");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+
 // Components
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
@@ -3390,8 +3403,37 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   components: {
-    HistoryRow: _Row_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
-  }
+    HistoryRow: _Row_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    LabelItem: _LabelItem_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["categories"])), {}, {
+    addedAssignments: function addedAssignments() {
+      var _this = this;
+      if (!(this.item.key || "").startsWith("category->")) return [];
+      var categoryId = this.item.key.slice("category->".length);
+      var category = this.categories.find(function (category) {
+        return category.id == categoryId;
+      });
+      var labels = category && category.labels || [];
+      return (0,_utils_prospect_label_history__WEBPACK_IMPORTED_MODULE_0__.addedLabelNames)(this.item, labels).map(function (name) {
+        return _objectSpread(_objectSpread({}, labels.find(function (label) {
+          return label.name === name;
+        })), {}, {
+          id: _this.item.id,
+          category_id: categoryId,
+          field: _this.item.field,
+          name: name,
+          created_at: _this.item.created_at,
+          creator: _this.item.user,
+          creator_id: _this.item.user_id
+        });
+      });
+    },
+    showRevision: function showRevision() {
+      // Legacy baselines preserve an assignment, not a known before/after.
+      return this.item.old_value !== null || !this.addedAssignments.length;
+    }
+  })
 });
 
 /***/ }),
@@ -12289,10 +12331,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     bgcolor: $props.item.bgcolor
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [$options.category ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("b", {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [$options.category || $props.item.field ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("b", {
         key: 0,
         "class": "hc-prospect-profile-history-label-category",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.category.name + ' : ')
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(($options.category ? $options.category.name : $props.item.field) + ' : ')
       }, null, 8 /* PROPS */, _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-prospect-profile-history-label-name",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.item.name)
@@ -12435,8 +12477,15 @@ var _hoisted_4 = {
 };
 var _hoisted_5 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_label_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("label-item");
   var _component_history_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("history-row");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_history_row, {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.addedAssignments, function (assignment) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_label_item, {
+      key: assignment.name,
+      item: assignment
+    }, null, 8 /* PROPS */, ["item"]);
+  }), 128 /* KEYED_FRAGMENT */)), $options.showRevision ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_history_row, {
+    key: 0,
     item: $props.item,
     date: $props.item.created_at,
     user: $props.item.user,
@@ -12458,7 +12507,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["item", "date", "user"]);
+  }, 8 /* PROPS */, ["item", "date", "user"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
 }
 
 /***/ }),
@@ -16445,6 +16494,95 @@ __webpack_require__.r(__webpack_exports__);
 var PALETTE = ["#7939b8", "#c2185b", "#00897b", "#6d4c41", "#4527a0", "#ad1457", "#00695c", "#558b2f"];
 function duplicateColor(groupId) {
   return PALETTE[Math.abs(Number(groupId) || 0) % PALETTE.length];
+}
+
+/***/ }),
+
+/***/ "./resources/js/utils/prospect-label-history.js":
+/*!******************************************************!*\
+  !*** ./resources/js/utils/prospect-label-history.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   addedLabelNames: () => (/* binding */ addedLabelNames),
+/* harmony export */   assignmentRecorded: () => (/* binding */ assignmentRecorded)
+/* harmony export */ });
+function addedLabelNames(revision) {
+  var labels = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+  var before = revision.old_value || "";
+  var after = revision.new_value || "";
+  if (!after) return [];
+  // Preserved legacy assignments contain a single historical label name.
+  if (revision.old_value === null) return [after];
+  var oldNames = knownSelection(before, labels);
+  var newNames = knownSelection(after, labels);
+  if (oldNames && newNames) {
+    return newNames.filter(function (name) {
+      return !oldNames.includes(name);
+    });
+  }
+
+  // A renamed/deleted label may be missing from current category metadata.
+  // Prove an addition using the complete stored name before using metadata.
+  var added = labels.filter(function (label) {
+    return recordsLabelAddition(revision, label.name);
+  }).map(function (label) {
+    return label.name;
+  });
+  if (added.length) return added;
+  if (!before) return [after];
+  var oldParts = before.split(", ");
+  var newParts = after.split(", ");
+  while (oldParts.length && oldParts[0] === newParts[0]) {
+    oldParts.shift();
+    newParts.shift();
+  }
+  while (oldParts.length && oldParts[oldParts.length - 1] === newParts[newParts.length - 1]) {
+    oldParts.pop();
+    newParts.pop();
+  }
+  if (oldParts.length || !newParts.length) return [];
+  var inserted = newParts.join(", ");
+  return knownSelection(inserted, labels) || [inserted];
+}
+function knownSelection(value, labels) {
+  var names = labels.map(function (label) {
+    return label.name;
+  }).filter(Boolean).sort(function (left, right) {
+    return right.length - left.length;
+  });
+  var selection = [];
+  var remaining = value;
+  while (remaining) {
+    var name = names.find(function (name) {
+      return remaining === name || remaining.startsWith(name + ", ");
+    });
+    if (!name) return null;
+    selection.push(name);
+    remaining = remaining.slice(name.length + 2);
+  }
+  return selection;
+}
+function assignmentRecorded(item, revisions) {
+  var _assignment$creator_i;
+  var assignment = item.pivot || item;
+  var author = (_assignment$creator_i = assignment.creator_id) !== null && _assignment$creator_i !== void 0 ? _assignment$creator_i : null;
+  var date = new Date(assignment.created_at || item.created_at).getTime();
+  return revisions.some(function (revision) {
+    var _ref, _revision$user_id, _revision$user;
+    return revision.key === "category->" + item.category_id && new Date(revision.created_at).getTime() === date && String((_ref = (_revision$user_id = revision.user_id) !== null && _revision$user_id !== void 0 ? _revision$user_id : (_revision$user = revision.user) === null || _revision$user === void 0 ? void 0 : _revision$user.id) !== null && _ref !== void 0 ? _ref : "") === String(author !== null && author !== void 0 ? author : "") && recordsLabelAddition(revision, item.name);
+  });
+}
+function recordsLabelAddition(revision, name) {
+  var before = revision.old_value || "";
+  var after = revision.new_value || "";
+  if ((", " + before + ", ").includes(", " + name + ", ")) return false;
+  if (after === name) return true;
+  // Removing the added full name must recover the previous selection exactly.
+  // This is also safe for names containing commas or SQL wildcard characters.
+  return after.startsWith(name + ", ") && after.slice(name.length + 2) === before || after.endsWith(", " + name) && after.slice(0, -name.length - 2) === before || after.replace(", " + name + ", ", ", ") === before && after !== before;
 }
 
 /***/ }),
