@@ -424,6 +424,7 @@
 
                 <!-- Campaign -->
 
+                <!--
                 <header-menu
                     v-if="can('all.project.campaign.view')"
                     :label="$t('header.campaigns')"
@@ -494,6 +495,7 @@
                         />
                     </svg>
                 </header-menu>
+                -->
 
                 <!-- Workflows (automations) -->
 
