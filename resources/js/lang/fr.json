@@ -139,6 +139,7 @@
         "order": "Devis",
         "documents": "Documents",
         "campaigns": "Campagnes",
+        "workflows": "Automatisations",
         "stat": "Statistiques",
         "settings": "Paramètres"
     },
@@ -1057,6 +1058,408 @@
         },
         "color": {
             "title": "Colorer les marqueurs de la MAP avec ..."
+        }
+    },
+
+    "workflow": {
+        "title": "Automatisations",
+        "mobile": "Veuillez utiliser un ordinateur pour utiliser cet outil.",
+        "new": "Créer",
+        "new_placeholder": "Nom de l'automatisation",
+        "empty": "Aucune automatisation pour le moment.",
+        "select": "Choisissez une automatisation dans la liste, ou créez-en une.",
+        "yes": "Oui",
+        "no": "Non",
+        "choose": "Choisir...",
+        "loading": "Chargement...",
+        "section": {
+            "trigger": "Déclencheur",
+            "trigger_change": "Modifier le déclencheur",
+            "actions": "Actions",
+            "actions_help": "Ce que le CRM fait : envoyer un SMS, un email, appeler...",
+            "rules": "Règles",
+            "rules_help": "Ce qui décide de la suite : une condition, une attente, la fin."
+        },
+        "thread_create": {
+            "automatic": "Automatique : « {name} »",
+            "why": "Pour envoyer des emails, le CRM a besoin d'un canal public : c'est la conversation où l'email est classé et où les réponses arrivent. Aucun n'existe encore dans ce projet.",
+            "placeholder": "Nom du canal",
+            "default_name": "Emails",
+            "button": "Créer ce canal",
+            "ask_admin": "Demandez à un administrateur du projet de créer un canal public (paramètres des messages).",
+            "done": "Canal « {name} » créé.",
+            "error": "Le canal n'a pas pu être créé."
+        },
+        "chosen_count": "Sélection : {count}",
+        "close": "Fermer",
+        "cancel": "Annuler",
+        "next": "Ensuite",
+        "nothing": "(rien : l'automatisation s'arrête)",
+        "connecting": "Cliquez sur l'étape qui doit suivre.",
+        "input": "Entrée",
+        "output": "Sortie : cliquez puis choisissez l'étape suivante",
+        "remove_link": "Supprimer ce lien",
+        "more": "Plus d'actions",
+        "templates": {
+            "title": "Modèles prêts à l'emploi"
+        },
+        "template": {
+            "welcome_email": {
+                "name": "Email de bienvenue",
+                "description": "Envoie un email à chaque nouveau prospect."
+            },
+            "sms_follow_up": {
+                "name": "Relance SMS sans réponse",
+                "description": "Envoie un SMS, attend 2 jours une réponse, puis relance si le prospect n'a pas répondu."
+            },
+            "appointment_reminder": {
+                "name": "Rappel de rendez-vous",
+                "description": "Envoie un SMS au prospect la veille de son rendez-vous."
+            },
+            "work_hours_contact": {
+                "name": "Contact en heures ouvrées",
+                "description": "Envoie un SMS tout de suite en journée, ou le lendemain à 8h si le prospect arrive en dehors des horaires."
+            }
+        },
+        "add_menu": {
+            "title": "Ajouter une étape",
+            "insert": "Insérer une étape ici",
+            "link": "Relier à une étape existante",
+            "link_help": "Cliquez ensuite sur l'étape à rejoindre."
+        },
+        "remove_node": "Supprimer cette étape",
+        "not_configured": "À configurer",
+        "step_name": "Nom de l'étape (facultatif)",
+        "step_name_placeholder": "Ex. : Relance après 2 heures",
+        "trigger_filter": "Filtre à surveiller",
+        "provider_missing": "(opérateur introuvable dans ce projet)",
+        "danger": "Attention : cette action est définitive.",
+        "from_campaign": "Issue d'une campagne",
+        "trigger_filter_help": "Le prospect doit remplir les conditions ci-dessous. L'automatisation démarre au moment où il commence à les remplir.",
+        "trigger_help": {
+          "prospect_created": "Se déclenche chaque fois qu'un prospect est ajouté : à la main, par import ou par synchronisation.",
+          "prospect_updated": "Se déclenche chaque fois qu'un prospect est modifié (ses informations, ses utilisateurs, ses filtres...).",
+          "prospect_filter_entered": "Surveille un filtre : se déclenche quand un prospect commence à y correspondre. Définissez le filtre juste en dessous.",
+          "prospect_filter_left": "Surveille un filtre : se déclenche quand un prospect cesse d'y correspondre. Définissez le filtre juste en dessous.",
+          "order_created": "Se déclenche chaque fois qu'un devis est créé.",
+          "order_updated": "Se déclenche chaque fois qu'un devis est modifié.",
+          "event_created": "Se déclenche chaque fois qu'un RDV est créé.",
+          "event_updated": "Se déclenche chaque fois qu'un RDV est modifié.",
+          "event_starting_soon": "Se déclenche quelques minutes avant le début d'un RDV.",
+          "event_ended": "Se déclenche quand un RDV se termine."
+        },
+        "help": {
+          "provider": "Le compte qui envoie le message, tel qu'il est configuré dans les paramètres du projet. Rien à saisir ici : on choisit seulement parmi ceux qui existent.",
+          "thread": "Un canal est une conversation du CRM, par exemple « Commercial » ou « Support » : l'email y est classé et les réponses du prospect y arrivent. Laissez « Automatique » pour utiliser le premier canal public du projet. Les canaux privés n'envoient pas d'email, ils ne sont donc pas proposés.",
+          "body": "Le texte de l'email. Cliquez sur une variable (en dessous) pour l'insérer, par exemple le prénom du prospect.",
+          "message": "Le texte du SMS. Cliquez sur une variable (en dessous) pour l'insérer, par exemple le prénom du prospect.",
+          "user": "Facultatif : l'utilisateur dont on attend la réponse. Il sera prévenu quand le prospect répond.",
+          "on_error": "Que faire si l'envoi échoue (opérateur indisponible, prospect sans email ou sans mobile...).",
+          "exit_on_leave": "Si le prospect ne correspond plus au filtre pendant que l'automatisation attend, elle s'arrête pour lui.",
+          "once_per_subject": "Évite qu'un même prospect relance l'automatisation s'il sort puis rentre dans le filtre.",
+          "minutes_before": "Combien de minutes avant le début du RDV l'automatisation démarre."
+        },
+        "empty_list": {
+          "user": "Aucun utilisateur n'est disponible dans ce projet.",
+          "users": "Aucun utilisateur n'est disponible dans ce projet.",
+          "group": "Aucun groupe n'existe dans ce projet.",
+          "groups": "Aucun groupe n'existe dans ce projet.",
+          "thread": "Aucun canal de discussion public n'existe dans ce projet. Créez-en un dans les paramètres des messages.",
+          "label": "Aucun filtre n'existe pour les prospects de ce projet.",
+          "labels": "Aucun filtre n'existe pour les prospects de ce projet."
+        },
+        "legacy_action": "Action reprise d'une campagne : elle est conservée telle quelle. Ses réglages sont affichés ci-dessous.",
+        "variables": "Variables :",
+        "version": "Version {n}",
+        "unpublished": "Modifications non publiées",
+        "problems": "À corriger avant de publier :",
+        "valid": "Aucun problème détecté.",
+        "palette": "Étapes",
+        "palette_hint": "Cliquez ou glissez une étape dans le schéma, puis reliez les étapes avec les ronds.",
+        "tab": {
+            "schema": "Schéma",
+            "monitor": "Suivi"
+        },
+        "exec_status": {
+            "pending": "À démarrer",
+            "running": "En cours",
+            "waiting": "En attente",
+            "completed": "Terminée",
+            "failed": "En échec",
+            "cancelled": "Annulée",
+            "skipped": "Ignorée"
+        },
+        "step_status": {
+            "running": "En cours",
+            "waiting": "En attente",
+            "completed": "Réussie",
+            "failed": "En échec",
+            "skipped": "Ignorée"
+        },
+        "monitor": {
+            "overview": "Vue d'ensemble",
+            "last_days": "{n} derniers jours",
+            "card": {
+                "waiting": "en cours ou en attente",
+                "completed": "terminées",
+                "failed": "en échec",
+                "steps": "étapes exécutées"
+            },
+            "col": {
+                "workflow": "Automatisation",
+                "waiting": "En cours",
+                "completed": "Terminées",
+                "failed": "En échec",
+                "average": "Durée moyenne",
+                "last": "Dernier départ",
+                "next": "Prochaine reprise"
+            },
+            "errors": "Erreurs les plus fréquentes",
+            "operators": "Opérateurs utilisés",
+            "sent": "réussi(s)",
+            "failed": "en échec",
+            "executions": "Exécutions",
+            "all_workflows": "Toutes les automatisations",
+            "all_statuses": "Tous les états",
+            "refresh": "Actualiser",
+            "none": "Aucune exécution.",
+            "more": "Voir plus",
+            "cancel": "Annuler cette exécution",
+            "confirm_cancel": "Annuler cette exécution ? Les étapes déjà faites ne sont pas défaites.",
+            "cannot_cancel": "Cette exécution ne peut plus être annulée.",
+            "deleted_workflow": "Automatisation supprimée",
+            "no_step": "Aucune étape exécutée pour le moment.",
+            "waiting_event": "En attente de : {event}. Sans réponse, elle reprendra le {date}.",
+            "waiting_until": "En attente jusqu'au {date}.",
+            "operator": "Opérateur",
+            "sms": "SMS",
+            "message": "Message",
+            "call": "Appel",
+            "skipped": "Étape ignorée",
+            "outcome": {
+                "event": "L'événement a eu lieu",
+                "timeout": "Délai dépassé"
+            },
+            "subject": {
+                "prospect": "Prospect",
+                "order": "Devis",
+                "event": "RDV"
+            },
+            "prospect_title": "Automatisations de {prospect}",
+            "prospect_tooltip": "Automatisations",
+            "prospect_none": "Aucune automatisation n'a traité ce prospect."
+        },
+        "status": {
+            "draft": "Brouillon",
+            "active": "Active",
+            "paused": "En pause",
+            "archived": "Archivée"
+        },
+        "executions": {
+            "pending": "à démarrer",
+            "waiting": "en attente",
+            "running": "en cours",
+            "completed": "terminées",
+            "failed": "en échec",
+            "cancelled": "annulées",
+            "skipped": "ignorées"
+        },
+        "save": {
+            "saved": "Brouillon enregistré",
+            "pending": "Modifications en attente...",
+            "saving": "Enregistrement...",
+            "error": "Échec de l'enregistrement"
+        },
+        "action": {
+            "validate": "Vérifier",
+            "arrange": "Réorganiser",
+            "publish": "Publier",
+            "publish_activate": "Publier et activer",
+            "turn_on": "Activer",
+            "publish_now": "Publier la nouvelle version",
+            "activate": "Activer",
+            "pause": "Mettre en pause",
+            "archive": "Archiver",
+            "delete": "Supprimer"
+        },
+        "confirm": {
+            "archive": "Archiver cette automatisation ? Les exécutions en cours seront annulées.",
+            "delete": "Supprimer cette automatisation ? Les exécutions en cours seront annulées."
+        },
+        "done": {
+            "published": "Automatisation publiée.",
+            "activated": "Automatisation activée.",
+            "paused": "Automatisation mise en pause.",
+            "archived": "Automatisation archivée."
+        },
+        "error": {
+            "load": "Impossible de charger les automatisations.",
+            "create": "Impossible de créer l'automatisation.",
+            "save": "L'opération a échoué.",
+            "delete": "Impossible de supprimer l'automatisation.",
+            "self_link": "Une étape ne peut pas être reliée à elle-même.",
+            "into_trigger": "Aucune étape ne peut mener au déclencheur.",
+            "from_end": "Une étape « Terminer » n'a pas de suite.",
+            "bad_output": "Cette sortie n'existe pas sur cette étape.",
+            "cycle": "Ce lien créerait une boucle : une étape reviendrait à une étape précédente.",
+            "unknown_node": "Étape introuvable."
+        },
+        "node": {
+            "trigger": "Quand",
+            "condition": "Si",
+            "action": "Faire",
+            "wait": "Attendre",
+            "wait_event": "Attendre un événement",
+            "end": "Terminer"
+        },
+        "node_help": {
+            "trigger": "Ce qui déclenche l'automatisation",
+            "condition": "Vérifie quelque chose : une sortie Oui, une sortie Non",
+            "action": "Fait quelque chose : envoyer un message, affecter un utilisateur...",
+            "wait": "Attend un délai, une heure ou une date",
+            "wait_event": "Attend que le prospect réagisse, au plus pendant un délai",
+            "end": "Termine l'automatisation."
+        },
+        "trigger": {
+            "prospect_created": "Un nouveau prospect est créé",
+            "prospect_updated": "Un prospect est modifié",
+            "prospect_filter_entered": "Un prospect entre dans un filtre",
+            "prospect_filter_left": "Un prospect sort d'un filtre",
+            "order_created": "Un devis est créé",
+            "order_updated": "Un devis est modifié",
+            "event_created": "Un RDV est créé",
+            "event_updated": "Un RDV est modifié",
+            "event_starting_soon": "Un RDV approche",
+            "event_ended": "Un RDV se termine"
+        },
+        "event": {
+            "sms_received": "Le prospect répond par SMS",
+            "message_received": "Le prospect répond par message ou email",
+            "call_received": "Le prospect appelle",
+            "appointment_created": "Un RDV est pris pour le prospect",
+            "order_created": "Un devis est créé pour le prospect"
+        },
+        "category": {
+            "communication": "Communiquer",
+            "assignment": "Affecter",
+            "label": "Filtres",
+            "status": "Statut du prospect"
+        },
+        "action_type": {
+            "send_email": "Envoyer un email",
+            "send_sms": "Envoyer un SMS",
+            "make_call": "Effectuer un appel",
+            "prospect_attach_user": "Affecter à un utilisateur",
+            "prospect_detach_user": "Désaffecter un utilisateur",
+            "prospect_attach_group": "Affecter à un groupe",
+            "prospect_detach_group": "Retirer d'un groupe",
+            "prospect_attach_label": "Ajouter un filtre",
+            "prospect_detach_label": "Retirer un filtre",
+            "prospect_processed": "Archiver le prospect",
+            "prospect_not_processed": "Désarchiver le prospect",
+            "prospect_delete": "Supprimer le prospect",
+            "prospect_message": "Envoyer un message (campagne)",
+            "prospect_sms": "Envoyer un SMS (campagne)",
+            "prospect_event": "Créer un RDV (campagne)",
+            "prospect_order": "Créer un devis (campagne)",
+            "prospect_file_document": "Générer un document dans un dossier (campagne)",
+            "prospect_message_document": "Envoyer un document dans un canal (campagne)",
+            "prospect_get_lat_lng": "Géolocaliser le prospect (campagne)",
+            "prospect_file_invoice": "Classer la facture dans un dossier (campagne)",
+            "prospect_message_invoice": "Envoyer la facture dans un canal (campagne)",
+            "order_attach_label": "Ajouter un filtre au devis (campagne)",
+            "order_detach_label": "Retirer un filtre du devis (campagne)",
+            "order_attach_product": "Ajouter un produit au devis (campagne)",
+            "order_detach_product": "Retirer un produit du devis (campagne)",
+            "order_attach_step": "Passer le devis à une étape (campagne)",
+            "order_detach_step": "Retirer une étape du devis (campagne)",
+            "order_delete": "Supprimer le devis (campagne)",
+            "order_generate_invoice": "Générer la facture (campagne)",
+            "order_sign_invoice": "Faire signer la facture (campagne)",
+            "order_user_action": "Action utilisateur sur le devis (campagne)"
+        },
+        "field": {
+            "action": "Action",
+            "event": "Événement attendu",
+            "provider": "Opérateur",
+            "thread": "Canal de discussion",
+            "body": "Message de l'email",
+            "message": "Message du SMS",
+            "user": "Utilisateur",
+            "group": "Groupe",
+            "label": "Filtre",
+            "on_error": "En cas d'erreur",
+            "exit_on_leave": "Arrêter si le prospect sort du filtre",
+            "once_per_subject": "Une seule fois par prospect (même s'il sort puis rentre à nouveau dans le filtre)",
+            "minutes_before": "Minutes avant le RDV (0 : au début du RDV)"
+        },
+        "on_error": {
+            "fail": "Arrêter l'automatisation",
+            "continue": "Continuer quand même"
+        },
+        "no_provider": {
+            "email": "Aucun opérateur email n'est configuré dans les paramètres du projet.",
+            "sms": "Aucun opérateur SMS n'est configuré dans les paramètres du projet.",
+            "call": "Aucune ligne téléphonique compatible n'est configurée dans les paramètres du projet."
+        },
+        "wait": {
+            "mode": "Attendre",
+            "duration": "Pendant une durée",
+            "until_time": "Jusqu'à une heure",
+            "until_date": "Jusqu'à une date",
+            "minutes": "minutes",
+            "hours": "heures",
+            "days": "jours",
+            "time": "Heure",
+            "date": "Date et heure",
+            "only_days": "Seulement ces jours",
+            "max": "Attendre au plus",
+            "event_help": "Si l'événement arrive, l'automatisation suit la sortie Oui. Si le délai est dépassé, elle suit la sortie Non. Seul ce qui arrive après cette étape compte.",
+            "until_date_summary": "Jusqu'au {date}",
+            "until_time_summary": "Jusqu'à {time}"
+        },
+        "weekday": {
+            "1": "Lun",
+            "2": "Mar",
+            "3": "Mer",
+            "4": "Jeu",
+            "5": "Ven",
+            "6": "Sam",
+            "7": "Dim"
+        },
+        "condition": {
+            "intro": "Le prospect doit remplir :",
+            "empty": "Aucune condition pour l'instant : cliquez sur « + Une condition » ci-dessous.",
+            "all": "Toutes ces conditions",
+            "any": "Au moins une de ces conditions",
+            "remove": "Supprimer ce critère",
+            "remove_group": "Supprimer ce groupe",
+            "add_filter": "Une condition",
+            "add_check": "Un horaire",
+            "add_group": "Un groupe",
+            "summary": "{count} critère(s)",
+            "timezone_help": "Les heures sont celles du fuseau horaire du projet.",
+            "filter": {
+                "incomingCommunications": "Le prospect a écrit ou appelé",
+                "processed": "Le prospect est archivé",
+                "createdDaysAgo": "Créé depuis moins de (jours)",
+                "updatedDaysAgo": "Modifié depuis moins de (jours)",
+                "withUsers": "A pour utilisateur",
+                "withoutUsers": "N'a pas pour utilisateur",
+                "withGroups": "Est dans le groupe",
+                "withoutGroups": "N'est pas dans le groupe",
+                "withLabels": "A le filtre",
+                "withoutLabels": "N'a pas le filtre"
+            },
+            "check": {
+                "work_hours": "Dans les heures de travail",
+                "date_range": "Pendant une période"
+            },
+            "field": {
+                "days": "Jours",
+                "from": "De",
+                "to": "À"
+            }
         }
     },
 

@@ -144,6 +144,9 @@ class SheetSyncProcessor
                     'message' => $exception->getMessage(),
                 ]);
             }
+
+            // Bulk inserted (no model event): report them to the workflows
+            \App\Workflows\WorkflowEvents::prospectsCreated($import->project_id, $createdIds);
         }
 
         Import::withoutEvents(function () use ($import) {

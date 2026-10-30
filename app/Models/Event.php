@@ -78,6 +78,14 @@ class Event extends Model
     // Relationships
 
     /**
+     * Campaigns
+     */
+    public function campaigns()
+    {
+        return $this->belongsToMany(Campaign::class, 'campaign_event');
+    }
+
+    /**
      * Calendar
      */
     public function calendar()

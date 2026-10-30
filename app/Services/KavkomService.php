@@ -258,6 +258,90 @@ class KavkomService
         }
     }
 
+    /**
+     * Start a call from a Kavkom line configuration (api_token, domain_uuid,
+     * phone_number, extension): the extension of the agent rings first, then it
+     * is bridged to $destination. Checks that the outgoing number is usable.
+     *
+     * Shared by the softphone button and by the workflow "make a call" action.
+     */
+    public function callFromConfig(array $config, string $destination): array
+    {
+        $callerId = preg_replace('/\D+/', '', (string) ($config['phone_number'] ?? ''));
+        if (strlen($callerId) < 8 || preg_match('/^0+$/', $callerId)) {
+            return [
+                'success' => false,
+                'message' => 'Configurez un numéro sortant Kavkom (DID autorisé) dans les paramètres avant de lancer un appel. Le PBX utilise actuellement 0000000000, ce qui bloque les appels sortants.',
+            ];
+        }
+
+        $extension = $this->resolveExtension(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $config['extension'] ?? null
+        );
+
+        if (!$extension['success']) {
+            return $extension;
+        }
+
+        $effectiveCallerId = preg_replace(
+            '/\D+/',
+            '',
+            (string) ($extension['effective_caller_id_number'] ?? '')
+        );
+
+        // Kavkom's originate endpoint uses src_cid_number only for the leg
+        // that rings the agent. The caller ID presented to the prospect is
+        // bound to the extension in Kavkom (effective_caller_id_number).
+        if ($effectiveCallerId !== '' && $effectiveCallerId !== $callerId) {
+            return [
+                'success' => false,
+                'message' => "Le DID sortant de l'extension Kavkom {$extension['extension']} est {$effectiveCallerId}, alors que le CRM est configuré avec {$callerId}. Dans Kavkom, attribuez {$callerId} comme numéro sortant à l'extension {$extension['extension']}, puis réessayez.",
+            ];
+        }
+
+        return $this->originateCall(
+            $config['api_token'],
+            $config['domain_uuid'],
+            $extension['extension'],
+            $destination,
+            ['src_cid_number' => $callerId]
+        );
+    }
+
+    /**
+     * Link an originated call to the CRM prospect and agent, so that its
+     * recording can be transcribed.
+     */
+    public function linkOutboundCall(array $result, ?int $prospectId, ?int $userId, string $domainUuid, string $destination): void
+    {
+        if (!empty($result['call_uuid'])) {
+            // The CDR webhook may arrive before this API response. Complete
+            // that record so its recording can still be transcribed.
+            $call = \App\Models\KavkomCall::firstOrNew(['call_uuid' => $result['call_uuid']]);
+            $call->fill([
+                'prospect_id' => $call->prospect_id ?: $prospectId,
+                'user_id' => $call->user_id ?: $userId,
+                'domain_uuid' => $call->domain_uuid ?: $domainUuid,
+                'direction' => $call->direction ?: 'outbound',
+                'destination' => $call->destination ?: $destination,
+                'status' => $call->status ?: 'initiated',
+            ])->save();
+
+            Log::channel('kavkom')->info('Kavkom call linked to CRM prospect.', [
+                'call_uuid' => $result['call_uuid'],
+                'prospect_id' => $prospectId,
+                'user_id' => $userId,
+            ]);
+        } else {
+            Log::channel('kavkom')->warning('Kavkom call started without call_uuid; automatic transcription will not be linked.', [
+                'prospect_id' => $prospectId,
+                'user_id' => $userId,
+            ]);
+        }
+    }
+
     public function originateCall(string $apiToken, string $domainUuid, string $src, string $destination, array $options = []): array
     {
         if (empty($apiToken) || empty($domainUuid)) {

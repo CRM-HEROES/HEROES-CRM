@@ -30,6 +30,8 @@ use App\Http\Controllers\API\Project\Campaign\OperatorRuleController as ProjectC
 use App\Http\Controllers\API\Project\Campaign\ProspectController as ProjectCampaignProspectController;
 use App\Http\Controllers\API\Project\Campaign\OrderController as ProjectCampaignOrderController;
 use App\Http\Controllers\API\Project\Campaign\RuleController as ProjectCampaignRuleController;
+use App\Http\Controllers\API\Project\WorkflowController as ProjectWorkflowController;
+use App\Http\Controllers\API\Project\WorkflowExecutionController as ProjectWorkflowExecutionController;
 
 use App\Http\Controllers\API\Project\DefaultMenuController as ProjectDefaultMenuController;
 use App\Http\Controllers\API\Project\IncomingCommunicationController;
@@ -382,6 +384,23 @@ Route::group([
         Route::delete('campaign-operator/{operator}/rule/{rule}', [ProjectCampaignOperatorRuleController::class, 'destroy']);
 
         Route::apiResource('campaign-rule', ProjectCampaignRuleController::class);
+
+        // Workflow (automations)
+        Route::get('workflow-catalog', [ProjectWorkflowController::class, 'catalog'])->name('workflow.catalog');
+        Route::get('workflow-provider', [ProjectWorkflowController::class, 'providers'])->name('workflow.provider');
+        Route::apiResource('workflow', ProjectWorkflowController::class);
+        Route::post('workflow/{workflow}/validate', [ProjectWorkflowController::class, 'validateGraph'])->name('workflow.validate');
+        Route::post('workflow/{workflow}/publish', [ProjectWorkflowController::class, 'publish'])->name('workflow.publish');
+        Route::post('workflow/{workflow}/activate', [ProjectWorkflowController::class, 'activate'])->name('workflow.activate');
+        Route::post('workflow/{workflow}/pause', [ProjectWorkflowController::class, 'pause'])->name('workflow.pause');
+        Route::post('workflow/{workflow}/archive', [ProjectWorkflowController::class, 'archive'])->name('workflow.archive');
+
+        // Workflow executions (follow-up)
+        Route::get('workflow-execution', [ProjectWorkflowExecutionController::class, 'index'])->name('workflow-execution.index');
+        Route::get('workflow-execution/{execution}', [ProjectWorkflowExecutionController::class, 'show'])->name('workflow-execution.show');
+        Route::post('workflow-execution/{execution}/cancel', [ProjectWorkflowExecutionController::class, 'cancel'])->name('workflow-execution.cancel');
+        Route::get('workflow-stats', [ProjectWorkflowExecutionController::class, 'stats'])->name('workflow.stats');
+        Route::get('prospect/{prospect}/workflow-execution', [ProjectWorkflowExecutionController::class, 'prospect'])->name('prospect.workflow-execution');
 
         // Default menu
         Route::get('default-menu', [ProjectDefaultMenuController::class, 'index']);

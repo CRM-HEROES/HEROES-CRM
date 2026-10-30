@@ -84,6 +84,8 @@ use App\Observers\SmsObserver;
 use App\Observers\ThreadObserver;
 use App\Observers\UserObserver;
 use App\Observers\UserSettingObserver;
+use App\Observers\WorkflowEventObserver;
+use App\Observers\WorkflowObserver;
 
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Events\Authenticated;
@@ -151,7 +153,19 @@ class EventServiceProvider extends ServiceProvider
         Thread::observe(ThreadObserver::class);
         User::observe(UserObserver::class);
         UserSetting::observe(UserSettingObserver::class);
-            
+
+        // Workflows: after the observers above, so that they see the final state
+        Prospect::observe(WorkflowObserver::class);
+        Order::observe(WorkflowObserver::class);
+        Event::observe(WorkflowObserver::class);
+
+        // What a prospect does (answers, calls, books...), for the workflows that wait for it
+        Sms::observe(WorkflowEventObserver::class);
+        Message::observe(WorkflowEventObserver::class);
+        Interaction::observe(WorkflowEventObserver::class);
+        Order::observe(WorkflowEventObserver::class);
+        Event::observe(WorkflowEventObserver::class);
+
         LaravelEvent::listen(
             ProspectLabelAttached::class,
             [ProspectLabelAttachedListener::class, 'handle']

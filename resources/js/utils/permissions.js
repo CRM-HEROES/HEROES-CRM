@@ -58,6 +58,50 @@ export default {
                     ],
                 },
                 {
+                    key: "workflow",
+                    name: "Automatisation",
+                    icon: "fa-diagram-project icon-brown",
+                    sub: [
+                        {
+                            key: "view",
+                            name: "Voir les automatisations",
+                            icon: "fa-eye icon-blue",
+                        },
+                        {
+                            key: "add",
+                            name: "Ajouter une automatisation",
+                            icon: "fa-plus icon-green",
+                        },
+                        {
+                            key: "update",
+                            name: "Modifier et publier une automatisation",
+                            icon: "fa-pen icon-cyan",
+                        },
+                        {
+                            key: "delete",
+                            name: "Supprimer une automatisation",
+                            icon: "fa-trash icon-red",
+                        },
+                        {
+                            key: "execute",
+                            name: "Activer, mettre en pause, archiver une automatisation",
+                            icon: "fa-play icon-green",
+                        },
+                        {
+                            key: "execution",
+                            name: "Exécutions des automatisations",
+                            icon: "fa-list-check icon-blue",
+                            sub: [
+                                {
+                                    key: "view",
+                                    name: "Voir le suivi et l'historique des exécutions",
+                                    icon: "fa-eye icon-blue",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
                     key: "category",
                     name: "Catégorie de filtre",
                     icon: "fa-tags icon-purple",
