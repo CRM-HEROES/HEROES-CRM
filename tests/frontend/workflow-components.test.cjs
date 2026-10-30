@@ -17,7 +17,7 @@ function translation(key) {
 test('the workflow components exist', () => {
     assert.deepEqual(
         components.sort(),
-        ['ConditionGroup.vue', 'ExecutionSteps.vue', 'FieldInput.vue', 'NodeEditor.vue', 'ProspectWorkflowsSlide.vue', 'Workflow.vue', 'WorkflowBuilder.vue', 'WorkflowMonitor.vue']
+        ['ConditionGroup.vue', 'ExecutionSteps.vue', 'FieldInput.vue', 'HelpTip.vue', 'NodeEditor.vue', 'ProspectWorkflowsSlide.vue', 'Workflow.vue', 'WorkflowBuilder.vue', 'WorkflowMonitor.vue']
     );
 });
 

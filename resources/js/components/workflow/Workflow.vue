@@ -146,6 +146,7 @@
 }
 
 .hc-workflow-new {
+    align-items: center;
     display: flex;
     gap: 6px;
     padding: 4px 14px 14px;
