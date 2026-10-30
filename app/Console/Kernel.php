@@ -39,14 +39,22 @@ class Kernel extends ConsoleKernel
         $schedule->command('app:relevance --days=120')->daily();
 
         // Campaign
-        // $schedule->command('app:campaign --frequency=once')->everyMinute();
-        $schedule->command('app:campaign --frequency=every_fifteen_minutes')->everyFifteenMinutes();
-        $schedule->command('app:campaign --frequency=every_thirty_minutes')->everyThirtyMinutes();
-        $schedule->command('app:campaign --frequency=hourly')->hourly();
-        $schedule->command('app:campaign --frequency=daily')->daily();
-        $schedule->command('app:campaign --frequency=monthly')->monthlyOn(1);
-        
-        $schedule->command('app:campaign --frequency=once')->daily();
+        // Each frequency only selects its own campaigns (see Campaign::campaignIds()).
+        // "once" runs every minute so that a campaign starts right after its date;
+        // "daily" and "monthly" tick every hour: the command keeps the campaigns
+        // whose date hour (and day of the month) match the current time.
+        $schedule->command('app:campaign --frequency=once')->everyMinute()->withoutOverlapping(10)->runInBackground();
+        $schedule->command('app:campaign --frequency=every_fifteen_minutes')->everyFifteenMinutes()->withoutOverlapping(30)->runInBackground();
+        $schedule->command('app:campaign --frequency=every_thirty_minutes')->everyThirtyMinutes()->withoutOverlapping(60)->runInBackground();
+        $schedule->command('app:campaign --frequency=hourly')->hourly()->withoutOverlapping(120)->runInBackground();
+        $schedule->command('app:campaign --frequency=daily')->hourly()->withoutOverlapping(120)->runInBackground();
+        $schedule->command('app:campaign --frequency=monthly')->hourly()->withoutOverlapping(120)->runInBackground();
+
+        // Workflows: resume the waiting executions that are due and recover the stuck ones.
+        // Two indexed queries, whatever the number of prospects: it never scans the CRM data.
+        $schedule->command('workflows:resume')->everyMinute()->withoutOverlapping(5)->runInBackground();
+        // Old history, by batches, at night
+        $schedule->command('workflows:prune')->dailyAt('3:30')->withoutOverlapping(60)->runInBackground();
 
         // Google Sheets instant sync: recover rows left behind by a crash / restart
         $schedule->command('sheet-sync:recover')->everyMinute()->withoutOverlapping();

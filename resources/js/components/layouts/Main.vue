@@ -25,6 +25,7 @@
             />
             <manage-prospect-labels-slide />
             <manage-prospect-logs-slide />
+            <prospect-workflows-slide v-if="can('all.project.workflow.execution.view')" />
             <manage-prospect-messages-slide v-if="canMessage" />
             <manage-prospect-orders-slide
                 v-if="can('all.prospect.order.view')"
@@ -276,6 +277,7 @@ import ManageProspectGroupsSlide from "@/components/prospect/group/Slide.vue";
 import ManageProspectInteractionsSlide from "@/components/prospect/interaction/Slide.vue";
 import ManageProspectLabelsSlide from "@/components/prospect/label/Slide.vue";
 import ManageProspectLogsSlide from "@/components/prospect/log/Slide.vue";
+import ProspectWorkflowsSlide from "@/components/workflow/ProspectWorkflowsSlide.vue";
 import ManageProspectMessagesSlide from "@/components/prospect/message/Slide.vue";
 import ManageProspectOrdersSlide from "@/components/prospect/order/Slide.vue";
 import ManageProspectQuestionnairesSlide from "@/components/prospect/questionnaire/Slide.vue";
@@ -453,6 +455,7 @@ export default {
         ManageProspectInteractionsSlide,
         ManageProspectLabelsSlide,
         ManageProspectLogsSlide,
+        ProspectWorkflowsSlide,
         ManageProspectMessagesSlide,
         ManageProspectOrdersSlide,
         ManageRolePermissionsSlide,

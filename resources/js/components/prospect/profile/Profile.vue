@@ -100,6 +100,14 @@
                     @click.prevent.stop="showLogs"
                 />
                 <icon
+                    v-if="can('all.project.workflow.execution.view')"
+                    tag="a"
+                    class="fa fa-diagram-project icon-purple"
+                    v-tooltip="$t('workflow.monitor.prospect_tooltip')"
+                    :icon-size="16"
+                    @click.prevent.stop="showWorkflows"
+                />
+                <icon
                     v-if="prospect.latitude && prospect.longitude"
                     tag="a"
                     class="fa fa-map-marker icon-garnet"
@@ -536,6 +544,13 @@ export default {
          */
         showLogs() {
             store.commit(OPEN_SLIDE, "prospect-manage-logs");
+        },
+
+        /**
+         * What the automations did for the prospect
+         */
+        showWorkflows() {
+            store.commit(OPEN_SLIDE, "prospect-manage-workflows");
         },
 
         /**

@@ -513,6 +513,10 @@ class ImportProspects implements ShouldQueue
 
         ImportFinished::dispatch($this->import->refresh());
 
+        // The prospects were inserted in bulk (no model event):
+        // report them to the workflows now that the import is complete
+        \App\Workflows\WorkflowEvents::importFinished($this->import->id);
+
         Log::info('ImportProspects: finished import', [
             'import_id' => $this->import->id,
             'project_id' => $this->import->project_id,

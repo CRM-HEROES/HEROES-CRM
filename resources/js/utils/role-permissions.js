@@ -58,6 +58,50 @@ export default {
                     ],
                 },
                 {
+                    key: "workflow",
+                    name: "Automatisation",
+                    icon: "fa-diagram-project",
+                    sub: [
+                        {
+                            key: "view",
+                            name: "Voir les automatisations",
+                            icon: "fa-eye",
+                        },
+                        {
+                            key: "add",
+                            name: "Ajouter une automatisation",
+                            icon: "fa-plus",
+                        },
+                        {
+                            key: "update",
+                            name: "Modifier et publier une automatisation",
+                            icon: "fa-pen",
+                        },
+                        {
+                            key: "delete",
+                            name: "Supprimer une automatisation",
+                            icon: "fa-trash",
+                        },
+                        {
+                            key: "execute",
+                            name: "Activer, mettre en pause, archiver une automatisation",
+                            icon: "fa-play",
+                        },
+                        {
+                            key: "execution",
+                            name: "Exécutions des automatisations",
+                            icon: "fa-list-check",
+                            sub: [
+                                {
+                                    key: "view",
+                                    name: "Voir le suivi et l'historique des exécutions",
+                                    icon: "fa-eye",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
                     key: "category",
                     name: "Catégorie de filtre",
                     icon: "fa-tags",

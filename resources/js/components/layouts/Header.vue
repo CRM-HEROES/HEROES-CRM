@@ -495,6 +495,35 @@
                     </svg>
                 </header-menu>
 
+                <!-- Workflows (automations) -->
+
+                <header-menu
+                    v-if="can('all.project.workflow.view')"
+                    :label="$t('header.workflows')"
+                    :to="{
+                        name: 'workflow',
+                        params: {
+                            project: project.slug,
+                        },
+                    }"
+                >
+                    <svg
+                        version="1.1"
+                        xmlns="http://www.w3.org/2000/svg"
+                        x="0px"
+                        y="0px"
+                        viewBox="0 0 100 100"
+                        style="enable-background: new 0 0 100 100"
+                        xml:space="preserve"
+                    >
+                        <rect style="fill: #2e9d5c" x="38" y="6" width="24" height="18" rx="4" />
+                        <rect style="fill: #e8a317" x="38" y="41" width="24" height="18" rx="4" />
+                        <rect style="fill: #2f6fed" x="8" y="76" width="24" height="18" rx="4" />
+                        <rect style="fill: #8e5bd6" x="68" y="76" width="24" height="18" rx="4" />
+                        <path style="fill: none; stroke: #8a94a6; stroke-width: 4" d="M50,24 V41 M50,59 V68 M50,68 H20 V76 M50,68 H80 V76" />
+                    </svg>
+                </header-menu>
+
                 <!-- Claude -->
 
                 <header-menu
