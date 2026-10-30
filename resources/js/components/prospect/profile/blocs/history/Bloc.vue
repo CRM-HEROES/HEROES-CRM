@@ -20,6 +20,7 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
+import { assignmentRecorded } from "@/utils/prospect-label-history";
 
 import { FETCH_PROSPECT_REVISIONS } from "@/actions/project/prospect/revision";
 
@@ -40,7 +41,7 @@ export default {
     methods: {
         async fetchRevisions() {
             try {
-                await store.dispatch(FETCH_PROSPECT_REVISIONS);
+                await store.dispatch(FETCH_PROSPECT_REVISIONS, { all: true });
             } finally {
             }
         },
@@ -64,6 +65,7 @@ export default {
         ]),
 
         histories() {
+            const revisions = this.prospectRevisions.data || [];
             return [
                 ...this.prospectEvents.map((item) => ({
                     ...item,
@@ -81,12 +83,12 @@ export default {
                     ...item,
                     type: "interaction",
                 })),
-                ...this.prospectLabels.map((item) => ({
+                ...this.prospectLabels.filter(
+                    (item) => !assignmentRecorded(item, revisions)
+                ).map((item) => ({
                     ...item,
                     type: "label",
-                    created_at: item.pivot
-                        ? item.pivot.created_at
-                        : item.created_at,
+                    created_at: (item.pivot && item.pivot.created_at) || item.created_at,
                 })),
                 ...this.prospectLinks.map((item) => ({
                     ...item,
@@ -100,10 +102,7 @@ export default {
                     ...item,
                     type: "order",
                 })),
-                ...(this.prospectRevisions.data
-                    ? this.prospectRevisions.data
-                    : []
-                ).map((item) => ({
+                ...revisions.map((item) => ({
                     ...item,
                     type: "revision",
                 })),
@@ -118,7 +117,8 @@ export default {
             ]
                 .filter((item) => item.created_at)
                 .sort((item1, item2) =>
-                    item1.created_at < item2.created_at ? 1 : -1
+                    new Date(item2.created_at) - new Date(item1.created_at) ||
+                    item2.id - item1.id
                 );
         },
     },

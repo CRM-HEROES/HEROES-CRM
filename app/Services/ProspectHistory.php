@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Project;
+use App\Models\Prospect;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
@@ -176,6 +177,29 @@ class ProspectHistory
             'labels' => function ($query) use ($categories) {
                 $query->select('labels.id', 'name', 'category_id', 'color', 'bgcolor')
                     ->whereIn('category_id', $categories->pluck('id'))
+                    // Keep assignments from imports/bulk actions visible until
+                    // their own original date has been preserved in a revision.
+                    ->whereNotExists(function ($query) use ($categories) {
+                        $query->selectRaw('1')->from('revisions')
+                            ->whereColumn('revisions.revisionable_id', 'prospect_label.prospect_id')
+                            ->whereColumn('revisions.created_at', 'prospect_label.created_at')
+                            ->where('revisions.revisionable_type', (new Prospect())->getMorphClass())
+                            ->where(function ($query) {
+                                $query->whereColumn('revisions.user_id', 'prospect_label.creator_id')
+                                    ->orWhere(function ($query) {
+                                        $query->whereNull('revisions.user_id')->whereNull('prospect_label.creator_id');
+                                    });
+                            })
+                            ->where(function ($query) use ($categories) {
+                                foreach ($categories as $category) {
+                                    $query->orWhere(function ($query) use ($category) {
+                                        $query->where('labels.category_id', $category->id)
+                                            ->where('revisions.key', 'category->' . $category->id);
+                                    });
+                                }
+                            });
+                        app(ProspectLabelHistory::class)->whereRecordedAssignment($query);
+                    })
                     ->withPivot('created_at', 'creator_id');
             },
             'links' => fn ($query) => $query->select('id', 'prospect_id', 'name', 'link', 'creator_id', 'created_at'),

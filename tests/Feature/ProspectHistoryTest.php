@@ -2,18 +2,24 @@
 
 namespace Tests\Feature;
 
+use App\Exports\ProspectHistoryFormatter;
 use App\Http\Controllers\API\Project\ProspectController;
+use App\Http\Controllers\API\Project\Prospect\LabelController;
+use App\Models\Label;
 use App\Models\Message;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\User;
 use App\Services\ProspectHistory;
+use App\Services\ProspectLabelHistory;
+use Carbon\Carbon;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Notification;
 use Mockery;
 use Tests\TestCase;
 
@@ -35,7 +41,7 @@ class ProspectHistoryTest extends TestCase
             'prospects' => ['project_id'],
             'users' => ['name', 'role'],
             'fields' => ['project_id', 'for', 'slug', 'meta', 'name'],
-            'categories' => ['project_id', 'for', 'name'],
+            'categories' => ['project_id', 'for', 'name', 'unique'],
             'calendars' => ['project_id', 'name', 'color', 'bgcolor'],
             'events' => ['prospect_id', 'calendar_id', 'user_id', 'creator_id', 'started_at', 'location', 'description'],
             'folders' => ['project_id', 'for', 'name'],
@@ -92,6 +98,7 @@ class ProspectHistoryTest extends TestCase
 
     protected function tearDown(): void
     {
+        $this->travelBack();
         DB::purge('prospect_history_test');
         parent::tearDown();
     }
@@ -361,6 +368,281 @@ class ProspectHistoryTest extends TestCase
         $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
 
         (new ProspectController())->history($this->project(), $prospect);
+    }
+
+    public function test_replacing_unique_label_keeps_legacy_assignment_and_all_other_history_after_reload(): void
+    {
+        Notification::fake();
+        $this->seedHistory();
+        DB::table('categories')->where('id', 1)->update(['unique' => 1]);
+        DB::table('prospect_label')->where('prospect_id', 1)->update(['creator_id' => 2]);
+        DB::table('labels')->insert(['id' => 2, 'category_id' => 1, 'name' => 'Qualified']);
+        $before = collect($this->timeline());
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
+
+        (new LabelController())->update($this->project(), Prospect::findOrFail(1), Label::findOrFail(2));
+
+        $after = collect($this->timeline());
+        $changes = $after->where('key', 'category->1')->values();
+        $this->assertSame([2], Prospect::findOrFail(1)->labels()->pluck('labels.id')->all());
+        $this->assertCount($before->count() + 1, $after);
+        $this->assertCount(2, $changes);
+        $this->assertSame('revision', $after->first()['type']);
+        $this->assertSame('New', $changes[0]['old_value']);
+        $this->assertSame('Qualified', $changes[0]['new_value']);
+        $this->assertSame('Actor', $changes[0]['user']->name);
+        $this->assertStringStartsWith('2026-10-30T12:00:00', $changes[0]['created_at']);
+        $this->assertSame('New', $changes[1]['new_value']);
+        $this->assertSame('Assigned user', $changes[1]['user']->name);
+        $this->assertStringStartsWith('2026-10-21T12:00:00', $changes[1]['created_at']);
+        $this->assertEquals(
+            $before->reject(fn ($item) => $item['type'] === 'label')->values()->all(),
+            $after->reject(fn ($item) => ($item['key'] ?? null) === 'category->1')->values()->all()
+        );
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    public function test_removing_and_reattaching_label_prepends_changes_without_rewriting_previous_entries(): void
+    {
+        Notification::fake();
+        DB::table('labels')->insert(['id' => 1, 'category_id' => 1, 'name' => 'New']);
+        $controller = new LabelController();
+        $label = Label::findOrFail(1);
+        $this->travelTo(Carbon::parse('2026-10-28 09:00:00'));
+        $controller->update($this->project(), Prospect::findOrFail(1), $label);
+        $first = $this->timeline();
+        $this->assertCount(1, $first);
+        $this->assertSame('New', $first[0]['new_value']);
+
+        $this->travelTo(Carbon::parse('2026-10-29 10:00:00'));
+        $controller->destroy($this->project(), Prospect::findOrFail(1), $label);
+        $removed = $this->timeline();
+        $this->assertCount(2, $removed);
+        $this->assertSame('New', $removed[0]['old_value']);
+        $this->assertEmpty($removed[0]['new_value']);
+        $this->assertEquals($first, array_slice($removed, 1));
+        $this->assertSame(0, Prospect::findOrFail(1)->labels()->count());
+        $this->assertSummaryMatchesTimeline();
+
+        $this->travelTo(Carbon::parse('2026-10-30 11:00:00'));
+        $controller->update($this->project(), Prospect::findOrFail(1), $label);
+        $reattached = $this->timeline();
+        $this->assertCount(3, $reattached);
+        $this->assertSame('New', $reattached[0]['new_value']);
+        $this->assertEmpty($reattached[0]['old_value']);
+        $this->assertEquals($removed, array_slice($reattached, 1));
+        $this->assertCount(3, array_unique(array_column($reattached, 'id')));
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    public function test_removing_legacy_label_preserves_original_assignment_date_and_author(): void
+    {
+        DB::table('labels')->insert(['id' => 1, 'category_id' => 1, 'name' => 'Legacy']);
+        DB::table('prospect_label')->insert([
+            'prospect_id' => 1, 'label_id' => 1, 'creator_id' => 2,
+            'created_at' => '2026-09-15 08:30:00', 'updated_at' => '2026-09-15 08:30:00',
+        ]);
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
+
+        (new LabelController())->destroy($this->project(), Prospect::findOrFail(1), Label::findOrFail(1));
+
+        $history = $this->timeline();
+        $this->assertCount(2, $history);
+        $this->assertSame('Legacy', $history[0]['old_value']);
+        $this->assertEmpty($history[0]['new_value']);
+        $this->assertSame('Actor', $history[0]['user']->name);
+        $this->assertSame('Legacy', $history[1]['new_value']);
+        $this->assertSame('Assigned user', $history[1]['user']->name);
+        $this->assertStringStartsWith('2026-09-15T08:30:00', $history[1]['created_at']);
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    public function test_non_unique_category_revisions_keep_actual_before_and_after_selections(): void
+    {
+        Notification::fake();
+        DB::table('categories')->where('id', 1)->update(['unique' => 0]);
+        DB::table('labels')->insert([
+            ['id' => 1, 'category_id' => 1, 'name' => 'First'],
+            ['id' => 2, 'category_id' => 1, 'name' => 'Second'],
+        ]);
+        DB::table('prospect_label')->insert([
+            'prospect_id' => 1, 'label_id' => 1, 'creator_id' => 2,
+            'created_at' => '2026-10-01 08:00:00', 'updated_at' => '2026-10-01 08:00:00',
+        ]);
+        $controller = new LabelController();
+        $this->travelTo(Carbon::parse('2026-10-29 10:00:00'));
+        $controller->update($this->project(), Prospect::findOrFail(1), Label::findOrFail(2));
+        $added = $this->timeline();
+        $this->assertSame('First', $added[0]['old_value']);
+        $this->assertSame('First, Second', $added[0]['new_value']);
+        $this->assertSame([1, 2], Prospect::findOrFail(1)->labels()->orderBy('labels.id')->pluck('labels.id')->all());
+
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
+        $controller->destroy($this->project(), Prospect::findOrFail(1), Label::findOrFail(1));
+        $removed = $this->timeline();
+        $this->assertSame('First, Second', $removed[0]['old_value']);
+        $this->assertSame('Second', $removed[0]['new_value']);
+        $this->assertEquals($added, array_slice($removed, 1));
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    public function test_imported_assignment_in_already_revised_category_remains_visible_and_is_preserved_on_replacement(): void
+    {
+        Notification::fake();
+        DB::table('categories')->where('id', 1)->update(['unique' => 1]);
+        DB::table('labels')->insert([
+            ['id' => 1, 'category_id' => 1, 'name' => 'Imported'],
+            ['id' => 2, 'category_id' => 1, 'name' => 'Qualified'],
+        ]);
+        DB::table('revisions')->insert([
+            'revisionable_id' => 1, 'revisionable_type' => Prospect::class, 'key' => 'category->1',
+            'old_value' => '', 'new_value' => 'Original', 'user_id' => 1,
+            'created_at' => '2026-09-01 09:00:00',
+        ]);
+        // Imports and bulk operations can write assignments without dispatching a revision event.
+        DB::table('prospect_label')->insert([
+            'prospect_id' => 1, 'label_id' => 1, 'creator_id' => 2,
+            'created_at' => '2026-10-01 08:00:00', 'updated_at' => '2026-10-01 08:00:00',
+        ]);
+
+        $before = $this->timeline();
+        $this->assertCount(2, $before);
+        $this->assertSame('label', $before[0]['type']);
+        $this->assertSame('Imported', $before[0]['name']);
+        $this->assertSummaryMatchesTimeline();
+        $export = (new ProspectHistoryFormatter($this->project()))->format($before);
+        $this->assertStringContainsString('Imported', $export);
+        $this->assertStringContainsString('01/10/2026 08:00', $export);
+        $this->assertStringContainsString('Original', $export);
+
+        $this->travelTo(Carbon::parse('2026-10-30 12:00:00'));
+        (new LabelController())->update($this->project(), Prospect::findOrFail(1), Label::findOrFail(2));
+
+        $after = $this->timeline();
+        $this->assertCount(3, $after);
+        $this->assertSame('Imported', $after[0]['old_value']);
+        $this->assertSame('Qualified', $after[0]['new_value']);
+        $this->assertSame('Imported', $after[1]['new_value']);
+        $this->assertSame('Assigned user', $after[1]['user']->name);
+        $this->assertSame($before[0]['created_at'], $after[1]['created_at']);
+        $this->assertEquals($before[1], $after[2]);
+        $this->assertSummaryMatchesTimeline();
+        $export = (new ProspectHistoryFormatter($this->project()))->format($after);
+        $this->assertStringContainsString('Imported', $export);
+        $this->assertStringContainsString('01/10/2026 08:00', $export);
+        $this->assertStringContainsString('Original', $export);
+        $this->assertStringContainsString('Qualified', $export);
+    }
+
+    public function test_assignments_with_same_category_and_second_as_unrelated_revisions_keep_their_author(): void
+    {
+        DB::table('labels')->insert([
+            ['id' => 1, 'category_id' => 1, 'name' => 'RDV BE fixe'],
+            ['id' => 2, 'category_id' => 1, 'name' => 'Imported'],
+        ]);
+        $assignedAt = '2026-10-30 13:24:00';
+        DB::table('prospect_label')->insert([
+            ['prospect_id' => 1, 'label_id' => 1, 'creator_id' => 2, 'created_at' => $assignedAt],
+            ['prospect_id' => 1, 'label_id' => 2, 'creator_id' => 2, 'created_at' => $assignedAt],
+        ]);
+        DB::table('revisions')->insert([
+            ['revisionable_id' => 1, 'revisionable_type' => Prospect::class, 'key' => 'category->1',
+                'old_value' => '', 'new_value' => 'RDV BE fixe', 'user_id' => 1, 'created_at' => $assignedAt],
+            ['revisionable_id' => 1, 'revisionable_type' => Prospect::class, 'key' => 'category->1',
+                'old_value' => '', 'new_value' => 'Unrelated', 'user_id' => 2, 'created_at' => $assignedAt],
+        ]);
+
+        $before = collect($this->timeline());
+        $assignments = $before->where('type', 'label')->values();
+        $this->assertCount(2, $assignments);
+        $this->assertSame(['Imported', 'RDV BE fixe'], $assignments->pluck('name')->all());
+        $this->assertSame(['Assigned user'], $assignments->pluck('creator.name')->unique()->all());
+        $this->assertSummaryMatchesTimeline();
+
+        $history = new ProspectLabelHistory();
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+
+        $after = collect($this->timeline());
+        $this->assertCount(4, $after);
+        $this->assertCount(0, $after->where('type', 'label'));
+        $this->assertSame(1, $after->where('new_value', 'Imported')->where('user_id', 2)->count());
+        $this->assertSame(1, $after->where('new_value', 'RDV BE fixe')->where('user_id', 2)->count());
+        $this->assertEquals($before->where('type', 'revision')->values()->all(), $after->where('id', '<=', 2)->values()->all());
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    /** @dataProvider assignmentSnapshots */
+    public function test_only_a_revision_representing_the_complete_added_label_replaces_its_assignment(
+        ?string $oldValue, string $newValue, string $name, bool $recorded
+    ): void {
+        DB::table('labels')->insert(['id' => 1, 'category_id' => 1, 'name' => $name]);
+        $assignedAt = '2026-10-30 13:24:00';
+        DB::table('prospect_label')->insert([
+            'prospect_id' => 1, 'label_id' => 1, 'creator_id' => 2, 'created_at' => $assignedAt,
+        ]);
+        DB::table('revisions')->insert([
+            'revisionable_id' => 1, 'revisionable_type' => Prospect::class, 'key' => 'category->1',
+            'old_value' => $oldValue, 'new_value' => $newValue, 'user_id' => 2, 'created_at' => $assignedAt,
+        ]);
+
+        $this->assertCount($recorded ? 1 : 2, $this->timeline());
+        $this->assertSummaryMatchesTimeline();
+        $history = new ProspectLabelHistory();
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+        $this->assertCount($recorded ? 1 : 2, $this->timeline());
+        $this->assertSame(0, collect($this->timeline())->where('type', 'label')->count());
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    public static function assignmentSnapshots(): array
+    {
+        return [
+            'initial assignment' => [null, 'RDV', 'RDV', true],
+            'unique replacement' => ['New', 'RDV', 'RDV', true],
+            'addition at start' => ['Second', 'First, Second', 'First', true],
+            'addition at end' => ['First', 'First, Second', 'Second', true],
+            'addition in middle' => ['First, Third', 'First, Second, Third', 'Second', true],
+            'complete name containing comma' => ['First', 'First, Second, Third', 'Second, Third', true],
+            'substring of a comma-bearing name' => ['First', 'First, Second, Third', 'Third', false],
+            'same label without a change' => ['RDV', 'RDV', 'RDV', false],
+            'another label without a change' => ['Unrelated', 'Unrelated', 'RDV', false],
+            'removal of another label' => ['RDV, Other', 'RDV', 'RDV', false],
+            'addition of another label' => ['First', 'First, Other', 'RDV', false],
+        ];
+    }
+
+    public function test_preserved_assignments_without_an_author_are_deduplicated_consistently(): void
+    {
+        DB::table('labels')->insert(['id' => 1, 'category_id' => 1, 'name' => 'Imported']);
+        DB::table('prospect_label')->insert([
+            'prospect_id' => 1, 'label_id' => 1, 'creator_id' => null, 'created_at' => '2026-10-30 13:24:00',
+        ]);
+        $history = new ProspectLabelHistory();
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+        $history->preserve(Prospect::findOrFail(1), Label::findOrFail(1));
+
+        $timeline = $this->timeline();
+        $this->assertCount(1, $timeline);
+        $this->assertSame('revision', $timeline[0]['type']);
+        $this->assertNull($timeline[0]['user']);
+        $this->assertSummaryMatchesTimeline();
+    }
+
+    protected function timeline(): array
+    {
+        return (new ProspectController())->history($this->project(), Prospect::findOrFail(1));
+    }
+
+    protected function assertSummaryMatchesTimeline(): void
+    {
+        $history = $this->timeline();
+        $prospects = Prospect::query()->whereKey(1)->get();
+        (new ProspectHistory())->appendSummary($prospects, $this->project());
+
+        $this->assertSame(count($history), $prospects->first()->history_count);
+        $this->assertEquals($history[0] ?? null, $prospects->first()->history_latest);
     }
 
     protected function project(): Project
