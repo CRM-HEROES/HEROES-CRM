@@ -1,5 +1,11 @@
 <template>
+    <label-item
+        v-for="assignment in addedAssignments"
+        :key="assignment.name"
+        :item="assignment"
+    />
     <history-row
+        v-if="showRevision"
         :item="item"
         :date="item.created_at"
         :user="item.user"
@@ -39,8 +45,11 @@
 </style>
 
 <script>
+import { mapGetters } from "vuex";
+import { addedLabelNames } from "@/utils/prospect-label-history";
 // Components
 import HistoryRow from "./Row.vue";
+import LabelItem from "./LabelItem.vue";
 
 export default {
     props: {
@@ -51,6 +60,35 @@ export default {
 
     components: {
         HistoryRow,
+        LabelItem,
+    },
+
+    computed: {
+        ...mapGetters(["categories"]),
+
+        addedAssignments() {
+            if (!(this.item.key || "").startsWith("category->")) return [];
+
+            const categoryId = this.item.key.slice("category->".length);
+            const category = this.categories.find((category) => category.id == categoryId);
+            const labels = (category && category.labels) || [];
+
+            return addedLabelNames(this.item, labels).map((name) => ({
+                ...labels.find((label) => label.name === name),
+                id: this.item.id,
+                category_id: categoryId,
+                field: this.item.field,
+                name,
+                created_at: this.item.created_at,
+                creator: this.item.user,
+                creator_id: this.item.user_id,
+            }));
+        },
+
+        showRevision() {
+            // Legacy baselines preserve an assignment, not a known before/after.
+            return this.item.old_value !== null || !this.addedAssignments.length;
+        },
     },
 };
 </script>

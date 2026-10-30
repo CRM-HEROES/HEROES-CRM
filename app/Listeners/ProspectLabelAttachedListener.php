@@ -4,9 +4,9 @@ namespace App\Listeners;
 
 use App\Events\ProspectLabelAttached;
 use App\Notifications\PipedriveDealUpdatedProspectLabel;
+use App\Services\ProspectLabelHistory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Venturecraft\Revisionable\Revision;
 
 class ProspectLabelAttachedListener
 {
@@ -23,7 +23,7 @@ class ProspectLabelAttachedListener
      */
     public function handle(ProspectLabelAttached $event): void
     {
-        $this->revision($event->prospect, $event->label);
+        $this->revision($event->prospect, $event->label, $event->oldValue, $event->createdAt);
         $this->checkUniqueCategory($event->prospect, $event->label);
         $this->pipedriveDealUpdated($event->prospect, $event->label);
     }
@@ -31,33 +31,20 @@ class ProspectLabelAttachedListener
     /**
      * Insert revision row
      */
-    protected function revision($prospect, $label)
+    protected function revision($prospect, $label, ?string $oldValue = null, ?string $createdAt = null)
     {
-        $oldValue = $prospect
+        $oldValue ??= $prospect
             ->labels()
             ->where('category_id', $label->category_id)
-            ->where('id', '!=', $label->id)
+            ->where('labels.id', '!=', $label->id)
             ->get()
             ->pluck('name')
             ->implode(", ");
 
-        $newValue = $prospect
-            ->labels()
-            ->where('category_id', $label->category_id)
-            ->get()
-            ->pluck('name')
-            ->implode(", ");
+        $history = app(ProspectLabelHistory::class);
+        $newValue = $label->category->unique ? $label->name : $history->value($prospect, $label);
 
-        Revision::insert([
-            'revisionable_type' => get_class($prospect),
-            'revisionable_id' => $prospect->getKey(),
-            'key' => "category->" . $label->category_id,
-            'old_value' => $oldValue,
-            'new_value' => $newValue,
-            'user_id' => auth()->id(),
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
+        $history->record($prospect, $label, $oldValue, $newValue, $createdAt);
     }
 
     /**
@@ -76,7 +63,7 @@ class ProspectLabelAttachedListener
                 $prospect
                     ->labels()
                     ->where('category_id', $label->category_id)
-                    ->where('id', '!=', $label->id)
+                    ->where('labels.id', '!=', $label->id)
                     ->get()
                     ->pluck('id')
                     ->toArray()

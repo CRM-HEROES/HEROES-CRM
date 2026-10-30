@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Label;
 use App\Models\Project;
 use App\Models\Prospect;
+use App\Services\ProspectLabelHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -19,7 +20,7 @@ class LabelController extends Controller
     {
         return $prospect
             ->labels()
-            ->get();
+            ->get(['labels.*', 'prospect_label.created_at', 'prospect_label.creator_id']);
     }
 
     /**
@@ -32,18 +33,28 @@ class LabelController extends Controller
         // Label category for "prospect"
         abort_unless($label->category->for == "prospect", 404);
 
-        $prospect
-            ->labels()
-            ->withPivot('creator_id', 'created_at', 'updated_at')
-            ->syncWithoutDetaching([$label->id => [
-                'creator_id' => auth()->id(),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now()
-            ]]);
+        DB::transaction(function () use ($prospect, $label) {
+            $history = app(ProspectLabelHistory::class);
+            $history->preserve($prospect, $label);
+            $oldValue = $history->value($prospect, $label);
+            $changedAt = now()->toDateTimeString();
 
-        ProspectLabelAttached::dispatch($prospect, $label);
+            if (!$prospect->labels()->whereKey($label->id)->exists()) {
+                $prospect->labels()->attach($label->id, [
+                    'creator_id' => auth()->id(),
+                    'created_at' => $changedAt,
+                    'updated_at' => $changedAt,
+                ]);
+            }
 
-        return ['message' => trans('common.success.attached_resource')];
+            ProspectLabelAttached::dispatch($prospect, $label, $oldValue, $changedAt);
+        });
+
+        return [
+            'message' => trans('common.success.attached_resource'),
+            'label' => $prospect->labels()->whereKey($label->id)
+                ->first(['labels.*', 'prospect_label.created_at', 'prospect_label.creator_id']),
+        ];
     }
 
     /**
@@ -56,12 +67,17 @@ class LabelController extends Controller
         // Label category for "prospect"
         abort_unless($label->category->for == "prospect", 404);
 
-        /*DB::table('prospect_label')
-            ->where('prospect_id', $prospect->id)
-            ->where('label_id', $label->id)
-            ->update(['deleted_at' => DB::raw('NOW()')]);*/
-        
-        $prospect->labels()->detach($label->id);
+        DB::transaction(function () use ($prospect, $label) {
+            if (!$prospect->labels()->whereKey($label->id)->exists()) {
+                return;
+            }
+
+            $history = app(ProspectLabelHistory::class);
+            $history->preserve($prospect, $label);
+            $oldValue = $history->value($prospect, $label);
+            $prospect->labels()->detach($label->id);
+            $history->record($prospect, $label, $oldValue, $history->value($prospect, $label));
+        });
 
         return ['message' => trans('common.success.detached_resource')];
     }

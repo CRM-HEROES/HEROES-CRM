@@ -19,6 +19,7 @@ class RevisionController extends Controller
 
         $revisions = $prospect->revisionHistory()
             ->latest()
+            ->orderByDesc('id')
             ->where(function($query) use($fields, $categories) {
                 $query
                     ->whereIn('key', $fields->map(function($field) {

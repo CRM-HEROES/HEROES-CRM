@@ -10,8 +10,8 @@
         <div class="hc-prospect-profile-history-label">
             <b
                 class="hc-prospect-profile-history-label-category"
-                v-if="category"
-                v-text="category.name + ' : '"
+                v-if="category || item.field"
+                v-text="(category ? category.name : item.field) + ' : '"
             ></b>
             <div
                 class="hc-prospect-profile-history-label-name"
@@ -56,11 +56,15 @@ export default {
         },
 
         user() {
-            if (!this.item.creator_id) {
+            if (this.item.creator) return this.item.creator;
+
+            const creatorId = this.item.pivot
+                ? this.item.pivot.creator_id : this.item.creator_id;
+            if (!creatorId) {
                 return null;
             }
 
-            return this.users.find((user) => user.id == this.item.creator_id);
+            return this.users.find((user) => user.id == creatorId);
         },
     },
 };
