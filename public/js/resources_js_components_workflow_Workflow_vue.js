@@ -12,7 +12,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _FieldInput_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FieldInput.vue */ "./resources/js/components/workflow/FieldInput.vue");
-/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
+/* harmony import */ var _HelpTip_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HelpTip.vue */ "./resources/js/components/workflow/HelpTip.vue");
+/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -27,10 +28,12 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: "ConditionGroup",
   components: {
-    FieldInput: _FieldInput_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    FieldInput: _FieldInput_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    HelpTip: _HelpTip_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
   },
   props: {
     // { op: "and" | "or", items: [ { filters } | { check, ... } | { op, items } ] }
@@ -62,7 +65,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       return this.modelValue.items || [];
     },
     filters: function filters() {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_1__.filtersFor)(this.catalog, this.subject);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.filtersFor)(this.catalog, this.subject);
     }
   },
   methods: {
@@ -105,10 +108,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }) || {}).type;
     },
     newFilter: function newFilter(name) {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_1__.newFilterItem)(this.catalog, this.subject, name);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.newFilterItem)(this.catalog, this.subject, name);
     },
     newCheck: function newCheck(name) {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_1__.newCheckItem)(name);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.newCheckItem)(name);
     },
     checkFields: function checkFields(name) {
       return (this.catalog.conditions.checks.find(function (check) {
@@ -666,6 +669,91 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js":
+/*!**********************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+// One bubble at a time: opening another one closes the previous
+var opened = null;
+
+/**
+ * A small "i" button that explains, in a bubble, what the field or the button
+ * next to it does. Give it the text (text) or the key of a translation (k);
+ * without text there is no button at all.
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    text: {
+      type: String,
+      "default": ""
+    },
+    k: {
+      type: String,
+      "default": ""
+    }
+  },
+  data: function data() {
+    return {
+      open: false,
+      position: {}
+    };
+  },
+  computed: {
+    content: function content() {
+      if (this.text) {
+        return this.text;
+      }
+      return this.k && this.$te(this.k) ? this.$t(this.k) : "";
+    }
+  },
+  beforeUnmount: function beforeUnmount() {
+    this.close();
+  },
+  methods: {
+    toggle: function toggle() {
+      this.open ? this.close() : this.show();
+    },
+    show: function show() {
+      if (opened && opened !== this) {
+        opened.close();
+      }
+      var rect = this.$refs.button.getBoundingClientRect();
+      var width = 250;
+      this.position = {
+        left: Math.max(8, Math.min(rect.left - 12, window.innerWidth - width - 8)) + "px",
+        top: rect.bottom + 8 + "px"
+      };
+      this.open = true;
+      opened = this;
+      document.addEventListener("click", this.close);
+      document.addEventListener("keydown", this.onKey);
+      window.addEventListener("scroll", this.close, true);
+    },
+    close: function close() {
+      this.open = false;
+      if (opened === this) {
+        opened = null;
+      }
+      document.removeEventListener("click", this.close);
+      document.removeEventListener("keydown", this.onKey);
+      window.removeEventListener("scroll", this.close, true);
+    },
+    onKey: function onKey(event) {
+      if (event.key === "Escape") {
+        this.close();
+      }
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=script&lang=js":
 /*!*************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=script&lang=js ***!
@@ -677,10 +765,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _ConditionGroup_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ConditionGroup.vue */ "./resources/js/components/workflow/ConditionGroup.vue");
-/* harmony import */ var _FieldInput_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./FieldInput.vue */ "./resources/js/components/workflow/FieldInput.vue");
-/* harmony import */ var _utils_workflow_graph__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/workflow-graph */ "./resources/js/utils/workflow-graph.js");
-/* harmony import */ var _utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils/workflow-i18n */ "./resources/js/utils/workflow-i18n.js");
-/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
+/* harmony import */ var _HelpTip_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HelpTip.vue */ "./resources/js/components/workflow/HelpTip.vue");
+/* harmony import */ var _FieldInput_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./FieldInput.vue */ "./resources/js/components/workflow/FieldInput.vue");
+/* harmony import */ var _utils_workflow_graph__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/utils/workflow-graph */ "./resources/js/utils/workflow-graph.js");
+/* harmony import */ var _utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils/workflow-i18n */ "./resources/js/utils/workflow-i18n.js");
+/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
 var _excluded = ["mode", "filters"];
 function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
 function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
@@ -703,10 +792,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
+    HelpTip: _HelpTip_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
     ConditionGroup: _ConditionGroup_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    FieldInput: _FieldInput_vue__WEBPACK_IMPORTED_MODULE_1__["default"]
+    FieldInput: _FieldInput_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
   },
   props: {
     node: {
@@ -753,7 +844,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * What the workflow works on (prospect, order, appointment): the criteria depend on it
      */
     subject: function subject() {
-      var trigger = (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_2__.triggerNode)(this.graph);
+      var trigger = (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_3__.triggerNode)(this.graph);
       return trigger && trigger.config.trigger ? trigger.config.trigger.split(".")[0] : "prospect";
     },
     triggerFields: function triggerFields() {
@@ -813,7 +904,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     },
     outputList: function outputList() {
       var _this3 = this;
-      return (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_2__.outputs)(this.node).map(function (branch) {
+      return (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_3__.outputs)(this.node).map(function (branch) {
         var edge = _this3.graph.edges.find(function (e) {
           return e.from === _this3.node.id && (e.branch || null) === branch;
         });
@@ -834,12 +925,12 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
     }
   },
   methods: {
-    slug: _utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_3__.slug,
+    slug: _utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_4__.slug,
     /**
      * Name of an action; the identifier itself when it has no translation yet
      */
     actionLabel: function actionLabel(type) {
-      var key = "workflow.action_type." + (0,_utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_3__.slug)(type);
+      var key = "workflow.action_type." + (0,_utils_workflow_i18n__WEBPACK_IMPORTED_MODULE_4__.slug)(type);
       return this.$te(key) ? this.$t(key) : type;
     },
     setConfig: function setConfig(patch) {
@@ -852,7 +943,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       });
     },
     changeTrigger: function changeTrigger(type) {
-      this.replaceConfig((0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.triggerConfig)(this.catalog, type));
+      this.replaceConfig((0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_5__.triggerConfig)(this.catalog, type));
     },
     /**
      * The explanation of a field, if there is one
@@ -928,7 +1019,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.replaceConfig(config);
     },
     cycle: function cycle(id) {
-      return (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_2__.wouldCreateCycle)(this.graph, this.node.id, id);
+      return (0,_utils_workflow_graph__WEBPACK_IMPORTED_MODULE_3__.wouldCreateCycle)(this.graph, this.node.id, id);
     },
     label: function label(node) {
       return node.name || "".concat(this.$t("workflow.node." + node.type), " (").concat(node.id, ")");
@@ -2410,10 +2501,22 @@ var _hoisted_21 = {
   key: 2,
   "class": "hc-wfc-add"
 };
-var _hoisted_22 = ["textContent"];
+var _hoisted_22 = {
+  key: 0,
+  "class": "hc-wfc-addwrap"
+};
 var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
+var _hoisted_24 = {
+  "class": "hc-wfc-addwrap"
+};
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = {
+  key: 1,
+  "class": "hc-wfc-addwrap"
+};
+var _hoisted_27 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_help_tip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("help-tip");
   var _component_condition_group = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("condition-group", true);
   var _component_field_input = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("field-input");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
@@ -2436,7 +2539,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "or",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.any'))
-  }, null, 8 /* PROPS */, _hoisted_5)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_3), $props.depth > 1 && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+  }, null, 8 /* PROPS */, _hoisted_5)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.condition_op"
+  }), $props.depth > 1 && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
     type: "button",
     "class": "hc-wfc-remove",
@@ -2548,21 +2653,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.removeItem(index);
       }
     }, "×", 8 /* PROPS */, _hoisted_20)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-  }), 128 /* KEYED_FRAGMENT */)), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [$options.filters.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-    key: 0,
+  }), 128 /* KEYED_FRAGMENT */)), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [$options.filters.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[2] || (_cache[2] = function ($event) {
       return $options.add($options.newFilter($options.filters[0].name));
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_filter'))
-  }, null, 8 /* PROPS */, _hoisted_22)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.add_filter"
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[3] || (_cache[3] = function ($event) {
       return $options.add($options.newCheck('work_hours'));
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_check'))
-  }, null, 8 /* PROPS */, _hoisted_23), $props.depth < $props.catalog.conditions.max_depth ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-    key: 1,
+  }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.add_check"
+  })]), $props.depth < $props.catalog.conditions.max_depth ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[4] || (_cache[4] = function ($event) {
       return $options.add({
@@ -2571,7 +2678,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       });
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_group'))
-  }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.add_group"
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);
 }
 
 /***/ }),
@@ -2944,6 +3053,47 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716":
+/*!**************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716 ***!
+  \**************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+var _hoisted_1 = {
+  key: 0,
+  "class": "hc-tip"
+};
+var _hoisted_2 = ["title"];
+var _hoisted_3 = ["textContent"];
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return $options.content ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    ref: "button",
+    type: "button",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-tip-button", {
+      open: $data.open
+    }]),
+    title: _ctx.$t('workflow.tip.what'),
+    onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.toggle && $options.toggle.apply($options, arguments);
+    }, ["stop", "prevent"]))
+  }, "i", 10 /* CLASS, PROPS */, _hoisted_2), $data.open ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 0,
+    "class": "hc-tip-pop",
+    role: "tooltip",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($data.position),
+    onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"])),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.content)
+  }, null, 12 /* STYLE, PROPS */, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true);
+}
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=template&id=23a3b904":
 /*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=template&id=23a3b904 ***!
@@ -2968,66 +3118,93 @@ var _hoisted_2 = {
 };
 var _hoisted_3 = ["textContent"];
 var _hoisted_4 = ["title"];
-var _hoisted_5 = ["textContent"];
-var _hoisted_6 = ["value", "placeholder", "disabled"];
-var _hoisted_7 = ["textContent"];
-var _hoisted_8 = ["value", "disabled"];
-var _hoisted_9 = ["value", "textContent"];
-var _hoisted_10 = ["textContent"];
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = ["textContent"];
-var _hoisted_17 = ["value", "disabled"];
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["value", "textContent"];
-var _hoisted_20 = ["label"];
-var _hoisted_21 = ["value", "textContent"];
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
-var _hoisted_25 = {
+var _hoisted_5 = {
   "class": "hc-wfn-label"
 };
-var _hoisted_26 = {
+var _hoisted_6 = ["textContent"];
+var _hoisted_7 = ["value", "placeholder", "disabled"];
+var _hoisted_8 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["value", "disabled"];
+var _hoisted_11 = ["value", "textContent"];
+var _hoisted_12 = ["textContent"];
+var _hoisted_13 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_14 = ["textContent"];
+var _hoisted_15 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_16 = ["textContent"];
+var _hoisted_17 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_18 = ["textContent"];
+var _hoisted_19 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = ["value", "disabled"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = ["value", "textContent"];
+var _hoisted_24 = ["label"];
+var _hoisted_25 = ["value", "textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_30 = {
   key: 0,
   "class": "hc-wfn-required"
 };
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = ["value", "disabled"];
-var _hoisted_30 = ["textContent"];
-var _hoisted_31 = ["textContent"];
-var _hoisted_32 = ["textContent"];
-var _hoisted_33 = {
-  key: 0,
-  "class": "hc-wfn-duration"
+var _hoisted_31 = {
+  "class": "hc-wfn-label"
 };
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = ["value", "disabled"];
 var _hoisted_34 = ["textContent"];
 var _hoisted_35 = ["textContent"];
 var _hoisted_36 = ["textContent"];
-var _hoisted_37 = ["textContent"];
-var _hoisted_38 = ["value", "disabled"];
-var _hoisted_39 = ["textContent"];
-var _hoisted_40 = ["textContent"];
-var _hoisted_41 = ["value", "disabled"];
-var _hoisted_42 = ["value", "textContent"];
-var _hoisted_43 = ["textContent"];
-var _hoisted_44 = {
+var _hoisted_37 = {
+  key: 0,
   "class": "hc-wfn-duration"
 };
+var _hoisted_38 = ["textContent"];
+var _hoisted_39 = ["textContent"];
+var _hoisted_40 = ["textContent"];
+var _hoisted_41 = ["textContent"];
+var _hoisted_42 = ["value", "disabled"];
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = {
+  "class": "hc-wfn-label"
+};
 var _hoisted_45 = ["textContent"];
-var _hoisted_46 = ["textContent"];
-var _hoisted_47 = ["textContent"];
-var _hoisted_48 = ["textContent"];
+var _hoisted_46 = ["value", "disabled"];
+var _hoisted_47 = ["value", "textContent"];
+var _hoisted_48 = {
+  "class": "hc-wfn-label"
+};
 var _hoisted_49 = ["textContent"];
-var _hoisted_50 = ["value", "disabled", "onChange"];
+var _hoisted_50 = {
+  "class": "hc-wfn-duration"
+};
 var _hoisted_51 = ["textContent"];
-var _hoisted_52 = ["value", "disabled", "textContent"];
-var _hoisted_53 = ["textContent"];
+var _hoisted_52 = ["textContent"];
+var _hoisted_53 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_54 = ["textContent"];
+var _hoisted_55 = ["textContent"];
+var _hoisted_56 = ["value", "disabled", "onChange"];
+var _hoisted_57 = ["textContent"];
+var _hoisted_58 = ["value", "disabled", "textContent"];
+var _hoisted_59 = ["title", "textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_help_tip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("help-tip");
   var _component_condition_group = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("condition-group");
   var _component_field_input = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("field-input");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("aside", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
@@ -3039,10 +3216,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return _ctx.$emit('close');
     })
-  }, "×", 8 /* PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, "×", 8 /* PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.step_name'))
-  }, null, 8 /* PROPS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.step_name"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     maxlength: "120",
     value: $props.node.name,
@@ -3053,12 +3231,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         name: $event.target.value
       });
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" When "), $props.node.type === 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" When "), $props.node.type === 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node.trigger'))
-  }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.trigger"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.config.trigger,
     disabled: $props.readOnly,
     onChange: _cache[2] || (_cache[2] = function ($event) {
@@ -3069,22 +3248,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: trigger.type,
       value: trigger.type,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.trigger.' + $options.slug(trigger.type)))
-    }, null, 8 /* PROPS */, _hoisted_9);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    }, null, 8 /* PROPS */, _hoisted_11);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.trigger_help.' + $options.slug($options.config.trigger)))
-  }, null, 8 /* PROPS */, _hoisted_10), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.triggerFields, function (field) {
+  }, null, 8 /* PROPS */, _hoisted_12), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.triggerFields, function (field) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: field.key
     }, [field.type === 'condition' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 0
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-      "class": "hc-wfn-label",
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.trigger_filter'))
-    }, null, 8 /* PROPS */, _hoisted_11), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-      "class": "hc-wfn-help",
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.trigger_filter_help'))
-    }, null, 8 /* PROPS */, _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
+    }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+      k: "workflow.trigger_filter_help"
+    })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
       "model-value": $options.tree,
       subject: $options.subject,
       catalog: $props.catalog,
@@ -3092,14 +3269,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       "onUpdate:modelValue": $options.setTree
     }, null, 8 /* PROPS */, ["model-value", "subject", "catalog", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 1
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-      "class": "hc-wfn-label",
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.field.' + field.key))
-    }, null, 8 /* PROPS */, _hoisted_13), $options.help(field) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-      key: 0,
-      "class": "hc-wfn-help",
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.help(field))
-    }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, null, 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+      text: $options.help(field) || ''
+    }, null, 8 /* PROPS */, ["text"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.config[field.key],
       type: field.type,
       field: field,
@@ -3110,10 +3284,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 8 /* PROPS */, ["model-value", "type", "field", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */))], 64 /* STABLE_FRAGMENT */);
   }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'condition' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" If "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" If "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node_help.condition'))
-  }, null, 8 /* PROPS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
+  }, null, 8 /* PROPS */, _hoisted_18)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
     "model-value": $options.tree,
     subject: $options.subject,
     catalog: $props.catalog,
@@ -3121,10 +3294,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": $options.setTree
   }, null, 8 /* PROPS */, ["model-value", "subject", "catalog", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'action' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Do "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Do "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.field.action'))
-  }, null, 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.action"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.config.action || '',
     disabled: $props.readOnly,
     onChange: _cache[3] || (_cache[3] = function ($event) {
@@ -3133,11 +3307,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.choose'))
-  }, null, 8 /* PROPS */, _hoisted_18), $options.config.action && !$options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+  }, null, 8 /* PROPS */, _hoisted_22), $options.config.action && !$options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
     key: 0,
     value: $options.config.action,
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.actionLabel($options.config.action))
-  }, null, 8 /* PROPS */, _hoisted_19)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionGroups, function (group) {
+  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionGroups, function (group) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("optgroup", {
       key: group.category,
       label: _ctx.$t('workflow.category.' + group.category)
@@ -3146,31 +3320,29 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: action.type,
         value: action.type,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.action_type.' + $options.slug(action.type)))
-      }, null, 8 /* PROPS */, _hoisted_21);
-    }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_20);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" An action taken over from a campaign: kept as it is, its settings are shown "), $options.config.action && !$options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      }, null, 8 /* PROPS */, _hoisted_25);
+    }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_24);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" An action taken over from a campaign: kept as it is, its settings are shown "), $options.config.action && !$options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.legacy_action'))
-  }, null, 8 /* PROPS */, _hoisted_22), $options.hasValue ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("pre", {
+  }, null, 8 /* PROPS */, _hoisted_26), $options.hasValue ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("pre", {
     key: 0,
     "class": "hc-wfn-legacy",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(JSON.stringify($options.config.value, null, 2))
-  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.actionDef ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, [$options.actionDef.danger ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 0,
     "class": "hc-wfn-danger",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.danger'))
-  }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionDef.fields, function (field) {
+  }, null, 8 /* PROPS */, _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionDef.fields, function (field) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: field.key
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.field." + $options.fieldName(field))) + " ", 1 /* TEXT */), field.required ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_26, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $options.help(field) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-      key: 0,
-      "class": "hc-wfn-help",
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.help(field))
-    }, null, 8 /* PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.field." + $options.fieldName(field))) + " ", 1 /* TEXT */), field.required ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_30, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+      text: $options.help(field) || ''
+    }, null, 8 /* PROPS */, ["text"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.getPath(field.key),
       type: field.type,
       field: field,
@@ -3187,10 +3359,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, null, 8 /* PROPS */, ["model-value", "type", "field", "variables", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */);
   }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 3
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.mode'))
-  }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, null, 8 /* PROPS */, _hoisted_32), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.wait_mode"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.waitMode,
     disabled: $props.readOnly,
     onChange: _cache[5] || (_cache[5] = function ($event) {
@@ -3199,18 +3372,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "duration",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.duration'))
-  }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, null, 8 /* PROPS */, _hoisted_34), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "time",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.until_time'))
-  }, null, 8 /* PROPS */, _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "date",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.until_date'))
-  }, null, 8 /* PROPS */, _hoisted_32)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_29), $options.waitMode === 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
+  }, null, 8 /* PROPS */, _hoisted_36)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_33), $options.waitMode === 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: unit
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.' + unit))
-    }, null, 8 /* PROPS */, _hoisted_34), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, null, 8 /* PROPS */, _hoisted_38), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.config[unit],
       type: "number",
       "read-only": $props.readOnly,
@@ -3223,7 +3396,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.time'))
-  }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
     "model-value": $options.config.until_time,
     type: "time",
     "read-only": $props.readOnly,
@@ -3235,7 +3408,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, ["model-value", "read-only"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.only_days'))
-  }, null, 8 /* PROPS */, _hoisted_36), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+  }, null, 8 /* PROPS */, _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
     "model-value": $options.config.days,
     type: "weekdays",
     "read-only": $props.readOnly,
@@ -3249,7 +3422,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.date'))
-  }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "datetime-local",
     value: ($options.config.until_date || '').replace(' ', 'T'),
     disabled: $props.readOnly,
@@ -3258,16 +3431,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         until_date: $event.target.value.replace('T', ' ')
       });
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_38)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode !== 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_42)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode !== 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 3,
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.timezone_help'))
-  }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait_event' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_43)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait_event' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 4
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait for an event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait for an event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.field.event'))
-  }, null, 8 /* PROPS */, _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  }, null, 8 /* PROPS */, _hoisted_45), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.wait_event"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.config.event,
     disabled: $props.readOnly,
     onChange: _cache[9] || (_cache[9] = function ($event) {
@@ -3280,16 +3454,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: event,
       value: event,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.event.' + event))
-    }, null, 8 /* PROPS */, _hoisted_42);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+    }, null, 8 /* PROPS */, _hoisted_47);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.max'))
-  }, null, 8 /* PROPS */, _hoisted_43), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
+  }, null, 8 /* PROPS */, _hoisted_49), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.wait.event_help"
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: unit
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.' + unit))
-    }, null, 8 /* PROPS */, _hoisted_45), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.config[unit],
       type: "number",
       "read-only": $props.readOnly,
@@ -3297,19 +3472,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.setConfig(_defineProperty({}, unit, $event));
       }
     }, null, 8 /* PROPS */, ["model-value", "read-only", "onUpdate:modelValue"])]);
-  }), 64 /* STABLE_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
-    "class": "hc-wfn-help",
-    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.event_help'))
-  }, null, 8 /* PROPS */, _hoisted_46)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'end' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+  }), 64 /* STABLE_FRAGMENT */))])], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'end' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 5,
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node_help.end'))
-  }, null, 8 /* PROPS */, _hoisted_47)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What follows "), $options.outputList.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_52)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What follows "), $options.outputList.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 6
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-    "class": "hc-wfn-label",
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.next'))
-  }, null, 8 /* PROPS */, _hoisted_48), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.outputList, function (output) {
+  }, null, 8 /* PROPS */, _hoisted_54), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.next"
+  })]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.outputList, function (output) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: String(output.branch),
       "class": "hc-wfn-output"
@@ -3317,7 +3490,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: 0,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfn-branch", output.branch]),
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.' + output.branch))
-    }, null, 10 /* CLASS, PROPS */, _hoisted_49)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    }, null, 10 /* CLASS, PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
       value: output.to || '',
       disabled: $props.readOnly,
       onChange: function onChange($event) {
@@ -3329,23 +3502,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: "",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.nothing'))
-    }, null, 8 /* PROPS */, _hoisted_51), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.candidates, function (candidate) {
+    }, null, 8 /* PROPS */, _hoisted_57), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.candidates, function (candidate) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
         key: candidate.id,
         value: candidate.id,
         disabled: $options.cycle(candidate.id),
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label(candidate))
-      }, null, 8 /* PROPS */, _hoisted_52);
-    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_50)]);
+      }, null, 8 /* PROPS */, _hoisted_58);
+    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_56)]);
   }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$props.readOnly && $props.node.type !== 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 7,
     type: "button",
     "class": "hc-wfn-delete",
+    title: _ctx.$t('workflow.tip.remove_node'),
     onClick: _cache[10] || (_cache[10] = function ($event) {
       return _ctx.$emit('remove');
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.remove_node'))
-  }, null, 8 /* PROPS */, _hoisted_53)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, null, 8 /* PROPS */, _hoisted_59)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -3594,8 +3768,8 @@ var _hoisted_11 = {
   "class": "hc-wfb-more"
 };
 var _hoisted_12 = ["title"];
-var _hoisted_13 = ["disabled", "textContent"];
-var _hoisted_14 = ["disabled", "textContent"];
+var _hoisted_13 = ["disabled", "title", "textContent"];
+var _hoisted_14 = ["disabled", "title", "textContent"];
 var _hoisted_15 = ["disabled", "textContent"];
 var _hoisted_16 = ["disabled", "textContent"];
 var _hoisted_17 = ["disabled", "textContent"];
@@ -3615,26 +3789,33 @@ var _hoisted_24 = {
 var _hoisted_25 = {
   "class": "hc-wfb-palette"
 };
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "hc-wfb-palette-dot"
-}, null, -1 /* HOISTED */);
+var _hoisted_26 = {
+  "class": "hc-wfb-section"
+};
+var _hoisted_27 = ["textContent"];
 var _hoisted_28 = ["textContent"];
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = ["textContent"];
-var _hoisted_31 = ["draggable", "disabled", "title", "onClick", "onDragstart"];
-var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "hc-wfb-palette-dot"
 }, null, -1 /* HOISTED */);
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = {
+  "class": "hc-wfb-section"
+};
+var _hoisted_32 = ["textContent"];
 var _hoisted_33 = ["textContent"];
-var _hoisted_34 = ["textContent"];
-var _hoisted_35 = {
+var _hoisted_34 = ["draggable", "disabled", "title", "onClick", "onDragstart"];
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfb-palette-dot"
+}, null, -1 /* HOISTED */);
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = {
   key: 0,
   "class": "hc-wfb-connecting"
 };
-var _hoisted_36 = ["textContent"];
-var _hoisted_37 = ["width", "height"];
-var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("defs", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("marker", {
+var _hoisted_39 = ["textContent"];
+var _hoisted_40 = ["width", "height"];
+var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("defs", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("marker", {
   id: "hc-wfb-arrow",
   viewBox: "0 0 10 10",
   refX: "8",
@@ -3646,15 +3827,7 @@ var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   d: "M 0 0 L 10 5 L 0 10 z",
   fill: "#8a94a6"
 })])], -1 /* HOISTED */);
-var _hoisted_39 = ["d"];
-var _hoisted_40 = ["transform", "onClick"];
-var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
-  r: "8"
-}, null, -1 /* HOISTED */);
-var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("text", {
-  y: "4",
-  "text-anchor": "middle"
-}, "×", -1 /* HOISTED */);
+var _hoisted_42 = ["d"];
 var _hoisted_43 = ["transform", "onClick"];
 var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
   r: "8"
@@ -3662,28 +3835,37 @@ var _hoisted_44 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("text", {
   y: "4",
   "text-anchor": "middle"
+}, "×", -1 /* HOISTED */);
+var _hoisted_46 = ["transform", "onClick"];
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
+  r: "8"
+}, null, -1 /* HOISTED */);
+var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("text", {
+  y: "4",
+  "text-anchor": "middle"
 }, "+", -1 /* HOISTED */);
-var _hoisted_46 = ["onClick"];
-var _hoisted_47 = ["title", "onClick"];
-var _hoisted_48 = ["textContent"];
-var _hoisted_49 = ["onMousedown"];
-var _hoisted_50 = ["textContent"];
-var _hoisted_51 = ["title", "textContent"];
-var _hoisted_52 = ["title", "onClick"];
-var _hoisted_53 = ["disabled", "title", "onClick"];
-var _hoisted_54 = ["textContent"];
-var _hoisted_55 = ["disabled", "title", "onClick"];
-var _hoisted_56 = ["textContent"];
-var _hoisted_57 = ["textContent"];
-var _hoisted_58 = ["onClick"];
-var _hoisted_59 = ["textContent"];
+var _hoisted_49 = ["onClick"];
+var _hoisted_50 = ["title", "onClick"];
+var _hoisted_51 = ["textContent"];
+var _hoisted_52 = ["onMousedown"];
+var _hoisted_53 = ["textContent"];
+var _hoisted_54 = ["title", "textContent"];
+var _hoisted_55 = ["title", "textContent"];
+var _hoisted_56 = ["title", "onClick"];
+var _hoisted_57 = ["disabled", "title", "onClick"];
+var _hoisted_58 = ["textContent"];
+var _hoisted_59 = ["disabled", "title", "onClick"];
 var _hoisted_60 = ["textContent"];
 var _hoisted_61 = ["textContent"];
-var _hoisted_62 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-  "class": "hc-wfb-menu-icon"
-}, "↪", -1 /* HOISTED */);
+var _hoisted_62 = ["onClick"];
 var _hoisted_63 = ["textContent"];
 var _hoisted_64 = ["textContent"];
+var _hoisted_65 = ["textContent"];
+var _hoisted_66 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfb-menu-icon"
+}, "↪", -1 /* HOISTED */);
+var _hoisted_67 = ["textContent"];
+var _hoisted_68 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_node_editor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("node-editor");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Toolbar "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -3742,6 +3924,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     disabled: $data.busy,
+    title: _ctx.$t('workflow.tip.validate'),
     onClick: _cache[5] || (_cache[5] = function ($event) {
       $data.moreOpen = false;
       $options.check();
@@ -3750,6 +3933,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     disabled: $options.readOnly,
+    title: _ctx.$t('workflow.tip.arrange'),
     onClick: _cache[6] || (_cache[6] = function ($event) {
       $data.moreOpen = false;
       $options.arrange();
@@ -3813,10 +3997,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 1,
     "class": "hc-wfb-ok",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.valid'))
-  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Palette "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The trigger is the first step: one click to change it "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "hc-wfb-section",
+  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Palette "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("nav", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The trigger is the first step: one click to change it "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.trigger'))
-  }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, _hoisted_27)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    "class": "hc-wfb-section-help",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.trigger_help'))
+  }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfb-palette-item type-trigger", {
       on: $data.selectedId === $options.triggerId
@@ -3824,18 +4010,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[12] || (_cache[12] = function ($event) {
       return $data.selectedId = $options.triggerId;
     })
-  }, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, [_hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.trigger_change'))
-  }, null, 8 /* PROPS */, _hoisted_28)], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.sections(false), function (section) {
+  }, null, 8 /* PROPS */, _hoisted_30)], 2 /* CLASS */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.sections(false), function (section) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: section.key
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-      "class": "hc-wfb-section",
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.' + section.key))
-    }, null, 8 /* PROPS */, _hoisted_29), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    }, null, 8 /* PROPS */, _hoisted_32)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
       "class": "hc-wfb-section-help",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.' + section.key + '_help'))
-    }, null, 8 /* PROPS */, _hoisted_30), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(section.types, function (type) {
+    }, null, 8 /* PROPS */, _hoisted_33), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(section.types, function (type) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: type,
         type: "button",
@@ -3849,14 +4034,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onDragstart: function onDragstart($event) {
           return $options.paletteDragStart($event, type);
         }
-      }, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      }, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node.' + type))
-      }, null, 8 /* PROPS */, _hoisted_33)], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, _hoisted_31);
+      }, null, 8 /* PROPS */, _hoisted_36)], 42 /* CLASS, PROPS, HYDRATE_EVENTS */, _hoisted_34);
     }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */);
   }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "hc-wfb-palette-hint",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.palette_hint'))
-  }, null, 8 /* PROPS */, _hoisted_34)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Canvas "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_37)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Canvas "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     ref: "canvas",
     "class": "hc-wfb-canvas",
     onClick: _cache[17] || (_cache[17] = function () {
@@ -3866,13 +4051,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onDrop: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.paletteDrop && $options.paletteDrop.apply($options, arguments);
     }, ["prevent"]))
-  }, [$data.connecting ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.connecting")) + " ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, [$data.connecting ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.connecting")) + " ", 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.cancelConnect && $options.cancelConnect.apply($options, arguments);
     }, ["stop"])),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.cancel'))
-  }, null, 8 /* PROPS */, _hoisted_36)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, _hoisted_39)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-wfb-surface",
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
       width: $options.size.width + 'px',
@@ -3882,29 +4067,29 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "hc-wfb-links",
     width: $options.size.width,
     height: $options.size.height
-  }, [_hoisted_38, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.links, function (link) {
+  }, [_hoisted_41, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.links, function (link) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("g", {
       key: link.key
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
       d: link.path,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfb-link", link.branch]),
       "marker-end": "url(#hc-wfb-arrow)"
-    }, null, 10 /* CLASS, PROPS */, _hoisted_39), !$options.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("g", {
+    }, null, 10 /* CLASS, PROPS */, _hoisted_42), !$options.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("g", {
       key: 0,
       "class": "hc-wfb-link-remove",
       transform: "translate(".concat(link.middle.x, ", ").concat(link.middle.y, ")"),
       onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
         return $options.removeLink(link);
       }, ["stop"])
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.remove_link")), 1 /* TEXT */), _hoisted_41, _hoisted_42], 8 /* PROPS */, _hoisted_40)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("g", {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.remove_link")), 1 /* TEXT */), _hoisted_44, _hoisted_45], 8 /* PROPS */, _hoisted_43)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("g", {
       key: 1,
       "class": "hc-wfb-link-insert",
       transform: "translate(".concat(link.middle.x + 22, ", ").concat(link.middle.y, ")"),
       onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
         return $options.openMenu(link.from, link.branch, link.middle.x + 22, link.middle.y + 12, true);
       }, ["stop"])
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.add_menu.insert")), 1 /* TEXT */), _hoisted_44, _hoisted_45], 8 /* PROPS */, _hoisted_43)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-  }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_37)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.view.nodes, function (node) {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("title", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.add_menu.insert")), 1 /* TEXT */), _hoisted_47, _hoisted_48], 8 /* PROPS */, _hoisted_46)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_40)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.view.nodes, function (node) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: node.id,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfb-node", ['type-' + node.type, {
@@ -3927,10 +4112,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
         return $options.nodeClick(node);
       }, ["stop"])
-    }, null, 8 /* PROPS */, _hoisted_47)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, null, 8 /* PROPS */, _hoisted_50)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
       "class": "hc-wfb-node-icon",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.icon(node.type))
-    }, null, 8 /* PROPS */, _hoisted_48), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
       "class": "hc-wfb-node-main",
       onMousedown: function onMousedown($event) {
         return $options.dragStart($event, node);
@@ -3938,11 +4123,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": "hc-wfb-node-type",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node.' + node.type))
-    }, null, 8 /* PROPS */, _hoisted_50), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-      "class": "hc-wfb-node-body",
+    }, null, 8 /* PROPS */, _hoisted_53), node.name ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+      key: 0,
+      "class": "hc-wfb-node-name",
+      title: node.name,
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(node.name)
+    }, null, 8 /* PROPS */, _hoisted_54)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfb-node-body", {
+        small: node.name
+      }]),
       title: $options.describe(node),
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.describe(node))
-    }, null, 8 /* PROPS */, _hoisted_51)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_49), !$options.readOnly && node.type !== 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    }, null, 10 /* CLASS, PROPS */, _hoisted_55)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_52), !$options.readOnly && node.type !== 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
       key: 1,
       "class": "hc-wfb-node-remove",
       title: _ctx.$t('workflow.remove_node'),
@@ -3950,7 +4142,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
         return $options.removeNode(node);
       }, ["stop"])
-    }, "×", 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_52)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.outputsOf(node), function (branch) {
+    }, "×", 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_56)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.outputsOf(node), function (branch) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: String(branch)
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Open output: the \"+\" adds the next step, already linked "), !$options.hasLink(node, branch) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
@@ -3969,7 +4161,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 0,
         "class": "hc-wfb-add-label",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.' + branch))
-      }, null, 8 /* PROPS */, _hoisted_54)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14 /* CLASS, STYLE, PROPS */, _hoisted_53)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      }, null, 8 /* PROPS */, _hoisted_58)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14 /* CLASS, STYLE, PROPS */, _hoisted_57)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 1
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Linked output: a small dot, to link it elsewhere "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
@@ -3987,8 +4179,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, [branch ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
         key: 0,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.' + branch))
-      }, null, 8 /* PROPS */, _hoisted_56)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14 /* CLASS, STYLE, PROPS */, _hoisted_55)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))], 64 /* STABLE_FRAGMENT */);
-    }), 128 /* KEYED_FRAGMENT */))], 14 /* CLASS, STYLE, PROPS */, _hoisted_46);
+      }, null, 8 /* PROPS */, _hoisted_60)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 14 /* CLASS, STYLE, PROPS */, _hoisted_59)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))], 64 /* STABLE_FRAGMENT */);
+    }), 128 /* KEYED_FRAGMENT */))], 14 /* CLASS, STYLE, PROPS */, _hoisted_49);
   }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Menu of the \"+\" "), $data.menu ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 0,
     "class": "hc-wfb-menu",
@@ -4003,7 +4195,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
       "class": "hc-wfb-menu-title",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.section.' + section.key))
-    }, null, 8 /* PROPS */, _hoisted_57), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(section.types, function (type) {
+    }, null, 8 /* PROPS */, _hoisted_61), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(section.types, function (type) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: type,
         type: "button",
@@ -4014,11 +4206,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         "class": "hc-wfb-menu-icon",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.icon(type))
-      }, null, 8 /* PROPS */, _hoisted_59), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+      }, null, 8 /* PROPS */, _hoisted_63), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node.' + type))
-      }, null, 8 /* PROPS */, _hoisted_60), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+      }, null, 8 /* PROPS */, _hoisted_64), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node_help.' + type))
-      }, null, 8 /* PROPS */, _hoisted_61)])], 10 /* CLASS, PROPS */, _hoisted_58);
+      }, null, 8 /* PROPS */, _hoisted_65)])], 10 /* CLASS, PROPS */, _hoisted_62);
     }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */);
   }), 128 /* KEYED_FRAGMENT */)), !$data.menu.insert ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 0,
@@ -4027,11 +4219,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[15] || (_cache[15] = function () {
       return $options.linkExisting && $options.linkExisting.apply($options, arguments);
     })
-  }, [_hoisted_62, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+  }, [_hoisted_66, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.add_menu.link'))
-  }, null, 8 /* PROPS */, _hoisted_63), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+  }, null, 8 /* PROPS */, _hoisted_67), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.add_menu.link_help'))
-  }, null, 8 /* PROPS */, _hoisted_64)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 4 /* STYLE */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 4 /* STYLE */)], 544 /* HYDRATE_EVENTS, NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Configuration of the selected step "), $options.selectedNode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_node_editor, {
+  }, null, 8 /* PROPS */, _hoisted_68)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 4 /* STYLE */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 4 /* STYLE */)], 544 /* HYDRATE_EVENTS, NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Configuration of the selected step "), $options.selectedNode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_node_editor, {
     key: $options.selectedNode.id,
     node: $options.selectedNode,
     graph: $data.graph,
@@ -5343,7 +5535,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfc { position: relative; padding: 10px; background: #f6f7fb; border: 1px solid #e3e6ef; border-radius: 10px;\n}\n.hc-wfc .hc-wfc { margin-top: 4px; background: #fff; border-left: 3px solid #5b6cf0;\n}\n.hc-wfc select { padding: 7px 10px; color: #2b2f3a; background: #fff; border: 1px solid #d5d9e4; border-radius: 8px; font-size: 13px;\n}\n.hc-wfc select:focus { border-color: #5b6cf0; box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.15); outline: 0;\n}\n.hc-wfc-intro { margin: 0 0 8px; color: #5d6272; font-size: 12px;\n}\n.hc-wfc-empty { margin: 4px 0 8px; padding: 8px 10px; background: #fff7dd; border-radius: 8px; color: #6b4b00; font-size: 12px;\n}\n.hc-wfc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;\n}\n.hc-wfc-item { position: relative; margin-bottom: 8px; padding: 8px 30px 8px 8px; background: #fff; border: 1px solid #e3e6ef; border-radius: 8px;\n}\n.hc-wfc .hc-wfc .hc-wfc-item { background: #f6f7fb;\n}\n.hc-wfc-row { display: flex; flex-direction: column; gap: 6px;\n}\n.hc-wfc-row select { width: 100%;\n}\n.hc-wfc-field label { font-size: 11px; color: #7a7f90;\n}\n.hc-wfc-help { margin: 0; color: #8a8fa0; font-size: 11px;\n}\n.hc-wfc-remove { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; padding: 0; color: #8a8fa0; background: transparent; border: 0; border-radius: 50%; font-size: 16px; line-height: 1; cursor: pointer;\n}\n.hc-wfc-remove:hover { color: #c0341d; background: #fdecea;\n}\n.hc-wfc-head .hc-wfc-remove { position: static;\n}\n.hc-wfc-add { display: flex; flex-wrap: wrap; gap: 6px;\n}\n.hc-wfc-add button { padding: 5px 12px; color: #3a49c9; background: #eceefd; border: 1px dashed #aab2f5; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;\n}\n.hc-wfc-add button:hover { background: #dde1fb;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfc { position: relative; padding: 10px; background: #f6f7fb; border: 1px solid #e3e6ef; border-radius: 10px;\n}\n.hc-wfc .hc-wfc { margin-top: 4px; background: #fff; border-left: 3px solid #5b6cf0;\n}\n.hc-wfc select { padding: 7px 10px; color: #2b2f3a; background: #fff; border: 1px solid #d5d9e4; border-radius: 8px; font-size: 13px;\n}\n.hc-wfc select:focus { border-color: #5b6cf0; box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.15); outline: 0;\n}\n.hc-wfc-intro { margin: 0 0 8px; color: #5d6272; font-size: 12px;\n}\n.hc-wfc-empty { margin: 4px 0 8px; padding: 8px 10px; background: #fff7dd; border-radius: 8px; color: #6b4b00; font-size: 12px;\n}\n.hc-wfc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;\n}\n.hc-wfc-item { position: relative; margin-bottom: 8px; padding: 8px 30px 8px 8px; background: #fff; border: 1px solid #e3e6ef; border-radius: 8px;\n}\n.hc-wfc .hc-wfc .hc-wfc-item { background: #f6f7fb;\n}\n.hc-wfc-row { display: flex; flex-direction: column; gap: 6px;\n}\n.hc-wfc-row select { width: 100%;\n}\n.hc-wfc-field label { font-size: 11px; color: #7a7f90;\n}\n.hc-wfc-help { margin: 0; color: #8a8fa0; font-size: 11px;\n}\n.hc-wfc-remove { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; padding: 0; color: #8a8fa0; background: transparent; border: 0; border-radius: 50%; font-size: 16px; line-height: 1; cursor: pointer;\n}\n.hc-wfc-remove:hover { color: #c0341d; background: #fdecea;\n}\n.hc-wfc-head .hc-wfc-remove { position: static;\n}\n.hc-wfc-head {\n    gap: 6px;\n    justify-content: flex-start;\n}\n.hc-wfc-head .hc-wfc-remove {\n    margin-left: auto;\n}\n.hc-wfc-addwrap {\n    display: inline-flex;\n    align-items: center;\n}\n.hc-wfc-add { display: flex; flex-wrap: wrap; gap: 6px;\n}\n.hc-wfc-add button { padding: 5px 12px; color: #3a49c9; background: #eceefd; border: 1px dashed #aab2f5; border-radius: 16px; font-size: 12px; font-weight: 600; cursor: pointer; transition: background 0.15s;\n}\n.hc-wfc-add button:hover { background: #dde1fb;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5396,6 +5588,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wff select,\n.hc-wff input[type=
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css":
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-tip {\n    display: inline-block;\n    margin-left: 4px;\n    vertical-align: middle;\n}\n\n/* Two classes: stronger than the rules of the buttons around it (menus, toolbars) */\n.hc-tip > .hc-tip-button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    width: 16px;\n    min-width: 16px;\n    height: 16px;\n    min-height: 16px;\n    margin: 0;\n    padding: 0;\n    color: #3a49c9;\n    background: #eceefd;\n    border: 0;\n    border-radius: 50%;\n    box-shadow: none;\n    font-family: Georgia, \"Times New Roman\", serif;\n    font-size: 11px;\n    font-style: italic;\n    font-weight: 700;\n    line-height: 1;\n    letter-spacing: 0;\n    text-transform: none;\n    cursor: pointer;\n}\n.hc-tip > .hc-tip-button:hover,\n.hc-tip > .hc-tip-button.open {\n    color: #fff;\n    background: #4b5ce8;\n}\n.hc-tip-pop {\n    position: fixed;\n    z-index: 2000;\n    width: 250px;\n    padding: 10px 12px;\n    color: #2b2f3a;\n    background: #fff;\n    border: 1px solid #d5d9e4;\n    border-radius: 10px;\n    box-shadow: 0 10px 30px rgba(30, 35, 60, 0.22);\n    font-size: 12px;\n    font-style: normal;\n    font-weight: 400;\n    letter-spacing: 0;\n    line-height: 1.45;\n    text-align: left;\n    text-transform: none;\n    white-space: normal;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=style&index=0&id=23a3b904&lang=css":
 /*!**************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/NodeEditor.vue?vue&type=style&index=0&id=23a3b904&lang=css ***!
@@ -5435,7 +5650,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-workflow {\n    display: flex;\n    width: 100%;\n    height: 100%;\n    background-color: #f7f7fb;\n}\n#hc-workflow-mobile {\n    display: flex;\n    flex: 1;\n    align-items: center;\n    justify-content: center;\n    padding: 30px;\n    font-size: 20px;\n    text-align: center;\n}\n#hc-workflow-list {\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    flex: none;\n    width: 290px;\n    overflow: auto;\n    background: #fff;\n    border-right: 1px solid #e3e6ef;\n}\n.hc-workflow-list-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 18px 16px 10px;\n    font-size: 17px;\n    font-weight: 700;\n}\n.hc-workflow-count {\n    padding: 1px 8px;\n    color: #3a49c9;\n    background: #eceefd;\n    border-radius: 10px;\n    font-size: 12px;\n}\n.hc-workflow-new {\n    display: flex;\n    gap: 6px;\n    padding: 4px 14px 14px;\n}\n.hc-workflow-new input {\n    flex: 1;\n    min-width: 0;\n    padding: 8px 10px;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n    font-size: 13px;\n}\n.hc-workflow-new input:focus {\n    border-color: #5b6cf0;\n    box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.15);\n    outline: 0;\n}\n.hc-workflow-new button {\n    flex: none;\n    padding: 8px 12px;\n    color: #fff;\n    background: #4b5ce8;\n    border: 0;\n    border-radius: 8px;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-workflow-new button:hover:not(:disabled) {\n    background: #3a49c9;\n}\n.hc-workflow-new button:disabled {\n    opacity: 0.45;\n    cursor: not-allowed;\n}\n.hc-workflow-items {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 0 14px;\n}\n.hc-workflow-empty {\n    margin: 0;\n    padding: 14px;\n    color: #7a7f90;\n    background: #f6f7fb;\n    border-radius: 10px;\n    font-size: 13px;\n    line-height: 1.4;\n    text-align: center;\n}\n.hc-workflow-hint {\n    padding: 16px;\n    color: #7a7f90;\n    font-size: 13px;\n}\n.hc-workflow-list-item {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px 12px;\n    color: inherit;\n    text-decoration: none;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-left: 4px solid #c3c7d4;\n    border-radius: 10px;\n    transition: box-shadow 0.15s, border-color 0.15s;\n}\n.hc-workflow-list-item.active {\n    border-left-color: #2e9d5c;\n}\n.hc-workflow-list-item.paused {\n    border-left-color: #e8a317;\n}\n.hc-workflow-list-item:hover {\n    box-shadow: 0 3px 10px rgba(30, 35, 60, 0.1);\n}\n.hc-workflow-list-item.current {\n    background: #f1f2fd;\n    border-color: #aab2f5;\n    box-shadow: 0 0 0 2px rgba(91, 108, 240, 0.18);\n}\n.hc-workflow-list-top {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n.hc-workflow-list-name {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    color: #2b2f3a;\n    font-size: 14px;\n    font-weight: 600;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-workflow-list-counts {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n}\n.hc-workflow-pill {\n    padding: 1px 8px;\n    color: #5d6272;\n    background: #f0f1f6;\n    border-radius: 10px;\n    font-size: 11px;\n}\n.hc-workflow-pill.exec-completed {\n    color: #14633a;\n    background: #d6f5df;\n}\n.hc-workflow-pill.exec-failed {\n    color: #8a1f11;\n    background: #fdecea;\n}\n.hc-workflow-pill.exec-waiting {\n    color: #1b4aa8;\n    background: #e3ecff;\n}\n.hc-workflow-badge {\n    flex: none;\n    padding: 2px 9px;\n    border-radius: 10px;\n    background: #e5e7eb;\n    color: #444;\n    font-size: 11px;\n    font-weight: 600;\n}\n.hc-workflow-origin {\n    color: #8e5bd6;\n    font-size: 11px;\n}\n.hc-workflow-badge.active {\n    background: #d6f5df;\n    color: #14633a;\n}\n.hc-workflow-badge.paused {\n    background: #fff0cc;\n    color: #8a5a00;\n}\n.hc-workflow-badge.archived {\n    background: #ececec;\n    color: #888;\n}\n.hc-workflow-templates {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: auto;\n    padding: 14px;\n}\n.hc-workflow-templates-toggle {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 6px 2px;\n    color: #7a7f90;\n    background: transparent;\n    border: 0;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n    cursor: pointer;\n}\n.hc-workflow-chevron {\n    font-size: 16px;\n    transition: transform 0.15s;\n}\n.hc-workflow-chevron.open {\n    transform: rotate(90deg);\n}\n.hc-workflow-template {\n    display: flex;\n    align-items: flex-start;\n    gap: 10px;\n    padding: 9px 10px;\n    text-align: left;\n    background: #fafbfd;\n    border: 1px solid #e3e6ef;\n    border-radius: 10px;\n    cursor: pointer;\n    transition: border-color 0.15s, background 0.15s;\n}\n.hc-workflow-template:hover:not(:disabled) {\n    background: #f1f2fd;\n    border-color: #aab2f5;\n}\n.hc-workflow-template:disabled {\n    opacity: 0.5;\n}\n.hc-workflow-template-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 30px;\n    height: 30px;\n    background: #eceefd;\n    border-radius: 8px;\n    font-size: 15px;\n}\n.hc-workflow-template-text {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    min-width: 0;\n}\n.hc-workflow-template strong {\n    color: #2b2f3a;\n    font-size: 13px;\n}\n.hc-workflow-template small {\n    color: #7a7f90;\n    font-size: 11px;\n    line-height: 1.35;\n}\n#hc-workflow-main {\n    position: relative;\n    display: flex;\n    flex: 1;\n    min-width: 0;\n    flex-direction: column;\n}\n.hc-workflow-tabs {\n    display: flex;\n    gap: 4px;\n    padding: 10px 16px 0;\n    background: #fff;\n    border-bottom: 1px solid #e3e6ef;\n}\n.hc-workflow-tabs button {\n    padding: 8px 16px;\n    color: #7a7f90;\n    background: transparent;\n    border: 0;\n    border-bottom: 3px solid transparent;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-workflow-tabs button:hover {\n    color: #2b2f3a;\n}\n.hc-workflow-tabs button.active {\n    color: #3a49c9;\n    border-bottom-color: #4b5ce8;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n#hc-workflow {\n    display: flex;\n    width: 100%;\n    height: 100%;\n    background-color: #f7f7fb;\n}\n#hc-workflow-mobile {\n    display: flex;\n    flex: 1;\n    align-items: center;\n    justify-content: center;\n    padding: 30px;\n    font-size: 20px;\n    text-align: center;\n}\n#hc-workflow-list {\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    flex: none;\n    width: 290px;\n    overflow: auto;\n    background: #fff;\n    border-right: 1px solid #e3e6ef;\n}\n.hc-workflow-list-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 18px 16px 10px;\n    font-size: 17px;\n    font-weight: 700;\n}\n.hc-workflow-count {\n    padding: 1px 8px;\n    color: #3a49c9;\n    background: #eceefd;\n    border-radius: 10px;\n    font-size: 12px;\n}\n.hc-workflow-new {\n    align-items: center;\n    display: flex;\n    gap: 6px;\n    padding: 4px 14px 14px;\n}\n.hc-workflow-new input {\n    flex: 1;\n    min-width: 0;\n    padding: 8px 10px;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n    font-size: 13px;\n}\n.hc-workflow-new input:focus {\n    border-color: #5b6cf0;\n    box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.15);\n    outline: 0;\n}\n.hc-workflow-new button {\n    flex: none;\n    padding: 8px 12px;\n    color: #fff;\n    background: #4b5ce8;\n    border: 0;\n    border-radius: 8px;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-workflow-new button:hover:not(:disabled) {\n    background: #3a49c9;\n}\n.hc-workflow-new button:disabled {\n    opacity: 0.45;\n    cursor: not-allowed;\n}\n.hc-workflow-items {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 0 14px;\n}\n.hc-workflow-empty {\n    margin: 0;\n    padding: 14px;\n    color: #7a7f90;\n    background: #f6f7fb;\n    border-radius: 10px;\n    font-size: 13px;\n    line-height: 1.4;\n    text-align: center;\n}\n.hc-workflow-hint {\n    padding: 16px;\n    color: #7a7f90;\n    font-size: 13px;\n}\n.hc-workflow-list-item {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    padding: 10px 12px;\n    color: inherit;\n    text-decoration: none;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-left: 4px solid #c3c7d4;\n    border-radius: 10px;\n    transition: box-shadow 0.15s, border-color 0.15s;\n}\n.hc-workflow-list-item.active {\n    border-left-color: #2e9d5c;\n}\n.hc-workflow-list-item.paused {\n    border-left-color: #e8a317;\n}\n.hc-workflow-list-item:hover {\n    box-shadow: 0 3px 10px rgba(30, 35, 60, 0.1);\n}\n.hc-workflow-list-item.current {\n    background: #f1f2fd;\n    border-color: #aab2f5;\n    box-shadow: 0 0 0 2px rgba(91, 108, 240, 0.18);\n}\n.hc-workflow-list-top {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n}\n.hc-workflow-list-name {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    color: #2b2f3a;\n    font-size: 14px;\n    font-weight: 600;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-workflow-list-counts {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 4px;\n}\n.hc-workflow-pill {\n    padding: 1px 8px;\n    color: #5d6272;\n    background: #f0f1f6;\n    border-radius: 10px;\n    font-size: 11px;\n}\n.hc-workflow-pill.exec-completed {\n    color: #14633a;\n    background: #d6f5df;\n}\n.hc-workflow-pill.exec-failed {\n    color: #8a1f11;\n    background: #fdecea;\n}\n.hc-workflow-pill.exec-waiting {\n    color: #1b4aa8;\n    background: #e3ecff;\n}\n.hc-workflow-badge {\n    flex: none;\n    padding: 2px 9px;\n    border-radius: 10px;\n    background: #e5e7eb;\n    color: #444;\n    font-size: 11px;\n    font-weight: 600;\n}\n.hc-workflow-origin {\n    color: #8e5bd6;\n    font-size: 11px;\n}\n.hc-workflow-badge.active {\n    background: #d6f5df;\n    color: #14633a;\n}\n.hc-workflow-badge.paused {\n    background: #fff0cc;\n    color: #8a5a00;\n}\n.hc-workflow-badge.archived {\n    background: #ececec;\n    color: #888;\n}\n.hc-workflow-templates {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    margin-top: auto;\n    padding: 14px;\n}\n.hc-workflow-templates-toggle {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    padding: 6px 2px;\n    color: #7a7f90;\n    background: transparent;\n    border: 0;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n    cursor: pointer;\n}\n.hc-workflow-chevron {\n    font-size: 16px;\n    transition: transform 0.15s;\n}\n.hc-workflow-chevron.open {\n    transform: rotate(90deg);\n}\n.hc-workflow-template {\n    display: flex;\n    align-items: flex-start;\n    gap: 10px;\n    padding: 9px 10px;\n    text-align: left;\n    background: #fafbfd;\n    border: 1px solid #e3e6ef;\n    border-radius: 10px;\n    cursor: pointer;\n    transition: border-color 0.15s, background 0.15s;\n}\n.hc-workflow-template:hover:not(:disabled) {\n    background: #f1f2fd;\n    border-color: #aab2f5;\n}\n.hc-workflow-template:disabled {\n    opacity: 0.5;\n}\n.hc-workflow-template-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 30px;\n    height: 30px;\n    background: #eceefd;\n    border-radius: 8px;\n    font-size: 15px;\n}\n.hc-workflow-template-text {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    min-width: 0;\n}\n.hc-workflow-template strong {\n    color: #2b2f3a;\n    font-size: 13px;\n}\n.hc-workflow-template small {\n    color: #7a7f90;\n    font-size: 11px;\n    line-height: 1.35;\n}\n#hc-workflow-main {\n    position: relative;\n    display: flex;\n    flex: 1;\n    min-width: 0;\n    flex-direction: column;\n}\n.hc-workflow-tabs {\n    display: flex;\n    gap: 4px;\n    padding: 10px 16px 0;\n    background: #fff;\n    border-bottom: 1px solid #e3e6ef;\n}\n.hc-workflow-tabs button {\n    padding: 8px 16px;\n    color: #7a7f90;\n    background: transparent;\n    border: 0;\n    border-bottom: 3px solid transparent;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-workflow-tabs button:hover {\n    color: #2b2f3a;\n}\n.hc-workflow-tabs button.active {\n    color: #3a49c9;\n    border-bottom-color: #4b5ce8;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5458,7 +5673,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfb {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    min-height: 0;\n}\n.hc-wfb-toolbar {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n    padding: 10px 16px;\n    background: #fff;\n    border-bottom: 1px solid #e3e6ef;\n}\n.hc-wfb-toolbar button {\n    padding: 7px 14px;\n    color: #2b2f3a;\n    background: #fff;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: background 0.15s, box-shadow 0.15s;\n}\n.hc-wfb-toolbar button:hover:not(:disabled) {\n    background: #f3f4f9;\n}\n.hc-wfb-toolbar button:disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n.hc-wfb-name {\n    width: 260px;\n    padding: 6px 10px;\n    border: 1px solid transparent;\n    border-radius: 8px;\n    font-size: 16px;\n    font-weight: 700;\n}\n.hc-wfb-name:hover,\n.hc-wfb-name:focus {\n    border-color: #d5d9e4;\n    outline: 0;\n}\n.hc-wfb-muted {\n    color: #7a7f90;\n    font-size: 12px;\n}\n.hc-wfb-warn {\n    padding: 2px 8px;\n    color: #8a5a00;\n    background: #fff7dd;\n    border-radius: 10px;\n    font-size: 12px;\n}\n.hc-wfb-save.error {\n    color: #c0341d;\n}\n.hc-wfb-spacer {\n    flex: 1;\n}\n.hc-wfb-toolbar .hc-wfb-primary {\n    color: #fff;\n    background: #4b5ce8;\n    border-color: #4b5ce8;\n    box-shadow: 0 2px 6px rgba(75, 92, 232, 0.35);\n}\n.hc-wfb-toolbar .hc-wfb-primary:hover:not(:disabled) {\n    background: #3a49c9;\n}\n.hc-wfb-more {\n    position: relative;\n}\n.hc-wfb-more-toggle {\n    padding: 7px 12px;\n    font-size: 16px;\n    line-height: 1;\n}\n.hc-wfb-more-menu {\n    position: absolute;\n    top: calc(100% + 6px);\n    right: 0;\n    z-index: 20;\n    display: flex;\n    flex-direction: column;\n    min-width: 190px;\n    padding: 6px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 10px;\n    box-shadow: 0 8px 24px rgba(30, 35, 60, 0.15);\n}\n.hc-wfb-toolbar .hc-wfb-more-menu button {\n    text-align: left;\n    border: 0;\n    font-weight: 500;\n}\n.hc-wfb-toolbar .hc-wfb-danger {\n    color: #c0341d;\n}\n.hc-wfb-errors {\n    padding: 8px 14px;\n    background: #fdecea;\n    color: #8a1f11;\n    font-size: 13px;\n}\n.hc-wfb-errors ul {\n    margin: 4px 0 0 18px;\n    padding: 0;\n}\n.hc-wfb-ok {\n    padding: 6px 14px;\n    background: #e6f6ec;\n    color: #14633a;\n    font-size: 13px;\n}\n.hc-wfb-body {\n    display: flex;\n    flex: 1;\n    min-height: 0;\n}\n.hc-wfb-palette {\n    display: flex;\n    flex: none;\n    flex-direction: column;\n    gap: 6px;\n    width: 170px;\n    padding: 14px 12px;\n    overflow: auto;\n    background: #fff;\n    border-right: 1px solid #e3e6ef;\n}\n.hc-wfb-palette-title {\n    color: #7a7f90;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-palette-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 10px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 8px;\n    font-size: 13px;\n    cursor: grab;\n    transition: border-color 0.15s, box-shadow 0.15s;\n}\n.hc-wfb-palette-item:hover {\n    border-color: #aab2f5;\n    box-shadow: 0 2px 8px rgba(75, 92, 232, 0.12);\n}\n.hc-wfb-section {\n    margin-top: 10px;\n    color: #3a49c9;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-section-help {\n    margin: -2px 0 2px;\n    color: #8a8fa0;\n    font-size: 11px;\n    line-height: 1.3;\n}\n.hc-wfb-palette-item.on {\n    background: #eceefd;\n    border-color: #aab2f5;\n}\n.hc-wfb-palette-hint {\n    color: #8a8fa0;\n    font-size: 11px;\n}\n.type-trigger .hc-wfb-palette-dot {\n    background: #2e9d5c;\n}\n.hc-wfb-palette-dot {\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n    background: #8a94a6;\n}\n.type-condition .hc-wfb-palette-dot {\n    background: #e8a317;\n}\n.type-action .hc-wfb-palette-dot {\n    background: #4b5ce8;\n}\n.type-wait .hc-wfb-palette-dot,\n.type-wait_event .hc-wfb-palette-dot {\n    background: #8e5bd6;\n}\n.type-end .hc-wfb-palette-dot {\n    background: #666;\n}\n.hc-wfb-canvas {\n    position: relative;\n    flex: 1;\n    min-width: 0;\n    overflow: auto;\n    background-color: #fbfbfe;\n    background-image: radial-gradient(#d9dbe6 1px, transparent 1px);\n    background-size: 20px 20px;\n}\n.hc-wfb-connecting {\n    position: sticky;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    padding: 6px 12px;\n    background: #fff7dd;\n    color: #6b4b00;\n    font-size: 13px;\n}\n.hc-wfb-surface {\n    position: relative;\n}\n.hc-wfb-links {\n    position: absolute;\n    top: 0;\n    left: 0;\n    pointer-events: none;\n}\n.hc-wfb-link {\n    fill: none;\n    stroke: #aab0c0;\n    stroke-width: 2;\n}\n.hc-wfb-link.yes {\n    stroke: #2e9d5c;\n}\n.hc-wfb-link.no {\n    stroke: #d05a45;\n}\n.hc-wfb-link-remove {\n    cursor: pointer;\n    pointer-events: all;\n    opacity: 0.35;\n}\n.hc-wfb-link-remove:hover {\n    opacity: 1;\n}\n.hc-wfb-link-remove circle {\n    fill: #fff;\n    stroke: #8a94a6;\n}\n.hc-wfb-link-remove text {\n    font-size: 13px;\n    fill: #555;\n}\n.hc-wfb-node {\n    position: absolute;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    width: 230px;\n    height: 76px;\n    box-sizing: border-box;\n    padding: 0 12px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 14px;\n    box-shadow: 0 2px 8px rgba(30, 35, 60, 0.08);\n    cursor: pointer;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n    transition: box-shadow 0.15s, border-color 0.15s;\n}\n.hc-wfb-node:hover {\n    box-shadow: 0 4px 14px rgba(30, 35, 60, 0.14);\n}\n.hc-wfb-node-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 38px;\n    height: 38px;\n    color: #fff;\n    background: #8a94a6;\n    border-radius: 10px;\n    font-size: 18px;\n}\n.hc-wfb-node.type-trigger .hc-wfb-node-icon {\n    background: #2e9d5c;\n}\n.hc-wfb-node.type-condition .hc-wfb-node-icon {\n    background: #e8a317;\n}\n.hc-wfb-node.type-action .hc-wfb-node-icon {\n    background: #4b5ce8;\n}\n.hc-wfb-node.type-wait .hc-wfb-node-icon,\n.hc-wfb-node.type-wait_event .hc-wfb-node-icon {\n    background: #8e5bd6;\n}\n.hc-wfb-node.type-end .hc-wfb-node-icon {\n    background: #555b6b;\n}\n.hc-wfb-node.selected {\n    border-color: #4b5ce8;\n    box-shadow: 0 0 0 3px rgba(75, 92, 232, 0.22);\n}\n.hc-wfb-node.orphan {\n    border-style: dashed;\n    border-color: #d05a45;\n}\n.hc-wfb-node.invalid {\n    border-color: #d05a45;\n    box-shadow: 0 0 0 3px rgba(208, 90, 69, 0.2);\n}\n.hc-wfb-error-link {\n    color: #8a1f11;\n    text-decoration: underline;\n    cursor: pointer;\n}\n.hc-wfb-node.target {\n    outline: 2px dashed #4b5ce8;\n}\n.hc-wfb-node-main {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    min-width: 0;\n    cursor: move;\n}\n.hc-wfb-node-type {\n    color: #7a7f90;\n    font-size: 10px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-node-body {\n    display: -webkit-box;\n    overflow: hidden;\n    color: #2b2f3a;\n    font-size: 13px;\n    font-weight: 600;\n    line-height: 1.25;\n    -webkit-box-orient: vertical;\n    -webkit-line-clamp: 2;\n}\n.hc-wfb-node-remove {\n    position: absolute;\n    top: -8px;\n    right: -8px;\n    display: none;\n    width: 20px;\n    height: 20px;\n    color: #8a8fa0;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 50%;\n    font-size: 14px;\n    line-height: 18px;\n    text-align: center;\n}\n.hc-wfb-node:hover .hc-wfb-node-remove {\n    display: block;\n}\n.hc-wfb-node-remove:hover {\n    color: #c0341d;\n    border-color: #f1c3bb;\n}\n.hc-wfb-port {\n    position: absolute;\n    width: 14px;\n    height: 14px;\n    padding: 0;\n    background: #fff;\n    border: 2px solid #8a94a6;\n    border-radius: 50%;\n}\n.hc-wfb-port.in {\n    top: -8px;\n    left: calc(50% - 7px);\n}\n.hc-wfb-port.out {\n    bottom: -8px;\n    cursor: crosshair;\n}\n.hc-wfb-port.out:not(.yes):not(.no) {\n    left: calc(50% - 7px);\n}\n.hc-wfb-port.out.active {\n    background: #4b5ce8;\n    border-color: #4b5ce8;\n}\n.hc-wfb-port.out.yes {\n    border-color: #2e9d5c;\n}\n.hc-wfb-port.out.no {\n    border-color: #d05a45;\n}\n.hc-wfb-port.out span {\n    position: absolute;\n    top: 14px;\n    left: -6px;\n    color: #555;\n    font-size: 10px;\n}\n.hc-wfb-add {\n    position: absolute;\n    bottom: -14px;\n    width: 28px;\n    height: 28px;\n    padding: 0;\n    color: #fff;\n    background: #4b5ce8;\n    border: 3px solid #fbfbfe;\n    border-radius: 50%;\n    box-shadow: 0 2px 6px rgba(75, 92, 232, 0.4);\n    font-size: 18px;\n    font-weight: 700;\n    line-height: 20px;\n    cursor: pointer;\n    transition: transform 0.12s;\n}\n.hc-wfb-add:hover:not(:disabled) {\n    transform: scale(1.15);\n}\n.hc-wfb-add:disabled {\n    display: none;\n}\n.hc-wfb-add.yes {\n    background: #2e9d5c;\n    box-shadow: 0 2px 6px rgba(46, 157, 92, 0.4);\n}\n.hc-wfb-add.no {\n    background: #d05a45;\n    box-shadow: 0 2px 6px rgba(208, 90, 69, 0.4);\n}\n.hc-wfb-add-label {\n    position: absolute;\n    top: 26px;\n    left: 0;\n    width: 22px;\n    color: #555;\n    font-size: 10px;\n    font-weight: 700;\n    line-height: 1;\n    text-align: center;\n}\n.hc-wfb-link-insert {\n    cursor: pointer;\n    pointer-events: all;\n    opacity: 0.35;\n}\n.hc-wfb-link-insert:hover {\n    opacity: 1;\n}\n.hc-wfb-link-insert circle {\n    fill: #4b5ce8;\n    stroke: #4b5ce8;\n}\n.hc-wfb-link-insert text {\n    font-size: 13px;\n    font-weight: 700;\n    fill: #fff;\n}\n.hc-wfb-menu {\n    position: absolute;\n    z-index: 30;\n    display: flex;\n    flex-direction: column;\n    width: 280px;\n    padding: 6px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 12px;\n    box-shadow: 0 10px 30px rgba(30, 35, 60, 0.2);\n}\n.hc-wfb-menu-title {\n    padding: 6px 8px;\n    color: #7a7f90;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-menu-item {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    padding: 8px;\n    text-align: left;\n    background: transparent;\n    border: 0;\n    border-radius: 8px;\n    cursor: pointer;\n}\n.hc-wfb-menu-item:hover {\n    background: #f1f2fd;\n}\n.hc-wfb-menu-item strong {\n    display: block;\n    color: #2b2f3a;\n    font-size: 13px;\n}\n.hc-wfb-menu-item small {\n    display: block;\n    color: #7a7f90;\n    font-size: 11px;\n    line-height: 1.3;\n}\n.hc-wfb-menu-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 32px;\n    height: 32px;\n    color: #fff;\n    background: #8a94a6;\n    border-radius: 8px;\n    font-size: 16px;\n}\n.hc-wfb-menu-item.type-condition .hc-wfb-menu-icon {\n    background: #e8a317;\n}\n.hc-wfb-menu-item.type-action .hc-wfb-menu-icon {\n    background: #4b5ce8;\n}\n.hc-wfb-menu-item.type-wait .hc-wfb-menu-icon,\n.hc-wfb-menu-item.type-wait_event .hc-wfb-menu-icon {\n    background: #8e5bd6;\n}\n.hc-wfb-menu-item.type-end .hc-wfb-menu-icon {\n    background: #555b6b;\n}\n.hc-wfb-menu-item.link .hc-wfb-menu-icon {\n    color: #555b6b;\n    background: #eceef4;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfb {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    min-height: 0;\n}\n.hc-wfb-toolbar {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n    padding: 10px 16px;\n    background: #fff;\n    border-bottom: 1px solid #e3e6ef;\n}\n.hc-wfb-toolbar button {\n    padding: 7px 14px;\n    color: #2b2f3a;\n    background: #fff;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: background 0.15s, box-shadow 0.15s;\n}\n.hc-wfb-toolbar button:hover:not(:disabled) {\n    background: #f3f4f9;\n}\n.hc-wfb-toolbar button:disabled {\n    opacity: 0.5;\n    cursor: not-allowed;\n}\n.hc-wfb-name {\n    width: 260px;\n    padding: 6px 10px;\n    border: 1px solid transparent;\n    border-radius: 8px;\n    font-size: 16px;\n    font-weight: 700;\n}\n.hc-wfb-name:hover,\n.hc-wfb-name:focus {\n    border-color: #d5d9e4;\n    outline: 0;\n}\n.hc-wfb-muted {\n    color: #7a7f90;\n    font-size: 12px;\n}\n.hc-wfb-warn {\n    padding: 2px 8px;\n    color: #8a5a00;\n    background: #fff7dd;\n    border-radius: 10px;\n    font-size: 12px;\n}\n.hc-wfb-save.error {\n    color: #c0341d;\n}\n.hc-wfb-spacer {\n    flex: 1;\n}\n.hc-wfb-toolbar .hc-wfb-primary {\n    color: #fff;\n    background: #4b5ce8;\n    border-color: #4b5ce8;\n    box-shadow: 0 2px 6px rgba(75, 92, 232, 0.35);\n}\n.hc-wfb-toolbar .hc-wfb-primary:hover:not(:disabled) {\n    background: #3a49c9;\n}\n.hc-wfb-more {\n    position: relative;\n}\n.hc-wfb-more-toggle {\n    padding: 7px 12px;\n    font-size: 16px;\n    line-height: 1;\n}\n.hc-wfb-more-menu {\n    position: absolute;\n    top: calc(100% + 6px);\n    right: 0;\n    z-index: 20;\n    display: flex;\n    flex-direction: column;\n    min-width: 190px;\n    padding: 6px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 10px;\n    box-shadow: 0 8px 24px rgba(30, 35, 60, 0.15);\n}\n.hc-wfb-toolbar .hc-wfb-more-menu button {\n    text-align: left;\n    border: 0;\n    font-weight: 500;\n}\n.hc-wfb-toolbar .hc-wfb-danger {\n    color: #c0341d;\n}\n.hc-wfb-errors {\n    padding: 8px 14px;\n    background: #fdecea;\n    color: #8a1f11;\n    font-size: 13px;\n}\n.hc-wfb-errors ul {\n    margin: 4px 0 0 18px;\n    padding: 0;\n}\n.hc-wfb-ok {\n    padding: 6px 14px;\n    background: #e6f6ec;\n    color: #14633a;\n    font-size: 13px;\n}\n.hc-wfb-body {\n    display: flex;\n    flex: 1;\n    min-height: 0;\n}\n.hc-wfb-palette {\n    display: flex;\n    flex: none;\n    flex-direction: column;\n    gap: 6px;\n    width: 170px;\n    padding: 14px 12px;\n    overflow: auto;\n    background: #fff;\n    border-right: 1px solid #e3e6ef;\n}\n.hc-wfb-palette-title {\n    color: #7a7f90;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-palette-item {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 10px;\n    text-align: left;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 8px;\n    font-size: 13px;\n    cursor: grab;\n    transition: border-color 0.15s, box-shadow 0.15s;\n}\n.hc-wfb-palette-item:hover {\n    border-color: #aab2f5;\n    box-shadow: 0 2px 8px rgba(75, 92, 232, 0.12);\n}\n.hc-wfb-section {\n    margin-top: 10px;\n    color: #3a49c9;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-section-help {\n    margin: -2px 0 2px;\n    color: #8a8fa0;\n    font-size: 11px;\n    line-height: 1.3;\n}\n.hc-wfb-palette-item.on {\n    background: #eceefd;\n    border-color: #aab2f5;\n}\n.hc-wfb-palette-hint {\n    color: #8a8fa0;\n    font-size: 11px;\n}\n.type-trigger .hc-wfb-palette-dot {\n    background: #2e9d5c;\n}\n.hc-wfb-palette-dot {\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n    background: #8a94a6;\n}\n.type-condition .hc-wfb-palette-dot {\n    background: #e8a317;\n}\n.type-action .hc-wfb-palette-dot {\n    background: #4b5ce8;\n}\n.type-wait .hc-wfb-palette-dot,\n.type-wait_event .hc-wfb-palette-dot {\n    background: #8e5bd6;\n}\n.type-end .hc-wfb-palette-dot {\n    background: #666;\n}\n.hc-wfb-canvas {\n    position: relative;\n    flex: 1;\n    min-width: 0;\n    overflow: auto;\n    background-color: #fbfbfe;\n    background-image: radial-gradient(#d9dbe6 1px, transparent 1px);\n    background-size: 20px 20px;\n}\n.hc-wfb-connecting {\n    position: sticky;\n    top: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    padding: 6px 12px;\n    background: #fff7dd;\n    color: #6b4b00;\n    font-size: 13px;\n}\n.hc-wfb-surface {\n    position: relative;\n}\n.hc-wfb-links {\n    position: absolute;\n    top: 0;\n    left: 0;\n    pointer-events: none;\n}\n.hc-wfb-link {\n    fill: none;\n    stroke: #aab0c0;\n    stroke-width: 2;\n}\n.hc-wfb-link.yes {\n    stroke: #2e9d5c;\n}\n.hc-wfb-link.no {\n    stroke: #d05a45;\n}\n.hc-wfb-link-remove {\n    cursor: pointer;\n    pointer-events: all;\n    opacity: 0.35;\n}\n.hc-wfb-link-remove:hover {\n    opacity: 1;\n}\n.hc-wfb-link-remove circle {\n    fill: #fff;\n    stroke: #8a94a6;\n}\n.hc-wfb-link-remove text {\n    font-size: 13px;\n    fill: #555;\n}\n.hc-wfb-node {\n    position: absolute;\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    width: 230px;\n    height: 76px;\n    box-sizing: border-box;\n    padding: 0 12px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 14px;\n    box-shadow: 0 2px 8px rgba(30, 35, 60, 0.08);\n    cursor: pointer;\n    -webkit-user-select: none;\n       -moz-user-select: none;\n            user-select: none;\n    transition: box-shadow 0.15s, border-color 0.15s;\n}\n.hc-wfb-node:hover {\n    box-shadow: 0 4px 14px rgba(30, 35, 60, 0.14);\n}\n.hc-wfb-node-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 38px;\n    height: 38px;\n    color: #fff;\n    background: #8a94a6;\n    border-radius: 10px;\n    font-size: 18px;\n}\n.hc-wfb-node.type-trigger .hc-wfb-node-icon {\n    background: #2e9d5c;\n}\n.hc-wfb-node.type-condition .hc-wfb-node-icon {\n    background: #e8a317;\n}\n.hc-wfb-node.type-action .hc-wfb-node-icon {\n    background: #4b5ce8;\n}\n.hc-wfb-node.type-wait .hc-wfb-node-icon,\n.hc-wfb-node.type-wait_event .hc-wfb-node-icon {\n    background: #8e5bd6;\n}\n.hc-wfb-node.type-end .hc-wfb-node-icon {\n    background: #555b6b;\n}\n.hc-wfb-node.selected {\n    border-color: #4b5ce8;\n    box-shadow: 0 0 0 3px rgba(75, 92, 232, 0.22);\n}\n.hc-wfb-node.orphan {\n    border-style: dashed;\n    border-color: #d05a45;\n}\n.hc-wfb-node.invalid {\n    border-color: #d05a45;\n    box-shadow: 0 0 0 3px rgba(208, 90, 69, 0.2);\n}\n.hc-wfb-error-link {\n    color: #8a1f11;\n    text-decoration: underline;\n    cursor: pointer;\n}\n.hc-wfb-node.target {\n    outline: 2px dashed #4b5ce8;\n}\n.hc-wfb-node-main {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    min-width: 0;\n    cursor: move;\n}\n.hc-wfb-node-type {\n    color: #7a7f90;\n    font-size: 10px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-node-body {\n    display: -webkit-box;\n    overflow: hidden;\n    color: #2b2f3a;\n    font-size: 13px;\n    font-weight: 600;\n    line-height: 1.25;\n    -webkit-box-orient: vertical;\n    -webkit-line-clamp: 2;\n}\n.hc-wfb-node-name {\n    overflow: hidden;\n    color: #1f2330;\n    font-size: 13px;\n    font-weight: 700;\n    line-height: 1.25;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-wfb-node-body.small {\n    color: #6b7080;\n    font-size: 11px;\n    font-weight: 500;\n    -webkit-line-clamp: 1;\n}\n.hc-wfb-node-remove {\n    position: absolute;\n    top: -8px;\n    right: -8px;\n    display: none;\n    width: 20px;\n    height: 20px;\n    color: #8a8fa0;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 50%;\n    font-size: 14px;\n    line-height: 18px;\n    text-align: center;\n}\n.hc-wfb-node:hover .hc-wfb-node-remove {\n    display: block;\n}\n.hc-wfb-node-remove:hover {\n    color: #c0341d;\n    border-color: #f1c3bb;\n}\n.hc-wfb-port {\n    position: absolute;\n    width: 14px;\n    height: 14px;\n    padding: 0;\n    background: #fff;\n    border: 2px solid #8a94a6;\n    border-radius: 50%;\n}\n.hc-wfb-port.in {\n    top: -8px;\n    left: calc(50% - 7px);\n}\n.hc-wfb-port.out {\n    bottom: -8px;\n    cursor: crosshair;\n}\n.hc-wfb-port.out:not(.yes):not(.no) {\n    left: calc(50% - 7px);\n}\n.hc-wfb-port.out.active {\n    background: #4b5ce8;\n    border-color: #4b5ce8;\n}\n.hc-wfb-port.out.yes {\n    border-color: #2e9d5c;\n}\n.hc-wfb-port.out.no {\n    border-color: #d05a45;\n}\n.hc-wfb-port.out span {\n    position: absolute;\n    top: 14px;\n    left: -6px;\n    color: #555;\n    font-size: 10px;\n}\n.hc-wfb-add {\n    position: absolute;\n    bottom: -14px;\n    width: 28px;\n    height: 28px;\n    padding: 0;\n    color: #fff;\n    background: #4b5ce8;\n    border: 3px solid #fbfbfe;\n    border-radius: 50%;\n    box-shadow: 0 2px 6px rgba(75, 92, 232, 0.4);\n    font-size: 18px;\n    font-weight: 700;\n    line-height: 20px;\n    cursor: pointer;\n    transition: transform 0.12s;\n}\n.hc-wfb-add:hover:not(:disabled) {\n    transform: scale(1.15);\n}\n.hc-wfb-add:disabled {\n    display: none;\n}\n.hc-wfb-add.yes {\n    background: #2e9d5c;\n    box-shadow: 0 2px 6px rgba(46, 157, 92, 0.4);\n}\n.hc-wfb-add.no {\n    background: #d05a45;\n    box-shadow: 0 2px 6px rgba(208, 90, 69, 0.4);\n}\n.hc-wfb-add-label {\n    position: absolute;\n    top: 26px;\n    left: 0;\n    width: 22px;\n    color: #555;\n    font-size: 10px;\n    font-weight: 700;\n    line-height: 1;\n    text-align: center;\n}\n.hc-wfb-link-insert {\n    cursor: pointer;\n    pointer-events: all;\n    opacity: 0.35;\n}\n.hc-wfb-link-insert:hover {\n    opacity: 1;\n}\n.hc-wfb-link-insert circle {\n    fill: #4b5ce8;\n    stroke: #4b5ce8;\n}\n.hc-wfb-link-insert text {\n    font-size: 13px;\n    font-weight: 700;\n    fill: #fff;\n}\n.hc-wfb-menu {\n    position: absolute;\n    z-index: 30;\n    display: flex;\n    flex-direction: column;\n    width: 280px;\n    padding: 6px;\n    background: #fff;\n    border: 1px solid #e3e6ef;\n    border-radius: 12px;\n    box-shadow: 0 10px 30px rgba(30, 35, 60, 0.2);\n}\n.hc-wfb-menu-title {\n    padding: 6px 8px;\n    color: #7a7f90;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfb-menu-item {\n    display: flex;\n    align-items: center;\n    gap: 10px;\n    padding: 8px;\n    text-align: left;\n    background: transparent;\n    border: 0;\n    border-radius: 8px;\n    cursor: pointer;\n}\n.hc-wfb-menu-item:hover {\n    background: #f1f2fd;\n}\n.hc-wfb-menu-item strong {\n    display: block;\n    color: #2b2f3a;\n    font-size: 13px;\n}\n.hc-wfb-menu-item small {\n    display: block;\n    color: #7a7f90;\n    font-size: 11px;\n    line-height: 1.3;\n}\n.hc-wfb-menu-icon {\n    display: flex;\n    flex: none;\n    align-items: center;\n    justify-content: center;\n    width: 32px;\n    height: 32px;\n    color: #fff;\n    background: #8a94a6;\n    border-radius: 8px;\n    font-size: 16px;\n}\n.hc-wfb-menu-item.type-condition .hc-wfb-menu-icon {\n    background: #e8a317;\n}\n.hc-wfb-menu-item.type-action .hc-wfb-menu-icon {\n    background: #4b5ce8;\n}\n.hc-wfb-menu-item.type-wait .hc-wfb-menu-icon,\n.hc-wfb-menu-item.type-wait_event .hc-wfb-menu-icon {\n    background: #8e5bd6;\n}\n.hc-wfb-menu-item.type-end .hc-wfb-menu-icon {\n    background: #555b6b;\n}\n.hc-wfb-menu-item.link .hc-wfb-menu-icon {\n    color: #555b6b;\n    background: #eceef4;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5572,6 +5787,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FieldInput_vue_vue_type_style_index_0_id_712dfd36_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_style_index_0_id_b70e4716_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_style_index_0_id_b70e4716_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_style_index_0_id_b70e4716_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -5781,6 +6025,36 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/HelpTip.vue":
+/*!******************************************************!*\
+  !*** ./resources/js/components/workflow/HelpTip.vue ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _HelpTip_vue_vue_type_template_id_b70e4716__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./HelpTip.vue?vue&type=template&id=b70e4716 */ "./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716");
+/* harmony import */ var _HelpTip_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HelpTip.vue?vue&type=script&lang=js */ "./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js");
+/* harmony import */ var _HelpTip_vue_vue_type_style_index_0_id_b70e4716_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css */ "./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_HelpTip_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_HelpTip_vue_vue_type_template_id_b70e4716__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/workflow/HelpTip.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/NodeEditor.vue":
 /*!*********************************************************!*\
   !*** ./resources/js/components/workflow/NodeEditor.vue ***!
@@ -5946,6 +6220,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js":
+/*!******************************************************************************!*\
+  !*** ./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./HelpTip.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/NodeEditor.vue?vue&type=script&lang=js":
 /*!*********************************************************************************!*\
   !*** ./resources/js/components/workflow/NodeEditor.vue?vue&type=script&lang=js ***!
@@ -6051,6 +6340,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716":
+/*!************************************************************************************!*\
+  !*** ./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716 ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_template_id_b70e4716__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_template_id_b70e4716__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./HelpTip.vue?vue&type=template&id=b70e4716 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=template&id=b70e4716");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/NodeEditor.vue?vue&type=template&id=23a3b904":
 /*!***************************************************************************************!*\
   !*** ./resources/js/components/workflow/NodeEditor.vue?vue&type=template&id=23a3b904 ***!
@@ -6143,6 +6447,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_FieldInput_vue_vue_type_style_index_0_id_712dfd36_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./FieldInput.vue?vue&type=style&index=0&id=712dfd36&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/FieldInput.vue?vue&type=style&index=0&id=712dfd36&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css":
+/*!**************************************************************************************************!*\
+  !*** ./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HelpTip_vue_vue_type_style_index_0_id_b70e4716_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/HelpTip.vue?vue&type=style&index=0&id=b70e4716&lang=css");
 
 
 /***/ }),
