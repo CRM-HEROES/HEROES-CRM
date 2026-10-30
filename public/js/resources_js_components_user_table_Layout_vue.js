@@ -942,7 +942,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       {
         type: "other",
         name: this.$t("prospect.table.column.others.sms"),
-        icon: "fa fa-comments icon-purple",
+        icon: "fa fa-comment icon-purple",
         columnId: "sms",
         headerId: "hc-prospects-table-header-sms-sms"
       },

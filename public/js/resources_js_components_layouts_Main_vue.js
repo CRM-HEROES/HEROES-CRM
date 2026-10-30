@@ -90334,7 +90334,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         prospect: _ctx.prospect.id
       }
     } : null,
-    icon: "fa fa-comments",
+    icon: "fa fa-comment",
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
       width: $data.tab == 1 && $data.frameTab == 1 ? '380px' : '340px'
     })
