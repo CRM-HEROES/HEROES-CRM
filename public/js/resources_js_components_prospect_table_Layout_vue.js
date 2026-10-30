@@ -3599,7 +3599,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
@@ -3609,6 +3609,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
 /* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
 /* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
+/* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -3639,6 +3640,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   data: function data() {
     return {
@@ -3650,6 +3652,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       fetchingPreviousPage: false,
       fetchingNextPage: false,
       settingProspectsCount: false,
+      selectingAllFiltered: false,
       settingProspectsPage: false,
       chunks: [10, 20, 50, 100, 200, 300, 400, 500]
     };
@@ -4181,15 +4184,89 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           }
         }, _callee12);
       }))();
+    },
+    selectAllFilteredProspects: function selectAllFilteredProspects() {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
+        var ids, _params, first, page, _yield$ProspectServic, data;
+        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+          while (1) switch (_context13.prev = _context13.next) {
+            case 0:
+              if (!_this10.selectingAllFiltered) {
+                _context13.next = 2;
+                break;
+              }
+              return _context13.abrupt("return");
+            case 2:
+              _this10.selectingAllFiltered = true;
+              _context13.prev = 3;
+              ids = [];
+              _params = {
+                count: 500,
+                sortBy: _this10.prospectsSortBy,
+                sortOrder: _this10.prospectsSortOrder
+              };
+              if (Object.keys(_this10.prospectsParams || {}).length) _params.filters = JSON.stringify(_this10.prospectsParams);
+              _context13.next = 9;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__["default"].get(_this10.project.slug, {
+                params: _objectSpread(_objectSpread({}, _params), {}, {
+                  page: 1
+                })
+              });
+            case 9:
+              first = _context13.sent;
+              ids.push.apply(ids, _toConsumableArray(first.data.data.map(function (prospect) {
+                return prospect.id;
+              })));
+              page = 2;
+            case 12:
+              if (!(page <= first.data.last_page)) {
+                _context13.next = 21;
+                break;
+              }
+              _context13.next = 15;
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__["default"].get(_this10.project.slug, {
+                params: _objectSpread(_objectSpread({}, _params), {}, {
+                  page: page
+                })
+              });
+            case 15:
+              _yield$ProspectServic = _context13.sent;
+              data = _yield$ProspectServic.data;
+              ids.push.apply(ids, _toConsumableArray(data.data.map(function (prospect) {
+                return prospect.id;
+              })));
+            case 18:
+              page++;
+              _context13.next = 12;
+              break;
+            case 21:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, ids);
+              _context13.next = 27;
+              break;
+            case 24:
+              _context13.prev = 24;
+              _context13.t0 = _context13["catch"](3);
+              flashError(_context13.t0);
+            case 27:
+              _context13.prev = 27;
+              _this10.selectingAllFiltered = false;
+              return _context13.finish(27);
+            case 30:
+            case "end":
+              return _context13.stop();
+          }
+        }, _callee13, null, [[3, 24, 27, 30]]);
+      }))();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
   // "prospectsMaxLinesPerRow",
   "projectUserSettingsProspectsMaxRowLines", "prospectsParams", "prospectsParamsUrl", "prospectsSortOrder", "prospectsSortBy", "prospectsMenus", "prospectsOptions", "can", "lines"])), {}, {
     cloudtalkLine: function cloudtalkLine() {
-      var _this10 = this;
+      var _this11 = this;
       return this.lines.find(function (line) {
-        return line.operator === 'cloudtalk' && _this10.user && line.user_id == _this10.user.id;
+        return line.operator === 'cloudtalk' && _this11.user && line.user_id == _this11.user.id;
       });
     },
     /**
@@ -4205,9 +4282,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * is processed
      */
     selectedProspectsProcessed: function selectedProspectsProcessed() {
-      var _this11 = this;
+      var _this12 = this;
       return this.prospects.filter(function (p) {
-        return _this11.prospectsSelected.indexOf(p.id) >= 0 && p.processed_at;
+        return _this12.prospectsSelected.indexOf(p.id) >= 0 && p.processed_at;
       }).length == this.prospectsSelected.length;
     },
     /**
@@ -4216,9 +4293,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * is not processed
      */
     selectedProspectsNotProcessed: function selectedProspectsNotProcessed() {
-      var _this12 = this;
+      var _this13 = this;
       return this.prospects.filter(function (p) {
-        return _this12.prospectsSelected.indexOf(p.id) >= 0 && !p.processed_at;
+        return _this13.prospectsSelected.indexOf(p.id) >= 0 && !p.processed_at;
       }).length == this.prospectsSelected.length;
     },
     /**
@@ -4233,24 +4310,24 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return this.prospectsCount;
       },
       set: function () {
-        var _set = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13(value) {
-          return _regeneratorRuntime().wrap(function _callee13$(_context13) {
-            while (1) switch (_context13.prev = _context13.next) {
+        var _set = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee14(value) {
+          return _regeneratorRuntime().wrap(function _callee14$(_context14) {
+            while (1) switch (_context14.prev = _context14.next) {
               case 0:
                 _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_COUNT, value);
                 this.settingProspectsCount = true;
-                _context13.prev = 2;
-                _context13.next = 5;
+                _context14.prev = 2;
+                _context14.next = 5;
                 return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
               case 5:
-                _context13.prev = 5;
+                _context14.prev = 5;
                 this.settingProspectsCount = false;
-                return _context13.finish(5);
+                return _context14.finish(5);
               case 8:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
-          }, _callee13, this, [[2,, 5, 8]]);
+          }, _callee14, this, [[2,, 5, 8]]);
         }));
         function set(_x2) {
           return _set.apply(this, arguments);
@@ -4258,29 +4335,41 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return set;
       }()
     },
+    selectAllFiltered: {
+      get: function get() {
+        return this.prospectsTotal > 0 && this.prospectsSelected.length === this.prospectsTotal;
+      },
+      set: function set(checked) {
+        if (!checked) {
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+          return;
+        }
+        this.selectAllFilteredProspects();
+      }
+    },
     page: {
       get: function get() {
         return this.prospectsPage;
       },
       set: function () {
-        var _set2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee14(value) {
-          return _regeneratorRuntime().wrap(function _callee14$(_context14) {
-            while (1) switch (_context14.prev = _context14.next) {
+        var _set2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee15(value) {
+          return _regeneratorRuntime().wrap(function _callee15$(_context15) {
+            while (1) switch (_context15.prev = _context15.next) {
               case 0:
                 _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, value);
                 this.settingProspectsPage = true;
-                _context14.prev = 2;
-                _context14.next = 5;
+                _context15.prev = 2;
+                _context15.next = 5;
                 return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
               case 5:
-                _context14.prev = 5;
+                _context15.prev = 5;
                 this.settingProspectsPage = false;
-                return _context14.finish(5);
+                return _context15.finish(5);
               case 8:
               case "end":
-                return _context14.stop();
+                return _context15.stop();
             }
-          }, _callee14, this, [[2,, 5, 8]]);
+          }, _callee15, this, [[2,, 5, 8]]);
         }));
         function set(_x3) {
           return _set2.apply(this, arguments);
@@ -4293,9 +4382,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return this.projectUserSettingsProspectsMaxRowLines;
       },
       set: function () {
-        var _set3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee15(value) {
-          return _regeneratorRuntime().wrap(function _callee15$(_context15) {
-            while (1) switch (_context15.prev = _context15.next) {
+        var _set3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee16(value) {
+          return _regeneratorRuntime().wrap(function _callee16$(_context16) {
+            while (1) switch (_context16.prev = _context16.next) {
               case 0:
                 _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__.UPDATE_PROJECT_USER_SETTING, {
                   key: "prospects.max-row-lines",
@@ -4304,9 +4393,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 // store.commit(SET_PROSPECTS_MAX_LINES_PER_ROW, value);
               case 1:
               case "end":
-                return _context15.stop();
+                return _context16.stop();
             }
-          }, _callee15);
+          }, _callee16);
         }));
         function set(_x4) {
           return _set3.apply(this, arguments);
@@ -12803,8 +12892,22 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 'project.prospect.table.footer.add-prospect',
         name: 'Tableau de prospects - Nouveau prospect',
         body: 'Créer une nouvelle ligne de prospect'
-      }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-        "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_card_menu, {
+        icon: $options.selectAllFiltered ? 'fa fa-check-square' : 'fa-regular fa-square',
+        label: _ctx.$t('prospect.table.footer.select_all_filtered'),
+        disabled: $data.selectingAllFiltered,
+        onClick: _cache[0] || (_cache[0] = function ($event) {
+          return $options.selectAllFiltered = !$options.selectAllFiltered;
+        })
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+            loading: $data.selectingAllFiltered
+          }, null, 8 /* PROPS */, ["loading"])];
+        }),
+        _: 1 /* STABLE */
+      }, 8 /* PROPS */, ["icon", "label", "disabled"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
           return $options.count = $event;
         })
       }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.chunks, function (chunk) {
@@ -12828,7 +12931,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         name: 'Tableau de prospects - Colonnes',
         body: 'Ajouter une nouvelle colonne dans le tableau de prospects.<br>(SMS, RDV, devis, appels, filtres, ...)'
       }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.bulkDisabled ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
           return $options.maxLinesPerRow = $event;
         })
       }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(4, function (i) {
@@ -12882,7 +12985,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["disabled", "label", "onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
           return $options.page = $event;
         })
       }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.pagesCount, function (i) {

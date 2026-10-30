@@ -163,6 +163,7 @@
                 "toggle_menus": "Afficher/cacher les menus",
                 "toggle_prospect_menus": "Afficher/cacher les menus par prospect",
                 "add_prospect": "Nouveau prospect",
+                "select_all_filtered": "Sélectionner tous les prospects filtrés",
                 "import": "Importer des prospects",
                 "setting": "Paramètre des colonnes",
                 "previous": "Page précédente",

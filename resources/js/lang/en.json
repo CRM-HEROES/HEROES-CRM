@@ -162,6 +162,7 @@
                 "toggle_menus": "Toggle menus",
                 "toggle_prospect_menus": "Toggle prospect menus",
                 "add_prospect": "New prospect",
+                "select_all_filtered": "Select all filtered prospects",
                 "import": "Import prospects",
                 "setting": "Columns setting",
                 "previous": "Previous",
