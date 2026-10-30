@@ -8156,8 +8156,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(_ctx.prospectInteractions, function (interaction, i) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_interaction_row, {
           key: interaction.id,
-          interaction: interaction
-        }, null, 8 /* PROPS */, ["interaction"]);
+          interaction: interaction,
+          "color-index": i
+        }, null, 8 /* PROPS */, ["interaction", "color-index"]);
       }), 128 /* KEYED_FRAGMENT */))])];
     }),
     _: 1 /* STABLE */
