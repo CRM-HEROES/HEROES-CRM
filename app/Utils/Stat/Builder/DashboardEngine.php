@@ -3,6 +3,7 @@
 namespace App\Utils\Stat\Builder;
 
 use App\Models\Project;
+use App\Services\DashboardFollowups;
 use App\Services\DashboardRecordings;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -97,6 +98,11 @@ class DashboardEngine
                 'user' => $users,
                 'role' => $roles,
                 'team' => $teams,
+                'followup' => (new DashboardFollowups($this->project))->labels()->map(fn ($label) => [
+                    'value' => $label->id,
+                    'label' => $label->name,
+                    'category' => $label->category->name,
+                ])->values(),
                 'status' => collect(static::CONNECTION_STATUSES)->map(fn ($s) => ['value' => $s, 'label' => $s])->values(),
                 'source' => collect(['aircall', 'cloudtalk', 'ringover', 'telephone', 'smsbox', 'ultramsg', 'mtarget', 'brevo', 'whatsapp'])
                     ->map(fn ($s) => ['value' => $s, 'label' => ucfirst($s)])->values(),
@@ -763,8 +769,30 @@ class DashboardEngine
         }
 
         if ($src['kind'] === 'users') {
+            $followupColumns = array_filter($columns, fn ($column) =>
+                is_string($column['field']) && str_starts_with($column['field'], 'followup'));
+            $followups = new DashboardFollowups($this->project);
+            $labels = $followupColumns ? $followups->labels()->keyBy('id') : collect();
+            $selected = new \Illuminate\Database\Eloquent\Collection();
+            foreach ($followupColumns as $column) {
+                abort_unless(preg_match('/^followup_([1-9][0-9]*)$/D', $column['field'], $match), 422, 'Choisissez un suivi pour chaque colonne Suivi.');
+                $label = $labels->get($match[1]);
+                abort_unless($label && !$selected->has($label->id), 422, 'Suivi inconnu, indisponible ou déjà sélectionné.');
+                $selected->put($label->id, $label);
+            }
             $rows = $this->usersRows($config, $global, $range);
             $fields = $src['fields'];
+            if ($selected->isNotEmpty()) {
+                $counts = $followups->counts($selected, array_column($rows, 'id'), $range[0]->toDateTimeString(), $range[1]->toDateTimeString());
+                foreach ($selected as $label) {
+                    $field = 'followup_' . $label->id;
+                    $fields[$field] = ['label' => 'Suivi → ' . $label->name, 'type' => 'number', 'sortable' => true];
+                    foreach ($rows as &$row) {
+                        $row[$field] = $counts[$row['id']][$field] ?? 0;
+                    }
+                    unset($row);
+                }
+            }
         } else {
             $dims = [];
             $defs = [];

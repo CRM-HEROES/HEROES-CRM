@@ -178,6 +178,20 @@ export default {
             if (this.step >= 2 && def.sections.includes("dimension") && !c.dimension) return "Choisissez une dimension.";
             if (this.step >= 2 && def.sections.includes("series") && !(c.series || []).length) return "Ajoutez au moins une série de données.";
             if (this.step >= 2 && def.sections.includes("columns") && !(c.columns || []).length) return "Ajoutez au moins une colonne.";
+            if (this.step >= 2 && def.sections.includes("columns")) {
+                const followups = (this.meta.options && this.meta.options.followup) || [];
+                const selected = [];
+                for (const column of c.columns || []) {
+                    if (column.field === "followup") return "Choisissez le suivi à compter pour chaque colonne Suivi.";
+                    if (!String(column.field).startsWith("followup_")) continue;
+                    const id = String(column.field).slice("followup_".length);
+                    if (c.dataSource !== "users" || !/^[1-9]\d*$/.test(id) || !followups.some((followup) => String(followup.value) === id)) {
+                        return "Choisissez un suivi disponible dans ce projet.";
+                    }
+                    if (selected.includes(id)) return "Ce suivi est déjà présent dans les colonnes.";
+                    selected.push(id);
+                }
+            }
             if (this.step >= 2 && c.type === "funnel" && (c.steps || []).length < 2) return "Un funnel nécessite au moins 2 étapes.";
             if (this.step >= 2 && c.period && c.period.preset === "custom" && !(c.globalFilters || []).includes("period") && (!c.period.from || !c.period.to)) {
                 return "Renseignez les dates de la période personnalisée.";
