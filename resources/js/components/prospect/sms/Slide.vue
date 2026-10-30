@@ -614,6 +614,15 @@
                 </div>
             </template>
         </tab-layout>
+        <process-communications
+            v-if="prospect && tab === 1 && frameTab === 0 && selectedProspectsTab === 0 && slideOpen(name)"
+            :key="project.slug + ':' + prospect.id"
+            :project-slug="project.slug"
+            :prospect="prospect"
+            type="sms"
+            :records="prospectSms"
+            :disabled="fetchingSms"
+        />
     </slide>
 </template>
 
@@ -741,7 +750,6 @@ button.hc-prospect-sms-refresh:disabled:hover {
 </style>
 
 <script>
-import { markCommunicationsRead } from "@/utils/incoming-communications";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
@@ -766,6 +774,7 @@ import TemplateRow from "./TemplateRow.vue";
 import SelectedProspect from "./SelectedProspect.vue";
 import SelectProspect from "../select/Select.vue";
 import UploadingAttachmentRow from "../message/UploadingAttachmentRow.vue";
+import ProcessCommunications from "../ProcessCommunications.vue";
 
 export default {
     components: {
@@ -775,6 +784,7 @@ export default {
         TemplateRow,
         SelectedProspect,
         UploadingAttachmentRow,
+        ProcessCommunications,
     },
 
     data() {
@@ -817,17 +827,6 @@ export default {
             if (!this.addingSms) {
                 this.attachments = this.attachments.filter(file => file !== attachment);
                 this.sendError = "";
-            }
-        },
-
-        async markDisplayedSmsRead(records = this.prospectSms) {
-            const projectSlug = this.project?.slug;
-            const prospectId = this.prospect?.id;
-            await this.$nextTick();
-            if (this.project?.slug === projectSlug && this.prospect?.id === prospectId
-                && this.slideOpen(this.name) && this.tab === 1 && this.frameTab === 0 && this.selectedProspectsTab === 0) {
-                return markCommunicationsRead(projectSlug, prospectId, "sms",
-                    (records || []).filter(sms => sms.prospect_id == prospectId));
             }
         },
 
@@ -1016,28 +1015,18 @@ export default {
             if (newValue.length != oldValue.length && this.$refs.sms) {
                 this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
             }
-            this.markDisplayedSmsRead(newValue);
         },
 
         async tab(newValue) {
             await this.$nextTick();
 
             if (newValue == 1) {
-                this.markDisplayedSmsRead();
                 if (this.$refs.sms) {
                     this.$refs.sms.scrollTop = this.$refs.sms.scrollHeight;
                 }
             } else if (newValue == 2) {
                 this.fetchSmsTemplates();
             }
-        },
-
-        frameTab() {
-            this.markDisplayedSmsRead();
-        },
-
-        selectedProspectsTab() {
-            this.markDisplayedSmsRead();
         },
 
         async prospect(newValue, oldValue) {
