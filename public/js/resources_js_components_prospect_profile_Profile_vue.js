@@ -6310,7 +6310,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.prospectFullName)
   }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
     tag: "a",
-    "class": "fa fa-comments icon-purple",
+    "class": "fa fa-comment icon-purple",
     "icon-size": 16,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageSms, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.sms')]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -6320,7 +6320,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageInteractions, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.call')]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
     tag: "a",
-    "class": "fa fa-message icon-green",
+    "class": "fa fa-envelope icon-green",
     "icon-size": 16,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageMessages, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.message')]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -8692,7 +8692,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     options: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         tag: "a",
-        "class": "fa fa-comments",
+        "class": "fa fa-envelope",
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.manageMessages, ["prevent", "stop"])
       }, null, 8 /* PROPS */, ["onClick"])];
     }),

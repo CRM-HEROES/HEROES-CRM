@@ -54,8 +54,11 @@
         </div>
         <div id="hc-project-profile-body">
             <div id="hc-project-profile-body-columns">
-                <div>
-                    <label id="hc-project-profile-logo">
+                <div
+                    v-for="(column, i) in projectUserSettingsProjectProfile"
+                    :key="i"
+                >
+                    <label v-if="i == 0" id="hc-project-profile-logo">
                         <img
                             :src="
                                 project.thumbnail
@@ -76,55 +79,20 @@
                             v-text="$t('project.profile.logo.change')"
                         ></div>
                     </label>
-                    <user-bloc />
-                    <role-bloc />
-                    <group-bloc />
-                    <menu-bloc />
-                    <api-bloc />
-                    <import-bloc />
-                </div>
-                <div>
-                    <info-bloc
-                        :bloc="{
-                            name: $t('project.profile.blocs.profile'),
-                            items: ['name', 'email', 'phone_number'],
-                        }"
-                    />
-                    <info-bloc
-                        :bloc="{
-                            name: $t('project.profile.blocs.contacts'),
-                            items: [
-                                'street',
-                                'street_bis',
-                                'postal_code',
-                                'city',
-                                'county',
-                                'state',
-                                'country',
-                            ],
-                        }"
-                    />
-                    <info-bloc
-                        :bloc="{
-                            name: 'Autres',
-                            items: ['naf', 'siret', 'capital', 'num_tva_intra'],
-                        }"
-                    />
-                    <document-bloc />
-                    <line-bloc />
-                </div>
-                <div>
-                    <category-bloc />
-                    <field-bloc />
-                </div>
-                <div>
-                    <folder-bloc />
-                    <thread-bloc />
-                    <calendar-bloc />
-                    <product-bloc />
-                    <order-action-bloc />
-                    <order-step-bloc />
-                    <order-status-bloc />
+                    <draggable
+                        tag="div"
+                        class="hc-project-profile-body-column"
+                        :list="column"
+                        :disabled="!movable"
+                        group="project-profile-bloc"
+                        :item-key="blocKey"
+                        handle=".bloc-handle"
+                        @end="setBlocColumn"
+                    >
+                        <template #item="{ element }">
+                            <profile-bloc :bloc="element" />
+                        </template>
+                    </draggable>
                 </div>
             </div>
         </div>
@@ -182,6 +150,14 @@
     gap: 15px;
 }
 
+.hc-project-profile-body-column {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 50px;
+    flex: 1;
+}
+
 #hc-project-profile-logo {
     display: inline-block;
     width: 100%;
@@ -235,55 +211,44 @@ import store from "@/store";
 
 import { OPEN_MODAL } from "@/actions/modal";
 import { OPEN_SLIDE } from "@/actions/slide";
+import {
+    GET_PROJECT_USER_SETTING,
+    UPDATE_PROJECT_USER_SETTING,
+} from "@/actions/project/user/setting";
 
-import ApiBloc from "./blocs/api/Bloc.vue";
-import CalendarBloc from "./blocs/calendar/Bloc.vue";
-import CategoryBloc from "./blocs/category/Bloc.vue";
-import DocumentBloc from "./blocs/document/Bloc.vue";
-import FieldBloc from "./blocs/field/Bloc.vue";
-import FolderBloc from "./blocs/folder/Bloc.vue";
-import GroupBloc from "./blocs/group/Bloc.vue";
-import ImportBloc from "./blocs/import/Bloc.vue";
-import InfoBloc from "./blocs/info/Bloc.vue";
-import LineBloc from "./blocs/line/Bloc.vue";
-import MenuBloc from "./blocs/menu/Bloc.vue";
-import OrderActionBloc from "./blocs/order-action/Bloc.vue";
-import OrderStatusBloc from "./blocs/order-status/Bloc.vue";
-import OrderStepBloc from "./blocs/order-step/Bloc.vue";
-import ProductBloc from "./blocs/product/Bloc.vue";
-import RoleBloc from "./blocs/role/Bloc.vue";
-import ThreadBloc from "./blocs/thread/Bloc.vue";
-import UserBloc from "./blocs/user/Bloc.vue";
+import ProfileBloc from "./ProfileBloc.vue";
 
 export default {
     components: {
-        ApiBloc,
-        CalendarBloc,
-        CategoryBloc,
-        DocumentBloc,
-        FieldBloc,
-        FolderBloc,
-        GroupBloc,
-        ImportBloc,
-        InfoBloc,
-        LineBloc,
-        MenuBloc,
-        OrderActionBloc,
-        OrderStatusBloc,
-        OrderStepBloc,
-        ProductBloc,
-        RoleBloc,
-        ThreadBloc,
-        UserBloc,
+        ProfileBloc,
+    },
+
+    created() {
+        store.dispatch(GET_PROJECT_USER_SETTING, { key: "project-profile" });
     },
 
     data() {
         return {
             updatingLogo: false,
+            movable: deviceType() == "desktop",
         };
     },
 
     methods: {
+        blocKey(bloc) {
+            return bloc.type;
+        },
+
+        /**
+         * Save blocs order
+         */
+        setBlocColumn() {
+            store.dispatch(UPDATE_PROJECT_USER_SETTING, {
+                key: "project-profile",
+                value: [...this.projectUserSettingsProjectProfile],
+            });
+        },
+
         async setLogo(event) {
             var reader = new FileReader();
 
@@ -368,7 +333,13 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["project", "categories", "threads", "folders"]),
+        ...mapGetters([
+            "project",
+            "categories",
+            "threads",
+            "folders",
+            "projectUserSettingsProjectProfile",
+        ]),
     },
 };
 </script>

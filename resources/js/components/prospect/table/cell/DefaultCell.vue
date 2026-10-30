@@ -132,6 +132,7 @@
 </style>
 
 <script>
+import { mapGetters } from "vuex";
 import store from "@/store";
 
 import { UPDATE_PROSPECT } from "@/actions/project/prospect";
@@ -289,6 +290,8 @@ export default {
     },
 
     computed: {
+        ...mapGetters(["prospectReadOnly"]),
+
         /**
          * When value is updated
          * Send modification to the API
@@ -336,6 +339,7 @@ export default {
          */
         disabled() {
             return (
+                this.prospectReadOnly ||
                 // deleted or archived prospect
                 this.prospect.deleted_at ||
                 this.prospect.processed_at ||

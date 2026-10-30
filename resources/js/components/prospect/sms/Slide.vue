@@ -20,7 +20,7 @@
                   }
                 : null
         "
-        icon="fa fa-comments"
+        icon="fa fa-comment"
         :style="{ width: tab == 1 && frameTab == 1 ? '380px' : '340px' }"
     >
         <tab-layout :count="3" :tab="tab" class="hc-flex-1">
