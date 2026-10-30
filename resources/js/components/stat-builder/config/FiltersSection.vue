@@ -40,7 +40,7 @@ export default {
     computed: {
         fields() {
             return this.source.kind === "users"
-                ? this.source.fields.filter((f) => f.type !== "audio_action")
+                ? this.source.fields.filter((f) => f.type !== "audio_action" && f.key !== "followup")
                 : this.source.dimensions;
         },
     },

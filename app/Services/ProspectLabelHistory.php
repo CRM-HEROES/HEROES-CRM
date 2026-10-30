@@ -4,9 +4,72 @@ namespace App\Services;
 
 use App\Models\Label;
 use App\Models\Prospect;
+use Illuminate\Support\Facades\DB;
 
 class ProspectLabelHistory
 {
+    /** Preserve targeted bulk assignments before their pivot rows are deleted. */
+    public function preserveAssignments(array $prospects, array $labels): void
+    {
+        $this->saveAssignments($prospects, $labels, true);
+    }
+
+    /** Record every newly applied bulk assignment, including repeated actions. */
+    public function recordAssignments(array $prospects, array $labels): void
+    {
+        $this->saveAssignments($prospects, $labels, false);
+    }
+
+    private function saveAssignments(array $prospects, array $labels, bool $onlyMissing): void
+    {
+        if (!$prospects || !$labels) {
+            return;
+        }
+
+        $morph = (new Prospect())->getMorphClass();
+        $driver = DB::connection()->getDriverName();
+        $categoryKey = in_array($driver, ['sqlite', 'pgsql'], true)
+            ? "('category->' || labels.category_id)"
+            : "CONCAT('category->', labels.category_id)";
+        $assignments = DB::table('prospect_label')
+            ->join('labels', 'labels.id', '=', 'prospect_label.label_id')
+            ->whereIn('prospect_label.prospect_id', $prospects)
+            ->whereIn('prospect_label.label_id', $labels)
+            ->whereNotNull('prospect_label.created_at');
+
+        if ($onlyMissing) {
+            $assignments->whereNotExists(function ($query) use ($morph, $categoryKey) {
+                $query->selectRaw('1')->from('revisions')
+                    ->where('revisions.revisionable_type', $morph)
+                    ->whereColumn('revisions.revisionable_id', 'prospect_label.prospect_id')
+                    ->whereColumn('revisions.created_at', 'prospect_label.created_at')
+                    ->whereRaw('revisions.key = ' . $categoryKey)
+                    ->where(function ($query) {
+                        $query->whereColumn('revisions.user_id', 'prospect_label.creator_id')
+                            ->orWhere(fn ($query) => $query
+                                ->whereNull('revisions.user_id')->whereNull('prospect_label.creator_id'));
+                    });
+                $this->whereRecordedAssignment($query);
+            });
+        }
+
+        $assignments = $assignments->distinct()
+            ->get(['prospect_label.prospect_id', 'prospect_label.creator_id', 'prospect_label.created_at', 'labels.category_id', 'labels.name']);
+
+        foreach ($assignments->chunk(100) as $chunk) {
+            DB::table('revisions')->insert($chunk->map(fn ($assignment) => [
+                'revisionable_type' => $morph,
+                'revisionable_id' => $assignment->prospect_id,
+                'key' => 'category->' . $assignment->category_id,
+                'old_value' => null,
+                'new_value' => $assignment->name,
+                'user_id' => $assignment->creator_id,
+                'created_at' => $assignment->created_at,
+                'updated_at' => $assignment->created_at,
+            ])->all());
+        }
+    }
+
     /**
      * Preserve legacy assignments before their mutable pivot rows are changed.
      */

@@ -15,6 +15,19 @@
                     </div>
                     <input class="sb-input sb-col-label" v-model="col.label" :placeholder="fieldOf(col.field).label" data-tip="Nom affiché" />
                     <select
+                        v-if="isFollowup(col.field)"
+                        class="sb-input sb-col-followup"
+                        aria-label="Suivi à compter"
+                        :value="followupId(col.field)"
+                        @change="setFollowup(col, $event.target.value)"
+                    >
+                        <option value="" disabled>Choisir un suivi…</option>
+                        <option v-if="followupId(col.field) && !followupOf(col.field)" :value="followupId(col.field)" disabled>Suivi indisponible</option>
+                        <option v-for="f in followupOptions(col)" :key="f.value" :value="String(f.value)">
+                            {{ f.label }}{{ duplicateFollowupName(f) && f.category ? ' — ' + f.category : '' }}
+                        </option>
+                    </select>
+                    <select
                         v-if="aggsOf(col.field).length > 1"
                         class="sb-input sb-col-agg"
                         :value="col.agg || defaultAgg(col.field)"
@@ -22,7 +35,7 @@
                     >
                         <option v-for="a in aggsOf(col.field)" :key="a" :value="a">{{ aggLabels[a] }}</option>
                     </select>
-                    <button type="button" class="sb-btn-icon is-danger" data-tip="Supprimer la colonne" @click="config.columns.splice(index, 1)">
+                    <button type="button" class="sb-btn-icon is-danger" data-tip="Supprimer la colonne" @click="removeColumn(index)">
                         <i class="fa fa-xmark"></i>
                     </button>
                 </div>
@@ -80,6 +93,7 @@ export default {
     props: {
         config: { type: Object, required: true },
         source: { type: Object, required: true },
+        followups: { type: Array, default: () => [] },
     },
 
     data() {
@@ -90,7 +104,10 @@ export default {
         available() {
             const used = this.config.columns.map((c) => c.field);
 
-            return this.source.fields.filter((f) => !used.includes(f.key));
+            return this.source.fields.filter((f) => {
+                if (used.includes(f.key)) return false;
+                return f.key !== "followup" || this.followups.some((followup) => !used.includes("followup_" + followup.value));
+            });
         },
         sorting() {
             return { field: "", direction: "desc", ...(this.config.sorting || {}) };
@@ -105,14 +122,53 @@ export default {
     watch: {
         toAdd(key) {
             if (!key) return;
-            this.config.columns.push({ field: key, label: "" });
+            if (this.available.some((field) => field.key === key)) {
+                this.config.columns.push({ field: key, label: "" });
+            }
             this.toAdd = "";
         },
     },
 
     methods: {
         fieldOf(key) {
+            if (this.isFollowup(key)) {
+                const followup = this.followupOf(key);
+                return {
+                    ...this.source.fields.find((field) => field.key === "followup"),
+                    key,
+                    label: followup ? "Suivi → " + followup.label : "Suivi",
+                    type: "number",
+                    sortable: !!followup,
+                };
+            }
             return this.source.fields.find((f) => f.key === key) || { key, label: key, type: "string" };
+        },
+        isFollowup(key) {
+            return this.source.kind === "users" && (key === "followup" || /^followup_[1-9]\d*$/.test(key));
+        },
+        followupId(key) {
+            return /^followup_[1-9]\d*$/.test(key) ? key.slice("followup_".length) : "";
+        },
+        followupOf(key) {
+            return this.followups.find((followup) => String(followup.value) === this.followupId(key));
+        },
+        followupOptions(column) {
+            const used = this.config.columns.filter((col) => col !== column).map((col) => col.field);
+            return this.followups.filter((followup) => !used.includes("followup_" + followup.value));
+        },
+        duplicateFollowupName(followup) {
+            return this.followups.some((other) => other.value !== followup.value && other.label === followup.label);
+        },
+        setFollowup(column, value) {
+            const next = "followup_" + value;
+            if (!this.followupOptions(column).some((followup) => String(followup.value) === value)) return;
+            const previous = column.field;
+            column.field = next;
+            if (this.sorting.field === previous) this.setSort("field", next);
+        },
+        removeColumn(index) {
+            const [removed] = this.config.columns.splice(index, 1);
+            if (removed && this.sorting.field === removed.field) this.setSort("field", "");
         },
         typeLabel(f) {
             return f.measure ? "Mesure" : TYPE_LABELS[f.type] || f.type;
@@ -162,9 +218,10 @@ export default {
 }
 .sb-col-label { width: 150px; flex: 0 1 150px; }
 .sb-col-agg { width: 110px; flex: 0 0 110px; }
+.sb-col-followup { width: 190px; flex: 0 1 190px; }
 .sb-add-col { margin-top: 8px; }
 .sb-empty-inline { font-size: 12px; color: var(--sb-muted); padding: 10px; text-align: center; border: 1px dashed var(--sb-border); border-radius: 10px; }
 .sb-subtitle { font-size: 12px; font-weight: 600; color: var(--sb-muted); margin: 16px 0 6px; }
 .sb-ghost { opacity: 0.4; }
-@media (max-width: 640px) { .sb-col-label, .sb-col-agg { flex: 1 1 100%; width: auto; } }
+@media (max-width: 640px) { .sb-col-label, .sb-col-agg, .sb-col-followup { flex: 1 1 100%; width: auto; } }
 </style>

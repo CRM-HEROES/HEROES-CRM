@@ -25284,7 +25284,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         filters: ["withSms", "withoutSms"],
         name: "SMS",
         icon: "fa fa-comment icon-purple",
-        icon: "fa fa-comment icon-purple",
         slide: "prospects-table-filter-sms"
       },
       // User
@@ -57930,7 +57929,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
             case 12:
               _context.prev = 12;
               _context.t0 = _context["catch"](4);
-              flashError(_this.$t("workflow.error.load"));
+              flashError({
+                title: _this.$t("workflow.title"),
+                body: _this.$t("workflow.error.load")
+              });
             case 15:
               _context.prev = 15;
               _this.loading = false;
@@ -67671,12 +67673,9 @@ var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   d: "M204.144 147.657c-11.887-12.343-44.344-7.314-52.115-6.4-11.428-10.972-19.199-24.229-21.942-28.8 4.114-12.343 6.856-24.686 7.314-37.942 0-11.429-4.571-23.771-17.372-23.771-4.571 0-8.686 2.742-10.972 6.399-5.485 9.601-3.2 28.801 5.486 48.458-5.028 14.171-9.6 27.885-22.4 52.114-13.257 5.484-41.143 18.285-43.429 32-.914 4.113.457 8.229 3.657 11.428 3.2 2.743 7.314 4.114 11.429 4.114 16.914 0 33.371-23.313 44.8-42.972 9.6-3.199 24.686-7.771 39.772-10.514 17.828 15.543 33.371 17.828 41.6 17.828 10.971 0 15.086-4.571 16.457-8.686 2.285-4.57.914-9.599-2.285-13.256zm-11.43 7.772c-.457 3.2-4.57 6.399-11.885 4.571-8.686-2.285-16.457-6.4-23.314-11.886 5.943-.915 19.199-2.286 28.8-.457 3.657.914 7.314 3.2 6.399 7.772zm-76.342-94.172c.914-1.371 2.286-2.285 3.657-2.285 4.114 0 5.028 5.028 5.028 9.143-.457 9.601-2.286 19.2-5.485 28.343-6.858-18.286-5.486-31.087-3.2-35.201zm-.914 88.686c3.657-7.314 8.686-20.115 10.514-25.601 4.114 6.856 10.971 15.086 14.629 18.743 0 .458-14.172 3.2-25.143 6.858zm-26.972 18.286C77.972 185.6 67 196.571 61.057 196.571c-.914 0-1.829-.457-2.743-.914-1.372-.915-1.829-2.286-1.372-4.114 1.372-6.4 13.258-15.086 31.544-23.314z"
 }, null, -1 /* HOISTED */);
 var _hoisted_34 = [_hoisted_32, _hoisted_33];
-var _hoisted_35 = ["src"];
-var _hoisted_36 = {
-  key: 1,
+var _hoisted_35 = {
   version: "1.1",
   xmlns: "http://www.w3.org/2000/svg",
-  "xmlns:xlink": "http://www.w3.org/1999/xlink",
   x: "0px",
   y: "0px",
   viewBox: "0 0 100 100",
@@ -67685,52 +67684,67 @@ var _hoisted_36 = {
   },
   "xml:space": "preserve"
 };
-var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
   style: {
-    "fill": "#ea4435"
+    "fill": "#2e9d5c"
   },
-  d: "M17,68.9c-4.1,0-7.9-1.5-10.8-4L1.7,85.9c-0.5,2.3,1,4.5,3.2,5l6.9,1.5c2.3,0.5,4.5-1,5-3.2l4.3-20.2H17z"
+  x: "38",
+  y: "6",
+  width: "24",
+  height: "18",
+  rx: "4"
 }, null, -1 /* HOISTED */);
-var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
   style: {
-    "fill": "#33a852"
+    "fill": "#e8a317"
   },
-  d: "M70.5,15c-0.1,0-0.1,0-0.2,0c-3.4,0.5-6.2,15.7-6.2,34.3c0,18.5,2.7,33.6,6.2,34.3c0.1,0,0.2,0,0.2,0 c3.5,0,6.4-15.4,6.4-34.3S74.1,15,70.5,15z"
+  x: "38",
+  y: "41",
+  width: "24",
+  height: "18",
+  rx: "4"
 }, null, -1 /* HOISTED */);
-var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
   style: {
-    "fill": "#f9bc15"
+    "fill": "#2f6fed"
   },
-  cx: "67.3",
-  cy: "48.9",
-  r: "11.8"
+  x: "8",
+  y: "76",
+  width: "24",
+  height: "18",
+  rx: "4"
+}, null, -1 /* HOISTED */);
+var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
+  style: {
+    "fill": "#8e5bd6"
+  },
+  x: "68",
+  y: "76",
+  width: "24",
+  height: "18",
+  rx: "4"
 }, null, -1 /* HOISTED */);
 var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   style: {
-    "fill": "#547dbf"
+    "fill": "none",
+    "stroke": "#8a94a6",
+    "stroke-width": "4"
   },
-  d: "M64.2,49.4c0-18.6,2.8-33.8,6.2-34.3c-0.1,0-0.2,0-0.3,0c-0.7,0-1.4,0.2-2.1,0.6L47.4,27.5 c-3.7,2.1-7.8,3.2-12.1,3.2h-6.3h0H17c-9.2,0-16.6,7.4-16.6,16.6v5c0,9.2,7.4,16.6,16.6,16.6h11.9h0h8c4.2,0,8.4,1.1,12.1,3.2 l19,10.9c0.8,0.4,1.6,0.6,2.3,0.6C66.9,83,64.2,67.9,64.2,49.4z"
+  d: "M50,24 V41 M50,59 V68 M50,68 H20 V76 M50,68 H80 V76"
 }, null, -1 /* HOISTED */);
-var _hoisted_41 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  style: {
-    "fill": "#f9bc15"
-  },
-  d: "M80.9,71l10.2,5.9c2-2.8,3.8-5.9,5.1-9.1l-10.3-5.9C84.7,65.1,83,68.2,80.9,71z"
-}, null, -1 /* HOISTED */);
-var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  style: {
-    "fill": "#f9bc15"
-  },
-  d: "M85.9,35.9L96.2,30c-1.4-3.2-3.1-6.3-5.1-9.1l-10.2,5.9C83,29.5,84.7,32.6,85.9,35.9z"
-}, null, -1 /* HOISTED */);
-var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
-  style: {
-    "fill": "#f9bc15"
-  },
-  d: "M99.7,43.6H87.9c0.2,1.7,0.4,3.5,0.4,5.2c0,1.8-0.2,3.5-0.4,5.2h11.8c0.2-1.7,0.3-3.5,0.3-5.2 S99.9,45.4,99.7,43.6z"
-}, null, -1 /* HOISTED */);
-var _hoisted_44 = [_hoisted_37, _hoisted_38, _hoisted_39, _hoisted_40, _hoisted_41, _hoisted_42, _hoisted_43];
-var _hoisted_45 = {
+var _hoisted_41 = [_hoisted_36, _hoisted_37, _hoisted_38, _hoisted_39, _hoisted_40];
+var _hoisted_42 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  version: "1.1",
+  xmlns: "http://www.w3.org/2000/svg",
+  x: "0px",
+  y: "0px",
+  viewBox: "0 0 24 24",
+  "xml:space": "preserve"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  fill: "#d97757",
+  d: "m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"
+})], -1 /* HOISTED */);
+var _hoisted_43 = {
   style: {
     "flex": "1",
     "height": "100%",
@@ -67970,28 +67984,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 'project.header.menu.document',
     name: _ctx.$t('tutorial.project_header_menu_document.name'),
     body: '<img style="width: 100%;margin-bottom: 10px;border-radius: 5px;" src="/images/tutorial/header.documents.gif" /><br>' + _ctx.$t('tutorial.project_header_menu_document.body.0')
-  }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Campaign "), _ctx.can('all.project.campaign.view') ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_header_menu, {
+  }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Campaign "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("\n                <header-menu\n                    v-if=\"can('all.project.campaign.view')\"\n                    :label=\"$t('header.campaigns')\"\n                    :to=\"{\n                        name: 'campaign',\n                        params: {\n                            project: project.slug,\n                        },\n                    }\"\n                    v-tuto=\"{\n                        key: 'project.header.menu.campaign',\n                        name: $t('tutorial.project_header_menu_campaign.name'),\n                        body:\n                            $t('tutorial.project_header_menu_campaign.body.0') +\n                            '<br><img style=&quot;width: 100%;margin: 10px 0;border-radius: 5px;&quot; src=&quot;/images/tutorial/header.campaigns.gif&quot; /><br><ul><li>' +\n                            $t('tutorial.project_header_menu_campaign.body.1') +\n                            '</li><li>' +\n                            $t('tutorial.project_header_menu_campaign.body.2') +\n                            '</li><li>' +\n                            $t('tutorial.project_header_menu_campaign.body.3') +\n                            '</li><li>...</li></ul>',\n                    }\"\n                >\n                    <img\n                        v-if=\"projectUserSettingsMenuIconUrl('campaigns')\"\n                        :src=\"projectUserSettingsMenuIconUrl('campaigns')\"\n                    />\n                    <svg\n                        v-else\n                        version=\"1.1\"\n                        xmlns=\"http://www.w3.org/2000/svg\"\n                        xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n                        x=\"0px\"\n                        y=\"0px\"\n                        viewBox=\"0 0 100 100\"\n                        style=\"enable-background: new 0 0 100 100\"\n                        xml:space=\"preserve\"\n                    >\n                        <path\n                            style=\"fill: #ea4435\"\n                            d=\"M17,68.9c-4.1,0-7.9-1.5-10.8-4L1.7,85.9c-0.5,2.3,1,4.5,3.2,5l6.9,1.5c2.3,0.5,4.5-1,5-3.2l4.3-20.2H17z\"\n                        />\n                        <path\n                            style=\"fill: #33a852\"\n                            d=\"M70.5,15c-0.1,0-0.1,0-0.2,0c-3.4,0.5-6.2,15.7-6.2,34.3c0,18.5,2.7,33.6,6.2,34.3c0.1,0,0.2,0,0.2,0 c3.5,0,6.4-15.4,6.4-34.3S74.1,15,70.5,15z\"\n                        />\n                        <circle\n                            style=\"fill: #f9bc15\"\n                            cx=\"67.3\"\n                            cy=\"48.9\"\n                            r=\"11.8\"\n                        />\n                        <path\n                            style=\"fill: #547dbf\"\n                            d=\"M64.2,49.4c0-18.6,2.8-33.8,6.2-34.3c-0.1,0-0.2,0-0.3,0c-0.7,0-1.4,0.2-2.1,0.6L47.4,27.5 c-3.7,2.1-7.8,3.2-12.1,3.2h-6.3h0H17c-9.2,0-16.6,7.4-16.6,16.6v5c0,9.2,7.4,16.6,16.6,16.6h11.9h0h8c4.2,0,8.4,1.1,12.1,3.2 l19,10.9c0.8,0.4,1.6,0.6,2.3,0.6C66.9,83,64.2,67.9,64.2,49.4z\"\n                        />\n                        <path\n                            style=\"fill: #f9bc15\"\n                            d=\"M80.9,71l10.2,5.9c2-2.8,3.8-5.9,5.1-9.1l-10.3-5.9C84.7,65.1,83,68.2,80.9,71z\"\n                        />\n                        <path\n                            style=\"fill: #f9bc15\"\n                            d=\"M85.9,35.9L96.2,30c-1.4-3.2-3.1-6.3-5.1-9.1l-10.2,5.9C83,29.5,84.7,32.6,85.9,35.9z\"\n                        />\n                        <path\n                            style=\"fill: #f9bc15\"\n                            d=\"M99.7,43.6H87.9c0.2,1.7,0.4,3.5,0.4,5.2c0,1.8-0.2,3.5-0.4,5.2h11.8c0.2-1.7,0.3-3.5,0.3-5.2 S99.9,45.4,99.7,43.6z\"\n                        />\n                    </svg>\n                </header-menu>\n                "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Workflows (automations) "), _ctx.can('all.project.workflow.view') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_header_menu, {
     key: 3,
-    label: _ctx.$t('header.campaigns'),
+    label: _ctx.$t('header.workflows'),
     to: {
-      name: 'campaign',
+      name: 'workflow',
       params: {
         project: _ctx.project.slug
       }
     }
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_ctx.projectUserSettingsMenuIconUrl('campaigns') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
-        key: 0,
-        src: _ctx.projectUserSettingsMenuIconUrl('campaigns')
-      }, null, 8 /* PROPS */, _hoisted_35)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", _hoisted_36, _hoisted_44))];
+      return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", _hoisted_35, _hoisted_41))];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["label", "to"])), [[_directive_tuto, {
-    key: 'project.header.menu.campaign',
-    name: _ctx.$t('tutorial.project_header_menu_campaign.name'),
-    body: _ctx.$t('tutorial.project_header_menu_campaign.body.0') + '<br><img style="width: 100%;margin: 10px 0;border-radius: 5px;" src="/images/tutorial/header.campaigns.gif" /><br><ul><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.1') + '</li><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.2') + '</li><li>' + _ctx.$t('tutorial.project_header_menu_campaign.body.3') + '</li><li>...</li></ul>'
-  }]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_global_search, null, null, 512 /* NEED_PATCH */), [[_directive_tuto, _ctx.project ? {
+  }, 8 /* PROPS */, ["label", "to"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Claude "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_header_menu, {
+    tag: "a",
+    label: "Claude",
+    href: "https://claude.ai",
+    target: "_blank",
+    rel: "noopener"
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [_hoisted_42];
+    }),
+    _: 1 /* STABLE */
+  })], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_global_search, null, null, 512 /* NEED_PATCH */), [[_directive_tuto, _ctx.project ? {
     key: 'project.header.search',
     name: _ctx.$t('tutorial.project_header_search.name'),
     body: '<b>CTRL + F</b><br>' + _ctx.$t('tutorial.project_header_search.body.0') + '<br>' + _ctx.$t('tutorial.project_header_search.body.1')
@@ -116927,7 +116945,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

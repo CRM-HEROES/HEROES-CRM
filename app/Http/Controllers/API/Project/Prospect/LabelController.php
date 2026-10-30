@@ -138,42 +138,43 @@ class LabelController extends Controller
      * Bulk attach labels
      */
     protected function bulkActionAttach(&$prospects, &$labels) {
-        // Remove previous data
-        $this->bulkActionDetach($prospects, $labels);
+        DB::transaction(function () use ($prospects, $labels) {
+            // Remove previous data only after preserving its original assignments.
+            $this->bulkActionDetach($prospects, $labels);
 
-        // Update datas
-        $now = \Carbon\Carbon::now();
-        $data = array_map(function($label) use($prospects, $now) {
-            return array_map(function($prospect) use($label, $now) {
-                return [
-                    'prospect_id' => $prospect,
-                    'label_id' => $label,
-                    'creator_id' => auth()->id(),
-                    'deleted_at' => null,
-                    'created_at' => $now,
-                    'updated_at' => $now,
-                ];
-            }, $prospects);
-        }, $labels);
-        $data = array_reduce($data, function($carry, $data) {
-            return array_merge($carry, $data);
-        }, []);
+            // Update datas
+            $now = \Carbon\Carbon::now();
+            $data = array_map(function($label) use($prospects, $now) {
+                return array_map(function($prospect) use($label, $now) {
+                    return [
+                        'prospect_id' => $prospect,
+                        'label_id' => $label,
+                        'creator_id' => auth()->id(),
+                        'deleted_at' => null,
+                        'created_at' => $now,
+                        'updated_at' => $now,
+                    ];
+                }, $prospects);
+            }, $labels);
+            $data = array_reduce($data, function($carry, $data) {
+                return array_merge($carry, $data);
+            }, []);
 
-        DB::table('prospect_label')->insert($data);
+            DB::table('prospect_label')->insert($data);
+            app(ProspectLabelHistory::class)->recordAssignments($prospects, $labels);
+        });
     }
 
     /**
      * Bulk detach labels
      */
     protected function bulkActionDetach(&$prospects, &$labels) {
-        DB::table('prospect_label')
-            ->whereIn('label_id', $labels)
-            ->whereIn('prospect_id', $prospects)
-            ->delete();
-
-        /*DB::table('prospect_label')
-            ->whereIn('prospect_id', $prospects)
-            ->whereIn('label_id', $labels)
-            ->update(['deleted_at' => DB::raw('NOW()')]);*/
+        DB::transaction(function () use ($prospects, $labels) {
+            app(ProspectLabelHistory::class)->preserveAssignments($prospects, $labels);
+            DB::table('prospect_label')
+                ->whereIn('label_id', $labels)
+                ->whereIn('prospect_id', $prospects)
+                ->delete();
+        });
     }
 }

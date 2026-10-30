@@ -50,6 +50,18 @@
                 }"
                 @click="addProspect"
             />
+            <card-menu
+                :icon="
+                    selectAllFiltered
+                        ? 'fa fa-check-square'
+                        : 'fa-regular fa-square'
+                "
+                :label="$t('prospect.table.footer.select_all_filtered')"
+                :disabled="selectingAllFiltered"
+                @click="selectAllFiltered = !selectAllFiltered"
+            >
+                <loading :loading="selectingAllFiltered" />
+            </card-menu>
             <div
                 class="hc-prospects-table-footer-select"
                 id="hc-prospects-table-rows-count"
@@ -494,6 +506,7 @@ import {
 import { UPDATE_PROJECT_USER_SETTING } from "@/actions/project/user/setting";
 import { SET_USER } from "@/actions/project/user";
 import { API_URL } from "@/apis/common";
+import ProspectService from "@/apis/project/prospect";
 
 export default {
     data() {
@@ -506,6 +519,7 @@ export default {
             fetchingPreviousPage: false,
             fetchingNextPage: false,
             settingProspectsCount: false,
+            selectingAllFiltered: false,
             settingProspectsPage: false,
             chunks: [10, 20, 50, 100, 200, 300, 400, 500],
         };
@@ -954,6 +968,27 @@ export default {
                 store.commit(OPEN_MODAL, "prospect-export");
             }
         },
+
+        async selectAllFilteredProspects() {
+            if (this.selectingAllFiltered) return;
+            this.selectingAllFiltered = true;
+            try {
+                const ids = [];
+                const params = { count: 500, sortBy: this.prospectsSortBy, sortOrder: this.prospectsSortOrder };
+                if (Object.keys(this.prospectsParams || {}).length) params.filters = JSON.stringify(this.prospectsParams);
+                const first = await ProspectService.get(this.project.slug, { params: { ...params, page: 1 } });
+                ids.push(...first.data.data.map(prospect => prospect.id));
+                for (let page = 2; page <= first.data.last_page; page++) {
+                    const { data } = await ProspectService.get(this.project.slug, { params: { ...params, page } });
+                    ids.push(...data.data.map(prospect => prospect.id));
+                }
+                store.commit(UPDATE_SELECTED_PROSPECTS, ids);
+            } catch (error) {
+                flashError(error);
+            } finally {
+                this.selectingAllFiltered = false;
+            }
+        },
     },
 
     computed: {
@@ -1050,6 +1085,19 @@ export default {
             },
         },
 
+        selectAllFiltered: {
+            get() {
+                return this.prospectsTotal > 0 && this.prospectsSelected.length === this.prospectsTotal;
+            },
+            set(checked) {
+                if (!checked) {
+                    store.commit(UPDATE_SELECTED_PROSPECTS, []);
+                    return;
+                }
+                this.selectAllFilteredProspects();
+            },
+        },
+
         page: {
             get: function () {
                 return this.prospectsPage;
@@ -1083,5 +1131,6 @@ export default {
             return Math.ceil(this.prospectsTotal / this.prospectsCount);
         },
     },
+
 };
 </script>

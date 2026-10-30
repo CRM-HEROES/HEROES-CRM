@@ -155,6 +155,7 @@ class Sources
                     'sms_count' => ['label' => "SMS", 'type' => 'number', 'sortable' => true],
                     'orders_count' => ['label' => "Commandes", 'type' => 'number', 'sortable' => true],
                     'prospects_count' => ['label' => "Prospects", 'type' => 'number', 'sortable' => true],
+                    'followup' => ['label' => "Suivi", 'type' => 'number', 'sortable' => true, 'description' => "Nombre d'ajouts du suivi effectués par l'utilisateur pendant la période"],
                     'recording' => ['label' => "Écouter", 'type' => 'audio_action', 'sortable' => false, 'description' => "Dernier enregistrement d'appel"],
                     'performance' => ['label' => "Performance", 'type' => 'percentage', 'sortable' => true, 'description' => "Taux d'appels aboutis"],
                 ],
