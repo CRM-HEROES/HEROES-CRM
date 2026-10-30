@@ -43,6 +43,8 @@ const Map = () => import("@/components/map/Map.vue");
 const Document = () => import("@/components/document/Document.vue");
 // Campaign
 const Campaign = () => import("@/components/campaign/Campaign.vue");
+// Workflow (automations)
+const Workflow = () => import("@/components/workflow/Workflow.vue");
 // Agenda
 const Agenda = () => import("@/components/event/Agenda.vue");
 // Pipeline
@@ -243,6 +245,22 @@ const routes = [
                 component: Campaign,
                 meta: {
                     title: `Campagne`,
+                },
+            },
+            {
+                name: "workflow",
+                path: "workflow",
+                component: Workflow,
+                meta: {
+                    title: `Automatisations`,
+                },
+            },
+            {
+                name: "workflow.show",
+                path: "workflow/:workflow",
+                component: Workflow,
+                meta: {
+                    title: `Automatisations`,
                 },
             },
             {

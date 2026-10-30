@@ -230,28 +230,28 @@ class EventFilters extends Filters
      * Filter by starts in more than (seconds)
      */
     public function startsInMoreThan(Builder $builder, $value) {
-        $builder->where('started_at', '>=', \Carbon\Carbon::now()->addSeconds($value)->format("Y-m-d h:i:s"));
+        $builder->where('started_at', '>=', \Carbon\Carbon::now()->addSeconds($value)->format("Y-m-d H:i:s"));
     }
 
     /**
      * Filter by starts in less than (seconds)
      */
     public function startsInLessThan(Builder $builder, $value) {
-        $builder->where('started_at', '<=', \Carbon\Carbon::now()->addSeconds($value)->format("Y-m-d h:i:s"));
+        $builder->where('started_at', '<=', \Carbon\Carbon::now()->addSeconds($value)->format("Y-m-d H:i:s"));
     }
 
     /**
      * Filter by started more than (seconds)
      */
     public function startedMoreThan(Builder $builder, $value) {
-        $builder->where('started_at', '<=', \Carbon\Carbon::now()->subSeconds($value)->format("Y-m-d h:i:s"));
+        $builder->where('started_at', '<=', \Carbon\Carbon::now()->subSeconds($value)->format("Y-m-d H:i:s"));
     }
 
     /**
      * Filter by started less than (seconds)
      */
     public function startedLessThan(Builder $builder, $value) {
-        $builder->where('started_at', '>=', \Carbon\Carbon::now()->subSeconds($value)->format("Y-m-d h:i:s"));
+        $builder->where('started_at', '>=', \Carbon\Carbon::now()->subSeconds($value)->format("Y-m-d H:i:s"));
     }
 
     /**
@@ -314,7 +314,7 @@ class EventFilters extends Filters
      * Filter by coming
      */
     public function coming(Builder $builder, $value) {
-        $builder->where('started_at', $value ? '>' : '<=', \Carbon\Carbon::now()->format("Y-m-d h:i:s"));
+        $builder->where('started_at', $value ? '>' : '<=', \Carbon\Carbon::now()->format("Y-m-d H:i:s"));
     }
 
     /**

@@ -454,6 +454,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       _store__WEBPACK_IMPORTED_MODULE_1__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-logs");
     },
     /**
+     * What the automations did for the prospect
+     */
+    showWorkflows: function showWorkflows() {
+      _store__WEBPACK_IMPORTED_MODULE_1__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_2__.OPEN_SLIDE, "prospect-manage-workflows");
+    },
+    /**
      *
      */
     map: function map() {
@@ -6372,14 +6378,20 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "fa fa-eye icon-blue",
     "icon-size": 16,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.showLogs, ["prevent", "stop"])
-  }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.log')]]), _ctx.prospect.latitude && _ctx.prospect.longitude ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+  }, null, 8 /* PROPS */, ["onClick"]), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.log')]]), _ctx.can('all.project.workflow.execution.view') ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
     key: 0,
+    tag: "a",
+    "class": "fa fa-diagram-project icon-purple",
+    "icon-size": 16,
+    onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.showWorkflows, ["prevent", "stop"])
+  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('workflow.monitor.prospect_tooltip')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospect.latitude && _ctx.prospect.longitude ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 1,
     tag: "a",
     "class": "fa fa-map-marker icon-garnet",
     "icon-size": 16,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.map, ["prevent", "stop"])
   }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('prospect.profile.menus.map')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.prospect.latitude && _ctx.prospect.longitude ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 1,
+    key: 2,
     tag: "a",
     "icon-size": 16,
     href: $options.googleMapURL,
@@ -6390,7 +6402,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["href"])), [[_directive_tooltip, 'Google MAP']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.address ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 2,
+    key: 3,
     size: 30,
     tag: "a",
     onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"])),
@@ -6413,7 +6425,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('delete')]]), _ctx.can('all.prospect.setting-prospect-profile') ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 3,
+    key: 4,
     tag: "a",
     "class": "fa fa-cog",
     "icon-size": 16,

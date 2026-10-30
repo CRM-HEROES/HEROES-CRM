@@ -187,14 +187,14 @@ class ProspectFilters extends Filters
      * Filter by created X days ago
      */
     public function createdDaysAgo(Builder $builder, $value) {
-        return $builder->where('created_at', '>=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d h:i:s"));
+        return $builder->where('created_at', '>=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d H:i:s"));
     }
 
     /**
      * Filter by created before X days
      */
     public function createdBeforeDays(Builder $builder, $value) {
-        return $builder->where('created_at', '<=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d h:i:s"));
+        return $builder->where('created_at', '<=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d H:i:s"));
     }
 
     /**
@@ -222,14 +222,14 @@ class ProspectFilters extends Filters
      * Filter by updated X days ago
      */
     public function updatedDaysAgo(Builder $builder, $value) {
-        return $builder->where('updated_at', '>=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d h:i:s"));
+        return $builder->where('updated_at', '>=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d H:i:s"));
     }
 
     /**
      * Filter by updated before X days
      */
     public function updatedBeforeDays(Builder $builder, $value) {
-        return $builder->where('updated_at', '<=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d h:i:s"));
+        return $builder->where('updated_at', '<=', \Carbon\Carbon::now()->subDays($value)->format("Y-m-d H:i:s"));
     }
 
     /**

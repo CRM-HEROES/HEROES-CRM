@@ -60,8 +60,10 @@ use App\Console\Commands\Campaign\Order\ProspectMessageInvoiceAction;
 
 use App\Models\Campaign as CampaignModel;
 use App\Models\CampaignAction;
+use App\Models\Event;
 use App\Models\Order;
 use App\Models\Prospect;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -162,6 +164,16 @@ class Campaign extends Command
         ];
     }
 
+
+    /**
+     * Action handlers, by campaign target then action
+     * (reused by the workflow engine)
+     */
+    public function getActionHandlers(): array
+    {
+        return $this->actionHandlers;
+    }
+
     /**
      * Execute the console command.
      *
@@ -169,93 +181,154 @@ class Campaign extends Command
      */
     public function handle()
     {
-        // Paginate campaigns
-        $skip = 0;
-        $take = 100;
+        // Only the ids are loaded up front (ordered by project / order):
+        // the campaigns themselves are loaded page by page. Paginating the
+        // live query with skip/take is not safe because processing a
+        // campaign changes the very flags the query filters on.
+        foreach ($this->campaignIds()->chunk(100) as $ids) {
+            $campaigns = CampaignModel
+                ::whereIn('id', $ids)
+                ->orderBy('project_id')
+                ->orderBy('order')
+                ->orderBy('id')
+                ->get();
 
-        do {
-            $campaigns = $this->campaigns($skip, $take);
-            CampaignModel::whereIn('id', $campaigns->pluck('id'))->update(['pending' => true]);
-
-            foreach($campaigns as $campaign) {
+            foreach ($campaigns as $campaign) {
                 $this->handleCampaign($campaign);
             }
-
-            $skip += $take;
-        } while ($campaigns->count() >= $take);
+        }
     }
-    
-    /**
-     * Campaigns
-     */
-    protected function campaigns($skip, $take)
-    {
-        $this->date = $this->option('date') ? $this->option('date') . " 00:00" : \Carbon\Carbon::now()->format("Y-m-d h:i");
 
-        return CampaignModel
-            ::when(
-                $this->option('id'), 
-                function($query) {
-                    $query->whereIn('id', explode(',', $this->option('id')));
-                }, 
-                function($query) {
-                    $query
-                        ->when($this->option('frequency'), function($query) {
-                            $query->when(
-                                $this->option('frequency') == 'once', 
-                                // Frequency once
-                                function($query) {
-                                    $query->where(function($query) {
-                                        $query
-                                            ->where('frequency', 'once')
-                                            ->whereBetween('date', [$this->date . ':00', $this->date . ':59']);
-                                    });
-                                // Other frequencies
-                                }, function($query) {
-                                    $query->where(function($query) {
-                                        $query
-                                            ->where('frequency', '!=', 'once')
-                                            ->where('date', '>=', $this->date . ':00');
-                                    });
-                                }
-                            );
-                        })
-                        ->where('active', true)
-                        ->where('pending', false)
-                        ->where('processing', false);
-                }
-            )
+    /**
+     * Current date time, in the campaign timezone.
+     * The campaign date is a naive local date time: it must be compared
+     * with the local current time, not with the server (UTC) one.
+     */
+    protected function now(): Carbon
+    {
+        $timezone = config('campaign.timezone');
+
+        return $this->option('date')
+            ? Carbon::parse($this->option('date'), $timezone)
+            : Carbon::now($timezone);
+    }
+
+    /**
+     * Ids of the campaigns to run now, in execution order
+     */
+    protected function campaignIds()
+    {
+        $this->date = $this->now();
+
+        // Manual run of specific campaigns
+        if ($this->option('id')) {
+            return CampaignModel
+                ::whereIn('id', explode(',', $this->option('id')))
+                ->orderBy('project_id')
+                ->orderBy('order')
+                ->orderBy('id')
+                ->pluck('id');
+        }
+
+        $query = CampaignModel
+            ::where('active', true)
+            ->where('pending', false)
+            ->where('processing', false);
+
+        $frequency = $this->option('frequency');
+
+        if (!$frequency) {
+            return $query
+                ->orderBy('project_id')
+                ->orderBy('order')
+                ->orderBy('id')
+                ->pluck('id');
+        }
+
+        $query
+            ->where('frequency', $frequency)
+            // The campaign date is its start: not before it
+            ->where('date', '<=', $this->date->format('Y-m-d H:i:s'));
+
+        // "Once": only the campaigns that have never been executed.
+        // (The date is a lower bound, not an exact minute: a missed
+        // scheduler tick no longer makes the campaign skip its run.)
+        if ($frequency == 'once') {
+            $query->where('execution', 0);
+        }
+
+        $campaigns = $query
             ->orderBy('project_id')
             ->orderBy('order')
-            ->skip($skip)
-            ->take($take)
-            ->get();
+            ->orderBy('id')
+            ->get(['id', 'date']);
+
+        // Daily / monthly campaigns run at the hour (and day of the month)
+        // of their date. They are small sets: filtered here, which stays
+        // portable (no DB specific HOUR() / DAY() functions).
+        if ($frequency == 'daily') {
+            $campaigns = $campaigns->filter(function($campaign) {
+                return Carbon::parse($campaign->date)->hour == $this->date->hour;
+            });
+        } else if ($frequency == 'monthly') {
+            $campaigns = $campaigns->filter(function($campaign) {
+                $date = Carbon::parse($campaign->date);
+
+                // The 31st runs on the last day of shorter months
+                return min($date->day, $this->date->daysInMonth) == $this->date->day &&
+                    $date->hour == $this->date->hour;
+            });
+        }
+
+        return $campaigns->pluck('id');
     }
-    
+
     /**
-     * Campaign matching
+     * Campaign matching (one page, keyset pagination).
+     *
+     * Paging by id and not by offset: the matching set shrinks while it is
+     * processed (items processed by the action are excluded from it, and
+     * actions such as archive / label / delete change the filters), so an
+     * offset would skip items.
      */
-    protected function matching(CampaignModel $campaign, CampaignAction $action, $skip, $take) {
-        return $campaign
-            ->matching()
+    protected function matching(CampaignModel $campaign, CampaignAction $action, $lastId, $take) {
+        $query = $campaign->matching();
+        $table = $query->getModel()->getTable();
+
+        return $query
             ->when(!$campaign->re_process_processed_prospects, function($query) use($campaign, $action) {
                 $campaign->notProcessed($query, $action);
             })
-            ->skip($skip)
-            ->take($take)
+            ->where("$table.id", '>', $lastId)
+            ->reorder("$table.id")
+            ->limit($take)
             ->get();
     }
-    
+
     /**
      * Handle campaign
      */
     public function handleCampaign(CampaignModel $campaign) {
+        // Claim the campaign atomically: two overlapping runs
+        // must never process the same campaign
+        $claimed = CampaignModel
+            ::where('id', $campaign->id)
+            ->where('pending', false)
+            ->where('processing', false)
+            ->update(['pending' => true]);
+
+        if (!$claimed) {
+            return;
+        }
+
+        $campaign->forceFill(['pending' => true])->syncOriginalAttribute('pending');
+
         // Check if campaign
         // has valid rules
         // before processing it
         try {
             $campaign->matching();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Wrong rule
             $campaign->update(['error' => true, 'pending' => false]);
             return;
@@ -264,82 +337,98 @@ class Campaign extends Command
         // Campaign processing
         $campaign->update([
             'error' => false,
-            'begin_at' => \Carbon\Carbon::now(), 
+            'begin_at' => Carbon::now(),
             'pending' => false,
             'processing' => true,
             'execution' => $campaign->execution + 1
         ]);
 
-        // Process all campaign actions
-        $actions = $campaign
-            ->actions()
-            ->withPivot(['begin_at', 'end_at', 'processing'])
-            ->get();
+        try {
+            // Process all campaign actions
+            $actions = $campaign
+                ->actions()
+                ->withPivot(['begin_at', 'end_at', 'processing'])
+                ->get();
 
-        foreach ($actions as $action) {
-            $this->handleCampaignAction($campaign, $action);
+            foreach ($actions as $action) {
+                $this->handleCampaignAction($campaign, $action);
+            }
+        } catch (\Throwable $e) {
+            report($e);
+            $campaign->update(['error' => true]);
+        } finally {
+            // Campaign processed
+            // (certain actions may be queued and not finished
+            // even if the campaign is processed)
+            // Always released, otherwise a crash would lock the
+            // campaign (processing = true) forever.
+            $campaign->update([
+                'end_at' => Carbon::now(),
+                'processing' => false,
+                'pending' => false,
+            ]);
         }
-
-        // Campaign processed
-        // (certain actions may be queued and not finished
-        // even if the campaign is processed)
-        $campaign->update([
-            'end_at' => \Carbon\Carbon::now(),
-            'processing' => false
-        ]);
     }
-    
+
     /**
      * Handle campaign action
      */
     public function handleCampaignAction(CampaignModel $campaign, CampaignAction $action) {
         // Check if handler for the action exists
         if (
-            !isset($this->actionHandlers[$campaign->for]) || 
+            !isset($this->actionHandlers[$campaign->for]) ||
             !isset($this->actionHandlers[$campaign->for][$action->action])
         ) {
             $campaign
                 ->actions()
                 ->updateExistingPivot($action->id, [
-                    'processing' => false, 
+                    'processing' => false,
                     'error' => true
                 ]);
             return;
         }
-        
+
         $actionHandler = $this->actionHandlers[$campaign->for][$action->action];
         // Associate the action to the handler
         $actionHandler->setAction($action);
 
         // Action processing
         $action->pivot->update([
-            'begin_at' => \Carbon\Carbon::now(),
-            'processing' => true
+            'begin_at' => Carbon::now(),
+            'processing' => true,
+            'error' => false
         ]);
 
-        $skip = 0;
         $take = 100;
+        $lastId = 0;
 
-        // Paginate matching models
-        do {
-            $models = $this->matching($campaign, $action, $skip, $take);
+        try {
+            // Paginate matching models
+            do {
+                $models = $this->matching($campaign, $action, $lastId, $take);
 
-            foreach($models as $model) {
-                $this->handleCampaignActionOnModel($campaign, $actionHandler, $model);
-            }
+                foreach($models as $model) {
+                    $this->handleCampaignActionOnModel($campaign, $actionHandler, $model);
+                }
 
-            $skip += $take;
-        } while ($models->count() >= $take);
-
-        // Action processed
-        $action->pivot->update([
-            'end_at' => \Carbon\Carbon::now(),
-            'processing' => false
-        ]);
+                if ($models->isNotEmpty()) {
+                    $lastId = $models->last()->id;
+                }
+            } while ($models->count() >= $take);
+        } catch (\Throwable $e) {
+            report($e);
+            $action->pivot->update(['error' => true]);
+        } finally {
+            // Action processed
+            $action->pivot->update([
+                'end_at' => Carbon::now(),
+                'processing' => false
+            ]);
+        }
     }
-    
+
     /**
-     * Handle campaign action on model 
+     * Handle campaign action on model
      */
     public function handleCampaignActionOnModel(CampaignModel $campaign, Action $actionHandler, $model) {
         if ($model instanceof Prospect) {
@@ -348,47 +437,54 @@ class Campaign extends Command
         } else if ($model instanceof Order) {
             $table = "campaign_order";
             $item_id = "order_id";
+        } else if ($model instanceof Event) {
+            $table = "campaign_event";
+            $item_id = "event_id";
         } else {
             return;
         }
+
+        $actionId = $actionHandler->getAction()->id;
 
         // Action on model processing
         DB::table($table)
             ->updateOrInsert([
                     $item_id => $model->id,
                     'campaign_id' => $campaign->id,
-                    'action_id' => $actionHandler->getAction()->id,
+                    'action_id' => $actionId,
             ], [
-                'begin_at' => \Carbon\Carbon::now(),
+                'begin_at' => Carbon::now(),
                 'error' => false,
                 'processing' => true,
                 'execution' => $campaign->execution
             ]);
-            
+
         // Associate the model to the action handler
         $actionHandler->setModel($model);
 
         try {
             $actionHandler->handle();
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            report($e);
+
             DB::table($table)
                 ->where($item_id, $model->id)
                 ->where('campaign_id', $campaign->id)
-                ->where('action_id', $actionHandler->getAction()->id)
+                ->where('action_id', $actionId)
                 ->limit(1)
                 ->update([
                     'error' => true
                 ]);
         }
-        
+
         // Action on model processed
         DB::table($table)
             ->where($item_id, $model->id)
             ->where('campaign_id', $campaign->id)
-            ->where('action_id', $actionHandler->getAction()->id)
+            ->where('action_id', $actionId)
             ->limit(1)
             ->update([
-                'end_at' => \Carbon\Carbon::now(),
+                'end_at' => Carbon::now(),
                 'processing' => false
             ]);
     }
