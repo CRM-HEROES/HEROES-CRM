@@ -39444,6 +39444,25 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       var _this$settingsGet;
       return Boolean((_this$settingsGet = this.settingsGet("brevo")) === null || _this$settingsGet === void 0 ? void 0 : _this$settingsGet.validated_at);
     },
+    smsboxConfigured: function smsboxConfigured() {
+      var setting = this.settingsGet("smsbox");
+      return Boolean((setting === null || setting === void 0 ? void 0 : setting.api_uri) && (setting === null || setting === void 0 ? void 0 : setting.hlr_uri) && (setting === null || setting === void 0 ? void 0 : setting.api_key));
+    },
+    ultramsgConfigured: function ultramsgConfigured() {
+      var setting = this.settingsGet("ultramsg");
+      return Boolean((setting === null || setting === void 0 ? void 0 : setting.api_uri) && (setting === null || setting === void 0 ? void 0 : setting.instance) && (setting === null || setting === void 0 ? void 0 : setting.token));
+    },
+    mtargetConfigured: function mtargetConfigured() {
+      var setting = this.settingsGet("mtarget");
+      return Boolean((setting === null || setting === void 0 ? void 0 : setting.api_uri) && (setting === null || setting === void 0 ? void 0 : setting.username) && (setting === null || setting === void 0 ? void 0 : setting.password));
+    },
+    brevoConfigured: function brevoConfigured() {
+      var setting = this.settingsGet("brevo");
+      return Boolean((setting === null || setting === void 0 ? void 0 : setting.api_key) && (setting === null || setting === void 0 ? void 0 : setting.sender) && (setting === null || setting === void 0 ? void 0 : setting.validated_at));
+    },
+    hasUnconfiguredSmsOperators: function hasUnconfiguredSmsOperators() {
+      return !this.smsboxConfigured || this.can("all.prospect.sms.add") && (!this.ultramsgConfigured || !this.brevoConfigured) || !this.mtargetConfigured;
+    },
     canSendSms: function canSendSms() {
       if (this.sms.source == "cloudtalk") {
         return this.canSendCloudtalkSms && (!!this.sms.message.trim() || this.attachments.length > 0);
@@ -90565,44 +90584,121 @@ var _hoisted_29 = {
 var _hoisted_30 = ["textContent"];
 var _hoisted_31 = ["textContent"];
 var _hoisted_32 = {
+  key: 7,
+  "class": "hc-prospect-sms-unconfigured-operators"
+};
+var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 50 40"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#7d3a96"
+  },
+  d: "M42.8,40H7.2c-4,0-7.2-3.2-7.2-7.2V7c0-4,3.2-7.2,7.2-7.2h35.7C46.8-0.2,50,3,50,7v25.8 C50,36.8,46.8,40,42.8,40z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#ffffff"
+  },
+  d: "M26.6,34.3h-3.2c-4,0-7.3-3.3-7.3-7.3V13.6c0-4,3.3-7.3,7.3-7.3h3.2c4,0,7.3,3.3,7.3,7.3V27 C33.8,31,30.6,34.3,26.6,34.3z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#7e3b96"
+  },
+  d: "M27.4,23.4h-4.7c-2.2,0-3.9-1.8-3.9-3.9v-6.4c0-2.2,1.8-3.9,3.9-3.9h4.7c2.2,0,3.9,1.8,3.9,3.9v6.4 C31.3,21.7,29.5,23.4,27.4,23.4z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#ffffff"
+  },
+  d: "M31.9,11.8L31.9,11.8c-0.8,0-1.4-0.6-1.4-1.4V5.3c0-0.8,0.6-1.4,1.4-1.4h0c0.8,0,1.4,0.6,1.4,1.4v5.2 C33.3,11.2,32.7,11.8,31.9,11.8z"
+})], -1 /* HOISTED */);
+var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 50 50"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#07b49b"
+  },
+  d: "M0.8,28.2l2.6-2.6C3.8,25.2,4.4,25,4.9,25h10v19.8l-2.6,2.6c-0.4,0.4-0.9,0.6-1.5,0.6h-10V28.2z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#07b49b"
+  },
+  d: "M18,17.4l2.6-2.6c0.4-0.4,0.9-0.6,1.5-0.6h10v30.7l-2.6,2.6C29,47.8,28.5,48,27.9,48H18V17.4z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#07b49b"
+  },
+  d: "M35.1,6l2.6-2.6c0.4-0.4,0.9-0.6,1.5-0.6h10v42l-2.6,2.6c-0.4,0.4-0.9,0.6-1.5,0.6h-10V6z"
+})], -1 /* HOISTED */);
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 50 50"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#11b37d"
+  },
+  d: "M9.4,47c0-11.9,0-23.9,0.1-35.8c2.9,11.9,5.8,23.9,8.7,35.8h14.3c2.9-11.9,5.8-23.8,8.7-35.7 c0.1,11.9,0.1,23.8,0.1,35.7H50c0-14.8,0-29.7,0-44.5c-5,0-10.1,0-15.1,0.1c-3.2,13-6.3,26-9.5,39c-3.3-13-6.5-26-9.6-39.1 c-5,0-10,0-15.1,0c0,14.8,0,29.7,0,44.5H9.4z"
+})], -1 /* HOISTED */);
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  viewBox: "0 0 50 50"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("rect", {
+  x: "2",
+  y: "2",
+  width: "46",
+  height: "46",
+  rx: "10",
+  style: {
+    "fill": "#0b996c"
+  }
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  style: {
+    "fill": "#ffffff"
+  },
+  d: "M14,32V18c0-2.2,1.8-4,4-4h4c2.2,0,4,1.8,4,4s-1.8,4-4,4h-4v10H14z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
+  cx: "32",
+  cy: "26",
+  r: "7",
+  style: {
+    "fill": "#ffffff"
+  }
+})], -1 /* HOISTED */);
+var _hoisted_37 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_33 = ["textContent"];
-var _hoisted_34 = {
+var _hoisted_38 = ["textContent"];
+var _hoisted_39 = {
   id: "hc-prospect-sms-selected-prospects-list"
 };
-var _hoisted_35 = {
+var _hoisted_40 = {
   "class": "hc-prospect-sms-list"
 };
-var _hoisted_36 = {
+var _hoisted_41 = {
   "class": "hc-prospect-sms-messages",
   ref: "sms"
 };
-var _hoisted_37 = ["placeholder"];
-var _hoisted_38 = {
+var _hoisted_42 = ["placeholder"];
+var _hoisted_43 = {
   key: 0,
   "class": "hc-prospect-sms-attachments"
 };
-var _hoisted_39 = ["textContent"];
-var _hoisted_40 = {
+var _hoisted_44 = ["textContent"];
+var _hoisted_45 = {
   "class": "hc-flex-row"
 };
-var _hoisted_41 = ["textContent"];
-var _hoisted_42 = {
+var _hoisted_46 = ["textContent"];
+var _hoisted_47 = {
   "class": "hc-flex-column"
 };
-var _hoisted_43 = ["textContent"];
-var _hoisted_44 = {
+var _hoisted_48 = ["textContent"];
+var _hoisted_49 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_45 = ["textContent"];
-var _hoisted_46 = ["textContent"];
+var _hoisted_50 = ["textContent"];
+var _hoisted_51 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -90623,7 +90719,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[22] || (_cache[22] = function ($event) {
+    onOpen: _cache[26] || (_cache[26] = function ($event) {
       return $options.fetchSms(), $options.fetchSelectedProspects();
     }),
     title: _ctx.prospectsSelected.length > 0 ? _ctx.$t('prospect.sms.bulk_title', {
@@ -90722,7 +90818,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SMSBOX "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" SMSBOX "), $options.smsboxConfigured ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 2,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[1] || (_cache[1] = function ($event) {
                   return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'smsbox';
@@ -90745,8 +90842,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), _ctx.can('all.prospect.sms.add') && _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 2,
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ringover "), _ctx.can('all.prospect.sms.add') && _ctx.prospect ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 3,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[2] || (_cache[2] = function ($event) {
                   return $data.tab = 1, $data.frameTab = 1, $data.sms.source = 'ringover';
@@ -90768,8 +90865,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" UltraMsg "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 3,
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" UltraMsg "), _ctx.can('all.prospect.sms.add') && $options.ultramsgConfigured ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 4,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[3] || (_cache[3] = function ($event) {
                   return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'ultramsg';
@@ -90792,7 +90889,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" MTarget "), $options.mtargetConfigured ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 5,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[4] || (_cache[4] = function ($event) {
                   return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'mtarget';
@@ -90815,8 +90913,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Brevo "), _ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                key: 4,
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Brevo "), _ctx.can('all.prospect.sms.add') && $options.brevoConfigured ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 6,
                 "class": "hc-prospect-sms-item",
                 onClick: _cache[5] || (_cache[5] = function ($event) {
                   return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'brevo';
@@ -90843,7 +90941,83 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   })];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.hasUnconfiguredSmsOperators ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_32, [!$options.smsboxConfigured ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 0,
+                tag: "button",
+                type: "button",
+                "class": "hc-prospect-sms-unconfigured-operator",
+                "aria-label": "Configurer SMSBOX",
+                onClick: _cache[6] || (_cache[6] = function ($event) {
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'smsbox';
+                })
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [_hoisted_33];
+                    }),
+                    _: 1 /* STABLE */
+                  })];
+                }),
+                _: 1 /* STABLE */
+              })), [[_directive_tooltip, 'Configurer SMSBOX']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.can('all.prospect.sms.add') && !$options.ultramsgConfigured ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 1,
+                tag: "button",
+                type: "button",
+                "class": "hc-prospect-sms-unconfigured-operator",
+                "aria-label": "Configurer UltraMsg",
+                onClick: _cache[7] || (_cache[7] = function ($event) {
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'ultramsg';
+                })
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [_hoisted_34];
+                    }),
+                    _: 1 /* STABLE */
+                  })];
+                }),
+                _: 1 /* STABLE */
+              })), [[_directive_tooltip, 'Configurer UltraMsg']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.mtargetConfigured ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 2,
+                tag: "button",
+                type: "button",
+                "class": "hc-prospect-sms-unconfigured-operator",
+                "aria-label": "Configurer MTarget",
+                onClick: _cache[8] || (_cache[8] = function ($event) {
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'mtarget';
+                })
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [_hoisted_35];
+                    }),
+                    _: 1 /* STABLE */
+                  })];
+                }),
+                _: 1 /* STABLE */
+              })), [[_directive_tooltip, 'Configurer MTarget']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _ctx.can('all.prospect.sms.add') && !$options.brevoConfigured ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                key: 3,
+                tag: "button",
+                type: "button",
+                "class": "hc-prospect-sms-unconfigured-operator",
+                "aria-label": "Configurer Brevo",
+                onClick: _cache[9] || (_cache[9] = function ($event) {
+                  return $data.tab = 1, $data.frameTab = 0, $data.sms.source = 'brevo';
+                })
+              }, {
+                "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, null, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [_hoisted_36];
+                    }),
+                    _: 1 /* STABLE */
+                  })];
+                }),
+                _: 1 /* STABLE */
+              })), [[_directive_tooltip, 'Configurer Brevo']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })];
@@ -90861,8 +91035,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "class": "hc-flex-1"
               }, {
                 "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Back "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                    onClick: _cache[6] || (_cache[6] = function ($event) {
+                  return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Back "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                    onClick: _cache[10] || (_cache[10] = function ($event) {
                       return $data.tab = 0;
                     }),
                     "class": "bordered"
@@ -90875,7 +91049,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                           source: $options.source
                         }))
-                      }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_38), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         tag: "button",
                         type: "button",
                         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-sync-alt', 'hc-prospect-sms-refresh', $data.fetchingSms ? 'fa-spin' : '']),
@@ -90907,7 +91081,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Selected prospects "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     id: "hc-prospect-sms-selected-prospects",
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.selectedProspectsFolded ? 'folded' : '')
-                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
+                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_selected_prospect, {
                       key: prospect.id,
                       prospect: prospect,
@@ -90916,7 +91090,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $data.selectedProspectsFolded ? 'fa-caret-down' : 'fa-caret-up']),
-                    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.selectedProspectsFolded = !$data.selectedProspectsFolded;
                     }, ["prevent", "stop"])),
                     size: "30",
@@ -90926,14 +91100,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, null, 8 /* PROPS */, ["class"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-plus",
-                    onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.selectedProspectsTab = 1;
                     }, ["prevent", "stop"])),
                     size: "30",
                     style: {
                       "min-width": "30px"
                     }
-                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List of SMS "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.smss, function (c) {
+                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" List of SMS "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.smss, function (c) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_sms_row, {
                       key: c.id,
                       sms: c
@@ -90942,17 +91116,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     loading: $data.fetchingSms
                   }, null, 8 /* PROPS */, ["loading"])], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.smss.length > 0 || $data.fetchingSms]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms form "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
                     "class": "hc-flex-column hc-prospect-sms-form",
-                    onSubmit: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                    onSubmit: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                       return $options.sendSMS && $options.sendSMS.apply($options, arguments);
                     }, ["prevent"]))
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms textarea "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
                     ref: "textarea",
                     id: "hc-prospect-sms-textarea",
                     placeholder: _ctx.$t('prospect.sms.enter_text_message'),
-                    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+                    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
                       return $data.sms.message = $event;
                     })
-                  }, null, 8 /* PROPS */, _hoisted_37), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), $data.sms.source === 'cloudtalk' && $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_38, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (attachment, index) {
+                  }, null, 8 /* PROPS */, _hoisted_42), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.sms.message]]), $data.sms.source === 'cloudtalk' && $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_43, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (attachment, index) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_uploading_attachment_row, {
                       key: attachment.name + ':' + attachment.lastModified + ':' + index,
                       attachment: attachment,
@@ -90963,11 +91137,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "class": "hc-prospect-sms-error",
                     role: "alert",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-                  }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_40, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
-                    onClick: _cache[10] || (_cache[10] = function ($event) {
+                    onClick: _cache[14] || (_cache[14] = function ($event) {
                       return $data.showTextEditor = false;
                     })
                   }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Reduire']]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
@@ -90975,7 +91149,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Unfold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-caret-up",
-                    onClick: _cache[11] || (_cache[11] = function ($event) {
+                    onClick: _cache[15] || (_cache[15] = function ($event) {
                       return $data.showTextEditor = true;
                     })
                   }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Agrandir']])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms chars count "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -90985,10 +91159,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       "align-items": "center"
                     },
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.charsCount + '/' + $options.page)
-                  }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
-                    onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    onClick: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.tab = 2;
                     }, ["prevent"]))
                   }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Modèle de SMS']]), $data.sms.source === 'cloudtalk' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
@@ -90998,7 +91172,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "class": "fa fa-paperclip hc-prospect-sms-attach",
                     "aria-label": _ctx.$t('prospect.sms.add_attachment'),
                     disabled: !$options.canSendCloudtalkSms || $data.addingSms,
-                    onClick: _cache[13] || (_cache[13] = function ($event) {
+                    onClick: _cache[17] || (_cache[17] = function ($event) {
                       return _ctx.$refs.attachmentsInput.click();
                     })
                   }, null, 8 /* PROPS */, ["aria-label", "disabled"])), [[_directive_tooltip, _ctx.$t('prospect.sms.add_attachment')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sms.source === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
@@ -91008,7 +91182,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     accept: "image/jpeg,image/png,image/gif",
                     multiple: "",
                     hidden: "",
-                    onChange: _cache[14] || (_cache[14] = function () {
+                    onChange: _cache[18] || (_cache[18] = function () {
                       return $options.addAttachments && $options.addAttachments.apply($options, arguments);
                     })
                   }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Send "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -91022,7 +91196,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
                     "search-fields": ['first_name', 'last_name', 'mobile_phone_number'],
-                    onBack: _cache[16] || (_cache[16] = function ($event) {
+                    onBack: _cache[20] || (_cache[20] = function ($event) {
                       return $data.selectedProspectsTab = 0;
                     }),
                     onProspectSelected: $options.addSelectedProspect
@@ -91033,7 +91207,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             }),
             "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                onBack: _cache[18] || (_cache[18] = function ($event) {
+                onBack: _cache[22] || (_cache[22] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setSmsProspect
@@ -91043,8 +91217,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.prospect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[17] || (_cache[17] = function ($event) {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[21] || (_cache[21] = function ($event) {
                   return $data.tab = 0;
                 }),
                 "class": "bordered"
@@ -91057,7 +91231,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                       source: $options.source
                     }))
-                  }, null, 8 /* PROPS */, _hoisted_43)];
+                  }, null, 8 /* PROPS */, _hoisted_48)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
@@ -91076,8 +91250,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[19] || (_cache[19] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[23] || (_cache[23] = function ($event) {
               return $data.tab = 1;
             }),
             "class": "bordered"
@@ -91088,12 +91262,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.templates'))
-              }, null, 8 /* PROPS */, _hoisted_45)];
+              }, null, 8 /* PROPS */, _hoisted_50)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.smsTemplateKeyword,
-            "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+            "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
               return $data.smsTemplateKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -91116,11 +91290,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
               return [_ctx.can('all.prospect.sms.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
                 key: 0,
-                onClick: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                onClick: _cache[25] || (_cache[25] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                   return $options.addSmsTemplate && $options.addSmsTemplate.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_46)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              }, null, 8 /* PROPS */, _hoisted_51)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })])];
@@ -116407,7 +116581,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n    display: flex;\n    overflow-x: auto;\n    max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n    display: flex;\n    flex-direction: column;\n    flex: 0 1 auto;\n    min-height: 0;\n    max-height: 60%;\n    width: 100%;\n    position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    min-height: 0;\n    padding: 15px;\n    gap: 12px;\n    overflow-y: auto;\n    scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n    flex: 0 0 auto;\n    min-height: 0;\n    padding: 10px;\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n    flex: 0 0 auto;\n    height: 80px;\n    min-height: 50px;\n    max-height: 400px;\n    width: 100%;\n\n    resize: vertical;\n    overflow-y: auto;\n\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    box-sizing: border-box;\n}\n\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-sms-unconfigured-operators {\n    display: flex;\n    flex-direction: row;\n    justify-content: center;\n    gap: 12px;\n    margin-top: auto;\n    padding: 8px 0;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item {\n    width: auto;\n    padding: 4px;\n    border: 0;\n    background: transparent;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item svg {\n    width: 25px;\n    height: 25px;\n}\n.hc-prospect-sms-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n    display: block;\n    max-width: 26px;\n    max-height: 26px;\n    -o-object-fit: contain;\n       object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n    color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n    color: #bbbbbb;\n    cursor: not-allowed;\n    text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n    display: flex;\n    overflow-x: auto;\n    max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n    color: #bbbbbb;\n    cursor: wait;\n    text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n    display: flex;\n    flex-direction: column;\n    flex: 0 1 auto;\n    min-height: 0;\n    max-height: 60%;\n    width: 100%;\n    position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n    display: flex;\n    flex-direction: column;\n    width: 100%;\n    min-height: 0;\n    padding: 15px;\n    gap: 12px;\n    overflow-y: auto;\n    scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n    flex: 0 0 auto;\n    min-height: 0;\n    padding: 10px;\n    position: relative;\n    display: flex;\n    flex-direction: column;\n    justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n    flex: 0 0 auto;\n    height: 80px;\n    min-height: 50px;\n    max-height: 400px;\n    width: 100%;\n\n    resize: vertical;\n    overflow-y: auto;\n\n    border: 1px solid #dddddd;\n    border-radius: 5px;\n    padding: 10px;\n    box-sizing: border-box;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

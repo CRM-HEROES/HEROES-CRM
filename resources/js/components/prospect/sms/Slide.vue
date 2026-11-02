@@ -115,6 +115,7 @@
 
                     <!-- SMSBOX -->
                     <item
+                        v-if="smsboxConfigured"
                         class="hc-prospect-sms-item"
                         @click="
                             (tab = 1), (frameTab = 0), (sms.source = 'smsbox')
@@ -185,7 +186,7 @@
 
                     <!-- UltraMsg -->
                     <item
-                        v-if="can('all.prospect.sms.add')"
+                        v-if="can('all.prospect.sms.add') && ultramsgConfigured"
                         class="hc-prospect-sms-item"
                         @click="
                             (tab = 1), (frameTab = 0), (sms.source = 'ultramsg')
@@ -222,6 +223,7 @@
 
                     <!-- MTarget -->
                     <item
+                        v-if="mtargetConfigured"
                         class="hc-prospect-sms-item"
                         @click="
                             (tab = 1), (frameTab = 0), (sms.source = 'mtarget')
@@ -250,7 +252,7 @@
 
                     <!-- Brevo -->
                     <item
-                        v-if="can('all.prospect.sms.add')"
+                        v-if="can('all.prospect.sms.add') && brevoConfigured"
                         class="hc-prospect-sms-item"
                         @click="
                             (tab = 1), (frameTab = 0), (sms.source = 'brevo')
@@ -294,6 +296,121 @@
                         />
                         <icon class="fa fa-caret-right" />
                     </item>
+
+                    <div
+                        v-if="hasUnconfiguredSmsOperators"
+                        class="hc-prospect-sms-unconfigured-operators"
+                    >
+                        <item
+                            v-if="!smsboxConfigured"
+                            tag="button"
+                            type="button"
+                            class="hc-prospect-sms-unconfigured-operator"
+                            v-tooltip="'Configurer SMSBOX'"
+                            aria-label="Configurer SMSBOX"
+                            @click="
+                                (tab = 1), (frameTab = 0), (sms.source = 'smsbox')
+                            "
+                        >
+                            <icon>
+                                <svg viewBox="0 0 50 40">
+                                    <path
+                                        style="fill: #7d3a96"
+                                        d="M42.8,40H7.2c-4,0-7.2-3.2-7.2-7.2V7c0-4,3.2-7.2,7.2-7.2h35.7C46.8-0.2,50,3,50,7v25.8 C50,36.8,46.8,40,42.8,40z"
+                                    />
+                                    <path
+                                        style="fill: #ffffff"
+                                        d="M26.6,34.3h-3.2c-4,0-7.3-3.3-7.3-7.3V13.6c0-4,3.3-7.3,7.3-7.3h3.2c4,0,7.3,3.3,7.3,7.3V27 C33.8,31,30.6,34.3,26.6,34.3z"
+                                    />
+                                    <path
+                                        style="fill: #7e3b96"
+                                        d="M27.4,23.4h-4.7c-2.2,0-3.9-1.8-3.9-3.9v-6.4c0-2.2,1.8-3.9,3.9-3.9h4.7c2.2,0,3.9,1.8,3.9,3.9v6.4 C31.3,21.7,29.5,23.4,27.4,23.4z"
+                                    />
+                                    <path
+                                        style="fill: #ffffff"
+                                        d="M31.9,11.8L31.9,11.8c-0.8,0-1.4-0.6-1.4-1.4V5.3c0-0.8,0.6-1.4,1.4-1.4h0c0.8,0,1.4,0.6,1.4,1.4v5.2 C33.3,11.2,32.7,11.8,31.9,11.8z"
+                                    />
+                                </svg>
+                            </icon>
+                        </item>
+                        <item
+                            v-if="can('all.prospect.sms.add') && !ultramsgConfigured"
+                            tag="button"
+                            type="button"
+                            class="hc-prospect-sms-unconfigured-operator"
+                            v-tooltip="'Configurer UltraMsg'"
+                            aria-label="Configurer UltraMsg"
+                            @click="
+                                (tab = 1), (frameTab = 0), (sms.source = 'ultramsg')
+                            "
+                        >
+                            <icon>
+                                <svg viewBox="0 0 50 50">
+                                    <path
+                                        style="fill: #07b49b"
+                                        d="M0.8,28.2l2.6-2.6C3.8,25.2,4.4,25,4.9,25h10v19.8l-2.6,2.6c-0.4,0.4-0.9,0.6-1.5,0.6h-10V28.2z"
+                                    />
+                                    <path
+                                        style="fill: #07b49b"
+                                        d="M18,17.4l2.6-2.6c0.4-0.4,0.9-0.6,1.5-0.6h10v30.7l-2.6,2.6C29,47.8,28.5,48,27.9,48H18V17.4z"
+                                    />
+                                    <path
+                                        style="fill: #07b49b"
+                                        d="M35.1,6l2.6-2.6c0.4-0.4,0.9-0.6,1.5-0.6h10v42l-2.6,2.6c-0.4,0.4-0.9,0.6-1.5,0.6h-10V6z"
+                                    />
+                                </svg>
+                            </icon>
+                        </item>
+                        <item
+                            v-if="!mtargetConfigured"
+                            tag="button"
+                            type="button"
+                            class="hc-prospect-sms-unconfigured-operator"
+                            v-tooltip="'Configurer MTarget'"
+                            aria-label="Configurer MTarget"
+                            @click="
+                                (tab = 1), (frameTab = 0), (sms.source = 'mtarget')
+                            "
+                        >
+                            <icon>
+                                <svg viewBox="0 0 50 50">
+                                    <path
+                                        style="fill: #11b37d"
+                                        d="M9.4,47c0-11.9,0-23.9,0.1-35.8c2.9,11.9,5.8,23.9,8.7,35.8h14.3c2.9-11.9,5.8-23.8,8.7-35.7 c0.1,11.9,0.1,23.8,0.1,35.7H50c0-14.8,0-29.7,0-44.5c-5,0-10.1,0-15.1,0.1c-3.2,13-6.3,26-9.5,39c-3.3-13-6.5-26-9.6-39.1 c-5,0-10,0-15.1,0c0,14.8,0,29.7,0,44.5H9.4z"
+                                    />
+                                </svg>
+                            </icon>
+                        </item>
+                        <item
+                            v-if="can('all.prospect.sms.add') && !brevoConfigured"
+                            tag="button"
+                            type="button"
+                            class="hc-prospect-sms-unconfigured-operator"
+                            v-tooltip="'Configurer Brevo'"
+                            aria-label="Configurer Brevo"
+                            @click="
+                                (tab = 1), (frameTab = 0), (sms.source = 'brevo')
+                            "
+                        >
+                            <icon>
+                                <svg viewBox="0 0 50 50">
+                                    <rect
+                                        x="2"
+                                        y="2"
+                                        width="46"
+                                        height="46"
+                                        rx="10"
+                                        style="fill: #0b996c"
+                                    />
+                                    <path
+                                        style="fill: #ffffff"
+                                        d="M14,32V18c0-2.2,1.8-4,4-4h4c2.2,0,4,1.8,4,4s-1.8,4-4,4h-4v10H14z"
+                                    />
+                                    <circle cx="32" cy="26" r="7" style="fill: #ffffff" />
+                                </svg>
+                            </icon>
+                        </item>
+                    </div>
                 </item-list>
             </template>
 
@@ -631,6 +748,28 @@
     padding: 4px 0 !important;
     text-decoration: none;
 }
+
+.hc-prospect-sms-unconfigured-operators {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 12px;
+    margin-top: auto;
+    padding: 8px 0;
+}
+
+.hc-prospect-sms-unconfigured-operators .hc-item {
+    width: auto;
+    padding: 4px;
+    border: 0;
+    background: transparent;
+}
+
+.hc-prospect-sms-unconfigured-operators .hc-item svg {
+    width: 25px;
+    height: 25px;
+}
+
 .hc-prospect-sms-item-number {
     font-size: 11px;
     color: #999999;
@@ -1122,6 +1261,43 @@ export default {
 
         brevoSettingValidated() {
             return Boolean(this.settingsGet("brevo")?.validated_at);
+        },
+
+        smsboxConfigured() {
+            const setting = this.settingsGet("smsbox");
+            return Boolean(
+                setting?.api_uri && setting?.hlr_uri && setting?.api_key
+            );
+        },
+
+        ultramsgConfigured() {
+            const setting = this.settingsGet("ultramsg");
+            return Boolean(
+                setting?.api_uri && setting?.instance && setting?.token
+            );
+        },
+
+        mtargetConfigured() {
+            const setting = this.settingsGet("mtarget");
+            return Boolean(
+                setting?.api_uri && setting?.username && setting?.password
+            );
+        },
+
+        brevoConfigured() {
+            const setting = this.settingsGet("brevo");
+            return Boolean(
+                setting?.api_key && setting?.sender && setting?.validated_at
+            );
+        },
+
+        hasUnconfiguredSmsOperators() {
+            return (
+                !this.smsboxConfigured ||
+                (this.can("all.prospect.sms.add") &&
+                    (!this.ultramsgConfigured || !this.brevoConfigured)) ||
+                !this.mtargetConfigured
+            );
         },
 
         canSendSms() {
