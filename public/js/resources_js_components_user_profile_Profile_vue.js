@@ -2436,6 +2436,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         icon: "fa fa-clock icon-brown",
         columnId: "history",
         headerId: "hc-prospects-table-header-history-history"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.sms"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-comment icon-purple",
+        columnId: "history-sms",
+        headerId: "hc-prospects-table-header-history-sms-history-sms"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.calls"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-phone icon-orange",
+        columnId: "history-calls",
+        headerId: "hc-prospects-table-header-history-calls-history-calls"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("auth.email"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-envelope icon-green",
+        columnId: "history-emails",
+        headerId: "hc-prospects-table-header-history-emails-history-emails"
       },
       // Events
       {
@@ -11590,7 +11608,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-project-profile-bloc-header .fa-arrows {\n        display: none;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -11705,7 +11723,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-user-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-user-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-user-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-user-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-user-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-user-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-user-profile-bloc-header .fa-arrows {\n        display: none;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

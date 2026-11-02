@@ -264,10 +264,41 @@ export default {
                     let defaultValue = null;
                     let required = false;
                     let format = null;
+                    let historyType = null;
 
                     // History
                     if (key == "history") {
                         name = this.$t("prospect.table.column.others.history");
+                    } else if (key == "history-sms") {
+                        if (!this.can("all.prospect.sms.view")) {
+                            return null;
+                        }
+
+                        name = `${this.$t(
+                            "prospect.table.column.others.sms"
+                        )} (${this.$t(
+                            "prospect.table.column.others.history"
+                        )})`;
+                        category = "history-sms";
+                        historyType = "sms";
+                    } else if (key == "history-calls") {
+                        if (!this.can("all.prospect.interaction.view")) {
+                            return null;
+                        }
+
+                        name = `${this.$t(
+                            "prospect.table.column.others.calls"
+                        )} (${this.$t(
+                            "prospect.table.column.others.history"
+                        )})`;
+                        category = "history-calls";
+                        historyType = "interaction";
+                    } else if (key == "history-emails") {
+                        name = `${this.$t("auth.email")} (${this.$t(
+                            "prospect.table.column.others.history"
+                        )})`;
+                        category = "history-emails";
+                        historyType = "message";
                         // Users
                     } else if (key == "users") {
                         name = this.$t(
@@ -446,6 +477,7 @@ export default {
                         default_value: defaultValue,
                         required: required,
                         format: format,
+                        historyType: historyType,
                     };
                 })
                 .filter((column) => column);

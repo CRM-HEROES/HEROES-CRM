@@ -6,9 +6,10 @@
             v-text="interactions.length"
         ></span>
         <interaction-row
-            v-for="interaction in interactions"
+            v-for="(interaction, index) in interactions"
             :key="interaction.id"
             :interaction="interaction"
+            :color-index="index"
             :prospect="prospect"
         />
     </div>

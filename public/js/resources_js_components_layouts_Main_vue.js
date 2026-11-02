@@ -31102,16 +31102,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     interaction: {
       type: Object
+    },
+    colorIndex: {
+      type: Number,
+      "default": 0
     }
   },
   data: function data() {
@@ -31120,19 +31118,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     };
   },
   computed: {
-    interactionTextColor: function interactionTextColor() {
-      var _this$interaction, _this$interaction2;
-      var colors = ["#355c7d", "#4f6d3a", "#7a5a28", "#6a4c7d", "#2f6f6d", "#8a4f5d", "#56633a", "#4c607a"];
-      var interactionId = (_this$interaction = this.interaction) === null || _this$interaction === void 0 ? void 0 : _this$interaction.id;
-      var numericId = Number(interactionId);
-      if (interactionId !== null && interactionId !== undefined && Number.isFinite(numericId)) {
-        return colors[Math.abs(numericId) % colors.length];
-      }
-      var fallbackId = String(interactionId || ((_this$interaction2 = this.interaction) === null || _this$interaction2 === void 0 ? void 0 : _this$interaction2.created_at) || "");
-      var hash = _toConsumableArray(fallbackId).reduce(function (value, character) {
-        return value * 31 + character.charCodeAt(0);
-      }, 0);
-      return colors[Math.abs(hash) % colors.length];
+    interactionBackgroundColor: function interactionBackgroundColor() {
+      var colors = ["#eaf3ff", "#fff3d6"];
+      var colorIndex = Math.abs(Number(this.colorIndex) || 0);
+      return colors[colorIndex % colors.length];
     },
     /**
      *
@@ -84256,7 +84245,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-prospect-interaction', 'hc-flex-row', $props.interaction.from_user ? '' : 'hc-prospect-interaction-from-prospect']),
     style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
-      '--hc-interaction-text-color': $options.interactionTextColor
+      backgroundColor: $options.interactionBackgroundColor
     })
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -85664,11 +85653,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, null, 8 /* PROPS */, _hoisted_22)];
         }),
         _: 1 /* STABLE */
-      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.prospectInteractions, function (c) {
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.prospectInteractions, function (c, index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_interaction_row, {
           key: c.id,
-          interaction: c
-        }, null, 8 /* PROPS */, ["interaction"]);
+          interaction: c,
+          "color-index": index
+        }, null, 8 /* PROPS */, ["interaction", "color-index"]);
       }), 128 /* KEYED_FRAGMENT */))];
     }),
     _: 1 /* STABLE */
@@ -115769,7 +115759,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-icons {\n    display: inline-flex;\n    align-items: center;\n    flex: 0 0 40px;\n    width: 40px;\n    gap: 2px;\n}\n.hc-prospect-interaction-badges {\n    display: flex;\n    flex-direction: column;\n    gap: 1px;\n    width: 14px;\n}\n.hc-prospect-interaction-badges .hc-icon {\n    text-shadow: none;\n}\n.hc-prospect-interaction-creator {\n    color: var(--hc-interaction-text-color);\n}\n.hc-prospect-interaction-voicemail {\n    display: inline-flex;\n    align-items: center;\n    align-self: flex-start;\n    gap: 5px;\n    margin-bottom: 4px;\n    padding: 3px 7px;\n    border-radius: 10px;\n    background: #f3e5f5;\n    color: #7b1fa2;\n    font-size: 11px;\n    font-weight: 600;\n    line-height: 1.3;\n}\n.hc-prospect-interaction-date {\n    font-size: 11px;\n    color: var(--hc-interaction-text-color);\n}\n.hc-prospect-interaction-duration {\n    color: var(--hc-interaction-text-color);\n}\n.hc-prospect-interaction-number {\n    font-size: 11px;\n    color: var(--hc-interaction-text-color);\n}\n.hc-prospect-interaction-from-number {\n    font-size: 11px;\n    color: var(--hc-interaction-text-color);\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-icons {\n    display: inline-flex;\n    align-items: center;\n    flex: 0 0 40px;\n    width: 40px;\n    gap: 2px;\n}\n.hc-prospect-interaction-badges {\n    display: flex;\n    flex-direction: column;\n    gap: 1px;\n    width: 14px;\n}\n.hc-prospect-interaction-badges .hc-icon {\n    text-shadow: none;\n}\n.hc-prospect-interaction-creator {\n    color: #333333;\n}\n.hc-prospect-interaction-voicemail {\n    display: inline-flex;\n    align-items: center;\n    align-self: flex-start;\n    gap: 5px;\n    margin-bottom: 4px;\n    padding: 3px 7px;\n    border-radius: 10px;\n    background: #f3e5f5;\n    color: #7b1fa2;\n    font-size: 11px;\n    font-weight: 600;\n    line-height: 1.3;\n}\n.hc-prospect-interaction-date {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-duration {\n    color: #666666;\n}\n.hc-prospect-interaction-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-from-number {\n    font-size: 11px;\n    color: #7939b8;\n}\n\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

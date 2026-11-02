@@ -5267,11 +5267,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-<<<<<<< HEAD
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\r\n    width: 100%;\r\n    background-color: white;\r\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\r\n    position: relative;\r\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\r\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-project-profile-bloc-header .fa-arrows {\r\n        display: none;\n}\n}\r\n", ""]);
-=======
 ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-project-profile-bloc-header .fa-arrows {\n        display: none;\n}\n}\n", ""]);
->>>>>>> 592f08b6db472538d315f5908a682468d12087eb
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

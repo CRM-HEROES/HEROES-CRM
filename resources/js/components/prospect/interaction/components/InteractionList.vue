@@ -179,9 +179,10 @@
             ></div>
         </item>
         <interaction-row
-            v-for="c in prospectInteractions"
+            v-for="(c, index) in prospectInteractions"
             :key="c.id"
             :interaction="c"
+            :color-index="index"
         />
     </item-list>
 </template>

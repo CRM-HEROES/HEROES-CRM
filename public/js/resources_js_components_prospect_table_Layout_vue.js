@@ -3138,7 +3138,21 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     HistoryRow: _Row_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
   },
+  data: function data() {
+    return {
+      playingAudio: false
+    };
+  },
   computed: {
+    audioIcon: function audioIcon() {
+      if (this.playingAudio) {
+        return "fa fa-pause-circle";
+      }
+      return this.item.source == "cloudtalk" ? "fa fa-play-circle" : "fa fa-microphone";
+    },
+    audioTitle: function audioTitle() {
+      return this.item.source == "cloudtalk" ? "Ecouter la conversation" : "Ecouter l'enregistrement";
+    },
     source: function source() {
       if (this.item.source == "telephone") {
         return "Téléphone";
@@ -3153,6 +3167,25 @@ __webpack_require__.r(__webpack_exports__);
         return "CloudTalk";
       }
       return this.item.source;
+    }
+  },
+  methods: {
+    toggleAudio: function toggleAudio() {
+      var _this = this;
+      var audio = this.$refs.audio;
+      if (!audio) {
+        return;
+      }
+      if (this.playingAudio) {
+        audio.pause();
+        return;
+      }
+      var promise = audio.play();
+      if (promise && promise["catch"]) {
+        promise["catch"](function () {
+          _this.playingAudio = false;
+        });
+      }
     }
   }
 });
@@ -5910,10 +5943,29 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         var defaultValue = null;
         var required = false;
         var format = null;
+        var historyType = null;
 
         // History
         if (key == "history") {
           name = _this4.$t("prospect.table.column.others.history");
+        } else if (key == "history-sms") {
+          if (!_this4.can("all.prospect.sms.view")) {
+            return null;
+          }
+          name = "".concat(_this4.$t("prospect.table.column.others.sms"), " (").concat(_this4.$t("prospect.table.column.others.history"), ")");
+          category = "history-sms";
+          historyType = "sms";
+        } else if (key == "history-calls") {
+          if (!_this4.can("all.prospect.interaction.view")) {
+            return null;
+          }
+          name = "".concat(_this4.$t("prospect.table.column.others.calls"), " (").concat(_this4.$t("prospect.table.column.others.history"), ")");
+          category = "history-calls";
+          historyType = "interaction";
+        } else if (key == "history-emails") {
+          name = "".concat(_this4.$t("auth.email"), " (").concat(_this4.$t("prospect.table.column.others.history"), ")");
+          category = "history-emails";
+          historyType = "message";
           // Users
         } else if (key == "users") {
           name = _this4.$t("prospect.table.column.others.affected_users");
@@ -6043,7 +6095,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           category: category,
           default_value: defaultValue,
           required: required,
-          format: format
+          format: format,
+          historyType: historyType
         });
       }).filter(function (column) {
         return column;
@@ -6949,6 +7002,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     prospect: {
       type: Object,
       required: true
+    },
+    historyType: {
+      type: String,
+      "default": null
     }
   },
   data: function data() {
@@ -6984,7 +7041,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     loadHistory: function loadHistory() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var key, requestId, _yield$ProspectServic, data;
+        var key, requestId, request, _yield$request, data;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
@@ -7000,45 +7057,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _this.loading = true;
               _this.loadError = false;
               _context.prev = 7;
-              _context.next = 10;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].history(_this.project.slug, _this.prospect.id);
-            case 10:
-              _yield$ProspectServic = _context.sent;
-              data = _yield$ProspectServic.data;
+              request = _this.historyType ? _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].history(_this.project.slug, _this.prospect.id, _this.historyType) : _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].history(_this.project.slug, _this.prospect.id);
+              _context.next = 11;
+              return request;
+            case 11:
+              _yield$request = _context.sent;
+              data = _yield$request.data;
               if (!(requestId !== _this.requestId || key !== _this.summaryKey)) {
-                _context.next = 14;
+                _context.next = 15;
                 break;
               }
               return _context.abrupt("return");
-            case 14:
+            case 15:
               if (Array.isArray(data)) {
-                _context.next = 16;
+                _context.next = 17;
                 break;
               }
               throw new Error("Invalid prospect history response");
-            case 16:
+            case 17:
               _this.cachedHistory = data;
               _this.loadedKey = key;
-              _context.next = 23;
+              _context.next = 24;
               break;
-            case 20:
-              _context.prev = 20;
+            case 21:
+              _context.prev = 21;
               _context.t0 = _context["catch"](7);
               if (requestId === _this.requestId && key === _this.summaryKey) {
                 _this.loadError = true;
               }
-            case 23:
-              _context.prev = 23;
+            case 24:
+              _context.prev = 24;
               if (requestId === _this.requestId && key === _this.summaryKey) {
                 _this.loading = false;
                 _this.pendingKey = null;
               }
-              return _context.finish(23);
-            case 26:
+              return _context.finish(24);
+            case 27:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[7, 20, 23, 26]]);
+        }, _callee, null, [[7, 21, 24, 27]]);
       }))();
     },
     close: function close() {
@@ -7052,14 +7110,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_3__.mapGetters)(["project"])), {}, {
     latest: function latest() {
-      var latest = this.prospect.history_latest;
+      var latest = this.prospect[this.summaryFields.latest];
       return latest && latest.created_at ? latest : null;
     },
     historyCount: function historyCount() {
-      return Math.max(0, Number(this.prospect.history_count) || 0);
+      return Math.max(0, Number(this.prospect[this.summaryFields.count]) || 0);
+    },
+    summaryFields: function summaryFields() {
+      var fields = {
+        sms: ["sms_history_latest", "sms_history_count"],
+        interaction: ["calls_history_latest", "calls_history_count"],
+        message: ["email_history_latest", "email_history_count"]
+      }[this.historyType] || ["history_latest", "history_count"];
+      return {
+        latest: fields[0],
+        count: fields[1]
+      };
     },
     summaryKey: function summaryKey() {
-      return JSON.stringify([this.project && this.project.slug, this.prospect.id, this.historyCount, this.latest]);
+      return JSON.stringify([this.project && this.project.slug, this.prospect.id, this.historyType, this.historyCount, this.latest]);
     },
     histories: function histories() {
       return this.cachedHistory.filter(function (item) {
@@ -10742,6 +10811,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         icon: "fa fa-clock icon-brown",
         columnId: "history",
         headerId: "hc-prospects-table-header-history-history"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.sms"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-comment icon-purple",
+        columnId: "history-sms",
+        headerId: "hc-prospects-table-header-history-sms-history-sms"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.calls"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-phone icon-orange",
+        columnId: "history-calls",
+        headerId: "hc-prospects-table-header-history-calls-history-calls"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("auth.email"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-envelope icon-green",
+        columnId: "history-emails",
+        headerId: "hc-prospects-table-header-history-emails-history-emails"
       },
       // Events
       {
@@ -12312,6 +12399,8 @@ var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   textContent: 'Appelé sur : '
 }, null, -1 /* HOISTED */);
 var _hoisted_3 = ["textContent"];
+var _hoisted_4 = ["title", "aria-label"];
+var _hoisted_5 = ["src"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_history_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("history-row");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_history_row, {
@@ -12324,7 +12413,33 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [_hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-prospect-profile-history-label-name",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.source)
-      }, null, 8 /* PROPS */, _hoisted_3)])];
+      }, null, 8 /* PROPS */, _hoisted_3)]), $props.item.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 0,
+        type: "button",
+        "class": "hc-prospect-profile-history-audio",
+        title: $options.audioTitle,
+        "aria-label": $options.audioTitle,
+        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $options.toggleAudio && $options.toggleAudio.apply($options, arguments);
+        }, ["stop", "prevent"]))
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.audioIcon),
+        "aria-hidden": "true"
+      }, null, 2 /* CLASS */)], 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.item.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("audio", {
+        key: 1,
+        ref: "audio",
+        src: $props.item.audio,
+        preload: "none",
+        onPlay: _cache[1] || (_cache[1] = function ($event) {
+          return $data.playingAudio = true;
+        }),
+        onPause: _cache[2] || (_cache[2] = function ($event) {
+          return $data.playingAudio = false;
+        }),
+        onEnded: _cache[3] || (_cache[3] = function ($event) {
+          return $data.playingAudio = false;
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
   }, 8 /* PROPS */, ["item", "date", "user"]);
@@ -13244,22 +13359,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["prospect", "onClick"])) : $options.category == 'history' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_history_cell, {
         key: 9,
         prospect: $props.prospect
-      }, null, 8 /* PROPS */, ["prospect"])) : $options.category == 'sms' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_sms_cell, {
+      }, null, 8 /* PROPS */, ["prospect"])) : ['history-sms', 'history-calls', 'history-emails'].includes($options.category) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_history_cell, {
         key: 10,
+        prospect: $props.prospect,
+        "history-type": $props.column.historyType
+      }, null, 8 /* PROPS */, ["prospect", "history-type"])) : $options.category == 'sms' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_sms_cell, {
+        key: 11,
         prospect: $props.prospect,
         onClick: $options.manageSms
       }, null, 8 /* PROPS */, ["prospect", "onClick"])) : $options.category == 'users' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 11,
+        key: 12,
         prospect: $props.prospect,
         items: $props.prospect.users ? $props.prospect.users : [],
         onClick: $options.manageUsers
       }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'groups' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 12,
+        key: 13,
         prospect: $props.prospect,
         items: $props.prospect.groups ? $props.prospect.groups : [],
         onClick: $options.manageGroups
       }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'orders' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 13,
+        key: 14,
         prospect: $props.prospect,
         items: $props.prospect.orders ? $props.prospect.orders.map(function (order) {
           return _objectSpread(_objectSpread({}, order.status ? order.status : {}), order);
@@ -13267,15 +13386,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "item-clicked": $options.showOrder,
         onClick: $options.manageOrders
       }, null, 8 /* PROPS */, ["prospect", "items", "item-clicked", "onClick"])) : $options.category == 'import' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 14,
+        key: 15,
         prospect: $props.prospect,
         items: $props.prospect["import"] ? [$props.prospect["import"]] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'pipedrive-accounts' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 15,
+        key: 16,
         prospect: $props.prospect,
         items: $props.prospect.pipedrive_accounts ? $props.prospect.pipedrive_accounts : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : $options.category == 'creator' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_relation_cell, {
-        key: 16,
+        key: 17,
         prospect: $props.prospect,
         items: $props.prospect.creator ? [$props.prospect.creator] : []
       }, null, 8 /* PROPS */, ["prospect", "items"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
@@ -13604,7 +13723,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     id: $options.id
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$props.column.category == 'history' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      return [['history', 'history-sms', 'history-calls', 'history-emails'].includes($props.column.category) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.name)
       }, null, 8 /* PROPS */, _hoisted_2)])) : $props.column.category == 'users' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 1
@@ -14338,12 +14457,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "hc-interaction-cell-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.interactions.length)
-  }, null, 8 /* PROPS */, _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.interactions, function (interaction) {
+  }, null, 8 /* PROPS */, _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.interactions, function (interaction, index) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_interaction_row, {
       key: interaction.id,
       interaction: interaction,
+      "color-index": index,
       prospect: $props.prospect
-    }, null, 8 /* PROPS */, ["interaction", "prospect"]);
+    }, null, 8 /* PROPS */, ["interaction", "color-index", "prospect"]);
   }), 128 /* KEYED_FRAGMENT */))]);
 }
 
@@ -16885,6 +17005,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-profile-history-group {
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css":
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-profile-history-audio {\n    flex: 0 0 auto;\n    border: 0;\n    padding: 4px;\n    color: #1e6ee5;\n    background: transparent;\n    cursor: pointer;\n}\n.hc-prospect-profile-history-audio:hover,\n.hc-prospect-profile-history-audio:focus-visible {\n    color: #1452ad;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/LabelItem.vue?vue&type=style&index=0&id=b637e198&lang=css":
 /*!***********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/LabelItem.vue?vue&type=style&index=0&id=b637e198&lang=css ***!
@@ -17459,6 +17602,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_GroupItem_vue_vue_type_style_index_0_id_b7326882_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css":
+/*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css ***!
+  \*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionItem_vue_vue_type_style_index_0_id_696c56dc_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionItem_vue_vue_type_style_index_0_id_696c56dc_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionItem_vue_vue_type_style_index_0_id_696c56dc_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -18608,13 +18780,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _InteractionItem_vue_vue_type_template_id_696c56dc__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./InteractionItem.vue?vue&type=template&id=696c56dc */ "./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=template&id=696c56dc");
 /* harmony import */ var _InteractionItem_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./InteractionItem.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _InteractionItem_vue_vue_type_style_index_0_id_696c56dc_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css */ "./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_InteractionItem_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_InteractionItem_vue_vue_type_template_id_696c56dc__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/profile/blocs/history/InteractionItem.vue"]])
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_InteractionItem_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_InteractionItem_vue_vue_type_template_id_696c56dc__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/profile/blocs/history/InteractionItem.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -22390,6 +22565,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_GroupItem_vue_vue_type_style_index_0_id_b7326882_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./GroupItem.vue?vue&type=style&index=0&id=b7326882&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/GroupItem.vue?vue&type=style&index=0&id=b7326882&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css":
+/*!********************************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css ***!
+  \********************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_InteractionItem_vue_vue_type_style_index_0_id_696c56dc_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/profile/blocs/history/InteractionItem.vue?vue&type=style&index=0&id=696c56dc&lang=css");
 
 
 /***/ }),
