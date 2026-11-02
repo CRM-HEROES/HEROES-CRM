@@ -110,7 +110,10 @@ class IncomingCommunications
     {
         $counts = [];
         foreach (self::TYPES as $type => $model) {
-            $counts[$type] = $this->unreadQuery($project, $type, $userId)->count();
+            $query = $this->unreadQuery($project, $type, $userId);
+            $counts[$type] = $type === 'sms'
+                ? $query->distinct()->count('prospect_id')
+                : $query->count();
         }
 
         return ['count' => array_sum($counts)] + $counts;

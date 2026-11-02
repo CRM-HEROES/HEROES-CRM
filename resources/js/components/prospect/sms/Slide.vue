@@ -605,7 +605,10 @@
           </template>
 
           <template #2 v-if="prospect">
-            <div class="hc-flex-column">
+            <div
+              class="hc-flex-column hc-prospect-sms-ringover"
+              style="height: 100%; min-height: 0"
+            >
               <item @click="tab = 0" class="bordered">
                 <icon class="fa fa-caret-left" />
                 <div
@@ -621,7 +624,7 @@
                 id="ringover-sms"
                 :number="prospect.mobile_phone_number"
                 tab="sms"
-                style="flex: 1; width: 100%; height: 100%"
+                style="flex: 1 1 0; min-height: 0; width: 100%; height: 100%"
                 @sms-sent="sendSMSViaRingover"
               />
             </div>

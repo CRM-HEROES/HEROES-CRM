@@ -90803,7 +90803,11 @@ var _hoisted_45 = {
 };
 var _hoisted_46 = ["textContent"];
 var _hoisted_47 = {
-  "class": "hc-flex-column"
+  "class": "hc-flex-column hc-prospect-sms-ringover",
+  style: {
+    "height": "100%",
+    "min-height": "0"
+  }
 };
 var _hoisted_48 = ["textContent"];
 var _hoisted_49 = {
@@ -91363,7 +91367,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 number: _ctx.prospect.mobile_phone_number,
                 tab: "sms",
                 style: {
-                  "flex": "1",
+                  "flex": "1 1 0",
+                  "min-height": "0",
                   "width": "100%",
                   "height": "100%"
                 },

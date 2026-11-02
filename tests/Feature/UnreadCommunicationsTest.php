@@ -126,9 +126,16 @@ class UnreadCommunicationsTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_six_unread_communications_from_one_prospect_count_as_six(): void
+    public function test_unread_sms_count_once_per_prospect(): void
     {
-        $this->assertSame(['count' => 6, 'sms' => 3, 'email' => 2, 'voicemail' => 1], $this->counts(1));
+        $this->assertSame(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1], $this->counts(1));
+
+        DB::table('sms')->insert([
+            'id' => 7,
+            'prospect_id' => 2,
+            'message' => 'Another prospect',
+        ]);
+        $this->assertSame(2, $this->counts(1)['sms']);
     }
 
     public function test_reading_sms_decrements_only_the_current_users_count_and_is_idempotent(): void
@@ -138,8 +145,8 @@ class UnreadCommunicationsTest extends TestCase
         $this->postJson('/api/project/test/incoming-communications/read', $body)
             ->assertOk()->assertJson(['marked' => 2, 'count' => 4, 'sms' => 1]);
         $this->postJson('/api/project/test/incoming-communications/read', $body)
-            ->assertOk()->assertJson(['marked' => 0, 'count' => 4]);
-        $this->assertSame(7, $this->counts(2)['count']);
+            ->assertOk()->assertJson(['marked' => 0, 'count' => 4, 'sms' => 1]);
+        $this->assertSame(5, $this->counts(2)['count']);
         $this->assertDatabaseCount('communication_reads', 2);
         $this->assertSame([1], DB::table('communication_reads')->distinct()->pluck('user_id')->all());
     }
@@ -180,7 +187,7 @@ class UnreadCommunicationsTest extends TestCase
     {
         $this->actingAs(User::query()->findOrFail(1));
         $this->getJson('/api/project/test/incoming-communications/count')
-            ->assertOk()->assertExactJson(['count' => 6, 'sms' => 3, 'email' => 2, 'voicemail' => 1]);
+            ->assertOk()->assertExactJson(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1]);
     }
 
     public function test_reading_email_and_listening_to_voicemail_decrement_their_counts(): void
@@ -189,7 +196,7 @@ class UnreadCommunicationsTest extends TestCase
         $project = Project::query()->findOrFail(1);
         $this->assertSame(2, $service->markRead($project, 1, 1, 'email', [1, 2, 6]));
         $this->assertSame(1, $service->markRead($project, 1, 1, 'voicemail', [1, 2, 3]));
-        $this->assertSame(['count' => 3, 'sms' => 3, 'email' => 0, 'voicemail' => 0], $this->counts(1));
+        $this->assertSame(['count' => 1, 'sms' => 1, 'email' => 0, 'voicemail' => 0], $this->counts(1));
     }
 
     public function test_new_arrivals_remain_unread_after_older_messages_have_been_read(): void
