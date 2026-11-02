@@ -3477,7 +3477,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _yield$MessageService = _context.sent;
               data = _yield$MessageService.data;
               _this.messages = data.sort(function (m1, m2) {
-                return m1.created_at >= m2.created_at ? 1 : -1;
+                return new Date(m2.created_at) - new Date(m1.created_at);
               });
             case 7:
               _context.prev = 7;
@@ -3576,7 +3576,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               });
             case 7:
               message = _context4.sent;
-              _this4.messages = [].concat(_toConsumableArray(_this4.messages), [message]);
+              _this4.messages = [message].concat(_toConsumableArray(_this4.messages)).sort(function (m1, m2) {
+                return new Date(m2.created_at) - new Date(m1.created_at);
+              });
             case 9:
               _context4.prev = 9;
               _this4.addingMessage = false;
@@ -8748,24 +8750,24 @@ function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key i
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
-var _hoisted_1 = ["textContent"];
-var _hoisted_2 = {
+var _hoisted_1 = {
   key: 0,
   "class": "hc-prospect-new-message-attachments"
 };
-var _hoisted_3 = {
+var _hoisted_2 = {
   "class": "hc-flex-row"
 };
-var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content"
 }, null, -1 /* HOISTED */);
+var _hoisted_4 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
-  var _component_message_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("message-row");
-  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_text_editor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("text-editor");
   var _component_uploading_attachment_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("uploading-attachment-row");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_message_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("message-row");
+  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_bloc = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("bloc", true);
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_bloc, {
@@ -8780,30 +8782,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["onClick"])];
     }),
     body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.messages, function (m, i) {
-        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [i <= $data.shownMessagesCount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_message_row, {
-          key: m.id,
-          message: m,
-          onEdit: function onEdit($event) {
-            return $data.message = _objectSpread({}, m);
-          }
-        }, null, 8 /* PROPS */, ["message", "onEdit"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
-      }), 256 /* UNKEYED_FRAGMENT */)), $data.messages.length > $data.shownMessagesCount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_buttons, {
-        key: 0
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-              return $options.showMoreMessages && $options.showMoreMessages.apply($options, arguments);
-            }, ["prevent"])),
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('show_more'))
-          }, null, 8 /* PROPS */, _hoisted_1)];
-        }),
-        _: 1 /* STABLE */
-      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !_ctx.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
-        key: 1,
+      return [!_ctx.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
+        key: 0,
         "class": "hc-flex-column",
-        onSubmit: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+        onSubmit: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
           return $data.message.id ? $options.updateMessage() : $options.addMessage();
         }, ["prevent"])),
         style: {
@@ -8814,7 +8796,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 0
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_text_editor, {
         modelValue: $data.message.body,
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+        "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
           return $data.message.body = $event;
         }),
         modelModifiers: {
@@ -8822,39 +8804,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           enter: true
         },
         "min-height": 40,
-        onEnter: _cache[2] || (_cache[2] = function ($event) {
+        onEnter: _cache[1] || (_cache[1] = function ($event) {
           return $data.message.id ? $options.updateMessage() : $options.addMessage();
         }),
         placeholder: "Saisir un message ...",
         ref: "textarea"
-      }, null, 8 /* PROPS */, ["modelValue"]), $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (c) {
+      }, null, 8 /* PROPS */, ["modelValue"]), $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (c) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_uploading_attachment_row, {
           key: c.name,
           attachment: c,
           onRemove: $options.removeAttachment
         }, null, 8 /* PROPS */, ["attachment", "onRemove"]);
-      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
         key: 0,
         tag: "a",
         "class": "fa fa-caret-down",
-        onClick: _cache[3] || (_cache[3] = function ($event) {
+        onClick: _cache[2] || (_cache[2] = function ($event) {
           return $data.showTextEditor = false;
         })
       }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Reduire']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
         key: 1,
         tag: "a",
         "class": "fa fa-caret-up",
-        onClick: _cache[4] || (_cache[4] = function ($event) {
+        onClick: _cache[3] || (_cache[3] = function ($event) {
           return $data.showTextEditor = true;
         })
-      }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Agrandir']]), _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Agrandir']]), _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
         tag: "label",
         "class": "fa fa-link"
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
             type: "file",
-            onChange: _cache[5] || (_cache[5] = function () {
+            onChange: _cache[4] || (_cache[4] = function () {
               return $options.addAttachments && $options.addAttachments.apply($options, arguments);
             }),
             multiple: ""
@@ -8869,7 +8851,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }
       }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Envoyer']])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
         loading: $data.addingMessage
-      }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+      }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.messages, function (m, i) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [i <= $data.shownMessagesCount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_message_row, {
+          key: m.id,
+          message: m,
+          onEdit: function onEdit($event) {
+            return $data.message = _objectSpread({}, m);
+          }
+        }, null, 8 /* PROPS */, ["message", "onEdit"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+      }), 256 /* UNKEYED_FRAGMENT */)), $data.messages.length > $data.shownMessagesCount ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_buttons, {
+        key: 1
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+              return $options.showMoreMessages && $options.showMoreMessages.apply($options, arguments);
+            }, ["prevent"])),
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('show_more'))
+          }, null, 8 /* PROPS */, _hoisted_4)];
+        }),
+        _: 1 /* STABLE */
+      })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
         loading: $data.fetchingMessages
       }, null, 8 /* PROPS */, ["loading"])];
     }),
