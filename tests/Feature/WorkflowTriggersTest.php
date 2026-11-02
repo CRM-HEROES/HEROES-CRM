@@ -272,6 +272,18 @@ class WorkflowTriggersTest extends TestCase
         $this->assertSame(['a:1'], RecordingHandler::$calls);
     }
 
+    public function test_a_change_of_memberships_fires_the_filter_triggers_only(): void
+    {
+        $this->activate($this->filterGraph('prospect.filter_entered'));
+        $this->activate($this->graph('prospect.updated'));
+
+        // What a label attached to a prospect looks like: the prospect itself is not saved
+        $this->setProcessed(1, true);
+        $this->changed([1], 'membership');
+
+        $this->assertSame(['a:1'], RecordingHandler::$calls); // the "updated" workflow did not start
+    }
+
     public function test_leaving_then_entering_again_fires_again(): void
     {
         $this->activate($this->filterGraph('prospect.filter_entered'));

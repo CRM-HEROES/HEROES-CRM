@@ -53,6 +53,8 @@ class Kernel extends ConsoleKernel
         // Workflows: resume the waiting executions that are due and recover the stuck ones.
         // Two indexed queries, whatever the number of prospects: it never scans the CRM data.
         $schedule->command('workflows:resume')->everyMinute()->withoutOverlapping(5)->runInBackground();
+        // Labels attached by paths that do not report to the workflows (webhooks, scripts)
+        $schedule->command('workflows:scan-labels')->everyMinute()->withoutOverlapping(5)->runInBackground();
         // Old history, by batches, at night
         $schedule->command('workflows:prune')->dailyAt('3:30')->withoutOverlapping(60)->runInBackground();
 
