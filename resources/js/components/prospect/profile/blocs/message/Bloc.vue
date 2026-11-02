@@ -8,21 +8,6 @@
             />
         </template>
         <template #body>
-            <template v-for="(m, i) in messages">
-                <message-row
-                    :key="m.id"
-                    v-if="i <= shownMessagesCount"
-                    :message="m"
-                    @edit="message = { ...m }"
-                />
-            </template>
-
-            <buttons v-if="messages.length > shownMessagesCount">
-                <button
-                    @click.prevent="showMoreMessages"
-                    v-text="$t('show_more')"
-                ></button>
-            </buttons>
             <form
                 v-if="!disabled"
                 class="hc-flex-column"
@@ -80,6 +65,21 @@
                 </div>
                 <loading :loading="addingMessage" />
             </form>
+            <template v-for="(m, i) in messages">
+                <message-row
+                    :key="m.id"
+                    v-if="i <= shownMessagesCount"
+                    :message="m"
+                    @edit="message = { ...m }"
+                />
+            </template>
+
+            <buttons v-if="messages.length > shownMessagesCount">
+                <button
+                    @click.prevent="showMoreMessages"
+                    v-text="$t('show_more')"
+                ></button>
+            </buttons>
             <loading :loading="fetchingMessages" />
         </template>
     </bloc>
@@ -155,8 +155,9 @@ export default {
                     this.prospect.id,
                     this.thread.id
                 );
-                this.messages = data.sort((m1, m2) =>
-                    m1.created_at >= m2.created_at ? 1 : -1
+                this.messages = data.sort(
+                    (m1, m2) =>
+                        new Date(m2.created_at) - new Date(m1.created_at)
                 );
             } finally {
                 this.fetchingMessages = false;
@@ -224,7 +225,10 @@ export default {
                     thread: this.thread.id,
                     params: formData,
                 });
-                this.messages = [...this.messages, message];
+                this.messages = [message, ...this.messages].sort(
+                    (m1, m2) =>
+                        new Date(m2.created_at) - new Date(m1.created_at)
+                );
             } finally {
                 this.addingMessage = false;
                 this.attachments = [];
