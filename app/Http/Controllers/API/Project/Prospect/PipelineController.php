@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Project\Prospect;
 
 use App\Events\ProspectLabelAttached;
+use App\Workflows\WorkflowEvents;
 use App\Http\Controllers\Controller;
 use App\Models\Label;
 use App\Models\Pipeline;
@@ -51,6 +52,7 @@ class PipelineController extends Controller
             ]]);
 
         ProspectLabelAttached::dispatch($prospect, $label);
+        WorkflowEvents::membershipsChanged($project->id, [$prospect->id]);
 
         return ['message' => trans('common.success.attached_resource')];
     }
@@ -96,10 +98,12 @@ class PipelineController extends Controller
         switch ($request->input('action')) {
             case "attach":
                 $this->bulkActionAttach($prospects, $labels);
+                WorkflowEvents::membershipsChanged($project->id, $prospects);
                 return ['message' => trans('common.success.updated_resource')];            
 
             case "detach":
                 $this->bulkActionDetach($prospects, $labels);
+                WorkflowEvents::membershipsChanged($project->id, $prospects);
                 return ['message' => trans('common.success.deleted_resource')];
 
             default:

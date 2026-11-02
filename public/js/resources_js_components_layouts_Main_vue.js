@@ -57925,6 +57925,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (result.message_id) {
         lines.push("".concat(this.$t("workflow.monitor.message"), " #").concat(result.message_id));
       }
+
+      // Written by the step, sent right after: say whether it left
+      if (step.delivery) {
+        lines.push(step.delivery.sent ? this.$t("workflow.monitor.delivery.sent") : step.delivery.error ? this.$t("workflow.monitor.delivery.failed", {
+          error: step.delivery.error
+        }) : this.$t("workflow.monitor.delivery.pending"));
+      }
       if (result.call_uuid || result.call_id) {
         lines.push("".concat(this.$t("workflow.monitor.call"), " ").concat(result.call_uuid || result.call_id));
       }

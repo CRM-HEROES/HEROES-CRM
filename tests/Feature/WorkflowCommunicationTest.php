@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Jobs\ProspectThreadMessage;
 use App\Models\KavkomCall;
+use App\Observers\MessageObserver;
 use App\Models\Message;
 use App\Models\Sms;
 use App\Models\Workflow;
@@ -21,6 +23,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 use Tests\Support\RecordingHandler;
 use Tests\TestCase;
 
@@ -347,6 +350,27 @@ class WorkflowCommunicationTest extends TestCase
         $this->assertSame(1, $message->thread_id);
         $this->assertTrue((bool) $message->from_user);
         $this->assertSame($message->id, $this->nodeRow('a1')->result['message_id']);
+    }
+
+    public function test_a_message_written_by_a_workflow_is_queued_at_once(): void
+    {
+        // A queue worker has no "response": what waits for it is never sent
+        Queue::fake();
+        $message = Message::first() ?: Message::withoutEvents(fn () => Message::forceCreate(['prospect_id' => 1, 'thread_id' => 1, 'from_user' => 1, 'body' => 'x']));
+
+        WorkflowTriggerResolver::withoutTriggers(fn () => (new MessageObserver())->created($message));
+
+        Queue::assertPushed(ProspectThreadMessage::class, 1);
+    }
+
+    public function test_a_message_written_in_a_request_still_waits_for_the_response(): void
+    {
+        Queue::fake();
+        $message = Message::withoutEvents(fn () => Message::forceCreate(['prospect_id' => 1, 'thread_id' => 1, 'from_user' => 1, 'body' => 'x']));
+
+        (new MessageObserver())->created($message);
+
+        Queue::assertNotPushed(ProspectThreadMessage::class);
     }
 
     public function test_a_prospect_without_email_makes_the_step_fail(): void

@@ -1273,6 +1273,11 @@
             "waiting_event": "En attente de : {event}. Sans réponse, elle reprendra le {date}.",
             "waiting_until": "En attente jusqu'au {date}.",
             "operator": "Opérateur",
+            "delivery": {
+                "sent": "Email envoyé",
+                "failed": "Email non envoyé : {error}",
+                "pending": "Email en cours d'envoi"
+            },
             "sms": "SMS",
             "message": "Message",
             "call": "Appel",
