@@ -364,6 +364,14 @@ export default {
             this.refresh();
         },
 
+        // Another action (SMS instead of email): the operators are not the same
+        "field.capability"() {
+            if (this.type === "provider") {
+                this.providers = [];
+                this.loadProviders();
+            }
+        },
+
         categories() {
             if (this.isLabels) {
                 this.loadLabels();
@@ -476,14 +484,23 @@ export default {
 
         async loadProviders() {
             this.providersLoading = true;
+            const capability = this.field.capability;
 
             try {
-                const { data } = await WorkflowService.providers(this.project.slug, this.field.capability);
+                const { data } = await WorkflowService.providers(this.project.slug, capability);
+
+                // The answer of a previous choice that comes late is not the one wanted
+                if (capability !== this.field.capability) {
+                    return;
+                }
+
                 this.providers = data;
             } catch (e) {
                 flashError({ title: this.$t("workflow.title"), body: this.$t("workflow.error.load") });
             } finally {
-                this.providersLoading = false;
+                if (capability === this.field.capability) {
+                    this.providersLoading = false;
+                }
             }
         },
 

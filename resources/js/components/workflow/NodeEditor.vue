@@ -66,7 +66,7 @@
 
             <template v-if="actionDef">
                 <p v-if="actionDef.danger" class="hc-wfn-danger" v-text="$t('workflow.danger')"></p>
-                <template v-for="field in actionDef.fields" :key="field.key">
+                <template v-for="field in actionDef.fields" :key="config.action + ':' + field.key">
                     <label class="hc-wfn-label">
                         {{ $t("workflow.field." + fieldName(field)) }}
                         <span v-if="field.required" class="hc-wfn-required">*</span>
