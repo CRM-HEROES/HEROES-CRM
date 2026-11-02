@@ -28,6 +28,13 @@
                 <span>Modifier le champ</span>
             </span>
             <span
+                v-if="canFindReplace"
+                class="fa fa-exchange-alt"
+                @click.prevent.stop="findReplaceOpen = true"
+            >
+                <span>Rechercher et remplacer</span>
+            </span>
+            <span
                 v-if="canToggleUnique"
                 :class="['fa', 'fa-clone', field.unique ? 'icon-green' : '']"
                 v-tooltip="field.unique ? 'Détection des doublons activée' : 'Détecter les doublons'"
@@ -87,6 +94,12 @@
         ></a>
 
         <span v-text="column.name"></span>
+
+        <find-replace
+            v-if="findReplaceOpen"
+            :column="column"
+            @close="findReplaceOpen = false"
+        />
     </label>
 </template>
 
@@ -105,7 +118,11 @@ import {
 import { OPEN_MODAL } from "@/actions/modal";
 import { SET_FIELD, UPDATE_FIELD } from "@/actions/project/field";
 
+import FindReplace from "./FindReplace.vue";
+
 export default {
+    components: { FindReplace },
+
     props: {
         /**
          * Column
@@ -117,6 +134,7 @@ export default {
 
     data() {
         return {
+            findReplaceOpen: false,
             sorting: false,
             requiredShown: false,
             showOptions: false,
@@ -357,6 +375,17 @@ export default {
 
         isValidFilter() {
             return this.prospectsParamExists(this.isValidFilterKey);
+        },
+
+        /**
+         * Text-like fields only (meta or default field)
+         */
+        canFindReplace() {
+            return (
+                !!this.field &&
+                ["meta", "default"].includes(this.column.category) &&
+                !["id", "created_at", "updated_at"].includes(this.column.id)
+            );
         },
 
         canToggleUnique() {

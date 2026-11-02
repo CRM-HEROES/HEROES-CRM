@@ -71,6 +71,9 @@ export default {
             value: value,
         });
     },
+    findReplace(project, params) {
+        return ApiService.post(`project/${project}/prospect/find-replace`, params);
+    },
     bulkProjectProspect(project, prospects, toProject, mapping) {
         return ApiService.put(`project/${project}/prospect/bulk`, {
             action: "project",
