@@ -6,6 +6,7 @@ use App\Console\Commands\Campaign as CampaignCommand;
 use App\Models\CampaignAction;
 use App\Models\WorkflowExecution;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 /**
  * The actions a workflow can run.
@@ -63,6 +64,8 @@ class ActionRegistry
             throw new \RuntimeException("Unknown workflow action: $type");
         }
 
+        $this->assertTargetExists($type, $config['value'] ?? [], $subject->project_id ?? $execution->project_id);
+
         // Legacy handlers read the action value, and are stateful:
         // they are fed with a transient (never saved) action.
         $legacy->setAction(new CampaignAction(['action' => $type, 'value' => $config['value'] ?? []]));
@@ -70,6 +73,46 @@ class ActionRegistry
         $legacy->handle();
 
         return ['handler' => 'campaign'];
+    }
+
+    /**
+     * The campaign handlers do nothing, silently, when the user / group / label
+     * they are given does not exist (anymore) in the project. A step that did
+     * nothing must not be reported as done: it fails, and says why.
+     */
+    protected function assertTargetExists(string $type, array $value, ?int $projectId): void
+    {
+        if (!str_starts_with($type, 'prospect-')) {
+            return;
+        }
+
+        $messages = [
+            'user' => "L'utilisateur choisi n'existe plus dans ce projet.",
+            'group' => "Le groupe choisi n'existe plus dans ce projet.",
+            'label' => "L'étiquette choisie n'existe plus dans ce projet.",
+        ];
+
+        foreach ($messages as $key => $message) {
+            if (!str_ends_with($type, "-$key")) {
+                continue;
+            }
+
+            $id = $value[$key] ?? null;
+
+            $exists = $id && match ($key) {
+                'user' => DB::table('user_project')->where('user_id', $id)->where('project_id', $projectId)->exists(),
+                'group' => DB::table('groups')->where('id', $id)->where('project_id', $projectId)->whereNull('deleted_at')->exists(),
+                'label' => DB::table('labels')
+                    ->join('categories', 'categories.id', '=', 'labels.category_id')
+                    ->where('labels.id', $id)
+                    ->where('categories.project_id', $projectId)
+                    ->exists(),
+            };
+
+            if (!$exists) {
+                throw new \RuntimeException($message);
+            }
+        }
     }
 
     protected function legacyHandlers(): array
