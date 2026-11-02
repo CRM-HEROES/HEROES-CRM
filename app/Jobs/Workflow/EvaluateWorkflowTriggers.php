@@ -28,7 +28,8 @@ class EvaluateWorkflowTriggers implements ShouldQueue
 
     /**
      * @param  int[]  $ids
-     * @param  string  $event  "created" | "updated"
+     * @param  string  $event  "created" | "updated" | "membership" (labels, users...
+     *                         changed: only the filter transitions are looked at)
      * @param  int  $stamp  time of the change (identifies an occurrence of "updated")
      */
     public function __construct(
@@ -46,7 +47,7 @@ class EvaluateWorkflowTriggers implements ShouldQueue
         foreach ($this->ids as $id) {
             if ($this->event === 'created') {
                 $resolver->fire("{$this->subjectType}.created", $this->projectId, $id, "{$this->subjectType}.created:$id");
-            } else {
+            } elseif ($this->event === 'updated') {
                 // Changes within the same second are one occurrence
                 $resolver->fire("{$this->subjectType}.updated", $this->projectId, $id, "{$this->subjectType}.updated:$id:{$this->stamp}");
             }

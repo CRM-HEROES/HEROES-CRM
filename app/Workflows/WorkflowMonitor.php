@@ -8,6 +8,7 @@ use App\Models\WorkflowExecution;
 use App\Models\WorkflowNodeExecution;
 use App\Models\WorkflowVersion;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * What the follow-up screens show, read from the execution tables.
@@ -105,7 +106,9 @@ class WorkflowMonitor
             ->get()
             ->groupBy('execution_id');
 
-        return $executions->map(function (WorkflowExecution $execution) use ($workflows, $subjects, $graphs, $rows) {
+        $deliveries = $this->deliveries($rows);
+
+        return $executions->map(function (WorkflowExecution $execution) use ($workflows, $subjects, $graphs, $rows, $deliveries) {
             $nodes = $graphs[$execution->workflow_version_id] ?? collect();
             $current = $execution->current_node_id ? $nodes->get($execution->current_node_id) : null;
 
@@ -113,7 +116,7 @@ class WorkflowMonitor
                 'waiting_for' => $execution->status === WorkflowExecution::WAITING && $current
                     ? ['node_id' => $current['id'], 'type' => $current['type'], 'name' => $current['name'] ?? null]
                     : null,
-                'steps' => ($rows[$execution->id] ?? collect())->map(function (WorkflowNodeExecution $row) use ($nodes) {
+                'steps' => ($rows[$execution->id] ?? collect())->map(function (WorkflowNodeExecution $row) use ($nodes, $deliveries) {
                     $node = $nodes->get($row->node_id, []);
 
                     return [
@@ -126,6 +129,8 @@ class WorkflowMonitor
                         'branch' => $row->branch,
                         'attempts' => $row->attempts,
                         'result' => $row->result,
+                        // An email is written by the step and sent right after: how that went
+                        'delivery' => $deliveries[$row->result['message_id'] ?? 0] ?? null,
                         'error' => $row->error,
                         'started_at' => $row->started_at,
                         'finished_at' => $row->finished_at,
@@ -133,6 +138,26 @@ class WorkflowMonitor
                 })->values()->all(),
             ];
         })->values()->all();
+    }
+
+    /**
+     * Did the emails written by the steps leave? (one query, only when there are some)
+     *
+     * @return array<int, array{sent: bool, error: ?string}>
+     */
+    protected function deliveries(Collection $rows): array
+    {
+        $ids = $rows->flatten()->map(fn ($row) => $row->result['message_id'] ?? null)->filter()->unique()->values();
+
+        if ($ids->isEmpty()) {
+            return [];
+        }
+
+        return DB::table('messages')
+            ->whereIn('id', $ids)
+            ->get(['id', 'sent', 'error'])
+            ->mapWithKeys(fn ($message) => [$message->id => ['sent' => (bool) $message->sent, 'error' => $message->error]])
+            ->all();
     }
 
     /**

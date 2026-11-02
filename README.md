@@ -162,4 +162,9 @@ chmod +x scripts/backup-heroescrm.sh
 #### Log work:
 ```sh
 php artisan queue:work --queue=imports --tries=1 --timeout=3600
+```
+### Demarrage du worker
+```sh
+php artisan queue:work --queue=workflows,default
+
 ````

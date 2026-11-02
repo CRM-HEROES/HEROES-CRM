@@ -6,6 +6,7 @@ use App\Jobs\ProspectSendToThreadMessage;
 use App\Jobs\ProspectSendToUserThreadMessage;
 use App\Models\Message;
 use \App\Jobs\ProspectThreadMessage;
+use App\Workflows\WorkflowTriggerResolver;
 use App\Utils\Field\Renderer\ProjectFieldRenderer;
 use App\Utils\Field\Renderer\ProspectFieldRenderer;
 use Illuminate\Support\Facades\Storage;
@@ -31,6 +32,25 @@ class MessageObserver
         $this->sendToUser($message);
     }
    
+    /**
+     * Queue the sending of a message.
+     *
+     * "After the response" is the rule for a request. A workflow step is not
+     * one: it runs in a queue worker, where nothing runs "after the response"
+     * until the worker stops (a worker that handles several jobs never sends
+     * the message). The message is then queued right away.
+     */
+    protected function send(string $job, Message $message): void
+    {
+        if (WorkflowTriggerResolver::suppressed()) {
+            $job::dispatch($message);
+
+            return;
+        }
+
+        $job::dispatchAfterResponse($message);
+    }
+
     /**
      * Handle the Message "deleting" event.
      */
@@ -74,7 +94,7 @@ class MessageObserver
             return;
         }
 
-        ProspectThreadMessage::dispatchAfterResponse($message);
+        $this->send(ProspectThreadMessage::class, $message);
     }
     
     /**
@@ -99,7 +119,7 @@ class MessageObserver
             return;
         }
 
-        ProspectSendToThreadMessage::dispatchAfterResponse($message);
+        $this->send(ProspectSendToThreadMessage::class, $message);
     }
     
     /**
@@ -125,7 +145,7 @@ class MessageObserver
         }
 
         $message->users()->syncWithoutDetaching($thread->user_id);
-        ProspectSendToUserThreadMessage::dispatchAfterResponse($message);
+        $this->send(ProspectSendToUserThreadMessage::class, $message);
     }
     
     /**

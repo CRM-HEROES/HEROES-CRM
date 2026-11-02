@@ -20,6 +20,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -144,6 +145,31 @@ class WorkflowMonitorTest extends TestCase
             'execution_id' => $execution->id, 'node_id' => $node, 'node_type' => $type, 'status' => $status,
             'started_at' => now()->subMinutes(10), 'finished_at' => now()->subMinutes(9),
         ]);
+    }
+
+    public function test_a_step_that_wrote_an_email_says_whether_it_left(): void
+    {
+        Schema::create('messages', function ($table) {
+            $table->id();
+            $table->boolean('sent')->default(false);
+            $table->text('error')->nullable();
+        });
+        DB::table('messages')->insert([
+            ['id' => 1, 'sent' => 1, 'error' => null],
+            ['id' => 2, 'sent' => 0, 'error' => "Brevo bloque l'envoi"],
+        ]);
+
+        $workflow = $this->workflow('A');
+        $execution = $this->execution($workflow);
+        $this->step($execution, 'a1', 'action', 'completed', ['result' => ['message_id' => 1]]);
+        $this->step($execution, 'a2', 'action', 'completed', ['result' => ['message_id' => 2]]);
+        $this->step($execution, 'a3', 'action', 'completed', ['result' => ['sms_id' => 5]]);
+
+        $steps = $this->monitor->detail($execution)['steps'];
+
+        $this->assertSame(['sent' => true, 'error' => null], $steps[0]['delivery']);
+        $this->assertSame(['sent' => false, 'error' => "Brevo bloque l'envoi"], $steps[1]['delivery']);
+        $this->assertNull($steps[2]['delivery']);
     }
 
     // List

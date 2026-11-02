@@ -84,6 +84,32 @@ class WorkflowEvents
     }
 
     /**
+     * What puts prospects in or out of a filter changed without the prospect
+     * itself being saved (a label attached or removed...): only the "enters /
+     * leaves a filter" triggers need to look again.
+     *
+     * @param  int[]  $ids
+     */
+    public static function membershipsChanged(int $projectId, array $ids): void
+    {
+        try {
+            if (WorkflowTriggerResolver::suppressed() || !$ids) {
+                return;
+            }
+
+            if (!app(WorkflowTriggerResolver::class)->hasSubject(WorkflowSubject::PROSPECT, $projectId)) {
+                return;
+            }
+
+            foreach (array_chunk(array_values(array_unique($ids)), 500) as $chunk) {
+                EvaluateWorkflowTriggers::dispatch(WorkflowSubject::PROSPECT, $chunk, $projectId, 'membership', time())->afterCommit();
+            }
+        } catch (\Throwable $e) {
+            report($e);
+        }
+    }
+
+    /**
      * Prospects created in bulk (sheet synchronisation)
      *
      * @param  int[]  $ids

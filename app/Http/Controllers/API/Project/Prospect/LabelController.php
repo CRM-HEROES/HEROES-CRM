@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Project\Prospect;
 
 use App\Events\ProspectLabelAttached;
+use App\Workflows\WorkflowEvents;
 use App\Http\Controllers\Controller;
 use App\Models\Label;
 use App\Models\Project;
@@ -50,6 +51,8 @@ class LabelController extends Controller
             ProspectLabelAttached::dispatch($prospect, $label, $oldValue, $changedAt);
         });
 
+        WorkflowEvents::membershipsChanged($project->id, [$prospect->id]);
+
         return [
             'message' => trans('common.success.attached_resource'),
             'label' => $prospect->labels()->whereKey($label->id)
@@ -78,6 +81,8 @@ class LabelController extends Controller
             $prospect->labels()->detach($label->id);
             $history->record($prospect, $label, $oldValue, $history->value($prospect, $label));
         });
+
+        WorkflowEvents::membershipsChanged($project->id, [$prospect->id]);
 
         return ['message' => trans('common.success.detached_resource')];
     }
@@ -123,10 +128,12 @@ class LabelController extends Controller
         switch ($request->input('action')) {
             case "attach":
                 $this->bulkActionAttach($prospects, $labels);
+                WorkflowEvents::membershipsChanged($project->id, $prospects);
                 return ['message' => trans('common.success.updated_resource')];            
 
             case "detach":
                 $this->bulkActionDetach($prospects, $labels);
+                WorkflowEvents::membershipsChanged($project->id, $prospects);
                 return ['message' => trans('common.success.deleted_resource')];
 
             default:
