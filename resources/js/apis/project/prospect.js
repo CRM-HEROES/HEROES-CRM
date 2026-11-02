@@ -13,8 +13,11 @@ export default {
     show(project, prospect) {
         return ApiService.get(`project/${project}/prospect/${prospect}`);
     },
-    history(project, prospect) {
-        return ApiService.get(`project/${project}/prospect/${prospect}/history`);
+    history(project, prospect, type) {
+        return ApiService.get(
+            `project/${project}/prospect/${prospect}/history`,
+            type ? { type } : undefined
+        );
     },
     duplicate(project, prospect) {
         return ApiService.post(

@@ -230,6 +230,12 @@ const actions = {
                 id: params.id,
                 history_latest: data.history_latest,
                 history_count: data.history_count,
+                calls_history_latest: data.calls_history_latest,
+                calls_history_count: data.calls_history_count,
+                sms_history_latest: data.sms_history_latest,
+                sms_history_count: data.sms_history_count,
+                email_history_latest: data.email_history_latest,
+                email_history_count: data.email_history_count,
             });
         }
 

@@ -31804,8 +31804,10 @@ __webpack_require__.r(__webpack_exports__);
   show: function show(project, prospect) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/prospect/").concat(prospect));
   },
-  history: function history(project, prospect) {
-    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/prospect/").concat(prospect, "/history"));
+  history: function history(project, prospect, type) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/prospect/").concat(prospect, "/history"), type ? {
+      type: type
+    } : undefined);
   },
   duplicate: function duplicate(project, prospect) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/prospect/").concat(prospect, "/duplicate"));
@@ -44661,7 +44663,13 @@ var actions = _objectSpread(_objectSpread(_objectSpread(_objectSpread(_objectSpr
             context.commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, {
               id: params.id,
               history_latest: data.history_latest,
-              history_count: data.history_count
+              history_count: data.history_count,
+              calls_history_latest: data.calls_history_latest,
+              calls_history_count: data.calls_history_count,
+              sms_history_latest: data.sms_history_latest,
+              sms_history_count: data.sms_history_count,
+              email_history_latest: data.email_history_latest,
+              email_history_count: data.email_history_count
             });
           }
           if (!["email", "mobile_phone_number", "phone_number"].some(function (field) {

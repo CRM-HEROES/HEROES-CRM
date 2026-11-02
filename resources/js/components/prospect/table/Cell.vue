@@ -66,6 +66,15 @@
             v-else-if="category == 'history'"
             :prospect="prospect"
         />
+        <history-cell
+            v-else-if="
+                ['history-sms', 'history-calls', 'history-emails'].includes(
+                    category
+                )
+            "
+            :prospect="prospect"
+            :history-type="column.historyType"
+        />
         <sms-cell
             v-else-if="category == 'sms'"
             :prospect="prospect"
