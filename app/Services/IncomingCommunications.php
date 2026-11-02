@@ -130,4 +130,28 @@ class IncomingCommunications
             'communication_id' => $id, 'read_at' => $readAt,
         ])->all());
     }
+
+    public function smsReadHistory(Project $project, int $prospectId): Collection
+    {
+        $project->prospects()->findOrFail($prospectId);
+
+        return DB::table('communication_reads')
+            ->join('sms', 'sms.id', '=', 'communication_reads.communication_id')
+            ->leftJoin('users', 'users.id', '=', 'communication_reads.user_id')
+            ->where('communication_reads.communication_type', 'sms')
+            ->where('sms.prospect_id', $prospectId)
+            ->where(function ($incoming) {
+                $incoming->where('sms.is_incoming', true)
+                    ->orWhere('sms.from_user', false);
+            })
+            ->orderByDesc('communication_reads.read_at')
+            ->limit(1)
+            ->get([
+                'sms.id',
+                'sms.message',
+                'communication_reads.user_id',
+                'communication_reads.read_at',
+                'users.name as user_name',
+            ]);
+    }
 }

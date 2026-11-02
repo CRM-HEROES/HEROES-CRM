@@ -133,15 +133,22 @@ test('playing a voicemail does not process it', () => {
 });
 
 function processor(type, handler = async () => true) {
-    const calls = [];
+    const calls = [], historyRequests = [];
     const component = load('components/prospect/ProcessCommunications.vue', {
         '@/utils/incoming-communications': { markCommunicationsRead: async (...args) => {
             calls.push(args); return handler(...args);
         } },
+        '@/apis/project/incoming-communication': {
+            smsHistory: async (...args) => {
+                historyRequests.push(args);
+                return { data: [{ id: 1, message: 'Hello', user_name: 'Agent' }] };
+            },
+        },
     }).default;
     const vm = {
         ...component.data(), ...component.methods,
         projectSlug: 'test', prospect: { id: 2 }, type, disabled: false,
+        showHistory: false,
         records: [
             { id: 1, prospect_id: 2, from_user: false, call_outcome: 'voicemail' },
             { id: 2, prospect_id: 2, from_user: true, call_outcome: 'voicemail' },
@@ -149,7 +156,7 @@ function processor(type, handler = async () => true) {
         ],
     };
     Object.defineProperty(vm, 'pendingRecords', { get: () => component.computed.pendingRecords.call(vm) });
-    return { vm, calls };
+    return { vm, calls, historyRequests, component };
 }
 
 test('the process button handles only incoming messages of the displayed prospect', async () => {
@@ -160,6 +167,21 @@ test('the process button handles only incoming messages of the displayed prospec
         assert.deepEqual(h.calls, [['test', 2, type, [h.vm.records[0]]]]);
         assert.deepEqual(h.vm.pendingRecords, []);
     }
+});
+
+test('one SMS processing click marks only the most recent unread SMS', async () => {
+    const h = processor('sms');
+    h.vm.records = [
+        { id: 10, prospect_id: 2, from_user: false, created_at: '2026-11-01T10:00:00Z' },
+        { id: 12, prospect_id: 2, from_user: false, created_at: '2026-11-01T12:00:00Z' },
+        { id: 11, prospect_id: 2, from_user: false, created_at: '2026-11-01T11:00:00Z' },
+    ];
+    h.vm.prospect.unread_communications = { sms: [10, 11, 12] };
+
+    await h.vm.process();
+
+    assert.deepEqual(h.calls[0][3].map(record => record.id), [12]);
+    assert.deepEqual(h.vm.pendingRecords.map(record => record.id), [10, 11]);
 });
 
 test('messages received during processing still require a new click', async () => {
@@ -191,6 +213,18 @@ test('failed processing leaves messages pending and allows retrying', async () =
     assert.equal(h.vm.pendingRecords.length, 0);
 });
 
+test('SMS processing history loads from the server and refreshes after processing', async () => {
+    const h = processor('sms');
+    h.vm.showHistory = true;
+    await h.component.created.call(h.vm);
+    assert.deepEqual(h.historyRequests, [['test', 2]]);
+    assert.deepEqual(h.vm.history, [{ id: 1, message: 'Hello', user_name: 'Agent' }]);
+
+    await h.vm.process();
+    assert.equal(h.historyRequests.length, 2);
+    assert.deepEqual(h.vm.history[0], { id: 1, message: 'Hello', user_name: 'Agent' });
+});
+
 test('the unread metadata identifies voicemails even when provider fields differ', async () => {
     const h = processor('voicemail');
     h.vm.prospect.unread_communications = { voicemail: ['4'] };
@@ -199,8 +233,23 @@ test('the unread metadata identifies voicemails even when provider fields differ
     assert.deepEqual(h.calls[0][3].map(record => record.id), [4]);
 });
 
-test('SMS and call slides place manual processing at the bottom; email has no process button', () => {
-    for (const [kind, type] of [['sms', 'sms'], ['interaction', 'voicemail'], ['message', null]]) {
+test('SMS messages stay above the form, followed by actions and history', () => {
+    const smsSource = fs.readFileSync(path.join(sourceRoot, 'components/prospect/sms/Slide.vue'), 'utf8');
+    const formIndex = smsSource.indexOf('<form');
+    const processIndex = smsSource.indexOf('<process-communications');
+    const smsListIndex = smsSource.indexOf('class="hc-prospect-sms-list"');
+    assert.ok(smsListIndex >= 0 && formIndex > smsListIndex && processIndex > formIndex);
+    assert.match(smsSource.slice(processIndex), /show-history/);
+    const processorTemplate = parse(fs.readFileSync(
+        path.join(sourceRoot, 'components/prospect/ProcessCommunications.vue'), 'utf8'
+    )).descriptor.template.content;
+    assert.ok(processorTemplate.indexOf('<buttons>') < processorTemplate.indexOf('hc-process-communications-history'));
+    assert.match(processorTemplate, /not_processed/);
+    assert.match(processorTemplate, /processed_by/);
+    assert.match(processorTemplate, /class="hc-button-warning"/);
+    assert.match(processorTemplate, /class="hc-button-secondary"/);
+
+    for (const [kind, type] of [['interaction', 'voicemail'], ['message', null]]) {
         const source = fs.readFileSync(path.join(sourceRoot, `components/prospect/${kind}/Slide.vue`), 'utf8');
         const template = baseParse(parse(source).descriptor.template.content);
         const slide = template.children.find(node => node.tag === 'slide');
@@ -214,4 +263,14 @@ test('SMS and call slides place manual processing at the bottom; email has no pr
         assert.equal(footer.props.find(prop => prop.name === 'type').value.content, type);
         assert.ok(footer.props.some(prop => prop.name === 'if'));
     }
+});
+
+test('the SMS non-processed action closes the slide', () => {
+    const commits = [];
+    const component = load('components/prospect/sms/Slide.vue', {
+        vuex: { mapGetters: () => ({}) },
+        '@/store': { commit: (...args) => commits.push(args) },
+    }).default;
+    component.methods.closeSlide();
+    assert.deepEqual(commits, [['CLOSE_SLIDE']]);
 });
