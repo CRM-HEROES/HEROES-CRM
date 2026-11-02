@@ -42,3 +42,27 @@ test('ticking an item adds it, ticking it again removes it, others are kept', ()
     assert.equal(vm.isChosen(5), true);
     assert.equal(vm.isChosen(9), false);
 });
+
+test('the operators are loaded again when the action changes (SMS instead of email)', () => {
+    const { code } = transformSync(descriptor.script.content, {
+        babelrc: false,
+        configFile: false,
+        plugins: ['@babel/plugin-transform-modules-commonjs'],
+    });
+    const stubs = { vuex: { mapGetters: () => ({}) }, '@/store': {}, '@/apis/project/workflow': {}, '@/apis/project/label': {} };
+    const module_ = { exports: {} };
+    new Function('module', 'exports', 'require', code)(module_, module_.exports, (id) => stubs[id] || {});
+    const component = module_.exports.default;
+
+    const calls = [];
+    const vm = { type: 'provider', providers: [{ ref: 'email:project' }], loadProviders: () => calls.push('load') };
+
+    component.watch['field.capability'].call(vm);
+
+    assert.deepEqual(vm.providers, []); // the email operator is not offered for a SMS
+    assert.deepEqual(calls, ['load']);
+
+    // And the editor starts a new field for each action
+    const editor = fs.readFileSync(path.resolve(__dirname, '../../resources/js/components/workflow/NodeEditor.vue'), 'utf8');
+    assert.ok(editor.includes(`v-for="field in actionDef.fields" :key="config.action + ':' + field.key"`));
+});
