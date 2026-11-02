@@ -1095,6 +1095,40 @@ export default {
                     columnId: "history",
                     headerId: "hc-prospects-table-header-history-history",
                 },
+                {
+                    type: "other",
+                    name: `${this.$t(
+                        "prospect.table.column.others.sms"
+                    )} (${this.$t(
+                        "prospect.table.column.others.history"
+                    )})`,
+                    icon: "fa fa-comment icon-purple",
+                    columnId: "history-sms",
+                    headerId:
+                        "hc-prospects-table-header-history-sms-history-sms",
+                },
+                {
+                    type: "other",
+                    name: `${this.$t(
+                        "prospect.table.column.others.calls"
+                    )} (${this.$t(
+                        "prospect.table.column.others.history"
+                    )})`,
+                    icon: "fa fa-phone icon-orange",
+                    columnId: "history-calls",
+                    headerId:
+                        "hc-prospects-table-header-history-calls-history-calls",
+                },
+                {
+                    type: "other",
+                    name: `${this.$t("auth.email")} (${this.$t(
+                        "prospect.table.column.others.history"
+                    )})`,
+                    icon: "fa fa-envelope icon-green",
+                    columnId: "history-emails",
+                    headerId:
+                        "hc-prospects-table-header-history-emails-history-emails",
+                },
                 // Events
                 {
                     type: "other",

@@ -921,6 +921,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         icon: "fa fa-clock icon-brown",
         columnId: "history",
         headerId: "hc-prospects-table-header-history-history"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.sms"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-comment icon-purple",
+        columnId: "history-sms",
+        headerId: "hc-prospects-table-header-history-sms-history-sms"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("prospect.table.column.others.calls"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-phone icon-orange",
+        columnId: "history-calls",
+        headerId: "hc-prospects-table-header-history-calls-history-calls"
+      }, {
+        type: "other",
+        name: "".concat(this.$t("auth.email"), " (").concat(this.$t("prospect.table.column.others.history"), ")"),
+        icon: "fa fa-envelope icon-green",
+        columnId: "history-emails",
+        headerId: "hc-prospects-table-header-history-emails-history-emails"
       },
       // Events
       {

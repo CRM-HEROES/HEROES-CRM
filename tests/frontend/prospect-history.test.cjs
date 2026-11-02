@@ -124,7 +124,7 @@ async function settle() {
     await nextTick();
 }
 
-function historyCell(t, prospect = summary(), response = []) {
+function historyCell(t, prospect = summary(), response = [], historyType = null) {
     const requests = [];
     const service = {
         history: async (...args) => {
@@ -134,7 +134,7 @@ function historyCell(t, prospect = summary(), response = []) {
         },
     };
     return {
-        ...mount(t, component('cell/HistoryCell.vue', { '@/apis/project/prospect': service }), { prospect }),
+        ...mount(t, component('cell/HistoryCell.vue', { '@/apis/project/prospect': service }), { prospect, historyType }),
         requests,
     };
 }
@@ -161,6 +161,43 @@ test('mount renders only the latest summary and its real count without fetching 
     assert.equal(cell.root.tabindex, 0);
     assert.equal(details(cell.root).length, 0);
     assert.deepEqual(prospect, summary(latest, 27));
+});
+
+test('activity-specific columns use their own summary and request only matching history', async t => {
+    const latest = row(15);
+    const prospect = {
+        id: 7,
+        sms_history_latest: latest,
+        sms_history_count: 2,
+        history_latest: row(8),
+        history_count: 10,
+    };
+    const cell = historyCell(t, prospect, [latest], 'sms');
+    await settle();
+    assert.deepEqual(ids(cell.root), [15]);
+    assert.equal(badge(cell.root)[0].textContent, '2');
+    await hover(cell);
+    await settle();
+    assert.deepEqual(cell.requests, [['test', 7, 'sms']]);
+    assert.deepEqual(ids(details(cell.root)[0]), [15]);
+});
+
+test('call history rows expose the same play and pause controls as the interaction slide', () => {
+    const component = load('components/prospect/profile/blocs/history/InteractionItem.vue').default;
+    const audio = { playCount: 0, pauseCount: 0, play() { this.playCount++; }, pause() { this.pauseCount++; } };
+    const context = {
+        $refs: { audio },
+        playingAudio: false,
+    };
+
+    component.methods.toggleAudio.call(context);
+    assert.equal(audio.playCount, 1);
+    context.playingAudio = true;
+    component.methods.toggleAudio.call(context);
+    assert.equal(audio.pauseCount, 1);
+    assert.equal(component.computed.audioIcon.call({ playingAudio: false, item: { source: 'cloudtalk' } }), 'fa fa-play-circle');
+    assert.equal(component.computed.audioIcon.call({ playingAudio: true, item: { source: 'cloudtalk' } }), 'fa fa-pause-circle');
+    assert.match(fs.readFileSync(path.join(sourceRoot, 'components/prospect/profile/blocs/history/InteractionItem.vue'), 'utf8'), /v-if="item\.audio"/);
 });
 
 test('missing and empty summaries stay empty and unfocusable without a history request', async t => {
@@ -359,6 +396,39 @@ test('adding the history column produces a working table column, header and summ
     assert.equal(badge(cell.root)[0].textContent, '3');
 });
 
+test('adding SMS, calls and email history columns maps to their filtered summaries', async t => {
+    const slide = load(tableRoot + 'slides/add-column/Slide.vue').default;
+    const state = {
+        fields: [], categories: [], threads: [], calendars: [], prospectsTableSetting: [],
+        eventFields: [], project: { slug: 'test' }, can: () => true, $t: key => key,
+    };
+    const table = load(tableRoot + 'Table.vue').default;
+    const histories = [
+        ['history-sms', 'history-sms', 'sms', 'sms_history_latest', 'sms_history_count'],
+        ['history-calls', 'history-calls', 'interaction', 'calls_history_latest', 'calls_history_count'],
+        ['history-emails', 'history-emails', 'message', 'email_history_latest', 'email_history_count'],
+    ];
+
+    for (const [key, category, type, latestKey, countKey] of histories) {
+        const choice = slide.computed.columns.call(state).find(column => column.columnId === key);
+        assert.ok(choice, `${key} is available in the add-column slide`);
+        const [column] = table.computed.columns.call({
+            ...state, projectUserSettingsProspectsTable: [{ key }],
+        });
+        assert.equal(column.category, category);
+        assert.equal(column.historyType, type);
+        assert.equal(column.name, choice.name);
+        const header = mount(t, component('HeaderCell.vue'), { column });
+        assert.equal(header.root.id, choice.headerId);
+
+        const latest = row(15);
+        const prospect = { id: 7, [latestKey]: latest, [countKey]: 2 };
+        const cell = mount(t, component('Cell.vue'), { column, prospect });
+        assert.deepEqual(ids(cell.root), [15]);
+        assert.equal(badge(cell.root)[0].textContent, '2');
+    }
+});
+
 function updateHarness(prospects, response = { history_latest: null, history_count: 0 }) {
     const requests = [], commits = [];
     const store = load('store/project/prospect.js', {
@@ -373,7 +443,12 @@ function updateHarness(prospects, response = { history_latest: null, history_cou
 
 test('updates refresh the displayed history summary without fetching complete history', async () => {
     for (const prospect of [summary(), summary(null, 0)]) {
-        const updated = { history_latest: row(12), history_count: 4 };
+        const updated = {
+            history_latest: row(12), history_count: 4,
+            calls_history_latest: row(11), calls_history_count: 3,
+            sms_history_latest: row(10), sms_history_count: 2,
+            email_history_latest: row(9), email_history_count: 1,
+        };
         const harness = updateHarness([prospect], updated);
         const params = Object.freeze({ id: 7, name: 'Updated' });
         await harness.run(params);

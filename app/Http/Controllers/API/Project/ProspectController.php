@@ -164,11 +164,14 @@ class ProspectController extends Controller
     /**
      * Load the complete timeline when the history cell is opened.
      */
-    public function history(Project $project, Prospect $prospect)
+    public function history(Request $request, Project $project, Prospect $prospect)
     {
         abort_unless($prospect->project_id == $project->id, 404);
 
-        app(ProspectHistory::class)->append($prospect->newCollection([$prospect]), $project);
+        $type = $request->query('type');
+        abort_if($type !== null && !in_array($type, ['sms', 'interaction', 'message'], true), 422);
+
+        app(ProspectHistory::class)->append($prospect->newCollection([$prospect]), $project, $type);
 
         return $prospect->history;
     }
@@ -206,6 +209,10 @@ class ProspectController extends Controller
             app(ProspectHistory::class)->appendSummary($prospect->newCollection([$prospect]), $project);
             $response['history_latest'] = $prospect->history_latest;
             $response['history_count'] = $prospect->history_count;
+            foreach (['calls', 'sms', 'email'] as $type) {
+                $response[$type . '_history_latest'] = $prospect->{$type . '_history_latest'};
+                $response[$type . '_history_count'] = $prospect->{$type . '_history_count'};
+            }
         }
 
         return $response;
@@ -485,7 +492,7 @@ class ProspectController extends Controller
             return array_map(function($field) {
                 return $field['key'];
             }, array_filter($userSetting->value, function ($field) {
-                return $field['key'] !== 'history' || empty($field['hidden']);
+                return !in_array($field['key'], ['history', 'history-sms', 'history-calls', 'history-emails'], true) || empty($field['hidden']);
             }));
         }
 
@@ -495,7 +502,7 @@ class ProspectController extends Controller
         if ($projectSetting) {
             return $projectSetting->filter(function ($field) {
                 $field = (array) $field;
-                return $field['key'] !== 'history' || empty($field['hidden']);
+                return !in_array($field['key'], ['history', 'history-sms', 'history-calls', 'history-emails'], true) || empty($field['hidden']);
             })->map(function($field) {
                 $field = (array) $field;
                 return $field['key'];
@@ -816,7 +823,7 @@ class ProspectController extends Controller
 
         app(IncomingCommunications::class)->appendUnread($data->getCollection(), $project, $request->user()->id);
 
-        if (in_array('history', $fields)) {
+        if (array_intersect($fields, ['history', 'history-sms', 'history-calls', 'history-emails'])) {
             app(ProspectHistory::class)->appendSummary($data->getCollection(), $project);
         }
 

@@ -56,6 +56,10 @@ export default {
             type: Object,
             required: true,
         },
+        historyType: {
+            type: String,
+            default: null,
+        },
     },
 
     data() {
@@ -111,10 +115,17 @@ export default {
             this.loadError = false;
 
             try {
-                const { data } = await ProspectService.history(
-                    this.project.slug,
-                    this.prospect.id
-                );
+                const request = this.historyType
+                    ? ProspectService.history(
+                          this.project.slug,
+                          this.prospect.id,
+                          this.historyType
+                      )
+                    : ProspectService.history(
+                          this.project.slug,
+                          this.prospect.id
+                      );
+                const { data } = await request;
                 if (requestId !== this.requestId || key !== this.summaryKey) return;
                 if (!Array.isArray(data)) throw new Error("Invalid prospect history response");
                 this.cachedHistory = data;
@@ -146,18 +157,32 @@ export default {
         ...mapGetters(["project"]),
 
         latest() {
-            const latest = this.prospect.history_latest;
+            const latest = this.prospect[this.summaryFields.latest];
             return latest && latest.created_at ? latest : null;
         },
 
         historyCount() {
-            return Math.max(0, Number(this.prospect.history_count) || 0);
+            return Math.max(
+                0,
+                Number(this.prospect[this.summaryFields.count]) || 0
+            );
+        },
+
+        summaryFields() {
+            const fields = {
+                sms: ["sms_history_latest", "sms_history_count"],
+                interaction: ["calls_history_latest", "calls_history_count"],
+                message: ["email_history_latest", "email_history_count"],
+            }[this.historyType] || ["history_latest", "history_count"];
+
+            return { latest: fields[0], count: fields[1] };
         },
 
         summaryKey() {
             return JSON.stringify([
                 this.project && this.project.slug,
                 this.prospect.id,
+                this.historyType,
                 this.historyCount,
                 this.latest,
             ]);

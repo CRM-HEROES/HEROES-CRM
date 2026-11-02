@@ -10,7 +10,14 @@
         :id="id"
     >
         <label
-            v-if="column.category == 'history'"
+            v-if="
+                [
+                    'history',
+                    'history-sms',
+                    'history-calls',
+                    'history-emails',
+                ].includes(column.category)
+            "
             class="hc-relation-header-cell-label"
         >
             <span v-text="column.name"></span>

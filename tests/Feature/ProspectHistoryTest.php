@@ -58,7 +58,7 @@ class ProspectHistoryTest extends TestCase
             'order_product' => ['order_id', 'product_id', 'price', 'tax', 'including_tax', 'quantity', 'currency', 'meta'],
             'revisions' => ['revisionable_id', 'revisionable_type', 'key', 'old_value', 'new_value', 'user_id'],
             'sms' => ['prospect_id', 'source', 'message', 'creator_id'],
-            'interactions' => ['prospect_id', 'source', 'creator_id'],
+            'interactions' => ['prospect_id', 'source', 'creator_id', 'path', 'data'],
             'prospect_user' => ['prospect_id', 'user_id', 'creator_id'],
             'user_folder' => ['folder_id', 'user_id'],
             'user_file' => ['file_id', 'user_id'],
@@ -209,6 +209,18 @@ class ProspectHistoryTest extends TestCase
         $this->assertSame('sms', $prospects->first()->history_latest['type']);
         $this->assertSame('Latest', $prospects->first()->history_latest['message']);
         $this->assertSame('Actor', $prospects->first()->history_latest['creator']->name);
+        $this->assertSame(1, $prospects->first()->calls_history_count);
+        $this->assertSame('interaction', $prospects->first()->calls_history_latest['type']);
+        $this->assertStringContainsString(
+            '/interaction/1/audio',
+            $prospects->first()->calls_history_latest['audio']
+        );
+        $this->assertArrayNotHasKey('path', $prospects->first()->calls_history_latest);
+        $this->assertArrayNotHasKey('data', $prospects->first()->calls_history_latest);
+        $this->assertSame(1, $prospects->first()->sms_history_count);
+        $this->assertSame('sms', $prospects->first()->sms_history_latest['type']);
+        $this->assertSame(1, $prospects->first()->email_history_count);
+        $this->assertSame('message', $prospects->first()->email_history_latest['type']);
         $this->assertSame($messages, $prospects->first()->getRelation('messages'));
         $this->assertArrayNotHasKey('history', $prospects->first()->getAttributes());
         $this->assertSame(0, $prospects->last()->history_count);
@@ -245,7 +257,7 @@ class ProspectHistoryTest extends TestCase
         DB::enableQueryLog();
         (new ProspectHistory())->appendSummary($one, $project);
         $oneCount = count(DB::getQueryLog());
-        $this->assertCount(1, $retrieved);
+        $this->assertCount(3, $retrieved);
         $this->assertSame(240, $one->first()->history_count);
         $this->assertStringContainsString('COUNT(*) OVER', DB::getQueryLog()[2]['query']);
 
@@ -254,7 +266,7 @@ class ProspectHistoryTest extends TestCase
         (new ProspectHistory())->appendSummary($two, $project);
         $this->assertSame($oneCount, count(DB::getQueryLog()));
         $this->assertLessThan(10, $oneCount);
-        $this->assertCount(2, $retrieved);
+        $this->assertCount(4, $retrieved);
         $this->assertSame(1, $two->last()->history_count);
         DB::disableQueryLog();
     }
@@ -355,10 +367,35 @@ class ProspectHistoryTest extends TestCase
     public function test_history_endpoint_loads_full_timeline(): void
     {
         $this->seedHistory();
-        $response = (new ProspectController())->history($this->project(), Prospect::query()->findOrFail(1));
+        $response = (new ProspectController())->history(Request::create('/'), $this->project(), Prospect::query()->findOrFail(1));
 
         $this->assertCount(40, $response);
         $this->assertSame('sms', $response[0]['type']);
+    }
+
+    public function test_history_endpoint_can_load_only_a_requested_activity_type(): void
+    {
+        $this->seedHistory();
+        $response = (new ProspectController())->history(
+            Request::create('/', 'GET', ['type' => 'message']),
+            $this->project(),
+            Prospect::query()->findOrFail(1)
+        );
+
+        $this->assertCount(1, $response);
+        $this->assertSame('message', $response[0]['type']);
+    }
+
+    public function test_history_endpoint_rejects_unknown_activity_types(): void
+    {
+        $this->seedHistory();
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+
+        (new ProspectController())->history(
+            Request::create('/', 'GET', ['type' => 'unknown']),
+            $this->project(),
+            Prospect::query()->findOrFail(1)
+        );
     }
 
     public function test_history_endpoint_rejects_a_prospect_from_another_project(): void
@@ -367,7 +404,7 @@ class ProspectHistoryTest extends TestCase
         $prospect->project_id = 2;
         $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
 
-        (new ProspectController())->history($this->project(), $prospect);
+        (new ProspectController())->history(Request::create('/'), $this->project(), $prospect);
     }
 
     public function test_replacing_unique_label_keeps_legacy_assignment_and_all_other_history_after_reload(): void
@@ -632,7 +669,7 @@ class ProspectHistoryTest extends TestCase
 
     protected function timeline(): array
     {
-        return (new ProspectController())->history($this->project(), Prospect::findOrFail(1));
+        return (new ProspectController())->history(Request::create('/'), $this->project(), Prospect::findOrFail(1));
     }
 
     protected function assertSummaryMatchesTimeline(): void
@@ -660,7 +697,10 @@ class ProspectHistoryTest extends TestCase
         DB::table('labels')->insert(['id' => 1, 'category_id' => 1, 'name' => 'New']);
         DB::table('prospect_label')->insert($common + ['label_id' => 1]);
         DB::table('links')->insert($common + ['name' => 'Website', 'link' => 'https://example.test']);
-        DB::table('interactions')->insert($common + ['source' => 'cloudtalk']);
+        DB::table('interactions')->insert($common + [
+            'source' => 'cloudtalk',
+            'path' => 'recordings/call.mp3',
+        ]);
         DB::table('messages')->insert($common + ['id' => 1, 'thread_id' => 1, 'body' => 'Follow-up']);
         DB::table('orders')->insert($common + ['name' => 'Quote']);
         DB::table('products')->insert(['id' => 1, 'name' => 'Service']);

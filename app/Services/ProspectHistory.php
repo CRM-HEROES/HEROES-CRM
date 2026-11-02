@@ -31,13 +31,25 @@ class ProspectHistory
     /**
      * Load the timeline for the current page without changing its table relations.
      */
-    public function append(Collection $prospects, Project $project): void
+    public function append(Collection $prospects, Project $project, ?string $type = null): void
     {
         if ($prospects->isEmpty()) {
             return;
         }
 
         [$revisionFields, $relations] = $this->configuration($project);
+        if ($type !== null) {
+            $relation = array_search($type, self::TYPES, true);
+            if ($relation === false) {
+                throw new \InvalidArgumentException('Unsupported prospect history type.');
+            }
+
+            $relations = array_filter(
+                $relations,
+                fn ($constraint, $name) => $name === $relation || str_starts_with($name, $relation . '.'),
+                ARRAY_FILTER_USE_BOTH
+            );
+        }
         $histories = $this->hydrate($prospects, $project, $revisionFields, $relations);
 
         foreach ($prospects as $prospect) {
@@ -85,9 +97,51 @@ class ProspectHistory
         $latest = $connection->query()->fromSub($ranked, 'ranked_history')
             ->where('history_rank', 1)->get()->keyBy('prospect_id');
 
+        $activityUnion = null;
+        $activityRelations = ['interactions', 'sms', 'messages'];
+        foreach (array_keys(self::TYPES) as $rank => $name) {
+            if (!in_array($name, $activityRelations, true)) {
+                continue;
+            }
+
+            $relation = Relation::noConstraints(fn () => $prototype->{$name}());
+            $relations[$name]($relation);
+            [$prospectKey, $itemKey, $createdAt] = $this->columns($relation);
+
+            if ($relation instanceof MorphMany) {
+                $relation->where($relation->getQualifiedMorphType(), $relation->getMorphClass());
+            }
+
+            $query = $relation->getQuery()
+                ->whereIn($prospectKey, $prospects->modelKeys())
+                ->whereNotNull($createdAt)
+                ->select([$prospectKey . ' as prospect_id', $itemKey . ' as item_id', $createdAt . ' as created_at'])
+                ->selectRaw('? as activity_relation', [$name])
+                ->selectRaw('? as type_rank', [$rank])
+                ->toBase();
+            $activityUnion = $activityUnion ? $activityUnion->unionAll($query) : $query;
+        }
+
+        $activityRanked = $connection->query()->fromSub($activityUnion, 'activity_entries')
+            ->select('prospect_id', 'item_id', 'created_at', 'activity_relation', 'type_rank')
+            ->selectRaw('COUNT(*) OVER (PARTITION BY prospect_id, activity_relation) as activity_count')
+            ->selectRaw('ROW_NUMBER() OVER (PARTITION BY prospect_id, activity_relation ORDER BY created_at DESC, item_id DESC) as activity_rank');
+        $activities = $connection->query()->fromSub($activityRanked, 'ranked_activities')
+            ->where('activity_rank', 1)->get();
+
+        $referencesByRank = [];
+        foreach ($latest as $reference) {
+            $referencesByRank[$reference->type_rank][] = $reference;
+        }
+        foreach ($activities as $reference) {
+            $referencesByRank[$reference->type_rank][] = $reference;
+        }
+
         $latestRelations = [];
         foreach (array_keys(self::TYPES) as $rank => $name) {
-            $references = $latest->where('type_rank', $rank);
+            $references = collect($referencesByRank[$rank] ?? [])->unique(function ($reference) {
+                return $reference->prospect_id . ':' . $reference->item_id . ':' . $reference->created_at;
+            });
             if ($references->isEmpty()) {
                 continue;
             }
@@ -119,6 +173,20 @@ class ProspectHistory
         foreach ($prospects as $prospect) {
             $prospect->setAttribute('history_latest', $histories->get($prospect->id)->first());
             $prospect->setAttribute('history_count', (int) ($latest->get($prospect->id)->history_count ?? 0));
+
+            foreach ([
+                'interactions' => ['prefix' => 'calls', 'type' => 'interaction'],
+                'sms' => ['prefix' => 'sms', 'type' => 'sms'],
+                'messages' => ['prefix' => 'email', 'type' => 'message'],
+            ] as $relation => $activity) {
+                $summary = $activities->first(fn ($item) => $item->activity_relation === $relation && $item->prospect_id == $prospect->id);
+                $latestActivity = $summary
+                    ? $histories->get($prospect->id)->first(fn ($item) => $item['type'] === $activity['type'] && $item['id'] == $summary->item_id)
+                    : null;
+
+                $prospect->setAttribute($activity['prefix'] . '_history_latest', $latestActivity);
+                $prospect->setAttribute($activity['prefix'] . '_history_count', (int) ($summary->activity_count ?? 0));
+            }
         }
     }
 
@@ -173,7 +241,15 @@ class ProspectHistory
             'groups' => function ($query) {
                 $query->select('groups.id', 'name')->withPivot('created_at', 'creator_id');
             },
-            'interactions' => fn ($query) => $query->select('id', 'prospect_id', 'source', 'creator_id', 'created_at'),
+            'interactions' => fn ($query) => $query->select(
+                'id',
+                'prospect_id',
+                'source',
+                'creator_id',
+                'created_at',
+                'path',
+                'data'
+            ),
             'labels' => function ($query) use ($categories) {
                 $query->select('labels.id', 'name', 'category_id', 'color', 'bgcolor')
                     ->whereIn('category_id', $categories->pluck('id'))
@@ -269,6 +345,15 @@ class ProspectHistory
                         ]);
                     } elseif ($type === 'order') {
                         $entry['name'] = $item->name;
+                    } elseif ($type === 'interaction') {
+                        unset($entry['path'], $entry['data']);
+                        if ($item->path || $item->hasCloudTalkRecording()) {
+                            $entry['audio'] = route('api.project.prospect.interaction.audio', [
+                                'project' => $project->slug,
+                                'prospect' => $prospect->id,
+                                'interaction' => $item->id,
+                            ]);
+                        }
                     }
 
                     $history->push($entry);
