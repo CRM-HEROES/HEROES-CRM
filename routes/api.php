@@ -564,6 +564,7 @@ Route::group([
 
         // Prospect
         Route::get('prospect/count', [ProjectProspectController::class, 'count']);
+        Route::post('prospect/find-replace', [ProjectProspectController::class, 'findReplace']);
         Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
         Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);

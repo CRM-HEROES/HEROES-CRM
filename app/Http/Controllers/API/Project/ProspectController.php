@@ -311,6 +311,91 @@ class ProspectController extends Controller
     }
 
     /**
+     * Find (and optionally replace) a text in one column
+     * of the prospects matching the current filters.
+     *
+     * - mode "preview": count matches and return a few samples
+     * - mode "replace": replace every occurrence
+     */
+    public function findReplace(Request $request, ProspectRequestFilters $filters, Project $project)
+    {
+        $this->validate($request, [
+            'field' => 'required|string',
+            'search' => 'required|string',
+            'replace' => 'nullable|string',
+            'mode' => 'required|in:preview,replace',
+            'case_sensitive' => 'nullable|boolean',
+        ]);
+
+        $meta = Str::startsWith($request->input('field'), 'meta->');
+        $slug = Str::replace('meta->', '', $request->input('field'));
+
+        if (!$project->fields()->where('for', 'prospect')->where('slug', $slug)->where('meta', $meta)->exists()) {
+            return response('Unknown field.', 400);
+        }
+
+        $search = $request->input('search');
+        $replace = (string) $request->input('replace', '');
+        $caseSensitive = $request->boolean('case_sensitive');
+        $replacing = $request->input('mode') === 'replace';
+
+        $matches = 0;
+        $prospectsCount = 0;
+        $samples = [];
+
+        $project
+            ->prospects()
+            ->filter($filters)
+            ->chunkById(200, function ($prospects) use (
+                $meta, $slug, $search, $replace, $caseSensitive, $replacing,
+                &$matches, &$prospectsCount, &$samples
+            ) {
+                foreach ($prospects as $prospect) {
+                    $current = $meta ? data_get($prospect->meta, $slug) : $prospect->{$slug};
+
+                    if (!is_string($current) || $current === '') {
+                        continue;
+                    }
+
+                    $occurrences = $caseSensitive
+                        ? substr_count($current, $search)
+                        : substr_count(mb_strtolower($current), mb_strtolower($search));
+
+                    if ($occurrences === 0) {
+                        continue;
+                    }
+
+                    $matches += $occurrences;
+                    $prospectsCount++;
+
+                    $new = $caseSensitive
+                        ? Str::replace($search, $replace, $current)
+                        : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
+
+                    if (count($samples) < 10) {
+                        $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];
+                    }
+
+                    if ($replacing) {
+                        if ($meta) {
+                            $values = $prospect->meta ?: [];
+                            $values[$slug] = $new;
+                            $prospect->update(['meta' => $values]);
+                        } else {
+                            $prospect->update([$slug => $new]);
+                        }
+                    }
+                }
+            });
+
+        return [
+            'prospects' => $prospectsCount,
+            'matches' => $matches,
+            'samples' => $samples,
+        ];
+    }
+
+    /**
      *
      */
     protected function copyToProject($prospects, Project $project, $mapping = [])
