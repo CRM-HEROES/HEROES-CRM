@@ -33,6 +33,12 @@ export default {
             params
         );
     },
+    createCloudtalkParallelCampaign(project, params) {
+        return ApiService.post(
+            `project/${project}/line/cloudtalk/parallel-campaign`,
+            params
+        );
+    },
     verifyCloudtalk(project, params) {
         return ApiService.post(`project/${project}/line/cloudtalk/verify`, params);
     },

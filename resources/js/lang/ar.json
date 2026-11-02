@@ -356,6 +356,19 @@
             "call_by_aircall": "الاتصال عن طريق Aircall",
             "call_by_ringover": "الاتصال عن طريق Ringover",
             "call_by_cloudtalk": "الاتصال عن طريق CloudTalk",
+            "mode_picker": {
+                "parallel_prepared": "الحملة “{campaign}” جاهزة مع {count} جهة اتصال. افتح Dialer من لوحة CloudTalk الحالية وابدأ الجلسة يدويًا.",
+                "parallel_partial": "تم إنشاء الحملة “{campaign}” مع {count} جهة اتصال. تم تخطي {skipped} من العملاء المحتملين؛ ابدأ الجلسة من لوحة CloudTalk الحالية.",
+                "parallel_failed_partial": "تعذر تفعيل الحملة. تمت مزامنة {count} جهة اتصال جزئيًا؛ راجع {skipped} من العملاء المحتملين.",
+                "parallel_error": "تعذر على CloudTalk إعداد الحملة المتوازية.",
+                "title": "اختر وضع الاتصال في CloudTalk",
+                "sequential_title": "مكالمات متتابعة",
+                "sequential_description": "اتصل بالعملاء المحتملين المحددين واحدًا تلو الآخر كما في السابق.",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "جهّز هؤلاء العملاء المحتملين لحملة CloudTalk.",
+                "line_required": "لا يوجد خط CloudTalk مرتبط بمستخدمك. قم بإعداد خط قبل بدء المكالمات.",
+                "cancel": "إلغاء"
+            },
             "batch": {
                 "title": "تسلسل مكالمات CloudTalk",
                 "retry": "إعادة الاتصال",

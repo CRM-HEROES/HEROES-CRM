@@ -356,6 +356,19 @@
             "call_by_aircall": "通过空中电话拨打",
             "call_by_ringover": "通过振铃呼叫",
             "call_by_cloudtalk": "通过 CloudTalk 呼叫",
+            "mode_picker": {
+                "parallel_prepared": "活动“{campaign}”已准备好，共 {count} 个联系人。请在现有 CloudTalk 面板中打开 Dialer 并手动启动会话。",
+                "parallel_partial": "已创建活动“{campaign}”，共 {count} 个联系人。已跳过 {skipped} 位潜在客户；请从现有 CloudTalk 面板启动会话。",
+                "parallel_failed_partial": "无法激活活动。已部分同步 {count} 个联系人；请检查 {skipped} 位潜在客户。",
+                "parallel_error": "CloudTalk 无法准备并行活动。",
+                "title": "选择 CloudTalk 呼叫模式",
+                "sequential_title": "顺序拨打",
+                "sequential_description": "像现在一样，逐一呼叫选中的潜在客户。",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "为 CloudTalk 活动准备这些潜在客户。",
+                "line_required": "当前用户尚未分配 CloudTalk 线路。请先配置线路再拨打电话。",
+                "cancel": "取消"
+            },
             "batch": {
                 "title": "CloudTalk 连续呼叫",
                 "retry": "再次呼叫",

@@ -28,7 +28,13 @@
         :style="{ width: slideWidth }"
     >
         <div class="hc-prospect-interaction-root">
-            <loading :loading="!!cloudtalkSequence?.loading" />
+            <cloudtalk-call-mode-modal
+                :visible="!!cloudtalkCallModeSelection"
+                @sequential="selectCloudtalkCallMode('sequential')"
+                @parallel="selectCloudtalkCallMode('parallel')"
+                @cancel="cancelCloudtalkCallModeSelection"
+            />
+            <loading :loading="!!cloudtalkSequence?.loading || cloudtalkParallelSync" />
             <cloudtalk-sequence-controls
                 :sequence="cloudtalkSequence"
                 :next-name="cloudtalkSequenceName(cloudtalkSequenceNextProspect)"
@@ -526,6 +532,7 @@ import {
 
 // Components
 import CloudtalkPanel from "./components/CloudtalkPanel.vue";
+import CloudtalkCallModeModal from "./components/CloudtalkCallModeModal.vue";
 import CloudtalkSequenceControls from "./components/CloudtalkSequenceControls.vue";
 import cloudtalkSequence from "./cloudtalk-sequence";
 import InteractionFrames from "./components/InteractionFrames.vue";
@@ -536,6 +543,7 @@ export default {
     mixins: [cloudtalkSequence],
     components: {
         CloudtalkPanel,
+        CloudtalkCallModeModal,
         CloudtalkSequenceControls,
         InteractionFrames,
         InteractionList,

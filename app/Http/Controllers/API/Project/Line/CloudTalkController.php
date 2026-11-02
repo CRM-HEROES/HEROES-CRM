@@ -9,12 +9,73 @@ use App\Models\Message;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Services\CloudTalk;
+use App\Services\CloudTalkDialer;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use RuntimeException;
 
 class CloudTalkController extends Controller
 {
+    /**
+     * Prepare the selected prospects in a new parallel campaign for this agent.
+     */
+    public function parallelCampaign(Request $request, Project $project, CloudTalkDialer $dialer)
+    {
+        abort_unless($request->user()->can('', $project), 404);
+
+        $this->validate($request, [
+            'line_id' => 'required|integer',
+            'prospect_ids' => 'required|array|min:1|max:1000',
+            'prospect_ids.*' => 'required|integer|distinct',
+        ]);
+
+        $ids = array_map('intval', $request->input('prospect_ids'));
+        $prospects = $project->prospects()
+            ->whereIn('id', $ids)
+            ->get(['id', 'first_name', 'last_name', 'company_name', 'mobile_phone_number', 'phone_number']);
+
+        if ($prospects->count() !== count($ids)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Un ou plusieurs prospects sélectionnés ne sont plus disponibles dans ce projet.',
+            ], 422);
+        }
+
+        $line = $project->lines()
+            ->where('operator', 'cloudtalk')
+            ->where('user_id', $request->user()->id)
+            ->whereKey($request->input('line_id'))
+            ->first();
+
+        if (!$line) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aucune ligne CloudTalk n’est associée à votre utilisateur.',
+            ], 404);
+        }
+
+        // One selection triggers several CloudTalk API calls per prospect.
+        // Extend this request beyond PHP's short default execution limit.
+        if (function_exists('set_time_limit')) {
+            set_time_limit(120);
+        }
+
+        try {
+            $result = $dialer->createParallelCampaign($line, $project, $prospects);
+        } catch (RuntimeException $e) {
+            return $this->runtimeError($e);
+        }
+
+        if (!$result['success']) {
+            $status = $this->httpStatus((int) ($result['status'] ?? 502));
+            unset($result['status']);
+
+            return response()->json($result, $status);
+        }
+
+        return $result;
+    }
+
     /**
      * Verify CloudTalk API credentials.
      */
@@ -492,7 +553,7 @@ class CloudTalkController extends Controller
             return 422;
         }
 
-        return in_array($status, [403, 404, 406, 409, 422, 500, 503])
+        return in_array($status, [403, 404, 406, 409, 422, 429, 500, 502, 503])
             ? $status
             : 500;
     }

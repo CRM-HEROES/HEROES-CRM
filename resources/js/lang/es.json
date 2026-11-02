@@ -385,6 +385,19 @@
             "call_by_aircall": "Llamar por Aircall",
             "call_by_ringover": "Llamar por Ringover",
             "call_by_cloudtalk": "Llamar por CloudTalk",
+            "mode_picker": {
+                "parallel_prepared": "La campaña “{campaign}” está lista con {count} contacto(s). Abre Dialer en el panel CloudTalk existente e inicia la sesión manualmente.",
+                "parallel_partial": "Se creó la campaña “{campaign}” con {count} contacto(s). Se omitieron {skipped} prospecto(s); inicia la sesión desde el panel CloudTalk existente.",
+                "parallel_failed_partial": "No se pudo activar la campaña. Se sincronizaron parcialmente {count} contacto(s); revisa {skipped} prospecto(s).",
+                "parallel_error": "CloudTalk no pudo preparar la campaña paralela.",
+                "title": "Elige el modo de llamadas de CloudTalk",
+                "sequential_title": "Llamadas sucesivas",
+                "sequential_description": "Llama a los prospectos seleccionados uno por uno, como hasta ahora.",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "Prepara estos prospectos para una campaña de CloudTalk.",
+                "line_required": "No hay ninguna línea CloudTalk asignada a tu usuario. Configura una línea antes de iniciar las llamadas.",
+                "cancel": "Cancelar"
+            },
             "batch": {
                 "title": "Secuencia de llamadas CloudTalk",
                 "retry": "Volver a llamar",

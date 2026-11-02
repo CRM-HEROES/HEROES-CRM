@@ -356,6 +356,19 @@
             "call_by_aircall": "एयरकॉल द्वारा कॉल करें",
             "call_by_ringover": "रिंगओवर द्वारा कॉल करें",
             "call_by_cloudtalk": "CloudTalk द्वारा कॉल करें",
+            "mode_picker": {
+                "parallel_prepared": "{count} संपर्कों के साथ अभियान “{campaign}” तैयार है। मौजूदा CloudTalk पैनल में Dialer खोलें और सत्र मैन्युअल रूप से शुरू करें।",
+                "parallel_partial": "{count} संपर्कों के साथ अभियान “{campaign}” बनाया गया। {skipped} संभावित ग्राहक छोड़े गए; मौजूदा CloudTalk पैनल से सत्र शुरू करें।",
+                "parallel_failed_partial": "अभियान सक्रिय नहीं हो सका। {count} संपर्क आंशिक रूप से सिंक हुए; {skipped} संभावित ग्राहकों की जाँच करें।",
+                "parallel_error": "CloudTalk समानांतर अभियान तैयार नहीं कर सका।",
+                "title": "CloudTalk कॉलिंग मोड चुनें",
+                "sequential_title": "एक के बाद एक कॉल",
+                "sequential_description": "चयनित संभावित ग्राहकों को पहले की तरह एक-एक करके कॉल करें।",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "इन संपर्कों को CloudTalk अभियान के लिए तैयार करें।",
+                "line_required": "आपके उपयोगकर्ता को कोई CloudTalk लाइन नहीं दी गई है। कॉल शुरू करने से पहले लाइन कॉन्फ़िगर करें।",
+                "cancel": "रद्द करें"
+            },
             "batch": {
                 "title": "CloudTalk कॉल क्रम",
                 "retry": "फिर से कॉल करें",
