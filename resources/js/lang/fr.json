@@ -154,6 +154,13 @@
     "prospect": {
         "communications": {
             "process": "Traiter",
+            "request_process": "Demande traiter",
+            "not_processed": "Non traiter",
+            "history": "Historique des traitements",
+            "processed_by": "est traité par {user}",
+            "unknown_user": "Utilisateur inconnu",
+            "empty_history": "Aucune action enregistrée.",
+            "history_error": "Impossible de charger l’historique des traitements.",
             "process_error": "Le traitement a échoué. Veuillez réessayer."
         },
         "table": {

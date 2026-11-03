@@ -206,6 +206,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (result.message_id) {
         lines.push("".concat(this.$t("workflow.monitor.message"), " #").concat(result.message_id));
       }
+
+      // Written by the step, sent right after: say whether it left
+      if (step.delivery) {
+        lines.push(step.delivery.sent ? this.$t("workflow.monitor.delivery.sent") : step.delivery.error ? this.$t("workflow.monitor.delivery.failed", {
+          error: step.delivery.error
+        }) : this.$t("workflow.monitor.delivery.pending"));
+      }
       if (result.call_uuid || result.call_id) {
         lines.push("".concat(this.$t("workflow.monitor.call"), " ").concat(result.call_uuid || result.call_id));
       }
@@ -397,6 +404,13 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
     type: function type() {
       this.refresh();
     },
+    // Another action (SMS instead of email): the operators are not the same
+    "field.capability": function fieldCapability() {
+      if (this.type === "provider") {
+        this.providers = [];
+        this.loadProviders();
+      }
+    },
     categories: function categories() {
       if (this.isLabels) {
         this.loadLabels();
@@ -575,36 +589,45 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
     loadProviders: function loadProviders() {
       var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var _yield$WorkflowServic, data;
+        var capability, _yield$WorkflowServic, data;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
               _this5.providersLoading = true;
-              _context5.prev = 1;
-              _context5.next = 4;
-              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this5.project.slug, _this5.field.capability);
-            case 4:
+              capability = _this5.field.capability;
+              _context5.prev = 2;
+              _context5.next = 5;
+              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this5.project.slug, capability);
+            case 5:
               _yield$WorkflowServic = _context5.sent;
               data = _yield$WorkflowServic.data;
-              _this5.providers = data;
-              _context5.next = 12;
-              break;
+              if (!(capability !== _this5.field.capability)) {
+                _context5.next = 9;
+                break;
+              }
+              return _context5.abrupt("return");
             case 9:
-              _context5.prev = 9;
-              _context5.t0 = _context5["catch"](1);
+              _this5.providers = data;
+              _context5.next = 15;
+              break;
+            case 12:
+              _context5.prev = 12;
+              _context5.t0 = _context5["catch"](2);
               flashError({
                 title: _this5.$t("workflow.title"),
                 body: _this5.$t("workflow.error.load")
               });
-            case 12:
-              _context5.prev = 12;
-              _this5.providersLoading = false;
-              return _context5.finish(12);
             case 15:
+              _context5.prev = 15;
+              if (capability === _this5.field.capability) {
+                _this5.providersLoading = false;
+              }
+              return _context5.finish(15);
+            case 18:
             case "end":
               return _context5.stop();
           }
-        }, _callee5, null, [[1, 9, 12, 15]]);
+        }, _callee5, null, [[2, 12, 15, 18]]);
       }))();
     },
     /**
@@ -3339,7 +3362,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.danger'))
   }, null, 8 /* PROPS */, _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionDef.fields, function (field) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-      key: field.key
+      key: $options.config.action + ':' + field.key
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.field." + $options.fieldName(field))) + " ", 1 /* TEXT */), field.required ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_30, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
       text: $options.help(field) || ''
     }, null, 8 /* PROPS */, ["text"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {

@@ -568,6 +568,7 @@ Route::group([
         Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
         Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);
+        Route::get('incoming-communications/sms-history', [IncomingCommunicationController::class, 'smsHistory']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 

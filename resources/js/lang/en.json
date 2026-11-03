@@ -153,6 +153,13 @@
     "prospect": {
         "communications": {
             "process": "Process",
+            "request_process": "Request processing",
+            "not_processed": "Not processed",
+            "history": "Processing history",
+            "processed_by": "was processed by {user}",
+            "unknown_user": "Unknown user",
+            "empty_history": "No actions recorded.",
+            "history_error": "Unable to load the processing history.",
             "process_error": "Processing failed. Please try again."
         },
         "table": {
