@@ -324,6 +324,16 @@
             <icon v-else class="fa fa-caret-right" />
         </item>
 
+        <!-- AI agents -->
+        <item class="hc-setting-item" @click="manageAgents" tag="a">
+            <icon class="fa fa-robot" />
+            <div class="hc-item-main-content hc-flex-column">
+                <div class="hc-setting-item-name">{{ $t("agent.title") }}</div>
+                <div class="hc-setting-item-description" v-text="$t('agent.description')"></div>
+            </div>
+            <icon class="fa fa-caret-right" />
+        </item>
+
         <!-- Pipedrive -->
         <!--item
                 v-if="project && can('all.project')"
@@ -875,6 +885,10 @@ export default {
 
         manageClaudeApi() {
             store.commit(OPEN_MODAL, "setting-claude");
+        },
+
+        manageAgents() {
+            store.commit(OPEN_MODAL, "agents");
         },
 
         manageLocale() {

@@ -244,6 +244,24 @@ Route::group([
         ])
         ->name('server-monitoring');
 
+    // AI agents: always the agents, conversations and actions of the authenticated user
+    Route::prefix('agent')->as('agent.')->group(function () {
+        Route::get('catalog', [\App\Http\Controllers\API\Agent\AgentController::class, 'catalog'])->name('catalog');
+        Route::get('action', [\App\Http\Controllers\API\Agent\ActionController::class, 'index'])->name('action.index');
+        Route::get('action/{action}', [\App\Http\Controllers\API\Agent\ActionController::class, 'show'])->name('action.show');
+        Route::post('action/{action}/approve', [\App\Http\Controllers\API\Agent\ActionController::class, 'approve'])->name('action.approve');
+        Route::post('action/{action}/reject', [\App\Http\Controllers\API\Agent\ActionController::class, 'reject'])->name('action.reject');
+        Route::get('conversation/{conversation}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'show'])->name('conversation.show');
+        Route::get('run/{run}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'run'])->name('run.show');
+        Route::get('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'index'])->name('index');
+        Route::post('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'store'])->name('store');
+        Route::get('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'show'])->name('show');
+        Route::put('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'update'])->name('update');
+        Route::delete('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'destroy'])->name('destroy');
+        Route::get('{agent}/conversation', [\App\Http\Controllers\API\Agent\ConversationController::class, 'index'])->name('conversation.index');
+        Route::post('{agent}/ask', [\App\Http\Controllers\API\Agent\ConversationController::class, 'ask'])->middleware('throttle:30,1')->name('ask');
+    });
+
     Route::get('/settings/claude', [ClaudeSettingController::class, 'show'])->name('settings.claude.show');
     Route::put('/settings/claude', [ClaudeSettingController::class, 'update'])->name('settings.claude.update');
 

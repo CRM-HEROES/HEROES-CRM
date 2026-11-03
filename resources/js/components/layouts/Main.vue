@@ -9,6 +9,7 @@
 
         <setting-slide />
         <setting-claude-modal />
+        <agents-modal />
         <add-global-user-modal v-if="can('all')" />
 
         <template v-if="project">
@@ -422,6 +423,7 @@ import SettingMTargetModal from "@/components/settings/MTarget.vue";
 import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
 import SettingBrevoModal from "@/components/settings/Brevo.vue";
 import SettingClaudeModal from "@/components/settings/Claude.vue";
+import AgentsModal from "@/components/agent/AgentsModal.vue";
 
 import MenuIconSlide from "@/components/menu-icon/Slide.vue";
 import TrashSlide from "@/components/trash/Slide.vue";
@@ -600,6 +602,7 @@ export default {
         SettingPipedriveModal,
         SettingBrevoModal,
         SettingClaudeModal,
+        AgentsModal,
 
         MenuIconSlide,
         TrashSlide,

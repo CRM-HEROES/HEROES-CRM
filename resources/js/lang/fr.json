@@ -2943,5 +2943,68 @@
         "add": {
             "title": "Ajouter une ligne"
         }
+    },
+    "agent": {
+        "title": "Agents IA",
+        "description": "Créer des agents IA et valider leurs actions",
+        "tab": {
+            "chat": "Discussion",
+            "actions": "Validations",
+            "config": "Mes agents"
+        },
+        "no_agent": "Vous n'avez pas encore d'agent. Créez-en un dans l'onglet « Mes agents ».",
+        "no_action": "Aucune action en attente de validation.",
+        "placeholder": "Écrivez à votre agent…",
+        "send": "Envoyer",
+        "working": "L'agent travaille…",
+        "tool_used": "outil utilisé : {tool}",
+        "error": "Une erreur est survenue.",
+        "confirm": "Confirmer",
+        "cancel": "Annuler",
+        "running": "Exécution en cours…",
+        "done": "{updated} traité(s), {failed} en échec.",
+        "expires": "À valider avant le {date}",
+        "skipped_processed": "{n} fiche(s) déjà traitée(s) seront ignorées.",
+        "new": "Nouvel agent",
+        "name": "Nom",
+        "instructions": "Instructions (rôle, ton, objectifs)",
+        "model": "Modèle",
+        "autonomy": "Autonomie",
+        "skills": "Compétences",
+        "can_write": "peut modifier",
+        "create": "Créer l'agent",
+        "delete": "Supprimer",
+        "confirm_delete": "Supprimer l'agent « {name} » ?",
+        "risk": {
+            "write": "modification",
+            "communication": "envoi",
+            "destructive": "suppression"
+        },
+        "preview": {
+            "action": "Action",
+            "prospects": "Prospects concernés",
+            "sample": "Exemples",
+            "prospect": "Prospect",
+            "values": "Valeurs",
+            "name": "Intitulé",
+            "quand": "Quand",
+            "calendrier": "Calendrier",
+            "affecté_à": "Affecté à",
+            "canal": "Canal",
+            "message": "Message",
+            "objet": "Objet"
+        },
+        "tools": {
+            "prospect_set_labels": "Modifier les labels",
+            "prospect_set_groups": "Modifier les groupes",
+            "prospect_assign_users": "Assigner des utilisateurs",
+            "prospect_set_field": "Modifier un champ",
+            "prospect_create": "Créer un prospect",
+            "prospect_update": "Modifier un prospect",
+            "prospect_delete": "Supprimer des prospects",
+            "appointment_create": "Créer un rendez-vous",
+            "sms_send": "Envoyer un SMS",
+            "email_send": "Envoyer un e-mail"
+        }
     }
 }
