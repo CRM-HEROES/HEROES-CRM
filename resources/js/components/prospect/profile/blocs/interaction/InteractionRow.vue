@@ -34,9 +34,21 @@
             <div
                 class="hc-prospect-profile-interaction-creator"
                 v-text="
-                    interaction.creator
-                        ? interaction.creator.name
-                        : '(Utilisateur inconnu)'
+                    interaction.source === 'cloudtalk'
+                        ? $t('prospect.interaction.called_by_agent', {
+                              agent: (
+                                  [
+                                      interaction.data?.cloudtalk_ended?.data?.user?.first_name || interaction.data?.cloudtalk_call?.data?.user?.first_name,
+                                      interaction.data?.cloudtalk_ended?.data?.user?.last_name || interaction.data?.cloudtalk_call?.data?.user?.last_name,
+                                  ].filter(Boolean).join(' ')
+                                  || interaction.data?.cloudtalk_ended?.data?.user?.name?.replace(/\s*<[^>]*>\s*$/, '').trim()
+                                  || interaction.data?.cloudtalk_call?.data?.user?.name?.replace(/\s*<[^>]*>\s*$/, '').trim()
+                                  || '(Utilisateur inconnu)'
+                              ),
+                          })
+                        : interaction.creator
+                            ? interaction.creator.name
+                            : '(Utilisateur inconnu)'
                 "
             ></div>
             <div

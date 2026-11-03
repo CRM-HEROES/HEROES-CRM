@@ -485,6 +485,8 @@ Route::group([
         Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);
         Route::post('line/cloudtalk/history', [ProjectLineCloudTalkController::class, 'history']);
         Route::post('line/cloudtalk/call', [ProjectLineCloudTalkController::class, 'store']);
+        Route::get('line/cloudtalk/active-parallel-campaign', [ProjectLineCloudTalkController::class, 'activeParallelCampaigns']);
+        Route::post('line/cloudtalk/parallel-campaign', [ProjectLineCloudTalkController::class, 'parallelCampaign']);
         Route::get('line/available-users', [ProjectLineController::class, 'availableUsers']);
         Route::apiResource('line', ProjectLineController::class);
 

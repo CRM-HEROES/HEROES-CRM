@@ -356,6 +356,19 @@
             "call_by_aircall": "Звонок по воздуху",
             "call_by_ringover": "Звонок через Ringover",
             "call_by_cloudtalk": "Звонок через CloudTalk",
+            "mode_picker": {
+                "parallel_prepared": "Кампания «{campaign}» готова: контактов — {count}. Откройте Dialer в существующей панели CloudTalk и запустите сессию вручную.",
+                "parallel_partial": "Создана кампания «{campaign}», контактов — {count}. Пропущено потенциальных клиентов: {skipped}; запустите сессию в панели CloudTalk.",
+                "parallel_failed_partial": "Не удалось активировать кампанию. Частично синхронизировано контактов: {count}; проверьте потенциальных клиентов: {skipped}.",
+                "parallel_error": "Не удалось подготовить параллельную кампанию CloudTalk.",
+                "title": "Выберите режим звонков CloudTalk",
+                "sequential_title": "Последовательные звонки",
+                "sequential_description": "Звонить выбранным клиентам по очереди, как раньше.",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "Подготовить эти контакты для кампании CloudTalk.",
+                "line_required": "К вашему пользователю не привязана линия CloudTalk. Настройте линию перед началом звонков.",
+                "cancel": "Отмена"
+            },
             "batch": {
                 "title": "Последовательность звонков CloudTalk",
                 "retry": "Перезвонить",

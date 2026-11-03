@@ -315,7 +315,6 @@
             <card-menu
                 v-if="!selectedProspectsProcessed && can('all.prospect.interaction.view') && can('all.prospect.interaction.add')"
                 :label="$t('prospect.interaction.call_by_cloudtalk')"
-                :disabled="!cloudtalkLine"
                 @click="bulkCloudtalkInteraction"
             >
                 <icon>
@@ -885,13 +884,28 @@ export default {
         },
 
         bulkCloudtalkInteraction() {
-            if (!this.cloudtalkLine || !this.prospectsSelected.length
-                || !this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
+            if (!this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
+            if (!this.prospectsSelected.length) return;
 
-            EventBus.emit('cloudtalk:start-sequence', {
+            if (!this.cloudtalkLine) {
+                flashWarning({
+                    title: 'CloudTalk',
+                    body: this.$t('prospect.interaction.mode_picker.line_required'),
+                });
+                return;
+            }
+
+            const selection = {
                 projectSlug: this.project.slug,
                 prospectIds: [...this.prospectsSelected],
-            });
+            };
+
+            // Make sure the interaction slide (and its CloudTalk mode listener)
+            // is mounted before dispatching the event.
+            store.commit(OPEN_LEFT_SLIDE, 'prospect-manage-interactions');
+            const openModePicker = () => EventBus.emit('cloudtalk:choose-mode', selection);
+            if (typeof this.$nextTick === 'function') this.$nextTick(openModePicker);
+            else openModePicker();
         },
 
         /**

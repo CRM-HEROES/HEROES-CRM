@@ -64,6 +64,7 @@
         <iframe
             ref="phoneFrame"
             :src="src"
+            @load="emitCampaignSessionState"
             :class="[
                 'hc-cloudtalk-iframe',
                 { 'hc-cloudtalk-iframe-loading': showLoading },
@@ -233,6 +234,7 @@ export default {
     emits: [
         "answered-call",
         "call-activity",
+        "campaign-session-change",
         "call-ended",
         "contact-info",
         "hangup-call",
@@ -253,6 +255,11 @@ export default {
 
         number: {
             type: String,
+            default: null,
+        },
+
+        campaignId: {
+            type: [String, Number],
             default: null,
         },
 
@@ -296,6 +303,7 @@ export default {
 
     mounted() {
         window.addEventListener("message", this.handleMessage);
+        this.emitCampaignSessionState();
         this.syncSlowLoadingMessage();
     },
 
@@ -324,6 +332,26 @@ export default {
             }
 
             this.showSlowLoadingMessage = false;
+        },
+
+        emitCampaignSessionState() {
+            const iframeUrl = this.$refs.phoneFrame
+                ? this.$refs.phoneFrame.src
+                : this.src;
+            let isCampaignSession = false;
+
+            try {
+                const url = new URL(iframeUrl, window.location.origin);
+                isCampaignSession =
+                    url.origin === this.origin &&
+                    /^\/p\/dialer-next\/campaigns\/[^/]+\/session\/?$/.test(
+                        url.pathname
+                    );
+            } catch (error) {
+                isCampaignSession = false;
+            }
+
+            this.$emit("campaign-session-change", isCampaignSession);
         },
 
         requestCall() {
@@ -474,6 +502,10 @@ export default {
     },
 
     watch: {
+        src() {
+            this.emitCampaignSessionState();
+        },
+
         loading(value) {
             if (value) this.eventReceived = false;
             this.syncSlowLoadingMessage();
@@ -501,6 +533,10 @@ export default {
          * CloudTalk Phone iframe url
          */
         src() {
+            if (this.campaignId != null && String(this.campaignId).trim() !== "") {
+                return `${this.origin}/p/dialer-next/campaigns/${encodeURIComponent(this.campaignId)}/session`;
+            }
+
             return this.origin + "?partner=" + this.partner;
         },
     },
