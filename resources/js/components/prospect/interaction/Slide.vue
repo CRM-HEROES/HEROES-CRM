@@ -949,6 +949,7 @@ export default {
         },
 
         async interactionViaCloudtalk(number) {
+            this.interactionSlideMinimized = false;
             this.rememberCloudtalkReturnProspect();
             this.tab = 1;
             this.frameTab = 5;
@@ -965,6 +966,8 @@ export default {
         },
 
         async makeCloudtalkCall() {
+            this.interactionSlideMinimized = false;
+
             if (this.callingCloudtalk || !this.interaction.number) {
                 return;
             }
@@ -1060,6 +1063,7 @@ export default {
         },
 
         showCloudtalkPhone() {
+            this.interactionSlideMinimized = false;
             this.rememberCloudtalkReturnProspect();
             this.clearCloudtalkEventTimeout();
             this.cloudtalkWaitingForEvent = false;
@@ -2214,6 +2218,10 @@ export default {
 
     watch: {
         async interactionProspect(newValue, oldValue) {
+            if (newValue && newValue.id !== oldValue?.id) {
+                this.interactionSlideMinimized = false;
+            }
+
             if (newValue && this.leftSlideOpen(this.name)) {
                 this.fetchInteractions();
                 if (this.cloudtalkSequence) return;

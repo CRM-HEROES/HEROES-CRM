@@ -31757,6 +31757,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
+              _this5.interactionSlideMinimized = false;
               _this5.rememberCloudtalkReturnProspect();
               _this5.tab = 1;
               _this5.frameTab = 5;
@@ -31774,7 +31775,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 external_number: number
               });
               return _context4.abrupt("return", _this5.makeCloudtalkCall());
-            case 13:
+            case 14:
             case "end":
               return _context4.stop();
           }
@@ -31788,12 +31789,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
+              _this6.interactionSlideMinimized = false;
               if (!(_this6.callingCloudtalk || !_this6.interaction.number)) {
-                _context5.next = 2;
+                _context5.next = 3;
                 break;
               }
               return _context5.abrupt("return");
-            case 2:
+            case 3:
               _this6.callingCloudtalk = true;
               _this6.cloudtalkPhoneVisible = true;
               _this6.cloudtalkWaitingForEvent = true;
@@ -31802,16 +31804,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               request = ++_this6.cloudtalkCallRequest;
               interaction = _this6.interaction;
               sequence = _this6.cloudtalkSequence;
-              _context5.prev = 10;
+              _context5.prev = 11;
               params = {
                 number: _this6.interaction.number
               };
               if (_this6.cloudtalkLine) {
                 params.line_id = _this6.cloudtalkLine.id;
               }
-              _context5.next = 15;
+              _context5.next = 16;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_9__.MAKE_CLOUDTALK_CALL, params);
-            case 15:
+            case 16:
               response = _context5.sent;
               callId = _this6.cloudtalkCallId(response, false);
               if (sequence && callId) {
@@ -31824,11 +31826,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
               }
               if (!(request !== _this6.cloudtalkCallRequest || interaction !== _this6.interaction || sequence && (sequence !== _this6.cloudtalkSequence || sequence.awaitingChoice))) {
-                _context5.next = 20;
+                _context5.next = 21;
                 break;
               }
               return _context5.abrupt("return");
-            case 20:
+            case 21:
               _this6.interaction.status = "initiated";
               _this6.interaction.from_user = true;
               _this6.interaction.data = _objectSpread(_objectSpread({}, _this6.interaction.data || {}), {}, {
@@ -31841,17 +31843,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               if (_this6.cloudtalkWaitingForEvent) {
                 _this6.startCloudtalkEventTimeout();
               }
-              _context5.next = 39;
+              _context5.next = 40;
               break;
-            case 26:
-              _context5.prev = 26;
-              _context5.t0 = _context5["catch"](10);
+            case 27:
+              _context5.prev = 27;
+              _context5.t0 = _context5["catch"](11);
               if (!(request !== _this6.cloudtalkCallRequest || interaction !== _this6.interaction || sequence && (sequence !== _this6.cloudtalkSequence || sequence.awaitingChoice))) {
-                _context5.next = 30;
+                _context5.next = 31;
                 break;
               }
               return _context5.abrupt("return");
-            case 30:
+            case 31:
               _this6.cloudtalkWaitingForEvent = false;
               _this6.clearCloudtalkEventTimeout();
               status = _context5.t0.response && _context5.t0.response.data && _context5.t0.response.data.status ? _context5.t0.response.data.status : _context5.t0.response ? _context5.t0.response.status : null;
@@ -31869,18 +31871,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 duration: 7000
               });
               if (sequence) _this6.completeCloudtalkSequenceCall({}, message);
-            case 39:
-              _context5.prev = 39;
+            case 40:
+              _context5.prev = 40;
               if (request === _this6.cloudtalkCallRequest) _this6.callingCloudtalk = false;
-              return _context5.finish(39);
-            case 42:
+              return _context5.finish(40);
+            case 43:
             case "end":
               return _context5.stop();
           }
-        }, _callee5, null, [[10, 26, 39, 42]]);
+        }, _callee5, null, [[11, 27, 40, 43]]);
       }))();
     },
     showCloudtalkPhone: function showCloudtalkPhone() {
+      this.interactionSlideMinimized = false;
       this.rememberCloudtalkReturnProspect();
       this.clearCloudtalkEventTimeout();
       this.cloudtalkWaitingForEvent = false;
@@ -32896,23 +32899,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee16$(_context16) {
           while (1) switch (_context16.prev = _context16.next) {
             case 0:
+              if (newValue && newValue.id !== (oldValue === null || oldValue === void 0 ? void 0 : oldValue.id)) {
+                _this20.interactionSlideMinimized = false;
+              }
               if (!(newValue && _this20.leftSlideOpen(_this20.name))) {
-                _context16.next = 7;
+                _context16.next = 8;
                 break;
               }
               _this20.fetchInteractions();
               if (!_this20.cloudtalkSequence) {
-                _context16.next = 4;
+                _context16.next = 5;
                 break;
               }
               return _context16.abrupt("return");
-            case 4:
+            case 5:
               if (!(_this20.cloudtalkPhoneVisible && _this20.interaction.source == "cloudtalk" && !_this20.interaction.from_user && _this20.interaction.number)) {
-                _context16.next = 6;
+                _context16.next = 7;
                 break;
               }
               return _context16.abrupt("return");
-            case 6:
+            case 7:
               if (newValue.phone_number && (!oldValue || oldValue.phone_number == _this20.interaction.number)) {
                 _this20.interaction.number = newValue.phone_number;
               } else if (newValue.mobile_phone_number) {
@@ -32920,7 +32926,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 // to resolve the context of the call in progress.
                 _this20.interaction.number = newValue.mobile_phone_number;
               }
-            case 7:
+            case 8:
             case "end":
               return _context16.stop();
           }
