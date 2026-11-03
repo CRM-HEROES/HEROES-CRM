@@ -123,6 +123,11 @@ return [
             'tools' => ['project_config', 'crm_search', 'sms_send', 'email_send'],
             'playbook' => "Un envoi est réel et irréversible : il est toujours soumis à la validation de l'utilisateur. Prépare un message court et professionnel, montre-le, et n'envoie qu'à des prospects qui ont un numéro ou une adresse (vérifie avec crm_search en demandant ces champs).",
         ],
+        'reporting' => [
+            'label' => 'Rapports et documents',
+            'tools' => ['report_create'],
+            'playbook' => "Pour un rapport, une analyse ou un plan d'action, enregistre un document avec report_create (Markdown : titres, listes, tableaux) : il s'affiche à côté de la conversation. Mets le détail dans le document et résume en quelques lignes dans ta réponse. Un document ne contient que des chiffres obtenus avec les outils du CRM.",
+        ],
         'statistics_analysis' => [
             'label' => "Statistiques et performances de l'équipe",
             'tools' => ['crm_describe', 'crm_aggregate', 'team_performance', 'compare_periods'],

@@ -32,6 +32,14 @@ class AgentExecutionContext
     }
 
     /**
+     * The agent and the run this context works for (set by the engine; null
+     * outside a run). Lets a tool attach what it produces to the run.
+     */
+    public ?int $agentId = null;
+
+    public ?int $runId = null;
+
+    /**
      * Called by a long action with (done, total), so that its progress can be
      * shown while it runs.
      *

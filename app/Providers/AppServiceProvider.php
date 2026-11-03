@@ -9,6 +9,7 @@ use App\Agents\Tools\CrmSearchTool;
 use App\Agents\Tools\TeamPerformanceTool;
 use App\Agents\Tools\ProjectConfigTool;
 use App\Agents\Tools\ProspectHistoryTool;
+use App\Agents\Tools\ReportCreateTool;
 use App\Agents\Tools\ToolRegistry;
 use App\Agents\Tools\WorkflowCatalogTool;
 use App\Agents\Tools\WorkflowDraftTool;
@@ -48,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
                 $registry->register($app->make($tool));
             }
 
-            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class] as $tool) {
+            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, ReportCreateTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class] as $tool) {
                 $registry->register($app->make($tool));
             }
 

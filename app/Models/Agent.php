@@ -30,6 +30,7 @@ class Agent extends Model
         'name',
         'description',
         'specialty',
+        'avatar',
         'persona',
         'instructions',
         'objectives',
@@ -112,11 +113,25 @@ class Agent extends Model
      */
     public function skillKeys(): array
     {
+        // The agent knows every function of the CRM, whatever is added later:
+        // what it may actually do is decided by the rights of its owner
+        if ($this->hasAllSkills()) {
+            return array_keys(config('agents.skills', []));
+        }
+
         return \Illuminate\Support\Facades\DB::table('agent_skills')
             ->where('agent_id', $this->id)
             ->orderBy('skill_key')
             ->pluck('skill_key')
             ->all();
+    }
+
+    /**
+     * Does the agent have every skill, present and future (the default)?
+     */
+    public function hasAllSkills(): bool
+    {
+        return (bool) (($this->settings ?? [])['all_skills'] ?? false);
     }
 
     /**

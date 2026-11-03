@@ -28,6 +28,7 @@
             items: ['naf', 'siret', 'capital', 'num_tva_intra'],
         }"
     />
+    <agent-bloc v-else-if="bloc.type == 'agent'" />
     <api-bloc v-else-if="bloc.type == 'api'" />
     <calendar-bloc v-else-if="bloc.type == 'calendar'" />
     <category-bloc v-else-if="bloc.type == 'category'" />
@@ -48,6 +49,7 @@
 </template>
 
 <script>
+import AgentBloc from "./blocs/agent/Bloc.vue";
 import ApiBloc from "./blocs/api/Bloc.vue";
 import CalendarBloc from "./blocs/calendar/Bloc.vue";
 import CategoryBloc from "./blocs/category/Bloc.vue";
@@ -69,6 +71,7 @@ import UserBloc from "./blocs/user/Bloc.vue";
 
 export default {
     components: {
+        AgentBloc,
         ApiBloc,
         CalendarBloc,
         CategoryBloc,

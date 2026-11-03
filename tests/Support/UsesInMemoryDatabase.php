@@ -90,7 +90,8 @@ trait UsesInMemoryDatabase
         $this->assertSame('mysql', DB::connection()->getDriverName());
 
         foreach (['agents', 'agent_versions', 'agent_conversations', 'agent_messages', 'agent_runs', 'agent_run_steps', 'agent_actions', 'agent_memories', 'agent_reports', 'agent_schedules', 'agent_usage_daily'] as $table) {
-            if (DB::table($table)->exists()) {
+            // AGENTS_TEST_ALLOW_DATA=1: for the tests that never count agent rows (they work on their own rows, rolled back)
+            if (!env('AGENTS_TEST_ALLOW_DATA') && DB::table($table)->exists()) {
                 $this->markTestSkipped("La table $table contient des données : ce test ne tourne que sur des tables d'agents vides.");
             }
         }

@@ -69,6 +69,54 @@ class AgentApiTest extends CrmFixtureTestCase
         $this->assertSame('Autre', $agent->activeVersion->config['instructions']);
     }
 
+    public function test_an_agent_created_without_a_list_of_skills_knows_every_function_of_the_crm(): void
+    {
+        $response = $this->as('admin')->postJson('/api/agent', ['name' => 'Lyra', 'instructions' => 'Aide-moi.', 'project' => $this->slug()]);
+        $response->assertStatus(201)->assertJson(['all_skills' => true, 'model' => config('agents.default_model'), 'autonomy' => 'read_only']);
+
+        $this->assertEqualsCanonicalizing(array_keys(config('agents.skills')), $response->json('skills'));
+        $this->assertSame($this->pid, (int) Agent::find($response->json('id'))->project_id);
+
+        // A skill added to the CRM later is known to the agent at once, without touching it
+        config(['agents.skills.nouvelle_competence' => ['label' => 'Nouvelle', 'tools' => ['crm_describe'], 'playbook' => 'Test']]);
+        $this->assertContains('nouvelle_competence', Agent::find($response->json('id'))->skillKeys());
+    }
+
+    public function test_an_agent_with_every_skill_still_only_gets_the_tools_its_owner_may_use(): void
+    {
+        $id = $this->as('t1')->postJson('/api/agent', ['name' => 'Tele', 'autonomy' => 'auto', 'project' => $this->slug()])->assertStatus(201)->json('id');
+        $adminId = $this->as('admin')->postJson('/api/agent', ['name' => 'Chef', 'autonomy' => 'auto', 'project' => $this->slug()])->assertStatus(201)->json('id');
+
+        $offered = function (int $agentId, string $who) {
+            $gateway = new ScriptedGateway([ScriptedGateway::text('ok')]);
+            app()->instance(ClaudeGatewayFactory::class, new ScriptedGatewayFactory($gateway));
+            $this->as($who)->postJson("/api/agent/$agentId/ask", ['project' => $this->slug(), 'message' => 'Salut'])->assertStatus(202);
+
+            return array_column($gateway->requests[0]['tools'], 'name');
+        };
+
+        $telepro = $offered($id, 't1');
+        $admin = $offered($adminId, 'admin');
+
+        // The administrator's agent has the whole catalogue; the télépro's has less, never more
+        $this->assertGreaterThan(count($telepro), count($admin));
+        $this->assertSame([], array_values(array_diff($telepro, $admin)));
+        // The télépro role has no right to delete prospects or to read the workflows
+        $this->assertContains('prospect_delete', $admin);
+        $this->assertNotContains('prospect_delete', $telepro);
+        $this->assertNotContains('workflow_catalog', $telepro);
+        $this->assertContains('prospect_update', $telepro);
+    }
+
+    public function test_a_list_of_skills_given_by_the_api_narrows_the_agent_and_all_skills_widens_it_back(): void
+    {
+        $id = $this->createAgent('admin', ['skills' => ['crm_exploration']]);
+        $this->as('admin')->getJson("/api/agent/$id")->assertJson(['all_skills' => false, 'skills' => ['crm_exploration']]);
+
+        $this->as('admin')->putJson("/api/agent/$id", ['all_skills' => true])->assertOk()->assertJson(['all_skills' => true]);
+        $this->assertGreaterThan(1, count(Agent::find($id)->skillKeys()));
+    }
+
     public function test_what_does_not_exist_cannot_be_configured(): void
     {
         $this->as('admin')->postJson('/api/agent', ['name' => 'X', 'model' => 'gpt-4'])->assertStatus(422);

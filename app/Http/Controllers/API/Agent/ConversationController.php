@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Agent;
 use App\Models\AgentAction;
 use App\Models\AgentConversation;
+use App\Models\AgentReport;
 use App\Models\AgentRun;
 use App\Models\Project;
 use Illuminate\Http\Request;
@@ -38,6 +39,61 @@ class ConversationController extends Controller
             ->where('agent_id', $agent->id)->where('user_id', $request->user()->id)->where('project_id', $project->id)
             ->orderByDesc('last_message_at')->limit(50)
             ->get(['id', 'title', 'status', 'last_message_at', 'created_at']);
+    }
+
+    /**
+     * Every conversation of the user in a project, whatever the agent, most
+     * recent first: the history shown beside the chat.
+     */
+    public function all(Request $request)
+    {
+        $project = $this->project($request->input('project'));
+
+        return AgentConversation::query()
+            ->where('user_id', $request->user()->id)
+            ->where('project_id', $project->id)
+            ->where('status', AgentConversation::OPEN)
+            ->with('agent:id,name,avatar')
+            ->orderByDesc('last_message_at')->orderByDesc('id')->limit(100)
+            ->get(['id', 'agent_id', 'title', 'last_message_at', 'created_at'])
+            ->map(fn ($conversation) => [
+                'id' => $conversation->id,
+                'title' => $conversation->title,
+                'last_message_at' => $conversation->last_message_at ?? $conversation->created_at,
+                'agent' => $conversation->agent ? [
+                    'id' => $conversation->agent->id,
+                    'name' => $conversation->agent->name,
+                    'avatar_url' => \App\Agents\AgentAvatar::url($conversation->agent->avatar),
+                ] : null,
+            ])->values();
+    }
+
+    /**
+     * Removes a conversation from the history. It is archived, not erased: the
+     * audit trail of what the agent did stays.
+     */
+    public function archive(Request $request, int $conversation)
+    {
+        $this->conversation($request, $conversation)->update(['status' => AgentConversation::ARCHIVED]);
+
+        return ['message' => 'Conversation supprimée.'];
+    }
+
+    /**
+     * A document an agent produced, for its owner
+     */
+    public function report(Request $request, int $report)
+    {
+        $report = AgentReport::query()->where('user_id', $request->user()->id)->with('agent:id,name')->findOrFail($report);
+
+        return [
+            'id' => $report->id,
+            'title' => $report->title,
+            'format' => $report->format,
+            'content' => $report->content,
+            'agent' => $report->agent?->name,
+            'created_at' => $report->created_at,
+        ];
     }
 
     /**
@@ -83,7 +139,7 @@ class ConversationController extends Controller
                 $item = $this->block($message->role, $block);
 
                 if ($item) {
-                    $messages[] = $item + ['id' => $message->id, 'at' => $message->created_at];
+                    $messages[] = $item + ['id' => $message->id, 'run_id' => $message->run_id, 'at' => $message->created_at];
                 }
             }
         }
@@ -94,7 +150,15 @@ class ConversationController extends Controller
             'id' => $conversation->id,
             'title' => $conversation->title,
             'project_id' => $conversation->project_id,
+            'agent' => $conversation->agent ? [
+                'id' => $conversation->agent->id,
+                'name' => $conversation->agent->name,
+                'avatar_url' => \App\Agents\AgentAvatar::url($conversation->agent->avatar),
+            ] : null,
             'messages' => $messages,
+            'reports' => AgentReport::query()->where('user_id', $request->user()->id)
+                ->whereIn('run_id', $conversation->runs()->select('id'))
+                ->orderBy('id')->get(['id', 'run_id', 'title', 'created_at']),
             'run' => $last ? $this->presentRun($last) : null,
             'pending_actions' => AgentAction::query()->where('user_id', $request->user()->id)
                 ->whereIn('run_id', $conversation->runs()->select('id'))->where('status', AgentAction::PENDING)
@@ -141,6 +205,8 @@ class ConversationController extends Controller
             'id' => $run->id,
             'status' => $run->status,
             'finished' => in_array($run->status, AgentRun::FINISHED, true),
+            // How long it has been waiting for a worker: the screen warns when nobody picks it up
+            'waiting_seconds' => $run->status === AgentRun::PENDING ? (int) $run->created_at->diffInSeconds(now()) : 0,
             'error' => $run->error,
             'iterations' => $run->iterations,
             'tokens' => ['input' => (int) $run->input_tokens, 'output' => (int) $run->output_tokens],

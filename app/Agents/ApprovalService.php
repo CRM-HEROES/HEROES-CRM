@@ -133,6 +133,8 @@ class ApprovalService
         }
 
         $context = new AgentExecutionContext($owner, $project);
+        $context->agentId = $agent->id;
+        $context->runId = $action->run_id;
 
         // The progress of a long action, readable while it runs
         $lastWrite = 0;

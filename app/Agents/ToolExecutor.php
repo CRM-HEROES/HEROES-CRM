@@ -50,6 +50,9 @@ class ToolExecutor
         $started = microtime(true);
         $tool = $this->tools->get($toolUse['name']);
 
+        $context->agentId = $agent->id;
+        $context->runId = $run->id;
+
         $step = $this->openStep($run, $toolUse, $tool);
 
         if ($step === null) {

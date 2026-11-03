@@ -100,6 +100,14 @@ return [
         ],
 
         /**
+         * Pictures of the AI agents (re-encoded by AgentAvatar)
+         */
+        'agent_avatars' => [
+            'driver' => 'local',
+            'root' => storage_path('app/agent-avatars'),
+        ],
+
+        /**
          * Logos disk
          */
         'logos' => [

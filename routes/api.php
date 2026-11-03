@@ -224,6 +224,9 @@ Route::post('/webservice/{import}/sheet-sync', [\App\Http\Controllers\API\SheetS
 
 Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->name("project.logo");
 
+// Picture of an AI agent: shown in an <img>, so public; the name is random and unguessable
+Route::get('agent-avatar/{token}', [\App\Http\Controllers\API\Agent\AvatarController::class, 'show'])->name('agent.avatar');
+
 Route::group([
     'middleware' => ['auth:sanctum']
 ], function () {
@@ -251,13 +254,18 @@ Route::group([
         Route::get('action/{action}', [\App\Http\Controllers\API\Agent\ActionController::class, 'show'])->name('action.show');
         Route::post('action/{action}/approve', [\App\Http\Controllers\API\Agent\ActionController::class, 'approve'])->name('action.approve');
         Route::post('action/{action}/reject', [\App\Http\Controllers\API\Agent\ActionController::class, 'reject'])->name('action.reject');
+        Route::get('conversation', [\App\Http\Controllers\API\Agent\ConversationController::class, 'all'])->name('conversation.all');
         Route::get('conversation/{conversation}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'show'])->name('conversation.show');
+        Route::delete('conversation/{conversation}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'archive'])->name('conversation.archive');
+        Route::get('report/{report}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'report'])->name('report.show');
         Route::get('run/{run}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'run'])->name('run.show');
         Route::get('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'store'])->name('store');
         Route::get('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'show'])->name('show');
         Route::put('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'update'])->name('update');
         Route::delete('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'destroy'])->name('destroy');
+        Route::post('{agent}/avatar', [\App\Http\Controllers\API\Agent\AvatarController::class, 'store'])->middleware('throttle:20,1')->name('avatar.store');
+        Route::delete('{agent}/avatar', [\App\Http\Controllers\API\Agent\AvatarController::class, 'destroy'])->name('avatar.destroy');
         Route::get('{agent}/conversation', [\App\Http\Controllers\API\Agent\ConversationController::class, 'index'])->name('conversation.index');
         Route::post('{agent}/ask', [\App\Http\Controllers\API\Agent\ConversationController::class, 'ask'])->middleware('throttle:30,1')->name('ask');
     });

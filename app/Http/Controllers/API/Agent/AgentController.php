@@ -65,7 +65,10 @@ class AgentController extends Controller
         $data = $this->validated($request);
 
         $agent = DB::transaction(function () use ($request, $data) {
-            $agent = Agent::create($data['agent'] + ['user_id' => $request->user()->id, 'status' => Agent::ACTIVE]);
+            // By default an agent knows every function of the CRM; its rights are its owner's
+            $settings = ['all_skills' => $data['skills'] === null || $data['all_skills'] === true];
+
+            $agent = Agent::create($data['agent'] + ['user_id' => $request->user()->id, 'status' => Agent::ACTIVE, 'settings' => $settings]);
             $this->sync($agent, $data);
             $this->publish($agent, $request->user()->id);
 
@@ -82,6 +85,11 @@ class AgentController extends Controller
 
         DB::transaction(function () use ($agent, $data, $request) {
             $agent->update($data['agent']);
+
+            if ($data['all_skills'] !== null || $data['skills'] !== null) {
+                $agent->update(['settings' => ['all_skills' => $data['all_skills'] === true] + ($agent->settings ?? [])]);
+            }
+
             $this->sync($agent, $data);
             $this->publish($agent, $request->user()->id);
         });
@@ -125,6 +133,7 @@ class AgentController extends Controller
             'status' => ['sometimes', Rule::in([Agent::ACTIVE, Agent::DISABLED])],
             // null: usable in every project of its owner
             'project' => 'nullable|string',
+            'all_skills' => 'sometimes|boolean',
             'skills' => 'sometimes|array|max:20',
             'skills.*' => ['string', Rule::in(array_keys($this->skills->all()))],
             'tool_grants' => 'sometimes|array',
@@ -148,7 +157,12 @@ class AgentController extends Controller
             abort_unless($this->tools->get($tool), 422, "Outil inconnu : $tool.");
         }
 
-        return ['agent' => $agent, 'skills' => $values['skills'] ?? null, 'grants' => $values['tool_grants'] ?? null];
+        return [
+            'agent' => $agent,
+            'skills' => $values['skills'] ?? null,
+            'all_skills' => $values['all_skills'] ?? null,
+            'grants' => $values['tool_grants'] ?? null,
+        ];
     }
 
     protected function sync(Agent $agent, array $data): void
@@ -186,11 +200,13 @@ class AgentController extends Controller
             'name' => $agent->name,
             'description' => $agent->description,
             'specialty' => $agent->specialty,
+            'avatar_url' => \App\Agents\AgentAvatar::url($agent->avatar),
             'model' => $agent->model,
             'effort' => $agent->effort,
             'autonomy' => $agent->autonomy,
             'status' => $agent->status,
             'project' => $agent->project?->only(['id', 'name', 'slug']),
+            'all_skills' => $agent->hasAllSkills(),
             'skills' => $agent->skillKeys(),
         ];
 

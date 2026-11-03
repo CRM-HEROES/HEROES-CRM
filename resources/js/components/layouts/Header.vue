@@ -529,11 +529,13 @@
                 <!-- Claude -->
 
                 <header-menu
-                    tag="a"
                     label="Claude"
-                    href="https://claude.ai"
-                    target="_blank"
-                    rel="noopener"
+                    :to="{
+                        name: 'agent',
+                        params: {
+                            project: project.slug,
+                        },
+                    }"
                 >
                     <svg
                         version="1.1"
