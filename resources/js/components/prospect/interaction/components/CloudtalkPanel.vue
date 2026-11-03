@@ -25,6 +25,7 @@
                 id="cloudtalk-phone"
                 class="hc-prospect-interaction-cloudtalk-phone"
                 :number="number"
+                :campaign-id="campaignId"
                 :calling="calling"
                 :loading="loading"
                 :recall-available="recallAvailable"
@@ -312,6 +313,11 @@ export default {
         number: {
             type: [String, Number],
             default: "",
+        },
+
+        campaignId: {
+            type: [String, Number],
+            default: null,
         },
 
         lookupNumber: {

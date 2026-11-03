@@ -256,6 +256,11 @@ export default {
             default: null,
         },
 
+        campaignId: {
+            type: [String, Number],
+            default: null,
+        },
+
         calling: {
             type: Boolean,
             default: false,
@@ -501,6 +506,10 @@ export default {
          * CloudTalk Phone iframe url
          */
         src() {
+            if (this.campaignId != null && String(this.campaignId).trim() !== "") {
+                return `${this.origin}/p/dialer-next/campaigns/${encodeURIComponent(this.campaignId)}/session`;
+            }
+
             return this.origin + "?partner=" + this.partner;
         },
     },

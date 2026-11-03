@@ -30,9 +30,20 @@
         <div class="hc-prospect-interaction-root">
             <cloudtalk-call-mode-modal
                 :visible="!!cloudtalkCallModeSelection"
+                :prospect-count="cloudtalkCallModeSelection?.prospectIds?.length || 0"
+                :parallel-limit="cloudtalkParallelProspectLimit"
+                :campaign-name="cloudtalkCallModeSelection?.campaignName || ''"
                 @sequential="selectCloudtalkCallMode('sequential')"
-                @parallel="selectCloudtalkCallMode('parallel')"
+                @parallel="selectCloudtalkCallMode('parallel', $event)"
                 @cancel="cancelCloudtalkCallModeSelection"
+            />
+            <cloudtalk-active-campaign-modal
+                :visible="!!cloudtalkParallelPending"
+                :campaigns="cloudtalkParallelPending?.campaigns || []"
+                :busy="cloudtalkParallelSync"
+                @continue="continueActiveCloudtalkCampaign"
+                @replace="replaceActiveCloudtalkCampaign"
+                @cancel="cancelActiveCloudtalkCampaign"
             />
             <loading :loading="!!cloudtalkSequence?.loading || cloudtalkParallelSync" />
             <cloudtalk-sequence-controls
@@ -52,6 +63,7 @@
                 :displayed="cloudtalkPhoneDisplayed"
                 :context-visible="cloudtalkCallContextVisible"
                 :number="interaction.number"
+                :campaign-id="cloudtalkParallelCampaignId"
                 :calling="callingCloudtalk"
                 :loading="cloudtalkLoading"
                 :agent-name="cloudtalkAgentName"
@@ -533,6 +545,7 @@ import {
 // Components
 import CloudtalkPanel from "./components/CloudtalkPanel.vue";
 import CloudtalkCallModeModal from "./components/CloudtalkCallModeModal.vue";
+import CloudtalkActiveCampaignModal from "./components/CloudtalkActiveCampaignModal.vue";
 import CloudtalkSequenceControls from "./components/CloudtalkSequenceControls.vue";
 import cloudtalkSequence from "./cloudtalk-sequence";
 import InteractionFrames from "./components/InteractionFrames.vue";
@@ -544,6 +557,7 @@ export default {
     components: {
         CloudtalkPanel,
         CloudtalkCallModeModal,
+        CloudtalkActiveCampaignModal,
         CloudtalkSequenceControls,
         InteractionFrames,
         InteractionList,

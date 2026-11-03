@@ -8,21 +8,123 @@ use App\Models\Prospect;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
 
 class CloudTalkDialer
 {
+    public const MAX_PROSPECTS_PER_PARALLEL_CAMPAIGN = 10;
+
     private const BASE_URL = 'https://my.cloudtalk.io/api';
     private const DIALER_BASE_URL = 'https://api.cloudtalk.io/v1';
+    private const MIN_REQUEST_INTERVAL_US = 250_000;
+    private const MAX_RATE_LIMIT_RETRIES = 4;
 
     /**
-     * Sync only the supplied prospects into a new, agent-assigned parallel campaign.
+     * Find all active parallel campaigns assigned to the agent.
      */
-    public function createParallelCampaign(Line $line, Project $project, Collection $prospects): array
+    public function activeParallelCampaigns(Line $line): array
     {
         $config = $line->config ?: [];
         $this->validateConfig($config);
+
+        $agentId = (string) $config['agent_id'];
+        $cursor = null;
+        $campaigns = [];
+
+        do {
+            $params = [
+                'limit' => 100,
+                'mode' => 'parallel',
+                'status' => 'active',
+            ];
+            if ($cursor) {
+                $params['cursor'] = $cursor;
+            }
+
+            $response = $this->request($line, 'GET', '/dialer/campaigns', $params);
+            foreach (data_get($response, 'data', []) as $campaign) {
+                $campaignId = (string) data_get($campaign, 'id', '');
+                $campaignName = (string) data_get($campaign, 'name', '');
+                if ($campaignId === ''
+                    || data_get($campaign, 'status') !== 'active'
+                    || data_get($campaign, 'mode') !== 'parallel') {
+                    continue;
+                }
+
+                $campaigns[] = [
+                    'id' => $campaignId,
+                    'name' => $campaignName,
+                    'mode' => 'parallel',
+                    'status' => 'active',
+                ];
+            }
+
+            $cursor = data_get($response, 'meta.nextCursor');
+        } while ($cursor);
+
+        if (!$campaigns) {
+            return [];
+        }
+
+        usort($campaigns, fn ($left, $right) => (float) $right['id'] <=> (float) $left['id']);
+
+        $assignedCampaigns = [];
+        foreach ($campaigns as $campaign) {
+            $associations = $this->request(
+                $line,
+                'GET',
+                '/dialer/campaigns/' . rawurlencode($campaign['id']) . '/associations'
+            );
+            $assignedToAgent = collect(data_get($associations, 'agent', []))
+                ->contains(fn ($agent) => (string) data_get($agent, 'ref_id', $agent) === $agentId);
+            if ($assignedToAgent) {
+                $assignedCampaigns[] = $campaign;
+            }
+        }
+
+        return $assignedCampaigns;
+    }
+
+    /**
+     * Sync selected prospects into a new parallel campaign, optionally replacing
+     * the previous active campaign assigned to this agent.
+     */
+    public function createParallelCampaign(
+        Line $line,
+        Project $project,
+        Collection $prospects,
+        ?string $deactivateCampaignId = null,
+        ?string $campaignLabel = null,
+        array $deactivateCampaignIds = []
+    ): array {
+        $config = $line->config ?: [];
+        $this->validateConfig($config);
+
+        if ($prospects->count() > self::MAX_PROSPECTS_PER_PARALLEL_CAMPAIGN) {
+            throw new RuntimeException(
+                'Une campagne Parallel Dialer est limitée à ' . self::MAX_PROSPECTS_PER_PARALLEL_CAMPAIGN . ' prospects.',
+                422
+            );
+        }
+
+        if ($deactivateCampaignId !== null && trim($deactivateCampaignId) !== '') {
+            $deactivateCampaignIds[] = $deactivateCampaignId;
+        }
+        $deactivateCampaignIds = array_values(array_unique(array_filter(array_map(
+            fn ($campaignId) => trim((string) $campaignId),
+            $deactivateCampaignIds
+        ))));
+        $previousCampaigns = [];
+        foreach ($deactivateCampaignIds as $campaignId) {
+            $previousCampaigns[] = $this->activeParallelCampaignForAgent(
+                $line,
+                $campaignId,
+                (string) $config['agent_id']
+            );
+        }
+        $deactivatedCampaigns = [];
 
         $selected = [];
         $errors = [];
@@ -62,11 +164,15 @@ class CloudTalkDialer
 
         $selectionKey = Str::upper(Str::random(8));
         $projectName = Str::limit(Str::slug((string) $project->slug), 40, '');
-        $campaignName = sprintf('[HEROES-CRM] %s %s %s', $projectName ?: 'prospects', now()->format('Ymd-His'), $selectionKey);
+        $campaignLabel = trim((string) $campaignLabel);
+        $campaignLabel = Str::limit(Str::slug($campaignLabel !== '' ? $campaignLabel : $projectName), 40, '');
+        $campaignLabel = $campaignLabel ?: ($projectName ?: 'prospects');
+        $campaignName = sprintf('[HEROES-CRM] %s %s %s', $campaignLabel, now()->format('Ymd-His'), $selectionKey);
         $tagName = sprintf('HEROES-CRM-%s-%s', $projectName ?: 'prospects', $selectionKey);
         $agentId = (string) $config['agent_id'];
         $tagId = null;
         $campaign = null;
+        $campaignId = null;
         $synced = [];
 
         try {
@@ -146,6 +252,16 @@ class CloudTalkDialer
                 $agentId
             );
 
+            foreach ($previousCampaigns as $previousCampaign) {
+                $previousCampaignPath = '/dialer/campaigns/' . rawurlencode((string) $previousCampaign['id']);
+                $this->request($line, 'PATCH', $previousCampaignPath, ['status' => 'inactive']);
+                $deactivatedCampaigns[] = $previousCampaign;
+                $deactivatedCampaign = $this->request($line, 'GET', $previousCampaignPath);
+                if (data_get($deactivatedCampaign, 'status') !== 'inactive') {
+                    throw new RuntimeException('CloudTalk n’a pas désactivé une campagne précédente.', 502);
+                }
+            }
+
             $campaign = $this->request($line, 'PATCH', $campaignPath, [
                 'status' => 'active',
             ]);
@@ -155,14 +271,16 @@ class CloudTalkDialer
 
             $this->assertCampaignContacts($line, $campaignId, $expectedContactIds);
         } catch (RuntimeException $e) {
-            if ($campaign && data_get($campaign, 'id')) {
+            if ($campaignId !== null && $campaignId !== '') {
                 try {
-                    $campaignPath = '/dialer/campaigns/' . rawurlencode((string) data_get($campaign, 'id'));
+                    $campaignPath = '/dialer/campaigns/' . rawurlencode($campaignId);
                     if (data_get($campaign, 'status') === 'active') {
                         $campaign = $this->request($line, 'PATCH', $campaignPath, ['status' => 'inactive']);
                     } else {
                         $this->request($line, 'DELETE', $campaignPath);
-                        $campaign['status'] = 'deleted';
+                        if (is_array($campaign)) {
+                            $campaign['status'] = 'deleted';
+                        }
                     }
                 } catch (RuntimeException $ignored) {
                     // Keep the original synchronization error.
@@ -172,6 +290,19 @@ class CloudTalkDialer
                 $this->deleteTag($line, (string) $tagId);
             }
 
+            foreach (array_reverse($deactivatedCampaigns) as $previousCampaign) {
+                try {
+                    $this->request(
+                        $line,
+                        'PATCH',
+                        '/dialer/campaigns/' . rawurlencode((string) $previousCampaign['id']),
+                        ['status' => 'active']
+                    );
+                } catch (RuntimeException $ignored) {
+                    // Preserve the new campaign error if rollback is unavailable.
+                }
+            }
+
             return [
                 'success' => false,
                 'status' => $this->httpStatus((int) $e->getCode()),
@@ -179,8 +310,8 @@ class CloudTalkDialer
                 'synced_count' => count($synced),
                 'duplicate_count' => $duplicates,
                 'tag_name' => $tagName,
-                'campaign' => $campaign && data_get($campaign, 'id') ? [
-                    'id' => (string) data_get($campaign, 'id'),
+                'campaign' => $campaignId !== null && $campaignId !== '' ? [
+                    'id' => $campaignId,
                     'name' => (string) data_get($campaign, 'name', $campaignName),
                     'status' => (string) data_get($campaign, 'status', 'initializing'),
                 ] : null,
@@ -191,7 +322,7 @@ class CloudTalkDialer
         return [
             'success' => true,
             'campaign' => [
-                'id' => (string) data_get($campaign, 'id'),
+                'id' => $campaignId,
                 'name' => (string) data_get($campaign, 'name', $campaignName),
                 'mode' => (string) data_get($campaign, 'mode'),
                 'status' => (string) data_get($campaign, 'status'),
@@ -200,6 +331,29 @@ class CloudTalkDialer
             'duplicate_count' => $duplicates,
             'tag_name' => $tagName,
             'errors' => $errors,
+        ];
+    }
+
+    private function activeParallelCampaignForAgent(Line $line, string $campaignId, string $agentId): array
+    {
+        $campaignPath = '/dialer/campaigns/' . rawurlencode($campaignId);
+        $campaign = $this->request($line, 'GET', $campaignPath);
+        $campaignName = (string) data_get($campaign, 'name', '');
+        if (data_get($campaign, 'status') !== 'active'
+            || data_get($campaign, 'mode') !== 'parallel') {
+            throw new RuntimeException('La campagne sélectionnée n’est plus une campagne parallèle active.', 409);
+        }
+
+        $associations = $this->request($line, 'GET', $campaignPath . '/associations');
+        $assignedToAgent = collect(data_get($associations, 'agent', []))
+            ->contains(fn ($agent) => (string) data_get($agent, 'ref_id', $agent) === $agentId);
+        if (!$assignedToAgent) {
+            throw new RuntimeException('La campagne sélectionnée n’est pas associée à votre agent CloudTalk.', 409);
+        }
+
+        return [
+            'id' => $campaignId,
+            'name' => $campaignName,
         ];
     }
 
@@ -359,8 +513,10 @@ class CloudTalkDialer
         throw new RuntimeException('La campagne CloudTalk ne contient pas exactement les contacts sélectionnés.', 502);
     }
 
-    private function request(Line $line, string $method, string $path, array $data = []): array
+    private function request(Line $line, string $method, string $path, array $data = [], int $rateLimitRetry = 0): array
     {
+        usleep(self::MIN_REQUEST_INTERVAL_US);
+
         $config = $line->config ?: [];
         $baseUrl = str_starts_with($path, '/dialer/')
             ? self::DIALER_BASE_URL
@@ -382,13 +538,34 @@ class CloudTalkDialer
                 default => throw new RuntimeException('Méthode CloudTalk non prise en charge.', 500),
             };
         } catch (ConnectionException $e) {
+            Log::warning('CloudTalk API connection failed.', [
+                'method' => strtoupper($method),
+                'path' => $path,
+                'exception' => $e->getMessage(),
+            ]);
             throw new RuntimeException('Impossible de joindre l’API CloudTalk.', 503, $e);
         }
 
         $body = $response->json();
+        $httpStatus = $response->status();
         $apiStatus = (int) data_get($body, 'responseData.status', 0);
+        $rateLimited = $httpStatus === 429 || $apiStatus === 429;
+        $status = $rateLimited ? 429 : ($apiStatus ?: $httpStatus);
+        if ($rateLimited && $rateLimitRetry < self::MAX_RATE_LIMIT_RETRIES) {
+            $retry = $rateLimitRetry + 1;
+            $delayMs = $this->rateLimitDelayMilliseconds($response, $retry);
+            Log::warning('CloudTalk API rate limited; retrying request.', [
+                'method' => strtoupper($method),
+                'path' => $path,
+                'retry' => $retry,
+                'delay_ms' => $delayMs,
+            ]);
+            usleep($delayMs * 1000);
+
+            return $this->request($line, $method, $path, $data, $retry);
+        }
+
         if (!$response->successful() || ($apiStatus && !in_array($apiStatus, [200, 201], true))) {
-            $status = $apiStatus ?: $response->status();
             $message = data_get($body, 'message')
                 ?: data_get($body, 'responseData.message')
                 ?: data_get($body, 'responseData.data.message')
@@ -413,6 +590,23 @@ class CloudTalkDialer
         }
 
         return is_array($body) ? $body : [];
+    }
+
+    private function rateLimitDelayMilliseconds($response, int $retry): int
+    {
+        $retryAfter = trim((string) $response->header('Retry-After'));
+        if (is_numeric($retryAfter)) {
+            return min(60000, max(1000, (int) ceil((float) $retryAfter * 1000)));
+        }
+
+        if ($retryAfter !== '') {
+            $retryAt = strtotime($retryAfter);
+            if ($retryAt !== false) {
+                return min(60000, max(1000, ($retryAt - time()) * 1000));
+            }
+        }
+
+        return min(8000, 1000 * (2 ** ($retry - 1)));
     }
 
     private function deleteTag(Line $line, string $tagId): void
