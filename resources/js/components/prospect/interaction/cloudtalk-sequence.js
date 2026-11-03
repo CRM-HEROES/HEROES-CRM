@@ -151,7 +151,6 @@ export default {
             }
 
             const request = ++this.cloudtalkParallelRequest;
-            this.cloudtalkParallelCampaignId = null;
             this.cloudtalkParallelSync = true;
 
             try {
@@ -195,6 +194,16 @@ export default {
             if (!selectedCampaign?.id) return;
 
             this.cloudtalkParallelPending = null;
+            if (this.cloudtalkCampaignSession && this.cloudtalkParallelCampaignId
+                && String(selectedCampaign.id) !== String(this.cloudtalkParallelCampaignId)) {
+                flashWarning({
+                    title: 'CloudTalk',
+                    body: this.$t('prospect.interaction.mode_picker.parallel_session_continue_blocked'),
+                    duration: 10000,
+                });
+                this.openCloudtalkSequencePhone();
+                return;
+            }
             this.cloudtalkParallelCampaignId = String(selectedCampaign.id);
             this.openCloudtalkSequencePhone();
         },
@@ -234,11 +243,13 @@ export default {
             if (!this.cloudtalkParallelPending) return;
             this.cloudtalkParallelPending = null;
             this.cloudtalkParallelRequest++;
-            this.cloudtalkParallelCampaignId = null;
         },
 
         async performCloudtalkParallelCampaign(selection, request, deactivateCampaignIds = []) {
             const { projectSlug, prospectIds, campaignName } = selection;
+            const currentSessionCampaignId = this.cloudtalkCampaignSession
+                ? this.cloudtalkParallelCampaignId
+                : null;
             const params = {
                 line_id: this.cloudtalkLine.id,
                 prospect_ids: prospectIds,
@@ -250,11 +261,19 @@ export default {
             if (request !== this.cloudtalkParallelRequest || projectSlug !== this.project?.slug) return;
 
             const campaignId = data.campaign?.id;
-            this.cloudtalkParallelCampaignId = campaignId != null && String(campaignId).trim()
-                ? String(campaignId)
-                : null;
+            const keepCurrentSession = currentSessionCampaignId != null
+                && String(currentSessionCampaignId).trim() !== '';
+            if (!keepCurrentSession) {
+                this.cloudtalkParallelCampaignId = campaignId != null && String(campaignId).trim()
+                    ? String(campaignId)
+                    : null;
+            }
             this.openCloudtalkSequencePhone();
-            const message = data.errors?.length
+            const message = keepCurrentSession
+                ? this.$t('prospect.interaction.mode_picker.parallel_session_in_progress', {
+                    campaign: data.campaign.name,
+                })
+                : data.errors?.length
                 ? this.$t('prospect.interaction.mode_picker.parallel_partial', {
                     campaign: data.campaign.name,
                     count: data.synced_count,
@@ -265,7 +284,7 @@ export default {
                     count: data.synced_count,
                 });
             const notice = { title: 'CloudTalk', body: message, duration: 10000 };
-            if (data.errors?.length) {
+            if (keepCurrentSession || data.errors?.length) {
                 const details = this.cloudtalkParallelErrorDetails(data.errors);
                 flashWarning({ ...notice, body: [message, details].filter(Boolean).join(' ') });
             } else {

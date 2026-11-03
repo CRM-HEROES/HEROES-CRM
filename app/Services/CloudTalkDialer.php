@@ -124,8 +124,6 @@ class CloudTalkDialer
                 (string) $config['agent_id']
             );
         }
-        $deactivatedCampaigns = [];
-
         $selected = [];
         $errors = [];
         $seenNumbers = [];
@@ -260,13 +258,7 @@ class CloudTalkDialer
             );
 
             foreach ($previousCampaigns as $previousCampaign) {
-                $previousCampaignPath = '/dialer/campaigns/' . rawurlencode((string) $previousCampaign['id']);
-                $this->request($line, 'PATCH', $previousCampaignPath, ['status' => 'inactive']);
-                $deactivatedCampaigns[] = $previousCampaign;
-                $deactivatedCampaign = $this->request($line, 'GET', $previousCampaignPath);
-                if (data_get($deactivatedCampaign, 'status') !== 'inactive') {
-                    throw new RuntimeException('CloudTalk n’a pas désactivé une campagne précédente.', 502);
-                }
+                $this->deactivateCampaign($line, $previousCampaign);
             }
 
             $campaign = $this->request($line, 'PATCH', $campaignPath, [
@@ -274,6 +266,11 @@ class CloudTalkDialer
             ]);
             if (data_get($campaign, 'mode') !== 'parallel' || data_get($campaign, 'status') !== 'active') {
                 throw new RuntimeException('La campagne CloudTalk n’est pas active en mode parallel.', 502);
+            }
+
+            // Verify that replacement campaigns remain inactive after the new campaign starts.
+            foreach ($previousCampaigns as $previousCampaign) {
+                $this->deactivateCampaign($line, $previousCampaign);
             }
 
             $this->assertCampaignContacts($line, $campaignId, $expectedContactIds);
@@ -295,19 +292,6 @@ class CloudTalkDialer
             }
             if (!$campaign && $tagId) {
                 $this->deleteTag($line, (string) $tagId);
-            }
-
-            foreach (array_reverse($deactivatedCampaigns) as $previousCampaign) {
-                try {
-                    $this->request(
-                        $line,
-                        'PATCH',
-                        '/dialer/campaigns/' . rawurlencode((string) $previousCampaign['id']),
-                        ['status' => 'active']
-                    );
-                } catch (RuntimeException $ignored) {
-                    // Preserve the new campaign error if rollback is unavailable.
-                }
             }
 
             return [
@@ -362,6 +346,17 @@ class CloudTalkDialer
             'id' => $campaignId,
             'name' => $campaignName,
         ];
+    }
+
+    private function deactivateCampaign(Line $line, array $campaign): void
+    {
+        $campaignPath = '/dialer/campaigns/' . rawurlencode((string) $campaign['id']);
+        $this->request($line, 'PATCH', $campaignPath, ['status' => 'inactive']);
+        $deactivatedCampaign = $this->request($line, 'GET', $campaignPath);
+
+        if (data_get($deactivatedCampaign, 'status') !== 'inactive') {
+            throw new RuntimeException('CloudTalk n’a pas désactivé la campagne « ' . $campaign['name'] . ' ».', 502);
+        }
     }
 
     private function findOrCreateContact(Line $line, Prospect $prospect, string $number, string $tagName): array
