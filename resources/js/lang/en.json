@@ -459,6 +459,7 @@
         },
         "interaction": {
             "title": "Calls ({prospect})",
+            "called_by_agent": "Call by {agent}",
             "edit_phone_number": "Edit phone number",
             "edit_mobile_phone_number": "Edit mobile phone number",
             "add_history": "Add history",

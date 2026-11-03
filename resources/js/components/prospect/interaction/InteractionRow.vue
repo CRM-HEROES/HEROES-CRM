@@ -61,11 +61,7 @@
             </span>
             <div
                 class="hc-prospect-interaction-creator"
-                v-text="
-                    interaction.creator
-                        ? interaction.creator.name
-                        : '(Utilisateur inconnu)'
-                "
+                v-text="creatorLabel"
             ></div>
             <div class="hc-prospect-interaction-date">
                 <span v-text="date"></span>
@@ -77,7 +73,11 @@
             </div>
         </div>
 
-        <div class="hc-flex-column" style="align-items: flex-end">
+        <div
+            v-if="interaction.source !== 'cloudtalk'"
+            class="hc-flex-column"
+            style="align-items: flex-end"
+        >
             <div
                 v-if="interaction.number"
                 class="hc-prospect-interaction-number"
@@ -197,6 +197,31 @@ export default {
          */
         date() {
             return dayjs(this.interaction.created_at).fromNow();
+        },
+
+        cloudtalkAgentName() {
+            if (this.interaction.source !== "cloudtalk") return "";
+
+            const user = this.interaction.data?.cloudtalk_ended?.data?.user
+                || this.interaction.data?.cloudtalk_call?.data?.user;
+            if (!user) return "";
+
+            const fullName = [user.first_name, user.last_name]
+                .map((part) => String(part || "").trim())
+                .filter(Boolean)
+                .join(" ");
+
+            return fullName || String(user.name || "").replace(/\s*<[^>]*>\s*$/, "").trim();
+        },
+
+        creatorLabel() {
+            if (this.interaction.source === "cloudtalk" && this.cloudtalkAgentName) {
+                return this.$t("prospect.interaction.called_by_agent", {
+                    agent: this.cloudtalkAgentName,
+                });
+            }
+
+            return this.interaction.creator?.name || "(Utilisateur inconnu)";
         },
 
         durationLabel() {

@@ -460,6 +460,7 @@
         },
         "interaction": {
             "title": "Appels ({prospect})",
+            "called_by_agent": "Appelé par {agent}",
             "add_history": "Ajouter un historique d'appel",
             "edit_phone_number": "Modifier le numéro",
             "edit_mobile_phone_number": "Modifier le numéro mobile",

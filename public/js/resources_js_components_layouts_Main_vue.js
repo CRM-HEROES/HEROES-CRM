@@ -31197,6 +31197,25 @@ __webpack_require__.r(__webpack_exports__);
     date: function date() {
       return dayjs(this.interaction.created_at).fromNow();
     },
+    cloudtalkAgentName: function cloudtalkAgentName() {
+      var _this$interaction$dat, _this$interaction$dat2;
+      if (this.interaction.source !== "cloudtalk") return "";
+      var user = ((_this$interaction$dat = this.interaction.data) === null || _this$interaction$dat === void 0 || (_this$interaction$dat = _this$interaction$dat.cloudtalk_ended) === null || _this$interaction$dat === void 0 || (_this$interaction$dat = _this$interaction$dat.data) === null || _this$interaction$dat === void 0 ? void 0 : _this$interaction$dat.user) || ((_this$interaction$dat2 = this.interaction.data) === null || _this$interaction$dat2 === void 0 || (_this$interaction$dat2 = _this$interaction$dat2.cloudtalk_call) === null || _this$interaction$dat2 === void 0 || (_this$interaction$dat2 = _this$interaction$dat2.data) === null || _this$interaction$dat2 === void 0 ? void 0 : _this$interaction$dat2.user);
+      if (!user) return "";
+      var fullName = [user.first_name, user.last_name].map(function (part) {
+        return String(part || "").trim();
+      }).filter(Boolean).join(" ");
+      return fullName || String(user.name || "").replace(/\s*<[^>]*>\s*$/, "").trim();
+    },
+    creatorLabel: function creatorLabel() {
+      var _this$interaction$cre;
+      if (this.interaction.source === "cloudtalk" && this.cloudtalkAgentName) {
+        return this.$t("prospect.interaction.called_by_agent", {
+          agent: this.cloudtalkAgentName
+        });
+      }
+      return ((_this$interaction$cre = this.interaction.creator) === null || _this$interaction$cre === void 0 ? void 0 : _this$interaction$cre.name) || "(Utilisateur inconnu)";
+    },
     durationLabel: function durationLabel() {
       var duration = this.interaction.duration;
       if (duration === null || duration === undefined || duration === "") {
@@ -31220,8 +31239,8 @@ __webpack_require__.r(__webpack_exports__);
       return this.interaction.source == "cloudtalk" ? "Ecouter la conversation" : "Ecouter l'enregistrement";
     },
     callDirection: function callDirection() {
-      var _this$interaction$dat, _this$interaction$dat2, _this$interaction$dat3, _this$interaction$dat4, _this$interaction$dat5;
-      var direction = this.interaction.call_direction || ((_this$interaction$dat = this.interaction.data) === null || _this$interaction$dat === void 0 ? void 0 : _this$interaction$dat.direction) || ((_this$interaction$dat2 = this.interaction.data) === null || _this$interaction$dat2 === void 0 || (_this$interaction$dat2 = _this$interaction$dat2.cloudtalk_call) === null || _this$interaction$dat2 === void 0 ? void 0 : _this$interaction$dat2.direction) || ((_this$interaction$dat3 = this.interaction.data) === null || _this$interaction$dat3 === void 0 || (_this$interaction$dat3 = _this$interaction$dat3.cloudtalk_call) === null || _this$interaction$dat3 === void 0 ? void 0 : _this$interaction$dat3.type) || ((_this$interaction$dat4 = this.interaction.data) === null || _this$interaction$dat4 === void 0 || (_this$interaction$dat4 = _this$interaction$dat4.cloudtalk_history) === null || _this$interaction$dat4 === void 0 || (_this$interaction$dat4 = _this$interaction$dat4.Cdr) === null || _this$interaction$dat4 === void 0 ? void 0 : _this$interaction$dat4.direction) || ((_this$interaction$dat5 = this.interaction.data) === null || _this$interaction$dat5 === void 0 || (_this$interaction$dat5 = _this$interaction$dat5.cloudtalk_history) === null || _this$interaction$dat5 === void 0 || (_this$interaction$dat5 = _this$interaction$dat5.Cdr) === null || _this$interaction$dat5 === void 0 ? void 0 : _this$interaction$dat5.type) || "";
+      var _this$interaction$dat3, _this$interaction$dat4, _this$interaction$dat5, _this$interaction$dat6, _this$interaction$dat7;
+      var direction = this.interaction.call_direction || ((_this$interaction$dat3 = this.interaction.data) === null || _this$interaction$dat3 === void 0 ? void 0 : _this$interaction$dat3.direction) || ((_this$interaction$dat4 = this.interaction.data) === null || _this$interaction$dat4 === void 0 || (_this$interaction$dat4 = _this$interaction$dat4.cloudtalk_call) === null || _this$interaction$dat4 === void 0 ? void 0 : _this$interaction$dat4.direction) || ((_this$interaction$dat5 = this.interaction.data) === null || _this$interaction$dat5 === void 0 || (_this$interaction$dat5 = _this$interaction$dat5.cloudtalk_call) === null || _this$interaction$dat5 === void 0 ? void 0 : _this$interaction$dat5.type) || ((_this$interaction$dat6 = this.interaction.data) === null || _this$interaction$dat6 === void 0 || (_this$interaction$dat6 = _this$interaction$dat6.cloudtalk_history) === null || _this$interaction$dat6 === void 0 || (_this$interaction$dat6 = _this$interaction$dat6.Cdr) === null || _this$interaction$dat6 === void 0 ? void 0 : _this$interaction$dat6.direction) || ((_this$interaction$dat7 = this.interaction.data) === null || _this$interaction$dat7 === void 0 || (_this$interaction$dat7 = _this$interaction$dat7.cloudtalk_history) === null || _this$interaction$dat7 === void 0 || (_this$interaction$dat7 = _this$interaction$dat7.Cdr) === null || _this$interaction$dat7 === void 0 ? void 0 : _this$interaction$dat7.type) || "";
       var normalizedDirection = String(direction).toLowerCase();
       if (["inbound", "incoming", "in"].includes(normalizedDirection)) {
         return "incoming";
@@ -31250,8 +31269,8 @@ __webpack_require__.r(__webpack_exports__);
       return this.callDirection == "incoming" ? "Appel entrant" : "Appel sortant";
     },
     callOutcome: function callOutcome() {
-      var _this$interaction$dat6, _this$interaction$dat7;
-      var outcome = this.interaction.call_outcome || ((_this$interaction$dat6 = this.interaction.data) === null || _this$interaction$dat6 === void 0 ? void 0 : _this$interaction$dat6.outcome) || ((_this$interaction$dat7 = this.interaction.data) === null || _this$interaction$dat7 === void 0 || (_this$interaction$dat7 = _this$interaction$dat7.cloudtalk_call) === null || _this$interaction$dat7 === void 0 ? void 0 : _this$interaction$dat7.outcome) || this.interaction.status || "";
+      var _this$interaction$dat8, _this$interaction$dat9;
+      var outcome = this.interaction.call_outcome || ((_this$interaction$dat8 = this.interaction.data) === null || _this$interaction$dat8 === void 0 ? void 0 : _this$interaction$dat8.outcome) || ((_this$interaction$dat9 = this.interaction.data) === null || _this$interaction$dat9 === void 0 || (_this$interaction$dat9 = _this$interaction$dat9.cloudtalk_call) === null || _this$interaction$dat9 === void 0 ? void 0 : _this$interaction$dat9.outcome) || this.interaction.status || "";
       var normalized = String(outcome).toLowerCase();
       if (["voicemail", "voice_mail", "voice mail", "messagerie"].some(function (value) {
         return normalized.includes(value);
@@ -84623,6 +84642,7 @@ var _hoisted_9 = {
 var _hoisted_10 = ["textContent"];
 var _hoisted_11 = ["textContent"];
 var _hoisted_12 = {
+  key: 0,
   "class": "hc-flex-column",
   style: {
     "align-items": "flex-end"
@@ -84678,14 +84698,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "icon-size": 8
       }, null, 8 /* PROPS */, ["class", "color", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [$options.callOutcome === 'voicemail' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("prospect.interaction.voicemail")), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
         "class": "hc-prospect-interaction-creator",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.creator ? $props.interaction.creator.name : '(Utilisateur inconnu)')
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.creatorLabel)
       }, null, 8 /* PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.date)
       }, null, 8 /* PROPS */, _hoisted_10), $options.durationLabel ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
         key: 0,
         "class": "hc-prospect-interaction-duration",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(' - ' + $options.durationLabel)
-      }, null, 8 /* PROPS */, _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [$props.interaction.number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+      }, null, 8 /* PROPS */, _hoisted_11)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])]), $props.interaction.source !== 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [$props.interaction.number ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
         key: 0,
         "class": "hc-prospect-interaction-number",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.number)
@@ -84693,15 +84713,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 1,
         "class": "hc-prospect-interaction-from-number",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.interaction.from_number)
-      }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-        key: 0,
+      }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+        key: 1,
         tag: "button",
         type: "button",
         onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.toggleAudio, ["prevent", "stop"]),
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($options.audioIcon),
         title: $options.audioTitle
       }, null, 8 /* PROPS */, ["onClick", "class", "title"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.interaction.audio ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("audio", {
-        key: 1,
+        key: 2,
         ref: "audio",
         src: $props.interaction.audio,
         preload: "none",
