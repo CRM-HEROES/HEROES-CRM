@@ -30,6 +30,7 @@
                 :loading="loading"
                 :recall-available="recallAvailable"
                 :agent-name="agentName"
+                @campaign-session-change="$emit('campaign-session-change', $event)"
                 @make-call="emitPanelEvent('make-call')"
                 @call-activity="emitPanelEvent('call-activity', $event)"
                 @ringing-call="emitPanelEvent('ringing-call', $event)"
@@ -506,6 +507,7 @@ export default {
 
     emits: [
         "make-call",
+        "campaign-session-change",
         "call-activity",
         "ringing-call",
         "outgoing-call",

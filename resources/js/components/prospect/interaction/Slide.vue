@@ -1,7 +1,11 @@
 <template>
     <slide
         :name="name"
-        @open="fetchInteractions(), fetchSelectedProspects()"
+        class="hc-prospect-interaction-slide"
+        :class="{
+            'hc-prospect-interaction-slide-minimized': interactionSlideMinimized,
+        }"
+        @open="openInteractionSlide"
         :before-close="beforeCloudtalkSlideClose"
         @closed="handleCloudtalkSlideClosed"
         :title="
@@ -28,6 +32,31 @@
         :style="{ width: slideWidth }"
     >
         <div class="hc-prospect-interaction-root">
+            <button
+                type="button"
+                class="hc-prospect-interaction-slide-minimize"
+                :title="
+                    interactionSlideMinimized
+                        ? 'Restaurer le panneau'
+                        : 'Réduire le panneau vers le bas'
+                "
+                :aria-label="
+                    interactionSlideMinimized
+                        ? 'Restaurer le panneau'
+                        : 'Réduire le panneau vers le bas'
+                "
+                @click.stop="
+                    interactionSlideMinimized = !interactionSlideMinimized
+                "
+            >
+                <icon
+                    :class="
+                        interactionSlideMinimized
+                            ? 'fa fa-chevron-up'
+                            : 'fa fa-chevron-down'
+                    "
+                />
+            </button>
             <cloudtalk-call-mode-modal
                 :visible="!!cloudtalkCallModeSelection"
                 :prospect-count="cloudtalkCallModeSelection?.prospectIds?.length || 0"
@@ -79,6 +108,7 @@
                 :messages-for-thread="cloudtalkMessagesForThread"
                 :format-date="formatCloudtalkDate"
                 :message-preview="messagePreview"
+                @campaign-session-change="cloudtalkCampaignSession = $event"
                 @make-call="makeCloudtalkCall"
                 @call-activity="displayCloudtalkPhoneFromIframe"
                 @ringing-call="cloudtalkCallRinging"
@@ -170,6 +200,37 @@
     position: relative;
     width: 100%;
     overflow-y: hidden;
+}
+
+.hc-prospect-interaction-slide-minimize {
+    position: fixed;
+    top: 5px;
+    right: 40px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 0;
+    border-radius: 15px;
+    background: transparent;
+    color: #888888;
+    cursor: pointer;
+}
+
+.hc-prospect-interaction-slide-minimize:hover {
+    background: #eeeeee;
+    color: #555555;
+}
+
+.hc-slide.hc-prospect-interaction-slide .hc-slide-title {
+    padding-right: 40px;
+}
+
+.hc-slide.hc-prospect-interaction-slide-minimized.active {
+    transform: translateY(calc(100% - 48px));
 }
 
 .hc-prospect-interaction-item {
@@ -584,6 +645,8 @@ export default {
             cloudtalkWaitingForEvent: false,
             cloudtalkLoginRequired: false,
             cloudtalkPhoneVisible: false,
+            cloudtalkCampaignSession: false,
+            interactionSlideMinimized: false,
             cloudtalkContextPanelVisible: false,
             cloudtalkReturnProspect: null,
             cloudtalkEventTimeout: null,
@@ -631,6 +694,12 @@ export default {
                 status: "new",
                 data: {},
             };
+        },
+
+        openInteractionSlide() {
+            this.interactionSlideMinimized = false;
+            this.fetchInteractions();
+            this.fetchSelectedProspects();
         },
 
         async fetchInteractions() {
@@ -2226,6 +2295,10 @@ export default {
         },
 
         slideWidth() {
+            if (this.cloudtalkPhoneDisplayed && this.cloudtalkCampaignSession) {
+                return "75%";
+            }
+
             if (
                 this.cloudtalkPhoneDisplayed &&
                 this.cloudtalkCallContextVisible &&

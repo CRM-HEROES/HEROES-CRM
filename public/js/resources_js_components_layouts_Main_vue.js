@@ -31421,6 +31421,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       cloudtalkWaitingForEvent: false,
       cloudtalkLoginRequired: false,
       cloudtalkPhoneVisible: false,
+      cloudtalkCampaignSession: false,
+      interactionSlideMinimized: false,
       cloudtalkContextPanelVisible: false,
       cloudtalkReturnProspect: null,
       cloudtalkEventTimeout: null,
@@ -31465,6 +31467,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         status: "new",
         data: {}
       };
+    },
+    openInteractionSlide: function openInteractionSlide() {
+      this.interactionSlideMinimized = false;
+      this.fetchInteractions();
+      this.fetchSelectedProspects();
     },
     fetchInteractions: function fetchInteractions() {
       var _this = this;
@@ -32954,6 +32961,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return this.interactionProspect || this.cloudtalkCallProspect;
     },
     slideWidth: function slideWidth() {
+      if (this.cloudtalkPhoneDisplayed && this.cloudtalkCampaignSession) {
+        return "75%";
+      }
       if (this.cloudtalkPhoneDisplayed && this.cloudtalkCallContextVisible && this.cloudtalkContextPanelVisible) {
         return "620px";
       }
@@ -33484,7 +33494,7 @@ __webpack_require__.r(__webpack_exports__);
       return String(number || "").replace(/\D+/g, "");
     }
   },
-  emits: ["make-call", "call-activity", "ringing-call", "outgoing-call", "call-ended", "hangup-call", "answered-call", "contact-info", "back", "login-cloudtalk", "create-prospect", "context-panel-visible"]
+  emits: ["make-call", "campaign-session-change", "call-activity", "ringing-call", "outgoing-call", "call-ended", "hangup-call", "answered-call", "contact-info", "back", "login-cloudtalk", "create-prospect", "context-panel-visible"]
 });
 
 /***/ }),
@@ -57539,7 +57549,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
  * CloudTalk recommends a minimum size of 700px x 420px.
  */
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  emits: ["answered-call", "call-activity", "call-ended", "contact-info", "hangup-call", "make-call", "outgoing-call", "ringing-call"],
+  emits: ["answered-call", "call-activity", "campaign-session-change", "call-ended", "contact-info", "hangup-call", "make-call", "outgoing-call", "ringing-call"],
   props: {
     id: {
       type: String
@@ -57590,6 +57600,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   mounted: function mounted() {
     window.addEventListener("message", this.handleMessage);
+    this.emitCampaignSessionState();
     this.syncSlowLoadingMessage();
   },
   beforeUnmount: function beforeUnmount() {
@@ -57613,6 +57624,17 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         this.slowLoadingTimeout = null;
       }
       this.showSlowLoadingMessage = false;
+    },
+    emitCampaignSessionState: function emitCampaignSessionState() {
+      var iframeUrl = this.$refs.phoneFrame ? this.$refs.phoneFrame.src : this.src;
+      var isCampaignSession = false;
+      try {
+        var url = new URL(iframeUrl, window.location.origin);
+        isCampaignSession = url.origin === this.origin && /^\/p\/dialer-next\/campaigns\/[^/]+\/session\/?$/.test(url.pathname);
+      } catch (error) {
+        isCampaignSession = false;
+      }
+      this.$emit("campaign-session-change", isCampaignSession);
     },
     requestCall: function requestCall() {
       if (!this.number || this.calling || this.loading || this.callActive) {
@@ -57720,6 +57742,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     }
   },
   watch: {
+    src: function src() {
+      this.emitCampaignSessionState();
+    },
     loading: function loading(value) {
       if (value) this.eventReceived = false;
       this.syncSlowLoadingMessage();
@@ -84758,7 +84783,9 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "hc-prospect-interaction-root"
 };
+var _hoisted_2 = ["title", "aria-label"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_cloudtalk_call_mode_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk-call-mode-modal");
   var _component_cloudtalk_active_campaign_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("cloudtalk-active-campaign-modal");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
@@ -84771,9 +84798,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_slide = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("slide", true);
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: $data.name,
-    onOpen: _cache[10] || (_cache[10] = function ($event) {
-      return $options.fetchInteractions(), $options.fetchSelectedProspects();
-    }),
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-prospect-interaction-slide", {
+      'hc-prospect-interaction-slide-minimized': $data.interactionSlideMinimized
+    }]),
+    onOpen: $options.openInteractionSlide,
     "before-close": _ctx.beforeCloudtalkSlideClose,
     onClosed: _ctx.handleCloudtalkSlideClosed,
     title: _ctx.$t('prospect.interaction.title', {
@@ -84795,15 +84823,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       var _ctx$cloudtalkCallMod, _ctx$cloudtalkCallMod2, _ctx$cloudtalkParalle, _ctx$cloudtalkSequenc;
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk_call_mode_modal, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        "class": "hc-prospect-interaction-slide-minimize",
+        title: $data.interactionSlideMinimized ? 'Restaurer le panneau' : 'Réduire le panneau vers le bas',
+        "aria-label": $data.interactionSlideMinimized ? 'Restaurer le panneau' : 'Réduire le panneau vers le bas',
+        onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return $data.interactionSlideMinimized = !$data.interactionSlideMinimized;
+        }, ["stop"]))
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.interactionSlideMinimized ? 'fa fa-chevron-up' : 'fa fa-chevron-down')
+      }, null, 8 /* PROPS */, ["class"])], 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk_call_mode_modal, {
         visible: !!_ctx.cloudtalkCallModeSelection,
         "prospect-count": ((_ctx$cloudtalkCallMod = _ctx.cloudtalkCallModeSelection) === null || _ctx$cloudtalkCallMod === void 0 || (_ctx$cloudtalkCallMod = _ctx$cloudtalkCallMod.prospectIds) === null || _ctx$cloudtalkCallMod === void 0 ? void 0 : _ctx$cloudtalkCallMod.length) || 0,
         "parallel-limit": _ctx.cloudtalkParallelProspectLimit,
         "campaign-name": ((_ctx$cloudtalkCallMod2 = _ctx.cloudtalkCallModeSelection) === null || _ctx$cloudtalkCallMod2 === void 0 ? void 0 : _ctx$cloudtalkCallMod2.campaignName) || '',
-        onSequential: _cache[0] || (_cache[0] = function ($event) {
+        onSequential: _cache[1] || (_cache[1] = function ($event) {
           return _ctx.selectCloudtalkCallMode('sequential');
         }),
-        onParallel: _cache[1] || (_cache[1] = function ($event) {
+        onParallel: _cache[2] || (_cache[2] = function ($event) {
           return _ctx.selectCloudtalkCallMode('parallel', $event);
         }),
         onCancel: _ctx.cancelCloudtalkCallModeSelection
@@ -84848,6 +84886,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "messages-for-thread": $options.cloudtalkMessagesForThread,
         "format-date": $options.formatCloudtalkDate,
         "message-preview": $options.messagePreview,
+        onCampaignSessionChange: _cache[3] || (_cache[3] = function ($event) {
+          return $data.cloudtalkCampaignSession = $event;
+        }),
         onMakeCall: $options.makeCloudtalkCall,
         onCallActivity: $options.displayCloudtalkPhoneFromIframe,
         onRingingCall: $options.cloudtalkCallRinging,
@@ -84859,7 +84900,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onBack: $options.backFromCloudtalk,
         onLoginCloudtalk: $options.loginCloudtalk,
         onCreateProspect: $options.createCloudtalkProspect,
-        onContextPanelVisible: _cache[2] || (_cache[2] = function ($event) {
+        onContextPanelVisible: _cache[4] || (_cache[4] = function ($event) {
           return $data.cloudtalkContextPanelVisible = $event;
         })
       }, null, 8 /* PROPS */, ["displayed", "context-visible", "number", "campaign-id", "calling", "loading", "agent-name", "retry-visible", "lookup-loading", "lookup-number", "prospect", "prospect-name", "project", "threads", "creating-prospect", "can-create-prospect", "messages-for-thread", "format-date", "message-preview", "onMakeCall", "onCallActivity", "onRingingCall", "onOutgoingCall", "onCallEnded", "onHangupCall", "onAnsweredCall", "onContactInfo", "onBack", "onLoginCloudtalk", "onCreateProspect"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_tab_layout, {
@@ -84870,11 +84911,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_interaction_frames, {
             "phone-number": $data.phoneNumber,
-            "onUpdate:phoneNumber": _cache[5] || (_cache[5] = function ($event) {
+            "onUpdate:phoneNumber": _cache[7] || (_cache[7] = function ($event) {
               return $data.phoneNumber = $event;
             }),
             "mobile-phone-number": $data.mobilePhoneNumber,
-            "onUpdate:mobilePhoneNumber": _cache[6] || (_cache[6] = function ($event) {
+            "onUpdate:mobilePhoneNumber": _cache[8] || (_cache[8] = function ($event) {
               return $data.mobilePhoneNumber = $event;
             }),
             "interaction-prospect": _ctx.interactionProspect,
@@ -84886,10 +84927,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "updating-phone-number": $data.updatingPhoneNumber,
             "updating-mobile-phone-number": $data.updatingMobilePhoneNumber,
             onBack: $options.backFromInteractionFrame,
-            onAircallSetting: _cache[7] || (_cache[7] = function ($event) {
+            onAircallSetting: _cache[9] || (_cache[9] = function ($event) {
               return $data.aircallTab = 1;
             }),
-            onAircallBackSetting: _cache[8] || (_cache[8] = function ($event) {
+            onAircallBackSetting: _cache[10] || (_cache[10] = function ($event) {
               return $data.aircallTab = 0;
             }),
             onCopyAircallWebhook: $options.copyAircallWebhookURLToClipboard,
@@ -84905,7 +84946,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "calling-kavkom": $data.callingViaKavkom,
             "kavkom-message": $data.kavkomCallMessage,
             "kavkom-success": $data.kavkomCallSuccess,
-            onCallKavkom: _cache[9] || (_cache[9] = function ($event) {
+            onCallKavkom: _cache[11] || (_cache[11] = function ($event) {
               return $options.triggerKavkomCall($data.interaction.number);
             })
           }, null, 8 /* PROPS */, ["phone-number", "mobile-phone-number", "interaction-prospect", "interaction", "tab", "frame-tab", "aircall-tab", "aircall-webhook-url", "updating-phone-number", "updating-mobile-phone-number", "onBack", "onCopyAircallWebhook", "onRingoverSetting", "onUpdateInteraction", "onNextInteraction", "onProspectSelected", "onUpdatePhoneNumber", "onUpdateMobilePhoneNumber", "onBackCloudtalk", "project-id", "kavkom-ready", "calling-kavkom", "kavkom-message", "kavkom-success"])];
@@ -84919,10 +84960,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "prospect-interactions": _ctx.prospectInteractions,
             "adding-history": $data.addingHistory,
             "can-add": _ctx.can('all.prospect.interaction.add'),
-            onEditPhone: _cache[3] || (_cache[3] = function ($event) {
+            onEditPhone: _cache[5] || (_cache[5] = function ($event) {
               return $data.tab = 1, $data.frameTab = 3;
             }),
-            onEditMobile: _cache[4] || (_cache[4] = function ($event) {
+            onEditMobile: _cache[6] || (_cache[6] = function ($event) {
               return $data.tab = 1, $data.frameTab = 4;
             }),
             onCallTelephone: $options.interactionViaTelephone,
@@ -84944,7 +84985,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["project-slug", "prospect", "records", "disabled"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["name", "before-close", "onClosed", "title", "url", "style"]);
+  }, 8 /* PROPS */, ["name", "class", "onOpen", "before-close", "onClosed", "title", "url", "style"]);
 }
 
 /***/ }),
@@ -85612,28 +85653,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     loading: $props.loading,
     "recall-available": $data.recallAvailable,
     "agent-name": $props.agentName,
-    onMakeCall: _cache[1] || (_cache[1] = function ($event) {
+    onCampaignSessionChange: _cache[1] || (_cache[1] = function ($event) {
+      return _ctx.$emit('campaign-session-change', $event);
+    }),
+    onMakeCall: _cache[2] || (_cache[2] = function ($event) {
       return $options.emitPanelEvent('make-call');
     }),
-    onCallActivity: _cache[2] || (_cache[2] = function ($event) {
+    onCallActivity: _cache[3] || (_cache[3] = function ($event) {
       return $options.emitPanelEvent('call-activity', $event);
     }),
-    onRingingCall: _cache[3] || (_cache[3] = function ($event) {
+    onRingingCall: _cache[4] || (_cache[4] = function ($event) {
       return $options.emitPanelEvent('ringing-call', $event);
     }),
-    onOutgoingCall: _cache[4] || (_cache[4] = function ($event) {
+    onOutgoingCall: _cache[5] || (_cache[5] = function ($event) {
       return $options.emitPanelEvent('outgoing-call', $event);
     }),
-    onCallEnded: _cache[5] || (_cache[5] = function ($event) {
+    onCallEnded: _cache[6] || (_cache[6] = function ($event) {
       return $options.emitPanelEvent('call-ended', $event);
     }),
-    onHangupCall: _cache[6] || (_cache[6] = function ($event) {
+    onHangupCall: _cache[7] || (_cache[7] = function ($event) {
       return $options.emitPanelEvent('hangup-call', $event);
     }),
-    onAnsweredCall: _cache[7] || (_cache[7] = function ($event) {
+    onAnsweredCall: _cache[8] || (_cache[8] = function ($event) {
       return $options.emitPanelEvent('answered-call', $event);
     }),
-    onContactInfo: _cache[8] || (_cache[8] = function ($event) {
+    onContactInfo: _cache[9] || (_cache[9] = function ($event) {
       return $options.emitPanelEvent('contact-info', $event);
     })
   }, null, 8 /* PROPS */, ["number", "campaign-id", "calling", "loading", "recall-available", "agent-name"]), $props.retryVisible ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
@@ -85642,7 +85686,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "hc-prospect-interaction-cloudtalk-retry-button secondary",
-    onClick: _cache[9] || (_cache[9] = function ($event) {
+    onClick: _cache[10] || (_cache[10] = function ($event) {
       return $options.emitPanelEvent('login-cloudtalk');
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -85651,7 +85695,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "hc-prospect-interaction-cloudtalk-retry-button",
     disabled: $props.calling || $props.loading,
-    onClick: _cache[10] || (_cache[10] = function ($event) {
+    onClick: _cache[11] || (_cache[11] = function ($event) {
       return $options.emitPanelEvent('make-call');
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -85662,7 +85706,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "hc-prospect-interaction-cloudtalk-context-toggle",
     "aria-expanded": $data.contextPanelVisible ? 'true' : 'false',
     title: $data.contextPanelVisible ? 'Masquer le contexte' : 'Afficher le contexte',
-    onClick: _cache[11] || (_cache[11] = function () {
+    onClick: _cache[12] || (_cache[12] = function () {
       return $options.toggleContextPanel && $options.toggleContextPanel.apply($options, arguments);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -85703,7 +85747,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "hc-prospect-interaction-cloudtalk-context-button",
     disabled: $props.creatingProspect,
-    onClick: _cache[12] || (_cache[12] = function ($event) {
+    onClick: _cache[13] || (_cache[13] = function ($event) {
       return $options.emitPanelEvent('create-prospect');
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -85764,7 +85808,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "hc-prospect-interaction-cloudtalk-context-button",
     disabled: $props.creatingProspect,
-    onClick: _cache[13] || (_cache[13] = function ($event) {
+    onClick: _cache[14] || (_cache[14] = function ($event) {
       return $options.emitPanelEvent('create-prospect');
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
@@ -106039,13 +106083,16 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, ["loading"]), $data.showSlowLoadingMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, _hoisted_9)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("iframe", {
     ref: "phoneFrame",
     src: $options.src,
+    onLoad: _cache[1] || (_cache[1] = function () {
+      return $options.emitCampaignSessionState && $options.emitCampaignSessionState.apply($options, arguments);
+    }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-cloudtalk-iframe', {
       'hc-cloudtalk-iframe-loading': $options.showLoading
     }]),
     allow: "microphone *; camera *; display-capture *; autoplay *; clipboard-read *; clipboard-write *; fullscreen *",
     allowfullscreen: "",
     referrerpolicy: "origin"
-  }, null, 10 /* CLASS, PROPS */, _hoisted_10)], 8 /* PROPS */, _hoisted_1);
+  }, null, 42 /* CLASS, PROPS, HYDRATE_EVENTS */, _hoisted_10)], 8 /* PROPS */, _hoisted_1);
 }
 
 /***/ }),
@@ -116966,7 +117013,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    display: flex;\n    flex-direction: column;\n    flex: 1;\n    min-height: 0;\n    position: relative;\n    width: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-panel {\n    --cloudtalk-phone-width: 300px;\n    --cloudtalk-context-width: 320px;\n    position: absolute;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    flex-direction: column;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-panel.with-context {\n    right: auto;\n    width: var(--cloudtalk-phone-width);\n}\n.hc-prospect-interaction-cloudtalk-panel.context-open {\n    width: calc(\n        var(--cloudtalk-phone-width) + var(--cloudtalk-context-width)\n    );\n}\n.hc-prospect-interaction-cloudtalk-panel.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n.hc-prospect-interaction-cloudtalk-back {\n    flex: 0 0 auto;\n}\n.hc-prospect-interaction-cloudtalk-content {\n    position: relative;\n    display: flex;\n    flex: 1 1 auto;\n    min-height: 0;\n    overflow: hidden;\n}\n.hc-prospect-interaction-cloudtalk-retry {\n    position: absolute;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 3;\n    display: flex;\n    width: var(--cloudtalk-phone-width);\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 10px;\n    padding: 16px;\n    background: rgba(255, 255, 255, 0.9);\n    text-align: center;\n}\n.hc-prospect-interaction-cloudtalk-retry-title {\n    font-size: 12px;\n    font-weight: 700;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-retry-actions {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    width: 100%;\n    max-width: 220px;\n}\n.hc-prospect-interaction-cloudtalk-retry-button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-height: 34px;\n    padding: 8px 12px;\n    border: 1px solid #12a0f3;\n    border-radius: 4px;\n    background: #12a0f3;\n    color: #ffffff;\n    cursor: pointer;\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-prospect-interaction-cloudtalk-retry-button.secondary {\n    border-color: #dddddd;\n    background: #ffffff;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-retry-button.secondary:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-retry-button:disabled {\n    border-color: #bbbbbb;\n    background: #bbbbbb;\n    cursor: wait;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n.hc-prospect-interaction-cloudtalk-panel.with-context\n    .hc-prospect-interaction-cloudtalk-phone {\n    flex: 0 0 var(--cloudtalk-phone-width);\n    width: var(--cloudtalk-phone-width);\n}\n.hc-prospect-interaction-cloudtalk-context-toggle {\n    position: absolute;\n    top: 50%;\n    right: 0;\n    z-index: 2;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 24px;\n    height: 42px;\n    padding: 0;\n    border: 1px solid #dddddd;\n    border-right: 0;\n    border-radius: 4px 0 0 4px;\n    background: #ffffff;\n    color: #555555;\n    cursor: pointer;\n    transform: translateY(-50%);\n}\n.hc-prospect-interaction-cloudtalk-context-toggle:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-panel.context-open\n    .hc-prospect-interaction-cloudtalk-context-toggle {\n    right: var(--cloudtalk-context-width);\n}\n.hc-prospect-interaction-cloudtalk-context {\n    display: flex;\n    flex: 0 0 var(--cloudtalk-context-width);\n    flex-direction: column;\n    gap: 14px;\n    height: 100%;\n    overflow: auto;\n    padding: 14px;\n    border-left: 1px solid #e5e5e5;\n    background: #fafafa;\n}\n.hc-prospect-interaction-cloudtalk-context-loading {\n    position: relative;\n    min-height: 80px;\n}\n.hc-prospect-interaction-cloudtalk-context-header {\n    display: flex;\n    align-items: flex-start;\n    justify-content: space-between;\n    gap: 10px;\n}\n.hc-prospect-interaction-cloudtalk-context-title {\n    font-size: 16px;\n    font-weight: 700;\n    line-height: 1.2;\n    color: #222222;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-subtitle {\n    margin-top: 3px;\n    font-size: 12px;\n    color: #777777;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-link {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-prospect-interaction-cloudtalk-context-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-prospect-interaction-cloudtalk-context-heading {\n    font-size: 11px;\n    font-weight: 700;\n    color: #777777;\n    text-transform: uppercase;\n}\n.hc-prospect-interaction-cloudtalk-context-line {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 12px;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-context-line span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-context-empty {\n    font-size: 12px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-context-button {\n    position: relative;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-height: 34px;\n    padding: 8px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n    cursor: pointer;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-prospect-interaction-cloudtalk-context-button:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-context-button:disabled {\n    color: #999999;\n    cursor: default;\n}\n.hc-prospect-interaction-cloudtalk-thread {\n    padding: 10px;\n    border: 1px solid #e7e7e7;\n    border-radius: 6px;\n    background: #ffffff;\n}\n.hc-prospect-interaction-cloudtalk-thread-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: #222222;\n}\n.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-thread-title small {\n    font-size: 11px;\n    font-weight: 600;\n    color: #777777;\n}\n.hc-prospect-interaction-cloudtalk-thread-color {\n    display: inline-block;\n    flex: 0 0 10px;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n}\n.hc-prospect-interaction-cloudtalk-message {\n    margin-top: 9px;\n    padding-top: 9px;\n    border-top: 1px solid #eeeeee;\n}\n.hc-prospect-interaction-cloudtalk-message-meta {\n    display: flex;\n    justify-content: space-between;\n    gap: 8px;\n    font-size: 10px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-message-body {\n    margin-top: 4px;\n    display: -webkit-box;\n    overflow: hidden;\n    color: #333333;\n    font-size: 12px;\n    line-height: 1.35;\n    -webkit-line-clamp: 3;\n    -webkit-box-orient: vertical;\n}\n.hc-prospect-interaction-cloudtalk-message-users {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: 5px;\n    font-size: 11px;\n    color: #777777;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-interaction-root {\n    display: flex;\n    flex-direction: column;\n    flex: 1;\n    min-height: 0;\n    position: relative;\n    width: 100%;\n    overflow-y: hidden;\n}\n.hc-prospect-interaction-slide-minimize {\n    position: fixed;\n    top: 5px;\n    right: 40px;\n    z-index: 2;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    width: 30px;\n    height: 30px;\n    padding: 0;\n    border: 0;\n    border-radius: 15px;\n    background: transparent;\n    color: #888888;\n    cursor: pointer;\n}\n.hc-prospect-interaction-slide-minimize:hover {\n    background: #eeeeee;\n    color: #555555;\n}\n.hc-slide.hc-prospect-interaction-slide .hc-slide-title {\n    padding-right: 40px;\n}\n.hc-slide.hc-prospect-interaction-slide-minimized.active {\n    transform: translateY(calc(100% - 48px));\n}\n.hc-prospect-interaction-item {\n    padding: 4px 0 !important;\n    text-decoration: none;\n}\n.hc-prospect-interaction-item-number {\n    font-size: 11px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-panel {\n    --cloudtalk-phone-width: 300px;\n    --cloudtalk-context-width: 320px;\n    position: absolute;\n    top: 0;\n    right: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 5;\n    display: flex;\n    flex-direction: column;\n    background: #ffffff;\n    opacity: 0;\n    pointer-events: none;\n    visibility: hidden;\n}\n.hc-prospect-interaction-cloudtalk-panel.with-context {\n    right: auto;\n    width: var(--cloudtalk-phone-width);\n}\n.hc-prospect-interaction-cloudtalk-panel.context-open {\n    width: calc(\n        var(--cloudtalk-phone-width) + var(--cloudtalk-context-width)\n    );\n}\n.hc-prospect-interaction-cloudtalk-panel.visible {\n    opacity: 1;\n    pointer-events: auto;\n    visibility: visible;\n}\n.hc-prospect-interaction-cloudtalk-back {\n    flex: 0 0 auto;\n}\n.hc-prospect-interaction-cloudtalk-content {\n    position: relative;\n    display: flex;\n    flex: 1 1 auto;\n    min-height: 0;\n    overflow: hidden;\n}\n.hc-prospect-interaction-cloudtalk-retry {\n    position: absolute;\n    top: 0;\n    bottom: 0;\n    left: 0;\n    z-index: 3;\n    display: flex;\n    width: var(--cloudtalk-phone-width);\n    flex-direction: column;\n    align-items: center;\n    justify-content: center;\n    gap: 10px;\n    padding: 16px;\n    background: rgba(255, 255, 255, 0.9);\n    text-align: center;\n}\n.hc-prospect-interaction-cloudtalk-retry-title {\n    font-size: 12px;\n    font-weight: 700;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-retry-actions {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    width: 100%;\n    max-width: 220px;\n}\n.hc-prospect-interaction-cloudtalk-retry-button {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-height: 34px;\n    padding: 8px 12px;\n    border: 1px solid #12a0f3;\n    border-radius: 4px;\n    background: #12a0f3;\n    color: #ffffff;\n    cursor: pointer;\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-prospect-interaction-cloudtalk-retry-button.secondary {\n    border-color: #dddddd;\n    background: #ffffff;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-retry-button.secondary:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-retry-button:disabled {\n    border-color: #bbbbbb;\n    background: #bbbbbb;\n    cursor: wait;\n}\n.hc-prospect-interaction-cloudtalk-phone {\n    flex: 1 1 auto;\n    min-width: 0;\n}\n.hc-prospect-interaction-cloudtalk-panel.with-context\n    .hc-prospect-interaction-cloudtalk-phone {\n    flex: 0 0 var(--cloudtalk-phone-width);\n    width: var(--cloudtalk-phone-width);\n}\n.hc-prospect-interaction-cloudtalk-context-toggle {\n    position: absolute;\n    top: 50%;\n    right: 0;\n    z-index: 2;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 24px;\n    height: 42px;\n    padding: 0;\n    border: 1px solid #dddddd;\n    border-right: 0;\n    border-radius: 4px 0 0 4px;\n    background: #ffffff;\n    color: #555555;\n    cursor: pointer;\n    transform: translateY(-50%);\n}\n.hc-prospect-interaction-cloudtalk-context-toggle:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-panel.context-open\n    .hc-prospect-interaction-cloudtalk-context-toggle {\n    right: var(--cloudtalk-context-width);\n}\n.hc-prospect-interaction-cloudtalk-context {\n    display: flex;\n    flex: 0 0 var(--cloudtalk-context-width);\n    flex-direction: column;\n    gap: 14px;\n    height: 100%;\n    overflow: auto;\n    padding: 14px;\n    border-left: 1px solid #e5e5e5;\n    background: #fafafa;\n}\n.hc-prospect-interaction-cloudtalk-context-loading {\n    position: relative;\n    min-height: 80px;\n}\n.hc-prospect-interaction-cloudtalk-context-header {\n    display: flex;\n    align-items: flex-start;\n    justify-content: space-between;\n    gap: 10px;\n}\n.hc-prospect-interaction-cloudtalk-context-title {\n    font-size: 16px;\n    font-weight: 700;\n    line-height: 1.2;\n    color: #222222;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-subtitle {\n    margin-top: 3px;\n    font-size: 12px;\n    color: #777777;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-interaction-cloudtalk-context-link {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 28px;\n    height: 28px;\n    color: #555555;\n    text-decoration: none;\n}\n.hc-prospect-interaction-cloudtalk-context-section {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-prospect-interaction-cloudtalk-context-heading {\n    font-size: 11px;\n    font-weight: 700;\n    color: #777777;\n    text-transform: uppercase;\n}\n.hc-prospect-interaction-cloudtalk-context-line {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 12px;\n    color: #333333;\n}\n.hc-prospect-interaction-cloudtalk-context-line span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-context-empty {\n    font-size: 12px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-context-button {\n    position: relative;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    gap: 8px;\n    min-height: 34px;\n    padding: 8px 10px;\n    border: 1px solid #dddddd;\n    border-radius: 4px;\n    background: #ffffff;\n    color: #333333;\n    cursor: pointer;\n    font-size: 12px;\n    font-weight: 600;\n}\n.hc-prospect-interaction-cloudtalk-context-button:hover {\n    background: #f5f5f5;\n}\n.hc-prospect-interaction-cloudtalk-context-button:disabled {\n    color: #999999;\n    cursor: default;\n}\n.hc-prospect-interaction-cloudtalk-thread {\n    padding: 10px;\n    border: 1px solid #e7e7e7;\n    border-radius: 6px;\n    background: #ffffff;\n}\n.hc-prospect-interaction-cloudtalk-thread-title {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-width: 0;\n    font-size: 13px;\n    font-weight: 700;\n    color: #222222;\n}\n.hc-prospect-interaction-cloudtalk-thread-title > span:nth-child(2) {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-prospect-interaction-cloudtalk-thread-title small {\n    font-size: 11px;\n    font-weight: 600;\n    color: #777777;\n}\n.hc-prospect-interaction-cloudtalk-thread-color {\n    display: inline-block;\n    flex: 0 0 10px;\n    width: 10px;\n    height: 10px;\n    border-radius: 50%;\n}\n.hc-prospect-interaction-cloudtalk-message {\n    margin-top: 9px;\n    padding-top: 9px;\n    border-top: 1px solid #eeeeee;\n}\n.hc-prospect-interaction-cloudtalk-message-meta {\n    display: flex;\n    justify-content: space-between;\n    gap: 8px;\n    font-size: 10px;\n    color: #999999;\n}\n.hc-prospect-interaction-cloudtalk-message-body {\n    margin-top: 4px;\n    display: -webkit-box;\n    overflow: hidden;\n    color: #333333;\n    font-size: 12px;\n    line-height: 1.35;\n    -webkit-line-clamp: 3;\n    -webkit-box-orient: vertical;\n}\n.hc-prospect-interaction-cloudtalk-message-users {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    margin-top: 5px;\n    font-size: 11px;\n    color: #777777;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -64,6 +64,7 @@
         <iframe
             ref="phoneFrame"
             :src="src"
+            @load="emitCampaignSessionState"
             :class="[
                 'hc-cloudtalk-iframe',
                 { 'hc-cloudtalk-iframe-loading': showLoading },
@@ -233,6 +234,7 @@ export default {
     emits: [
         "answered-call",
         "call-activity",
+        "campaign-session-change",
         "call-ended",
         "contact-info",
         "hangup-call",
@@ -301,6 +303,7 @@ export default {
 
     mounted() {
         window.addEventListener("message", this.handleMessage);
+        this.emitCampaignSessionState();
         this.syncSlowLoadingMessage();
     },
 
@@ -329,6 +332,26 @@ export default {
             }
 
             this.showSlowLoadingMessage = false;
+        },
+
+        emitCampaignSessionState() {
+            const iframeUrl = this.$refs.phoneFrame
+                ? this.$refs.phoneFrame.src
+                : this.src;
+            let isCampaignSession = false;
+
+            try {
+                const url = new URL(iframeUrl, window.location.origin);
+                isCampaignSession =
+                    url.origin === this.origin &&
+                    /^\/p\/dialer-next\/campaigns\/[^/]+\/session\/?$/.test(
+                        url.pathname
+                    );
+            } catch (error) {
+                isCampaignSession = false;
+            }
+
+            this.$emit("campaign-session-change", isCampaignSession);
         },
 
         requestCall() {
@@ -479,6 +502,10 @@ export default {
     },
 
     watch: {
+        src() {
+            this.emitCampaignSessionState();
+        },
+
         loading(value) {
             if (value) this.eventReceived = false;
             this.syncSlowLoadingMessage();
