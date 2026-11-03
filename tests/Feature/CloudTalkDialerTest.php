@@ -58,7 +58,9 @@ class CloudTalkDialerTest extends TestCase
         $result = app(CloudTalkDialer::class)->createParallelCampaign(
             $this->line(),
             $this->project(),
-            collect([$this->prospect(1, '+33123456789', '+33987654321')])
+            collect([$this->prospect(1, '+33123456789', '+33987654321')]),
+            null,
+            'test2'
         );
 
         $this->assertTrue($result['success']);
@@ -80,6 +82,7 @@ class CloudTalkDialerTest extends TestCase
         Http::assertSent(fn (Request $request) =>
             $request->method() === 'POST' &&
             $request->url() === 'https://api.cloudtalk.io/v1/dialer/campaigns' &&
+            preg_match('/^\[HEROES-CRM\] nomAgent test2 \d{8}-\d{6} [A-Z0-9]{8}$/', (string) data_get($request->data(), 'name')) === 1 &&
             data_get($request->data(), 'mode') === 'parallel' &&
             data_get($request->data(), 'calling_policy.parallel_calls') === 2 &&
             data_get($request->data(), 'calling_policy.number_selection') === 'automatic'
@@ -361,6 +364,7 @@ class CloudTalkDialerTest extends TestCase
             'api_key_id' => 'access-key',
             'api_key_secret' => 'secret-key',
             'agent_id' => 88,
+            'agent_name' => 'nomAgent',
         ];
 
         return $line;

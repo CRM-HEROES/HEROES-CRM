@@ -167,7 +167,14 @@ class CloudTalkDialer
         $campaignLabel = trim((string) $campaignLabel);
         $campaignLabel = Str::limit(Str::slug($campaignLabel !== '' ? $campaignLabel : $projectName), 40, '');
         $campaignLabel = $campaignLabel ?: ($projectName ?: 'prospects');
-        $campaignName = sprintf('[HEROES-CRM] %s %s %s', $campaignLabel, now()->format('Ymd-His'), $selectionKey);
+        $agentName = trim((string) $line->cloudtalk_agent_name);
+        $campaignName = sprintf(
+            '[HEROES-CRM] %s %s %s %s',
+            $agentName,
+            $campaignLabel,
+            now()->format('Ymd-His'),
+            $selectionKey
+        );
         $tagName = sprintf('HEROES-CRM-%s-%s', $projectName ?: 'prospects', $selectionKey);
         $agentId = (string) $config['agent_id'];
         $tagId = null;
@@ -468,11 +475,16 @@ class CloudTalkDialer
     {
         $hasTag = collect(data_get($associations, 'target_tag', []))
             ->contains(fn ($tag) => (string) data_get($tag, 'ref_id', $tag) === $tagId);
-        $hasAgent = collect(data_get($associations, 'agent', []))
-            ->contains(fn ($agent) => (string) data_get($agent, 'ref_id', $agent) === $agentId);
+        $assignedAgentIds = collect(data_get($associations, 'agent', []))
+            ->map(fn ($agent) => (string) data_get($agent, 'ref_id', $agent))
+            ->filter()
+            ->unique()
+            ->values();
+        $hasOnlyAgent = $assignedAgentIds->count() === 1
+            && $assignedAgentIds->first() === $agentId;
 
-        if (!$hasTag || !$hasAgent) {
-            throw new RuntimeException('La campagne CloudTalk n’est pas associée au tag et à l’agent attendus.', 502);
+        if (!$hasTag || !$hasOnlyAgent) {
+            throw new RuntimeException('La campagne CloudTalk doit être associée au tag attendu et au seul agent configuré.', 502);
         }
     }
 
