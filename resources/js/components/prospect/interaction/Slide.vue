@@ -70,7 +70,6 @@
                 :visible="!!cloudtalkParallelPending"
                 :campaigns="cloudtalkParallelPending?.campaigns || []"
                 :busy="cloudtalkParallelSync"
-                :session-open="cloudtalkCampaignSession"
                 @continue="continueActiveCloudtalkCampaign"
                 @replace="replaceActiveCloudtalkCampaign"
                 @cancel="cancelActiveCloudtalkCampaign"

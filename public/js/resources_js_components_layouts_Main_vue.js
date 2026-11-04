@@ -33109,10 +33109,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     busy: {
       type: Boolean,
       "default": false
-    },
-    sessionOpen: {
-      type: Boolean,
-      "default": false
     }
   },
   data: function data() {
@@ -84859,11 +84855,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         visible: !!_ctx.cloudtalkParallelPending,
         campaigns: ((_ctx$cloudtalkParalle = _ctx.cloudtalkParallelPending) === null || _ctx$cloudtalkParalle === void 0 ? void 0 : _ctx$cloudtalkParalle.campaigns) || [],
         busy: _ctx.cloudtalkParallelSync,
-        "session-open": $data.cloudtalkCampaignSession,
         onContinue: _ctx.continueActiveCloudtalkCampaign,
         onReplace: _ctx.replaceActiveCloudtalkCampaign,
         onCancel: _ctx.cancelActiveCloudtalkCampaign
-      }, null, 8 /* PROPS */, ["visible", "campaigns", "busy", "session-open", "onContinue", "onReplace", "onCancel"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+      }, null, 8 /* PROPS */, ["visible", "campaigns", "busy", "onContinue", "onReplace", "onCancel"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
         loading: !!((_ctx$cloudtalkSequenc = _ctx.cloudtalkSequence) !== null && _ctx$cloudtalkSequenc !== void 0 && _ctx$cloudtalkSequenc.loading) || _ctx.cloudtalkParallelSync
       }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_cloudtalk_sequence_controls, {
         sequence: _ctx.cloudtalkSequence,
@@ -85267,7 +85262,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($data.step === 'actions' ? 'prospect.interaction.mode_picker.active_campaign_title' : 'prospect.interaction.mode_picker.choose_campaign_title')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [$data.step === 'actions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($props.sessionOpen ? 'prospect.interaction.mode_picker.active_campaign_session_description' : 'prospect.interaction.mode_picker.active_campaign_description')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.mode_picker.active_campaign_description')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     ref: "continueActionButton",
     type: "button",
     "class": "hc-cloudtalk-active-campaign-option",
@@ -85282,7 +85277,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function ($event) {
       return _ctx.$emit('replace');
     })
-  }, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($props.sessionOpen ? 'prospect.interaction.mode_picker.replace_active_campaigns_session' : 'prospect.interaction.mode_picker.replace_active_campaigns')), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_7)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.mode_picker.replace_active_campaigns')), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_7)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.interaction.mode_picker.choose_campaign_description')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.campaigns, function (campaign) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("article", {
@@ -107358,15 +107353,6 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
       var selectedCampaign = campaign || ((_pending$campaigns = pending.campaigns) === null || _pending$campaigns === void 0 ? void 0 : _pending$campaigns[0]);
       if (!(selectedCampaign !== null && selectedCampaign !== void 0 && selectedCampaign.id)) return;
       this.cloudtalkParallelPending = null;
-      if (this.cloudtalkCampaignSession && this.cloudtalkParallelCampaignId && String(selectedCampaign.id) !== String(this.cloudtalkParallelCampaignId)) {
-        flashWarning({
-          title: 'CloudTalk',
-          body: this.$t('prospect.interaction.mode_picker.parallel_session_continue_blocked'),
-          duration: 10000
-        });
-        this.openCloudtalkSequencePhone();
-        return;
-      }
       this.cloudtalkParallelCampaignId = String(selectedCampaign.id);
       this.openCloudtalkSequencePhone();
     },
@@ -107437,39 +107423,33 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
         _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var _this3$project, _data$campaign2, _data$errors, _data$errors2;
-        var deactivateCampaignIds, projectSlug, prospectIds, campaignName, currentSessionCampaignId, params, _yield$LineService$cr, data, campaignId, keepCurrentSession, message, notice, details;
+        var deactivateCampaignIds, projectSlug, prospectIds, campaignName, params, _yield$LineService$cr, data, campaignId, message, notice, details;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               deactivateCampaignIds = _arguments2.length > 2 && _arguments2[2] !== undefined ? _arguments2[2] : [];
               projectSlug = selection.projectSlug, prospectIds = selection.prospectIds, campaignName = selection.campaignName;
-              currentSessionCampaignId = _this3.cloudtalkCampaignSession ? _this3.cloudtalkParallelCampaignId : null;
               params = {
                 line_id: _this3.cloudtalkLine.id,
                 prospect_ids: prospectIds,
                 campaign_name: campaignName
               };
               if (deactivateCampaignIds.length) params.deactivate_campaign_ids = deactivateCampaignIds;
-              _context3.next = 7;
+              _context3.next = 6;
               return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].createCloudtalkParallelCampaign(projectSlug, params);
-            case 7:
+            case 6:
               _yield$LineService$cr = _context3.sent;
               data = _yield$LineService$cr.data;
               if (!(request !== _this3.cloudtalkParallelRequest || projectSlug !== ((_this3$project = _this3.project) === null || _this3$project === void 0 ? void 0 : _this3$project.slug))) {
-                _context3.next = 11;
+                _context3.next = 10;
                 break;
               }
               return _context3.abrupt("return");
-            case 11:
+            case 10:
               campaignId = (_data$campaign2 = data.campaign) === null || _data$campaign2 === void 0 ? void 0 : _data$campaign2.id;
-              keepCurrentSession = currentSessionCampaignId != null && String(currentSessionCampaignId).trim() !== '';
-              if (!keepCurrentSession) {
-                _this3.cloudtalkParallelCampaignId = campaignId != null && String(campaignId).trim() ? String(campaignId) : null;
-              }
+              _this3.cloudtalkParallelCampaignId = campaignId != null && String(campaignId).trim() ? String(campaignId) : null;
               _this3.openCloudtalkSequencePhone();
-              message = keepCurrentSession ? _this3.$t('prospect.interaction.mode_picker.parallel_session_in_progress', {
-                campaign: data.campaign.name
-              }) : (_data$errors = data.errors) !== null && _data$errors !== void 0 && _data$errors.length ? _this3.$t('prospect.interaction.mode_picker.parallel_partial', {
+              message = (_data$errors = data.errors) !== null && _data$errors !== void 0 && _data$errors.length ? _this3.$t('prospect.interaction.mode_picker.parallel_partial', {
                 campaign: data.campaign.name,
                 count: data.synced_count,
                 skipped: data.errors.length
@@ -107482,7 +107462,7 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
                 body: message,
                 duration: 10000
               };
-              if (keepCurrentSession || (_data$errors2 = data.errors) !== null && _data$errors2 !== void 0 && _data$errors2.length) {
+              if ((_data$errors2 = data.errors) !== null && _data$errors2 !== void 0 && _data$errors2.length) {
                 details = _this3.cloudtalkParallelErrorDetails(data.errors);
                 flashWarning(_objectSpread(_objectSpread({}, notice), {}, {
                   body: [message, details].filter(Boolean).join(' ')
@@ -107490,7 +107470,7 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
               } else {
                 flashInfo(notice);
               }
-            case 18:
+            case 16:
             case "end":
               return _context3.stop();
           }

@@ -18,9 +18,7 @@
                 <div class="hc-modal-body">
                     <template v-if="step === 'actions'">
                         <p class="hc-cloudtalk-active-campaign-description">
-                            {{ $t(sessionOpen
-                                ? 'prospect.interaction.mode_picker.active_campaign_session_description'
-                                : 'prospect.interaction.mode_picker.active_campaign_description') }}
+                            {{ $t('prospect.interaction.mode_picker.active_campaign_description') }}
                         </p>
                         <button
                             ref="continueActionButton"
@@ -39,9 +37,7 @@
                             @click="$emit('replace')"
                         >
                             <i class="fa fa-plus" aria-hidden="true"></i>
-                            <span>{{ $t(sessionOpen
-                                ? 'prospect.interaction.mode_picker.replace_active_campaigns_session'
-                                : 'prospect.interaction.mode_picker.replace_active_campaigns') }}</span>
+                            <span>{{ $t('prospect.interaction.mode_picker.replace_active_campaigns') }}</span>
                         </button>
                     </template>
                     <template v-else>
@@ -130,7 +126,6 @@ export default {
         visible: { type: Boolean, default: false },
         campaigns: { type: Array, default: () => [] },
         busy: { type: Boolean, default: false },
-        sessionOpen: { type: Boolean, default: false },
     },
     data() {
         return { previousFocus: null, step: "actions" };
