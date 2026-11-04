@@ -25,10 +25,12 @@
                 id="cloudtalk-phone"
                 class="hc-prospect-interaction-cloudtalk-phone"
                 :number="number"
+                :campaign-id="campaignId"
                 :calling="calling"
                 :loading="loading"
                 :recall-available="recallAvailable"
                 :agent-name="agentName"
+                @campaign-session-change="$emit('campaign-session-change', $event)"
                 @make-call="emitPanelEvent('make-call')"
                 @call-activity="emitPanelEvent('call-activity', $event)"
                 @ringing-call="emitPanelEvent('ringing-call', $event)"
@@ -314,6 +316,11 @@ export default {
             default: "",
         },
 
+        campaignId: {
+            type: [String, Number],
+            default: null,
+        },
+
         lookupNumber: {
             type: [String, Number],
             default: "",
@@ -500,6 +507,7 @@ export default {
 
     emits: [
         "make-call",
+        "campaign-session-change",
         "call-activity",
         "ringing-call",
         "outgoing-call",

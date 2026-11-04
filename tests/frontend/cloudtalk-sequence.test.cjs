@@ -19,7 +19,7 @@ const deferred = () => {
 };
 
 function harness(options = {}) {
-    const calls = [], gets = [], commits = [], notices = [], timers = [], listeners = new Map();
+    const calls = [], gets = [], lineCalls = [], commits = [], notices = [], timers = [], listeners = new Map();
     let vm;
     const bus = {
         on(name, fn) { listeners.set(name, fn); },
@@ -55,6 +55,16 @@ function harness(options = {}) {
             const ids = JSON.parse(config.params.filters).ids.map(String);
             return { data: { data: (options.prospects || [second, first]).filter(p => ids.includes(String(p.id))) } };
         } },
+        '@/apis/project/line': { async createCloudtalkParallelCampaign(slug, params) {
+            lineCalls.push({ slug, params });
+            if (options.parallelError) throw options.parallelError;
+            return { data: options.parallelResult || {
+                success: true,
+                campaign: { id: '77', name: 'Batch 77', mode: 'parallel', status: 'active' },
+                synced_count: 2,
+                errors: [],
+            } };
+        } },
     };
     function load(filename) {
         if (!compiled.has(filename)) {
@@ -66,13 +76,13 @@ function harness(options = {}) {
             }).code);
         }
         const module = { exports: {} };
-        new Function('require', 'module', 'exports', 'flashWarning', 'flashError', 'setTimeout', 'clearTimeout', 'window', compiled.get(filename))(
+        new Function('require', 'module', 'exports', 'flashWarning', 'flashError', 'flashInfo', 'setTimeout', 'clearTimeout', 'window', compiled.get(filename))(
             key => {
                 if (key in dependencies) return dependencies[key];
                 if (key === './cloudtalk-sequence') return load(interactionPath + 'cloudtalk-sequence.js');
                 if (key.startsWith('@/actions/')) return new Proxy({}, { get: (_, name) => name });
                 return {};
-            }, module, module.exports, value => notices.push(value), value => notices.push(value),
+            }, module, module.exports, value => notices.push(value), value => notices.push(value), value => notices.push(value),
             (callback, delay) => { const timer = { callback, delay, cleared: false }; timers.push(timer); return timer; },
             timer => { if (timer) timer.cleared = true; }, fakeWindow,
         );
@@ -111,13 +121,14 @@ function harness(options = {}) {
     phone.mounted.call(child);
     const makeCalls = () => calls.filter(c => c.action === 'MAKE_CLOUDTALK_CALL');
     const start = (ids = [1, 2]) => bus.emit('cloudtalk:start-sequence', { projectSlug: vm.project.slug, prospectIds: ids });
+    const startParallel = (ids = [1, 2]) => bus.emit('cloudtalk:parallel-dialer', { projectSlug: vm.project.slug, prospectIds: ids });
     const message = (event, properties = {}, overrides = {}) => windowListeners.get('message')?.({
         origin: child.origin, source: frameWindow, data: JSON.stringify({ event, properties }), ...overrides,
     });
     const end = (id = vm.currentCloudtalkCallIds()[0], event = 'call_ended') => message(event, {
         call_id: id, external_number: vm.interaction.number, direction: 'outbound',
     });
-    return { vm, component, mixin, phone, child, start, end, message, makeCalls, calls, gets, commits, notices, timers,
+    return { vm, component, mixin, phone, child, start, startParallel, end, message, makeCalls, calls, lineCalls, gets, commits, notices, timers,
         bus, windowListeners, load };
 }
 
@@ -253,10 +264,15 @@ test('outbound callbacks without any call UUID keep the CRM number while waiting
         .every(c => c.params.number === first.mobile_phone_number), true);
 });
 
-test('menu action starts an ordered sequence, preferring mobile and skipping unavailable numbers', async () => {
+test('menu action opens a mode choice and sequential mode preserves the existing ordered calls', async () => {
     const h = harness({ prospects: [second, { id: 3, mobile_phone_number: ' ' }, first] });
     const menu = h.load('components/prospect/table/CardMenus.vue').default;
     await menu.methods.bulkCloudtalkInteraction.call({ ...h.vm, prospectsSelected: [1, 3, 2, 1] });
+    assert.deepEqual(h.vm.cloudtalkCallModeSelection, {
+        projectSlug: 'test', prospectIds: ['1', '3', '2'],
+    });
+    assert.equal(h.makeCalls().length, 0);
+    h.vm.selectCloudtalkCallMode('sequential');
     await new Promise(resolve => setImmediate(resolve));
     assert.deepEqual(h.vm.cloudtalkSequence.prospects.map(p => p.id), [1, 2]);
     assert.equal(h.vm.interactionProspect.id, 1);
@@ -264,6 +280,43 @@ test('menu action starts an ordered sequence, preferring mobile and skipping una
     assert.equal(h.vm.cloudtalkSequenceNextProspect.id, 2);
     assert.equal(h.vm.cloudtalkSequenceName(h.vm.cloudtalkSequenceNextProspect), 'Bob Durand');
     assert.equal(h.notices[0].body, 'prospect.interaction.batch.skipped');
+});
+
+test('parallel mode forwards the selected prospects without starting a sequential call', async () => {
+    const h = harness();
+    const menu = h.load('components/prospect/table/CardMenus.vue').default;
+    let parallelSelection = null;
+    h.bus.on('cloudtalk:parallel-dialer', payload => { parallelSelection = payload; });
+
+    await menu.methods.bulkCloudtalkInteraction.call({ ...h.vm, prospectsSelected: [2, 1, 2] });
+    h.vm.selectCloudtalkCallMode('parallel');
+
+    assert.deepEqual(parallelSelection, { projectSlug: 'test', prospectIds: ['2', '1'] });
+    assert.equal(h.vm.cloudtalkSequence, null);
+    assert.equal(h.makeCalls().length, 0);
+});
+
+test('parallel mode syncs only the selected ids and opens the existing phone iframe without placing calls', async () => {
+    const h = harness();
+    await h.startParallel([2, 1, 2]);
+    assert.deepEqual(h.lineCalls, [{
+        slug: 'test',
+        params: { line_id: 7, prospect_ids: ['2', '1'] },
+    }]);
+    assert.equal(h.vm.cloudtalkPhoneVisible, true);
+    assert.equal(h.vm.frameTab, 5);
+    assert.equal(h.makeCalls().length, 0);
+    assert.equal(h.notices.length, 1);
+    assert.match(h.notices[0].body, /parallel_prepared/);
+});
+
+test('parallel mode reports API failures without opening a second call path', async () => {
+    const h = harness({ parallelError: { response: { data: { message: 'CloudTalk API error' } } } });
+    await h.startParallel([1]);
+    assert.equal(h.vm.cloudtalkPhoneVisible, false);
+    assert.equal(h.makeCalls().length, 0);
+    assert.equal(h.notices.length, 1);
+    assert.match(h.notices[0].body, /CloudTalk API error/);
 });
 
 test('the registered window message listener opens one choice dialog on hangup and ended', async () => {
@@ -754,13 +807,21 @@ test('dialog uses confirmation before stop, choice after end, and emits the matc
 
 test('the modified Vue templates compile and every supported locale contains the sequence labels', () => {
     for (const filename of ['components/Slide.vue', interactionPath + 'Slide.vue',
-        interactionPath + 'components/CloudtalkSequenceControls.vue', 'components/prospect/table/CardMenus.vue', 'components/utils/Cloudtalk.vue']) {
+        interactionPath + 'components/CloudtalkSequenceControls.vue',
+        interactionPath + 'components/CloudtalkCallModeModal.vue',
+        'components/prospect/table/CardMenus.vue', 'components/utils/Cloudtalk.vue']) {
         const { descriptor, errors } = parse(fs.readFileSync(path.join(root, filename), 'utf8'));
         assert.deepEqual(errors, [], filename);
         const result = compileTemplate({ source: descriptor.template.content, filename, id: filename });
         assert.deepEqual(result.errors, [], filename);
     }
     const locales = ['fr', 'en', 'es', 'it', 'pt', 'ar', 'hi', 'ru', 'zh_CN'];
+    for (const locale of locales) {
+        const picker = JSON.parse(fs.readFileSync(path.join(root, 'lang/' + locale + '.json'))).prospect.interaction.mode_picker;
+        for (const key of ['parallel_prepared', 'parallel_partial', 'parallel_failed_partial', 'parallel_error']) {
+            assert.equal(typeof picker[key], 'string', locale + ':mode_picker:' + key);
+        }
+    }
     const labels = JSON.parse(fs.readFileSync(path.join(root, 'lang/fr.json'))).prospect.interaction.batch;
     for (const locale of locales) {
         const batch = JSON.parse(fs.readFileSync(path.join(root, `lang/${locale}.json`))).prospect.interaction.batch;

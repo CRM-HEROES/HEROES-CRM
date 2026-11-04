@@ -154,6 +154,13 @@
     "prospect": {
         "communications": {
             "process": "Traiter",
+            "request_process": "Demande traiter",
+            "not_processed": "Non traiter",
+            "history": "Historique des traitements",
+            "processed_by": "est traité par {user}",
+            "unknown_user": "Utilisateur inconnu",
+            "empty_history": "Aucune action enregistrée.",
+            "history_error": "Impossible de charger l’historique des traitements.",
             "process_error": "Le traitement a échoué. Veuillez réessayer."
         },
         "table": {
@@ -453,6 +460,7 @@
         },
         "interaction": {
             "title": "Appels ({prospect})",
+            "called_by_agent": "Appelé par {agent}",
             "add_history": "Ajouter un historique d'appel",
             "edit_phone_number": "Modifier le numéro",
             "edit_mobile_phone_number": "Modifier le numéro mobile",
@@ -460,6 +468,34 @@
             "call_by_aircall": "Appeler via Aircall",
             "call_by_ringover": "Appeler via Ringover",
             "call_by_cloudtalk": "Appeler via CloudTalk",
+            "mode_picker": {
+                "parallel_prepared": "Campagne « {campaign} » prête avec {count} contact(s). Ouvrez le Dialer dans l’iframe CloudTalk existante et démarrez la session manuellement.",
+                "parallel_partial": "Campagne « {campaign} » créée avec {count} contact(s). {skipped} prospect(s) ignoré(s) ; démarrez la session depuis l’iframe CloudTalk existante.",
+                "parallel_failed_partial": "La campagne n’a pas pu être activée. {count} contact(s) ont été synchronisés partiellement ; {skipped} prospect(s) sont à vérifier.",
+                "parallel_error": "CloudTalk n’a pas pu préparer la campagne parallèle.",
+                "parallel_selection_cap": "Maximum : {limit} prospects par campagne.",
+                "parallel_selection_limit": "Une campagne Parallel Dialer est limitée à {limit} prospects. Désélectionnez-en avant de continuer.",
+                "campaign_name_label": "Nom de campagne",
+                "campaign_name_hint": "Ce texte remplace le slug du projet dans le nom généré.",
+                "campaign_name_title": "Nommer la campagne Parallel Dialer",
+                "campaign_name_back": "Retour",
+                "campaign_name_continue": "Continuer",
+                "title": "Choisir le mode d’appel CloudTalk",
+                "sequential_title": "Appels successifs",
+                "sequential_description": "Appeler les prospects sélectionnés un par un.",
+                "parallel_title": "Parallel Dialer",
+                "parallel_description": "Préparer ces prospects pour une campagne CloudTalk.",
+                "active_campaign_title": "Des campagnes CloudTalk sont en cours",
+                "active_campaign_description": "Poursuivez une campagne active ou désactivez les campagnes en cours pour en lancer une nouvelle.",
+                "continue_active_campaigns": "Poursuivre une campagne active",
+                "continue_active_campaign": "Poursuivre cette campagne",
+                "replace_active_campaigns": "Désactiver les campagnes actives et lancer la nouvelle",
+                "choose_campaign_title": "Choisir une campagne à poursuivre",
+                "choose_campaign_description": "Sélectionnez la campagne CloudTalk que vous souhaitez reprendre.",
+                "back_to_campaign_actions": "Retour",
+                "line_required": "Aucune ligne CloudTalk n’est associée à votre utilisateur. Configurez une ligne avant de lancer les appels.",
+                "cancel": "Annuler"
+            },
             "batch": {
                 "title": "Suite des appels CloudTalk",
                 "retry": "Rappeler",

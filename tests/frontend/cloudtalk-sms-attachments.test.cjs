@@ -132,6 +132,21 @@ test('operator and prospect changes clear attachments while refreshing the same 
     assert.deepEqual(h.vm.attachments, []);
 });
 
+test('Ringover iframe container fills the SMS slide height', () => {
+    const source = fs.readFileSync(
+        path.resolve(__dirname, '../../resources/js/components/prospect/sms/Slide.vue'),
+        'utf8'
+    );
+    const ringoverSection = source.slice(source.indexOf('<template #2 v-if="prospect">'));
+
+    assert.match(ringoverSection, /hc-flex-column hc-prospect-sms-ringover/);
+    assert.match(ringoverSection, /height:\s*100%; min-height:\s*0/);
+    assert.match(
+        ringoverSection,
+        /flex:\s*1 1 0; min-height:\s*0; width:\s*100%; height:\s*100%/
+    );
+});
+
 test('API uses multipart for individual and bulk uploads and keeps plain SMS as JSON', async () => {
     const calls = [];
     const api = load('apis/project/prospect/sms.js', {

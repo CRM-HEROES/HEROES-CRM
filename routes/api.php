@@ -511,6 +511,8 @@ Route::group([
         Route::post('line/cloudtalk/lookup', [ProjectLineCloudTalkController::class, 'lookup']);
         Route::post('line/cloudtalk/history', [ProjectLineCloudTalkController::class, 'history']);
         Route::post('line/cloudtalk/call', [ProjectLineCloudTalkController::class, 'store']);
+        Route::get('line/cloudtalk/active-parallel-campaign', [ProjectLineCloudTalkController::class, 'activeParallelCampaigns']);
+        Route::post('line/cloudtalk/parallel-campaign', [ProjectLineCloudTalkController::class, 'parallelCampaign']);
         Route::get('line/available-users', [ProjectLineController::class, 'availableUsers']);
         Route::apiResource('line', ProjectLineController::class);
 
@@ -594,6 +596,7 @@ Route::group([
         Route::post('prospect/email/bulk', [ProspectMessageController::class, 'bulkEmail']);
         Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
         Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);
+        Route::get('incoming-communications/sms-history', [IncomingCommunicationController::class, 'smsHistory']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 

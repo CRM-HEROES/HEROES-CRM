@@ -4122,11 +4122,27 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
     },
     bulkCloudtalkInteraction: function bulkCloudtalkInteraction() {
-      if (!this.cloudtalkLine || !this.prospectsSelected.length || !this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
-      _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__["default"].emit('cloudtalk:start-sequence', {
+      if (!this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
+      if (!this.prospectsSelected.length) return;
+      if (!this.cloudtalkLine) {
+        flashWarning({
+          title: 'CloudTalk',
+          body: this.$t('prospect.interaction.mode_picker.line_required')
+        });
+        return;
+      }
+      var selection = {
         projectSlug: this.project.slug,
         prospectIds: _toConsumableArray(this.prospectsSelected)
-      });
+      };
+
+      // Make sure the interaction slide (and its CloudTalk mode listener)
+      // is mounted before dispatching the event.
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_LEFT_SLIDE, 'prospect-manage-interactions');
+      var openModePicker = function openModePicker() {
+        return _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__["default"].emit('cloudtalk:choose-mode', selection);
+      };
+      if (typeof this.$nextTick === 'function') this.$nextTick(openModePicker);else openModePicker();
     },
     /**
      * Call prospects one after the other
@@ -13425,7 +13441,6 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed && _ctx.can('all.prospect.interaction.view') && _ctx.can('all.prospect.interaction.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
         key: 9,
         label: _ctx.$t('prospect.interaction.call_by_cloudtalk'),
-        disabled: !$options.cloudtalkLine,
         onClick: $options.bulkCloudtalkInteraction
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -13437,7 +13452,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["label", "disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
+      }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
         key: 10,
         icon: "fa fa-phone",
         label: _ctx.$t('prospect.table.footer.bulk_ringover_interactions'),

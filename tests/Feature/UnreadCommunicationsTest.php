@@ -34,6 +34,7 @@ class UnreadCommunicationsTest extends TestCase
         $schema = DB::connection()->getSchemaBuilder();
         $schema->create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('name')->nullable();
             $table->string('role')->default('super_admin');
         });
         $schema->create('projects', function (Blueprint $table) {
@@ -67,6 +68,7 @@ class UnreadCommunicationsTest extends TestCase
         $schema->create('sms', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('prospect_id');
+            $table->text('message')->nullable();
             $table->boolean('from_user')->default(false);
             $table->boolean('is_incoming')->default(true);
         });
@@ -79,7 +81,10 @@ class UnreadCommunicationsTest extends TestCase
         });
         (require database_path('migrations/2026_10_20_000000_create_communication_reads_table.php'))->up();
 
-        DB::table('users')->insert([['id' => 1], ['id' => 2]]);
+        DB::table('users')->insert([
+            ['id' => 1, 'name' => 'Agent One'],
+            ['id' => 2, 'name' => 'Agent Two'],
+        ]);
         DB::table('projects')->insert([['id' => 1, 'slug' => 'test'], ['id' => 2, 'slug' => 'other']]);
         foreach ([1 => 1, 2 => 1, 3 => 2, 4 => 1] as $id => $projectId) {
             DB::table('prospects')->insert([
@@ -89,10 +94,14 @@ class UnreadCommunicationsTest extends TestCase
         }
         DB::table('threads')->insert(['id' => 1, 'project_id' => 1]);
         foreach ([1, 2, 3] as $id) {
-            DB::table('sms')->insert(['id' => $id, 'prospect_id' => 1]);
+            DB::table('sms')->insert([
+                'id' => $id,
+                'prospect_id' => 1,
+                'message' => 'Message ' . $id,
+            ]);
         }
         DB::table('sms')->insert([
-            ['id' => 4, 'prospect_id' => 1, 'from_user' => true, 'is_incoming' => false],
+            ['id' => 4, 'prospect_id' => 1, 'message' => 'Outgoing', 'from_user' => true, 'is_incoming' => false],
             ['id' => 5, 'prospect_id' => 3, 'from_user' => false, 'is_incoming' => true],
             ['id' => 6, 'prospect_id' => 4, 'from_user' => false, 'is_incoming' => true],
         ]);
@@ -117,9 +126,16 @@ class UnreadCommunicationsTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_six_unread_communications_from_one_prospect_count_as_six(): void
+    public function test_unread_sms_count_once_per_prospect(): void
     {
-        $this->assertSame(['count' => 6, 'sms' => 3, 'email' => 2, 'voicemail' => 1], $this->counts(1));
+        $this->assertSame(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1], $this->counts(1));
+
+        DB::table('sms')->insert([
+            'id' => 7,
+            'prospect_id' => 2,
+            'message' => 'Another prospect',
+        ]);
+        $this->assertSame(2, $this->counts(1)['sms']);
     }
 
     public function test_reading_sms_decrements_only_the_current_users_count_and_is_idempotent(): void
@@ -129,17 +145,49 @@ class UnreadCommunicationsTest extends TestCase
         $this->postJson('/api/project/test/incoming-communications/read', $body)
             ->assertOk()->assertJson(['marked' => 2, 'count' => 4, 'sms' => 1]);
         $this->postJson('/api/project/test/incoming-communications/read', $body)
-            ->assertOk()->assertJson(['marked' => 0, 'count' => 4]);
-        $this->assertSame(7, $this->counts(2)['count']);
+            ->assertOk()->assertJson(['marked' => 0, 'count' => 4, 'sms' => 1]);
+        $this->assertSame(5, $this->counts(2)['count']);
         $this->assertDatabaseCount('communication_reads', 2);
         $this->assertSame([1], DB::table('communication_reads')->distinct()->pluck('user_id')->all());
+    }
+
+    public function test_sms_processing_history_shows_message_and_user_for_the_project_prospect(): void
+    {
+        $this->actingAs(User::query()->findOrFail(1));
+        DB::table('communication_reads')->insert([
+            [
+                'user_id' => 1,
+                'communication_type' => 'sms',
+                'communication_id' => 1,
+                'read_at' => '2026-11-02 09:04:00',
+            ],
+            [
+                'user_id' => 1,
+                'communication_type' => 'sms',
+                'communication_id' => 2,
+                'read_at' => '2026-11-02 09:05:00',
+            ],
+        ]);
+
+        $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=1')
+            ->assertOk()
+            ->assertJsonCount(1)
+            ->assertJsonFragment([
+                'id' => 2,
+                'message' => 'Message 2',
+                'user_name' => 'Agent One',
+            ])
+            ->assertJsonMissing(['id' => 1, 'message' => 'Message 1']);
+
+        $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=3')
+            ->assertNotFound();
     }
 
     public function test_count_endpoint_returns_unread_messages_instead_of_prospects(): void
     {
         $this->actingAs(User::query()->findOrFail(1));
         $this->getJson('/api/project/test/incoming-communications/count')
-            ->assertOk()->assertExactJson(['count' => 6, 'sms' => 3, 'email' => 2, 'voicemail' => 1]);
+            ->assertOk()->assertExactJson(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1]);
     }
 
     public function test_reading_email_and_listening_to_voicemail_decrement_their_counts(): void
@@ -148,7 +196,7 @@ class UnreadCommunicationsTest extends TestCase
         $project = Project::query()->findOrFail(1);
         $this->assertSame(2, $service->markRead($project, 1, 1, 'email', [1, 2, 6]));
         $this->assertSame(1, $service->markRead($project, 1, 1, 'voicemail', [1, 2, 3]));
-        $this->assertSame(['count' => 3, 'sms' => 3, 'email' => 0, 'voicemail' => 0], $this->counts(1));
+        $this->assertSame(['count' => 1, 'sms' => 1, 'email' => 0, 'voicemail' => 0], $this->counts(1));
     }
 
     public function test_new_arrivals_remain_unread_after_older_messages_have_been_read(): void
