@@ -163,6 +163,8 @@ class EventController extends Controller
             $event->user_id == auth()->id() || 
             // Creator user
             $event->creator_id == auth()->id() ||
+            // Users assigned to the event prospect
+            $this->isProspectUser($event) ||
             // Users allowed in agenda permissions
             $this->canEditEventUserAgenda($project, $event),
             404
@@ -202,6 +204,8 @@ class EventController extends Controller
             $event->user_id == auth()->id() || 
             // Creator user
             $event->creator_id == auth()->id() ||
+            // Users assigned to the event prospect
+            $this->isProspectUser($event) ||
             // Users allowed in agenda permissions
             $this->canEditEventUserAgenda($project, $event),
             404
@@ -210,6 +214,17 @@ class EventController extends Controller
         $event->delete();
 
         return ['message' => trans('common.success.deleted_resource')];
+    }
+
+    /**
+     * Is the authenticated user assigned to the event prospect
+     */
+    protected function isProspectUser(Event $event)
+    {
+        return $event->prospect_id &&
+            $event->prospect()->whereHas('users', function($query) {
+                $query->where('users.id', auth()->id());
+            })->exists();
     }
 
     /**

@@ -85,6 +85,9 @@ php artisan serve
 docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
+L'application est ensuite accessible sur `http://localhost:8080`.
+En mode Docker, la configuration de développement utilise `host.docker.internal` pour joindre le MySQL installé sur la machine Windows ; le `.env` local reste configuré pour `127.0.0.1`.
+
 ## Compilation pour la production
 
 Pour compiler l'application en mode production :

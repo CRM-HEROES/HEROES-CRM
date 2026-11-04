@@ -144,6 +144,45 @@
         "settings": "Paramètres"
     },
 
+    "email_composer": {
+        "title": { "preview": "Aperçu de l’e-mail", "new": "Nouveau message" },
+        "back": "Retour",
+        "preview": {
+            "message": "Message",
+            "subject": "Objet de l’e-mail",
+            "body": "Le contenu de votre message apparaîtra ici.",
+            "closing": "Bien cordialement,",
+            "sent_by": "Un message envoyé par {project}.",
+            "rights": "© {year} {project} · Tous droits réservés.",
+            "variables_note": "Les variables du prospect seront remplacées pour chaque destinataire lors de l’envoi."
+        },
+        "recipient": {
+            "label": "À",
+            "label_plural": "Destinataires",
+            "placeholder": "Destinataire",
+            "bulk_count": "{count} destinataire(s) — un e-mail sera envoyé à chaque prospect.",
+            "none_with_email": "Aucun prospect sélectionné ne possède d’adresse e-mail."
+        },
+        "subject": { "placeholder": "Objet" },
+        "body": { "placeholder": "Rédigez votre message…", "label": "Message" },
+        "attachment": {
+            "remove": "Retirer {name}",
+            "add": "Ajouter des pièces jointes",
+            "add_help": "Ajouter des pièces jointes (10 fichiers maximum, 10 Mo par fichier)",
+            "limits": "10 fichiers max., 10 Mo chacun",
+            "invalid": "Vous pouvez joindre 10 fichiers maximum, de 10 Mo chacun."
+        },
+        "status": { "send": "Envoyer", "sent": "E-mail envoyé avec succès.", "sending": "Envoi en cours…" },
+        "toolbar": { "edit": "Modifier le message" },
+        "templates": {
+            "title": "Modèles d’e-mail",
+            "attachment_count": "{count} pièce(s) jointe(s)",
+            "edit": "Modifier le modèle",
+            "empty": "Aucun modèle disponible.",
+            "load_error": "Impossible de charger les modèles."
+        },
+        "send_error": "L’e-mail n’a pas pu être envoyé."
+    },
     "dashboard": {
         "your_projects": "Vos tableaux",
         "new_project": "Nouveau projet",

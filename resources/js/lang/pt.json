@@ -129,6 +129,45 @@
         "stat": "Estatísticas",
         "settings": "Configurações"
     },
+    "email_composer": {
+        "title": { "preview": "Pré-visualização do e-mail", "new": "Nova mensagem" },
+        "back": "Voltar",
+        "preview": {
+            "message": "Mensagem",
+            "subject": "Assunto do e-mail",
+            "body": "O conteúdo da sua mensagem aparecerá aqui.",
+            "closing": "Atenciosamente,",
+            "sent_by": "Uma mensagem enviada por {project}.",
+            "rights": "© {year} {project} · Todos os direitos reservados.",
+            "variables_note": "As variáveis do prospect serão substituídas para cada destinatário no envio."
+        },
+        "recipient": {
+            "label": "Para",
+            "label_plural": "Destinatários",
+            "placeholder": "Destinatário",
+            "bulk_count": "Cada um dos {count} destinatários receberá um e-mail.",
+            "none_with_email": "Nenhum dos prospects selecionados tem um endereço de e-mail."
+        },
+        "subject": { "placeholder": "Assunto" },
+        "body": { "placeholder": "Escreva sua mensagem…", "label": "Mensagem" },
+        "attachment": {
+            "remove": "Remover {name}",
+            "add": "Adicionar anexos",
+            "add_help": "Adicionar anexos (máximo de 10 arquivos, 10 MB cada)",
+            "limits": "Máx. 10 arquivos, 10 MB cada",
+            "invalid": "Você pode anexar até 10 arquivos, com no máximo 10 MB cada."
+        },
+        "status": { "send": "Enviar", "sent": "E-mail enviado com sucesso.", "sending": "Enviando…" },
+        "toolbar": { "edit": "Editar mensagem" },
+        "templates": {
+            "title": "Modelos de e-mail",
+            "attachment_count": "{count} anexo(s)",
+            "edit": "Editar modelo",
+            "empty": "Nenhum modelo disponível.",
+            "load_error": "Não foi possível carregar os modelos."
+        },
+        "send_error": "Não foi possível enviar o e-mail."
+    },
     "dashboard": {
         "your_projects": "Seus projetos",
         "new_project": "Novo projeto",

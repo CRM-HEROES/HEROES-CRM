@@ -129,6 +129,45 @@
         "stat": "Estadísticas",
         "settings": "Ajustes"
     },
+    "email_composer": {
+        "title": { "preview": "Vista previa del correo", "new": "Nuevo mensaje" },
+        "back": "Volver",
+        "preview": {
+            "message": "Mensaje",
+            "subject": "Asunto del correo",
+            "body": "El contenido del mensaje aparecerá aquí.",
+            "closing": "Un cordial saludo,",
+            "sent_by": "Un mensaje enviado por {project}.",
+            "rights": "© {year} {project} · Todos los derechos reservados.",
+            "variables_note": "Las variables del prospecto se sustituirán para cada destinatario al enviar el correo."
+        },
+        "recipient": {
+            "label": "Para",
+            "label_plural": "Destinatarios",
+            "placeholder": "Destinatario",
+            "bulk_count": "Cada uno de los {count} destinatarios recibirá un correo.",
+            "none_with_email": "Ninguno de los prospectos seleccionados tiene una dirección de correo."
+        },
+        "subject": { "placeholder": "Asunto" },
+        "body": { "placeholder": "Escribe tu mensaje…", "label": "Mensaje" },
+        "attachment": {
+            "remove": "Eliminar {name}",
+            "add": "Añadir archivos adjuntos",
+            "add_help": "Añadir archivos adjuntos (máximo 10 archivos, 10 MB cada uno)",
+            "limits": "Máx. 10 archivos, 10 MB cada uno",
+            "invalid": "Puedes adjuntar hasta 10 archivos, de un máximo de 10 MB cada uno."
+        },
+        "status": { "send": "Enviar", "sent": "Correo enviado correctamente.", "sending": "Enviando…" },
+        "toolbar": { "edit": "Editar mensaje" },
+        "templates": {
+            "title": "Plantillas de correo",
+            "attachment_count": "{count} archivo(s) adjunto(s)",
+            "edit": "Editar plantilla",
+            "empty": "No hay plantillas disponibles.",
+            "load_error": "No se pudieron cargar las plantillas."
+        },
+        "send_error": "No se pudo enviar el correo."
+    },
     "dashboard": {
         "your_projects": "Tus proyectos",
         "new_project": "Nuevo proyecto",

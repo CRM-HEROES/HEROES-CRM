@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\API\Project;
 
-use App\Filters\EventFilters;
 use App\Filters\ProspectRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
@@ -812,20 +811,11 @@ class ProspectController extends Controller
             // Events
             ->when(in_array('events', $fields) || count(array_filter($fields, function($field) {
                 return Str::startsWith($field, 'event->') || Str::startsWith($field, 'calendar->');
-            })) > 0, function($query) use($filters) {
+            })) > 0, function($query) {
                 $query->with([
-                    'events' => function($query) use($filters) {
-                        $query
-                            // ->select('id', 'started_at', 'ended_at', 'prospect_id', 'calendar_id', 'done', 'confirmed')
-                            // Filter events list
-                            ->when($filters->getFilter('withEvents'), function($query) use($filters) {
-                                $eventFilters = new EventFilters();
-                                foreach ($filters->getFilter('withEvents') as $key => $value) {
-                                    $eventFilters->addFilter($key, $value);
-                                }
-                                $query->filter($eventFilters);
-                            });
-                    },
+                    // Filters select matching prospects below; keep every event
+                    // attached so the table count and event column remain complete.
+                    'events',
                     'events.calendar' => function($query) {
                         $query->select('id', 'color', 'bgcolor', 'name', 'type');
                     },
