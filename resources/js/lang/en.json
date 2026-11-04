@@ -143,6 +143,45 @@
         "settings": "Settings"
     },
 
+    "email_composer": {
+        "title": { "preview": "Email preview", "new": "New message" },
+        "back": "Back",
+        "preview": {
+            "message": "Message",
+            "subject": "Email subject",
+            "body": "Your message will appear here.",
+            "closing": "Best regards,",
+            "sent_by": "A message sent by {project}.",
+            "rights": "© {year} {project} · All rights reserved.",
+            "variables_note": "Prospect variables will be replaced for each recipient when the email is sent."
+        },
+        "recipient": {
+            "label": "To",
+            "label_plural": "Recipients",
+            "placeholder": "Recipient",
+            "bulk_count": "{count} recipients will each receive an email.",
+            "none_with_email": "None of the selected prospects has an email address."
+        },
+        "subject": { "placeholder": "Subject" },
+        "body": { "placeholder": "Write your message…", "label": "Message" },
+        "attachment": {
+            "remove": "Remove {name}",
+            "add": "Add attachments",
+            "add_help": "Add attachments (up to 10 files, 10 MB each)",
+            "limits": "Max. 10 files, 10 MB each",
+            "invalid": "You can attach up to 10 files, each no larger than 10 MB."
+        },
+        "status": { "send": "Send", "sent": "Email sent successfully.", "sending": "Sending…" },
+        "toolbar": { "edit": "Edit message" },
+        "templates": {
+            "title": "Email templates",
+            "attachment_count": "{count} attachment(s)",
+            "edit": "Edit template",
+            "empty": "No templates available.",
+            "load_error": "Unable to load templates."
+        },
+        "send_error": "The email could not be sent."
+    },
     "dashboard": {
         "your_projects": "Your projects",
         "new_project": "New project",

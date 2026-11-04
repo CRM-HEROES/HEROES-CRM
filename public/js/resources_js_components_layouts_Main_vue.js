@@ -22362,6 +22362,8 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     return {
       draft: _objectSpread({}, this.initialDraft),
       tab: 0,
+      previewMode: false,
+      currentYear: new Date().getFullYear(),
       templateKeyword: "",
       templateId: null,
       templateAttachments: [],
@@ -22376,6 +22378,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project", "messageTemplates", "can"])), {}, {
     canSend: function canSend() {
       return !!this.draft.to.trim() && !!this.draft.subject.trim() && !!this.draft.body.trim() && (!this.draft.prospects || this.draft.prospects.length > 0);
+    },
+    hasProspectVariables: function hasProspectVariables() {
+      return /\{prospect\.[\x2D\.0-9A-Z_a-z]+\}/.test(String(this.draft.body || ""));
     },
     filteredTemplates: function filteredTemplates() {
       var normalize = function normalize(value) {
@@ -22397,7 +22402,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       if (files.length > 10 || files.some(function (file) {
         return file.size > 10 * 1024 * 1024;
       })) {
-        this.sendError = "Vous pouvez joindre 10 fichiers maximum, de 10 Mo chacun.";
+        this.sendError = this.$t("email_composer.attachment.invalid");
         return false;
       }
       return true;
@@ -22442,7 +22447,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
             case 8:
               _context.prev = 8;
               _context.t0 = _context["catch"](3);
-              _this.templateError = _this.errorMessage(_context.t0, "Impossible de charger les modèles.");
+              _this.templateError = _this.errorMessage(_context.t0, _this.$t("email_composer.templates.load_error"));
             case 11:
               _context.prev = 11;
               _this.loadingTemplates = false;
@@ -22478,6 +22483,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.draft.body = this.plainText(template.body);
       this.sendError = "";
       this.sent = false;
+      this.previewMode = false;
       this.tab = 0;
     },
     addTemplate: function addTemplate() {
@@ -22537,21 +22543,22 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               _this2.templateAttachments = [];
               _this2.templateId = null;
               _this2.sent = true;
-              _context2.next = 29;
+              _this2.previewMode = false;
+              _context2.next = 30;
               break;
-            case 26:
-              _context2.prev = 26;
+            case 27:
+              _context2.prev = 27;
               _context2.t0 = _context2["catch"](11);
-              _this2.sendError = _this2.errorMessage(_context2.t0, "L'e-mail n'a pas pu être envoyé.");
-            case 29:
-              _context2.prev = 29;
+              _this2.sendError = _this2.errorMessage(_context2.t0, _this2.$t("email_composer.send_error"));
+            case 30:
+              _context2.prev = 30;
               _this2.sending = false;
-              return _context2.finish(29);
-            case 32:
+              return _context2.finish(30);
+            case 33:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[11, 26, 29, 32]]);
+        }, _callee2, null, [[11, 27, 30, 33]]);
       }))();
     }
   }
@@ -77152,78 +77159,117 @@ __webpack_require__.r(__webpack_exports__);
 var _withScopeId = function _withScopeId(n) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.pushScopeId)("data-v-52e0648a"), n = n(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.popScopeId)(), n;
 };
-var _hoisted_1 = ["textContent"];
+var _hoisted_1 = {
+  "class": "hc-email-compose-header"
+};
 var _hoisted_2 = {
-  "class": "hc-email-composer-fields"
+  "class": "hc-email-compose-title"
 };
-var _hoisted_3 = ["disabled"];
-var _hoisted_4 = ["value"];
-var _hoisted_5 = {
-  key: 0,
-  "class": "hc-email-help"
-};
+var _hoisted_3 = ["textContent"];
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = ["title", "aria-label", "disabled"];
 var _hoisted_6 = {
-  key: 1,
-  role: "alert",
-  "class": "hc-email-error"
+  key: 0,
+  "class": "hc-email-preview-scroll"
 };
 var _hoisted_7 = {
+  "class": "hc-email-preview"
+};
+var _hoisted_8 = {
+  "class": "hc-email-preview-card"
+};
+var _hoisted_9 = {
+  "class": "hc-email-preview-brand"
+};
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "HEROES CRM", -1 /* HOISTED */);
+});
+var _hoisted_12 = {
+  "class": "hc-email-preview-content"
+};
+var _hoisted_13 = ["textContent"];
+var _hoisted_14 = ["textContent"];
+var _hoisted_15 = ["textContent"];
+var _hoisted_16 = {
+  "class": "hc-email-preview-signature"
+};
+var _hoisted_17 = ["textContent"];
+var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
+  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1 /* HOISTED */);
+});
+var _hoisted_19 = ["textContent"];
+var _hoisted_20 = {
+  "class": "hc-email-preview-footer"
+};
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = ["textContent"];
+var _hoisted_25 = {
+  key: 1,
+  "class": "hc-email-composer-fields"
+};
+var _hoisted_26 = ["disabled"];
+var _hoisted_27 = {
+  "class": "hc-email-recipient-row"
+};
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["placeholder", "aria-label"];
+var _hoisted_30 = ["aria-label", "textContent"];
+var _hoisted_31 = ["textContent"];
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = {
+  "class": "hc-email-subject-row"
+};
+var _hoisted_34 = ["placeholder", "aria-label"];
+var _hoisted_35 = ["placeholder", "aria-label"];
+var _hoisted_36 = {
   key: 2,
   "class": "hc-email-attachments"
 };
-var _hoisted_8 = ["textContent"];
-var _hoisted_9 = ["aria-label", "onClick"];
-var _hoisted_10 = ["textContent"];
-var _hoisted_11 = ["aria-label", "onClick"];
-var _hoisted_12 = {
-  "class": "hc-flex-row"
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = ["aria-label", "onClick"];
+var _hoisted_39 = ["textContent"];
+var _hoisted_40 = ["aria-label", "onClick"];
+var _hoisted_41 = ["textContent"];
+var _hoisted_42 = ["textContent"];
+var _hoisted_43 = {
+  "class": "hc-email-compose-footer"
 };
-var _hoisted_13 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    "class": "hc-email-help"
-  }, "10 fichiers maximum, 10 Mo par fichier.", -1 /* HOISTED */);
-});
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = {
-  key: 1,
-  role: "status",
-  "class": "hc-email-success"
-};
-var _hoisted_16 = ["disabled", "textContent"];
-var _hoisted_17 = {
+var _hoisted_44 = ["disabled", "textContent"];
+var _hoisted_45 = ["title", "aria-label", "disabled"];
+var _hoisted_46 = ["title", "aria-label", "disabled"];
+var _hoisted_47 = ["title", "aria-label", "disabled"];
+var _hoisted_48 = ["title", "aria-label"];
+var _hoisted_49 = ["aria-label", "disabled"];
+var _hoisted_50 = ["textContent"];
+var _hoisted_51 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-    "class": "hc-item-main-content"
-  }, "Modèles d'e-mail", -1 /* HOISTED */);
-});
-var _hoisted_19 = {
+var _hoisted_52 = ["textContent"];
+var _hoisted_53 = {
   "class": "hc-item-main-content"
 };
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = {
+var _hoisted_54 = ["textContent"];
+var _hoisted_55 = ["textContent"];
+var _hoisted_56 = {
   key: 1
 };
-var _hoisted_23 = {
-  key: 0,
-  "class": "hc-email-help"
-};
-var _hoisted_24 = ["textContent"];
-var _hoisted_25 = ["textContent"];
+var _hoisted_57 = ["textContent"];
+var _hoisted_58 = ["textContent"];
+var _hoisted_59 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
-  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
-  var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
-  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
+  var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
   var _component_search = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("search");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
+  var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_tab_layout, {
     count: 2,
@@ -77233,81 +77279,111 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
         "class": "hc-email-composer",
-        onSubmit: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.send && $options.send.apply($options, arguments);
         }, ["prevent"]))
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-        tag: "button",
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($data.previewMode ? 'email_composer.title.preview' : 'email_composer.title.new'))
+      }, null, 8 /* PROPS */, _hoisted_3), $data.draft.category ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+        key: 0,
+        "class": "hc-email-compose-category",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.category)
+      }, null, 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         type: "button",
-        "class": "bordered",
+        "class": "hc-email-compose-close",
+        title: _ctx.$t('email_composer.back'),
+        "aria-label": _ctx.$t('email_composer.back'),
         disabled: $data.sending,
         onClick: _cache[0] || (_cache[0] = function ($event) {
           return _ctx.$emit('back');
         })
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-            "class": "fa fa-caret-left"
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-            "class": "hc-item-main-content",
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.category)
-          }, null, 8 /* PROPS */, _hoisted_1)];
-        }),
-        _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["disabled"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-times"
+      })], 8 /* PROPS */, _hoisted_5)]), $data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.project.name)
+      }, null, 8 /* PROPS */, _hoisted_10), _hoisted_11]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-email-preview-category",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.category || _ctx.$t('email_composer.preview.message'))
+      }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.subject || _ctx.$t('email_composer.preview.subject'))
+      }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-email-preview-body",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.body || _ctx.$t('email_composer.preview.body'))
+      }, null, 8 /* PROPS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.closing'))
+      }, null, 8 /* PROPS */, _hoisted_17), _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.project.name)
+      }, null, 8 /* PROPS */, _hoisted_19)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.sent_by', {
+          project: _ctx.project.name
+        }))
+      }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.rights', {
+          year: $data.currentYear,
+          project: _ctx.project.name
+        }))
+      }, null, 8 /* PROPS */, _hoisted_22)]), $options.hasProspectVariables ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 0,
+        "class": "hc-email-preview-note",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.variables_note'))
+      }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 0,
+        role: "alert",
+        "class": "hc-email-error",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
+      }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
         disabled: $data.sending
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-        label: "Destinataire",
-        required: ""
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [!$data.draft.prospects ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-            key: 0,
-            "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
-              return $data.draft.to = $event;
-            }),
-            type: "email",
-            required: ""
-          }, null, 512 /* NEED_PATCH */)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.to]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("textarea", {
-            key: 1,
-            value: $data.draft.to,
-            rows: "3",
-            readonly: "",
-            "aria-label": "Destinataires"
-          }, null, 8 /* PROPS */, _hoisted_4))];
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+        "class": "hc-email-recipient-label",
+        "for": "hc-email-recipient",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.label'))
+      }, null, 8 /* PROPS */, _hoisted_28), !$data.draft.prospects ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+        key: 0,
+        id: "hc-email-recipient",
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+          return $data.draft.to = $event;
         }),
-        _: 1 /* STABLE */
-      }), $data.draft.prospects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.prospects.length) + " destinataire(s) — un e-mail sera envoyé à chaque prospect. ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.draft.prospects && !$data.draft.prospects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_6, " Aucun prospect sélectionné ne possède d'adresse e-mail. ")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-        label: "Objet",
-        required: ""
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-            "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
-              return $data.draft.subject = $event;
-            }),
-            required: "",
-            maxlength: "255"
-          }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.subject]])];
+        "class": "hc-email-recipient-input",
+        type: "email",
+        required: "",
+        placeholder: _ctx.$t('email_composer.recipient.placeholder'),
+        "aria-label": _ctx.$t('email_composer.recipient.label')
+      }, null, 8 /* PROPS */, _hoisted_29)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.to]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        key: 1,
+        "class": "hc-email-recipient-list",
+        role: "group",
+        "aria-label": _ctx.$t('email_composer.recipient.label_plural'),
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.to)
+      }, null, 8 /* PROPS */, _hoisted_30))]), $data.draft.prospects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 0,
+        "class": "hc-email-help hc-email-recipient-help",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.bulk_count', {
+          count: $data.draft.prospects.length
+        }))
+      }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.draft.prospects && !$data.draft.prospects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 1,
+        role: "alert",
+        "class": "hc-email-error",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.none_with_email'))
+      }, null, 8 /* PROPS */, _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+          return $data.draft.subject = $event;
         }),
-        _: 1 /* STABLE */
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-        label: "Message",
-        required: ""
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
-            "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
-              return $data.draft.body = $event;
-            }),
-            "class": "hc-email-body",
-            rows: "10",
-            required: "",
-            placeholder: "Saisir un e-mail ..."
-          }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.body]])];
+        "class": "hc-email-subject",
+        required: "",
+        maxlength: "255",
+        placeholder: _ctx.$t('email_composer.subject.placeholder'),
+        "aria-label": _ctx.$t('email_composer.subject.placeholder')
+      }, null, 8 /* PROPS */, _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.subject]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+          return $data.draft.body = $event;
         }),
-        _: 1 /* STABLE */
-      }), $data.templateAttachments.length || $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.templateAttachments, function (file) {
+        "class": "hc-email-body",
+        rows: "10",
+        required: "",
+        placeholder: _ctx.$t('email_composer.body.placeholder'),
+        "aria-label": _ctx.$t('email_composer.body.label')
+      }, null, 8 /* PROPS */, _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.body]]), $data.templateAttachments.length || $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_36, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.templateAttachments, function (file) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: file.id,
           "class": "hc-email-attachment"
@@ -77315,13 +77391,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "class": "fa fa-paperclip"
         }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
-        }, null, 8 /* PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
-          "aria-label": 'Retirer ' + file.name,
+          "aria-label": _ctx.$t('email_composer.attachment.remove', {
+            name: file.name
+          }),
           onClick: function onClick($event) {
             return $options.removeTemplateAttachment(file);
           }
-        }, "×", 8 /* PROPS */, _hoisted_9)]);
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+          "class": "fa fa-times"
+        })], 8 /* PROPS */, _hoisted_38)]);
       }), 128 /* KEYED_FRAGMENT */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (file, index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: 'upload-' + index,
@@ -77330,71 +77410,111 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "class": "fa fa-paperclip"
         }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
-        }, null, 8 /* PROPS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
-          "aria-label": 'Retirer ' + file.name,
+          "aria-label": _ctx.$t('email_composer.attachment.remove', {
+            name: file.name
+          }),
           onClick: function onClick($event) {
             return $options.removeAttachment(file);
           }
-        }, "×", 8 /* PROPS */, _hoisted_11)]);
-      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-        tag: "button",
-        type: "button",
-        "class": "fa fa-file-alt",
-        title: "Modèles d'e-mail",
-        "aria-label": "Modèles d'e-mail",
-        onClick: $options.showTemplates
-      }, null, 8 /* PROPS */, ["onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-        tag: "label",
-        "class": "fa fa-paperclip",
-        title: "Ajouter des pièces jointes"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-            type: "file",
-            multiple: "",
-            "aria-label": "Ajouter des pièces jointes",
-            onChange: _cache[4] || (_cache[4] = function () {
-              return $options.addAttachments && $options.addAttachments.apply($options, arguments);
-            })
-          }, null, 32 /* HYDRATE_EVENTS */)];
-        }),
-        _: 1 /* STABLE */
-      }), _hoisted_13])], 8 /* PROPS */, _hoisted_3), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+          "class": "fa fa-times"
+        })], 8 /* PROPS */, _hoisted_40)]);
+      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_26), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         role: "alert",
         "class": "hc-email-error",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-      }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_15, "E-mail envoyé avec succès.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            disabled: $data.sending || !$options.canSend,
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sending ? 'Envoi en cours...' : _ctx.$t('send'))
-          }, null, 8 /* PROPS */, _hoisted_16)];
-        }),
-        _: 1 /* STABLE */
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+      }, null, 8 /* PROPS */, _hoisted_41)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 1,
+        role: "status",
+        "class": "hc-email-success",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.status.sent'))
+      }, null, 8 /* PROPS */, _hoisted_42)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("footer", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        "class": "hc-email-send",
+        disabled: $data.sending || !$options.canSend,
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sending ? _ctx.$t('email_composer.status.sending') : _ctx.$t('email_composer.status.send'))
+      }, null, 8 /* PROPS */, _hoisted_44), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 0,
+        type: "button",
+        "class": "hc-email-toolbar-button",
+        title: _ctx.$t('email_composer.title.preview'),
+        "aria-label": _ctx.$t('email_composer.title.preview'),
+        disabled: $data.sending,
+        onClick: _cache[4] || (_cache[4] = function ($event) {
+          return $data.previewMode = true;
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-eye"
+      })], 8 /* PROPS */, _hoisted_45)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 1,
+        type: "button",
+        "class": "hc-email-toolbar-button",
+        title: _ctx.$t('email_composer.toolbar.edit'),
+        "aria-label": _ctx.$t('email_composer.toolbar.edit'),
+        disabled: $data.sending,
+        onClick: _cache[5] || (_cache[5] = function ($event) {
+          return $data.previewMode = false;
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-pencil-alt"
+      })], 8 /* PROPS */, _hoisted_46)), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 2,
+        type: "button",
+        "class": "hc-email-toolbar-button",
+        title: _ctx.$t('email_composer.templates.title'),
+        "aria-label": _ctx.$t('email_composer.templates.title'),
+        disabled: $data.sending,
+        onClick: _cache[6] || (_cache[6] = function () {
+          return $options.showTemplates && $options.showTemplates.apply($options, arguments);
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-file-alt"
+      })], 8 /* PROPS */, _hoisted_47)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+        key: 3,
+        "class": "hc-email-toolbar-button hc-email-attach-button",
+        title: _ctx.$t('email_composer.attachment.add_help'),
+        "aria-label": _ctx.$t('email_composer.attachment.add')
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-paperclip"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "file",
+        multiple: "",
+        "aria-label": _ctx.$t('email_composer.attachment.add'),
+        disabled: $data.sending,
+        onChange: _cache[7] || (_cache[7] = function () {
+          return $options.addAttachments && $options.addAttachments.apply($options, arguments);
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_49)], 8 /* PROPS */, _hoisted_48)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+        key: 4,
+        "class": "hc-email-help hc-email-attachment-help",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.attachment.limits'))
+      }, null, 8 /* PROPS */, _hoisted_50)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
         loading: $data.sending
       }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
     }),
     "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
         tag: "button",
         type: "button",
         "class": "bordered",
-        onClick: _cache[6] || (_cache[6] = function ($event) {
+        onClick: _cache[9] || (_cache[9] = function ($event) {
           return $data.tab = 0;
         })
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
             "class": "fa fa-caret-left"
-          }), _hoisted_18];
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+            "class": "hc-item-main-content",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.title'))
+          }, null, 8 /* PROPS */, _hoisted_52)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
         modelValue: $data.templateKeyword,
-        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
           return $data.templateKeyword = $event;
         })
       }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -77413,42 +77533,48 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                 return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                   "class": "fa fa-file-alt"
-                }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.name)
-                }, null, 8 /* PROPS */, _hoisted_20), template.subject ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+                }, null, 8 /* PROPS */, _hoisted_54), template.subject ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
                   key: 0,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.subject)
-                }, null, 8 /* PROPS */, _hoisted_21)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), template.attachments && template.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_22, " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.attachments.length) + " pièce(s) jointe(s)", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _ctx.can('all.project.message-template.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                }, null, 8 /* PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), template.attachments && template.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_56, " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.attachment_count', {
+                  count: template.attachments.length
+                })), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _ctx.can('all.project.message-template.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                   key: 0,
                   tag: "button",
                   type: "button",
                   "class": "fa fa-cog",
-                  title: "Modifier le modèle",
-                  "aria-label": "Modifier le modèle",
+                  title: _ctx.$t('email_composer.templates.edit'),
+                  "aria-label": _ctx.$t('email_composer.templates.edit'),
                   onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                     return $options.editTemplate(template);
                   }, ["stop", "prevent"])
-                }, null, 8 /* PROPS */, ["onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+                }, null, 8 /* PROPS */, ["title", "aria-label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
               }),
               _: 2 /* DYNAMIC */
             }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]);
-          }), 128 /* KEYED_FRAGMENT */)), !$data.loadingTemplates && !$options.filteredTemplates.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_23, "Aucun modèle disponible.")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.templateError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+          }), 128 /* KEYED_FRAGMENT */)), !$data.loadingTemplates && !$options.filteredTemplates.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+            key: 0,
+            "class": "hc-email-help",
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.empty'))
+          }, null, 8 /* PROPS */, _hoisted_57)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.templateError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
             key: 1,
             role: "alert",
             "class": "hc-email-error",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.templateError)
-          }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          }, null, 8 /* PROPS */, _hoisted_58)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [_ctx.can('all.project.message-template.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
             key: 0,
-            onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.addTemplate && $options.addTemplate.apply($options, arguments);
             }, ["prevent"])),
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-          }, null, 8 /* PROPS */, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          }, null, 8 /* PROPS */, _hoisted_59)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -116705,7 +116831,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-composer[data-v-52e0648a] { display: flex; flex-direction: column; height: 100%; position: relative;\n}\n.hc-email-composer-fields[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 10px;\n}\n.hc-email-composer fieldset[data-v-52e0648a] { border: 0; padding: 0; margin: 0; min-width: 0;\n}\n.hc-email-composer textarea[data-v-52e0648a] { width: 100%; resize: vertical;\n}\n.hc-email-composer .hc-email-body[data-v-52e0648a] { height: 220px; min-height: 150px; overflow-y: auto;\n}\n.hc-email-help[data-v-52e0648a] { color: #777; font-size: 11px; padding: 5px; white-space: normal;\n}\n.hc-email-error[data-v-52e0648a] { color: #b42318; padding: 5px;\n}\n.hc-email-success[data-v-52e0648a] { color: #26834a; padding: 5px;\n}\n.hc-email-attachments[data-v-52e0648a] { display: flex; flex-direction: column; gap: 4px; padding: 5px 0;\n}\n.hc-email-attachment[data-v-52e0648a] { display: flex; align-items: center; background: #f5f5f5; border-radius: 5px;\n}\n.hc-email-attachment span[data-v-52e0648a] { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;\n}\n.hc-email-attachment button[data-v-52e0648a] { background: none; border: 0; padding: 8px; cursor: pointer;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-composer[data-v-52e0648a] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    position: relative;\n    overflow: hidden;\n    color: #202124;\n    background: #fff;\n    border: 1px solid #dadce0;\n    border-radius: 8px;\n    box-shadow: 0 2px 8px rgba(60, 64, 67, 0.18);\n    font-family: Arial, sans-serif;\n}\n.hc-email-compose-header[data-v-52e0648a] {\n    min-height: 40px;\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 0 10px 0 14px;\n    background: #f2f6fc;\n    color: #202124;\n}\n.hc-email-compose-title[data-v-52e0648a] { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 14px; font-weight: 600;\n}\n.hc-email-compose-category[data-v-52e0648a] {\n    max-width: 125px;\n    overflow: hidden;\n    padding: 3px 8px;\n    border-radius: 12px;\n    background: #e8f0fe;\n    color: #1967d2;\n    font-size: 10px;\n    font-weight: 400;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-email-compose-close[data-v-52e0648a], .hc-email-toolbar-button[data-v-52e0648a] {\n    display: inline-flex;\n    flex: 0 0 32px;\n    align-items: center;\n    justify-content: center;\n    width: 32px;\n    height: 32px;\n    padding: 0;\n    border: 0;\n    border-radius: 50%;\n    background: transparent;\n    color: #5f6368;\n    cursor: pointer;\n}\n.hc-email-compose-close[data-v-52e0648a]:hover, .hc-email-toolbar-button[data-v-52e0648a]:hover { background: rgba(60, 64, 67, 0.08); color: #202124;\n}\n.hc-email-compose-close[data-v-52e0648a]:focus-visible, .hc-email-toolbar-button[data-v-52e0648a]:focus-visible, .hc-email-send[data-v-52e0648a]:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-compose-close[data-v-52e0648a]:disabled, .hc-email-toolbar-button[data-v-52e0648a]:disabled { cursor: default; opacity: 0.5;\n}\n.hc-email-composer-fields[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px;\n}\n.hc-email-composer fieldset[data-v-52e0648a] { display: flex; flex-direction: column; border: 0; padding: 0; margin: 0; min-width: 0;\n}\n.hc-email-recipient-row[data-v-52e0648a] {\n    display: flex;\n    align-items: flex-start;\n    gap: 12px;\n    min-height: 42px;\n    padding: 10px 0 8px;\n    border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-recipient-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-recipient-label[data-v-52e0648a] { flex: 0 0 18px; padding-top: 3px; color: #5f6368; font-size: 13px;\n}\n.hc-email-recipient-input[data-v-52e0648a], .hc-email-recipient-list[data-v-52e0648a], .hc-email-subject[data-v-52e0648a] {\n    flex: 1;\n    min-width: 0;\n    padding: 2px 0;\n    border: 0;\n    outline: 0;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.5 Arial, sans-serif;\n}\n.hc-email-recipient-list[data-v-52e0648a] { overflow-wrap: anywhere;\n}\n.hc-email-recipient-input[data-v-52e0648a]::-moz-placeholder, .hc-email-subject[data-v-52e0648a]::-moz-placeholder, .hc-email-body[data-v-52e0648a]::-moz-placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-recipient-input[data-v-52e0648a]::placeholder, .hc-email-subject[data-v-52e0648a]::placeholder, .hc-email-body[data-v-52e0648a]::placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-subject-row[data-v-52e0648a] { display: flex; min-height: 42px; border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-subject-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-composer .hc-email-body[data-v-52e0648a] {\n    width: 100%;\n    min-height: 180px;\n    height: 220px;\n    padding: 13px 0;\n    border: 0;\n    outline: 0;\n    resize: vertical;\n    overflow-y: auto;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.55 Arial, sans-serif;\n}\n.hc-email-recipient-help[data-v-52e0648a] { margin: 5px 0 2px 30px; padding: 0; color: #5f6368; font-size: 11px; line-height: 1.4;\n}\n.hc-email-help[data-v-52e0648a] { color: #5f6368; font-size: 10px; white-space: normal;\n}\n.hc-email-error[data-v-52e0648a], .hc-email-success[data-v-52e0648a] { margin: 8px 0 0; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4;\n}\n.hc-email-error[data-v-52e0648a] { background: #fce8e6; color: #b3261e;\n}\n.hc-email-success[data-v-52e0648a] { background: #e6f4ea; color: #137333;\n}\n.hc-email-attachments[data-v-52e0648a] { display: flex; flex-direction: column; gap: 6px; padding: 0 0 10px;\n}\n.hc-email-attachment[data-v-52e0648a] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 36px;\n    padding: 2px 4px 2px 9px;\n    border: 1px solid #dadce0;\n    border-radius: 4px;\n    background: #f8f9fa;\n    color: #5f6368;\n    font-size: 12px;\n}\n.hc-email-attachment > span[data-v-52e0648a] { flex: 1; min-width: 0; overflow: hidden; color: #3c4043; text-overflow: ellipsis; white-space: nowrap;\n}\n.hc-email-attachment button[data-v-52e0648a] { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #5f6368; cursor: pointer;\n}\n.hc-email-attachment button[data-v-52e0648a]:hover { background: #e8eaed; color: #202124;\n}\n.hc-email-compose-footer[data-v-52e0648a] { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 9px 12px 12px;\n}\n.hc-email-send[data-v-52e0648a] { min-height: 36px; margin-right: 5px; padding: 0 20px; border: 0; border-radius: 18px; background: #0b57d0; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;\n}\n.hc-email-send[data-v-52e0648a]:hover:not(:disabled) { background: #0842a0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);\n}\n.hc-email-send[data-v-52e0648a]:disabled { background: #a8c7fa; cursor: default;\n}\n.hc-email-attach-button[data-v-52e0648a] { position: relative; overflow: hidden; cursor: pointer;\n}\n.hc-email-attach-button[data-v-52e0648a]:focus-within { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-attach-button input[data-v-52e0648a] { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap;\n}\n.hc-email-attachment-help[data-v-52e0648a] { margin-left: 4px;\n}\n.hc-email-preview-scroll[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 9px 20px; background: #f3f6f8;\n}\n.hc-email-preview[data-v-52e0648a] { width: 100%; max-width: 600px; margin: 0 auto; color: #24323d; font-family: Arial, Helvetica, sans-serif;\n}\n.hc-email-preview-card[data-v-52e0648a] { overflow: hidden; border-radius: 8px; background: #fff; box-shadow: 0 8px 24px rgba(22, 59, 82, 0.1);\n}\n.hc-email-preview-brand[data-v-52e0648a] { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 50px; padding: 12px 17px; background: #163b52; color: #fff;\n}\n.hc-email-preview-brand strong[data-v-52e0648a] { min-width: 0; overflow-wrap: anywhere; font-size: 16px;\n}\n.hc-email-preview-brand span[data-v-52e0648a] { flex: 0 0 auto; color: #b9d6df; font-size: 9px; letter-spacing: 1px; text-transform: uppercase;\n}\n.hc-email-preview-content[data-v-52e0648a] { padding: 22px 20px 18px;\n}\n.hc-email-preview-category[data-v-52e0648a] { margin-bottom: 10px; color: #4a8796; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;\n}\n.hc-email-preview-content h1[data-v-52e0648a] { margin: 0 0 18px; color: #163b52; font-size: 21px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere;\n}\n.hc-email-preview-body[data-v-52e0648a] { min-height: 28px; padding-top: 17px; border-top: 1px solid #e7edf0; color: #42515b; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere;\n}\n.hc-email-preview-signature[data-v-52e0648a] { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e7edf0; color: #6d7b83; font-size: 12px; line-height: 1.6;\n}\n.hc-email-preview-signature strong[data-v-52e0648a] { color: #163b52;\n}\n.hc-email-preview-footer[data-v-52e0648a] { padding: 16px 8px 0; color: #84929a; font-size: 10px; line-height: 1.6; text-align: center;\n}\n.hc-email-preview-note[data-v-52e0648a] { margin: 12px 0 0; padding: 9px 10px; border-radius: 4px; background: #e8f0fe; color: #3c4043; font-size: 11px; line-height: 1.4;\n}\n@media (max-width: 360px) {\n.hc-email-composer-fields[data-v-52e0648a] { padding-right: 12px; padding-left: 12px;\n}\n.hc-email-compose-footer[data-v-52e0648a] { padding-right: 8px; padding-left: 8px;\n}\n.hc-email-attachment-help[data-v-52e0648a] { flex-basis: 100%; margin-left: 4px;\n}\n.hc-email-preview-content[data-v-52e0648a] { padding-right: 16px; padding-left: 16px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

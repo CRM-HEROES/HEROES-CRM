@@ -125,6 +125,45 @@
         "stat": "Statistiche",
         "settings": "Impostazioni"
     },
+    "email_composer": {
+        "title": { "preview": "Anteprima dell’e-mail", "new": "Nuovo messaggio" },
+        "back": "Indietro",
+        "preview": {
+            "message": "Messaggio",
+            "subject": "Oggetto dell’e-mail",
+            "body": "Il contenuto del messaggio apparirà qui.",
+            "closing": "Cordiali saluti,",
+            "sent_by": "Un messaggio inviato da {project}.",
+            "rights": "© {year} {project} · Tutti i diritti riservati.",
+            "variables_note": "Le variabili del prospect saranno sostituite per ogni destinatario al momento dell’invio."
+        },
+        "recipient": {
+            "label": "A",
+            "label_plural": "Destinatari",
+            "placeholder": "Destinatario",
+            "bulk_count": "Ognuno dei {count} destinatari riceverà un’e-mail.",
+            "none_with_email": "Nessuno dei prospect selezionati ha un indirizzo e-mail."
+        },
+        "subject": { "placeholder": "Oggetto" },
+        "body": { "placeholder": "Scrivi il tuo messaggio…", "label": "Messaggio" },
+        "attachment": {
+            "remove": "Rimuovi {name}",
+            "add": "Aggiungi allegati",
+            "add_help": "Aggiungi allegati (massimo 10 file, 10 MB ciascuno)",
+            "limits": "Max. 10 file, 10 MB ciascuno",
+            "invalid": "Puoi allegare al massimo 10 file, di non oltre 10 MB ciascuno."
+        },
+        "status": { "send": "Invia", "sent": "E-mail inviata correttamente.", "sending": "Invio in corso…" },
+        "toolbar": { "edit": "Modifica messaggio" },
+        "templates": {
+            "title": "Modelli e-mail",
+            "attachment_count": "{count} allegato/i",
+            "edit": "Modifica modello",
+            "empty": "Nessun modello disponibile.",
+            "load_error": "Impossibile caricare i modelli."
+        },
+        "send_error": "Impossibile inviare l’e-mail."
+    },
     "dashboard": {
         "your_projects": "I tuoi progetti",
         "new_project": "Nuovo progetto",

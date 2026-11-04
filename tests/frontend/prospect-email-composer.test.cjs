@@ -37,6 +37,10 @@ function composer(handler = async () => ({}), overrides = {}) {
     });
     const vm = {
         ...component.methods,
+        $t: key => ({
+            'email_composer.attachment.invalid': 'Vous pouvez joindre 10 fichiers maximum, de 10 Mo chacun.',
+            'email_composer.send_error': "L'e-mail n'a pas pu être envoyé.",
+        }[key] || key),
         initialDraft: { prospect: 12, prospects: null, to: 'lea@example.com', subject: 'Suivi', body: 'Bonjour', category: 'Suivi prospect', ...overrides },
     };
     Object.assign(vm, component.data.call(vm), { project: { slug: 'test' }, messageTemplates: [] });
