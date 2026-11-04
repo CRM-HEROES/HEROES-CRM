@@ -151,7 +151,6 @@ export default {
             }
 
             const request = ++this.cloudtalkParallelRequest;
-            this.cloudtalkParallelCampaignId = null;
             this.cloudtalkParallelSync = true;
 
             try {
@@ -234,7 +233,6 @@ export default {
             if (!this.cloudtalkParallelPending) return;
             this.cloudtalkParallelPending = null;
             this.cloudtalkParallelRequest++;
-            this.cloudtalkParallelCampaignId = null;
         },
 
         async performCloudtalkParallelCampaign(selection, request, deactivateCampaignIds = []) {

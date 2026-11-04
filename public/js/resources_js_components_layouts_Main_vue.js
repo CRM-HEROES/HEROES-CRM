@@ -107287,25 +107287,24 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
               return _context.abrupt("return");
             case 11:
               request = ++_this.cloudtalkParallelRequest;
-              _this.cloudtalkParallelCampaignId = null;
               _this.cloudtalkParallelSync = true;
-              _context.prev = 14;
-              _context.next = 17;
+              _context.prev = 13;
+              _context.next = 16;
               return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].getActiveCloudtalkParallelCampaigns(projectSlug, {
                 line_id: _this.cloudtalkLine.id
               });
-            case 17:
+            case 16:
               _yield$LineService$ge = _context.sent;
               data = _yield$LineService$ge.data;
               if (!(request !== _this.cloudtalkParallelRequest || projectSlug !== ((_this$project3 = _this.project) === null || _this$project3 === void 0 ? void 0 : _this$project3.slug))) {
-                _context.next = 21;
+                _context.next = 20;
                 break;
               }
               return _context.abrupt("return");
-            case 21:
+            case 20:
               campaigns = Array.isArray(data.campaigns) ? data.campaigns : (_data$campaign = data.campaign) !== null && _data$campaign !== void 0 && _data$campaign.id ? [data.campaign] : [];
               if (!campaigns.length) {
-                _context.next = 25;
+                _context.next = 24;
                 break;
               }
               _this.cloudtalkParallelPending = {
@@ -107316,35 +107315,35 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
                 request: request
               };
               return _context.abrupt("return");
-            case 25:
-              _context.next = 27;
+            case 24:
+              _context.next = 26;
               return _this.performCloudtalkParallelCampaign({
                 projectSlug: projectSlug,
                 prospectIds: selection,
                 campaignName: campaignName
               }, request);
-            case 27:
-              _context.next = 34;
+            case 26:
+              _context.next = 33;
               break;
-            case 29:
-              _context.prev = 29;
-              _context.t0 = _context["catch"](14);
+            case 28:
+              _context.prev = 28;
+              _context.t0 = _context["catch"](13);
               if (!(request !== _this.cloudtalkParallelRequest || projectSlug !== ((_this$project4 = _this.project) === null || _this$project4 === void 0 ? void 0 : _this$project4.slug))) {
-                _context.next = 33;
+                _context.next = 32;
                 break;
               }
               return _context.abrupt("return");
-            case 33:
+            case 32:
               _this.handleCloudtalkParallelCampaignError(_context.t0);
-            case 34:
-              _context.prev = 34;
+            case 33:
+              _context.prev = 33;
               if (request === _this.cloudtalkParallelRequest) _this.cloudtalkParallelSync = false;
-              return _context.finish(34);
-            case 37:
+              return _context.finish(33);
+            case 36:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[14, 29, 34, 37]]);
+        }, _callee, null, [[13, 28, 33, 36]]);
       }))();
     },
     continueActiveCloudtalkCampaign: function continueActiveCloudtalkCampaign(campaign) {
@@ -107418,7 +107417,6 @@ var MAX_CLOUDTALK_PARALLEL_PROSPECTS = 10;
       if (!this.cloudtalkParallelPending) return;
       this.cloudtalkParallelPending = null;
       this.cloudtalkParallelRequest++;
-      this.cloudtalkParallelCampaignId = null;
     },
     performCloudtalkParallelCampaign: function performCloudtalkParallelCampaign(selection, request) {
       var _arguments2 = arguments,
