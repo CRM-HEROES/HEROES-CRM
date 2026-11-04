@@ -18,6 +18,11 @@ class UserTrackActivity
      */
     public function handle($request, Closure $next)
     {
+        // A call made by an AI agent on behalf of its owner is not a visit of the owner
+        if ($request->attributes->get('agent_internal')) {
+            return $next($request);
+        }
+
         /*if (
             $request->cookie(config('cookie-consent.cookie_name')) && 
             !$request->is(config('prospect.prefix', "client")) && 
