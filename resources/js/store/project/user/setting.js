@@ -381,6 +381,28 @@ const getters = {
     projectUserSettingsProjectProfile(state, getters) {
         let setting = getters.projectUserSetting("project-profile");
 
+        // A saved layout predates the AI agents bloc: show it after the
+        // phone lines (or in the last column), without touching the rest
+        if (
+            setting &&
+            Array.isArray(setting) &&
+            !setting.some((column) =>
+                (column || []).some((bloc) => bloc.type === "agent")
+            )
+        ) {
+            const columns = setting.map((column) => [...(column || [])]);
+            const target =
+                columns.find((column) => column.some((bloc) => bloc.type === "line")) ||
+                columns[columns.length - 1];
+
+            if (target) {
+                const at = target.findIndex((bloc) => bloc.type === "line");
+                target.splice(at === -1 ? target.length : at + 1, 0, { type: "agent" });
+
+                return columns;
+            }
+        }
+
         return !setting || !Array.isArray(setting)
             ? [
                   [
@@ -397,6 +419,7 @@ const getters = {
                       { type: "info-other" },
                       { type: "document" },
                       { type: "line" },
+                      { type: "agent" },
                   ],
                   [{ type: "category" }, { type: "field" }],
                   [
