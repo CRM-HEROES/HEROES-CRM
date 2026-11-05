@@ -111,6 +111,55 @@
                     <icon class="fa fa-caret-right" />
                 </item>
 
+                <!-- Filter by date period -->
+                <item tag="label">
+                    <icon class="fa fa-calendar-day" />
+                    <div
+                        class="hc-item-main-content"
+                        v-text="
+                            $t('prospect.table.filters.appointments.period')
+                        "
+                    ></div>
+                    <select
+                        v-model="filterPeriod"
+                        class="hc-prospect-filter-event-item-period"
+                    >
+                        <option value="">
+                            {{
+                                $t(
+                                    'prospect.table.filters.appointments.period_placeholder'
+                                )
+                            }}
+                        </option>
+                        <option value="today">
+                            {{
+                                $t('prospect.table.filters.appointments.today')
+                            }}
+                        </option>
+                        <option value="yesterday">
+                            {{
+                                $t(
+                                    'prospect.table.filters.appointments.yesterday'
+                                )
+                            }}
+                        </option>
+                        <option value="tomorrow">
+                            {{
+                                $t(
+                                    'prospect.table.filters.appointments.tomorrow'
+                                )
+                            }}
+                        </option>
+                        <option value="currentWeek">
+                            {{
+                                $t(
+                                    'prospect.table.filters.appointments.current_week'
+                                )
+                            }}
+                        </option>
+                    </select>
+                </item>
+
                 <!-- After date -->
                 <item tag="label">
                     <icon class="fa fa-clock" />
@@ -373,6 +422,13 @@
     border: 1px solid #ccc;
     border-radius: 3px;
     padding: 0 0 0 5px;
+}
+
+.hc-prospect-filter-event-item-period {
+    width: 135px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 3px;
 }
 </style>
 
@@ -687,6 +743,47 @@ export default {
             },
         },
 
+        filterPeriod: {
+            get() {
+                const eventParams = this.eventParams;
+
+                if (
+                    !eventParams ||
+                    !eventParams.startedAt ||
+                    !eventParams.endedAt
+                ) {
+                    return "";
+                }
+
+                return (
+                    ["today", "yesterday", "tomorrow", "currentWeek"].find(
+                        (period) => {
+                            const range = this.getPeriodRange(period);
+
+                            return (
+                                eventParams.startedAt === range.startedAt &&
+                                eventParams.endedAt === range.endedAt
+                            );
+                        }
+                    ) || ""
+                );
+            },
+            set(period) {
+                const eventParams = this.eventParams || {};
+                delete eventParams.startedAt;
+                delete eventParams.endedAt;
+
+                if (period) {
+                    const range = this.getPeriodRange(period);
+                    eventParams.startedAt = range.startedAt;
+                    eventParams.endedAt = range.endedAt;
+                }
+
+                this.eventParams =
+                    Object.keys(eventParams).length > 0 ? eventParams : null;
+            },
+        },
+
         /**
          *
          */
@@ -900,6 +997,41 @@ export default {
                         ? -1
                         : 1
                 );
+        },
+    },
+
+    methods: {
+        getPeriodRange(period) {
+            const date = new Date();
+            date.setHours(0, 0, 0, 0);
+
+            if (period === "yesterday") {
+                date.setDate(date.getDate() - 1);
+            } else if (period === "tomorrow") {
+                date.setDate(date.getDate() + 1);
+            } else if (period === "currentWeek") {
+                date.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+            }
+
+            const formatDate = (value) => {
+                const year = value.getFullYear();
+                const month = String(value.getMonth() + 1).padStart(2, "0");
+                const day = String(value.getDate()).padStart(2, "0");
+
+                return `${year}-${month}-${day}`;
+            };
+
+            const startedAt = formatDate(date);
+            const endedDate = new Date(date);
+
+            if (period === "currentWeek") {
+                endedDate.setDate(endedDate.getDate() + 6);
+            }
+
+            return {
+                startedAt,
+                endedAt: formatDate(endedDate),
+            };
         },
     },
 };

@@ -26583,6 +26583,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
       }
     },
+    filterPeriod: {
+      get: function get() {
+        var _this2 = this;
+        var eventParams = this.eventParams;
+        if (!eventParams || !eventParams.startedAt || !eventParams.endedAt) {
+          return "";
+        }
+        return ["today", "yesterday", "tomorrow", "currentWeek"].find(function (period) {
+          var range = _this2.getPeriodRange(period);
+          return eventParams.startedAt === range.startedAt && eventParams.endedAt === range.endedAt;
+        }) || "";
+      },
+      set: function set(period) {
+        var eventParams = this.eventParams || {};
+        delete eventParams.startedAt;
+        delete eventParams.endedAt;
+        if (period) {
+          var range = this.getPeriodRange(period);
+          eventParams.startedAt = range.startedAt;
+          eventParams.endedAt = range.endedAt;
+        }
+        this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
+      }
+    },
     /**
      *
      */
@@ -26695,9 +26719,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     filterCalendarsName: function filterCalendarsName() {
-      var _this2 = this;
+      var _this3 = this;
       return this.filterCalendars.map(function (fu) {
-        return _this2.calendars.find(function (u) {
+        return _this3.calendars.find(function (u) {
           return u.id == fu;
         });
       }).filter(function (u) {
@@ -26710,9 +26734,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     filterUsersName: function filterUsersName() {
-      var _this3 = this;
+      var _this4 = this;
       return this.filterUsers.map(function (fu) {
-        return _this3.users.find(function (u) {
+        return _this4.users.find(function (u) {
           return u.id == fu;
         });
       }).filter(function (u) {
@@ -26725,9 +26749,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     filterCreatorsName: function filterCreatorsName() {
-      var _this4 = this;
+      var _this5 = this;
       return this.filterCreators.map(function (fu) {
-        return _this4.users.find(function (u) {
+        return _this5.users.find(function (u) {
           return u.id == fu;
         });
       }).filter(function (u) {
@@ -26756,7 +26780,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return user1.pivot && user2.pivot && user1.pivot.relevance_event > user2.pivot.relevance_event ? -1 : 1;
       });
     }
-  })
+  }),
+  methods: {
+    getPeriodRange: function getPeriodRange(period) {
+      var date = new Date();
+      date.setHours(0, 0, 0, 0);
+      if (period === "yesterday") {
+        date.setDate(date.getDate() - 1);
+      } else if (period === "tomorrow") {
+        date.setDate(date.getDate() + 1);
+      } else if (period === "currentWeek") {
+        date.setDate(date.getDate() - (date.getDay() + 6) % 7);
+      }
+      var formatDate = function formatDate(value) {
+        var year = value.getFullYear();
+        var month = String(value.getMonth() + 1).padStart(2, "0");
+        var day = String(value.getDate()).padStart(2, "0");
+        return "".concat(year, "-").concat(month, "-").concat(day);
+      };
+      var startedAt = formatDate(date);
+      var endedDate = new Date(date);
+      if (period === "currentWeek") {
+        endedDate.setDate(endedDate.getDate() + 6);
+      }
+      return {
+        startedAt: startedAt,
+        endedAt: formatDate(endedDate)
+      };
+    }
+  }
 });
 
 /***/ }),
@@ -81752,37 +81804,53 @@ var _hoisted_8 = {
 var _hoisted_9 = ["textContent"];
 var _hoisted_10 = ["textContent"];
 var _hoisted_11 = ["textContent"];
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = ["textContent"];
+var _hoisted_12 = {
+  value: ""
+};
+var _hoisted_13 = {
+  value: "today"
+};
+var _hoisted_14 = {
+  value: "yesterday"
+};
+var _hoisted_15 = {
+  value: "tomorrow"
+};
+var _hoisted_16 = {
+  value: "currentWeek"
+};
 var _hoisted_17 = ["textContent"];
 var _hoisted_18 = ["textContent"];
-var _hoisted_19 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%",
-    "position": "relative"
-  }
-};
+var _hoisted_19 = ["textContent"];
 var _hoisted_20 = ["textContent"];
-var _hoisted_21 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%",
-    "position": "relative"
-  }
-};
+var _hoisted_21 = ["textContent"];
 var _hoisted_22 = ["textContent"];
-var _hoisted_23 = {
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = ["textContent"];
+var _hoisted_25 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_24 = ["textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%",
+    "position": "relative"
+  }
+};
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%",
+    "position": "relative"
+  }
+};
+var _hoisted_30 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
@@ -81897,6 +81965,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               })];
             }),
             _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Filter by date period "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            tag: "label"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-calendar-day"
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                "class": "hc-item-main-content",
+                textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.period'))
+              }, null, 8 /* PROPS */, _hoisted_11), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+                "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+                  return $options.filterPeriod = $event;
+                }),
+                "class": "hc-prospect-filter-event-item-period"
+              }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.period_placeholder')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.today')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_14, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.yesterday')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.tomorrow')), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", _hoisted_16, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.current_week')), 1 /* TEXT */)], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.filterPeriod]])];
+            }),
+            _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" After date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
             tag: "label"
           }, {
@@ -81906,9 +81991,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.after'))
-              }, null, 8 /* PROPS */, _hoisted_11), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+              }, null, 8 /* PROPS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                 type: "date",
-                "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+                "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
                   return $options.filterStartedAt = $event;
                 }),
                 "class": "hc-prospect-filter-event-item-date"
@@ -81916,7 +82001,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 key: 0,
                 tag: "a",
                 "class": "fa fa-times",
-                onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                   return $options.filterStartedAt = null;
                 }, ["prevent", "stop"]))
               })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
@@ -81934,9 +82019,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.before'))
-              }, null, 8 /* PROPS */, _hoisted_12), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+              }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                 type: "date",
-                "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+                "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
                   return $options.filterEndedAt = $event;
                 }),
                 "class": "hc-prospect-filter-event-item-date"
@@ -81944,7 +82029,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 key: 0,
                 tag: "a",
                 "class": "fa fa-times",
-                onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                   return $options.filterEndedAt = null;
                 }, ["prevent", "stop"]))
               })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
@@ -81962,9 +82047,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.future'))
-              }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterComing,
-                "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
                   return $options.filterComing = $event;
                 }),
                 style: {
@@ -81982,9 +82067,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.old'))
-              }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotComing,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
                   return $options.filterNotComing = $event;
                 }),
                 style: {
@@ -82002,9 +82087,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterConfirmed,
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                   return $options.filterConfirmed = $event;
                 }),
                 style: {
@@ -82022,9 +82107,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotConfirmed,
-                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
                   return $options.filterNotConfirmed = $event;
                 }),
                 style: {
@@ -82042,9 +82127,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.done'))
-              }, null, 8 /* PROPS */, _hoisted_17), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterDone,
-                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
                   return $options.filterDone = $event;
                 }),
                 style: {
@@ -82062,9 +82147,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_done'))
-              }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotDone,
-                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+                "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
                   return $options.filterNotDone = $event;
                 }),
                 style: {
@@ -82085,8 +82170,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "hc-flex-1"
       }, {
         "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[15] || (_cache[15] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[16] || (_cache[16] = function ($event) {
               return $data.tab = 0;
             }),
             "class": "bordered"
@@ -82097,12 +82182,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.select_calendars'))
-              }, null, 8 /* PROPS */, _hoisted_20)];
+              }, null, 8 /* PROPS */, _hoisted_26)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.calendarKeyword,
-            "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+            "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
               return $data.calendarKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82118,7 +82203,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: calendar.id,
                   calendar: calendar,
                   modelValue: $options.filterCalendars,
-                  "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+                  "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
                     return $options.filterCalendars = $event;
                   })
                 }, null, 8 /* PROPS */, ["calendar", "modelValue"]);
@@ -82130,8 +82215,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[18] || (_cache[18] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[19] || (_cache[19] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -82144,12 +82229,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.affected_to'))
-              }, null, 8 /* PROPS */, _hoisted_22)];
+              }, null, 8 /* PROPS */, _hoisted_28)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
+            "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82165,7 +82250,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterUsers,
-                  "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+                  "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
                     return $options.filterUsers = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);
@@ -82177,8 +82262,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[21] || (_cache[21] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[22] || (_cache[22] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -82191,12 +82276,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.created_by'))
-              }, null, 8 /* PROPS */, _hoisted_24)];
+              }, null, 8 /* PROPS */, _hoisted_30)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
+            "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82212,7 +82297,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterCreators,
-                  "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+                  "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
                     return $options.filterCreators = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);
@@ -117936,7 +118021,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-filter-event-item {\n    padding: 3px 0 !important;\n    align-items: start;\n}\n.hc-prospect-filter-event-item-title {\n    color: #000000;\n}\n.hc-prospect-filter-event-item-value {\n    color: #000000;\n    font-size: 11px;\n    opacity: 0.7;\n}\n.hc-prospect-filter-event-item-date {\n    width: 90px;\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    padding: 0 0 0 5px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-filter-event-item {\n    padding: 3px 0 !important;\n    align-items: start;\n}\n.hc-prospect-filter-event-item-title {\n    color: #000000;\n}\n.hc-prospect-filter-event-item-value {\n    color: #000000;\n    font-size: 11px;\n    opacity: 0.7;\n}\n.hc-prospect-filter-event-item-date {\n    width: 90px;\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    padding: 0 0 0 5px;\n}\n.hc-prospect-filter-event-item-period {\n    width: 135px;\n    border: 1px solid #ccc;\n    border-radius: 3px;\n    padding: 3px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
