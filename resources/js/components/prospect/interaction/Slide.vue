@@ -132,6 +132,10 @@
                         :prospect-interactions="prospectInteractions"
                         :adding-history="addingHistory"
                         :can-add="can('all.prospect.interaction.add')"
+                        :cloudtalk-configured="!!cloudtalkLine"
+                        :kavkom-configured="!!kavkomLine"
+                        :project-slug="project.slug"
+                        :user-id="user && user.id"
                         @edit-phone="(tab = 1), (frameTab = 3)"
                         @edit-mobile="(tab = 1), (frameTab = 4)"
                         @call-telephone="interactionViaTelephone"
@@ -2414,6 +2418,15 @@ export default {
             return this.lines.find(
                 (line) =>
                     line.operator === "cloudtalk" &&
+                    this.user &&
+                    line.user_id == this.user.id
+            );
+        },
+
+        kavkomLine() {
+            return this.lines.find(
+                (line) =>
+                    line.operator === "kavkom" &&
                     this.user &&
                     line.user_id == this.user.id
             );
