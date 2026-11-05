@@ -5524,7 +5524,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\r\n    width: 100%;\r\n    background-color: white;\r\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\r\n    position: relative;\r\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\r\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-project-profile-bloc-header .fa-arrows {\r\n        display: none;\n}\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-project-profile-bloc {\n    width: 100%;\n    background-color: white;\n    border-radius: 10px;\n}\n.hc-project-profile-bloc-body {\n    position: relative;\n    font-size: 12px;\n}\n.hc-project-profile-bloc-header > .hc-item-main-content {\n    font-weight: bold;\n}\n@media (max-width: 767px) {\n.hc-project-profile-bloc-header .fa-arrows {\n        display: none;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5547,7 +5547,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-row-avatar {\r\n    width: 30px;\r\n    height: 30px;\r\n    flex: 0 0 30px;\r\n    border-radius: 50%;\r\n    -o-object-fit: cover;\r\n       object-fit: cover;\n}\n.hc-agent-row-detail {\r\n    color: #777;\r\n    font-size: 11px;\n}\n.hc-agent-row-autonomy {\r\n    font-size: 10px;\r\n    padding: 1px 6px;\r\n    border-radius: 8px;\r\n    background: #eee;\r\n    white-space: nowrap;\n}\n.hc-agent-row-autonomy.is-auto {\r\n    background: #fde7c8;\n}\n.hc-agent-row-autonomy.is-propose {\r\n    background: #dbeafe;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-row-avatar {\n    width: 30px;\n    height: 30px;\n    flex: 0 0 30px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.hc-agent-row-detail {\n    color: #777;\n    font-size: 11px;\n}\n.hc-agent-row-autonomy {\n    font-size: 10px;\n    padding: 1px 6px;\n    border-radius: 8px;\n    background: #eee;\n    white-space: nowrap;\n}\n.hc-agent-row-autonomy.is-auto {\n    background: #fde7c8;\n}\n.hc-agent-row-autonomy.is-propose {\n    background: #dbeafe;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
