@@ -40,7 +40,7 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
     }
-    
+
     /**
      * When user is authenticated
      */
@@ -58,7 +58,7 @@ class LoginController extends Controller
             if (!$user->two_factors_check_type || !$session) {
 
                 \Auth::logout();
-        
+
                 $request->session()->put('two_factors.user.id', $user->id);
 
                 return response()->json([
@@ -67,7 +67,9 @@ class LoginController extends Controller
 
             }
         }
-     
+
+        \App\Services\LoginLocationCheck::check($user, $request->ip());
+
         return response()->json(['message' => 'Login successful'], 200);
     }
 
