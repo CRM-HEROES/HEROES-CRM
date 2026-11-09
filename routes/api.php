@@ -209,6 +209,12 @@ Route::controller(RegisterController::class)->group(function(){
 // Google Auth
 Route::post('/google/auth/login', [App\Http\Controllers\API\Google\AuthController::class, 'login'])->name('google.auth.login');
 
+// Localisation : liens de l'email "est-ce vous ?" (liens signés, donc infalsifiables)
+Route::get('/login-location/{id}/confirm', [\App\Http\Controllers\API\LoginLocationController::class, 'confirm'])
+    ->middleware('signed')->name('login-location.confirm');
+Route::get('/login-location/{id}/deny', [\App\Http\Controllers\API\LoginLocationController::class, 'deny'])
+    ->middleware('signed')->name('login-location.deny');
+
 // Two factors
 Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class, 'login']);
 
@@ -322,6 +328,8 @@ Route::group([
     Route::post('/google/authenticator/activate', [GoogleAuthenticatorController::class, 'activate'])->name('google.authenticator.activate');
     Route::post('/google/authenticator/deactivate', [GoogleAuthenticatorController::class, 'deactivate'])->name('google.authenticator.deactivate');
     Route::get('/google/authenticator/check', [GoogleAuthenticatorController::class, 'check'])->name('google.authenticator.check');
+    Route::get('/login-location/pending', [\App\Http\Controllers\API\LoginLocationController::class, 'pending']);
+Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocationController::class, 'report']);
 
     // Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');

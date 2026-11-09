@@ -1,6 +1,7 @@
 <template>
     <div id="hc-main-layout" @keydown="keydown">
         <layout-header />
+        <login-location-banner />
         <div id="hc-main-layout-body">
             <router-view></router-view>
         </div>
@@ -254,13 +255,13 @@
 import "dayjs/locale/en";
 import "dayjs/locale/fr";
 
-import { mapActions, mapGetters } from "vuex";
 import store from "@/store";
+import { mapActions, mapGetters } from "vuex";
 
 // Actions
-import { FETCH_PERMISSIONS } from "@/actions/permission";
 import { CLOSE_MODALS } from "@/actions/modal";
-import { CLOSE_SLIDES, OPEN_SLIDE } from "@/actions/slide";
+import { FETCH_PERMISSIONS } from "@/actions/permission";
+import { CLOSE_SLIDES } from "@/actions/slide";
 
 import EventReminder from "@/components/event/Reminder.vue";
 
@@ -278,13 +279,13 @@ import ManageProspectGroupsSlide from "@/components/prospect/group/Slide.vue";
 import ManageProspectInteractionsSlide from "@/components/prospect/interaction/Slide.vue";
 import ManageProspectLabelsSlide from "@/components/prospect/label/Slide.vue";
 import ManageProspectLogsSlide from "@/components/prospect/log/Slide.vue";
-import ProspectWorkflowsSlide from "@/components/workflow/ProspectWorkflowsSlide.vue";
 import ManageProspectMessagesSlide from "@/components/prospect/message/Slide.vue";
 import ManageProspectOrdersSlide from "@/components/prospect/order/Slide.vue";
 import ManageProspectQuestionnairesSlide from "@/components/prospect/questionnaire/Slide.vue";
 import ManageProspectRevisionsSlide from "@/components/prospect/revision/Slide.vue";
 import ManageProspectSmsSlide from "@/components/prospect/sms/Slide.vue";
 import ManageProspectUsersSlide from "@/components/prospect/user/Slide.vue";
+import ProspectWorkflowsSlide from "@/components/workflow/ProspectWorkflowsSlide.vue";
 
 import ManageLocaleSlide from "@/components/locale/Slide.vue";
 import ManageTutorialSlide from "@/components/tutorial/Slide.vue";
@@ -293,35 +294,35 @@ import ManageUserActionsSlide from "@/components/user/action/Slide.vue";
 import ManageUserCalendarsSlide from "@/components/user/calendar/Slide.vue";
 import ManageUserCategoriesSlide from "@/components/user/category/Slide.vue";
 import ManageUserDocumentsSlide from "@/components/user/document/Slide.vue";
-import ManageUserPhoneCountryCodesSlide from "@/components/user/phone-country-codes/Slide.vue";
 import ManageUserDuplicateSlide from "@/components/user/duplicate/Slide.vue";
 import ManageUserFilesSlide from "@/components/user/file/Slide.vue";
 import ManageUserFoldersSlide from "@/components/user/folder/Slide.vue";
 import ManageUserGroupsSlide from "@/components/user/group/Slide.vue";
+import ManageUsersSlide from "@/components/user/list/Slide.vue";
 import ManageUserMenusSlide from "@/components/user/menu/Slide.vue";
 import ManageUserOrderActionsSlide from "@/components/user/order-action/Slide.vue";
 import ManageUserOrderStepsSlide from "@/components/user/order-step/Slide.vue";
 import ManageUserPermissionsSlide from "@/components/user/permission/Slide.vue";
+import ManageUserPhoneCountryCodesSlide from "@/components/user/phone-country-codes/Slide.vue";
 import ManageUserQuestionnairesSlide from "@/components/user/questionnaire/Slide.vue";
 import ManageUserRolesSlide from "@/components/user/role/Slide.vue";
 import ManageUserSessionsSlide from "@/components/user/session/Slide.vue";
 import ManageUserThreadsSlide from "@/components/user/thread/Slide.vue";
 import ManageUserUsersSlide from "@/components/user/user/Slide.vue";
 import ManageUserVehiclesSlide from "@/components/user/vehicle/list/Slide.vue";
-import ManageUsersSlide from "@/components/user/list/Slide.vue";
 
 import ManageRoleCalendarsSlide from "@/components/role/calendar/Slide.vue";
 import ManageRoleCategoriesSlide from "@/components/role/category/Slide.vue";
 import ManageRoleDocumentsSlide from "@/components/role/document/Slide.vue";
 import ManageRoleDuplicateSlide from "@/components/role/duplicate/Slide.vue";
 import ManageRoleFoldersSlide from "@/components/role/folder/Slide.vue";
+import ManageRolesSlide from "@/components/role/list/Slide.vue";
 import ManageRoleOrderActionsSlide from "@/components/role/order-action/Slide.vue";
 import ManageRoleOrderStepsSlide from "@/components/role/order-step/Slide.vue";
 import ManageRolePermissionsSlide from "@/components/role/permission/Slide.vue";
 import ManageRoleQuestionnairesSlide from "@/components/role/questionnaire/Slide.vue";
 import ManageRoleThreadsSlide from "@/components/role/thread/Slide.vue";
 import ManageRoleUsersSlide from "@/components/role/user/Slide.vue";
-import ManageRolesSlide from "@/components/role/list/Slide.vue";
 
 import AddCalendarModal from "@/components/calendar/add/Modal.vue";
 import AddCategoryModal from "@/components/category/add/Modal.vue";
@@ -341,10 +342,10 @@ import AddOrderStepModal from "@/components/order/step/add/Modal.vue";
 import AddPipelineModal from "@/components/pipeline/add/Modal.vue";
 import AddProductModal from "@/components/product/add/Modal.vue";
 import AddProspectLinkModal from "@/components/prospect/link/add/Modal.vue";
+import AddQuestionnaireOptionModal from "@/components/questionnaire/option/add/Modal.vue";
+import AddQuestionnaireQuestionModal from "@/components/questionnaire/question/add/Modal.vue";
 import AddQuestionnaireModal from "@/components/questionnaire/questionnaire/add/Modal.vue";
 import AddQuestionnaireSectionModal from "@/components/questionnaire/section/add/Modal.vue";
-import AddQuestionnaireQuestionModal from "@/components/questionnaire/question/add/Modal.vue";
-import AddQuestionnaireOptionModal from "@/components/questionnaire/option/add/Modal.vue";
 import AddRoleModal from "@/components/role/add/Modal.vue";
 import AddSmsTemplateModal from "@/components/sms-template/add/Modal.vue";
 import AddThreadModal from "@/components/thread/add/Modal.vue";
@@ -380,58 +381,60 @@ import UpdateOrderStepModal from "@/components/order/step/update/Modal.vue";
 import UpdatePipelineModal from "@/components/pipeline/update/Modal.vue";
 import UpdateProductModal from "@/components/product/update/Modal.vue";
 import UpdateProspectLinkModal from "@/components/prospect/link/update/Modal.vue";
+import UpdateQuestionnaireOptionModal from "@/components/questionnaire/option/update/Modal.vue";
+import UpdateQuestionnaireQuestionModal from "@/components/questionnaire/question/update/Modal.vue";
 import UpdateQuestionnaireModal from "@/components/questionnaire/questionnaire/update/Modal.vue";
 import UpdateQuestionnaireSectionModal from "@/components/questionnaire/section/update/Modal.vue";
-import UpdateQuestionnaireQuestionModal from "@/components/questionnaire/question/update/Modal.vue";
-import UpdateQuestionnaireOptionModal from "@/components/questionnaire/option/update/Modal.vue";
 import UpdateRoleModal from "@/components/role/update/Modal.vue";
 import UpdateSmsTemplateModal from "@/components/sms-template/update/Modal.vue";
 import UpdateThreadModal from "@/components/thread/update/Modal.vue";
 
 import ExportModal from "@/components/prospect/table/modals/export/Modal.vue";
 
+import FilterProspectAllSlide from "@/components/prospect/filters/all/Slide.vue";
+import FilterProspectCreatedSlide from "@/components/prospect/filters/created/Slide.vue";
+import FilterProspectCreatorSlide from "@/components/prospect/filters/creator/Slide.vue";
 import FilterProspectEventSlide from "@/components/prospect/filters/event/Slide.vue";
 import FilterProspectFieldSlide from "@/components/prospect/filters/field/Slide.vue";
 import FilterProspectFileSlide from "@/components/prospect/filters/file/Slide.vue";
-import FilterProspectCreatedSlide from "@/components/prospect/filters/created/Slide.vue";
-import FilterProspectCreatorSlide from "@/components/prospect/filters/creator/Slide.vue";
 import FilterProspectGroupSlide from "@/components/prospect/filters/group/Slide.vue";
 import FilterProspectImportSlide from "@/components/prospect/filters/import/Slide.vue";
 import FilterProspectInteractionSlide from "@/components/prospect/filters/interaction/Slide.vue";
 import FilterProspectLabelSlide from "@/components/prospect/filters/label/Slide.vue";
 import FilterProspectMessageSlide from "@/components/prospect/filters/message/Slide.vue";
 import FilterProspectOrderSlide from "@/components/prospect/filters/order/Slide.vue";
-import FilterProspectThreadSlide from "@/components/prospect/filters/thread/Slide.vue";
 import FilterProspectPipedriveAccountSlide from "@/components/prospect/filters/pipedrive-account/Slide.vue";
 import FilterProspectSmsSlide from "@/components/prospect/filters/sms/Slide.vue";
+import FilterProspectThreadSlide from "@/components/prospect/filters/thread/Slide.vue";
 import FilterProspectUserSlide from "@/components/prospect/filters/user/Slide.vue";
-import FilterProspectAllSlide from "@/components/prospect/filters/all/Slide.vue";
 
+import ManageProspectBulkFieldModal from "@/components/prospect/bulk/field/Modal.vue";
 import ManageProspectBulkGroupsModal from "@/components/prospect/bulk/group/Modal.vue";
 import ManageProspectBulkLabelsModal from "@/components/prospect/bulk/label/Modal.vue";
-import ManageProspectBulkUsersModal from "@/components/prospect/bulk/user/Modal.vue";
-import ManageProspectBulkFieldModal from "@/components/prospect/bulk/field/Modal.vue";
 import ManageProspectBulkProjectModal from "@/components/prospect/bulk/project/Modal.vue";
+import ManageProspectBulkUsersModal from "@/components/prospect/bulk/user/Modal.vue";
 
-import SettingCloudtalkModal from "@/components/settings/Cloudtalk.vue";
-import SettingEmailModal from "@/components/settings/Email.vue";
+import AgentFormModal from "@/components/agent/FormModal.vue";
 import ProspectEmailModal from "@/components/prospect/email/Modal.vue";
-import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
-import SettingRingoverModal from "@/components/settings/Ringover.vue";
-import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
-import SettingMTargetModal from "@/components/settings/MTarget.vue";
-import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
 import SettingBrevoModal from "@/components/settings/Brevo.vue";
 import SettingClaudeModal from "@/components/settings/Claude.vue";
-import AgentFormModal from "@/components/agent/FormModal.vue";
+import SettingCloudtalkModal from "@/components/settings/Cloudtalk.vue";
+import SettingEmailModal from "@/components/settings/Email.vue";
+import SettingMTargetModal from "@/components/settings/MTarget.vue";
+import SettingPipedriveModal from "@/components/settings/Pipedrive.vue";
+import SettingRingoverModal from "@/components/settings/Ringover.vue";
+import SettingSmsboxModal from "@/components/settings/Smsbox.vue";
+import SettingUltramsgModal from "@/components/settings/Ultramsg.vue";
 
 import MenuIconSlide from "@/components/menu-icon/Slide.vue";
 import TrashSlide from "@/components/trash/Slide.vue";
 
 import ApiPappersSlide from "@/components/api/pappers/Slide.vue";
 
-import LayoutHeader from "./Header.vue";
 import LayoutFooter from "./Footer.vue";
+import LayoutHeader from "./Header.vue";
+
+import LoginLocationBanner from "@/components/security/LoginLocationBanner.vue";
 
 import Confirm from "@/components/Confirm.vue";
 
@@ -441,6 +444,8 @@ export default {
     components: {
         LayoutHeader,
         LayoutFooter,
+
+        LoginLocationBanner,
 
         EventReminder,
 

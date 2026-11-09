@@ -21,13 +21,13 @@ class AuthenticatorController extends Controller
         $secret = $google2FA->generateSecretKey();
         // $secret = strtoupper(Base32::encode(random_bytes(10)));
         $user = auth()->user();
- 
+
         session()->forget(['two_factors.secret', 'two_factors.user.id']);
         session([
-            'two_factors.secret' => \Crypt::encrypt($secret), 
+            'two_factors.secret' => \Crypt::encrypt($secret),
             'two_factors.user.id' => auth()->id()
         ]);
- 
+
         //generate image for QR barcode
         $QRCode = $google2FA->getQRCodeInline(
             config('app.name'),
@@ -35,7 +35,7 @@ class AuthenticatorController extends Controller
             $secret,
             200
         );
- 
+
         return [
             'qrcode' => $QRCode,
             'secret' => $secret,
@@ -43,7 +43,7 @@ class AuthenticatorController extends Controller
             'encryt2' => \Crypt::encrypt($secret)
         ];
     }
-    
+
     /**
      * Activate two factors authentication.
      */
@@ -58,22 +58,22 @@ class AuthenticatorController extends Controller
             "message" => "Two factors authentication successfully activated."
         ];
     }
-    
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function deactivate()
     {
         $user = auth()->user();
- 
+
         $user->two_factors_secret = null;
         $user->save();
- 
+
         return [
             "message" => "Two factors authentication successfully deactivated."
         ];
     }
- 
+
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -82,7 +82,7 @@ class AuthenticatorController extends Controller
         $user = auth()->user();
         return $user->two_factors_secret ? 1 : 0;
     }
- 
+
     /**
      * Validate code from two factors authentication.
      */
@@ -92,7 +92,9 @@ class AuthenticatorController extends Controller
             $user = User::findOrFail($request->session()->pull('two_factors.user.id'));
             $token = $user->createToken('HeroesCRM')->plainTextToken;
             \Auth::login($user);
-            
+
+            \App\Services\LoginLocationCheck::check($user, $request->ip());
+
             return $token;
         } catch (\Exception $e) {
             return response()->json(['message' => 'User not found'], 404);
