@@ -171,3 +171,12 @@ php artisan queue:work --queue=imports --tries=1 --timeout=3600
 php artisan queue:work --queue=workflows,default
 
 ````
+
+### Tinker
+```sh
+php artisan tinker
+````
+
+```sh
+\App\Models\User::where('email','tonny.andritina@gmail.com')->update(['role'=>'super_admin']);
+````
