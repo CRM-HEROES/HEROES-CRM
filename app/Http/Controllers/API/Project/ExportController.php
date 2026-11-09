@@ -13,6 +13,7 @@ use App\Models\GoogleAccount;
 use App\Models\Project;
 use App\Models\UserSetting;
 use App\Utils\ProjectSetting;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -41,7 +42,15 @@ class ExportController extends Controller
             'filters' => ['sometimes', 'json'],
             'email' => ['exclude_unless:mode,email', 'required', 'email', 'max:255'],
             'sheet_name' => ['exclude_unless:mode,sheet', 'nullable', 'string', 'max:150'],
+            'schedule' => ['sometimes', 'boolean'],
+            'scheduled_at' => [$request->boolean('schedule') ? 'required' : 'nullable', 'date', 'after:now'],
         ]);
+
+        if ($request->boolean('schedule') && !in_array($request->input('mode'), ['email', 'sheet'], true)) {
+            throw ValidationException::withMessages([
+                'mode' => 'La planification est disponible uniquement pour un envoi par email ou Google Sheets.',
+            ]);
+        }
 
         $sheetAccount = null;
         if ($request->input('mode') === 'sheet') {
@@ -56,21 +65,35 @@ class ExportController extends Controller
         }
 
         $fields = $this->getFields($request, $project);
+        $filters = json_decode($request->input('filters', '{}'));
+        $filtersForMode = json_decode($request->input('filters', '{}'), true);
+        // Keep the existing behavior for callers that do not specify a mode.
+        $mode = $request->input('mode', empty($filtersForMode) ? 'email' : 'download');
+        $scheduledAt = $request->boolean('schedule')
+            ? Carbon::parse($request->input('scheduled_at'))->utc()
+            : null;
 
         // Before exporting
         // Add trace into the DB
         $export = $project->exports()->create([
-            'filters' => json_decode($request->input('filters', '{}')),
+            'filters' => $filters,
             'fields' => $fields,
             'sort_by' => $request->input('sort_by', 'id'),
             'sort_order' => $request->input('sort_order', 'desc'),
             'count' => $request->input('count', 0),
             'email' => $request->input('email', auth()->user()->email),
+            'mode' => $mode,
+            'sheet_name' => $request->input('sheet_name'),
+            'scheduled_at' => $scheduledAt,
             'creator_id' => auth()->id(),
         ]);
-        
-        // Keep the existing behavior for callers that do not specify a mode.
-        $mode = $request->input('mode', empty($export->filters) ? 'email' : 'download');
+
+        if ($scheduledAt) {
+            return response()->json([
+                'message' => 'Votre export a été planifié pour le',
+                'scheduled_at' => $scheduledAt->toIso8601String(),
+            ], 202);
+        }
 
         if ($mode === 'sheet') {
             $title = trim((string) $request->input('sheet_name'));
@@ -118,6 +141,13 @@ class ExportController extends Controller
     {
         // Export associated to the current project
         abort_unless($project->id == $export->project_id, 404);
+
+        if ($export->scheduled_at && !$export->scheduled_dispatched_at) {
+            abort(409, 'Cet export est planifié et sera lancé à la date prévue.');
+        }
+        if ($export->scheduled_at && $export->mode === 'email') {
+            abort(409, 'Cet export a déjà été envoyé par email.');
+        }
 
         $status = app(ProspectDownload::class)->status($export);
         if (($status['mode'] ?? null) === 'sheet') {

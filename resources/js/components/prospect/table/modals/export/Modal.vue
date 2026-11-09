@@ -14,8 +14,33 @@
                     <select v-model="prospectExport.mode" :disabled="exporting">
                         <option value="email">Envoi par email</option>
                         <option value="sheet">Google Sheets</option>
-                        <option value="download">Télécharger</option>
+                        <option value="download" :disabled="prospectExport.scheduled">Télécharger</option>
                     </select>
+                </v-field>
+                <label
+                    v-if="prospectExport.mode === 'email' || prospectExport.mode === 'sheet'"
+                    class="hc-prospect-export-schedule"
+                >
+                    <input
+                        v-model="prospectExport.scheduled"
+                        type="checkbox"
+                        :disabled="exporting"
+                    />
+                    <span>Planifier l’exportation</span>
+                </label>
+                <v-field
+                    v-if="prospectExport.scheduled"
+                    label="Date et heure de l’exportation"
+                    required
+                >
+                    <input
+                        v-model="prospectExport.scheduled_at"
+                        type="datetime-local"
+                        :min="minimumScheduledAt()"
+                        required
+                        :disabled="exporting"
+                    />
+                    <small>Heure locale de votre navigateur.</small>
                 </v-field>
                 <template v-if="prospectExport.mode === 'sheet'">
                     <v-field label="Nom du Google Sheet">
@@ -130,6 +155,20 @@
     min-height: 0;
 }
 
+.hc-prospect-export-schedule {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.hc-prospect-export-schedule > input {
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    margin: 0;
+}
+
 .hc-prospect-export-columns {
     border: none;
     flex-shrink: 0;
@@ -210,6 +249,8 @@ export default {
                 count: 0,
                 fields: [],
                 sheet_name: "",
+                scheduled: false,
+                scheduled_at: "",
             },
         };
     },
@@ -228,6 +269,10 @@ export default {
         "prospectExport.mode"(mode) {
             this.sheetUrl = "";
             this.exportMessage = "";
+            if (mode === "download") {
+                this.prospectExport.scheduled = false;
+                this.prospectExport.scheduled_at = "";
+            }
             if (mode === "sheet") return this.loadSheetConfiguration();
         },
     },
@@ -236,6 +281,8 @@ export default {
         resetExportFields() {
             this.sheetUrl = "";
             this.exportMessage = "";
+            this.prospectExport.scheduled = false;
+            this.prospectExport.scheduled_at = "";
             const visibleKeys = new Set(
                 this.projectUserSettingsProspectsTable
                     .filter((column) => !column.hidden)
@@ -251,6 +298,14 @@ export default {
 
         selectAllExportFields() {
             this.prospectExport.fields = this.exportColumns.map((column) => column.key);
+        },
+
+        minimumScheduledAt() {
+            const now = new Date();
+            now.setSeconds(0, 0);
+            now.setMinutes(now.getMinutes() + 1);
+            const localNow = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+            return localNow.toISOString().slice(0, 16);
         },
 
         async loadSheetConfiguration() {
@@ -307,6 +362,11 @@ export default {
                     filters: JSON.stringify(this.prospectsParams || {}),
                 };
 
+                if (this.prospectExport.scheduled) {
+                    params.schedule = 1;
+                    params.scheduled_at = new Date(this.prospectExport.scheduled_at).toISOString();
+                }
+
                 if (byEmail) {
                     params.email = this.prospectExport.email;
                 } else if (bySheet && this.prospectExport.sheet_name) {
@@ -318,6 +378,13 @@ export default {
                     { params, responseType: "json" }
                 );
                 if (!this.exporting) return;
+
+                if (this.prospectExport.scheduled) {
+                    const scheduledTime = new Date(this.prospectExport.scheduled_at).toLocaleString();
+                    flashInfo(`${response.data.message} ${scheduledTime}`);
+                    store.commit(CLOSE_MODAL);
+                    return;
+                }
 
                 if (byEmail) {
                     flashInfo(response.data.message);
@@ -393,6 +460,7 @@ export default {
     computed: {
         exportDisabled() {
             return this.exporting || !this.selectedExportFields.length || (
+                (this.prospectExport.scheduled && !this.prospectExport.scheduled_at) ||
                 this.prospectExport.mode === "sheet" && (
                     this.sheetConfigurationLoading || !!this.sheetConfigurationError || !this.sheetConfiguration?.connected
                 )
@@ -400,6 +468,7 @@ export default {
         },
 
         exportButtonLabel() {
+            if (this.prospectExport.scheduled) return "Planifier l’exportation";
             if (this.prospectExport.mode === "sheet") return "Créer le Google Sheet";
             return this.prospectExport.mode === "email" ? "Envoyer par email" : "Télécharger";
         },
