@@ -324,6 +324,8 @@ class ProspectController extends Controller
             'replace' => 'nullable|string',
             'mode' => 'required|in:preview,replace',
             'case_sensitive' => 'nullable|boolean',
+            'prospect_ids' => 'sometimes|array|min:1|max:10',
+            'prospect_ids.*' => 'required|integer|distinct',
         ]);
 
         $meta = Str::startsWith($request->input('field'), 'meta->');
@@ -334,6 +336,20 @@ class ProspectController extends Controller
         }
 
         $search = $request->input('search');
+        $numericSearch = false;
+        if (preg_match('/^\+?[\d\s().-]+$/u', $search)) {
+            $normalizedSearch = preg_replace('/\s+/u', '', $search);
+            if ($normalizedSearch !== '') {
+                $search = $normalizedSearch;
+                $numericSearch = true;
+            }
+        }
+        $numericSearchPattern = $numericSearch
+            ? implode('\s*', array_map(
+                fn ($character) => preg_quote($character, '/'),
+                preg_split('//u', $search, -1, PREG_SPLIT_NO_EMPTY)
+            ))
+            : null;
         $replace = (string) $request->input('replace', '');
         $caseSensitive = $request->boolean('case_sensitive');
         $replacing = $request->input('mode') === 'replace';
@@ -342,11 +358,14 @@ class ProspectController extends Controller
         $prospectsCount = 0;
         $samples = [];
 
-        $project
-            ->prospects()
-            ->filter($filters)
-            ->chunkById(200, function ($prospects) use (
-                $meta, $slug, $search, $replace, $caseSensitive, $replacing,
+        $prospectsQuery = $project->prospects()->filter($filters);
+
+        if ($request->has('prospect_ids')) {
+            $prospectsQuery->whereIn('id', $request->input('prospect_ids'));
+        }
+
+        $prospectsQuery->chunkById(200, function ($prospects) use (
+                $meta, $slug, $search, $replace, $caseSensitive, $replacing, $numericSearchPattern,
                 &$matches, &$prospectsCount, &$samples
             ) {
                 foreach ($prospects as $prospect) {
@@ -356,9 +375,13 @@ class ProspectController extends Controller
                         continue;
                     }
 
-                    $occurrences = $caseSensitive
-                        ? substr_count($current, $search)
-                        : substr_count(mb_strtolower($current), mb_strtolower($search));
+                    if ($numericSearchPattern !== null) {
+                        $occurrences = preg_match_all('/' . $numericSearchPattern . '/u', $current);
+                    } else {
+                        $occurrences = $caseSensitive
+                            ? substr_count($current, $search)
+                            : substr_count(mb_strtolower($current), mb_strtolower($search));
+                    }
 
                     if ($occurrences === 0) {
                         continue;
@@ -367,9 +390,17 @@ class ProspectController extends Controller
                     $matches += $occurrences;
                     $prospectsCount++;
 
-                    $new = $caseSensitive
-                        ? Str::replace($search, $replace, $current)
-                        : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
+                    if ($numericSearchPattern !== null) {
+                        $new = preg_replace_callback(
+                            '/' . $numericSearchPattern . '/u',
+                            fn () => $replace,
+                            $current
+                        );
+                    } else {
+                        $new = $caseSensitive
+                            ? Str::replace($search, $replace, $current)
+                            : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
+                    }
 
                     if (count($samples) < 10) {
                         $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];

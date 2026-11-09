@@ -9028,6 +9028,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       replace: "",
       caseSensitive: false,
       result: null,
+      selectedSamples: [],
       confirming: false,
       loading: false,
       error: null
@@ -9037,6 +9038,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     this.$refs.search.focus();
   },
   methods: {
+    resetResult: function resetResult() {
+      this.result = null;
+      this.selectedSamples = [];
+    },
     run: function run(mode) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
@@ -9054,28 +9059,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 case_sensitive: _this.caseSensitive,
                 mode: mode
               };
+              if (mode === "replace" && _this.selectedSamples.length) {
+                params.prospect_ids = _this.selectedSamples;
+              }
               if (_this.hasFilters) {
                 params.filters = JSON.stringify(_this.prospectsParams);
               }
-              _context.next = 7;
+              _context.next = 8;
               return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_1__["default"].findReplace(_this.project.slug, params);
-            case 7:
+            case 8:
               _yield$ProspectServic = _context.sent;
               data = _yield$ProspectServic.data;
               return _context.abrupt("return", data);
-            case 12:
-              _context.prev = 12;
+            case 13:
+              _context.prev = 13;
               _context.t0 = _context["catch"](2);
               _this.error = "Une erreur est survenue.";
-            case 15:
-              _context.prev = 15;
+            case 16:
+              _context.prev = 16;
               _this.loading = false;
-              return _context.finish(15);
-            case 18:
+              return _context.finish(16);
+            case 19:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[2, 12, 15, 18]]);
+        }, _callee, null, [[2, 13, 16, 19]]);
       }))();
     },
     find: function find() {
@@ -9090,18 +9098,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
               return _context2.abrupt("return");
             case 2:
-              _context2.next = 4;
+              _this2.result = null;
+              _this2.selectedSamples = [];
+              _context2.next = 6;
               return _this2.run("preview");
-            case 4:
+            case 6:
               _context2.t0 = _context2.sent;
               if (_context2.t0) {
-                _context2.next = 7;
+                _context2.next = 9;
                 break;
               }
               _context2.t0 = null;
-            case 7:
+            case 9:
               _this2.result = _context2.t0;
-            case 8:
+            case 10:
             case "end":
               return _context2.stop();
           }
@@ -9151,6 +9161,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.confirming = false;
     },
     caseSensitive: function caseSensitive() {
+      this.confirming = false;
+    },
+    selectedSamples: function selectedSamples() {
       this.confirming = false;
     },
     result: function result() {
@@ -15493,25 +15506,29 @@ var _hoisted_7 = ["textContent"];
 var _hoisted_8 = {
   key: 0
 };
-var _hoisted_9 = ["textContent"];
-var _hoisted_10 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_9 = {
+  "class": "hc-find-replace-sample"
+};
+var _hoisted_10 = ["value", "aria-label"];
+var _hoisted_11 = ["textContent"];
+var _hoisted_12 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "fa fa-arrow-right"
   }, null, -1 /* HOISTED */);
 });
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = {
+var _hoisted_13 = ["textContent"];
+var _hoisted_14 = ["textContent"];
+var _hoisted_15 = {
   "class": "hc-find-replace-actions"
 };
-var _hoisted_14 = ["disabled"];
-var _hoisted_15 = ["disabled"];
+var _hoisted_16 = ["disabled"];
+var _hoisted_17 = ["disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Teleport, {
     to: "body"
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-find-replace-overlay",
-    onClick: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return _ctx.$emit('close');
     }, ["self"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Rechercher et remplacer "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
@@ -15522,8 +15539,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     placeholder: "Rechercher ...",
     ref: "search",
-    onInput: _cache[1] || (_cache[1] = function ($event) {
-      return $data.result = null;
+    onInput: _cache[1] || (_cache[1] = function () {
+      return $options.resetResult && $options.resetResult.apply($options, arguments);
     }),
     onKeyup: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.find && $options.find.apply($options, arguments);
@@ -15541,8 +15558,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
       return $data.caseSensitive = $event;
     }),
-    onChange: _cache[6] || (_cache[6] = function ($event) {
-      return $data.result = null;
+    onChange: _cache[6] || (_cache[6] = function () {
+      return $options.resetResult && $options.resetResult.apply($options, arguments);
     })
   }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.caseSensitive]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Respecter la casse ")]), $data.result ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [$data.result.matches == 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_5, "Aucun résultat trouvé.")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
@@ -15553,38 +15570,51 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" prospect(s) "), $options.hasFilters ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_8, "(filtres actuels)")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ul", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.result.samples, function (s) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
       key: s.id
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("del", {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+        return $data.selectedSamples = $event;
+      }),
+      type: "checkbox",
+      value: s.id,
+      "aria-label": 'Remplacer dans le prospect ' + s.id
+    }, null, 8 /* PROPS */, _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.selectedSamples]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("del", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(s.before)
-    }, null, 8 /* PROPS */, _hoisted_9), _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ins", {
+    }, null, 8 /* PROPS */, _hoisted_11), _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ins", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(s.after)
-    }, null, 8 /* PROPS */, _hoisted_11)]);
+    }, null, 8 /* PROPS */, _hoisted_13)])]);
   }), 128 /* KEYED_FRAGMENT */))])], 64 /* STABLE_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 1,
     "class": "hc-find-replace-error",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.error)
-  }, null, 8 /* PROPS */, _hoisted_12)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[7] || (_cache[7] = function ($event) {
+    onClick: _cache[8] || (_cache[8] = function ($event) {
       return _ctx.$emit('close');
     })
   }, " Annuler "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     disabled: !$data.search || $data.loading,
-    onClick: _cache[8] || (_cache[8] = function () {
+    onClick: _cache[9] || (_cache[9] = function () {
       return $options.find && $options.find.apply($options, arguments);
     })
-  }, " Rechercher ", 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Rechercher ", 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "primary",
     disabled: !$data.result || $data.result.matches == 0 || $data.loading,
-    onClick: _cache[9] || (_cache[9] = function () {
+    onClick: _cache[10] || (_cache[10] = function () {
       return $options.apply && $options.apply.apply($options, arguments);
     })
   }, [$data.confirming ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Confirmer (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.result.matches) + ") ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, [$data.selectedSamples.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Confirmer (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedSamples.length) + " prospect(s)) ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 1
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tout remplacer")], 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_15)])])])]);
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Confirmer (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.result.matches) + ") ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : $data.selectedSamples.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Remplacer la sélection (" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.selectedSamples.length) + ") ", 1 /* TEXT */)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 2
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Tout remplacer")], 64 /* STABLE_FRAGMENT */))], 8 /* PROPS */, _hoisted_17)])])])]);
 }
 
 /***/ }),
@@ -17673,7 +17703,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-find-replace-overlay[data-v-c7933d96] {\n    position: fixed;\n    inset: 0;\n    z-index: 10000;\n    background: #0004;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n.hc-find-replace[data-v-c7933d96] {\n    background: white;\n    color: #222;\n    border-radius: 6px;\n    padding: 16px;\n    width: 420px;\n    max-width: 95vw;\n    box-shadow: 0 8px 30px #0005;\n}\n.hc-find-replace h4[data-v-c7933d96] {\n    margin: 0 0 12px;\n}\n.hc-find-replace h4 small[data-v-c7933d96] {\n    color: #777;\n    font-weight: normal;\n}\n.hc-find-replace > input[data-v-c7933d96] {\n    display: block;\n    width: 100%;\n    margin-bottom: 8px;\n    padding: 6px 8px;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n}\n.hc-find-replace-case[data-v-c7933d96] {\n    display: block;\n    font-size: 12px;\n    margin-bottom: 8px;\n}\n.hc-find-replace-result[data-v-c7933d96] {\n    font-size: 12px;\n    max-height: 200px;\n    overflow: auto;\n    margin-bottom: 8px;\n}\n.hc-find-replace-result ul[data-v-c7933d96] {\n    list-style: none;\n    padding: 0;\n    margin: 6px 0 0;\n}\n.hc-find-replace-result li[data-v-c7933d96] {\n    padding: 2px 0;\n    border-top: 1px solid #eee;\n}\n.hc-find-replace-result del[data-v-c7933d96] {\n    color: #c0392b;\n}\n.hc-find-replace-result ins[data-v-c7933d96] {\n    color: #27ae60;\n    text-decoration: none;\n}\n.hc-find-replace-error[data-v-c7933d96] {\n    color: #c0392b;\n    font-size: 12px;\n}\n.hc-find-replace-actions[data-v-c7933d96] {\n    display: flex;\n    gap: 8px;\n    justify-content: flex-end;\n}\n.hc-find-replace-actions button[data-v-c7933d96] {\n    padding: 6px 12px;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n    background: white;\n    cursor: pointer;\n}\n.hc-find-replace-actions button.primary[data-v-c7933d96] {\n    background: #1a73e8;\n    border-color: #1a73e8;\n    color: white;\n}\n.hc-find-replace-actions button[data-v-c7933d96]:disabled {\n    opacity: 0.5;\n    cursor: default;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-find-replace-overlay[data-v-c7933d96] {\n    position: fixed;\n    inset: 0;\n    z-index: 10000;\n    background: #0004;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n}\n.hc-find-replace[data-v-c7933d96] {\n    background: white;\n    color: #222;\n    border-radius: 6px;\n    padding: 16px;\n    width: 420px;\n    max-width: 95vw;\n    box-shadow: 0 8px 30px #0005;\n}\n.hc-find-replace h4[data-v-c7933d96] {\n    margin: 0 0 12px;\n}\n.hc-find-replace h4 small[data-v-c7933d96] {\n    color: #777;\n    font-weight: normal;\n}\n.hc-find-replace > input[data-v-c7933d96] {\n    display: block;\n    width: 100%;\n    margin-bottom: 8px;\n    padding: 6px 8px;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n}\n.hc-find-replace-case[data-v-c7933d96] {\n    display: block;\n    font-size: 12px;\n    margin-bottom: 8px;\n}\n.hc-find-replace-result[data-v-c7933d96] {\n    font-size: 12px;\n    max-height: 200px;\n    overflow: auto;\n    margin-bottom: 8px;\n}\n.hc-find-replace-result ul[data-v-c7933d96] {\n    list-style: none;\n    padding: 0;\n    margin: 6px 0 0;\n}\n.hc-find-replace-result li[data-v-c7933d96] {\n    padding: 2px 0;\n    border-top: 1px solid #eee;\n}\n.hc-find-replace-sample[data-v-c7933d96] {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    cursor: pointer;\n}\n.hc-find-replace-sample input[data-v-c7933d96] {\n    flex: none;\n}\n.hc-find-replace-result del[data-v-c7933d96] {\n    color: #c0392b;\n}\n.hc-find-replace-result ins[data-v-c7933d96] {\n    color: #27ae60;\n    text-decoration: none;\n}\n.hc-find-replace-error[data-v-c7933d96] {\n    color: #c0392b;\n    font-size: 12px;\n}\n.hc-find-replace-actions[data-v-c7933d96] {\n    display: flex;\n    gap: 8px;\n    justify-content: flex-end;\n}\n.hc-find-replace-actions button[data-v-c7933d96] {\n    padding: 6px 12px;\n    border: 1px solid #ccc;\n    border-radius: 4px;\n    background: white;\n    cursor: pointer;\n}\n.hc-find-replace-actions button.primary[data-v-c7933d96] {\n    background: #1a73e8;\n    border-color: #1a73e8;\n    color: white;\n}\n.hc-find-replace-actions button[data-v-c7933d96]:disabled {\n    opacity: 0.5;\n    cursor: default;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
