@@ -60,6 +60,9 @@ class Kernel extends ConsoleKernel
 
         // Google Sheets instant sync: recover rows left behind by a crash / restart
         $schedule->command('sheet-sync:recover')->everyMinute()->withoutOverlapping();
+
+        // Run prospect exports when their requested date and time are reached.
+        $schedule->command('exports:dispatch-scheduled-prospects')->everyMinute()->withoutOverlapping(10)->runInBackground();
     }
 
     /**

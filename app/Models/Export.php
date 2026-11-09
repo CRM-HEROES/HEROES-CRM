@@ -24,6 +24,11 @@ class Export extends Model
         'sort_order',
         'count',
         'email',
+        'mode',
+        'sheet_name',
+        'scheduled_at',
+        'scheduled_claimed_at',
+        'scheduled_dispatched_at',
         'creator_id',
     ];
 
@@ -36,6 +41,9 @@ class Export extends Model
     protected $casts = [
         'filters' => 'json',
         'fields' => 'json',
+        'scheduled_at' => 'datetime',
+        'scheduled_claimed_at' => 'datetime',
+        'scheduled_dispatched_at' => 'datetime',
     ];
 
 
