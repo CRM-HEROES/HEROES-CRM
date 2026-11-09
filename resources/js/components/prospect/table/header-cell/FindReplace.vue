@@ -11,7 +11,7 @@
                     v-model="search"
                     placeholder="Rechercher ..."
                     ref="search"
-                    @input="result = null"
+                    @input="resetResult"
                     @keyup.enter="find"
                 />
                 <input
@@ -24,7 +24,7 @@
                     <input
                         type="checkbox"
                         v-model="caseSensitive"
-                        @change="result = null"
+                        @change="resetResult"
                     />
                     Respecter la casse
                 </label>
@@ -41,9 +41,17 @@
                         </p>
                         <ul>
                             <li v-for="s in result.samples" :key="s.id">
+                                <label class="hc-find-replace-sample">
+                                    <input
+                                        v-model="selectedSamples"
+                                        type="checkbox"
+                                        :value="s.id"
+                                        :aria-label="'Remplacer dans le prospect ' + s.id"
+                                    />
                                 <del v-text="s.before"></del>
                                 <span class="fa fa-arrow-right"></span>
                                 <ins v-text="s.after"></ins>
+                                </label>
                             </li>
                         </ul>
                     </template>
@@ -69,7 +77,15 @@
                         @click="apply"
                     >
                         <template v-if="confirming">
-                            Confirmer ({{ result.matches }})
+                            <template v-if="selectedSamples.length">
+                                Confirmer ({{ selectedSamples.length }} prospect(s))
+                            </template>
+                            <template v-else>
+                                Confirmer ({{ result.matches }})
+                            </template>
+                        </template>
+                        <template v-else-if="selectedSamples.length">
+                            Remplacer la sélection ({{ selectedSamples.length }})
                         </template>
                         <template v-else>Tout remplacer</template>
                     </button>
@@ -100,6 +116,7 @@ export default {
             replace: "",
             caseSensitive: false,
             result: null,
+            selectedSamples: [],
             confirming: false,
             loading: false,
             error: null,
@@ -111,6 +128,11 @@ export default {
     },
 
     methods: {
+        resetResult() {
+            this.result = null;
+            this.selectedSamples = [];
+        },
+
         async run(mode) {
             this.loading = true;
             this.error = null;
@@ -123,6 +145,10 @@ export default {
                     case_sensitive: this.caseSensitive,
                     mode,
                 };
+
+                if (mode === "replace" && this.selectedSamples.length) {
+                    params.prospect_ids = this.selectedSamples;
+                }
 
                 if (this.hasFilters) {
                     params.filters = JSON.stringify(this.prospectsParams);
@@ -144,6 +170,8 @@ export default {
             if (!this.search) {
                 return;
             }
+            this.result = null;
+            this.selectedSamples = [];
             this.result = (await this.run("preview")) || null;
         },
 
@@ -172,6 +200,9 @@ export default {
             this.confirming = false;
         },
         caseSensitive() {
+            this.confirming = false;
+        },
+        selectedSamples() {
             this.confirming = false;
         },
         result() {
@@ -256,6 +287,17 @@ export default {
 .hc-find-replace-result li {
     padding: 2px 0;
     border-top: 1px solid #eee;
+}
+
+.hc-find-replace-sample {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.hc-find-replace-sample input {
+    flex: none;
 }
 
 .hc-find-replace-result del {
