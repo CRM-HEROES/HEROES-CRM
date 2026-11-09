@@ -46,6 +46,18 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, Authenticatable $user)
     {
+        if ($user->must_change_password && (
+            !$user->password_temporary_expires_at ||
+            $user->password_temporary_expires_at->isPast()
+        )) {
+            \Auth::logout();
+
+            return response()->json([
+                'code' => 'password_expired',
+                'message' => 'Votre mot de passe temporaire a expiré. Veuillez contacter l’administrateur.'
+            ], 403);
+        }
+
         if (!empty($user->two_factors_secret)) {
             $session = DB::table('tracker_sessions')
                 ->where([

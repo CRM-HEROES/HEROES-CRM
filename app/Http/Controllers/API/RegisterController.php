@@ -80,6 +80,16 @@ class RegisterController extends BaseController
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
             $user = Auth::user(); 
+
+            if ($user->must_change_password && (
+                !$user->password_temporary_expires_at ||
+                $user->password_temporary_expires_at->isPast()
+            )) {
+                Auth::logout();
+
+                return $this->sendError('Votre mot de passe temporaire a expiré. Veuillez contacter l’administrateur.', [], 403);
+            }
+
             $success['token'] =  $user->createToken('HeroesCRM')->plainTextToken; 
             $success['user'] =  $user;
    

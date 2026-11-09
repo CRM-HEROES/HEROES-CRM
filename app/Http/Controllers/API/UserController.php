@@ -6,7 +6,10 @@ use App\Filters\UserRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserSetting;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -114,19 +117,35 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required',
-            'password' => 'required',
             'status' => [
                 'nullable',
                 Rule::in(['super_admin']),
-            ]
+            ],
+            'password' => 'nullable',
         ]);
 
         abort_if(User::where('email', $request->input('email'))->first(), 400, 'User already exists!');
 
-        return User::create(array_merge($request->only($this->fields), [
-            'creator_id' => auth()->id(),
-            'password' => bcrypt($request->input('password'))
-        ]));
+        return DB::transaction(function () use ($request) {
+            $user = new User(array_merge($request->except('password'), [
+                'creator_id' => auth()->id(),
+                'password' => Hash::make(bin2hex(random_bytes(16))),
+            ]));
+
+            $user->forceFill([
+                'must_change_password' => true,
+                'password_temporary_expires_at' => now()->addHours(24),
+            ]);
+            $user->save();
+
+            if (!\App\Services\TemporaryPassword::issue($user)) {
+                throw new HttpResponseException(response()->json([
+                    'message' => 'Connexion Internet requise : l’email contenant le mot de passe temporaire n’a pas pu être envoyé. L’utilisateur n’a pas été créé.',
+                ], 503));
+            }
+
+            return $user;
+        });
     }
     
     /**
@@ -146,6 +165,20 @@ class UserController extends Controller
         }
 
         return ['message' => trans('common.success.updated_resource')];
+    }
+
+    public function resendTemporaryPassword(User $user)
+    {
+        abort_unless(auth()->user()->is_super_admin || auth()->user()->can('', request()->project ?? null), 404);
+
+        $issued = \App\Services\TemporaryPassword::issue($user);
+
+        return response()->json([
+            'success' => $issued,
+            'message' => $issued
+                ? 'Un nouveau mot de passe temporaire a été envoyé à l’utilisateur.'
+                : 'Le mot de passe temporaire n’a pas pu être envoyé.',
+        ]);
     }
 
     /**

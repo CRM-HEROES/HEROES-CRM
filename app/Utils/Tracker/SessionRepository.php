@@ -221,7 +221,16 @@ class SessionRepository
         foreach ($this->sessionInfo as $key => $value) {
             if (! isset($sessionData[$key]) || $sessionData[$key] !== $value) {
                 if (! isset($model)) {
-                    $model = $this->find($this->sessionInfo['id']);
+                    $model = $this->find($this->sessionInfo['id'])
+                        ?: $this->findByUuid($this->sessionInfo['uuid']);
+
+                    if (! $model) {
+                        $model = $this->firstOrCreate([
+                            'uuid' => $this->sessionInfo['uuid'],
+                        ]);
+                    }
+
+                    $this->sessionInfo['id'] = $model->id;
                 }
 
                 $model->{$key} = $value;

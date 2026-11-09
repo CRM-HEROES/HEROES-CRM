@@ -107,6 +107,7 @@ class UserController extends Controller
 
         $this->validate($request, [
             'email' => 'required',
+            'password' => 'nullable',
         ]);
 
         abort_unless($user = User::where('email', $request->input('email'))->first(), 404, trans('project.error.unknown_user'));

@@ -30,25 +30,6 @@
                         :placeholder="label + ' ...'"
                         v-model="user.email"
                 /></v-field>
-                <v-field :label="$t('password')" required v-slot="{ label }">
-                    <div class="hc-flex-row">
-                        <input
-                            required
-                            :type="showPassword ? 'text' : 'password'"
-                            :placeholder="label + ' ...'"
-                            class="hc-flex-1"
-                            v-model="user.password"
-                        />
-                        <icon
-                            @click.prevent="showPassword = !showPassword"
-                            tag="a"
-                            :class="
-                                showPassword ? 'fa fa-eye-slash' : 'fa fa-eye'
-                            "
-                            :size="34"
-                        />
-                    </div>
-                </v-field>
                 <item tag="label">
                     <icon class="fa fa-plus" />
                     <div
@@ -125,6 +106,9 @@
                     />
                 </item>
             </item-list>
+            <small class="temp-password-note">
+                Un mot de passe temporaire sera envoyé par email à l'utilisateur (valable 24 h).
+            </small>
             <buttons>
                 <button v-text="$t('add')"></button>
             </buttons>
@@ -132,6 +116,15 @@
         </form>
     </modal>
 </template>
+
+<style scoped>
+.temp-password-note {
+    color: #9ca3af;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 8px;
+}
+</style>
 
 <script>
 import store from "@/store";
@@ -146,7 +139,6 @@ export default {
             user: this.newUser(),
             showMore: false,
             addingUser: false,
-            showPassword: false,
         };
     },
 
@@ -159,7 +151,6 @@ export default {
                 name: "",
                 last_name: "",
                 email: "",
-                password: "",
                 street: "",
                 street_bis: "",
                 postal_code: "",
@@ -185,20 +176,27 @@ export default {
          */
         async storeUser() {
             this.addingUser = true;
+            let created = false;
 
             try {
                 await store.dispatch(ADD_GLOBAL_USER, this.user);
+                created = true;
             } catch (e) {
+                const message =
+                    !e.response &&
+                    (navigator.onLine === false || e.code === "ERR_NETWORK")
+                        ? "Connexion Internet requise pour créer l’utilisateur et envoyer son mot de passe temporaire."
+                        : e.response?.data?.message ||
+                          "Erreur lors de la création de l’utilisateur.";
                 flashError({
                     title: "Nouvel utilisateur",
-                    body:
-                        "Erreur lors de la création de nouvel utilisateur (" +
-                        e.response.data.message +
-                        ")",
+                    body: message,
                 });
             } finally {
                 this.addingUser = false;
-                store.commit(CLOSE_MODAL);
+                if (created) {
+                    store.commit(CLOSE_MODAL);
+                }
             }
         },
     },
