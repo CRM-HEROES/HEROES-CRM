@@ -26586,6 +26586,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
       }
     },
+    filterLatest: {
+      get: function get() {
+        var eventParams = this.eventParams;
+        return eventParams && eventParams.latest == 1;
+      },
+      set: function set(value) {
+        var eventParams = this.eventParams || {};
+        if (value) {
+          eventParams.latest = 1;
+        } else if (eventParams.latest !== undefined) {
+          delete eventParams.latest;
+        }
+        this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
+      }
+    },
     filterPeriod: {
       get: function get() {
         var _this2 = this;
@@ -81986,30 +82001,31 @@ var _hoisted_21 = ["textContent"];
 var _hoisted_22 = ["textContent"];
 var _hoisted_23 = ["textContent"];
 var _hoisted_24 = ["textContent"];
-var _hoisted_25 = {
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = {
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = {
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_30 = ["textContent"];
+var _hoisted_31 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
@@ -82197,6 +82213,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }))];
             }),
             _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Only the latest appointment for each prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            tag: "label"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-calendar-check"
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                "class": "hc-item-main-content",
+                textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.latest_only'))
+              }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                modelValue: $options.filterLatest,
+                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                  return $options.filterLatest = $event;
+                }),
+                style: {
+                  "margin-right": "5px"
+                }
+              }, null, 8 /* PROPS */, ["modelValue"])];
+            }),
+            _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Coming "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
             tag: "label"
           }, {
@@ -82206,9 +82242,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.future'))
-              }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterComing,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
                   return $options.filterComing = $event;
                 }),
                 style: {
@@ -82226,9 +82262,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.old'))
-              }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotComing,
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                   return $options.filterNotComing = $event;
                 }),
                 style: {
@@ -82246,9 +82282,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterConfirmed,
-                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
                   return $options.filterConfirmed = $event;
                 }),
                 style: {
@@ -82266,9 +82302,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotConfirmed,
-                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
                   return $options.filterNotConfirmed = $event;
                 }),
                 style: {
@@ -82286,9 +82322,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.done'))
-              }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterDone,
-                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+                "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
                   return $options.filterDone = $event;
                 }),
                 style: {
@@ -82306,9 +82342,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_done'))
-              }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotDone,
-                "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+                "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
                   return $options.filterNotDone = $event;
                 }),
                 style: {
@@ -82329,8 +82365,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "hc-flex-1"
       }, {
         "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[16] || (_cache[16] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[17] || (_cache[17] = function ($event) {
               return $data.tab = 0;
             }),
             "class": "bordered"
@@ -82341,12 +82377,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.select_calendars'))
-              }, null, 8 /* PROPS */, _hoisted_26)];
+              }, null, 8 /* PROPS */, _hoisted_27)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.calendarKeyword,
-            "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+            "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
               return $data.calendarKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82362,7 +82398,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: calendar.id,
                   calendar: calendar,
                   modelValue: $options.filterCalendars,
-                  "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+                  "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
                     return $options.filterCalendars = $event;
                   })
                 }, null, 8 /* PROPS */, ["calendar", "modelValue"]);
@@ -82374,8 +82410,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[19] || (_cache[19] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[20] || (_cache[20] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -82388,12 +82424,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.affected_to'))
-              }, null, 8 /* PROPS */, _hoisted_28)];
+              }, null, 8 /* PROPS */, _hoisted_29)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
+            "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82409,7 +82445,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterUsers,
-                  "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+                  "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
                     return $options.filterUsers = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);
@@ -82421,8 +82457,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[22] || (_cache[22] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[23] || (_cache[23] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -82435,12 +82471,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.created_by'))
-              }, null, 8 /* PROPS */, _hoisted_30)];
+              }, null, 8 /* PROPS */, _hoisted_31)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
+            "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -82456,7 +82492,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterCreators,
-                  "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
+                  "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
                     return $options.filterCreators = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);

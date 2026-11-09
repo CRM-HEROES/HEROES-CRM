@@ -846,6 +846,20 @@ class ProspectController extends Controller
                 $query->with([
                     // Filters select matching prospects below; keep every event
                     // attached so the table count and event column remain complete.
+
+                    // 'events' => function($query) use($filters) {
+                    //     $query
+                    //         // ->select('id', 'started_at', 'ended_at', 'prospect_id', 'calendar_id', 'done', 'confirmed')
+                    //         // Filter events list
+                    //         ->when($filters->getFilter('withEvents'), function($query) use($filters) {
+                    //             $eventFilters = new EventFilters();
+                    //             foreach ($filters->getFilter('withEvents') as $key => $value) {
+                    //                 $eventFilters->addFilter($key, $value);
+                    //             }
+                    //             $query->filter($eventFilters);
+                    //         });
+                    // },
+                    
                     'events',
                     'events.calendar' => function($query) {
                         $query->select('id', 'color', 'bgcolor', 'name', 'type');

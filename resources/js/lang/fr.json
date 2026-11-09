@@ -342,6 +342,7 @@
                     "title": "Filtrer par RDV",
                     "with": "Avec RDV ...",
                     "without": "Sans RDV",
+                    "latest_only": "Dernier RDV",
                     "calendars": "Calendriers ...",
                     "no_selected_calendar": "Aucun calendrier sélectionné ...",
                     "affected_to": "Affectés à ...",

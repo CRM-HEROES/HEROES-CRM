@@ -204,6 +204,23 @@
                     <icon v-else class="fa fa-plus" />
                 </item>
 
+                <!-- Only the latest appointment for each prospect -->
+                <item tag="label">
+                    <icon class="fa fa-calendar-check" />
+                    <div
+                        class="hc-item-main-content"
+                        v-text="
+                            $t(
+                                'prospect.table.filters.appointments.latest_only'
+                            )
+                        "
+                    ></div>
+                    <checkbox
+                        v-model="filterLatest"
+                        style="margin-right: 5px"
+                    />
+                </item>
+
                 <!-- Coming -->
                 <item tag="label">
                     <icon class="fa fa-step-forward" />
@@ -737,6 +754,24 @@ export default {
                     eventParams.endedAt = value;
                 } else if (eventParams.endedAt) {
                     delete eventParams.endedAt;
+                }
+                this.eventParams =
+                    Object.keys(eventParams).length > 0 ? eventParams : null;
+            },
+        },
+
+        filterLatest: {
+            get() {
+                const eventParams = this.eventParams;
+
+                return eventParams && eventParams.latest == 1;
+            },
+            set(value) {
+                const eventParams = this.eventParams || {};
+                if (value) {
+                    eventParams.latest = 1;
+                } else if (eventParams.latest !== undefined) {
+                    delete eventParams.latest;
                 }
                 this.eventParams =
                     Object.keys(eventParams).length > 0 ? eventParams : null;

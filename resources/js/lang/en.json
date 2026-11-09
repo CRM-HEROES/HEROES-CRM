@@ -341,6 +341,7 @@
                     "title": "Filter by appointments",
                     "with": "With appointments ...",
                     "without": "Without appointment",
+                    "latest_only": "Latest appointment",
                     "calendars": "Calendars",
                     "no_selected_calendar": "No selected calendar ...",
                     "affected_to": "Affected to",

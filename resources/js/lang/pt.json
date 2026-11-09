@@ -277,6 +277,7 @@
                     "title": "Filtrar por compromissos",
                     "with": "Com compromissos...",
                     "without": "Sem hora marcada",
+                    "latest_only": "Último compromisso",
                     "calendars": "Calendários",
                     "no_selected_calendar": "Nenhum calendário selecionado...",
                     "affected_to": "Afetado para",
