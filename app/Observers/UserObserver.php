@@ -30,7 +30,9 @@ class UserObserver
             }
         }
 
-        $user->notify(new UserRegistration());
+        if (!$user->must_change_password) {
+            $user->notify(new UserRegistration());
+        }
     }
     
     /**

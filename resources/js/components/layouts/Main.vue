@@ -2,6 +2,7 @@
     <div id="hc-main-layout" @keydown="keydown">
         <layout-header />
         <login-location-banner />
+        <force-password-change />
         <div id="hc-main-layout-body">
             <router-view></router-view>
         </div>
@@ -435,6 +436,7 @@ import LayoutFooter from "./Footer.vue";
 import LayoutHeader from "./Header.vue";
 
 import LoginLocationBanner from "@/components/security/LoginLocationBanner.vue";
+import ForcePasswordChange from "@/components/security/ForcePasswordChange.vue";
 
 import Confirm from "@/components/Confirm.vue";
 
@@ -446,6 +448,7 @@ export default {
         LayoutFooter,
 
         LoginLocationBanner,
+        ForcePasswordChange,
 
         EventReminder,
 

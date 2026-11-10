@@ -3,6 +3,7 @@
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\DefaultFieldController;
 use App\Http\Controllers\API\EventController;
+use App\Http\Controllers\API\PasswordController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\WebserviceController;
@@ -234,7 +235,7 @@ Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->na
 Route::get('agent-avatar/{token}', [\App\Http\Controllers\API\Agent\AvatarController::class, 'show'])->name('agent.avatar');
 
 Route::group([
-    'middleware' => ['auth:sanctum']
+    'middleware' => ['auth:sanctum', \App\Http\Middleware\ForcePasswordChange::class]
 ], function () {
 
     // Personal Claude key, independent of the current project and role.
@@ -307,6 +308,10 @@ Route::group([
         return $user;
     })->name('auth');
 
+    Route::post('/password/change', [PasswordController::class, 'change'])
+        ->middleware('throttle:5,1')
+        ->name('password.change');
+
     // Find user by email
     Route::get('/user/email/{email}', function (Request $request, $email) {
         return User::where('email', $email)->first(['email', 'name', 'last_name']);
@@ -315,6 +320,7 @@ Route::group([
     // User
     Route::get('/user', [UserController::class, 'index'])->name("user.index");
     Route::post('/user', [UserController::class, 'store'])->name("user.store");
+    Route::post('/user/{user}/temporary-password', [\App\Http\Controllers\API\UserController::class, 'resendTemporaryPassword'])->name('user.temporary-password');
     Route::get('/user/{user}', [UserController::class, 'show'])->name("user.show");
     Route::put('/user/{user}', [UserController::class, 'update'])->name("user.update");
 

@@ -47,8 +47,10 @@
             </component>
             <icon
                 v-if="!impersonating"
+                tag="button"
+                type="button"
                 class="fa fa-sign-out"
-                @click.prevent.stop="logout"
+                @click.stop.prevent="logout"
             />
         </item>
 
@@ -681,15 +683,17 @@ export default {
         },
 
         async logout() {
-            await axios
-                .post("/logout")
-                .then(({ data }) => {
-                    this.signOut();
-                })
-                .catch(({ response: { data } }) => {
-                    alert(data.message);
-                })
-                .finally(() => {});
+            try {
+                await axios.post("/logout");
+                this.$store.commit("auth/SET_USER", {});
+                this.$store.commit("auth/SET_AUTHENTICATED", false);
+                window.location.replace("/login");
+            } catch (error) {
+                alert(
+                    error.response?.data?.message ||
+                        "La déconnexion n’a pas pu être effectuée."
+                );
+            }
         },
 
         /**

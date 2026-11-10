@@ -62,31 +62,6 @@
                             :placeholder="label + ' ...'"
                             v-model="userToCreate.email"
                     /></v-field>
-                    <v-field
-                        :label="$t('password')"
-                        required
-                        v-slot="{ label }"
-                    >
-                        <div class="hc-flex-row">
-                            <input
-                                required
-                                :type="showPassword ? 'text' : 'password'"
-                                :placeholder="label + ' ...'"
-                                class="hc-flex-1"
-                                v-model="userToCreate.password"
-                            />
-                            <icon
-                                @click.prevent="showPassword = !showPassword"
-                                tag="a"
-                                :class="
-                                    showPassword
-                                        ? 'fa fa-eye-slash'
-                                        : 'fa fa-eye'
-                                "
-                                :size="34"
-                            />
-                        </div>
-                    </v-field>
                     <item tag="label">
                         <icon class="fa fa-plus" />
                         <div
@@ -182,6 +157,9 @@
                         />
                     </item>
                 </item-list>
+                <small class="temp-password-note">
+                    Un mot de passe temporaire sera envoyé par email à l'utilisateur (valable 24 h).
+                </small>
                 <buttons>
                     <button v-text="$t('add')"></button>
                 </buttons>
@@ -192,6 +170,13 @@
 </template>
 
 <style>
+.temp-password-note {
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.4;
+    margin-top: 8px;
+}
+
 #hc-user-add-not-found {
     padding: 10px;
     font-size: 13px;
@@ -223,7 +208,6 @@ export default {
             userToCreate: this.newUser(),
             showMore: false,
             creatingUser: false,
-            showPassword: false,
         };
     },
 
@@ -255,7 +239,6 @@ export default {
                 name: "",
                 last_name: "",
                 email: this.email,
-                password: "",
                 street: "",
                 street_bis: "",
                 postal_code: "",
@@ -298,12 +281,15 @@ export default {
                 this.tab = 0;
                 this.addUser();
             } catch (e) {
+                const message =
+                    !e.response &&
+                    (navigator.onLine === false || e.code === "ERR_NETWORK")
+                        ? "Connexion Internet requise pour créer l’utilisateur et envoyer son mot de passe temporaire."
+                        : e.response?.data?.message ||
+                          "Erreur lors de la création de l’utilisateur.";
                 flashError({
                     title: "Nouvel utilisateur",
-                    body:
-                        "Erreur lors de la création de nouvel utilisateur (" +
-                        e.response.data.message +
-                        ")",
+                    body: message,
                 });
             } finally {
                 this.creatingUser = false;
