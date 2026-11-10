@@ -265,6 +265,7 @@
                     "title": "تصفية حسب المواعيد",
                     "with": "بالمواعيد...",
                     "without": "بدون موعد",
+                    "latest_only": "الموعد الأخير",
                     "calendars": "التقاويم",
                     "no_selected_calendar": "لم يتم تحديد تقويم...",
                     "affected_to": "تتأثر",

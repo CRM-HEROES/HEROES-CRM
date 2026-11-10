@@ -11,6 +11,44 @@ use Illuminate\Database\Eloquent\Builder;
 class EventFilters extends Filters
 {
     /**
+     * Keep only the latest event for each prospect, ordered by appointment date.
+     */
+    public function latest(Builder $builder, $value) {
+        if (!$value) {
+            return;
+        }
+
+        $builder->whereNotExists(function($query) {
+            $query
+                ->select(DB::raw(1))
+                ->from('events as newer_events')
+                ->whereColumn('newer_events.prospect_id', 'events.prospect_id')
+                ->whereNull('newer_events.deleted_at')
+                ->where(function($query) {
+                    $query
+                        ->whereColumn(
+                            'newer_events.started_at',
+                            '>',
+                            'events.started_at'
+                        )
+                        ->orWhere(function($query) {
+                            $query
+                                ->whereColumn(
+                                    'newer_events.started_at',
+                                    '=',
+                                    'events.started_at'
+                                )
+                                ->whereColumn(
+                                    'newer_events.id',
+                                    '>',
+                                    'events.id'
+                                );
+                        });
+                });
+        });
+    }
+
+    /**
      * Filter by id
      */
     public function ids(Builder $builder, $value) {

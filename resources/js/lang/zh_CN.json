@@ -265,6 +265,7 @@
                     "title": "按约会过滤",
                     "with": "与约会...",
                     "without": "无需预约",
+                    "latest_only": "最新预约",
                     "calendars": "日历",
                     "no_selected_calendar": "没有选择的日历...",
                     "affected_to": "受影响于",

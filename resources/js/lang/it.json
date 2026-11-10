@@ -265,6 +265,7 @@
                     "title": "Filtra per appuntamenti",
                     "with": "Con appuntamenti...",
                     "without": "Senza appuntamento",
+                    "latest_only": "Ultimo appuntamento",
                     "calendars": "Calendari",
                     "no_selected_calendar": "Nessun calendario selezionato...",
                     "affected_to": "Colpito da",

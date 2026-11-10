@@ -277,6 +277,7 @@
                     "title": "Filtrar por citas",
                     "with": "Con citas...",
                     "without": "Sin cita previa",
+                    "latest_only": "Última cita",
                     "calendars": "Calendarios",
                     "no_selected_calendar": "No hay calendario seleccionado...",
                     "affected_to": "Afectado a",
