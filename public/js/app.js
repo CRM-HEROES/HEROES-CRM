@@ -46432,8 +46432,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   state: () => (/* binding */ state)
 /* harmony export */ });
 /* harmony import */ var _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/project/prospect/label */ "./resources/js/apis/project/prospect/label.js");
-/* harmony import */ var _actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/prospect/revision */ "./resources/js/actions/project/prospect/revision.js");
-/* harmony import */ var _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/prospect/label */ "./resources/js/actions/project/prospect/label.js");
+/* harmony import */ var _apis_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/prospect/revision */ "./resources/js/apis/project/prospect/revision.js");
+/* harmony import */ var _actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/prospect/revision */ "./resources/js/actions/project/prospect/revision.js");
+/* harmony import */ var _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/prospect/label */ "./resources/js/actions/project/prospect/label.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 var _actions, _mutations;
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -46452,6 +46453,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 /**
  * ProspectLabel Store state
  */
@@ -46462,7 +46464,7 @@ var state = {
 /**
  * ProspectLabel Store Actions
  */
-var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.FETCH_PROSPECT_LABELS, function (context, params) {
+var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.FETCH_PROSPECT_LABELS, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
     var _yield$ProspectLabelS, data;
     return _regeneratorRuntime().wrap(function _callee$(_context) {
@@ -46473,7 +46475,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
         case 2:
           _yield$ProspectLabelS = _context.sent;
           data = _yield$ProspectLabelS.data;
-          context.commit(_actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_LABELS, data);
+          context.commit(_actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT_LABELS, data);
           return _context.abrupt("return", data);
         case 6:
         case "end":
@@ -46481,7 +46483,7 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
       }
     }, _callee);
   }))();
-}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.ADD_PROSPECT_LABEL, function (context, label) {
+}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_LABEL, function (context, label) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
     var project, prospect, response, attached;
     return _regeneratorRuntime().wrap(function _callee2$(_context2) {
@@ -46489,36 +46491,45 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
         case 0:
           project = context.state.project.slug;
           prospect = context.state.project.prospect.id;
-          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_REVISION_LOADING, {
+          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
             project: project,
             prospect: prospect,
             categoryId: label.category_id,
             loading: true
           });
           _context2.prev = 3;
-          _context2.next = 6;
+          _context2.prev = 4;
+          _context2.next = 7;
           return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].update(project, prospect, label.id);
-        case 6:
+        case 7:
           response = _context2.sent;
-          attached = response && response.data && response.data.label || label;
-          _context2.next = 10;
-          return refreshLabelHistory(context, project, prospect, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.ADD_PROSPECT_LABEL, attached);
+          _context2.next = 14;
+          break;
         case 10:
           _context2.prev = 10;
-          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_REVISION_LOADING, {
+          _context2.t0 = _context2["catch"](4);
+          flashLabelAssignmentError(_context2.t0);
+          throw _context2.t0;
+        case 14:
+          attached = response && response.data && response.data.label || label;
+          _context2.next = 17;
+          return refreshLabelHistory(context, project, prospect, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_LABEL, attached);
+        case 17:
+          _context2.prev = 17;
+          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
             project: project,
             prospect: prospect,
             categoryId: label.category_id,
             loading: false
           });
-          return _context2.finish(10);
-        case 13:
+          return _context2.finish(17);
+        case 20:
         case "end":
           return _context2.stop();
       }
-    }, _callee2, null, [[3,, 10, 13]]);
+    }, _callee2, null, [[3,, 17, 20], [4, 10]]);
   }))();
-}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_LABEL, function (context, label) {
+}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT_LABEL, function (context, label) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
     var project, prospect;
     return _regeneratorRuntime().wrap(function _callee3$(_context3) {
@@ -46526,34 +46537,43 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
         case 0:
           project = context.state.project.slug;
           prospect = context.state.project.prospect.id;
-          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_REVISION_LOADING, {
+          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
             project: project,
             prospect: prospect,
             categoryId: label.category_id,
             loading: true
           });
           _context3.prev = 3;
-          _context3.next = 6;
+          _context3.prev = 4;
+          _context3.next = 7;
           return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(project, prospect, label.id);
-        case 6:
-          _context3.next = 8;
-          return refreshLabelHistory(context, project, prospect, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_LABEL, label);
-        case 8:
-          _context3.prev = 8;
-          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__.SET_PROSPECT_REVISION_LOADING, {
+        case 7:
+          _context3.next = 13;
+          break;
+        case 9:
+          _context3.prev = 9;
+          _context3.t0 = _context3["catch"](4);
+          flashLabelAssignmentError(_context3.t0);
+          throw _context3.t0;
+        case 13:
+          _context3.next = 15;
+          return refreshLabelHistory(context, project, prospect, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT_LABEL, label);
+        case 15:
+          _context3.prev = 15;
+          context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
             project: project,
             prospect: prospect,
             categoryId: label.category_id,
             loading: false
           });
-          return _context3.finish(8);
-        case 11:
+          return _context3.finish(15);
+        case 18:
         case "end":
           return _context3.stop();
       }
-    }, _callee3, null, [[3,, 8, 11]]);
+    }, _callee3, null, [[3,, 15, 18], [4, 9]]);
   }))();
-}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.BULK_ADD_PROSPECT_LABEL, function (context, _ref) {
+}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.BULK_ADD_PROSPECT_LABEL, function (context, _ref) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
     var prospects, labels;
     return _regeneratorRuntime().wrap(function _callee4$(_context4) {
@@ -46561,14 +46581,16 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
         case 0:
           prospects = _ref.prospects, labels = _ref.labels;
           _context4.next = 3;
-          return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].bulkUpdate(context.state.project.slug, prospects, labels);
+          return updateBulkLabels(context, prospects, labels, function (project) {
+            return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].bulkUpdate(project, prospects, labels);
+          });
         case 3:
         case "end":
           return _context4.stop();
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.BULK_REMOVE_PROSPECT_LABEL, function (context, _ref2) {
+}), _defineProperty(_actions, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.BULK_REMOVE_PROSPECT_LABEL, function (context, _ref2) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
     var prospects, labels;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
@@ -46576,7 +46598,9 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
         case 0:
           prospects = _ref2.prospects, labels = _ref2.labels;
           _context5.next = 3;
-          return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].bulkDestroy(context.state.project.slug, prospects, labels);
+          return updateBulkLabels(context, prospects, labels, function (project) {
+            return _apis_project_prospect_label__WEBPACK_IMPORTED_MODULE_0__["default"].bulkDestroy(project, prospects, labels);
+          });
         case 3:
         case "end":
           return _context5.stop();
@@ -46584,49 +46608,154 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_prospec
     }, _callee5);
   }))();
 }), _actions);
-function refreshLabelHistory(_x, _x2, _x3, _x4, _x5) {
+function updateBulkLabels(_x, _x2, _x3, _x4) {
+  return _updateBulkLabels.apply(this, arguments);
+}
+function _updateBulkLabels() {
+  _updateBulkLabels = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7(context, prospects, labels, update) {
+    var project, prospectIds, categoryIds;
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
+        case 0:
+          project = context.state.project.slug;
+          prospectIds = _toConsumableArray(new Set(prospects));
+          categoryIds = getLabelCategoryIds(context, labels);
+          prospectIds.forEach(function (prospect) {
+            categoryIds.forEach(function (categoryId) {
+              context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
+                project: project,
+                prospect: prospect,
+                categoryId: categoryId,
+                loading: true
+              });
+            });
+          });
+          _context7.prev = 4;
+          _context7.prev = 5;
+          _context7.next = 8;
+          return update(project);
+        case 8:
+          _context7.next = 14;
+          break;
+        case 10:
+          _context7.prev = 10;
+          _context7.t0 = _context7["catch"](5);
+          flashLabelAssignmentError(_context7.t0);
+          throw _context7.t0;
+        case 14:
+          _context7.next = 16;
+          return Promise.all(prospectIds.map(/*#__PURE__*/function () {
+            var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6(prospect) {
+              return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+                while (1) switch (_context6.prev = _context6.next) {
+                  case 0:
+                    _context6.prev = 0;
+                    _context6.next = 3;
+                    return _apis_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__["default"].get(project, prospect);
+                  case 3:
+                    _context6.next = 7;
+                    break;
+                  case 5:
+                    _context6.prev = 5;
+                    _context6.t0 = _context6["catch"](0);
+                  case 7:
+                  case "end":
+                    return _context6.stop();
+                }
+              }, _callee6, null, [[0, 5]]);
+            }));
+            return function (_x10) {
+              return _ref3.apply(this, arguments);
+            };
+          }()));
+        case 16:
+          _context7.prev = 16;
+          prospectIds.forEach(function (prospect) {
+            categoryIds.forEach(function (categoryId) {
+              context.commit(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_REVISION_LOADING, {
+                project: project,
+                prospect: prospect,
+                categoryId: categoryId,
+                loading: false
+              });
+            });
+          });
+          return _context7.finish(16);
+        case 19:
+        case "end":
+          return _context7.stop();
+      }
+    }, _callee7, null, [[4,, 16, 19], [5, 10]]);
+  }));
+  return _updateBulkLabels.apply(this, arguments);
+}
+function flashLabelAssignmentError(error) {
+  var _error$response;
+  var data = error === null || error === void 0 || (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.data;
+  var validationError = data !== null && data !== void 0 && data.errors ? Object.values(data.errors).flat()[0] : null;
+  flashError({
+    title: "Affectation des étiquettes",
+    body: validationError || (data === null || data === void 0 ? void 0 : data.message) || (error === null || error === void 0 ? void 0 : error.message) || "Impossible d'affecter les étiquettes au prospect.",
+    duration: 7000
+  });
+}
+function getLabelCategoryIds(context, labels) {
+  var labelIds = new Set(labels.map(String));
+  var matchedLabelIds = new Set();
+  var categoryIds = new Set();
+  (context.state.project.categories || []).forEach(function (category) {
+    (category.labels || []).forEach(function (label) {
+      if (labelIds.has(String(label.id))) {
+        matchedLabelIds.add(String(label.id));
+        categoryIds.add(category.id);
+      }
+    });
+  });
+  return matchedLabelIds.size === labelIds.size && categoryIds.size ? _toConsumableArray(categoryIds) : ["*"];
+}
+function refreshLabelHistory(_x5, _x6, _x7, _x8, _x9) {
   return _refreshLabelHistory.apply(this, arguments);
 }
 /**
  * Prospect label Store Mutations
  */
 function _refreshLabelHistory() {
-  _refreshLabelHistory = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6(context, project, prospect, mutation, label) {
+  _refreshLabelHistory = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8(context, project, prospect, mutation, label) {
     var isCurrent;
-    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-      while (1) switch (_context6.prev = _context6.next) {
+    return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+      while (1) switch (_context8.prev = _context8.next) {
         case 0:
           isCurrent = function isCurrent() {
             var _context$state$projec, _context$state$projec2;
             return ((_context$state$projec = context.state.project) === null || _context$state$projec === void 0 ? void 0 : _context$state$projec.slug) === project && ((_context$state$projec2 = context.state.project) === null || _context$state$projec2 === void 0 || (_context$state$projec2 = _context$state$projec2.prospect) === null || _context$state$projec2 === void 0 ? void 0 : _context$state$projec2.id) === prospect;
           };
           if (isCurrent()) {
-            _context6.next = 3;
+            _context8.next = 3;
             break;
           }
-          return _context6.abrupt("return");
+          return _context8.abrupt("return");
         case 3:
-          _context6.prev = 3;
-          _context6.next = 6;
-          return context.dispatch(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECT_REVISIONS, {
+          _context8.prev = 3;
+          _context8.next = 6;
+          return context.dispatch(_actions_project_prospect_revision__WEBPACK_IMPORTED_MODULE_2__.FETCH_PROSPECT_REVISIONS, {
             all: true
           });
         case 6:
-          _context6.prev = 6;
+          _context8.prev = 6;
           // The label change succeeded even if its history could not be refreshed.
           if (isCurrent()) context.commit(mutation, label);
-          return _context6.finish(6);
+          return _context8.finish(6);
         case 9:
         case "end":
-          return _context6.stop();
+          return _context8.stop();
       }
-    }, _callee6, null, [[3,, 6, 9]]);
+    }, _callee8, null, [[3,, 6, 9]]);
   }));
   return _refreshLabelHistory.apply(this, arguments);
 }
-var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.SET_PROSPECT_LABELS, function (state, labels) {
+var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.SET_PROSPECT_LABELS, function (state, labels) {
   state.project.prospect.labels = labels;
-}), _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.ADD_PROSPECT_LABEL, function (state, label) {
+}), _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_LABEL, function (state, label) {
   var category = Array.isArray(state.project.categories) ? state.project.categories.find(function (category) {
     return category.id == label.category_id;
   }) : null;
@@ -46649,7 +46778,7 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_p
   /*state.project.prospects = state.project.prospects.map((o) =>
       o.id == state.project.prospect.id ? state.project.prospect : o
   );*/
-}), _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_2__.REMOVE_PROSPECT_LABEL, function (state, label) {
+}), _defineProperty(_mutations, _actions_project_prospect_label__WEBPACK_IMPORTED_MODULE_3__.REMOVE_PROSPECT_LABEL, function (state, label) {
   state.project.prospect.labels = (state.project.prospect.labels ? state.project.prospect.labels : []).filter(function (o) {
     return o.id != label.id;
   });
@@ -48713,7 +48842,8 @@ var getters = {
   isProspectRevisionLoading: function isProspectRevisionLoading(state) {
     return function (project, prospect, categoryId) {
       var _state$project;
-      return !!((_state$project = state.project) !== null && _state$project !== void 0 && (_state$project = _state$project.prospectRevisionLoading) !== null && _state$project !== void 0 && _state$project["".concat(project, ":").concat(prospect, ":").concat(categoryId)]);
+      var loading = ((_state$project = state.project) === null || _state$project === void 0 ? void 0 : _state$project.prospectRevisionLoading) || {};
+      return !!loading["".concat(project, ":").concat(prospect, ":").concat(categoryId)] || !!loading["".concat(project, ":").concat(prospect, ":*")];
     };
   }
 };

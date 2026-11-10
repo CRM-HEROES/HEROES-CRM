@@ -1,4 +1,5 @@
 import ProspectLabelService from "@/apis/project/prospect/label";
+import ProspectRevisionService from "@/apis/project/prospect/revision";
 import {
     FETCH_PROSPECT_REVISIONS,
     SET_PROSPECT_REVISION_LOADING,
@@ -58,11 +59,18 @@ export const actions = {
         });
 
         try {
-            const response = await ProspectLabelService.update(
-                project,
-                prospect,
-                label.id
-            );
+            let response;
+            try {
+                response = await ProspectLabelService.update(
+                    project,
+                    prospect,
+                    label.id
+                );
+            } catch (error) {
+                flashLabelAssignmentError(error);
+                throw error;
+            }
+
             const attached =
                 (response && response.data && response.data.label) || label;
             await refreshLabelHistory(
@@ -100,7 +108,17 @@ export const actions = {
         });
 
         try {
-            await ProspectLabelService.destroy(project, prospect, label.id);
+            try {
+                await ProspectLabelService.destroy(
+                    project,
+                    prospect,
+                    label.id
+                );
+            } catch (error) {
+                flashLabelAssignmentError(error);
+                throw error;
+            }
+
             await refreshLabelHistory(
                 context,
                 project,
@@ -126,10 +144,12 @@ export const actions = {
      * @returns prospectGroup
      */
     async [BULK_ADD_PROSPECT_LABEL](context, { prospects, labels }) {
-        await ProspectLabelService.bulkUpdate(
-            context.state.project.slug,
-            prospects,
-            labels
+        await updateBulkLabels(context, prospects, labels, (project) =>
+            ProspectLabelService.bulkUpdate(
+                project,
+                prospects,
+                labels
+            )
         );
     },
 
@@ -141,13 +161,98 @@ export const actions = {
      * @returns prospectGroup
      */
     async [BULK_REMOVE_PROSPECT_LABEL](context, { prospects, labels }) {
-        await ProspectLabelService.bulkDestroy(
-            context.state.project.slug,
-            prospects,
-            labels
+        await updateBulkLabels(context, prospects, labels, (project) =>
+            ProspectLabelService.bulkDestroy(
+                project,
+                prospects,
+                labels
+            )
         );
     },
 };
+
+async function updateBulkLabels(context, prospects, labels, update) {
+    const project = context.state.project.slug;
+    const prospectIds = [...new Set(prospects)];
+    const categoryIds = getLabelCategoryIds(context, labels);
+
+    prospectIds.forEach((prospect) => {
+        categoryIds.forEach((categoryId) => {
+            context.commit(SET_PROSPECT_REVISION_LOADING, {
+                project,
+                prospect,
+                categoryId,
+                loading: true,
+            });
+        });
+    });
+
+    try {
+        try {
+            await update(project);
+        } catch (error) {
+            flashLabelAssignmentError(error);
+            throw error;
+        }
+
+        await Promise.all(
+            prospectIds.map(async (prospect) => {
+                try {
+                    await ProspectRevisionService.get(project, prospect);
+                } catch {
+                    // Refreshing the history does not undo a successful label change.
+                }
+            })
+        );
+    } finally {
+        prospectIds.forEach((prospect) => {
+            categoryIds.forEach((categoryId) => {
+                context.commit(SET_PROSPECT_REVISION_LOADING, {
+                    project,
+                    prospect,
+                    categoryId,
+                    loading: false,
+                });
+            });
+        });
+    }
+}
+
+function flashLabelAssignmentError(error) {
+    const data = error?.response?.data;
+    const validationError = data?.errors
+        ? Object.values(data.errors).flat()[0]
+        : null;
+
+    flashError({
+        title: "Affectation des étiquettes",
+        body:
+            validationError ||
+            data?.message ||
+            error?.message ||
+            "Impossible d'affecter les étiquettes au prospect.",
+        duration: 7000,
+    });
+}
+
+function getLabelCategoryIds(context, labels) {
+    const labelIds = new Set(labels.map(String));
+    const matchedLabelIds = new Set();
+    const categoryIds = new Set();
+
+    (context.state.project.categories || []).forEach((category) => {
+        (category.labels || []).forEach((label) => {
+            if (labelIds.has(String(label.id))) {
+                matchedLabelIds.add(String(label.id));
+                categoryIds.add(category.id);
+            }
+        });
+    });
+
+    return matchedLabelIds.size === labelIds.size && categoryIds.size
+        ? [...categoryIds]
+        : ["*"];
+}
 
 async function refreshLabelHistory(context, project, prospect, mutation, label) {
     const isCurrent = () =>

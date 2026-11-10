@@ -130,10 +130,13 @@ export const getters = {
         state.project.prospect.revisions
             ? state.project.prospect.revisions
             : [],
-    isProspectRevisionLoading: (state) => (project, prospect, categoryId) =>
-        !!state.project?.prospectRevisionLoading?.[
-            `${project}:${prospect}:${categoryId}`
-        ],
+    isProspectRevisionLoading: (state) => (project, prospect, categoryId) => {
+        const loading = state.project?.prospectRevisionLoading || {};
+        return (
+            !!loading[`${project}:${prospect}:${categoryId}`] ||
+            !!loading[`${project}:${prospect}:*`]
+        );
+    },
 };
 
 /**
