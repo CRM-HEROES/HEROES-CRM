@@ -33,7 +33,7 @@ class MessageTemplateController extends Controller
 
         try {
             return $project->messageTemplates()->create(array_merge(
-                $request->only('name', 'body', 'subject'),
+                $request->only('name', 'body', 'subject', 'email_layout'),
                 ['creator_id' => auth()->id(), 'attachments' => $attachments]
             ));
         } catch (\Throwable $exception) {
@@ -75,7 +75,7 @@ class MessageTemplateController extends Controller
         $added = $this->storeAttachments($request, $project);
         try {
             $messageTemplate->update(array_merge(
-                $request->only('name', 'body', 'subject', 'order'),
+                $request->only('name', 'body', 'subject', 'email_layout', 'order'),
                 ['attachments' => array_merge($retained, $added)]
             ));
         } catch (\Throwable $exception) {
@@ -110,6 +110,14 @@ class MessageTemplateController extends Controller
             'name' => ($updating ? 'sometimes|' : '').'required|string|max:255',
             'body' => ($updating ? 'sometimes|' : '').'required|string',
             'subject' => 'nullable|string|max:255',
+            'email_layout' => 'sometimes|nullable|array:brand_name,brand_label,category,closing,signature_name,sent_by,rights',
+            'email_layout.brand_name' => 'nullable|string|max:255',
+            'email_layout.brand_label' => 'nullable|string|max:255',
+            'email_layout.category' => 'nullable|string|max:255',
+            'email_layout.closing' => 'nullable|string|max:255',
+            'email_layout.signature_name' => 'nullable|string|max:255',
+            'email_layout.sent_by' => 'nullable|string|max:500',
+            'email_layout.rights' => 'nullable|string|max:500',
             'order' => 'sometimes|integer|min:1',
             'attachments' => 'sometimes|array|max:10',
             'attachments.*' => 'file|max:10240',

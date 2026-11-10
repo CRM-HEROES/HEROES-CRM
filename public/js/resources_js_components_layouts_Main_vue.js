@@ -22782,15 +22782,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/prospect/email */ "./resources/js/apis/project/prospect/email.js");
 /* harmony import */ var _actions_project_message_template__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/project/message-template */ "./resources/js/actions/project/message-template.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+/* harmony import */ var _message_SelectedProspect_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../message/SelectedProspect.vue */ "./resources/js/components/prospect/message/SelectedProspect.vue");
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -22807,22 +22812,34 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    SelectedProspect: _message_SelectedProspect_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+  },
   props: {
     initialDraft: {
       type: Object,
       required: true
     }
   },
-  emits: ["back"],
+  emits: ["back", "add-prospects"],
   data: function data() {
     return {
       draft: _objectSpread({}, this.initialDraft),
+      emailLayout: {},
+      selectedProspects: _toConsumableArray(this.initialDraft.selectedProspects || []),
+      selectedProspectsFolded: true,
       tab: 0,
       previewMode: false,
       currentYear: new Date().getFullYear(),
       templateKeyword: "",
       templateId: null,
+      showTemplateSave: false,
+      templateName: "",
+      savingTemplate: false,
+      templateSaved: false,
+      templateSaveError: "",
       templateAttachments: [],
       attachments: [],
       sending: false,
@@ -22832,7 +22849,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       sent: false
     };
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project", "messageTemplates", "can"])), {}, {
+  created: function created() {
+    this.emailLayout = this.mergeEmailLayout(this.initialDraft.email_layout, this.initialDraft.category);
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "messageTemplates", "can"])), {}, {
     canSend: function canSend() {
       return !!this.draft.to.trim() && !!this.draft.subject.trim() && !!this.draft.body.trim() && (!this.draft.prospects || this.draft.prospects.length > 0);
     },
@@ -22849,7 +22869,52 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
     }
   }),
+  watch: {
+    initialDraft: {
+      deep: true,
+      handler: function handler(value) {
+        this.selectedProspects = _toConsumableArray(value.selectedProspects || []);
+        if (Array.isArray(value.prospects)) {
+          this.draft.prospects = _toConsumableArray(value.prospects);
+          this.draft.to = value.to || "";
+        }
+        if (value.email_layout) {
+          this.emailLayout = this.mergeEmailLayout(value.email_layout, value.category);
+        }
+      }
+    }
+  },
   methods: {
+    defaultEmailLayout: function defaultEmailLayout() {
+      var _this$project;
+      var category = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.draft.category;
+      var projectName = ((_this$project = this.project) === null || _this$project === void 0 ? void 0 : _this$project.name) || "";
+      return {
+        brand_name: projectName,
+        brand_label: "HEROES CRM",
+        category: category || this.$t("email_composer.preview.message"),
+        closing: this.$t("email_composer.preview.closing"),
+        signature_name: projectName,
+        sent_by: this.$t("email_composer.preview.sent_by", {
+          project: projectName
+        }),
+        rights: this.$t("email_composer.preview.rights", {
+          year: this.currentYear,
+          project: projectName
+        })
+      };
+    },
+    mergeEmailLayout: function mergeEmailLayout() {
+      var layout = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var category = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.draft.category;
+      var defaults = this.defaultEmailLayout(category);
+      var values = layout && _typeof(layout) === "object" ? layout : {};
+      return Object.keys(defaults).reduce(function (result, key) {
+        var _values$key;
+        result[key] = Object.prototype.hasOwnProperty.call(values, key) ? String((_values$key = values[key]) !== null && _values$key !== void 0 ? _values$key : "") : defaults[key];
+        return result;
+      }, {});
+    },
     errorMessage: function errorMessage(error, fallback) {
       var _error$response, _error$response2;
       var errors = (_error$response = error.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
@@ -22885,6 +22950,25 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         return item.id !== file.id;
       });
       this.sendError = "";
+    },
+    removeSelectedProspect: function removeSelectedProspect(prospect) {
+      if (this.sending) return;
+      this.selectedProspects = this.selectedProspects.filter(function (item) {
+        return item.id != prospect.id;
+      });
+      this.draft.prospects = this.selectedProspects.map(function (item) {
+        return item.id;
+      });
+      this.draft.to = this.selectedProspects.map(function (item) {
+        return item.email;
+      }).filter(Boolean).join(", ");
+      this.sendError = "";
+      this.sent = false;
+    },
+    addProspects: function addProspects() {
+      if (!this.sending) {
+        this.$emit("add-prospects", _toConsumableArray(this.selectedProspects));
+      }
     },
     showTemplates: function showTemplates() {
       var _this = this;
@@ -22928,6 +23012,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
       return element.textContent.trim();
     },
+    formatTemplateBody: function formatTemplateBody(body) {
+      return String(body || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\r\n?/g, "\n").replace(/\n/g, "<br>");
+    },
     setTemplate: function setTemplate(template) {
       var files = _toConsumableArray(template.attachments || []);
       if (!this.validAttachments([].concat(_toConsumableArray(files), _toConsumableArray(this.attachments)))) {
@@ -22938,10 +23025,88 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.templateAttachments = files;
       if (template.subject) this.draft.subject = template.subject;
       this.draft.body = this.plainText(template.body);
+      this.emailLayout = this.mergeEmailLayout(template.email_layout, this.draft.category);
       this.sendError = "";
       this.sent = false;
+      this.templateSaved = false;
       this.previewMode = false;
       this.tab = 0;
+    },
+    startTemplateSave: function startTemplateSave() {
+      var _this2 = this;
+      this.showTemplateSave = true;
+      this.templateSaved = false;
+      this.templateSaveError = "";
+      this.templateName = String(this.draft.subject || "").slice(0, 255);
+      this.$nextTick(function () {
+        var _this2$$refs$template;
+        return (_this2$$refs$template = _this2.$refs.templateName) === null || _this2$$refs$template === void 0 ? void 0 : _this2$$refs$template.focus();
+      });
+    },
+    cancelTemplateSave: function cancelTemplateSave() {
+      if (this.savingTemplate) return;
+      this.showTemplateSave = false;
+      this.templateSaveError = "";
+    },
+    saveCurrentAsTemplate: function saveCurrentAsTemplate() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var name, _this3$$refs$template;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              name = _this3.templateName.trim();
+              if (!_this3.savingTemplate) {
+                _context2.next = 3;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 3:
+              if (name) {
+                _context2.next = 6;
+                break;
+              }
+              (_this3$$refs$template = _this3.$refs.templateName) === null || _this3$$refs$template === void 0 ? void 0 : _this3$$refs$template.focus();
+              return _context2.abrupt("return");
+            case 6:
+              if (String(_this3.draft.body || "").trim()) {
+                _context2.next = 9;
+                break;
+              }
+              _this3.templateSaveError = _this3.$t("email_composer.templates.body_required");
+              return _context2.abrupt("return");
+            case 9:
+              _this3.savingTemplate = true;
+              _this3.templateSaveError = "";
+              _context2.prev = 11;
+              _context2.next = 14;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_2__.ADD_MESSAGE_TEMPLATE, {
+                name: name,
+                subject: _this3.draft.subject || "",
+                body: _this3.formatTemplateBody(_this3.draft.body),
+                email_layout: _objectSpread({}, _this3.emailLayout),
+                attachments: []
+              });
+            case 14:
+              _this3.showTemplateSave = false;
+              _this3.templateName = "";
+              _this3.templateSaved = true;
+              _context2.next = 22;
+              break;
+            case 19:
+              _context2.prev = 19;
+              _context2.t0 = _context2["catch"](11);
+              _this3.templateSaveError = _this3.errorMessage(_context2.t0, _this3.$t("email_composer.templates.save_error"));
+            case 22:
+              _context2.prev = 22;
+              _this3.savingTemplate = false;
+              return _context2.finish(22);
+            case 25:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[11, 19, 22, 25]]);
+      }))();
     },
     addTemplate: function addTemplate() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.OPEN_MODAL, "message-template-add");
@@ -22951,71 +23116,78 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.OPEN_MODAL, "message-template-update");
     },
     send: function send() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var payload, _i, _arr, field;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              if (!(_this2.sending || !_this2.canSend)) {
-                _context2.next = 2;
+              if (!(_this4.sending || _this4.savingTemplate || !_this4.canSend)) {
+                _context3.next = 2;
                 break;
               }
-              return _context2.abrupt("return");
+              return _context3.abrupt("return");
             case 2:
-              _this2.sending = true;
-              _this2.sendError = "";
-              _this2.sent = false;
+              _this4.sending = true;
+              _this4.sendError = "";
+              _this4.sent = false;
               payload = new FormData();
               for (_i = 0, _arr = ["to", "subject", "body", "category"]; _i < _arr.length; _i++) {
                 field = _arr[_i];
-                payload.append(field, _this2.draft[field] || "");
+                payload.append(field, field === "category" ? _this4.emailLayout.category : _this4.draft[field] || "");
               }
-              (_this2.draft.prospects || []).forEach(function (id) {
+              Object.entries(_this4.emailLayout).forEach(function (_ref) {
+                var _ref2 = _slicedToArray(_ref, 2),
+                  key = _ref2[0],
+                  value = _ref2[1];
+                payload.append("email_layout[".concat(key, "]"), value);
+              });
+              (_this4.draft.prospects || []).forEach(function (id) {
                 return payload.append("prospects[]", id);
               });
-              if (_this2.templateId) payload.append("template_id", _this2.templateId);
-              _this2.templateAttachments.forEach(function (file) {
+              if (_this4.templateId) payload.append("template_id", _this4.templateId);
+              _this4.templateAttachments.forEach(function (file) {
                 return payload.append("template_attachment_ids[]", file.id);
               });
-              _this2.attachments.forEach(function (file) {
+              _this4.attachments.forEach(function (file) {
                 return payload.append("attachments[]", file, file.name);
               });
-              _context2.prev = 11;
-              if (!_this2.draft.prospects) {
-                _context2.next = 17;
+              _context3.prev = 12;
+              if (!_this4.draft.prospects) {
+                _context3.next = 18;
                 break;
               }
-              _context2.next = 15;
-              return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].sendBulk(_this2.project.slug, payload);
-            case 15:
-              _context2.next = 19;
+              _context3.next = 16;
+              return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].sendBulk(_this4.project.slug, payload);
+            case 16:
+              _context3.next = 20;
               break;
-            case 17:
-              _context2.next = 19;
-              return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].send(_this2.project.slug, _this2.draft.prospect, payload);
-            case 19:
-              _this2.draft.body = "";
-              _this2.attachments = [];
-              _this2.templateAttachments = [];
-              _this2.templateId = null;
-              _this2.sent = true;
-              _this2.previewMode = false;
-              _context2.next = 30;
+            case 18:
+              _context3.next = 20;
+              return _apis_project_prospect_email__WEBPACK_IMPORTED_MODULE_1__["default"].send(_this4.project.slug, _this4.draft.prospect, payload);
+            case 20:
+              _this4.draft.body = "";
+              _this4.attachments = [];
+              _this4.templateAttachments = [];
+              _this4.templateId = null;
+              _this4.showTemplateSave = false;
+              _this4.sent = true;
+              _this4.previewMode = false;
+              _context3.next = 32;
               break;
-            case 27:
-              _context2.prev = 27;
-              _context2.t0 = _context2["catch"](11);
-              _this2.sendError = _this2.errorMessage(_context2.t0, _this2.$t("email_composer.send_error"));
-            case 30:
-              _context2.prev = 30;
-              _this2.sending = false;
-              return _context2.finish(30);
-            case 33:
+            case 29:
+              _context3.prev = 29;
+              _context3.t0 = _context3["catch"](12);
+              _this4.sendError = _this4.errorMessage(_context3.t0, _this4.$t("email_composer.send_error"));
+            case 32:
+              _context3.prev = 32;
+              _this4.sending = false;
+              return _context3.finish(32);
+            case 35:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[11, 27, 30, 33]]);
+        }, _callee3, null, [[12, 29, 32, 35]]);
       }))();
     }
   }
@@ -35800,6 +35972,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       selectedProspectsFolded: true,
       fetchingProspects: false,
       selectedProspectsRequestId: 0,
+      addingEmailProspect: false,
       addingMessage: false,
       fetchingMessages: false,
       emailDraft: null,
@@ -35906,6 +36079,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context2.next = 11;
               return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_2__["default"].get(projectSlug, {
                 params: {
+                  count: ids.length,
                   filters: JSON.stringify({
                     ids: ids
                   }),
@@ -35935,6 +36109,59 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return p.id;
       }));
       this.selectedProspectsTab = 0;
+    },
+    handleSelectedProspect: function handleSelectedProspect(prospect) {
+      if (this.addingEmailProspect) {
+        this.addEmailRecipient(prospect);
+        return;
+      }
+      this.addSelectedProspect(prospect);
+    },
+    backFromSelectedProspects: function backFromSelectedProspects() {
+      this.selectedProspectsTab = 0;
+      if (this.addingEmailProspect) {
+        this.addingEmailProspect = false;
+        this.tab = 3;
+      }
+    },
+    addEmailProspects: function addEmailProspects() {
+      var _this$emailDraft, _this$emailDraft2;
+      var recipients = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : ((_this$emailDraft = this.emailDraft) === null || _this$emailDraft === void 0 ? void 0 : _this$emailDraft.selectedProspects) || [];
+      if (!Array.isArray((_this$emailDraft2 = this.emailDraft) === null || _this$emailDraft2 === void 0 ? void 0 : _this$emailDraft2.prospects)) return;
+      this.emailDraft = _objectSpread(_objectSpread({}, this.emailDraft), {}, {
+        selectedProspects: recipients,
+        prospects: recipients.map(function (recipient) {
+          return recipient.id;
+        }),
+        to: recipients.map(function (recipient) {
+          return recipient.email;
+        }).filter(Boolean).join(", ")
+      });
+      this.addingEmailProspect = true;
+      this.frameTab = 0;
+      this.selectedProspectsTab = 1;
+      this.tab = 1;
+    },
+    addEmailRecipient: function addEmailRecipient(prospect) {
+      var _this$emailDraft3;
+      var recipients = _toConsumableArray(((_this$emailDraft3 = this.emailDraft) === null || _this$emailDraft3 === void 0 ? void 0 : _this$emailDraft3.selectedProspects) || []);
+      if (prospect.email && !recipients.some(function (recipient) {
+        return recipient.id == prospect.id;
+      })) {
+        recipients.push(prospect);
+        this.emailDraft = _objectSpread(_objectSpread({}, this.emailDraft), {}, {
+          selectedProspects: recipients,
+          prospects: recipients.map(function (recipient) {
+            return recipient.id;
+          }),
+          to: recipients.map(function (recipient) {
+            return recipient.email;
+          }).join(", ")
+        });
+      }
+      this.addingEmailProspect = false;
+      this.selectedProspectsTab = 0;
+      this.tab = 3;
     },
     /**
      *
@@ -36191,6 +36418,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         prospects: this.prospect ? null : recipients.map(function (item) {
           return item.id;
         }),
+        selectedProspects: recipients,
         to: recipients.map(function (item) {
           return item.email;
         }).join(", "),
@@ -36204,6 +36432,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     },
     resetEmailComposer: function resetEmailComposer() {
       this.emailDraft = null;
+      this.addingEmailProspect = false;
       if (this.tab === 3) this.tab = 0;
     },
     /**
@@ -78347,90 +78576,114 @@ var _hoisted_8 = {
 var _hoisted_9 = {
   "class": "hc-email-preview-brand"
 };
-var _hoisted_10 = ["textContent"];
-var _hoisted_11 = /*#__PURE__*/_withScopeId(function () {
-  return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "HEROES CRM", -1 /* HOISTED */);
-});
+var _hoisted_10 = ["aria-label", "disabled"];
+var _hoisted_11 = ["aria-label", "disabled"];
 var _hoisted_12 = {
   "class": "hc-email-preview-content"
 };
-var _hoisted_13 = ["textContent"];
-var _hoisted_14 = ["textContent"];
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = {
+var _hoisted_13 = ["aria-label", "disabled"];
+var _hoisted_14 = ["placeholder", "aria-label", "disabled"];
+var _hoisted_15 = ["placeholder", "aria-label", "disabled"];
+var _hoisted_16 = ["textContent"];
+var _hoisted_17 = {
   "class": "hc-email-preview-signature"
 };
-var _hoisted_17 = ["textContent"];
-var _hoisted_18 = /*#__PURE__*/_withScopeId(function () {
+var _hoisted_18 = ["aria-label", "disabled"];
+var _hoisted_19 = /*#__PURE__*/_withScopeId(function () {
   return /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("br", null, null, -1 /* HOISTED */);
 });
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = {
+var _hoisted_20 = ["aria-label", "disabled"];
+var _hoisted_21 = {
   "class": "hc-email-preview-footer"
 };
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = ["textContent"];
+var _hoisted_22 = ["aria-label", "disabled"];
+var _hoisted_23 = ["aria-label", "disabled"];
 var _hoisted_24 = ["textContent"];
-var _hoisted_25 = {
+var _hoisted_25 = ["disabled"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = {
+  key: 1,
+  "class": "hc-email-template-save"
+};
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["placeholder", "disabled"];
+var _hoisted_30 = {
+  "class": "hc-email-template-save-actions"
+};
+var _hoisted_31 = ["disabled", "textContent"];
+var _hoisted_32 = ["disabled", "textContent"];
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = ["textContent"];
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = {
   key: 1,
   "class": "hc-email-composer-fields"
 };
-var _hoisted_26 = ["disabled"];
-var _hoisted_27 = {
+var _hoisted_37 = ["disabled"];
+var _hoisted_38 = {
+  key: 0,
   "class": "hc-email-recipient-row"
 };
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = ["placeholder", "aria-label"];
-var _hoisted_30 = ["aria-label", "textContent"];
-var _hoisted_31 = ["textContent"];
-var _hoisted_32 = ["textContent"];
-var _hoisted_33 = {
+var _hoisted_39 = ["textContent"];
+var _hoisted_40 = ["placeholder", "aria-label"];
+var _hoisted_41 = {
+  key: 1,
+  "class": "hc-email-recipient-row hc-email-recipient-row-bulk"
+};
+var _hoisted_42 = ["textContent"];
+var _hoisted_43 = ["aria-label"];
+var _hoisted_44 = {
+  "class": "hc-email-selected-prospects-list"
+};
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = ["textContent"];
+var _hoisted_47 = {
   "class": "hc-email-subject-row"
 };
-var _hoisted_34 = ["placeholder", "aria-label"];
-var _hoisted_35 = ["placeholder", "aria-label"];
-var _hoisted_36 = {
-  key: 2,
+var _hoisted_48 = ["placeholder", "aria-label"];
+var _hoisted_49 = ["placeholder", "aria-label"];
+var _hoisted_50 = {
+  key: 4,
   "class": "hc-email-attachments"
 };
-var _hoisted_37 = ["textContent"];
-var _hoisted_38 = ["aria-label", "onClick"];
-var _hoisted_39 = ["textContent"];
-var _hoisted_40 = ["aria-label", "onClick"];
-var _hoisted_41 = ["textContent"];
-var _hoisted_42 = ["textContent"];
-var _hoisted_43 = {
+var _hoisted_51 = ["textContent"];
+var _hoisted_52 = ["aria-label", "onClick"];
+var _hoisted_53 = ["textContent"];
+var _hoisted_54 = ["aria-label", "onClick"];
+var _hoisted_55 = ["textContent"];
+var _hoisted_56 = ["textContent"];
+var _hoisted_57 = {
   "class": "hc-email-compose-footer"
 };
-var _hoisted_44 = ["disabled", "textContent"];
-var _hoisted_45 = ["title", "aria-label", "disabled"];
-var _hoisted_46 = ["title", "aria-label", "disabled"];
-var _hoisted_47 = ["title", "aria-label", "disabled"];
-var _hoisted_48 = ["title", "aria-label"];
-var _hoisted_49 = ["aria-label", "disabled"];
-var _hoisted_50 = ["textContent"];
-var _hoisted_51 = {
+var _hoisted_58 = ["disabled", "textContent"];
+var _hoisted_59 = ["title", "aria-label", "disabled"];
+var _hoisted_60 = ["title", "aria-label", "disabled"];
+var _hoisted_61 = ["title", "aria-label", "disabled"];
+var _hoisted_62 = ["title", "aria-label"];
+var _hoisted_63 = ["aria-label", "disabled"];
+var _hoisted_64 = ["textContent"];
+var _hoisted_65 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_52 = ["textContent"];
-var _hoisted_53 = {
+var _hoisted_66 = ["textContent"];
+var _hoisted_67 = {
   "class": "hc-item-main-content"
 };
-var _hoisted_54 = ["textContent"];
-var _hoisted_55 = ["textContent"];
-var _hoisted_56 = {
+var _hoisted_68 = ["textContent"];
+var _hoisted_69 = ["textContent"];
+var _hoisted_70 = {
   key: 1
 };
-var _hoisted_57 = ["textContent"];
-var _hoisted_58 = ["textContent"];
-var _hoisted_59 = ["textContent"];
+var _hoisted_71 = ["textContent"];
+var _hoisted_72 = ["textContent"];
+var _hoisted_73 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
+  var _component_selected_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("selected-prospect");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
   var _component_search = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("search");
@@ -78445,7 +78698,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
         "class": "hc-email-composer",
-        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[40] || (_cache[40] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.send && $options.send.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("header", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -78459,54 +78712,207 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "hc-email-compose-close",
         title: _ctx.$t('email_composer.back'),
         "aria-label": _ctx.$t('email_composer.back'),
-        disabled: $data.sending,
+        disabled: $data.sending || $data.savingTemplate,
         onClick: _cache[0] || (_cache[0] = function ($event) {
           return _ctx.$emit('back');
         })
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": "fa fa-times"
-      })], 8 /* PROPS */, _hoisted_5)]), $data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.project.name)
-      }, null, 8 /* PROPS */, _hoisted_10), _hoisted_11]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+      })], 8 /* PROPS */, _hoisted_5)]), $data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+          return $data.emailLayout.brand_name = $event;
+        }),
+        "class": "hc-email-preview-brand-name",
+        maxlength: "255",
+        "aria-label": _ctx.$t('email_composer.preview.brand_name'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[2] || (_cache[2] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.brand_name]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+          return $data.emailLayout.brand_label = $event;
+        }),
+        "class": "hc-email-preview-brand-label",
+        maxlength: "255",
+        "aria-label": _ctx.$t('email_composer.preview.brand_label'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[5] || (_cache[5] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_11), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.brand_label]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+          return $data.emailLayout.category = $event;
+        }),
         "class": "hc-email-preview-category",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.category || _ctx.$t('email_composer.preview.message'))
-      }, null, 8 /* PROPS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h1", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.subject || _ctx.$t('email_composer.preview.subject'))
-      }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        maxlength: "255",
+        "aria-label": _ctx.$t('email_composer.preview.category'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[8] || (_cache[8] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_13), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.category]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+          return $data.draft.subject = $event;
+        }),
+        type: "text",
+        "class": "hc-email-preview-subject",
+        maxlength: "255",
+        placeholder: _ctx.$t('email_composer.preview.subject'),
+        "aria-label": _ctx.$t('email_composer.subject.placeholder'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[11] || (_cache[11] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.subject]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+        "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+          return $data.draft.body = $event;
+        }),
         "class": "hc-email-preview-body",
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.body || _ctx.$t('email_composer.preview.body'))
-      }, null, 8 /* PROPS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.closing'))
-      }, null, 8 /* PROPS */, _hoisted_17), _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.project.name)
-      }, null, 8 /* PROPS */, _hoisted_19)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.sent_by', {
+        rows: "8",
+        placeholder: _ctx.$t('email_composer.preview.body'),
+        "aria-label": _ctx.$t('email_composer.body.label'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[14] || (_cache[14] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        })
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.body]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+        "class": "hc-email-preview-edit-hint",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.edit_hint'))
+      }, null, 8 /* PROPS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+          return $data.emailLayout.closing = $event;
+        }),
+        "class": "hc-email-preview-signature-closing",
+        maxlength: "255",
+        "aria-label": _ctx.$t('email_composer.preview.closing'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[16] || (_cache[16] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.closing]]), _hoisted_19, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+          return $data.emailLayout.signature_name = $event;
+        }),
+        "class": "hc-email-preview-signature-name",
+        maxlength: "255",
+        "aria-label": _ctx.$t('email_composer.preview.signature_name'),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[19] || (_cache[19] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[20] || (_cache[20] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_20), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.signature_name]])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+          return $data.emailLayout.sent_by = $event;
+        }),
+        maxlength: "500",
+        "aria-label": _ctx.$t('email_composer.preview.sent_by', {
           project: _ctx.project.name
-        }))
-      }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.rights', {
+        }),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[22] || (_cache[22] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_22), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.sent_by]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
+          return $data.emailLayout.rights = $event;
+        }),
+        maxlength: "500",
+        "aria-label": _ctx.$t('email_composer.preview.rights', {
           year: $data.currentYear,
           project: _ctx.project.name
-        }))
-      }, null, 8 /* PROPS */, _hoisted_22)]), $options.hasProspectVariables ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        }),
+        disabled: $data.sending || $data.savingTemplate,
+        onInput: _cache[25] || (_cache[25] = function ($event) {
+          $data.templateSaved = false;
+          $data.templateSaveError = '';
+        }),
+        onKeydown: _cache[26] || (_cache[26] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_23), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.emailLayout.rights]])]), $options.hasProspectVariables ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         "class": "hc-email-preview-note",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.preview.variables_note'))
-      }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+      }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _ctx.can('all.project.message-template.add') && !$data.showTemplateSave ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        key: 0,
+        type: "button",
+        "class": "hc-email-template-save-trigger",
+        disabled: $data.sending || $data.savingTemplate,
+        onClick: _cache[27] || (_cache[27] = function () {
+          return $options.startTemplateSave && $options.startTemplateSave.apply($options, arguments);
+        })
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-save"
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.save_current'))
+      }, null, 8 /* PROPS */, _hoisted_26)], 8 /* PROPS */, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.showTemplateSave ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+        "for": "hc-email-template-name",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.name_placeholder'))
+      }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        id: "hc-email-template-name",
+        ref: "templateName",
+        "onUpdate:modelValue": _cache[28] || (_cache[28] = function ($event) {
+          return $data.templateName = $event;
+        }),
+        maxlength: "255",
+        required: "",
+        placeholder: _ctx.$t('email_composer.templates.name_placeholder'),
+        disabled: $data.savingTemplate,
+        onKeydown: _cache[29] || (_cache[29] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $options.saveCurrentAsTemplate && $options.saveCurrentAsTemplate.apply($options, arguments);
+        }, ["prevent"]), ["enter"]))
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_29), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.templateName]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        disabled: $data.savingTemplate,
+        onClick: _cache[30] || (_cache[30] = function () {
+          return $options.saveCurrentAsTemplate && $options.saveCurrentAsTemplate.apply($options, arguments);
+        }),
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.save'))
+      }, null, 8 /* PROPS */, _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        type: "button",
+        disabled: $data.savingTemplate,
+        onClick: _cache[31] || (_cache[31] = function () {
+          return $options.cancelTemplateSave && $options.cancelTemplateSave.apply($options, arguments);
+        }),
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('cancel'))
+      }, null, 8 /* PROPS */, _hoisted_32)]), $data.templateSaveError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         role: "alert",
         "class": "hc-email-error",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.templateSaveError)
+      }, null, 8 /* PROPS */, _hoisted_33)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.templateSaved ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 2,
+        role: "status",
+        "class": "hc-email-success",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.saved'))
+      }, null, 8 /* PROPS */, _hoisted_34)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 3,
+        role: "alert",
+        "class": "hc-email-error",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-      }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
+      }, null, 8 /* PROPS */, _hoisted_35)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("fieldset", {
         disabled: $data.sending
-      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+      }, [!$data.draft.prospects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
         "class": "hc-email-recipient-label",
         "for": "hc-email-recipient",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.label'))
-      }, null, 8 /* PROPS */, _hoisted_28), !$data.draft.prospects ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-        key: 0,
+      }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
         id: "hc-email-recipient",
-        "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+        "onUpdate:modelValue": _cache[32] || (_cache[32] = function ($event) {
           return $data.draft.to = $event;
         }),
         "class": "hc-email-recipient-input",
@@ -78514,25 +78920,58 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: "",
         placeholder: _ctx.$t('email_composer.recipient.placeholder'),
         "aria-label": _ctx.$t('email_composer.recipient.label')
-      }, null, 8 /* PROPS */, _hoisted_29)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.to]]) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-        key: 1,
-        "class": "hc-email-recipient-list",
+      }, null, 8 /* PROPS */, _hoisted_40), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.to]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        "class": "hc-email-recipient-label",
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.label'))
+      }, null, 8 /* PROPS */, _hoisted_42), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        "class": "hc-email-selected-prospects-container",
         role: "group",
+        "aria-label": _ctx.$t('email_composer.recipient.label_plural')
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+        id: "hc-email-composer-selected-prospects",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-email-selected-prospects', $data.selectedProspectsFolded ? 'folded' : ''])
+      }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_selected_prospect, {
+          key: prospect.id,
+          prospect: prospect,
+          title: prospect.email || '',
+          onRemove: $options.removeSelectedProspect
+        }, null, 8 /* PROPS */, ["prospect", "title", "onRemove"]);
+      }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        tag: "a",
+        "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $data.selectedProspectsFolded ? 'fa-caret-down' : 'fa-caret-up']),
+        title: _ctx.$t('email_composer.recipient.label_plural'),
         "aria-label": _ctx.$t('email_composer.recipient.label_plural'),
-        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.draft.to)
-      }, null, 8 /* PROPS */, _hoisted_30))]), $data.draft.prospects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-        key: 0,
+        onClick: _cache[33] || (_cache[33] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          return $data.selectedProspectsFolded = !$data.selectedProspectsFolded;
+        }, ["prevent", "stop"])),
+        size: "30",
+        style: {
+          "min-width": "30px"
+        }
+      }, null, 8 /* PROPS */, ["class", "title", "aria-label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        tag: "a",
+        "class": "fa fa-plus",
+        title: _ctx.$t('email_composer.recipient.label_plural'),
+        "aria-label": _ctx.$t('email_composer.recipient.label_plural'),
+        onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.addProspects, ["prevent", "stop"]),
+        size: "30",
+        style: {
+          "min-width": "30px"
+        }
+      }, null, 8 /* PROPS */, ["title", "aria-label", "onClick"])], 2 /* CLASS */)], 8 /* PROPS */, _hoisted_43)])), $data.draft.prospects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 2,
         "class": "hc-email-help hc-email-recipient-help",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.bulk_count', {
           count: $data.draft.prospects.length
         }))
-      }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.draft.prospects && !$data.draft.prospects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-        key: 1,
+      }, null, 8 /* PROPS */, _hoisted_45)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.draft.prospects && !$data.draft.prospects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        key: 3,
         role: "alert",
         "class": "hc-email-error",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.recipient.none_with_email'))
-      }, null, 8 /* PROPS */, _hoisted_32)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_33, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-        "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      }, null, 8 /* PROPS */, _hoisted_46)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        "onUpdate:modelValue": _cache[34] || (_cache[34] = function ($event) {
           return $data.draft.subject = $event;
         }),
         "class": "hc-email-subject",
@@ -78540,8 +78979,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         maxlength: "255",
         placeholder: _ctx.$t('email_composer.subject.placeholder'),
         "aria-label": _ctx.$t('email_composer.subject.placeholder')
-      }, null, 8 /* PROPS */, _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.subject]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
-        "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      }, null, 8 /* PROPS */, _hoisted_48), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.subject]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+        "onUpdate:modelValue": _cache[35] || (_cache[35] = function ($event) {
           return $data.draft.body = $event;
         }),
         "class": "hc-email-body",
@@ -78549,7 +78988,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         required: "",
         placeholder: _ctx.$t('email_composer.body.placeholder'),
         "aria-label": _ctx.$t('email_composer.body.label')
-      }, null, 8 /* PROPS */, _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.body]]), $data.templateAttachments.length || $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_36, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.templateAttachments, function (file) {
+      }, null, 8 /* PROPS */, _hoisted_49), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft.body]]), $data.templateAttachments.length || $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_50, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.templateAttachments, function (file) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: file.id,
           "class": "hc-email-attachment"
@@ -78557,7 +78996,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "class": "fa fa-paperclip"
         }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
-        }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
           "aria-label": _ctx.$t('email_composer.attachment.remove', {
             name: file.name
@@ -78567,7 +79006,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
           "class": "fa fa-times"
-        })], 8 /* PROPS */, _hoisted_38)]);
+        })], 8 /* PROPS */, _hoisted_52)]);
       }), 128 /* KEYED_FRAGMENT */)), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (file, index) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: 'upload-' + index,
@@ -78576,7 +79015,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "class": "fa fa-paperclip"
         }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
-        }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        }, null, 8 /* PROPS */, _hoisted_53), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
           "aria-label": _ctx.$t('email_composer.attachment.remove', {
             name: file.name
@@ -78586,58 +79025,58 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
           "class": "fa fa-times"
-        })], 8 /* PROPS */, _hoisted_40)]);
-      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_26), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+        })], 8 /* PROPS */, _hoisted_54)]);
+      }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_37), $data.sendError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 0,
         role: "alert",
         "class": "hc-email-error",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-      }, null, 8 /* PROPS */, _hoisted_41)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+      }, null, 8 /* PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
         key: 1,
         role: "status",
         "class": "hc-email-success",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.status.sent'))
-      }, null, 8 /* PROPS */, _hoisted_42)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("footer", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      }, null, 8 /* PROPS */, _hoisted_56)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("footer", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "hc-email-send",
-        disabled: $data.sending || !$options.canSend,
+        disabled: $data.sending || $data.savingTemplate || !$options.canSend,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sending ? _ctx.$t('email_composer.status.sending') : _ctx.$t('email_composer.status.send'))
-      }, null, 8 /* PROPS */, _hoisted_44), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      }, null, 8 /* PROPS */, _hoisted_58), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 0,
         type: "button",
         "class": "hc-email-toolbar-button",
         title: _ctx.$t('email_composer.title.preview'),
         "aria-label": _ctx.$t('email_composer.title.preview'),
         disabled: $data.sending,
-        onClick: _cache[4] || (_cache[4] = function ($event) {
+        onClick: _cache[36] || (_cache[36] = function ($event) {
           return $data.previewMode = true;
         })
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": "fa fa-eye"
-      })], 8 /* PROPS */, _hoisted_45)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      })], 8 /* PROPS */, _hoisted_59)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 1,
         type: "button",
         "class": "hc-email-toolbar-button",
         title: _ctx.$t('email_composer.toolbar.edit'),
         "aria-label": _ctx.$t('email_composer.toolbar.edit'),
         disabled: $data.sending,
-        onClick: _cache[5] || (_cache[5] = function ($event) {
+        onClick: _cache[37] || (_cache[37] = function ($event) {
           return $data.previewMode = false;
         })
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": "fa fa-pencil-alt"
-      })], 8 /* PROPS */, _hoisted_46)), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      })], 8 /* PROPS */, _hoisted_60)), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
         key: 2,
         type: "button",
         "class": "hc-email-toolbar-button",
         title: _ctx.$t('email_composer.templates.title'),
         "aria-label": _ctx.$t('email_composer.templates.title'),
         disabled: $data.sending,
-        onClick: _cache[6] || (_cache[6] = function () {
+        onClick: _cache[38] || (_cache[38] = function () {
           return $options.showTemplates && $options.showTemplates.apply($options, arguments);
         })
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
         "class": "fa fa-file-alt"
-      })], 8 /* PROPS */, _hoisted_47)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+      })], 8 /* PROPS */, _hoisted_61)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
         key: 3,
         "class": "hc-email-toolbar-button hc-email-attach-button",
         title: _ctx.$t('email_composer.attachment.add_help'),
@@ -78649,23 +79088,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         multiple: "",
         "aria-label": _ctx.$t('email_composer.attachment.add'),
         disabled: $data.sending,
-        onChange: _cache[7] || (_cache[7] = function () {
+        onChange: _cache[39] || (_cache[39] = function () {
           return $options.addAttachments && $options.addAttachments.apply($options, arguments);
         })
-      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_49)], 8 /* PROPS */, _hoisted_48)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+      }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_63)], 8 /* PROPS */, _hoisted_62)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.previewMode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
         key: 4,
         "class": "hc-email-help hc-email-attachment-help",
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.attachment.limits'))
-      }, null, 8 /* PROPS */, _hoisted_50)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+      }, null, 8 /* PROPS */, _hoisted_64)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
         loading: $data.sending
       }, null, 8 /* PROPS */, ["loading"])], 32 /* HYDRATE_EVENTS */)];
     }),
     "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
         tag: "button",
         type: "button",
         "class": "bordered",
-        onClick: _cache[9] || (_cache[9] = function ($event) {
+        onClick: _cache[41] || (_cache[41] = function ($event) {
           return $data.tab = 0;
         })
       }, {
@@ -78675,12 +79114,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
             "class": "hc-item-main-content",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.title'))
-          }, null, 8 /* PROPS */, _hoisted_52)];
+          }, null, 8 /* PROPS */, _hoisted_66)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
         modelValue: $data.templateKeyword,
-        "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+        "onUpdate:modelValue": _cache[42] || (_cache[42] = function ($event) {
           return $data.templateKeyword = $event;
         })
       }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -78699,12 +79138,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                 return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                   "class": "fa fa-file-alt"
-                }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.name)
-                }, null, 8 /* PROPS */, _hoisted_54), template.subject ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
+                }, null, 8 /* PROPS */, _hoisted_68), template.subject ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", {
                   key: 0,
                   textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(template.subject)
-                }, null, 8 /* PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), template.attachments && template.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_56, " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.attachment_count', {
+                }, null, 8 /* PROPS */, _hoisted_69)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), template.attachments && template.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("small", _hoisted_70, " · " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.attachment_count', {
                   count: template.attachments.length
                 })), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), _ctx.can('all.project.message-template.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                   key: 0,
@@ -78724,23 +79163,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             key: 0,
             "class": "hc-email-help",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('email_composer.templates.empty'))
-          }, null, 8 /* PROPS */, _hoisted_57)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.templateError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+          }, null, 8 /* PROPS */, _hoisted_71)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.templateError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
             key: 1,
             role: "alert",
             "class": "hc-email-error",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.templateError)
-          }, null, 8 /* PROPS */, _hoisted_58)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          }, null, 8 /* PROPS */, _hoisted_72)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [_ctx.can('all.project.message-template.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
             key: 0,
-            onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[43] || (_cache[43] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.addTemplate && $options.addTemplate.apply($options, arguments);
             }, ["prevent"])),
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-          }, null, 8 /* PROPS */, _hoisted_59)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          }, null, 8 /* PROPS */, _hoisted_73)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -88946,13 +89385,18 @@ var _hoisted_1 = {
 };
 var _hoisted_2 = ["textContent"];
 var _hoisted_3 = ["textContent"];
-var _hoisted_4 = ["textContent"];
+var _hoisted_4 = {
+  key: 1,
+  "class": "hc-prospect-message-email-reasons"
+};
 var _hoisted_5 = ["textContent"];
 var _hoisted_6 = ["textContent"];
-var _hoisted_7 = {
+var _hoisted_7 = ["textContent"];
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = {
   id: "hc-prospect-message-selected-prospects-list"
 };
-var _hoisted_8 = {
+var _hoisted_10 = {
   style: {
     "display": "flex",
     "flex-direction": "column",
@@ -88964,36 +89408,27 @@ var _hoisted_8 = {
   },
   ref: "messages"
 };
-var _hoisted_9 = {
+var _hoisted_11 = {
   key: 0,
   "class": "hc-prospect-new-message-attachments"
 };
-var _hoisted_10 = {
+var _hoisted_12 = {
   "class": "hc-flex-row"
 };
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content"
 }, null, -1 /* HOISTED */);
-var _hoisted_12 = {
-  "class": "hc-flex-column",
-  style: {
-    "height": "100%"
-  }
-};
-var _hoisted_13 = ["textContent"];
 var _hoisted_14 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_15 = ["textContent"];
-var _hoisted_16 = {
-  "class": "hc-flex-column hc-flex-1",
-  style: {
-    "overflow": "auto"
-  }
+var _hoisted_15 = {
+  key: 0,
+  "class": "hc-prospect-message-email-reasons"
 };
+var _hoisted_16 = ["textContent"];
 var _hoisted_17 = {
   "class": "hc-flex-column",
   style: {
@@ -89001,17 +89436,30 @@ var _hoisted_17 = {
   }
 };
 var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["textContent"];
+var _hoisted_19 = {
+  "class": "hc-flex-column hc-flex-1",
+  style: {
+    "overflow": "auto"
+  }
+};
+var _hoisted_20 = {
+  "class": "hc-flex-column",
+  style: {
+    "height": "100%"
+  }
+};
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_search = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("search");
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
+  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _component_thread_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("thread-row");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
   var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_selected_prospect = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("selected-prospect");
   var _component_message_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("message-row");
-  var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _component_text_editor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("text-editor");
   var _component_invoice_attachment = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("invoice-attachment");
   var _component_uploading_attachment_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("uploading-attachment-row");
@@ -89080,7 +89528,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 name: 'Prospect - Message - Paramètre email',
                 body: 'Avant d\'envoyer un message dans une discussion externe, paramétrez ici l\'envoi d\'email dans votre projet.',
                 timeout: 500
-              }]]), _ctx.prospect && _ctx.prospect.email || $data.selectedProspects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+              }]]), _ctx.prospect && _ctx.prospect.email ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
                 key: 0
               }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.emailReasons, function (reason) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
@@ -89100,7 +89548,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }),
                   _: 2 /* DYNAMIC */
                 }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]);
-              }), 128 /* KEYED_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredThreads, function (c) {
+              }), 128 /* KEYED_FRAGMENT */)) : _ctx.prospectsSelected.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects.length ? $data.emailReasons : [], function (reason) {
+                return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                  key: reason.key,
+                  tag: "a",
+                  onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+                    return $options.openEmailComposer(reason);
+                  }, ["prevent"])
+                }, {
+                  "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                    return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      "class": "fa fa-paper-plane icon-blue"
+                    }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                      "class": "hc-item-main-content",
+                      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(reason.label)
+                    }, null, 8 /* PROPS */, _hoisted_5)];
+                  }),
+                  _: 2 /* DYNAMIC */
+                }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]);
+              }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+                loading: $data.fetchingProspects
+              }, null, 8 /* PROPS */, ["loading"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredThreads, function (c) {
                 return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_thread_row, {
                   key: c.id,
                   thread: c,
@@ -89121,7 +89589,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   return $options.addThread && $options.addThread.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_4)];
+              }, null, 8 /* PROPS */, _hoisted_6)];
             }),
             _: 1 /* STABLE */
           })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
@@ -89133,9 +89601,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "hc-flex-1"
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [$data.selectedProspects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item_list, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [$data.selectedProspects.length || $data.fetchingProspects ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [$data.selectedProspects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item_list, {
                 key: 0,
-                padding: "5px"
+                padding: "5px",
+                style: {
+                  "height": "auto"
+                }
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.emailReasons, function (reason) {
@@ -89152,16 +89623,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                           "class": "hc-item-main-content",
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(reason.label)
-                        }, null, 8 /* PROPS */, _hoisted_13)];
+                        }, null, 8 /* PROPS */, _hoisted_16)];
                       }),
                       _: 2 /* DYNAMIC */
                     }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["onClick"]);
                   }), 128 /* KEYED_FRAGMENT */))];
                 }),
                 _: 1 /* STABLE */
-              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
+              })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+                loading: $data.fetchingProspects
+              }, null, 8 /* PROPS */, ["loading"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
                 "class": "hc-flex-1",
-                onBack: _cache[17] || (_cache[17] = function ($event) {
+                onBack: _cache[16] || (_cache[16] = function ($event) {
                   return $data.tab = 0;
                 }),
                 onProspectSelected: $options.setMessageProspect
@@ -89201,19 +89674,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.messageThread.name)
-                      }, null, 8 /* PROPS */, _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                      }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         style: {
                           "padding": "0 5px",
                           "color": "#777"
                         },
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.messageThread["private"] ? 'Interne' : 'Partagé')
-                      }, null, 8 /* PROPS */, _hoisted_6)];
+                      }, null, 8 /* PROPS */, _hoisted_8)];
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Selected prospects "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     id: "hc-prospect-message-selected-prospects",
                     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)($data.selectedProspectsFolded ? 'folded' : '')
-                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
+                  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.selectedProspects, function (prospect) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_selected_prospect, {
                       key: prospect.id,
                       prospect: prospect,
@@ -89239,7 +89712,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     style: {
                       "min-width": "30px"
                     }
-                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.messages, function (c) {
+                  })], 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.messages, function (c) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_message_row, {
                       key: c.id,
                       message: c,
@@ -89279,7 +89752,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     placeholder: "Saisir un message ...",
                     ref: "textarea"
-                  }, null, 8 /* PROPS */, ["modelValue"]), $data.attachments.length || _ctx.messageInvoice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_ctx.messageInvoice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_invoice_attachment, {
+                  }, null, 8 /* PROPS */, ["modelValue"]), $data.attachments.length || _ctx.messageInvoice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [_ctx.messageInvoice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_invoice_attachment, {
                     key: 0,
                     invoice: _ctx.messageInvoice,
                     onRemove: $options.removeInvoice
@@ -89289,7 +89762,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       attachment: c,
                       onRemove: $options.removeAttachment
                     }, null, 8 /* PROPS */, ["attachment", "onRemove"]);
-                  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
@@ -89303,7 +89776,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     onClick: _cache[8] || (_cache[8] = function ($event) {
                       return $data.showTextEditor = true;
                     })
-                  }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Agrandir']]), _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 512 /* NEED_PATCH */)), [[_directive_tooltip, 'Agrandir']]), _hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
                     onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -89335,12 +89808,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 }),
                 "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_select_prospect, {
-                    "search-fields": ['first_name', 'last_name'],
-                    onBack: _cache[16] || (_cache[16] = function ($event) {
-                      return $data.selectedProspectsTab = 0;
-                    }),
-                    onProspectSelected: $options.addSelectedProspect
-                  }, null, 8 /* PROPS */, ["onProspectSelected"])];
+                    "search-fields": ['first_name', 'last_name', 'email'],
+                    onBack: $options.backFromSelectedProspects,
+                    onProspectSelected: $options.handleSelectedProspect
+                  }, null, 8 /* PROPS */, ["onBack", "onProspectSelected"])];
                 }),
                 _: 1 /* STABLE */
               }, 8 /* PROPS */, ["tab"])];
@@ -89355,8 +89826,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             "class": "hc-flex-1"
           }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createSlots)({
             "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[20] || (_cache[20] = function ($event) {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[19] || (_cache[19] = function ($event) {
                   return $data.tab = 1;
                 }),
                 "class": "bordered"
@@ -89367,12 +89838,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.message.templates.title'))
-                  }, null, 8 /* PROPS */, _hoisted_18)];
+                  }, null, 8 /* PROPS */, _hoisted_21)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
                 modelValue: $data.messageTemplateKeyword,
-                "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+                "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
                   return $data.messageTemplateKeyword = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -89402,11 +89873,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-                    onClick: _cache[22] || (_cache[22] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+                    onClick: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                       return $options.addMessageTemplate && $options.addMessageTemplate.apply($options, arguments);
                     }, ["prevent"])),
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-                  }, null, 8 /* PROPS */, _hoisted_19)];
+                  }, null, 8 /* PROPS */, _hoisted_22)];
                 }),
                 _: 1 /* STABLE */
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
@@ -89415,8 +89886,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.waitingUserMessage ? {
             name: "1",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-                onClick: _cache[18] || (_cache[18] = function ($event) {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                onClick: _cache[17] || (_cache[17] = function ($event) {
                   return $options.setWaitingUserMessage(null);
                 }),
                 "class": "bordered"
@@ -89427,12 +89898,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.messageThread.name)
-                  }, null, 8 /* PROPS */, _hoisted_15)];
+                  }, null, 8 /* PROPS */, _hoisted_18)];
                 }),
                 _: 1 /* STABLE */
-              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
                 modelValue: $data.userKeyword,
-                "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
+                "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
                   return $data.userKeyword = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -89460,10 +89931,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [$data.emailDraft ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_email_composer, {
             key: $data.emailDraftKey,
             "initial-draft": $data.emailDraft,
-            onBack: _cache[23] || (_cache[23] = function ($event) {
+            onBack: _cache[22] || (_cache[22] = function ($event) {
               return $data.tab = $data.emailReturnTab;
-            })
-          }, null, 8 /* PROPS */, ["initial-draft"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+            }),
+            onAddProspects: $options.addEmailProspects
+          }, null, 8 /* PROPS */, ["initial-draft", "onAddProspects"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["tab"])];
@@ -118132,7 +118604,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-composer[data-v-52e0648a] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    position: relative;\n    overflow: hidden;\n    color: #202124;\n    background: #fff;\n    border: 1px solid #dadce0;\n    border-radius: 8px;\n    box-shadow: 0 2px 8px rgba(60, 64, 67, 0.18);\n    font-family: Arial, sans-serif;\n}\n.hc-email-compose-header[data-v-52e0648a] {\n    min-height: 40px;\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 0 10px 0 14px;\n    background: #f2f6fc;\n    color: #202124;\n}\n.hc-email-compose-title[data-v-52e0648a] { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 14px; font-weight: 600;\n}\n.hc-email-compose-category[data-v-52e0648a] {\n    max-width: 125px;\n    overflow: hidden;\n    padding: 3px 8px;\n    border-radius: 12px;\n    background: #e8f0fe;\n    color: #1967d2;\n    font-size: 10px;\n    font-weight: 400;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-email-compose-close[data-v-52e0648a], .hc-email-toolbar-button[data-v-52e0648a] {\n    display: inline-flex;\n    flex: 0 0 32px;\n    align-items: center;\n    justify-content: center;\n    width: 32px;\n    height: 32px;\n    padding: 0;\n    border: 0;\n    border-radius: 50%;\n    background: transparent;\n    color: #5f6368;\n    cursor: pointer;\n}\n.hc-email-compose-close[data-v-52e0648a]:hover, .hc-email-toolbar-button[data-v-52e0648a]:hover { background: rgba(60, 64, 67, 0.08); color: #202124;\n}\n.hc-email-compose-close[data-v-52e0648a]:focus-visible, .hc-email-toolbar-button[data-v-52e0648a]:focus-visible, .hc-email-send[data-v-52e0648a]:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-compose-close[data-v-52e0648a]:disabled, .hc-email-toolbar-button[data-v-52e0648a]:disabled { cursor: default; opacity: 0.5;\n}\n.hc-email-composer-fields[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px;\n}\n.hc-email-composer fieldset[data-v-52e0648a] { display: flex; flex-direction: column; border: 0; padding: 0; margin: 0; min-width: 0;\n}\n.hc-email-recipient-row[data-v-52e0648a] {\n    display: flex;\n    align-items: flex-start;\n    gap: 12px;\n    min-height: 42px;\n    padding: 10px 0 8px;\n    border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-recipient-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-recipient-label[data-v-52e0648a] { flex: 0 0 18px; padding-top: 3px; color: #5f6368; font-size: 13px;\n}\n.hc-email-recipient-input[data-v-52e0648a], .hc-email-recipient-list[data-v-52e0648a], .hc-email-subject[data-v-52e0648a] {\n    flex: 1;\n    min-width: 0;\n    padding: 2px 0;\n    border: 0;\n    outline: 0;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.5 Arial, sans-serif;\n}\n.hc-email-recipient-list[data-v-52e0648a] { overflow-wrap: anywhere;\n}\n.hc-email-recipient-input[data-v-52e0648a]::-moz-placeholder, .hc-email-subject[data-v-52e0648a]::-moz-placeholder, .hc-email-body[data-v-52e0648a]::-moz-placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-recipient-input[data-v-52e0648a]::placeholder, .hc-email-subject[data-v-52e0648a]::placeholder, .hc-email-body[data-v-52e0648a]::placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-subject-row[data-v-52e0648a] { display: flex; min-height: 42px; border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-subject-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-composer .hc-email-body[data-v-52e0648a] {\n    width: 100%;\n    min-height: 180px;\n    height: 220px;\n    padding: 13px 0;\n    border: 0;\n    outline: 0;\n    resize: vertical;\n    overflow-y: auto;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.55 Arial, sans-serif;\n}\n.hc-email-recipient-help[data-v-52e0648a] { margin: 5px 0 2px 30px; padding: 0; color: #5f6368; font-size: 11px; line-height: 1.4;\n}\n.hc-email-help[data-v-52e0648a] { color: #5f6368; font-size: 10px; white-space: normal;\n}\n.hc-email-error[data-v-52e0648a], .hc-email-success[data-v-52e0648a] { margin: 8px 0 0; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4;\n}\n.hc-email-error[data-v-52e0648a] { background: #fce8e6; color: #b3261e;\n}\n.hc-email-success[data-v-52e0648a] { background: #e6f4ea; color: #137333;\n}\n.hc-email-attachments[data-v-52e0648a] { display: flex; flex-direction: column; gap: 6px; padding: 0 0 10px;\n}\n.hc-email-attachment[data-v-52e0648a] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 36px;\n    padding: 2px 4px 2px 9px;\n    border: 1px solid #dadce0;\n    border-radius: 4px;\n    background: #f8f9fa;\n    color: #5f6368;\n    font-size: 12px;\n}\n.hc-email-attachment > span[data-v-52e0648a] { flex: 1; min-width: 0; overflow: hidden; color: #3c4043; text-overflow: ellipsis; white-space: nowrap;\n}\n.hc-email-attachment button[data-v-52e0648a] { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #5f6368; cursor: pointer;\n}\n.hc-email-attachment button[data-v-52e0648a]:hover { background: #e8eaed; color: #202124;\n}\n.hc-email-compose-footer[data-v-52e0648a] { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 9px 12px 12px;\n}\n.hc-email-send[data-v-52e0648a] { min-height: 36px; margin-right: 5px; padding: 0 20px; border: 0; border-radius: 18px; background: #0b57d0; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;\n}\n.hc-email-send[data-v-52e0648a]:hover:not(:disabled) { background: #0842a0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);\n}\n.hc-email-send[data-v-52e0648a]:disabled { background: #a8c7fa; cursor: default;\n}\n.hc-email-attach-button[data-v-52e0648a] { position: relative; overflow: hidden; cursor: pointer;\n}\n.hc-email-attach-button[data-v-52e0648a]:focus-within { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-attach-button input[data-v-52e0648a] { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap;\n}\n.hc-email-attachment-help[data-v-52e0648a] { margin-left: 4px;\n}\n.hc-email-preview-scroll[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 9px 20px; background: #f3f6f8;\n}\n.hc-email-preview[data-v-52e0648a] { width: 100%; max-width: 600px; margin: 0 auto; color: #24323d; font-family: Arial, Helvetica, sans-serif;\n}\n.hc-email-preview-card[data-v-52e0648a] { overflow: hidden; border-radius: 8px; background: #fff; box-shadow: 0 8px 24px rgba(22, 59, 82, 0.1);\n}\n.hc-email-preview-brand[data-v-52e0648a] { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 50px; padding: 12px 17px; background: #163b52; color: #fff;\n}\n.hc-email-preview-brand strong[data-v-52e0648a] { min-width: 0; overflow-wrap: anywhere; font-size: 16px;\n}\n.hc-email-preview-brand span[data-v-52e0648a] { flex: 0 0 auto; color: #b9d6df; font-size: 9px; letter-spacing: 1px; text-transform: uppercase;\n}\n.hc-email-preview-content[data-v-52e0648a] { padding: 22px 20px 18px;\n}\n.hc-email-preview-category[data-v-52e0648a] { margin-bottom: 10px; color: #4a8796; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;\n}\n.hc-email-preview-content h1[data-v-52e0648a] { margin: 0 0 18px; color: #163b52; font-size: 21px; font-weight: 700; line-height: 1.3; overflow-wrap: anywhere;\n}\n.hc-email-preview-body[data-v-52e0648a] { min-height: 28px; padding-top: 17px; border-top: 1px solid #e7edf0; color: #42515b; font-size: 13px; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere;\n}\n.hc-email-preview-signature[data-v-52e0648a] { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e7edf0; color: #6d7b83; font-size: 12px; line-height: 1.6;\n}\n.hc-email-preview-signature strong[data-v-52e0648a] { color: #163b52;\n}\n.hc-email-preview-footer[data-v-52e0648a] { padding: 16px 8px 0; color: #84929a; font-size: 10px; line-height: 1.6; text-align: center;\n}\n.hc-email-preview-note[data-v-52e0648a] { margin: 12px 0 0; padding: 9px 10px; border-radius: 4px; background: #e8f0fe; color: #3c4043; font-size: 11px; line-height: 1.4;\n}\n@media (max-width: 360px) {\n.hc-email-composer-fields[data-v-52e0648a] { padding-right: 12px; padding-left: 12px;\n}\n.hc-email-compose-footer[data-v-52e0648a] { padding-right: 8px; padding-left: 8px;\n}\n.hc-email-attachment-help[data-v-52e0648a] { flex-basis: 100%; margin-left: 4px;\n}\n.hc-email-preview-content[data-v-52e0648a] { padding-right: 16px; padding-left: 16px;\n}\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-composer[data-v-52e0648a] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n    min-height: 0;\n    position: relative;\n    overflow: hidden;\n    color: #202124;\n    background: #fff;\n    border: 1px solid #dadce0;\n    border-radius: 8px;\n    box-shadow: 0 2px 8px rgba(60, 64, 67, 0.18);\n    font-family: Arial, sans-serif;\n}\n.hc-email-compose-header[data-v-52e0648a] {\n    min-height: 40px;\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 8px;\n    padding: 0 10px 0 14px;\n    background: #f2f6fc;\n    color: #202124;\n}\n.hc-email-compose-title[data-v-52e0648a] { display: flex; align-items: center; gap: 9px; min-width: 0; font-size: 14px; font-weight: 600;\n}\n.hc-email-compose-category[data-v-52e0648a] {\n    max-width: 125px;\n    overflow: hidden;\n    padding: 3px 8px;\n    border-radius: 12px;\n    background: #e8f0fe;\n    color: #1967d2;\n    font-size: 10px;\n    font-weight: 400;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-email-compose-close[data-v-52e0648a], .hc-email-toolbar-button[data-v-52e0648a] {\n    display: inline-flex;\n    flex: 0 0 32px;\n    align-items: center;\n    justify-content: center;\n    width: 32px;\n    height: 32px;\n    padding: 0;\n    border: 0;\n    border-radius: 50%;\n    background: transparent;\n    color: #5f6368;\n    cursor: pointer;\n}\n.hc-email-compose-close[data-v-52e0648a]:hover, .hc-email-toolbar-button[data-v-52e0648a]:hover { background: rgba(60, 64, 67, 0.08); color: #202124;\n}\n.hc-email-compose-close[data-v-52e0648a]:focus-visible, .hc-email-toolbar-button[data-v-52e0648a]:focus-visible, .hc-email-send[data-v-52e0648a]:focus-visible { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-compose-close[data-v-52e0648a]:disabled, .hc-email-toolbar-button[data-v-52e0648a]:disabled { cursor: default; opacity: 0.5;\n}\n.hc-email-composer-fields[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 0 16px 12px;\n}\n.hc-email-composer fieldset[data-v-52e0648a] { display: flex; flex-direction: column; border: 0; padding: 0; margin: 0; min-width: 0;\n}\n.hc-email-recipient-row[data-v-52e0648a] {\n    display: flex;\n    align-items: flex-start;\n    gap: 12px;\n    min-height: 42px;\n    padding: 10px 0 8px;\n    border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-recipient-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-recipient-row-bulk[data-v-52e0648a] { align-items: flex-start;\n}\n.hc-email-recipient-label[data-v-52e0648a] { flex: 0 0 18px; padding-top: 3px; color: #5f6368; font-size: 13px;\n}\n.hc-email-selected-prospects-container[data-v-52e0648a] { flex: 1; min-width: 0;\n}\n.hc-email-selected-prospects[data-v-52e0648a] {\n    display: flex;\n    flex-direction: row;\n    max-height: 100%;\n    padding: 5px 5px 0;\n    border-bottom: 1px solid #eee;\n}\n.hc-email-selected-prospects-list[data-v-52e0648a] { flex: 1; height: auto; min-width: 0; overflow: auto;\n}\n.hc-email-selected-prospects.folded .hc-email-selected-prospects-list[data-v-52e0648a] { height: 35px; overflow: hidden;\n}\n.hc-email-recipient-input[data-v-52e0648a], .hc-email-recipient-list[data-v-52e0648a], .hc-email-subject[data-v-52e0648a] {\n    flex: 1;\n    min-width: 0;\n    padding: 2px 0;\n    border: 0;\n    outline: 0;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.5 Arial, sans-serif;\n}\n.hc-email-recipient-list[data-v-52e0648a] { overflow-wrap: anywhere;\n}\n.hc-email-recipient-input[data-v-52e0648a]::-moz-placeholder, .hc-email-subject[data-v-52e0648a]::-moz-placeholder, .hc-email-body[data-v-52e0648a]::-moz-placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-recipient-input[data-v-52e0648a]::placeholder, .hc-email-subject[data-v-52e0648a]::placeholder, .hc-email-body[data-v-52e0648a]::placeholder { color: #80868b; opacity: 1;\n}\n.hc-email-subject-row[data-v-52e0648a] { display: flex; min-height: 42px; border-bottom: 1px solid #e0e0e0;\n}\n.hc-email-subject-row[data-v-52e0648a]:focus-within { border-color: #1a73e8;\n}\n.hc-email-composer .hc-email-body[data-v-52e0648a] {\n    width: 100%;\n    min-height: 180px;\n    height: 220px;\n    padding: 13px 0;\n    border: 0;\n    outline: 0;\n    resize: vertical;\n    overflow-y: auto;\n    background: transparent;\n    color: #202124;\n    font: 13px/1.55 Arial, sans-serif;\n}\n.hc-email-recipient-help[data-v-52e0648a] { margin: 5px 0 2px 30px; padding: 0; color: #5f6368; font-size: 11px; line-height: 1.4;\n}\n.hc-email-help[data-v-52e0648a] { color: #5f6368; font-size: 10px; white-space: normal;\n}\n.hc-email-error[data-v-52e0648a], .hc-email-success[data-v-52e0648a] { margin: 8px 0 0; padding: 8px 10px; border-radius: 4px; font-size: 12px; line-height: 1.4;\n}\n.hc-email-error[data-v-52e0648a] { background: #fce8e6; color: #b3261e;\n}\n.hc-email-success[data-v-52e0648a] { background: #e6f4ea; color: #137333;\n}\n.hc-email-attachments[data-v-52e0648a] { display: flex; flex-direction: column; gap: 6px; padding: 0 0 10px;\n}\n.hc-email-attachment[data-v-52e0648a] {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 36px;\n    padding: 2px 4px 2px 9px;\n    border: 1px solid #dadce0;\n    border-radius: 4px;\n    background: #f8f9fa;\n    color: #5f6368;\n    font-size: 12px;\n}\n.hc-email-attachment > span[data-v-52e0648a] { flex: 1; min-width: 0; overflow: hidden; color: #3c4043; text-overflow: ellipsis; white-space: nowrap;\n}\n.hc-email-attachment button[data-v-52e0648a] { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #5f6368; cursor: pointer;\n}\n.hc-email-attachment button[data-v-52e0648a]:hover { background: #e8eaed; color: #202124;\n}\n.hc-email-compose-footer[data-v-52e0648a] { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 9px 12px 12px;\n}\n.hc-email-send[data-v-52e0648a] { min-height: 36px; margin-right: 5px; padding: 0 20px; border: 0; border-radius: 18px; background: #0b57d0; color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;\n}\n.hc-email-send[data-v-52e0648a]:hover:not(:disabled) { background: #0842a0; box-shadow: 0 1px 2px rgba(60, 64, 67, 0.3);\n}\n.hc-email-send[data-v-52e0648a]:disabled { background: #a8c7fa; cursor: default;\n}\n.hc-email-attach-button[data-v-52e0648a] { position: relative; overflow: hidden; cursor: pointer;\n}\n.hc-email-attach-button[data-v-52e0648a]:focus-within { outline: 2px solid #1a73e8; outline-offset: 2px;\n}\n.hc-email-attach-button input[data-v-52e0648a] { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); clip-path: inset(50%); white-space: nowrap;\n}\n.hc-email-attachment-help[data-v-52e0648a] { margin-left: 4px;\n}\n.hc-email-preview-scroll[data-v-52e0648a] { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 9px 20px; background: #f3f6f8;\n}\n.hc-email-preview[data-v-52e0648a] { width: 100%; max-width: 600px; margin: 0 auto; color: #24323d; font-family: Arial, Helvetica, sans-serif;\n}\n.hc-email-preview-card[data-v-52e0648a] { overflow: hidden; border-radius: 8px; background: #fff; box-shadow: 0 8px 24px rgba(22, 59, 82, 0.1);\n}\n.hc-email-preview-brand[data-v-52e0648a] { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 50px; padding: 12px 17px; background: #163b52; color: #fff;\n}\n.hc-email-preview-brand input[data-v-52e0648a], .hc-email-preview-content input[data-v-52e0648a], .hc-email-preview-signature input[data-v-52e0648a], .hc-email-preview-footer input[data-v-52e0648a] {\n    min-width: 0;\n    padding: 0;\n    border: 1px solid transparent;\n    border-radius: 2px;\n    outline: 0;\n    background: transparent;\n    font-family: inherit;\n}\n.hc-email-preview-brand input[data-v-52e0648a]:hover, .hc-email-preview-content input[data-v-52e0648a]:hover, .hc-email-preview-signature input[data-v-52e0648a]:hover, .hc-email-preview-footer input[data-v-52e0648a]:hover { border-color: rgba(128, 140, 148, 0.45);\n}\n.hc-email-preview-brand input[data-v-52e0648a]:focus, .hc-email-preview-content input[data-v-52e0648a]:focus, .hc-email-preview-signature input[data-v-52e0648a]:focus, .hc-email-preview-footer input[data-v-52e0648a]:focus { border-color: #1a73e8; outline: 2px solid rgba(26, 115, 232, 0.16); background: #fff;\n}\n.hc-email-preview-brand-name[data-v-52e0648a] { flex: 1 1 auto; color: #fff; font-size: 16px; font-weight: 700;\n}\n.hc-email-preview-brand-label[data-v-52e0648a] { flex: 0 0 auto; max-width: 42%; color: #b9d6df; font-size: 9px; letter-spacing: 1px; text-align: right; text-transform: uppercase;\n}\n.hc-email-preview-brand input[data-v-52e0648a]:focus { background: rgba(255, 255, 255, 0.1);\n}\n.hc-email-preview-content[data-v-52e0648a] { padding: 22px 20px 18px;\n}\n.hc-email-preview-category[data-v-52e0648a] { display: block; width: 100%; box-sizing: border-box; margin: 0 0 10px; color: #4a8796; font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;\n}\n.hc-email-preview-subject[data-v-52e0648a] {\n    display: block;\n    width: 100%;\n    min-height: 34px;\n    margin: 0 0 18px;\n    padding: 2px 4px;\n    border: 1px solid transparent;\n    border-radius: 3px;\n    background: transparent;\n    color: #163b52;\n    font: 700 21px/1.3 Arial, Helvetica, sans-serif;\n    overflow-wrap: anywhere;\n}\n.hc-email-preview-subject[data-v-52e0648a]:hover, .hc-email-preview-body[data-v-52e0648a]:hover { border-color: #c7d5dc;\n}\n.hc-email-preview-subject[data-v-52e0648a]:focus, .hc-email-preview-body[data-v-52e0648a]:focus { border-color: #1a73e8; outline: 2px solid rgba(26, 115, 232, 0.16); background: #fff;\n}\n.hc-email-preview-body[data-v-52e0648a] {\n    display: block;\n    box-sizing: border-box;\n    width: 100%;\n    min-height: 150px;\n    padding: 17px 5px 5px;\n    border: 1px solid transparent;\n    border-top: 1px solid #e7edf0;\n    border-radius: 3px;\n    resize: vertical;\n    background: transparent;\n    color: #42515b;\n    font: 13px/1.65 Arial, Helvetica, sans-serif;\n    white-space: pre-wrap;\n    overflow-wrap: anywhere;\n}\n.hc-email-preview-edit-hint[data-v-52e0648a] { margin: 2px 0 0; color: #84929a; font-size: 10px;\n}\n.hc-email-template-save-trigger[data-v-52e0648a] { display: flex; align-items: center; gap: 8px; margin: 12px auto 0; padding: 8px 12px; border: 1px solid #dadce0; border-radius: 18px; background: #fff; color: #0b57d0; font-size: 12px; cursor: pointer;\n}\n.hc-email-template-save-trigger[data-v-52e0648a]:hover:not(:disabled) { background: #f2f6fc;\n}\n.hc-email-template-save-trigger[data-v-52e0648a]:disabled { cursor: default; opacity: 0.6;\n}\n.hc-email-template-save[data-v-52e0648a] { margin: 12px auto 0; padding: 12px; max-width: 600px; border: 1px solid #dadce0; border-radius: 6px; background: #fff;\n}\n.hc-email-template-save label[data-v-52e0648a] { display: block; margin-bottom: 5px; color: #5f6368; font-size: 12px;\n}\n.hc-email-template-save > input[data-v-52e0648a] { box-sizing: border-box; width: 100%; min-height: 36px; padding: 7px 9px; border: 1px solid #dadce0; border-radius: 4px; color: #202124; font: inherit;\n}\n.hc-email-template-save > input[data-v-52e0648a]:focus { border-color: #1a73e8; outline: 2px solid rgba(26, 115, 232, 0.16);\n}\n.hc-email-template-save-actions[data-v-52e0648a] { display: flex; justify-content: flex-end; gap: 8px; margin-top: 9px;\n}\n.hc-email-template-save-actions button[data-v-52e0648a] { min-height: 32px; padding: 0 12px; border: 1px solid #dadce0; border-radius: 4px; background: #fff; color: #3c4043; cursor: pointer;\n}\n.hc-email-template-save-actions button[data-v-52e0648a]:first-child { border-color: #0b57d0; background: #0b57d0; color: #fff;\n}\n.hc-email-template-save-actions button[data-v-52e0648a]:disabled { cursor: default; opacity: 0.6;\n}\n.hc-email-preview-signature[data-v-52e0648a] { margin-top: 22px; padding-top: 16px; border-top: 1px solid #e7edf0; color: #6d7b83; font-size: 12px; line-height: 1.6;\n}\n.hc-email-preview-signature input[data-v-52e0648a] { display: inline-block; width: 100%; color: inherit; font-size: inherit; line-height: inherit;\n}\n.hc-email-preview-signature-name[data-v-52e0648a] { color: #163b52 !important; font-weight: 700;\n}\n.hc-email-preview-footer[data-v-52e0648a] { display: flex; flex-direction: column; gap: 3px; padding: 16px 8px 0; color: #84929a; font-size: 10px; line-height: 1.6; text-align: center;\n}\n.hc-email-preview-footer input[data-v-52e0648a] { width: 100%; color: inherit; font-size: inherit; line-height: inherit; text-align: center;\n}\n.hc-email-preview-note[data-v-52e0648a] { margin: 12px 0 0; padding: 9px 10px; border-radius: 4px; background: #e8f0fe; color: #3c4043; font-size: 11px; line-height: 1.4;\n}\n@media (max-width: 360px) {\n.hc-email-composer-fields[data-v-52e0648a] { padding-right: 12px; padding-left: 12px;\n}\n.hc-email-compose-footer[data-v-52e0648a] { padding-right: 8px; padding-left: 8px;\n}\n.hc-email-attachment-help[data-v-52e0648a] { flex-basis: 100%; margin-left: 4px;\n}\n.hc-email-preview-content[data-v-52e0648a] { padding-right: 16px; padding-left: 16px;\n}\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -118708,7 +119180,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-new-message-attachments {\n    display: flex;\n    flex-direction: row;\n    overflow: auto;\n    scroll-behavior: smooth;\n    overflow-y: hidden;\n}\n.hc-prospect-new-message-attachments::-webkit-scrollbar {\n    display: none;\n}\n#hc-prospect-message-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-message-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.folded #hc-prospect-message-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-new-message-attachments {\n    display: flex;\n    flex-direction: row;\n    overflow: auto;\n    scroll-behavior: smooth;\n    overflow-y: hidden;\n}\n.hc-prospect-new-message-attachments::-webkit-scrollbar {\n    display: none;\n}\n#hc-prospect-message-selected-prospects {\n    display: flex;\n    flex-direction: row;\n    border-bottom: 1px solid #eee;\n    padding: 5px 5px 0 5px;\n    max-height: 100%;\n}\n#hc-prospect-message-selected-prospects-list {\n    height: auto;\n    overflow: auto;\n    flex: 1;\n}\n.hc-prospect-message-email-reasons {\n    position: relative;\n    min-height: 42px;\n}\n.folded #hc-prospect-message-selected-prospects-list {\n    height: 35px;\n    overflow: hidden;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
