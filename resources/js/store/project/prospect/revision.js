@@ -3,6 +3,7 @@ import ProspectRevisionService from "@/apis/project/prospect/revision";
 import {
     FETCH_PROSPECT_REVISIONS,
     SET_PROSPECT_REVISIONS,
+    SET_PROSPECT_REVISION_LOADING,
 } from "@/actions/project/prospect/revision";
 
 const pendingFetches = new WeakMap();
@@ -91,6 +92,26 @@ export const mutations = {
             state.project.prospect.revisions = revisions;
         }
     },
+
+    [SET_PROSPECT_REVISION_LOADING](
+        state,
+        { project, prospect, categoryId, loading }
+    ) {
+        const key = `${project}:${prospect}:${categoryId}`;
+        const current = state.project.prospectRevisionLoading || {};
+        const count = current[key] || 0;
+        const next = { ...current };
+
+        if (loading) {
+            next[key] = count + 1;
+        } else if (count <= 1) {
+            delete next[key];
+        } else {
+            next[key] = count - 1;
+        }
+
+        state.project.prospectRevisionLoading = next;
+    },
 };
 
 /**
@@ -109,6 +130,10 @@ export const getters = {
         state.project.prospect.revisions
             ? state.project.prospect.revisions
             : [],
+    isProspectRevisionLoading: (state) => (project, prospect, categoryId) =>
+        !!state.project?.prospectRevisionLoading?.[
+            `${project}:${prospect}:${categoryId}`
+        ],
 };
 
 /**

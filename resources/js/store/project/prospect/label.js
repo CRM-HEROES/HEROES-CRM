@@ -1,5 +1,8 @@
 import ProspectLabelService from "@/apis/project/prospect/label";
-import { FETCH_PROSPECT_REVISIONS } from "@/actions/project/prospect/revision";
+import {
+    FETCH_PROSPECT_REVISIONS,
+    SET_PROSPECT_REVISION_LOADING,
+} from "@/actions/project/prospect/revision";
 
 import {
     FETCH_PROSPECT_LABELS,
@@ -47,13 +50,36 @@ export const actions = {
     async [ADD_PROSPECT_LABEL](context, label) {
         const project = context.state.project.slug;
         const prospect = context.state.project.prospect.id;
-        const response = await ProspectLabelService.update(
+        context.commit(SET_PROSPECT_REVISION_LOADING, {
             project,
             prospect,
-            label.id
-        );
-        const attached = (response && response.data && response.data.label) || label;
-        await refreshLabelHistory(context, project, prospect, ADD_PROSPECT_LABEL, attached);
+            categoryId: label.category_id,
+            loading: true,
+        });
+
+        try {
+            const response = await ProspectLabelService.update(
+                project,
+                prospect,
+                label.id
+            );
+            const attached =
+                (response && response.data && response.data.label) || label;
+            await refreshLabelHistory(
+                context,
+                project,
+                prospect,
+                ADD_PROSPECT_LABEL,
+                attached
+            );
+        } finally {
+            context.commit(SET_PROSPECT_REVISION_LOADING, {
+                project,
+                prospect,
+                categoryId: label.category_id,
+                loading: false,
+            });
+        }
     },
 
     /**
@@ -66,12 +92,30 @@ export const actions = {
     async [REMOVE_PROSPECT_LABEL](context, label) {
         const project = context.state.project.slug;
         const prospect = context.state.project.prospect.id;
-        await ProspectLabelService.destroy(
+        context.commit(SET_PROSPECT_REVISION_LOADING, {
             project,
             prospect,
-            label.id
-        );
-        await refreshLabelHistory(context, project, prospect, REMOVE_PROSPECT_LABEL, label);
+            categoryId: label.category_id,
+            loading: true,
+        });
+
+        try {
+            await ProspectLabelService.destroy(project, prospect, label.id);
+            await refreshLabelHistory(
+                context,
+                project,
+                prospect,
+                REMOVE_PROSPECT_LABEL,
+                label
+            );
+        } finally {
+            context.commit(SET_PROSPECT_REVISION_LOADING, {
+                project,
+                prospect,
+                categoryId: label.category_id,
+                loading: false,
+            });
+        }
     },
 
     /**
