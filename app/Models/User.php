@@ -90,6 +90,8 @@ class User extends Authenticatable // implements MustVerifyEmail
     protected $casts = [
         'last_activity' => 'datetime',
         'email_verified_at' => 'datetime',
+        'password_temporary_expires_at' => 'datetime',
+        'must_change_password' => 'boolean',
         'default_projects' => 'json',
         'claude_api_key' => 'encrypted',
     ];

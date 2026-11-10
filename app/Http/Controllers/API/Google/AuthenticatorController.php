@@ -90,6 +90,17 @@ class AuthenticatorController extends Controller
     {
         try {
             $user = User::findOrFail($request->session()->pull('two_factors.user.id'));
+
+            if ($user->must_change_password && (
+                !$user->password_temporary_expires_at ||
+                $user->password_temporary_expires_at->isPast()
+            )) {
+                return response()->json([
+                    'code' => 'password_expired',
+                    'message' => 'Votre mot de passe temporaire a expiré. Veuillez contacter l’administrateur.'
+                ], 403);
+            }
+
             $token = $user->createToken('HeroesCRM')->plainTextToken;
             \Auth::login($user);
 

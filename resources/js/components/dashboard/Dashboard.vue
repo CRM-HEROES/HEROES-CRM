@@ -286,13 +286,17 @@ export default {
     name: "dashboard",
     data() {
         return {
-            user: this.$store.state.auth.user,
             projects: [],
         };
     },
 
     created() {
-        this.fetchProjects();
+        if (
+            this.$store.state.auth.authenticated &&
+            !this.$store.state.auth.user.must_change_password
+        ) {
+            this.fetchProjects();
+        }
         store.commit(SET_GLOBAL_USERS, []);
     },
 
@@ -340,6 +344,21 @@ export default {
 
         projectsDraggable() {
             return deviceType() == "desktop";
+        },
+    },
+
+    watch: {
+        user: {
+            flush: "sync",
+            handler(user, previousUser) {
+                if (
+                    previousUser.must_change_password === true &&
+                    user.must_change_password === false &&
+                    this.$store.state.auth.authenticated
+                ) {
+                    this.fetchProjects();
+                }
+            },
         },
     },
 };

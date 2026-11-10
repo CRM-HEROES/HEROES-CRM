@@ -50,12 +50,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   name: "dashboard",
   data: function data() {
     return {
-      user: this.$store.state.auth.user,
       projects: []
     };
   },
   created: function created() {
-    this.fetchProjects();
+    if (this.$store.state.auth.authenticated && !this.$store.state.auth.user.must_change_password) {
+      this.fetchProjects();
+    }
     _store__WEBPACK_IMPORTED_MODULE_2__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_8__.SET_GLOBAL_USERS, []);
   },
   methods: {
@@ -114,7 +115,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     projectsDraggable: function projectsDraggable() {
       return deviceType() == "desktop";
     }
-  })
+  }),
+  watch: {
+    user: {
+      flush: "sync",
+      handler: function handler(user, previousUser) {
+        if (previousUser.must_change_password === true && user.must_change_password === false && this.$store.state.auth.authenticated) {
+          this.fetchProjects();
+        }
+      }
+    }
+  }
 });
 
 /***/ }),
