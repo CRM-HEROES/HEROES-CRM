@@ -6,8 +6,17 @@ const PasswordRequest = () => import("@/components/auth/password/Request.vue");
 const TwoFactorsEnable = () =>
     import("@/components/auth/two-factors/Enable.vue");
 const TwoFactorsLogin = () => import("@/components/auth/two-factors/Login.vue");
+const Invitation = () => import("@/components/auth/Invitation.vue");
 
 export default [
+    {
+        name: "invitation",
+        path: "/invitation/:user",
+        component: Invitation,
+        meta: {
+            title: `Activation du compte`,
+        },
+    },
     {
         name: "login",
         path: "/login",

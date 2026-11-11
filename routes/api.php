@@ -216,6 +216,10 @@ Route::get('/login-location/{id}/confirm', [\App\Http\Controllers\API\LoginLocat
 Route::get('/login-location/{id}/deny', [\App\Http\Controllers\API\LoginLocationController::class, 'deny'])
     ->middleware('signed')->name('login-location.deny');
 
+// Invitation : le nouvel utilisateur choisit son mot de passe via un lien signé (email)
+Route::post('/invitation/{user}', [\App\Http\Controllers\API\InvitationController::class, 'accept'])
+    ->middleware(['signed', 'throttle:10,1'])->name('invitation.accept');
+
 // Two factors
 Route::post('/google/authenticator/login', [GoogleAuthenticatorController::class, 'login']);
 
@@ -320,7 +324,7 @@ Route::group([
     // User
     Route::get('/user', [UserController::class, 'index'])->name("user.index");
     Route::post('/user', [UserController::class, 'store'])->name("user.store");
-    Route::post('/user/{user}/temporary-password', [\App\Http\Controllers\API\UserController::class, 'resendTemporaryPassword'])->name('user.temporary-password');
+    Route::post('/user/{user}/invitation', [\App\Http\Controllers\API\UserController::class, 'resendInvitation'])->name('user.invitation');
     Route::get('/user/{user}', [UserController::class, 'show'])->name("user.show");
     Route::put('/user/{user}', [UserController::class, 'update'])->name("user.update");
 

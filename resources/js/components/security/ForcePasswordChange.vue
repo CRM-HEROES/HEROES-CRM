@@ -8,18 +8,18 @@
             <h2>Choisissez votre mot de passe</h2>
 
             <div class="field-group">
-                <label>Mot de passe temporaire</label>
+                <label>Mot de passe actuel</label>
                 <div class="password-input">
                     <input
                         v-model="form.current_password"
                         :type="showPasswords.current_password ? 'text' : 'password'"
                         autocomplete="current-password"
-                        placeholder="Mot de passe temporaire"
+                        placeholder="Mot de passe actuel"
                     />
                     <button
                         type="button"
                         class="toggle-password"
-                        :aria-label="showPasswords.current_password ? 'Masquer le mot de passe temporaire' : 'Afficher le mot de passe temporaire'"
+                        :aria-label="showPasswords.current_password ? 'Masquer le mot de passe actuel' : 'Afficher le mot de passe actuel'"
                         @click="showPasswords.current_password = !showPasswords.current_password"
                     >
                         <i
@@ -52,6 +52,8 @@
                     </button>
                 </div>
             </div>
+
+            <PasswordRules :password="form.password" />
 
             <div class="field-group">
                 <label>Confirmation</label>
@@ -93,9 +95,11 @@
 
 <script>
 import axios from "axios";
+import PasswordRules from "./PasswordRules.vue";
 
 export default {
     name: "ForcePasswordChange",
+    components: { PasswordRules },
     data() {
         return {
             loading: false,
