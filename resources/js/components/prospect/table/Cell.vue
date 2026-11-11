@@ -1,5 +1,5 @@
 <template>
-    <component :is="tag" :class="[isFiltered ? 'filtered' : '', isDuplicateField ? 'duplicate' : '']" :style="[style, duplicateStyle]">
+    <component :is="tag" :class="[isFiltered ? 'filtered' : '', isDuplicateField ? 'duplicate' : '']" :style="[style, duplicateStyle]" :data-col-key="column.key" :data-pid="prospect.id">
         <street-cell
             v-if="column.key == 'street'"
             :prospect="prospect"
