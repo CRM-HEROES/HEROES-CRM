@@ -10,6 +10,8 @@ import {
     SET_EVENTS,
     SET_EVENT,
     ADD_EVENT,
+    BULK_ADD_EVENTS,
+    ADD_EVENTS,
     SHOW_EVENT,
     UPDATE_EVENT,
     REMOVE_EVENT,
@@ -130,6 +132,15 @@ const actions = {
             params
         );
         context.commit(ADD_EVENT, data);
+        return data;
+    },
+
+    async [BULK_ADD_EVENTS](context, params) {
+        const { data } = await EventService.bulkCreate(
+            context.state.project.slug,
+            params
+        );
+        context.commit(ADD_EVENTS, data);
         return data;
     },
 
@@ -374,6 +385,10 @@ const mutations = {
      */
     [ADD_EVENT](state, event) {
         state.project.events = [...state.project.events, event];
+    },
+
+    [ADD_EVENTS](state, events) {
+        state.project.events = [...(state.project.events || []), ...events];
     },
 
     /**

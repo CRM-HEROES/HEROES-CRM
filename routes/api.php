@@ -468,6 +468,9 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::delete('duplicate', [ProjectDuplicateController::class, 'destroy']);
 
         // Event
+        Route::post('event/bulk', [ProjectEventController::class, 'bulkStore'])
+            ->name('event.bulk-store')
+            ->withoutMiddleware("throttle:api");
         Route::apiResource('event', ProjectEventController::class)->withoutMiddleware("throttle:api");
         // Event description Template
         Route::apiResource('event-description-template', ProjectEventDescriptionTemplateController::class);

@@ -3632,17 +3632,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _utils_event_bus__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/event-bus */ "./resources/js/utils/event-bus.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
 /* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
-/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
-/* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
-/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
-/* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
-/* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
+/* harmony import */ var _actions_project_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/event */ "./resources/js/actions/project/event.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+/* harmony import */ var _actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/prospect/interaction */ "./resources/js/actions/project/prospect/interaction.js");
+/* harmony import */ var _actions_project_user_setting__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/project/user/setting */ "./resources/js/actions/project/user/setting.js");
+/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
+/* harmony import */ var _apis_common__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/apis/common */ "./resources/js/apis/common.js");
+/* harmony import */ var _apis_project_prospect__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @/apis/project/prospect */ "./resources/js/apis/project/prospect.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -3662,6 +3663,7 @@ function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o =
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -3705,7 +3707,24 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Deselect selected prospect
      */
     bulkDeselect: function bulkDeselect() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
+    },
+    /**
+     * Create one appointment for each selected prospect
+     */
+    bulkEvent: function bulkEvent() {
+      if (!this.prospectsSelected.length) return;
+      var startDate = new Date();
+      startDate.setMinutes(60);
+      var endDate = new Date();
+      endDate.setMinutes(120);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_4__.SET_EVENT, {
+        bulkProspectMode: true,
+        started_at: dateToString(startDate),
+        ended_at: dateToString(endDate)
+      });
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-events");
     },
     /**
      * Create new prospect line
@@ -3772,10 +3791,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
             case 0:
               // Create empty prospect
               prospect = _this.newProspect();
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT, prospect);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT, prospect);
               _context.prev = 2;
               _context.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.ADD_PROSPECT, prospect);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.ADD_PROSPECT, prospect);
             case 5:
               createdProspect = _context.sent;
               // Get updated values from empty created prospect
@@ -3784,14 +3803,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               })); // Dispatch updated values
               if (Object.keys(updatedProspect).length > 0) {
                 updatedProspect.id = createdProspect.id;
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_PROSPECT, updatedProspect);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_PROSPECT, updatedProspect);
               }
             case 8:
               _context.prev = 8;
               // Remove empty created prospect from the table
               // it will be replaced by the prospect
               // created from the database
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.REMOVE_PROSPECT, prospect.id);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.REMOVE_PROSPECT, prospect.id);
               return _context.finish(8);
             case 11:
             case "end":
@@ -3805,7 +3824,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * in the table
      */
     addColumn: function addColumn() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user__WEBPACK_IMPORTED_MODULE_7__.SET_USER, this.user);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_user__WEBPACK_IMPORTED_MODULE_8__.SET_USER, this.user);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospects-table-columns-setting");
     },
     /**
@@ -3823,13 +3842,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, parseInt(_this2.prospectsPage) - 1);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECTS_PAGE, parseInt(_this2.prospectsPage) - 1);
 
               // Refresh prospects list
               _this2.fetchingPreviousPage = true;
               _context2.prev = 2;
               _context2.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
             case 5:
               _context2.prev = 5;
               _this2.fetchingPreviousPage = false;
@@ -3850,13 +3869,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, parseInt(_this3.prospectsPage) + 1);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECTS_PAGE, parseInt(_this3.prospectsPage) + 1);
 
               // Refresh prospects list
               _this3.fetchingNextPage = true;
               _context3.prev = 2;
               _context3.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
             case 5:
               _context3.prev = 5;
               _this3.fetchingNextPage = false;
@@ -3880,14 +3899,14 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Toggle prospects menus
      */
     toggleProspectsMenus: function toggleProspectsMenus() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_PROSPECTS_MENUS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_PROSPECTS_MENUS);
     },
     /**
      * Init filters
      */
     initParams: function initParams() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.INIT_PROSPECT_PARAMS);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.INIT_PROSPECT_PARAMS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
     },
     /**
      * Toggle prospects options
@@ -3895,7 +3914,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * from the prospects table
      */
     toggleProspectsOptions: function toggleProspectsOptions() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.TOGGLE_PROSPECTS_OPTIONS);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.TOGGLE_PROSPECTS_OPTIONS);
     },
     /**
      * Import prospects (XLSX, CSV)
@@ -3930,7 +3949,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * See: @/components/prospect/sms/Slide.vue
      */
     bulkSms: function bulkSms() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-sms");
     },
     /**
@@ -3958,13 +3977,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
                       // Selected prospects
                       prospectsSelected = _this4.prospectsSelected;
-                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
                       _context4.prev = 3;
                       _context4.next = 6;
-                      return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_REMOVE_PROSPECT, prospectsSelected);
+                      return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.BULK_REMOVE_PROSPECT, prospectsSelected);
                     case 6:
                       // Refresh prospects list
-                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
                     case 7:
                       _context4.prev = 7;
                       _this4.bulkingRemove = false;
@@ -3996,13 +4015,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this5.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
               _context6.prev = 3;
               _context6.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_RESTORE_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.BULK_RESTORE_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
             case 7:
               _context6.prev = 7;
               _this5.bulkingRestore = false;
@@ -4022,7 +4041,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-manage-messages");
             case 2:
             case "end":
@@ -4039,7 +4058,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECT, null);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT, null);
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "prospect-bulk-update");
             case 2:
             case "end":
@@ -4062,13 +4081,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this6.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
               _context9.prev = 3;
               _context9.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_PROCESSED_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.BULK_PROCESSED_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
             case 7:
               _context9.prev = 7;
               _this6.bulkingProcessed = false;
@@ -4094,13 +4113,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
               // Selected prospects
               prospectsSelected = _this7.prospectsSelected;
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
               _context10.prev = 3;
               _context10.next = 6;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.BULK_NOT_PROCESSED_PROSPECT, prospectsSelected);
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.BULK_NOT_PROCESSED_PROSPECT, prospectsSelected);
             case 6:
               // Refresh prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
             case 7:
               _context10.prev = 7;
               _this7.bulkingNotProcessed = false;
@@ -4116,10 +4135,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Call prospects one after the other
      */
     bulkAircallInteraction: function bulkAircallInteraction() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_INTERACTION_PROSPECT, null);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_TAB, 1);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_INTERACTION_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_INTERACTION_FRAME_TAB, 0);
     },
     bulkCloudtalkInteraction: function bulkCloudtalkInteraction() {
       if (!this.can('all.prospect.interaction.view') || !this.can('all.prospect.interaction.add')) return;
@@ -4148,10 +4167,10 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
      * Call prospects one after the other
      */
     bulkRingoverInteraction: function bulkRingoverInteraction() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_INTERACTION_PROSPECT, null);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_INTERACTION_PROSPECT, null);
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_LEFT_SLIDE, "prospect-manage-interactions");
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_TAB, 1);
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECT_INTERACTION_FRAME_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_INTERACTION_TAB, 1);
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect_interaction__WEBPACK_IMPORTED_MODULE_6__.SET_PROSPECT_INTERACTION_FRAME_TAB, 1);
     },
     /**
      * Show Map
@@ -4213,7 +4232,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 params = JSON.stringify(params);
 
                 // Download prospects list
-                location.href = "".concat(_apis_common__WEBPACK_IMPORTED_MODULE_8__.API_URL, "/project/").concat(_this9.project.slug, "/export/create") + (params ? "?filters=" + params : "");
+                location.href = "".concat(_apis_common__WEBPACK_IMPORTED_MODULE_9__.API_URL, "/project/").concat(_this9.project.slug, "/export/create") + (params ? "?filters=" + params : "");
               }; // We also add selected prospects
               // as filter for the list of prospects
               // do download
@@ -4257,7 +4276,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               };
               if (Object.keys(_this10.prospectsParams || {}).length) _params.filters = JSON.stringify(_this10.prospectsParams);
               _context13.next = 9;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__["default"].get(_this10.project.slug, {
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_10__["default"].get(_this10.project.slug, {
                 params: _objectSpread(_objectSpread({}, _params), {}, {
                   page: 1
                 })
@@ -4274,7 +4293,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
                 break;
               }
               _context13.next = 15;
-              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_9__["default"].get(_this10.project.slug, {
+              return _apis_project_prospect__WEBPACK_IMPORTED_MODULE_10__["default"].get(_this10.project.slug, {
                 params: _objectSpread(_objectSpread({}, _params), {}, {
                   page: page
                 })
@@ -4290,7 +4309,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
               _context13.next = 12;
               break;
             case 21:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, ids);
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, ids);
               _context13.next = 27;
               break;
             case 24:
@@ -4309,9 +4328,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       }))();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_11__.mapGetters)(["project", "prospectsSelected", "prospects", "prospectsParamExists", "fields", "prospectsPage", "prospectsCount", "prospectsTotal",
   // "prospectsMaxLinesPerRow",
-  "projectUserSettingsProspectsMaxRowLines", "prospectsParams", "prospectsParamsUrl", "prospectsSortOrder", "prospectsSortBy", "prospectsMenus", "prospectsOptions", "can", "lines"])), {}, {
+  "projectUserSettingsProspectsMaxRowLines", "prospectsParams", "prospectsParamsUrl", "prospectsSortOrder", "prospectsSortBy", "prospectsMenus", "prospectsOptions", "can", "canEvent", "lines"])), {}, {
     cloudtalkLine: function cloudtalkLine() {
       var _this11 = this;
       return this.lines.find(function (line) {
@@ -4363,11 +4382,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee14$(_context14) {
             while (1) switch (_context14.prev = _context14.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_COUNT, value);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECTS_COUNT, value);
                 this.settingProspectsCount = true;
                 _context14.prev = 2;
                 _context14.next = 5;
-                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
               case 5:
                 _context14.prev = 5;
                 this.settingProspectsCount = false;
@@ -4390,7 +4409,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       },
       set: function set(checked) {
         if (!checked) {
-          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.UPDATE_SELECTED_PROSPECTS, []);
+          _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.UPDATE_SELECTED_PROSPECTS, []);
           return;
         }
         this.selectAllFilteredProspects();
@@ -4405,11 +4424,11 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee15$(_context15) {
             while (1) switch (_context15.prev = _context15.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.SET_PROSPECTS_PAGE, value);
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.SET_PROSPECTS_PAGE, value);
                 this.settingProspectsPage = true;
                 _context15.prev = 2;
                 _context15.next = 5;
-                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_4__.FETCH_PROSPECTS);
+                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_5__.FETCH_PROSPECTS);
               case 5:
                 _context15.prev = 5;
                 this.settingProspectsPage = false;
@@ -4435,7 +4454,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
           return _regeneratorRuntime().wrap(function _callee16$(_context16) {
             while (1) switch (_context16.prev = _context16.next) {
               case 0:
-                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_6__.UPDATE_PROJECT_USER_SETTING, {
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_user_setting__WEBPACK_IMPORTED_MODULE_7__.UPDATE_PROJECT_USER_SETTING, {
                   key: "prospects.max-row-lines",
                   value: value
                 });
@@ -7680,6 +7699,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   props: {
     /**
@@ -7716,6 +7743,10 @@ __webpack_require__.r(__webpack_exports__);
       type: String,
       "default": "bgcolor"
     },
+    categoryId: {
+      type: [Number, String],
+      "default": null
+    },
     /**
      * Item clicked
      */
@@ -7731,7 +7762,12 @@ __webpack_require__.r(__webpack_exports__);
         this.itemClicked(item);
       }
     }
-  }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_0__.mapGetters)(["project", "isProspectRevisionLoading"])), {}, {
+    isRevisionLoading: function isRevisionLoading() {
+      return this.categoryId !== null && this.isProspectRevisionLoading(this.project.slug, this.prospect.id, this.categoryId);
+    }
+  })
 });
 
 /***/ }),
@@ -13378,41 +13414,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: $options.bulkUser
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.bulkDisabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 10
-      }, [!$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
+      }, [_ctx.canEvent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
         key: 0,
+        icon: "hc-icon hc-slide-icon fa fa-calendar",
+        label: _ctx.$t('event.new'),
+        onClick: $options.bulkEvent
+      }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
+        key: 1,
         icon: "fa fa-users",
         label: _ctx.$t('prospect.table.footer.bulk_groups'),
         onClick: $options.bulkGroup
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 1,
+        key: 2,
         icon: "fa fa-tags",
         label: _ctx.$t('prospect.table.footer.bulk_labels'),
         onClick: $options.bulkLabel
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 2,
+        key: 3,
         icon: "fa fa-copy",
         label: _ctx.$t('prospect.table.footer.bulk_project'),
         onClick: $options.bulkProject
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed && _ctx.can('all.prospect.sms') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 3,
+        key: 4,
         icon: "fa fa-comment",
         label: _ctx.$t('prospect.table.footer.bulk_sms'),
         color: "#7939b8",
         onClick: $options.bulkSms
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 4,
+        key: 5,
         icon: "fa fa-envelope",
         label: _ctx.$t('prospect.table.footer.bulk_messages'),
         color: "#dd214a",
         onClick: $options.bulkMessage
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 5,
+        key: 6,
         icon: "fa fa-pen",
         label: _ctx.$t('prospect.table.footer.bulk_update'),
         color: "#1e6ee5",
         onClick: $options.bulkUpdate
       }, null, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed && _ctx.can('all.prospect.archive') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 6,
+        key: 7,
         icon: "fa fa-lock",
         label: _ctx.$t('prospect.table.footer.bulk_archive'),
         color: "#e38a00",
@@ -13425,7 +13466,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsNotProcessed && _ctx.can('all.prospect.archive') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 7,
+        key: 8,
         icon: "fa fa-unlock",
         label: _ctx.$t('prospect.table.footer.bulk_do_not_archive'),
         color: "#22bcd7",
@@ -13438,7 +13479,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 8,
+        key: 9,
         label: _ctx.$t('prospect.table.footer.bulk_aircall_interactions'),
         onClick: $options.bulkAircallInteraction
       }, {
@@ -13452,7 +13493,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed && _ctx.can('all.prospect.interaction.view') && _ctx.can('all.prospect.interaction.add') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 9,
+        key: 10,
         label: _ctx.$t('prospect.interaction.call_by_cloudtalk'),
         onClick: $options.bulkCloudtalkInteraction
       }, {
@@ -13466,7 +13507,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }),
         _: 1 /* STABLE */
       }, 8 /* PROPS */, ["label", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$options.selectedProspectsProcessed ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_card_menu, {
-        key: 10,
+        key: 11,
         icon: "fa fa-phone",
         label: _ctx.$t('prospect.table.footer.bulk_ringover_interactions'),
         onClick: $options.bulkRingoverInteraction
@@ -13551,8 +13592,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         key: 3,
         prospect: $props.prospect,
         items: $options.categoryLabels($props.column.id),
+        "category-id": $props.column.id,
         onClick: $options.manageLabels
-      }, null, 8 /* PROPS */, ["prospect", "items", "onClick"])) : $options.category == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_thread_cell, {
+      }, null, 8 /* PROPS */, ["prospect", "items", "category-id", "onClick"])) : $options.category == 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_thread_cell, {
         key: 4,
         prospect: $props.prospect,
         thread: $props.column.id,
@@ -14940,9 +14982,14 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   "class": "hc-relation-cell"
 };
+var _hoisted_2 = {
+  key: 0,
+  "class": "fa fa-spinner fa-spin hc-relation-cell-loading",
+  "aria-hidden": "true"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_tag = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tag");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.items, function (item) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [$options.isRevisionLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_2)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.items, function (item) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_tag, {
       key: item.id,
       text: item[$props.name],
@@ -17687,6 +17734,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-history-cell {\n    position: re
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-relation-cell-loading {\n    display: inline-block;\n    font-size: 11px;\n    margin: 0 4px;\n    vertical-align: middle;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/header-cell/FindReplace.vue?vue&type=style&index=0&id=c7933d96&scoped=true&lang=css":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/header-cell/FindReplace.vue?vue&type=style&index=0&id=c7933d96&scoped=true&lang=css ***!
@@ -18385,6 +18455,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HistoryCell_vue_vue_type_style_index_0_id_74beaed2_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RelationCell_vue_vue_type_style_index_0_id_92947b1c_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RelationCell_vue_vue_type_style_index_0_id_92947b1c_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RelationCell_vue_vue_type_style_index_0_id_92947b1c_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -20037,13 +20136,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _RelationCell_vue_vue_type_template_id_92947b1c__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./RelationCell.vue?vue&type=template&id=92947b1c */ "./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=template&id=92947b1c");
 /* harmony import */ var _RelationCell_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./RelationCell.vue?vue&type=script&lang=js */ "./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=script&lang=js");
-/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+/* harmony import */ var _RelationCell_vue_vue_type_style_index_0_id_92947b1c_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css */ "./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
 
 
 
 
 ;
-const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_2__["default"])(_RelationCell_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_RelationCell_vue_vue_type_template_id_92947b1c__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/table/cell/RelationCell.vue"]])
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_RelationCell_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_RelationCell_vue_vue_type_template_id_92947b1c__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/prospect/table/cell/RelationCell.vue"]])
 /* hot reload */
 if (false) {}
 
@@ -23216,6 +23318,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_HistoryCell_vue_vue_type_style_index_0_id_74beaed2_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./HistoryCell.vue?vue&type=style&index=0&id=74beaed2&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/HistoryCell.vue?vue&type=style&index=0&id=74beaed2&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css":
+/*!******************************************************************************************************************!*\
+  !*** ./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css ***!
+  \******************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_RelationCell_vue_vue_type_style_index_0_id_92947b1c_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../../node_modules/style-loader/dist/cjs.js!../../../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/prospect/table/cell/RelationCell.vue?vue&type=style&index=0&id=92947b1c&lang=css");
 
 
 /***/ }),

@@ -1,5 +1,10 @@
 <template>
     <div class="hc-relation-cell">
+        <i
+            v-if="isRevisionLoading"
+            class="fa fa-spinner fa-spin hc-relation-cell-loading"
+            aria-hidden="true"
+        />
         <tag
             v-for="item in items"
             :key="item.id"
@@ -11,7 +16,18 @@
     </div>
 </template>
 
+<style>
+.hc-relation-cell-loading {
+    display: inline-block;
+    font-size: 11px;
+    margin: 0 4px;
+    vertical-align: middle;
+}
+</style>
+
 <script>
+import { mapGetters } from "vuex";
+
 export default {
     props: {
         /**
@@ -53,6 +69,11 @@ export default {
             default: "bgcolor",
         },
 
+        categoryId: {
+            type: [Number, String],
+            default: null,
+        },
+
         /**
          * Item clicked
          */
@@ -68,6 +89,21 @@ export default {
                 event.stopPropagation();
                 this.itemClicked(item);
             }
+        },
+    },
+
+    computed: {
+        ...mapGetters(["project", "isProspectRevisionLoading"]),
+
+        isRevisionLoading() {
+            return (
+                this.categoryId !== null &&
+                this.isProspectRevisionLoading(
+                    this.project.slug,
+                    this.prospect.id,
+                    this.categoryId
+                )
+            );
         },
     },
 };

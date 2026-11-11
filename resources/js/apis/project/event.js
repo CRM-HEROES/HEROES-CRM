@@ -7,6 +7,9 @@ export default {
     create(project, params) {
         return ApiService.post(`project/${project}/event`, params);
     },
+    bulkCreate(project, params) {
+        return ApiService.post(`project/${project}/event/bulk`, params);
+    },
     show(project, event) {
         return ApiService.get(`project/${project}/event/${event}`);
     },

@@ -76,6 +76,14 @@ class MessageController extends Controller
             'subject' => 'required|string|max:255',
             'body' => 'required|string',
             'category' => 'nullable|string|max:255',
+            'email_layout' => 'sometimes|array:brand_name,brand_label,category,closing,signature_name,sent_by,rights',
+            'email_layout.brand_name' => 'nullable|string|max:255',
+            'email_layout.brand_label' => 'nullable|string|max:255',
+            'email_layout.category' => 'nullable|string|max:255',
+            'email_layout.closing' => 'nullable|string|max:255',
+            'email_layout.signature_name' => 'nullable|string|max:255',
+            'email_layout.sent_by' => 'nullable|string|max:500',
+            'email_layout.rights' => 'nullable|string|max:500',
             'attachments' => 'sometimes|array|max:10',
             'attachments.*' => 'required|file|max:10240',
             'template_id' => 'nullable|integer|required_with:template_attachment_ids',
@@ -140,10 +148,14 @@ class MessageController extends Controller
     protected function sendDirectEmail(Request $request, Project $project, Prospect $prospect, string $to, array $attachments): void
     {
         $subject = $this->personalizeEmail($request->input('subject'), $prospect);
+        $emailLayout = $this->emailLayout($request, $project);
+        foreach ($emailLayout as $key => $value) {
+            $emailLayout[$key] = $this->personalizeEmail($value, $prospect);
+        }
         try {
             Mail::send('emails.prospect-message', [
                 'body' => $this->personalizeEmail($request->input('body'), $prospect),
-                'category' => $request->input('category', 'Message'),
+                'emailLayout' => $emailLayout,
                 'project' => $project,
                 'subject' => $subject,
             ], function ($message) use ($to, $subject, $attachments) {
@@ -155,6 +167,28 @@ class MessageController extends Controller
         } catch (BrevoTransportException $exception) {
             throw ValidationException::withMessages(['email' => $exception->getMessage()]);
         }
+    }
+
+    protected function emailLayout(Request $request, Project $project): array
+    {
+        $defaults = [
+            'brand_name' => $project->name,
+            'brand_label' => 'HEROES CRM',
+            'category' => $request->input('category') ?? 'Message',
+            'closing' => 'Bien cordialement,',
+            'signature_name' => $project->name,
+            'sent_by' => "Un message envoyé par {$project->name}.",
+            'rights' => '© '.date('Y').' '.$project->name.' · Tous droits réservés.',
+        ];
+        $custom = $request->input('email_layout', []);
+
+        foreach ($defaults as $key => $default) {
+            $defaults[$key] = array_key_exists($key, $custom)
+                ? (string) ($custom[$key] ?? '')
+                : $default;
+        }
+
+        return $defaults;
     }
 
     protected function personalizeEmail(string $text, Prospect $prospect): string

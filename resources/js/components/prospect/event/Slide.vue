@@ -2,16 +2,18 @@
     <slide
         name="prospect-manage-events"
         :title="
-            eventProspect
-                ? [
-                      prospectEvent.prospect.first_name,
-                      prospectEvent.prospect.last_name,
-                  ]
-                      .filter((n) => n)
-                      .join(' ')
-                : project.slug == 'professionnel'
-                ? 'Missions'
-                : $t('event.title')
+            bulkProspectIds.length
+                ? $t('event.new') + ' (' + bulkProspectIds.length + ')'
+                : eventProspect
+                  ? [
+                        prospectEvent.prospect.first_name,
+                        prospectEvent.prospect.last_name,
+                    ]
+                        .filter((n) => n)
+                        .join(' ')
+                  : project.slug == 'professionnel'
+                    ? 'Missions'
+                    : $t('event.title')
         "
         :url="
             eventProspect
@@ -332,6 +334,26 @@
                         <!-- Event prospect -->
 
                         <item
+                            v-if="bulkProspectIds.length"
+                            class="hc-prospect-event-item"
+                        >
+                            <icon
+                                class="fa fa-users icon-orange"
+                                :size="40"
+                            />
+                            <div class="hc-item-main-content hc-flex-column">
+                                <span
+                                    class="hc-prospect-event-item-title"
+                                    v-text="$t('event.prospect')"
+                                ></span>
+                                <span
+                                    class="hc-prospect-event-item-value"
+                                    v-text="bulkProspectIds.length"
+                                ></span>
+                            </div>
+                        </item>
+                        <item
+                            v-else
                             class="hc-prospect-event-item"
                             @click="(frameTab = 2), (tab = 1)"
                         >
@@ -848,17 +870,22 @@
                         <!-- Update or add event -->
 
                         <button
+                            :disabled="addingEvent || updatingEvent"
                             @click.prevent="
                                 prospectEvent.id ? updateEvent() : storeEvent()
                             "
                             v-text="
                                 prospectEvent.id
                                     ? 'Validation RDV'
+                                    : bulkProspectIds.length > 1
+                                    ? $t('event.new')
                                     : 'Créer le RDV'
                             "
                             v-tooltip="
                                 prospectEvent.id
                                     ? 'Validation RDV'
+                                    : bulkProspectIds.length > 1
+                                    ? $t('event.new')
                                     : 'Créer le RDV'
                             "
                         ></button>
@@ -1188,14 +1215,24 @@ import ProspectLabelService from "@/apis/project/prospect/label";
 import GoogleCalendarService from "@/apis/google/calendar";
 
 import { CLOSE_SLIDE, OPEN_LEFT_SLIDE, OPEN_SUB_SLIDE } from "@/actions/slide";
-import { ADD_EVENT, UPDATE_EVENT, REMOVE_EVENT } from "@/actions/project/event";
+import {
+    ADD_EVENT,
+    BULK_ADD_EVENTS,
+    SET_EVENT,
+    UPDATE_EVENT,
+    REMOVE_EVENT,
+} from "@/actions/project/event";
 import {
     ADD_PROSPECT_EVENT,
     UPDATE_PROSPECT_EVENT,
     REMOVE_PROSPECT_EVENT,
 } from "@/actions/project/prospect/event";
 
-import { SET_PROSPECT, UPDATE_PROSPECT } from "@/actions/project/prospect";
+import {
+    FETCH_PROSPECTS,
+    SET_PROSPECT,
+    UPDATE_PROSPECT,
+} from "@/actions/project/prospect";
 import { SET_INTERACTION_PROSPECT } from "@/actions/project/prospect/interaction";
 import { ADD_PROSPECT_USER } from "@/actions/project/prospect/user";
 import { SET_NEW_EVENT } from "@/actions/project/event";
@@ -1245,6 +1282,7 @@ export default {
             googleCalendar: undefined,
             removingGoogleCalendar: false,
             showEndedAtDate: false,
+            bulkProspectMode: false,
         };
     },
 
@@ -1329,6 +1367,7 @@ export default {
          *
          */
         async storeEvent() {
+            const bulkProspectIds = [...this.bulkProspectIds];
             const data = {
                 calendar_id: this.prospectEvent.calendar.id,
                 user_id: this.prospectEvent.user.id,
@@ -1374,28 +1413,44 @@ export default {
             this.addingEvent = true;
 
             try {
-                const d = await store.dispatch(
-                    /*this.prospect && this.prospect.id
-                        ? ADD_PROSPECT_EVENT
-                        : */ ADD_EVENT,
-                    data
-                );
-
-                if (this.prospect && !this.prospect.street) {
-                    store.commit(UPDATE_PROSPECT, {
-                        id: this.prospect.id,
-                        street: this.prospectEvent.location,
+                if (bulkProspectIds.length) {
+                    await store.dispatch(BULK_ADD_EVENTS, {
+                        ...data,
+                        prospects: bulkProspectIds,
                     });
-                }
 
-                if (this.prospect && this.prospect.id == data.prospect_id) {
-                    store.commit(ADD_PROSPECT_EVENT, {
-                        ...this.prospectEvent,
-                        id: d.id,
-                    });
+                    await store.dispatch(FETCH_PROSPECTS);
+                } else {
+                    const d = await store.dispatch(
+                        /*this.prospect && this.prospect.id
+                            ? ADD_PROSPECT_EVENT
+                            : */ ADD_EVENT,
+                        data
+                    );
+
+                    if (this.prospect && !this.prospect.street) {
+                        store.commit(UPDATE_PROSPECT, {
+                            id: this.prospect.id,
+                            street: this.prospectEvent.location,
+                        });
+                    }
+
+                    if (this.prospect && this.prospect.id == data.prospect_id) {
+                        store.commit(ADD_PROSPECT_EVENT, {
+                            ...this.prospectEvent,
+                            id: d.id,
+                        });
+                    }
                 }
             } finally {
                 this.addingEvent = false;
+                if (bulkProspectIds.length && this.event) {
+                    this.bulkProspectMode = false;
+                    store.commit(SET_EVENT, {
+                        ...this.event,
+                        bulkProspectMode: false,
+                    });
+                }
                 store.commit(CLOSE_SLIDE);
                 store.commit(SET_NEW_EVENT, null);
             }
@@ -1850,6 +1905,10 @@ export default {
          * Event
          */
         async event(newValue) {
+            this.bulkProspectMode = Boolean(
+                newValue && newValue.bulkProspectMode
+            );
+
             // Fetch event
             if (newValue) {
                 this.prospectEvent = newValue;
@@ -1955,6 +2014,7 @@ export default {
         ...mapGetters([
             "project",
             "prospect",
+            "prospectsSelected",
             "prospectFullName",
             "event",
             "projectUserSettingsAgendaMinimumHour",
@@ -2217,6 +2277,10 @@ export default {
          */
         eventProspect() {
             return this.prospectEvent.prospect;
+        },
+
+        bulkProspectIds() {
+            return this.bulkProspectMode ? this.prospectsSelected : [];
         },
 
         /**

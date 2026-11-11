@@ -19,11 +19,13 @@ class MessageTemplate extends Model
         'body',
         'subject',
         'attachments',
+        'email_layout',
         'order',
     ];
 
     protected $casts = [
         'attachments' => 'array',
+        'email_layout' => 'array',
     ];
 
     public function attributesToArray()

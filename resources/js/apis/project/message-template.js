@@ -7,6 +7,11 @@ function templateFormData(params, updating = false) {
             data.append(key, params[key] ?? "");
         }
     }
+    if (params.email_layout && typeof params.email_layout === "object") {
+        Object.entries(params.email_layout).forEach(([key, value]) => {
+            data.append(`email_layout[${key}]`, value ?? "");
+        });
+    }
     if (Array.isArray(params.attachments)) {
         const retained = params.attachments.filter(attachment => !(attachment instanceof File));
         if (updating && retained.length === 0) {

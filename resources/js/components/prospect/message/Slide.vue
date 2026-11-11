@@ -44,16 +44,32 @@
                                 v-tooltip="'Configuration Brevo validée'"
                             />
                         </item>
-                        <item
-                            v-if="(prospect && prospect.email) || selectedProspects.length"
-                            v-for="reason in emailReasons"
-                            :key="reason.key"
-                            tag="a"
-                            @click.prevent="openEmailComposer(reason)"
+                        <template v-if="prospect && prospect.email">
+                            <item
+                                v-for="reason in emailReasons"
+                                :key="reason.key"
+                                tag="a"
+                                @click.prevent="openEmailComposer(reason)"
+                            >
+                                <icon class="fa fa-paper-plane icon-blue" />
+                                <div class="hc-item-main-content" v-text="reason.label"></div>
+                            </item>
+                        </template>
+                        <div
+                            v-else-if="prospectsSelected.length"
+                            class="hc-prospect-message-email-reasons"
                         >
-                            <icon class="fa fa-paper-plane icon-blue" />
-                            <div class="hc-item-main-content" v-text="reason.label"></div>
-                        </item>
+                            <item
+                                v-for="reason in selectedProspects.length ? emailReasons : []"
+                                :key="reason.key"
+                                tag="a"
+                                @click.prevent="openEmailComposer(reason)"
+                            >
+                                <icon class="fa fa-paper-plane icon-blue" />
+                                <div class="hc-item-main-content" v-text="reason.label"></div>
+                            </item>
+                            <loading :loading="fetchingProspects" />
+                        </div>
                         <thread-row
                             v-for="c in filteredThreads"
                             :key="c.id"
@@ -275,26 +291,36 @@
 
                             <template #2>
                                 <select-prospect
-                                    :search-fields="['first_name', 'last_name']"
-                                    @back="selectedProspectsTab = 0"
-                                    @prospect-selected="addSelectedProspect"
+                                    :search-fields="['first_name', 'last_name', 'email']"
+                                    @back="backFromSelectedProspects"
+                                    @prospect-selected="handleSelectedProspect"
                             /></template>
                         </tab-layout>
                     </template>
 
                     <template #2>
                         <div class="hc-flex-column" style="height: 100%">
-                            <item-list v-if="selectedProspects.length" padding="5px">
-                                <item
-                                    v-for="reason in emailReasons"
-                                    :key="'bulk-' + reason.key"
-                                    tag="a"
-                                    @click.prevent="openEmailComposer(reason)"
+                            <div
+                                v-if="selectedProspects.length || fetchingProspects"
+                                class="hc-prospect-message-email-reasons"
+                            >
+                                <item-list
+                                    v-if="selectedProspects.length"
+                                    padding="5px"
+                                    style="height: auto"
                                 >
-                                    <icon class="fa fa-paper-plane icon-blue" />
-                                    <div class="hc-item-main-content" v-text="reason.label"></div>
-                                </item>
-                            </item-list>
+                                    <item
+                                        v-for="reason in emailReasons"
+                                        :key="'bulk-' + reason.key"
+                                        tag="a"
+                                        @click.prevent="openEmailComposer(reason)"
+                                    >
+                                        <icon class="fa fa-paper-plane icon-blue" />
+                                        <div class="hc-item-main-content" v-text="reason.label"></div>
+                                    </item>
+                                </item-list>
+                                <loading :loading="fetchingProspects" />
+                            </div>
                             <select-prospect
                                 class="hc-flex-1"
                                 @back="tab = 0"
@@ -379,6 +405,7 @@
                     :key="emailDraftKey"
                     :initial-draft="emailDraft"
                     @back="tab = emailReturnTab"
+                    @add-prospects="addEmailProspects"
                 />
             </template>
         </tab-layout>
@@ -410,6 +437,11 @@
     height: auto;
     overflow: auto;
     flex: 1;
+}
+
+.hc-prospect-message-email-reasons {
+    position: relative;
+    min-height: 42px;
 }
 
 .folded #hc-prospect-message-selected-prospects-list {
@@ -489,6 +521,7 @@ export default {
             selectedProspectsFolded: true,
             fetchingProspects: false,
             selectedProspectsRequestId: 0,
+            addingEmailProspect: false,
 
             addingMessage: false,
             fetchingMessages: false,
@@ -568,6 +601,7 @@ export default {
             try {
                 const { data } = await ProspectService.get(projectSlug, {
                     params: {
+                        count: ids.length,
                         filters: JSON.stringify({
                             ids,
                         }),
@@ -591,6 +625,63 @@ export default {
                 this.selectedProspects.map((p) => p.id)
             );
             this.selectedProspectsTab = 0;
+        },
+
+        handleSelectedProspect(prospect) {
+            if (this.addingEmailProspect) {
+                this.addEmailRecipient(prospect);
+                return;
+            }
+
+            this.addSelectedProspect(prospect);
+        },
+
+        backFromSelectedProspects() {
+            this.selectedProspectsTab = 0;
+
+            if (this.addingEmailProspect) {
+                this.addingEmailProspect = false;
+                this.tab = 3;
+            }
+        },
+
+        addEmailProspects(recipients = this.emailDraft?.selectedProspects || []) {
+            if (!Array.isArray(this.emailDraft?.prospects)) return;
+
+            this.emailDraft = {
+                ...this.emailDraft,
+                selectedProspects: recipients,
+                prospects: recipients.map((recipient) => recipient.id),
+                to: recipients
+                    .map((recipient) => recipient.email)
+                    .filter(Boolean)
+                    .join(", "),
+            };
+            this.addingEmailProspect = true;
+            this.frameTab = 0;
+            this.selectedProspectsTab = 1;
+            this.tab = 1;
+        },
+
+        addEmailRecipient(prospect) {
+            const recipients = [...(this.emailDraft?.selectedProspects || [])];
+
+            if (
+                prospect.email &&
+                !recipients.some((recipient) => recipient.id == prospect.id)
+            ) {
+                recipients.push(prospect);
+                this.emailDraft = {
+                    ...this.emailDraft,
+                    selectedProspects: recipients,
+                    prospects: recipients.map((recipient) => recipient.id),
+                    to: recipients.map((recipient) => recipient.email).join(", "),
+                };
+            }
+
+            this.addingEmailProspect = false;
+            this.selectedProspectsTab = 0;
+            this.tab = 3;
         },
 
         /**
@@ -801,6 +892,7 @@ export default {
             this.emailDraft = {
                 prospect: this.prospect ? this.prospect.id : null,
                 prospects: this.prospect ? null : recipients.map((item) => item.id),
+                selectedProspects: recipients,
                 to: recipients.map((item) => item.email).join(", "),
                 category: reason.label,
                 subject: reason.subject,
@@ -813,6 +905,7 @@ export default {
 
         resetEmailComposer() {
             this.emailDraft = null;
+            this.addingEmailProspect = false;
             if (this.tab === 3) this.tab = 0;
         },
 
