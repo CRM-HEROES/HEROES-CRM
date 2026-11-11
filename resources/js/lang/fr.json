@@ -204,7 +204,7 @@
     "prospect": {
         "communications": {
             "process": "Traiter",
-            "request_process": "Demande traiter",
+            "request_process": "Demande traité",
             "not_processed": "Non traiter",
             "history": "Historique des traitements",
             "processed_by": "est traité par {user}",
