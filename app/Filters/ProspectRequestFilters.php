@@ -16,6 +16,8 @@ class ProspectRequestFilters extends ProspectFilters
         'createdDaysAgo',
         'createdBeforeDays',
         'imports',
+        'labelDateFrom',
+        'labelDateTo',
         'polygon',
         'position',
         'processed',
