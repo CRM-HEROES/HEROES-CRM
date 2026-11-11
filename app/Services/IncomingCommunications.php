@@ -153,7 +153,7 @@ class IncomingCommunications
                     ->orWhere('sms.from_user', false);
             })
             ->orderByDesc('communication_reads.read_at')
-            ->limit(1)
+            // ->limit(1)
             ->get([
                 'sms.id',
                 'sms.message',
