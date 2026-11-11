@@ -6,75 +6,10 @@
             showOptions ? 'show-options' : '',
         ]"
     >
-        <div
-            ref="options"
-            class="hc-prospect-header-cell-options"
-        >
-            <button
-                type="button"
-                class="hc-prospect-header-cell-options-trigger"
-                aria-label="Options de la colonne"
-                :aria-expanded="showOptions"
-                @click.prevent="showOptions = !showOptions"
-            >
-                ⁝
-            </button>
-            <ul
-                v-if="showOptions"
-                class="hc-prospect-header-cell-options-menu"
-                role="menu"
-            >
-                <li role="none">
-                    <button type="button" role="menuitem" @click.prevent="sortBy">
-                        <span
-                            :class="[
-                                'fa',
-                                sortedBy && sortedAsc ? 'fa-caret-down' : 'fa-caret-up',
-                            ]"
-                        ></span>
-                        Trier
-                        <loading :loading="sorting" />
-                    </button>
-                </li>
-                <li v-if="can('all.project.field.update')" role="none">
-                    <button type="button" role="menuitem" @click.prevent="edit">
-                        <span class="fa fa-cog"></span>
-                        Modifier le champ
-                    </button>
-                </li>
-                <li v-if="canFindReplace" role="none">
-                    <button
-                        type="button"
-                        role="menuitem"
-                        @click.prevent="openFindReplace"
-                    >
-                        <span class="fa fa-exchange-alt"></span>
-                        Rechercher et remplacer
-                    </button>
-                </li>
-                <li v-if="canToggleUnique" role="none">
-                    <button
-                        type="button"
-                        role="menuitem"
-                        @click.prevent="toggleUnique"
-                    >
-                        <span
-                            :class="[
-                                'fa',
-                                'fa-clone',
-                                field.unique ? 'icon-green' : '',
-                            ]"
-                        ></span>
-                        {{ field.unique ? 'Détection des doublons activée' : 'Détecter les doublons' }}
-                    </button>
-                </li>
-            </ul>
-        </div>
-
         <input
             :placeholder="column.name + ' ...'"
-            @focus="$emit('focus'), showRequired()"
-            @blur="$emit('blur'), hideRequired()"
+            @focus="onSearchFocus"
+            @blur="onSearchBlur"
             @change="search"
             ref="search"
         />
@@ -124,6 +59,72 @@
 
         <span v-text="column.name"></span>
 
+        <div
+            ref="options"
+            class="hc-prospect-header-cell-options"
+        >
+            <button
+                v-show="!searchFocused"
+                type="button"
+                class="hc-prospect-header-cell-options-trigger"
+                aria-label="Options de la colonne"
+                :aria-expanded="showOptions"
+                @click.prevent.stop="showOptions = !showOptions"
+            >
+                ⁝
+            </button>
+            <ul
+                v-if="showOptions"
+                class="hc-prospect-header-cell-options-menu"
+                role="menu"
+            >
+                <li role="none">
+                    <button type="button" role="menuitem" @click.stop.prevent="sortBy">
+                        <span
+                            :class="[
+                                'fa',
+                                sortedBy && sortedAsc ? 'fa-caret-down' : 'fa-caret-up',
+                            ]"
+                        ></span>
+                        Trier
+                        <loading :loading="sorting" />
+                    </button>
+                </li>
+                <li v-if="can('all.project.field.update')" role="none">
+                    <button type="button" role="menuitem" @click.stop.prevent="edit">
+                        <span class="fa fa-cog"></span>
+                        Modifier le champ
+                    </button>
+                </li>
+                <li v-if="canFindReplace" role="none">
+                    <button
+                        type="button"
+                        role="menuitem"
+                        @click.stop.prevent="openFindReplace"
+                    >
+                        <span class="fa fa-exchange-alt"></span>
+                        Rechercher et remplacer
+                    </button>
+                </li>
+                <li v-if="canToggleUnique" role="none">
+                    <button
+                        type="button"
+                        role="menuitem"
+                        @click.stop.prevent="toggleUnique"
+                    >
+                        <span
+                            :class="[
+                                'fa',
+                                'fa-clone',
+                                field.unique ? 'icon-green' : '',
+                            ]"
+                        ></span>
+                        {{ field.unique ? 'Détection des doublons activée' : 'Détecter les doublons' }}
+                    </button>
+                </li>
+            </ul>
+        </div>
+
         <find-replace
             v-if="findReplaceOpen"
             :column="column"
@@ -167,6 +168,7 @@ export default {
             sorting: false,
             requiredShown: false,
             showOptions: false,
+            searchFocused: false,
         };
     },
 
@@ -179,6 +181,19 @@ export default {
     },
 
     methods: {
+        onSearchFocus() {
+            this.searchFocused = true;
+            this.showOptions = false;
+            this.$emit("focus");
+            this.showRequired();
+        },
+
+        onSearchBlur() {
+            this.searchFocused = false;
+            this.$emit("blur");
+            this.hideRequired();
+        },
+
         handleDocumentClick(event) {
             if (
                 this.$refs.options &&
