@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Workflow;
 use App\Models\WorkflowExecution;
+use App\Workflows\Actions\EmailDesign;
+use App\Workflows\Actions\EmailHtml;
 use App\Workflows\Providers\ProviderRegistry;
 use App\Workflows\WorkflowCatalog;
 use App\Workflows\WorkflowExecutionManager;
@@ -79,10 +81,46 @@ class WorkflowController extends Controller
 
         abort_unless($capability === null || in_array($capability, ProviderRegistry::CAPABILITIES, true), 422);
 
+        // With "with_missing": also the operators that are not configured yet, to
+        // configure them from the builder (each says whether it is configured)
+        if ($capability !== null && $request->boolean('with_missing')) {
+            return $providers->withMissing($project->id, $capability);
+        }
+
         return array_map(
             [ProviderRegistry::class, 'public'],
             $providers->forProject($project->id, $capability)
         );
+    }
+
+    /**
+     * The email as it will be sent, drawn by the same view as the real one, so
+     * that what the builder shows is what the prospect gets. Nothing is saved
+     * or sent. The body is cleaned like it is when sent, and the variables are
+     * already replaced by examples by the builder.
+     */
+    public function emailPreview(Request $request, Project $project)
+    {
+        $this->authorizeAction($project, 'Update');
+
+        $data = $request->validate([
+            'subject' => 'nullable|string|max:255',
+            'body' => 'nullable|string|max:200000',
+            'design' => 'nullable|array',
+        ]);
+
+        $problems = EmailDesign::problems($data['design'] ?? [], 'aperçu');
+        abort_if($problems, 422, $problems[0] ?? '');
+
+        return [
+            'html' => EmailDesign::render(
+                $data['design'] ?? [],
+                (string) ($data['subject'] ?? ''),
+                EmailHtml::clean((string) ($data['body'] ?? '')),
+                $project->name,
+                $project->thumbnail
+            ),
+        ];
     }
 
     public function store(Request $request, Project $project)

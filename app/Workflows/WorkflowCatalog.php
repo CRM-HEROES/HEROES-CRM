@@ -89,8 +89,11 @@ class WorkflowCatalog
                     ['key' => 'provider', 'type' => 'provider', 'capability' => ProviderRegistry::EMAIL, 'required' => true],
                     // Optional: without it the first public channel of the project is used
                     ['key' => 'thread', 'type' => 'thread'],
+                    ['key' => 'subject', 'type' => 'line'],
                     ['key' => 'body', 'type' => 'html', 'required' => true],
-                    ['key' => 'user', 'type' => 'user'],
+                    // People in copy of the email: users, and the members of groups
+                    ['key' => 'cc_users', 'type' => 'users'],
+                    ['key' => 'cc_groups', 'type' => 'groups'],
                     $onError,
                 ],
             ],

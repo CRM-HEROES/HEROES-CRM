@@ -16,8 +16,32 @@
             @input="$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value))"
         />
 
+        <!-- The email: written as in a word processor -->
+        <email-editor
+            v-else-if="type === 'html'"
+            :model-value="modelValue || ''"
+            :variables="variables"
+            :subject="subject"
+            :design="design"
+            :project-name="project ? project.name : ''"
+            :read-only="readOnly"
+            @update:model-value="$emit('update:modelValue', $event)"
+            @update:design="$emit('update:design', $event)"
+        />
+
+        <!-- One line (the subject of an email) -->
+        <input
+            v-else-if="type === 'line'"
+            type="text"
+            maxlength="255"
+            :value="modelValue"
+            :placeholder="$t('workflow.line_placeholder.' + field.key)"
+            :disabled="readOnly"
+            @input="$emit('update:modelValue', $event.target.value)"
+        />
+
         <!-- Texts -->
-        <template v-else-if="type === 'text' || type === 'html'">
+        <template v-else-if="type === 'text'">
             <textarea
                 ref="text"
                 rows="5"
@@ -60,15 +84,16 @@
 
         <!-- An operator of the project -->
         <template v-else-if="type === 'provider'">
-            <select :value="modelValue" :disabled="readOnly" @change="chooseProvider($event.target.value)">
+            <select ref="provider" :value="modelValue" :disabled="readOnly" @change="chooseProvider($event.target.value)">
                 <option value="" v-text="$t('workflow.choose')"></option>
                 <option
                     v-if="modelValue && !providers.some((p) => p.ref === modelValue)"
                     :value="modelValue"
                     v-text="$t('workflow.provider_missing')"
                 ></option>
-                <option v-for="provider in providers" :key="provider.ref" :value="provider.ref" v-text="provider.label"></option>
+                <option v-for="provider in providers" :key="provider.ref" :value="provider.ref" v-text="providerLabel(provider)"></option>
             </select>
+            <p v-if="unconfiguredChosen" class="hc-wff-count" v-text="$t('workflow.provider_setup.waiting')"></p>
             <p v-if="!providersLoading && !providers.length" class="hc-wff-warn" v-text="$t('workflow.no_provider.' + field.capability)"></p>
         </template>
 
@@ -253,15 +278,19 @@
 import { mapGetters } from "vuex";
 import store from "@/store";
 import WorkflowService from "@/apis/project/workflow";
+import EmailEditor from "./EmailEditor.vue";
 import LabelService from "@/apis/project/label";
 import { FETCH_USERS } from "@/actions/project/user";
 import { FETCH_GROUPS } from "@/actions/project/group";
 import { ADD_THREAD, FETCH_THREADS } from "@/actions/project/thread";
+import { OPEN_MODAL } from "@/actions/modal";
 import { FETCH_CATEGORIES } from "@/actions/project/category";
 
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
 
 export default {
+    components: { EmailEditor },
+
     props: {
         modelValue: { default: null },
         // boolean, number, minutes, text, html, user(s), group(s), label(s), thread, provider, on_error, time, date, weekdays
@@ -270,15 +299,21 @@ export default {
         field: { type: Object, default: () => ({}) },
         // { prospect: [...], user: [...], project: [...] }
         variables: { type: Object, default: () => ({}) },
+        // The subject of the email, shown in its preview
+        subject: { type: String, default: "" },
+        // The look of the email (null: the usual look of the CRM)
+        design: { type: Object, default: null },
         readOnly: { type: Boolean, default: false },
     },
 
-    emits: ["update:modelValue", "provider-label"],
+    emits: ["update:modelValue", "update:design", "provider-label"],
 
     data() {
         return {
             providers: [],
             providersLoading: false,
+            // The operator being configured in its window: chosen when it is done
+            pendingProvider: null,
             labels: [],
             labelsLoaded: false,
             loadingLists: false,
@@ -289,7 +324,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["project", "users", "groups", "threads", "categories", "can"]),
+        ...mapGetters(["project", "users", "groups", "threads", "categories", "can", "modals"]),
 
         isSingle() {
             return ["user", "group", "label", "thread"].includes(this.type);
@@ -308,6 +343,13 @@ export default {
             }
 
             return this.options.length ? this.$t("workflow.thread_create.automatic", { name: this.options[0].label }) : this.$t("workflow.choose");
+        },
+
+        /**
+         * The operator in the list is one that still has to be configured: say what is awaited
+         */
+        unconfiguredChosen() {
+            return !!this.pendingProvider;
         },
 
         isLabels() {
@@ -359,6 +401,13 @@ export default {
     },
 
     watch: {
+        // The window of the operator was closed: is it configured now?
+        modals(list) {
+            if (this.pendingProvider && !list.includes(this.pendingProvider.setup)) {
+                this.afterSetup();
+            }
+        },
+
         // The same field can change of type (another criterion) or get its categories late
         type() {
             this.refresh();
@@ -469,8 +518,57 @@ export default {
          * Chosen operator: the node keeps its reference, and its name for the messages
          */
         chooseProvider(ref) {
+            const provider = this.providers.find((p) => p.ref === ref);
+
+            // Not configured yet: its window opens to configure it, the choice is made once it is
+            if (provider && provider.configured === false) {
+                this.setupProvider(provider);
+                return;
+            }
+
             this.$emit("update:modelValue", ref || null);
-            this.$emit("provider-label", this.providers.find((p) => p.ref === ref)?.label || null);
+            this.$emit("provider-label", provider?.label || null);
+        },
+
+        providerLabel(provider) {
+            return provider.configured === false ? `${provider.label} (${this.$t("workflow.provider_setup.to_configure")})` : provider.label;
+        },
+
+        /**
+         * Opens the window of the CRM that configures the operator (the same as in the settings)
+         */
+        setupProvider(provider) {
+            // The list shows what is really chosen, not the operator clicked
+            if (this.$refs.provider) {
+                this.$refs.provider.value = this.modelValue || "";
+            }
+
+            if (!provider.setup) {
+                flashWarning({ title: this.$t("workflow.title"), body: this.$t("workflow.provider_setup.no_window", { name: provider.label }) });
+                return;
+            }
+
+            this.pendingProvider = provider;
+            store.commit(OPEN_MODAL, provider.setup);
+        },
+
+        /**
+         * Back from the window: the operator is chosen if it is configured now
+         */
+        async afterSetup() {
+            const pending = this.pendingProvider;
+            this.pendingProvider = null;
+
+            await this.loadProviders();
+
+            const provider = this.providers.find((p) => p.ref === pending.ref);
+
+            if (provider && provider.configured) {
+                this.chooseProvider(provider.ref);
+                flash({ title: this.$t("workflow.title"), body: this.$t("workflow.provider_setup.done", { name: provider.label }) });
+            } else {
+                flashWarning({ title: this.$t("workflow.title"), body: this.$t("workflow.provider_setup.not_done", { name: pending.label }) });
+            }
         },
 
         insertVariable(variable) {
@@ -487,7 +585,7 @@ export default {
             const capability = this.field.capability;
 
             try {
-                const { data } = await WorkflowService.providers(this.project.slug, capability);
+                const { data } = await WorkflowService.providers(this.project.slug, capability, true);
 
                 // The answer of a previous choice that comes late is not the one wanted
                 if (capability !== this.field.capability) {

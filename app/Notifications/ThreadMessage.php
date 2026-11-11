@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\Message;
+use App\Workflows\Actions\EmailDesign;
 use App\Utils\Project\LogoThumbnail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -39,14 +40,36 @@ class ThreadMessage extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         $mailMessage = (new MailMessage)
-                    ->subject("Vous avez un nouveau message")
-                    ->from(config("mail.from.address"), config("mail.from.name"))
-                    ->view('emails.thread-message', [
-                        'icon' => $this->icon(),
-                        'title' => $this->message->thread->project->name,
-                        'threadMessage' => $this->message->body,
-                        'notifiable' => $notifiable
-                    ]);
+                    ->subject($this->message->subject ?: "Vous avez un nouveau message")
+                    ->from(config("mail.from.address"), config("mail.from.name"));
+
+        if ($this->message->email_layout) {
+            // An automatic email with its own design (see App\Workflows\Actions\EmailDesign)
+            $project = $this->message->thread->project;
+
+            $mailMessage->view('emails.workflow-message', [
+                'design' => EmailDesign::normalize($this->message->email_layout, $project->name),
+                'subject' => (string) $this->message->subject,
+                'body' => $this->message->body,
+                'projectName' => $project->name,
+                'logo' => $project->thumbnail,
+                'fontStack' => EmailDesign::fontStack($this->message->email_layout['font'] ?? 'arial'),
+            ]);
+        } else {
+            $mailMessage->view('emails.thread-message', [
+                'icon' => $this->icon(),
+                'title' => $this->message->thread->project->name,
+                'threadMessage' => $this->message->body,
+                'notifiable' => $notifiable
+            ]);
+        }
+
+        // Copies (emails written by a workflow): the prospect sees who else got it
+        foreach ($this->message->cc ?? [] as $copy) {
+            if (!empty($copy['email'])) {
+                $mailMessage->cc($copy['email'], $copy['name'] ?? null);
+            }
+        }
 
         if ($this->message->creator) {
             $mailMessage = $mailMessage->replyTo($this->message->creator->email, $this->message->creator->name);
