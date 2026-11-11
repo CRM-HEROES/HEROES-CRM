@@ -74,8 +74,9 @@
         "confirm_password": "Confirmer le mot de passe",
         "init_password": {
             "title": "Réinitialiser le mot de passe",
-            "success": "Le lien de réinitialisation de mot de passe a été bien envoyé à l'adresse email <b>{email}</b>.",
-            "error": "Nous rencontrons pour l'instant une erreur lors de  l'envoi du lien de réinitialisation de mot de passe.<br><br>Vérifier bien que l'email saisi est correct.",
+            "success": "Si un compte existe pour l'adresse <b>{email}</b>, un email contenant un lien de changement de mot de passe vient d'être envoyé (lien valable 60 minutes).",
+            "error": "L'envoi du lien de réinitialisation a échoué. Vérifiez l'adresse saisie et réessayez dans un instant.",
+            "too_many": "Trop de demandes. Réessayez dans une minute.",
             "send_verification_email": "Envoyer le lien de réinitialisation",
             "sending_verification_email": "Envoi du lien de réinitialisation"
         },

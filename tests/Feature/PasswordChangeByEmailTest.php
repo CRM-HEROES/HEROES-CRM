@@ -207,13 +207,35 @@ class PasswordChangeByEmailTest extends TestCase
         $this->assertSame($hash, $user->fresh()->password);
     }
 
-    public function test_une_seconde_demande_rapprochee_est_limitee(): void
+    public function test_une_seconde_demande_rapprochee_ne_renvoie_pas_dautre_email(): void
     {
         $this->makeUser();
         $this->requestToken();
 
-        $this->postJson('/password/email', ['email' => 'alice@example.test'])->assertStatus(422);
+        // Même réponse de succès (on ne révèle rien), mais aucun second email
+        $this->postJson('/password/email', ['email' => 'alice@example.test'])->assertOk();
         $this->assertSame(1, $this->mails()->count());
+    }
+
+    public function test_adresse_inconnue_recoit_la_meme_reponse_quune_adresse_connue(): void
+    {
+        $this->makeUser();
+
+        $known = $this->postJson('/password/email', ['email' => 'alice@example.test']);
+        $unknown = $this->postJson('/password/email', ['email' => 'inconnu@example.test']);
+
+        $this->assertSame($known->status(), $unknown->status());
+        $this->assertSame($known->json('message'), $unknown->json('message'));
+        $this->assertSame(1, $this->mails()->count(), 'Aucun email ne doit partir pour une adresse inconnue.');
+    }
+
+    public function test_trop_de_demandes_depuis_la_meme_ip_sont_bloquees(): void
+    {
+        for ($i = 0; $i < 6; $i++) {
+            $this->postJson('/password/email', ['email' => "inconnu{$i}@example.test"])->assertOk();
+        }
+
+        $this->postJson('/password/email', ['email' => 'inconnu7@example.test'])->assertStatus(429);
     }
 
     public function test_compte_en_attente_est_active_par_le_changement(): void
