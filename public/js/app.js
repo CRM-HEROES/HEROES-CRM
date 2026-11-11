@@ -27806,9 +27806,11 @@ var REMOVE_EVENT_DESCRIPTION_TEMPLATE = "removeEventDescriptionTemplate";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ADD_EVENT: () => (/* binding */ ADD_EVENT),
+/* harmony export */   ADD_EVENTS: () => (/* binding */ ADD_EVENTS),
 /* harmony export */   ADD_EVENT_PARAMS: () => (/* binding */ ADD_EVENT_PARAMS),
 /* harmony export */   ADD_EVENT_USER: () => (/* binding */ ADD_EVENT_USER),
 /* harmony export */   ADD_EVENT_USER_DAILY_DIRECTION: () => (/* binding */ ADD_EVENT_USER_DAILY_DIRECTION),
+/* harmony export */   BULK_ADD_EVENTS: () => (/* binding */ BULK_ADD_EVENTS),
 /* harmony export */   FETCH_EVENTS: () => (/* binding */ FETCH_EVENTS),
 /* harmony export */   FETCH_EVENT_USER_DAILY_DIRECTION: () => (/* binding */ FETCH_EVENT_USER_DAILY_DIRECTION),
 /* harmony export */   FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY: () => (/* binding */ FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY),
@@ -27842,6 +27844,8 @@ var FETCH_EVENTS = "fetchEvents";
 var SET_EVENTS = "setEvents";
 var SET_EVENT = "setEvent";
 var ADD_EVENT = "addEvent";
+var BULK_ADD_EVENTS = "bulkAddEvents";
+var ADD_EVENTS = "addEvents";
 var SHOW_EVENT = "showEvent";
 var UPDATE_EVENT = "updateEvent";
 var REMOVE_EVENT = "removeEvent";
@@ -31069,6 +31073,9 @@ __webpack_require__.r(__webpack_exports__);
   },
   create: function create(project, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/event"), params);
+  },
+  bulkCreate: function bulkCreate(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/event/bulk"), params);
   },
   show: function show(project, event) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/event/").concat(event));
@@ -40327,74 +40334,93 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
       }
     }, _callee4);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, function (context, params) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.BULK_ADD_EVENTS, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+    var _yield$EventService$b, data;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
           _context5.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].bulkCreate(context.state.project.slug, params);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, params);
-        case 3:
+          _yield$EventService$b = _context5.sent;
+          data = _yield$EventService$b.data;
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENTS, data);
+          return _context5.abrupt("return", data);
+        case 6:
         case "end":
           return _context5.stop();
       }
     }, _callee5);
   }))();
-}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, function (context, slug) {
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, function (context, params) {
   return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
     return _regeneratorRuntime().wrap(function _callee6$(_context6) {
       while (1) switch (_context6.prev = _context6.next) {
         case 0:
           _context6.next = 2;
-          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].update(context.state.project.slug, params.id, params);
         case 2:
-          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, slug);
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, params);
         case 3:
         case "end":
           return _context6.stop();
       }
     }, _callee6);
   }))();
+}), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, function (context, slug) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+    return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+      while (1) switch (_context7.prev = _context7.next) {
+        case 0:
+          _context7.next = 2;
+          return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].destroy(context.state.project.slug, slug);
+        case 2:
+          context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REMOVE_EVENT, slug);
+        case 3:
+        case "end":
+          return _context7.stop();
+      }
+    }, _callee7);
+  }))();
 }), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_EVENT_USER_DAILY_DIRECTION, function (context, _ref3) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
     var _context$state$projec, _context$rootState$au;
     var user, direction_at, _ref3$events, events, scope, project, can, canReadSummary, routeEvents, result;
-    return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-      while (1) switch (_context9.prev = _context9.next) {
+    return _regeneratorRuntime().wrap(function _callee10$(_context10) {
+      while (1) switch (_context10.prev = _context10.next) {
         case 0:
           user = _ref3.user, direction_at = _ref3.direction_at, _ref3$events = _ref3.events, events = _ref3$events === void 0 ? [] : _ref3$events;
           if (user !== null && user !== void 0 && user.id) {
-            _context9.next = 3;
+            _context10.next = 3;
             break;
           }
-          return _context9.abrupt("return", null);
+          return _context10.abrupt("return", null);
         case 3:
           scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
           project = (_context$state$projec = context.state.project) === null || _context$state$projec === void 0 ? void 0 : _context$state$projec.slug;
           can = context.rootGetters.can;
           canReadSummary = project && (typeof can !== "function" || ((_context$rootState$au = context.rootState.auth) === null || _context$rootState$au === void 0 || (_context$rootState$au = _context$rootState$au.user) === null || _context$rootState$au === void 0 ? void 0 : _context$rootState$au.id) == user.id || can("all.project.user.agenda.".concat(user.id)));
           routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
-          _context9.next = 10;
+          _context10.next = 10;
           return _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].fetch(scope, user.id, direction_at, routeEvents, function (control) {
             return (0,_utils_event_daily_direction_loader__WEBPACK_IMPORTED_MODULE_3__.loadDailyDirection)(_objectSpread(_objectSpread({}, control), {}, {
               userId: user.id,
               date: direction_at,
               loadDetail: function () {
-                var _loadDetail = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-                  return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-                    while (1) switch (_context7.prev = _context7.next) {
+                var _loadDetail = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+                  return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+                    while (1) switch (_context8.prev = _context8.next) {
                       case 0:
-                        _context7.next = 2;
+                        _context8.next = 2;
                         return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].dailyDirection(user, direction_at);
                       case 2:
-                        return _context7.abrupt("return", _context7.sent.data);
+                        return _context8.abrupt("return", _context8.sent.data);
                       case 3:
                       case "end":
-                        return _context7.stop();
+                        return _context8.stop();
                     }
-                  }, _callee7);
+                  }, _callee8);
                 }));
                 function loadDetail() {
                   return _loadDetail.apply(this, arguments);
@@ -40402,29 +40428,29 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
                 return loadDetail;
               }(),
               loadSummary: function () {
-                var _loadSummary = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-                  return _regeneratorRuntime().wrap(function _callee8$(_context8) {
-                    while (1) switch (_context8.prev = _context8.next) {
+                var _loadSummary = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+                  return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+                    while (1) switch (_context9.prev = _context9.next) {
                       case 0:
                         if (!canReadSummary) {
-                          _context8.next = 4;
+                          _context9.next = 4;
                           break;
                         }
-                        _context8.t0 = _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
-                        _context8.next = 7;
+                        _context9.t0 = _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
+                        _context9.next = 7;
                         break;
                       case 4:
-                        _context8.next = 6;
+                        _context9.next = 6;
                         return _apis_project_event__WEBPACK_IMPORTED_MODULE_0__["default"].dailyDirectionStatus(user, direction_at);
                       case 6:
-                        _context8.t0 = _context8.sent.data;
+                        _context9.t0 = _context9.sent.data;
                       case 7:
-                        return _context8.abrupt("return", _context8.t0);
+                        return _context9.abrupt("return", _context9.t0);
                       case 8:
                       case "end":
-                        return _context8.stop();
+                        return _context9.stop();
                     }
-                  }, _callee8);
+                  }, _callee9);
                 }));
                 function loadSummary() {
                   return _loadSummary.apply(this, arguments);
@@ -40434,53 +40460,53 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_event__
             }));
           });
         case 10:
-          result = _context9.sent;
+          result = _context10.sent;
           if (result && (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState) === scope && _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents) === result) {
             context.commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.REFRESH_EVENT_USER_DAILY_DIRECTION_SUMMARY, {
               user_id: user.id,
               started_at: direction_at
             });
           }
-          return _context9.abrupt("return", result);
+          return _context10.abrupt("return", result);
         case 13:
         case "end":
-          return _context9.stop();
+          return _context10.stop();
       }
-    }, _callee9);
+    }, _callee10);
   }))();
 }), _defineProperty(_actions, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.FETCH_EVENT_USER_DAILY_DIRECTION_SUMMARY, function (context, _ref4) {
-  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
     var _context$state$projec2, _context$rootState$au2;
     var user, direction_at, _ref4$events, events, project, can, scope, routeEvents;
-    return _regeneratorRuntime().wrap(function _callee10$(_context10) {
-      while (1) switch (_context10.prev = _context10.next) {
+    return _regeneratorRuntime().wrap(function _callee11$(_context11) {
+      while (1) switch (_context11.prev = _context11.next) {
         case 0:
           user = _ref4.user, direction_at = _ref4.direction_at, _ref4$events = _ref4.events, events = _ref4$events === void 0 ? [] : _ref4$events;
           project = (_context$state$projec2 = context.state.project) === null || _context$state$projec2 === void 0 ? void 0 : _context$state$projec2.slug;
           if (!(!(user !== null && user !== void 0 && user.id) || !project)) {
-            _context10.next = 4;
+            _context11.next = 4;
             break;
           }
-          return _context10.abrupt("return", null);
+          return _context11.abrupt("return", null);
         case 4:
           can = context.rootGetters.can;
           if (!(typeof can === "function" && ((_context$rootState$au2 = context.rootState.auth) === null || _context$rootState$au2 === void 0 || (_context$rootState$au2 = _context$rootState$au2.user) === null || _context$rootState$au2 === void 0 ? void 0 : _context$rootState$au2.id) != user.id && !can("all.project.user.agenda.".concat(user.id)))) {
-            _context10.next = 7;
+            _context11.next = 7;
             break;
           }
-          return _context10.abrupt("return", null);
+          return _context11.abrupt("return", null);
         case 7:
           scope = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionCacheScope)(context.rootState);
           routeEvents = (0,_utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__.dailyDirectionContextEvents)(context.rootState, user.id, direction_at, events);
-          return _context10.abrupt("return", _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.fetch(scope, user.id, direction_at, routeEvents, function () {
+          return _context11.abrupt("return", _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.summaryCache.fetch(scope, user.id, direction_at, routeEvents, function () {
             var detail = _utils_event_daily_direction_cache__WEBPACK_IMPORTED_MODULE_1__["default"].get(scope, user.id, direction_at, routeEvents);
             return detail ? Promise.resolve((0,_utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__.toDailyDirectionSummary)(detail)) : _utils_event_daily_direction_summary__WEBPACK_IMPORTED_MODULE_2__["default"].request(scope, project, user.id, direction_at);
           }));
         case 10:
         case "end":
-          return _context10.stop();
+          return _context11.stop();
       }
-    }, _callee10);
+    }, _callee11);
   }))();
 }), _actions);
 
@@ -40518,6 +40544,8 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_e
   state.project.resizedEvent = event;
 }), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT, function (state, event) {
   state.project.events = [].concat(_toConsumableArray(state.project.events), [event]);
+}), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENTS, function (state, events) {
+  state.project.events = [].concat(_toConsumableArray(state.project.events || []), _toConsumableArray(events));
 }), _defineProperty(_mutations, _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.UPDATE_EVENT, function (state, params) {
   if (!state.project.events) {
     return;

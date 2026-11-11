@@ -35,6 +35,7 @@ class Event extends Model
         'done',
         'drop_off_location',
         'ended_at',
+        'email_to_prospect',
         'latitude',
         'location',
         'send_email_to_prospect',

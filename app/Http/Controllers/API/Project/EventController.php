@@ -64,6 +64,7 @@ class EventController extends Controller
                 'ended_at',
                 'location',
                 'drop_off_location',
+                'email_to_prospect',
                 'send_email_to_prospect',
                 'meta',
             ), [
@@ -86,6 +87,110 @@ class EventController extends Controller
         $event->load('vehicle:id,name');
 
         return $event;
+    }
+
+    /**
+     * Store the same appointment for multiple prospects.
+     */
+    public function bulkStore(Request $request, Project $project)
+    {
+        $validated = $request->validate([
+            'prospects' => ['required', 'array', 'min:1'],
+            'prospects.*' => ['required', 'integer', 'distinct'],
+            'calendar_id' => ['required', 'integer'],
+            'user_id' => ['required', 'integer'],
+            'vehicle_id' => ['sometimes', 'nullable', 'integer'],
+            'confirmed' => ['sometimes', 'nullable', 'boolean'],
+            'done' => ['sometimes', 'nullable', 'boolean'],
+            'name' => ['sometimes', 'nullable', 'string'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'started_at' => ['required', 'date'],
+            'ended_at' => ['required', 'date'],
+            'location' => ['sometimes', 'nullable', 'string'],
+            'drop_off_location' => ['sometimes', 'nullable', 'string'],
+            'email_to_prospect' => ['sometimes', 'nullable', 'boolean'],
+            'send_email_to_prospect' => ['sometimes', 'nullable', 'boolean'],
+            'meta' => ['sometimes', 'nullable', 'array'],
+            'users' => ['sometimes', 'array'],
+            'users.*' => ['integer', 'distinct'],
+        ]);
+
+        abort_unless(
+            $project->calendars()->find($validated['calendar_id']),
+            404,
+            'Unknown event calendar'
+        );
+        abort_unless(
+            $project->users()->find($validated['user_id']),
+            404,
+            'Unknown event user'
+        );
+
+        if (!empty($validated['vehicle_id'])) {
+            abort_unless(
+                $project->vehicles()->find($validated['vehicle_id']),
+                404,
+                'Unknown event vehicle'
+            );
+        }
+
+        $prospectIds = $validated['prospects'];
+        $prospectCount = $project->prospects()
+            ->whereIn('id', $prospectIds)
+            ->count();
+
+        abort_unless(
+            $prospectCount === count($prospectIds),
+            404,
+            'Unknown event prospect'
+        );
+
+        $eventAttributes = collect($validated)
+            ->except(['prospects', 'users'])
+            ->all();
+        if (array_key_exists('send_email_to_prospect', $eventAttributes)) {
+            $eventAttributes['email_to_prospect'] =
+                $eventAttributes['email_to_prospect'] ??
+                $eventAttributes['send_email_to_prospect'];
+            unset($eventAttributes['send_email_to_prospect']);
+        }
+        $attendeeIds = $validated['users'] ?? null;
+
+        $events = DB::transaction(function () use (
+            $eventAttributes,
+            $prospectIds,
+            $project,
+            $attendeeIds
+        ) {
+            return collect($prospectIds)->map(function ($prospectId) use (
+                $eventAttributes,
+                $project,
+                $attendeeIds
+            ) {
+                $event = Event::create(array_merge($eventAttributes, [
+                    'prospect_id' => $prospectId,
+                    'creator_id' => auth()->id(),
+                ]));
+
+                if ($attendeeIds !== null) {
+                    $this->attachUsers($project, $event, $attendeeIds);
+                }
+
+                return $event->load(
+                    'calendar:id,name,color,bgcolor',
+                    'confirmedBy:id,name',
+                    'creator:id,name',
+                    'doneBy:id,name',
+                    'prospect:id,first_name,last_name',
+                    'order',
+                    'user:id,name',
+                    'users:id,name',
+                    'vehicle:id,name'
+                );
+            });
+        });
+
+        return $events;
     }
 
     /**

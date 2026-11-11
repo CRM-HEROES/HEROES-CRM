@@ -237,6 +237,12 @@
 
         <template v-if="!bulkDisabled">
             <card-menu
+                v-if="canEvent"
+                icon="hc-icon hc-slide-icon fa fa-calendar"
+                :label="$t('event.new')"
+                @click="bulkEvent"
+            />
+            <card-menu
                 v-if="!selectedProspectsProcessed"
                 icon="fa fa-users"
                 :label="$t('prospect.table.footer.bulk_groups')"
@@ -479,6 +485,7 @@ import EventBus from "@/utils/event-bus";
 
 import { OPEN_MODAL } from "@/actions/modal";
 import { OPEN_SLIDE, OPEN_LEFT_SLIDE } from "@/actions/slide";
+import { SET_EVENT } from "@/actions/project/event";
 import {
     BULK_REMOVE_PROSPECT,
     BULK_RESTORE_PROSPECT,
@@ -543,6 +550,27 @@ export default {
          */
         bulkDeselect() {
             store.commit(UPDATE_SELECTED_PROSPECTS, []);
+        },
+
+        /**
+         * Create one appointment for each selected prospect
+         */
+        bulkEvent() {
+            if (!this.prospectsSelected.length) return;
+
+            const startDate = new Date();
+            startDate.setMinutes(60);
+
+            const endDate = new Date();
+            endDate.setMinutes(120);
+
+            store.commit(SET_PROSPECT, null);
+            store.commit(SET_EVENT, {
+                bulkProspectMode: true,
+                started_at: dateToString(startDate),
+                ended_at: dateToString(endDate),
+            });
+            store.commit(OPEN_SLIDE, "prospect-manage-events");
         },
 
         /**
@@ -1027,6 +1055,7 @@ export default {
             "prospectsMenus",
             "prospectsOptions",
             "can",
+            "canEvent",
             "lines",
         ]),
 

@@ -23405,7 +23405,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       removingEvent: false,
       googleCalendar: undefined,
       removingGoogleCalendar: false,
-      showEndedAtDate: false
+      showEndedAtDate: false,
+      bulkProspectMode: false
     };
   },
   methods: {
@@ -23474,10 +23475,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     storeEvent: function storeEvent() {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        var data, d;
+        var bulkProspectIds, data, d;
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
+              bulkProspectIds = _toConsumableArray(_this.bulkProspectIds);
               data = {
                 calendar_id: _this.prospectEvent.calendar.id,
                 user_id: _this.prospectEvent.user.id,
@@ -23515,14 +23517,29 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
               }
               data.meta = _this.meta;
               _this.addingEvent = true;
-              _context.prev = 8;
-              _context.next = 11;
+              _context.prev = 9;
+              if (!bulkProspectIds.length) {
+                _context.next = 17;
+                break;
+              }
+              _context.next = 13;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.BULK_ADD_EVENTS, _objectSpread(_objectSpread({}, data), {}, {
+                prospects: bulkProspectIds
+              }));
+            case 13:
+              _context.next = 15;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_8__.FETCH_PROSPECTS);
+            case 15:
+              _context.next = 22;
+              break;
+            case 17:
+              _context.next = 19;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(
               /*this.prospect && this.prospect.id
                   ? ADD_PROSPECT_EVENT
                   : */
               _actions_project_event__WEBPACK_IMPORTED_MODULE_6__.ADD_EVENT, data);
-            case 11:
+            case 19:
               d = _context.sent;
               if (_this.prospect && !_this.prospect.street) {
                 _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_8__.UPDATE_PROSPECT, {
@@ -23535,17 +23552,23 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                   id: d.id
                 }));
               }
-            case 14:
-              _context.prev = 14;
+            case 22:
+              _context.prev = 22;
               _this.addingEvent = false;
+              if (bulkProspectIds.length && _this.event) {
+                _this.bulkProspectMode = false;
+                _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_EVENT, _objectSpread(_objectSpread({}, _this.event), {}, {
+                  bulkProspectMode: false
+                }));
+              }
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_5__.CLOSE_SLIDE);
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_event__WEBPACK_IMPORTED_MODULE_6__.SET_NEW_EVENT, null);
-              return _context.finish(14);
-            case 19:
+              return _context.finish(22);
+            case 28:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[8,, 14, 19]]);
+        }, _callee, null, [[9,, 22, 28]]);
       }))();
     },
     /**
@@ -24002,30 +24025,33 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
         return _regeneratorRuntime().wrap(function _callee9$(_context9) {
           while (1) switch (_context9.prev = _context9.next) {
             case 0:
+              _this9.bulkProspectMode = Boolean(newValue && newValue.bulkProspectMode);
+
+              // Fetch event
               if (!newValue) {
-                _context9.next = 12;
+                _context9.next = 13;
                 break;
               }
               _this9.prospectEvent = newValue;
               if (!newValue.id) {
-                _context9.next = 8;
+                _context9.next = 9;
                 break;
               }
-              _context9.next = 5;
+              _context9.next = 6;
               return _apis_project_event__WEBPACK_IMPORTED_MODULE_1__["default"].show(_this9.project.slug, newValue.id);
-            case 5:
+            case 6:
               _yield$EventService$s = _context9.sent;
               data = _yield$EventService$s.data;
               _this9.prospectEvent = data;
-            case 8:
+            case 9:
               _this9.showEndedAtDate = _this9.eventDate != _this9.eventEndedAtDate;
               _this9.meta = _this9.prospectEvent.meta ? _this9.prospectEvent.meta : {};
               // Create new event
-              _context9.next = 13;
+              _context9.next = 14;
               break;
-            case 12:
-              _this9.prospectEvent = _this9.newEvent();
             case 13:
+              _this9.prospectEvent = _this9.newEvent();
+            case 14:
               // Select calendar
               // if current event is not associated
               // to a calendar
@@ -24058,7 +24084,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
                 }
               }
               _this9.eventDefaultValues();
-            case 16:
+            case 17:
             case "end":
               return _context9.stop();
           }
@@ -24090,7 +24116,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       this.defaultEmailToProspect();
     }
   },
-  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_24__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_24__.mapGetters)(["project", "prospect", "prospectFullName", "event", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsDefaultCalendar", "projectUserSettingsEventsDefaultUser", "projectUserSettingsEventsShowDropOffLocation", "projectUserSettingsEventsShowVehicle", "projectUserSettingsEventsShowOrder", "projectUserSettingsEventsShowLabels", "projectUserSetting", "calendars", "fields", "users", "can"])), {}, {
+  computed: _objectSpread(_objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_24__.mapGetters)("auth", ["user"])), (0,vuex__WEBPACK_IMPORTED_MODULE_24__.mapGetters)(["project", "prospect", "prospectsSelected", "prospectFullName", "event", "projectUserSettingsAgendaMinimumHour", "projectUserSettingsAgendaMaximumHour", "projectUserSettingsEventsDefaultCalendar", "projectUserSettingsEventsDefaultUser", "projectUserSettingsEventsShowDropOffLocation", "projectUserSettingsEventsShowVehicle", "projectUserSettingsEventsShowOrder", "projectUserSettingsEventsShowLabels", "projectUserSetting", "calendars", "fields", "users", "can"])), {}, {
     /**
      *
      */
@@ -24260,6 +24286,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
      */
     eventProspect: function eventProspect() {
       return this.prospectEvent.prospect;
+    },
+    bulkProspectIds: function bulkProspectIds() {
+      return this.bulkProspectMode ? this.prospectsSelected : [];
     },
     /**
      *
@@ -79531,55 +79560,53 @@ var _hoisted_29 = {
   "class": "hc-item-main-content hc-flex-column"
 };
 var _hoisted_30 = ["textContent"];
-var _hoisted_31 = {
-  "class": "hc-prospect-event-item-value hc-flex-row",
-  style: {
-    "gap": "0",
-    "height": "30px"
-  }
-};
+var _hoisted_31 = ["textContent"];
 var _hoisted_32 = {
-  "class": "hc-prospect-event-hour"
-};
-var _hoisted_33 = ["textContent"];
-var _hoisted_34 = ["value", "textContent"];
-var _hoisted_35 = ["textContent"];
-var _hoisted_36 = {
-  "class": "hc-prospect-event-hour-incr-decr"
-};
-var _hoisted_37 = {
-  key: 0,
-  "class": "hc-prospect-event-hour"
-};
-var _hoisted_38 = ["textContent"];
-var _hoisted_39 = ["value", "textContent"];
-var _hoisted_40 = ["textContent"];
-var _hoisted_41 = {
-  "class": "hc-prospect-event-hour-incr-decr"
-};
-var _hoisted_42 = {
-  key: 0,
-  "class": "hc-prospect-event-item-value hc-flex-row",
-  style: {
-    "gap": "0",
-    "height": "30px"
-  }
-};
-var _hoisted_43 = {
-  "class": "hc-prospect-event-hour"
-};
-var _hoisted_44 = ["textContent"];
-var _hoisted_45 = ["value", "textContent"];
-var _hoisted_46 = ["textContent"];
-var _hoisted_47 = {
-  "class": "hc-prospect-event-hour-incr-decr"
-};
-var _hoisted_48 = {
   "class": "hc-item-main-content hc-flex-column"
 };
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = {
+  "class": "hc-prospect-event-item-value hc-flex-row",
+  style: {
+    "gap": "0",
+    "height": "30px"
+  }
+};
+var _hoisted_35 = {
+  "class": "hc-prospect-event-hour"
+};
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = ["value", "textContent"];
+var _hoisted_38 = ["textContent"];
+var _hoisted_39 = {
+  "class": "hc-prospect-event-hour-incr-decr"
+};
+var _hoisted_40 = {
+  key: 0,
+  "class": "hc-prospect-event-hour"
+};
+var _hoisted_41 = ["textContent"];
+var _hoisted_42 = ["value", "textContent"];
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = {
+  "class": "hc-prospect-event-hour-incr-decr"
+};
+var _hoisted_45 = {
+  key: 0,
+  "class": "hc-prospect-event-item-value hc-flex-row",
+  style: {
+    "gap": "0",
+    "height": "30px"
+  }
+};
+var _hoisted_46 = {
+  "class": "hc-prospect-event-hour"
+};
+var _hoisted_47 = ["textContent"];
+var _hoisted_48 = ["value", "textContent"];
 var _hoisted_49 = ["textContent"];
 var _hoisted_50 = {
-  "class": "hc-prospect-event-item-value"
+  "class": "hc-prospect-event-hour-incr-decr"
 };
 var _hoisted_51 = {
   "class": "hc-item-main-content hc-flex-column"
@@ -79588,16 +79615,16 @@ var _hoisted_52 = ["textContent"];
 var _hoisted_53 = {
   "class": "hc-prospect-event-item-value"
 };
-var _hoisted_54 = ["textContent"];
-var _hoisted_55 = ["textContent"];
-var _hoisted_56 = ["textContent"];
-var _hoisted_57 = {
+var _hoisted_54 = {
   "class": "hc-item-main-content hc-flex-column"
 };
-var _hoisted_58 = ["textContent"];
-var _hoisted_59 = {
+var _hoisted_55 = ["textContent"];
+var _hoisted_56 = {
   "class": "hc-prospect-event-item-value"
 };
+var _hoisted_57 = ["textContent"];
+var _hoisted_58 = ["textContent"];
+var _hoisted_59 = ["textContent"];
 var _hoisted_60 = {
   "class": "hc-item-main-content hc-flex-column"
 };
@@ -79605,47 +79632,54 @@ var _hoisted_61 = ["textContent"];
 var _hoisted_62 = {
   "class": "hc-prospect-event-item-value"
 };
-var _hoisted_63 = ["placeholder"];
-var _hoisted_64 = {
+var _hoisted_63 = {
+  "class": "hc-item-main-content hc-flex-column"
+};
+var _hoisted_64 = ["textContent"];
+var _hoisted_65 = {
+  "class": "hc-prospect-event-item-value"
+};
+var _hoisted_66 = ["placeholder"];
+var _hoisted_67 = {
   "class": "hc-item-main-content hc-flex-column",
   style: {
     "overflow": "visible"
   }
 };
-var _hoisted_65 = ["textContent"];
-var _hoisted_66 = {
-  "class": "hc-prospect-event-item-value"
-};
-var _hoisted_67 = ["textContent"];
 var _hoisted_68 = ["textContent"];
 var _hoisted_69 = {
+  "class": "hc-prospect-event-item-value"
+};
+var _hoisted_70 = ["textContent"];
+var _hoisted_71 = ["disabled", "textContent"];
+var _hoisted_72 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_70 = ["textContent"];
-var _hoisted_71 = {
+var _hoisted_73 = ["textContent"];
+var _hoisted_74 = {
   style: {
     "height": "100%"
   }
 };
-var _hoisted_72 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_75 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content hc-flex-column",
   textContent: 'Paramètres'
 }, null, -1 /* HOISTED */);
-var _hoisted_73 = ["value", "textContent"];
-var _hoisted_74 = ["value", "textContent"];
-var _hoisted_75 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_76 = ["value", "textContent"];
+var _hoisted_77 = ["value", "textContent"];
+var _hoisted_78 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content hc-flex-column",
   textContent: 'Afficher \'Vehicule\''
 }, null, -1 /* HOISTED */);
-var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_79 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content hc-flex-column",
   textContent: 'Afficher \'Devis\''
 }, null, -1 /* HOISTED */);
-var _hoisted_77 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_80 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "hc-item-main-content hc-flex-column",
   textContent: 'Afficher \'Filtres\''
 }, null, -1 /* HOISTED */);
@@ -79676,7 +79710,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_slide, {
     name: "prospect-manage-events",
-    title: $options.eventProspect ? [$data.prospectEvent.prospect.first_name, $data.prospectEvent.prospect.last_name].filter(function (n) {
+    title: $options.bulkProspectIds.length ? _ctx.$t('event.new') + ' (' + $options.bulkProspectIds.length + ')' : $options.eventProspect ? [$data.prospectEvent.prospect.first_name, $data.prospectEvent.prospect.last_name].filter(function (n) {
       return n;
     }).join(' ') : _ctx.project.slug == 'professionnel' ? 'Missions' : _ctx.$t('event.title'),
     url: $options.eventProspect ? {
@@ -79888,7 +79922,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       })];
                     }),
                     _: 1 /* STABLE */
-                  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Event prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+                  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Event prospect "), $options.bulkProspectIds.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                    key: 1,
+                    "class": "hc-prospect-event-item"
+                  }, {
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                        "class": "fa fa-users icon-orange",
+                        size: 40
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                        "class": "hc-prospect-event-item-title",
+                        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.prospect'))
+                      }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                        "class": "hc-prospect-event-item-value",
+                        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.bulkProspectIds.length)
+                      }, null, 8 /* PROPS */, _hoisted_25)])];
+                    }),
+                    _: 1 /* STABLE */
+                  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                    key: 2,
                     "class": "hc-prospect-event-item",
                     onClick: _cache[8] || (_cache[8] = function ($event) {
                       return $data.frameTab = 2, $data.tab = 1;
@@ -79898,15 +79950,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-user icon-orange",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.prospect'))
-                      }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-value",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.prospectEvent.prospect ? [$data.prospectEvent.prospect.first_name, $data.prospectEvent.prospect.last_name].filter(function (n) {
                           return n;
                         }).join(' ') : 'Choisir un prospect ...')
-                      }, null, 8 /* PROPS */, _hoisted_25)]), $data.prospectEvent.prospect ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_28)]), $data.prospectEvent.prospect ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                         key: 0,
                         "class": "fa fa-pen icon-blue",
                         onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -79917,8 +79969,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       })];
                     }),
                     _: 1 /* STABLE */
-                  }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Event prospect order "), ($data.prospectEvent.prospect || $data.prospectEvent.prospect_id) && $options.showOrder ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                    key: 1,
+                  })), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Event prospect order "), ($data.prospectEvent.prospect || $data.prospectEvent.prospect_id) && $options.showOrder ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
+                    key: 3,
                     "class": "hc-prospect-event-item",
                     onClick: _cache[9] || (_cache[9] = function ($event) {
                       return $data.frameTab = 3, $data.tab = 1;
@@ -79928,13 +79980,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-shopping-cart icon-cyan",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.order'))
-                      }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-value",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.prospectEvent.order ? $data.prospectEvent.order.name : 'Choisir un devis ...')
-                      }, null, 8 /* PROPS */, _hoisted_28)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                      }, null, 8 /* PROPS */, _hoisted_31)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-caret-right"
                       })];
                     }),
@@ -79950,10 +80002,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-clock icon-blue",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.date_time'))
-                      }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                      }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "date",
                         style: {
                           "width": "100px",
@@ -79965,7 +80017,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           return $options.eventDate = $event;
                         }),
                         onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.eventDate]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Started at "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.eventDate]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Started at "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
                         "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                           return $options.eventStartHour = $event;
                         }),
@@ -79973,14 +80025,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
                         value: "",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.started_at'))
-                      }, null, 8 /* PROPS */, _hoisted_33), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
+                      }, null, 8 /* PROPS */, _hoisted_36), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
                         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
                           value: hour,
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(hour)
-                        }, null, 8 /* PROPS */, _hoisted_34);
+                        }, null, 8 /* PROPS */, _hoisted_37);
                       }), 256 /* UNKEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.eventStartHour]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.eventStartHour)
-                      }, null, 8 /* PROPS */, _hoisted_35)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+                      }, null, 8 /* PROPS */, _hoisted_38)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
                         "class": "fa fa-caret-up",
                         onClick: _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                           return $options.incrementStartedAt && $options.incrementStartedAt.apply($options, arguments);
@@ -79990,7 +80042,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         onClick: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                           return $options.decrementStartedAt && $options.decrementStartedAt.apply($options, arguments);
                         }, ["prevent", "stop"]))
-                      })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ended at "), !$data.showEndedAtDate ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+                      })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Ended at "), !$data.showEndedAtDate ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_40, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
                         "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
                           return $options.eventEndHour = $event;
                         }),
@@ -79998,15 +80050,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
                         value: "",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.ended_at'))
-                      }, null, 8 /* PROPS */, _hoisted_38), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
+                      }, null, 8 /* PROPS */, _hoisted_41), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
                         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [hour > $options.eventStartHour ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
                           key: 0,
                           value: hour,
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(hour)
-                        }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+                        }, null, 8 /* PROPS */, _hoisted_42)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
                       }), 256 /* UNKEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.eventEndHour]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.eventEndHour)
-                      }, null, 8 /* PROPS */, _hoisted_40)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_41, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+                      }, null, 8 /* PROPS */, _hoisted_43)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
                         "class": "fa fa-caret-up",
                         onClick: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                           return $options.incrementEndedAt && $options.incrementEndedAt.apply($options, arguments);
@@ -80016,7 +80068,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         onClick: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                           return $options.decrementEndedAt && $options.decrementEndedAt.apply($options, arguments);
                         }, ["prevent", "stop"]))
-                      })])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.showEndedAtDate ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_42, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                      })])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $data.showEndedAtDate ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_45, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         type: "date",
                         style: {
                           "width": "100px",
@@ -80028,7 +80080,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           return $options.eventEndedAtDate = $event;
                         }),
                         onClick: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {}, ["stop"]))
-                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.eventEndedAtDate]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_43, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+                      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.eventEndedAtDate]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
                         "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
                           return $options.eventEndedAtHour = $event;
                         }),
@@ -80036,15 +80088,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
                         value: "",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.ended_at'))
-                      }, null, 8 /* PROPS */, _hoisted_44), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
+                      }, null, 8 /* PROPS */, _hoisted_47), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.eventHours, function (hour) {
                         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [$options.eventEndedAtDate > $options.eventDate || hour > $options.eventStartHour ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
                           key: 0,
                           value: hour,
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(hour)
-                        }, null, 8 /* PROPS */, _hoisted_45)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+                        }, null, 8 /* PROPS */, _hoisted_48)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
                       }), 256 /* UNKEYED_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.eventEndedAtHour]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.eventEndHour)
-                      }, null, 8 /* PROPS */, _hoisted_46)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+                      }, null, 8 /* PROPS */, _hoisted_49)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
                         "class": "fa fa-caret-up",
                         onClick: _cache[24] || (_cache[24] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
                           return $options.incrementEndedAt && $options.incrementEndedAt.apply($options, arguments);
@@ -80077,10 +80129,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-map-marker icon-garnet",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.location'))
-                      }, null, 8 /* PROPS */, _hoisted_49), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_google_map_input, {
+                      }, null, 8 /* PROPS */, _hoisted_52), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_google_map_input, {
                         modelValue: $data.prospectEvent.location,
                         "onUpdate:modelValue": _cache[29] || (_cache[29] = function ($event) {
                           return $data.prospectEvent.location = $event;
@@ -80097,17 +80149,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Event drop off location "), _ctx.projectUserSettingsEventsShowDropOffLocation ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                    key: 2,
+                    key: 4,
                     "class": "hc-prospect-event-item"
                   }, {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-map-marker icon-garnet",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_51, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_54, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.drop_off_location'))
-                      }, null, 8 /* PROPS */, _hoisted_52), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_google_map_input, {
+                      }, null, 8 /* PROPS */, _hoisted_55), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_56, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_google_map_input, {
                         modelValue: $data.prospectEvent.drop_off_location,
                         "onUpdate:modelValue": _cache[30] || (_cache[30] = function ($event) {
                           return $data.prospectEvent.drop_off_location = $event;
@@ -80129,7 +80181,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.confirmed'))
-                      }, null, 8 /* PROPS */, _hoisted_54), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }, null, 8 /* PROPS */, _hoisted_57), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         style: {
                           "padding-right": "5px"
                         },
@@ -80153,7 +80205,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.done'))
-                      }, null, 8 /* PROPS */, _hoisted_55), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }, null, 8 /* PROPS */, _hoisted_58), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         style: {
                           "padding-right": "5px"
                         },
@@ -80168,7 +80220,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Send email to prospect "), ($data.prospectEvent.prospect || $data.prospectEvent.prospect_id) && $data.googleCalendar ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                    key: 3,
+                    key: 5,
                     tag: "label"
                   }, {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
@@ -80178,7 +80230,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                         "class": "hc-item-main-content",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.email_to_prospect'))
-                      }, null, 8 /* PROPS */, _hoisted_56), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }, null, 8 /* PROPS */, _hoisted_59), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         style: {
                           "padding-right": "5px"
                         },
@@ -80190,7 +80242,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }),
                     _: 1 /* STABLE */
                   })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Prospect labels "), $options.eventProspect && $options.showLabels ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                    key: 4,
+                    key: 6,
                     "class": "hc-prospect-event-item",
                     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.addProspectLabel, ["prevent"])
                   }, {
@@ -80198,10 +80250,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-tags",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_57, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.labels'))
-                      }, null, 8 /* PROPS */, _hoisted_58), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_59, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.prospectLabels, function (item) {
+                      }, null, 8 /* PROPS */, _hoisted_61), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.prospectLabels, function (item) {
                         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_tag, {
                           key: item.id,
                           text: item.name,
@@ -80222,10 +80274,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-info icon-blue",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_60, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.name'))
-                      }, null, 8 /* PROPS */, _hoisted_61), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_62, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+                      }, null, 8 /* PROPS */, _hoisted_64), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_65, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                         style: {
                           "height": "26px",
                           "padding": "0"
@@ -80234,7 +80286,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                         "onUpdate:modelValue": _cache[36] || (_cache[36] = function ($event) {
                           return $data.prospectEvent.name = $event;
                         })
-                      }, null, 8 /* PROPS */, _hoisted_63), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectEvent.name, void 0, {
+                      }, null, 8 /* PROPS */, _hoisted_66), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.prospectEvent.name, void 0, {
                         lazy: true
                       }]])])])];
                     }),
@@ -80246,10 +80298,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-align-left icon-blue",
                         size: 40
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_64, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
                         "class": "hc-prospect-event-item-title",
                         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.description'))
-                      }, null, 8 /* PROPS */, _hoisted_65), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_66, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_text_editor, {
+                      }, null, 8 /* PROPS */, _hoisted_68), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_text_editor, {
                         placeholder: _ctx.$t('event.add_description'),
                         "min-height": 120,
                         modelValue: $data.prospectEvent.description,
@@ -80311,12 +80363,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     }, ["prevent"])),
                     "class": "hc-button-danger",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('delete'))
-                  }, null, 8 /* PROPS */, _hoisted_67)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Update or add event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+                  }, null, 8 /* PROPS */, _hoisted_70)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Update or add event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+                    disabled: $data.addingEvent || $data.updatingEvent,
                     onClick: _cache[41] || (_cache[41] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
                       return $data.prospectEvent.id ? $options.updateEvent() : $options.storeEvent();
                     }, ["prevent"])),
-                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.prospectEvent.id ? 'Validation RDV' : 'Créer le RDV')
-                  }, null, 8 /* PROPS */, _hoisted_68), [[_directive_tooltip, $data.prospectEvent.id ? 'Validation RDV' : 'Créer le RDV']])];
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.prospectEvent.id ? 'Validation RDV' : $options.bulkProspectIds.length > 1 ? _ctx.$t('event.new') : 'Créer le RDV')
+                  }, null, 8 /* PROPS */, _hoisted_71), [[_directive_tooltip, $data.prospectEvent.id ? 'Validation RDV' : $options.bulkProspectIds.length > 1 ? _ctx.$t('event.new') : 'Créer le RDV']])];
                 }),
                 _: 1 /* STABLE */
               })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
@@ -80382,7 +80435,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, ["prospect"])];
             }),
             "5": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[48] || (_cache[48] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -80396,7 +80449,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                     "class": "hc-item-main-content hc-flex-column",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('event.choose_hour'))
-                  }, null, 8 /* PROPS */, _hoisted_70)];
+                  }, null, 8 /* PROPS */, _hoisted_73)];
                 }),
                 _: 1 /* STABLE */
               })])];
@@ -80443,7 +80496,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               })];
             }),
             "9": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_71, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[53] || (_cache[53] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -80454,7 +80507,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                 "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                   return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     "class": "fa fa-caret-left"
-                  }), _hoisted_72];
+                  }), _hoisted_75];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -80475,7 +80528,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           key: i - 1,
                           value: i - 1,
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((i <= 10 ? '0' : '') + (i - 1) + ':00')
-                        }, null, 8 /* PROPS */, _hoisted_73);
+                        }, null, 8 /* PROPS */, _hoisted_76);
                       }), 64 /* STABLE_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.minimumAgendaHour]])];
                     }),
                     _: 1 /* STABLE */
@@ -80492,7 +80545,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                           key: i - 1,
                           value: i - 1,
                           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)((i <= 10 ? '0' : '') + (i - 1) + ':00')
-                        }, null, 8 /* PROPS */, _hoisted_74)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+                        }, null, 8 /* PROPS */, _hoisted_77)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
                       }), 64 /* STABLE_FRAGMENT */))], 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $options.maximumAgendaHour]])];
                     }),
                     _: 1 /* STABLE */
@@ -80502,7 +80555,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-car"
-                      }), _hoisted_75, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }), _hoisted_78, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         modelValue: $options.showVehicle,
                         "onUpdate:modelValue": _cache[56] || (_cache[56] = function ($event) {
                           return $options.showVehicle = $event;
@@ -80516,7 +80569,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-shopping-cart"
-                      }), _hoisted_76, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }), _hoisted_79, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         modelValue: $options.showOrder,
                         "onUpdate:modelValue": _cache[57] || (_cache[57] = function ($event) {
                           return $options.showOrder = $event;
@@ -80530,7 +80583,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
                       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                         "class": "fa fa-tags"
-                      }), _hoisted_77, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                      }), _hoisted_80, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                         modelValue: $options.showLabels,
                         "onUpdate:modelValue": _cache[58] || (_cache[58] = function ($event) {
                           return $options.showLabels = $event;
