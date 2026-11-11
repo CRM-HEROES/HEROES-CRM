@@ -50,6 +50,12 @@ class CloudTalkExportScriptTest extends TestCase
             $table->string('name');
             $table->string('guard_name');
         });
+        $schema->create('model_has_permissions', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+        });
         $schema->create('roles', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id')->nullable();
@@ -215,6 +221,48 @@ class CloudTalkExportScriptTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_member_with_interaction_view_can_check_their_active_cloudtalk_campaigns(): void
+    {
+        $this->grantInteractionPermissions(['all.prospect.interaction.view']);
+        $this->actingAs(User::findOrFail(2));
+        DB::table('lines')->insert([
+            'id' => 5, 'project_id' => 1, 'user_id' => 2, 'name' => 'Member CloudTalk', 'operator' => 'cloudtalk',
+            'config' => json_encode([
+                'api_key_id' => 'fixture-key',
+                'api_key_secret' => 'fixture-secret',
+                'agent_id' => 88,
+            ]),
+        ]);
+        Http::fake([
+            'api.cloudtalk.io/*' => Http::response(['data' => [], 'meta' => ['nextCursor' => null]]),
+        ]);
+
+        $this->getJson('/api/project/test/line/cloudtalk/active-parallel-campaign?line_id=5')
+            ->assertOk()
+            ->assertExactJson(['campaigns' => []]);
+    }
+
+    public function test_member_without_interaction_view_cannot_check_active_cloudtalk_campaigns(): void
+    {
+        $this->actingAs(User::findOrFail(2));
+
+        $this->getJson('/api/project/test/line/cloudtalk/active-parallel-campaign?line_id=5')
+            ->assertNotFound();
+
+        Http::assertNothingSent();
+    }
+
+    public function test_member_without_interaction_add_cannot_create_a_cloudtalk_campaign(): void
+    {
+        $this->grantInteractionPermissions(['all.prospect.interaction.view']);
+        $this->actingAs(User::findOrFail(2));
+
+        $this->postJson('/api/project/test/line/cloudtalk/parallel-campaign', [])
+            ->assertNotFound();
+
+        Http::assertNothingSent();
+    }
+
     public function test_ordinary_member_cannot_access_exports_in_another_project(): void
     {
         $this->actingAs(User::findOrFail(2));
@@ -268,6 +316,24 @@ class CloudTalkExportScriptTest extends TestCase
     protected function endpoint(string $action = 'export-script'): string
     {
         return '/api/project/test/line/cloudtalk/' . $action;
+    }
+
+    protected function grantInteractionPermissions(array $permissions): void
+    {
+        setPermissionsTeamId(1);
+        foreach ($permissions as $name) {
+            $permissionId = DB::table('permissions')->insertGetId([
+                'name' => $name,
+                'guard_name' => 'web',
+            ]);
+            DB::table('model_has_permissions')->insert([
+                'project_id' => 1,
+                'permission_id' => $permissionId,
+                'model_type' => User::class,
+                'model_id' => 2,
+            ]);
+        }
+        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     protected function decodeConfig(string $script): array
