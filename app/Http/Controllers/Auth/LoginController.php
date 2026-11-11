@@ -80,7 +80,13 @@ class LoginController extends Controller
             }
         }
 
-        \App\Services\LoginLocationCheck::check($user, $request->ip());
+        if (\App\Services\LoginLocationCheck::check($user, $request->ip())) {
+            \Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return \App\Services\LoginLocationCheck::blockedResponse();
+        }
 
         return response()->json(['message' => 'Login successful'], 200);
     }
