@@ -534,14 +534,16 @@ export default {
             } else if (this.column.category == "meta") {
                 return (
                     this.prospectsParamExists("meta_" + this.column.id) ||
-                    this.prospectsParamExists("withMeta_" + this.column.id)
+                    this.prospectsParamExists("withMeta_" + this.column.id) ||
+                    this.prospectsParamExists("withoutMeta_" + this.column.id)
                 );
             }
 
             // By default field
             return (
                 this.prospectsParamExists("field_" + this.column.key) ||
-                this.prospectsParamExists("withField_" + this.column.id)
+                this.prospectsParamExists("withField_" + this.column.id) ||
+                this.prospectsParamExists("withoutField_" + this.column.id)
             );
         },
 

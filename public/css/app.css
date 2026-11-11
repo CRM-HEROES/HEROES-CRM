@@ -1083,8 +1083,38 @@ textarea.hc-default-cell-input {
   transition: all 100ms ease-out;
 }
 
-.hc-default-header-cell-label-valid {
-  right: 24px;
+/* Icons are grouped at the right edge of the cell, with no gap between
+   them. The group is only shown while the field search is active (the
+   name is then covered by the search input), so it never overlaps it. */
+.hc-default-header-cell-label-icons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 5;
+  height: 30px;
+  display: flex;
+  align-items: center;
+}
+
+.hc-default-header-cell-label-icons > .hc-default-header-cell-label-required,
+.hc-default-header-cell-label-icons > .hc-default-header-cell-label-valid,
+.hc-default-header-cell-label-icons > .hc-default-header-cell-label-different {
+  position: static;
+  top: auto;
+  right: auto;
+  flex: none;
+}
+
+.hc-default-header-cell-label-different {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+/* Keep the "different" icon visible while the inverse search is active */
+.filtered .hc-default-header-cell-label-different {
+  visibility: visible;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .hc-default-header-cell-label.required-shown .hc-default-header-cell-label-required,

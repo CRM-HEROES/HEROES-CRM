@@ -76,6 +76,10 @@ class ProspectRequestFilters extends ProspectFilters
             foreach ($request->project->fields as $field) {
                 $this->params[] = ($field->meta ? 'withMeta_' : 'withField_') . $field->slug;
             }
+            // Without fields (values different from the search)
+            foreach ($request->project->fields as $field) {
+                $this->params[] = ($field->meta ? 'withoutMeta_' : 'withoutField_') . $field->slug;
+            }
             // Labels
             foreach ($request->project->categories as $category) {
                 $this->params[] = 'withCategory_' . $category->id;
