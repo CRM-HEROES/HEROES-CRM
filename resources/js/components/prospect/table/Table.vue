@@ -5,6 +5,7 @@
             prospectsOptions ? 'hc-table-show-options' : '',
             'max-lines-per-row-' + projectUserSettingsProspectsMaxRowLines,
         ]"
+        @hc-select-column="onSelectColumnEvent"
     >
         <table v-if="this.columns.length > 0">
             <header-row
@@ -31,6 +32,27 @@
         </table>
 
         <loading :loading="loading" />
+
+        <!-- Progress of copy / paste / delete / undo operations -->
+        <div v-if="selectionProgress" class="hc-table-progress">
+            <div class="hc-table-progress-label">
+                <i class="fa fa-spinner fa-spin"></i>
+                {{ selectionProgress.label }} :
+                {{ selectionProgress.done }} / {{ selectionProgress.total }}
+                prospect(s)
+            </div>
+            <div class="hc-table-progress-bar">
+                <span
+                    :style="{
+                        width:
+                            (selectionProgress.total
+                                ? (selectionProgress.done * 100) /
+                                  selectionProgress.total
+                                : 0) + '%',
+                    }"
+                ></span>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -58,7 +80,12 @@ import HeaderRow from "./Header.vue";
 import FooterRow from "./Footer.vue";
 import Row from "./Row.vue";
 
+// Excel-like cells selection, copy & paste
+import tableSelection from "@/utils/table-selection";
+
 export default {
+    mixins: [tableSelection],
+
     components: {
         HeaderRow,
         FooterRow,

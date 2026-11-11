@@ -124,6 +124,14 @@
         />
 
         <div class="hc-header-cell-options">
+            <!-- Select column (copy / paste) -->
+            <span
+                class="hc-header-cell-select fa fa-columns"
+                data-select-column
+                @click.stop="selectColumn"
+                v-tooltip="'Sélectionner cette colonne (Maj : étendre) puis Ctrl+C / Ctrl+V'"
+            ></span>
+
             <!-- Remove column -->
             <span
                 class="hc-header-cell-remove fa fa-times"
@@ -215,6 +223,19 @@ export default {
     },
 
     methods: {
+        /**
+         * Select all the cells of the column
+         * (handled by the table, see @/utils/table-selection.js)
+         */
+        selectColumn(e) {
+            this.$el.dispatchEvent(
+                new CustomEvent("hc-select-column", {
+                    bubbles: true,
+                    detail: { key: this.column.key, extend: e.shiftKey },
+                })
+            );
+        },
+
         /**
          * Current column offet width
          */
