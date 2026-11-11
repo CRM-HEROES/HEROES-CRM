@@ -199,6 +199,17 @@ export default {
                 this.validatingTwoFactors = false;
                 this.signIn();
             } catch (e) {
+                if (
+                    e.response &&
+                    e.response.status === 403 &&
+                    e.response.data &&
+                    e.response.data.code === "location_confirmation_required"
+                ) {
+                    flashError({
+                        title: "Authentification",
+                        body: e.response.data.message,
+                    });
+                }
             } finally {
                 this.validatingTwoFactors = false;
             }
