@@ -60,7 +60,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 var data = _ref.data;
                 _this.signIn();
               })["catch"](function (error) {
-                if (!(error.response && error.response.status === 422 && error.response.data && error.response.data.message == "Two factors validation")) {
+                if (error.response && error.response.status === 403 && error.response.data && error.response.data.code === "location_confirmation_required") {
+                  // Nouveau pays : un email de confirmation a été envoyé
+                  flashError({
+                    title: "Authentification",
+                    body: error.response.data.message
+                  });
+                } else if (!(error.response && error.response.status === 422 && error.response.data && error.response.data.message == "Two factors validation")) {
                   flashError({
                     title: "Authentification",
                     body: _this.$t("auth.login.error")

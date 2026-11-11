@@ -109,6 +109,7 @@ class UserController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * L'utilisateur reçoit une invitation (lien), jamais un mot de passe.
      */
     public function store(Request $request)
     {
@@ -116,38 +117,49 @@ class UserController extends Controller
 
         $this->validate($request, [
             'name' => 'required',
-            'email' => 'required',
+            'email' => 'required|email',
             'status' => [
                 'nullable',
                 Rule::in(['super_admin']),
             ],
-            'password' => 'nullable',
+            'role' => [
+                'nullable',
+                Rule::in(['super_admin']),
+            ],
         ]);
+
+        // Seul un super admin peut créer un super admin (avant : n'importe quel appelant pouvait envoyer "role")
+        $wantsSuperAdmin = $request->input('role') === 'super_admin' || $request->input('status') === 'super_admin';
+        abort_if($wantsSuperAdmin && !auth()->user()->is_super_admin, 403, 'Seul un super admin peut créer un super admin.');
 
         abort_if(User::where('email', $request->input('email'))->first(), 400, 'User already exists!');
 
-        return DB::transaction(function () use ($request) {
-            $user = new User(array_merge($request->except('password'), [
+        // Liste blanche : ni role, ni mot de passe, ni 2FA, ni bannissement ne viennent de la requête
+        $data = $request->only(array_diff($this->fields, ['role', 'last_activity']));
+
+        return DB::transaction(function () use ($data, $wantsSuperAdmin) {
+            $user = new User(array_merge($data, [
                 'creator_id' => auth()->id(),
-                'password' => Hash::make(bin2hex(random_bytes(16))),
+                'password' => Hash::make(bin2hex(random_bytes(32))),
             ]));
 
-            $user->forceFill([
-                'must_change_password' => true,
-                'password_temporary_expires_at' => now()->addHours(24),
-            ]);
+            if ($wantsSuperAdmin) {
+                $user->role = 'super_admin';
+            }
+
+            $user->must_change_password = true;
             $user->save();
 
-            if (!\App\Services\TemporaryPassword::issue($user)) {
+            if (!\App\Services\UserInvitation::send($user)) {
                 throw new HttpResponseException(response()->json([
-                    'message' => 'Connexion Internet requise : l’email contenant le mot de passe temporaire n’a pas pu être envoyé. L’utilisateur n’a pas été créé.',
+                    'message' => 'Connexion Internet requise : l’email d’invitation n’a pas pu être envoyé. L’utilisateur n’a pas été créé.',
                 ], 503));
             }
 
             return $user;
         });
     }
-    
+
     /**
      * Update the specified resource in storage.
      */
@@ -155,9 +167,20 @@ class UserController extends Controller
     {
         abort_unless(auth()->user()->is_super_admin || auth()->id() == $user->id || $user->creator_id == auth()->id(), 404, 'You cannot update this user!');
 
-        $user->update($request->only(
-            $this->fields
-        ));
+        if ($request->filled('password')) {
+            $this->validate($request, [
+                'password' => ['string', new \App\Rules\StrongPassword()],
+            ]);
+        }
+
+        $data = $request->only($this->fields);
+
+        // Le rôle n'est modifiable que par un super admin (avant : chacun pouvait se donner le rôle super_admin)
+        if (!auth()->user()->is_super_admin) {
+            unset($data['role']);
+        }
+
+        $user->update($data);
 
         if ($request->filled('password')) {
             $user->password = bcrypt(request('password'));
@@ -167,18 +190,29 @@ class UserController extends Controller
         return ['message' => trans('common.success.updated_resource')];
     }
 
-    public function resendTemporaryPassword(User $user)
+    /**
+     * Renvoie l'invitation d'un compte qui n'a jamais été activé.
+     */
+    public function resendInvitation(User $user)
     {
-        abort_unless(auth()->user()->is_super_admin || auth()->user()->can('', request()->project ?? null), 404);
+        abort_unless(auth()->user()->is_super_admin || $user->creator_id == auth()->id(), 404);
 
-        $issued = \App\Services\TemporaryPassword::issue($user);
+        // Jamais sur un compte actif : cela écraserait son mot de passe et le déconnecterait
+        if (!$user->must_change_password) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ce compte est déjà activé : une invitation ne peut être renvoyée qu’à un compte en attente.',
+            ], 422);
+        }
+
+        $sent = \App\Services\UserInvitation::send($user);
 
         return response()->json([
-            'success' => $issued,
-            'message' => $issued
-                ? 'Un nouveau mot de passe temporaire a été envoyé à l’utilisateur.'
-                : 'Le mot de passe temporaire n’a pas pu être envoyé.',
-        ]);
+            'success' => $sent,
+            'message' => $sent
+                ? 'Une nouvelle invitation a été envoyée à l’utilisateur.'
+                : 'L’invitation n’a pas pu être envoyée.',
+        ], $sent ? 200 : 503);
     }
 
     /**

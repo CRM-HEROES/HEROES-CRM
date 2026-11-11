@@ -56,20 +56,26 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               data = _yield$axios$post.data;
               _this.validatingTwoFactors = false;
               _this.signIn();
-              _context.next = 12;
+              _context.next = 13;
               break;
             case 10:
               _context.prev = 10;
               _context.t0 = _context["catch"](1);
-            case 12:
-              _context.prev = 12;
+              if (_context.t0.response && _context.t0.response.status === 403 && _context.t0.response.data && _context.t0.response.data.code === "location_confirmation_required") {
+                flashError({
+                  title: "Authentification",
+                  body: _context.t0.response.data.message
+                });
+              }
+            case 13:
+              _context.prev = 13;
               _this.validatingTwoFactors = false;
-              return _context.finish(12);
-            case 15:
+              return _context.finish(13);
+            case 16:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[1, 10, 12, 15]]);
+        }, _callee, null, [[1, 10, 13, 16]]);
       }))();
     }
   })
