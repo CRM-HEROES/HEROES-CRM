@@ -320,12 +320,15 @@ class ProspectController extends Controller
     {
         $this->validate($request, [
             'field' => 'required|string',
-            'search' => 'required|string',
+            'search' => 'present|string',
             'replace' => 'nullable|string',
-            'mode' => 'required|in:preview,replace',
+            'mode' => 'required|in:preview,replace,replace_occurrence',
             'case_sensitive' => 'nullable|boolean',
+            'limit' => 'sometimes|integer|min:1|max:200',
             'prospect_ids' => 'sometimes|array|min:1|max:10',
             'prospect_ids.*' => 'required|integer|distinct',
+            'occurrence_index' => 'required_if:mode,replace_occurrence|integer|min:0',
+            'expected_value' => 'required_if:mode,replace_occurrence|string',
         ]);
 
         $meta = Str::startsWith($request->input('field'), 'meta->');
@@ -353,6 +356,12 @@ class ProspectController extends Controller
         $replace = (string) $request->input('replace', '');
         $caseSensitive = $request->boolean('case_sensitive');
         $replacing = $request->input('mode') === 'replace';
+        $replacingOccurrence = $request->input('mode') === 'replace_occurrence';
+        $occurrenceIndex = (int) $request->input('occurrence_index', -1);
+
+        if ($replacingOccurrence && !$request->has('prospect_ids')) {
+            return response()->json(['message' => 'A prospect must be selected.'], 422);
+        }
 
         $matches = 0;
         $prospectsCount = 0;
@@ -364,15 +373,27 @@ class ProspectController extends Controller
             $prospectsQuery->whereIn('id', $request->input('prospect_ids'));
         }
 
-        $prospectsQuery->chunkById(200, function ($prospects) use (
-                $meta, $slug, $search, $replace, $caseSensitive, $replacing, $numericSearchPattern,
-                &$matches, &$prospectsCount, &$samples
+        $limit = $request->input('limit');
+        $processed = 0;
+        $prospectsQuery->chunkById($limit === null ? 200 : $limit + 1, function ($prospects) use (
+                $meta, $slug, $search, $replace, $caseSensitive, $replacing, $replacingOccurrence,
+                $occurrenceIndex, $numericSearchPattern, $request,
+                $limit, &$processed, &$matches, &$prospectsCount, &$samples
             ) {
                 foreach ($prospects as $prospect) {
+                    if ($limit !== null && $processed >= $limit) {
+                        return false;
+                    }
+                    $processed++;
+
                     $current = $meta ? data_get($prospect->meta, $slug) : $prospect->{$slug};
 
                     if (!is_string($current) || $current === '') {
                         continue;
+                    }
+
+                    if ($replacingOccurrence && $current !== $request->input('expected_value')) {
+                        abort(409, 'The prospect field changed since the preview.');
                     }
 
                     if ($numericSearchPattern !== null) {
@@ -390,7 +411,20 @@ class ProspectController extends Controller
                     $matches += $occurrences;
                     $prospectsCount++;
 
-                    if ($numericSearchPattern !== null) {
+                    if ($replacingOccurrence) {
+                        abort_if($occurrenceIndex >= $occurrences, 409, 'The selected occurrence no longer exists.');
+                        $pattern = $numericSearchPattern !== null
+                            ? '/' . $numericSearchPattern . '/u'
+                            : '/' . preg_quote($search, '/') . '/' . ($caseSensitive ? 'u' : 'iu');
+                        $currentOccurrence = 0;
+                        $new = preg_replace_callback($pattern, function ($match) use (
+                            &$currentOccurrence, $occurrenceIndex, $replace
+                        ) {
+                            return $currentOccurrence++ === $occurrenceIndex
+                                ? $replace
+                                : $match[0];
+                        }, $current);
+                    } elseif ($numericSearchPattern !== null) {
                         $new = preg_replace_callback(
                             '/' . $numericSearchPattern . '/u',
                             fn () => $replace,
@@ -406,7 +440,7 @@ class ProspectController extends Controller
                         $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];
                     }
 
-                    if ($replacing) {
+                    if ($replacing || $replacingOccurrence) {
                         if ($meta) {
                             $values = $prospect->meta ?: [];
                             $values[$slug] = $new;

@@ -21,7 +21,11 @@ class CloudTalkController extends Controller
      */
     public function parallelCampaign(Request $request, Project $project, CloudTalkDialer $dialer)
     {
-        abort_unless($request->user()->can('', $project), 404);
+        abort_unless(
+            $request->user()->can('prospectInteractionView', $project)
+                && $request->user()->can('prospectInteractionAdd', $project),
+            404
+        );
 
         $this->validate($request, [
             'line_id' => 'required|integer',
@@ -94,7 +98,7 @@ class CloudTalkController extends Controller
      */
     public function activeParallelCampaigns(Request $request, Project $project, CloudTalkDialer $dialer)
     {
-        abort_unless($request->user()->can('', $project), 404);
+        abort_unless($request->user()->can('prospectInteractionView', $project), 404);
 
         $this->validate($request, ['line_id' => 'required|integer']);
 
