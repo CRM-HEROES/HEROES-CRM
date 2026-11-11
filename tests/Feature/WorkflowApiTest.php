@@ -370,6 +370,30 @@ class WorkflowApiTest extends TestCase
         $this->assertNull(app(\App\Workflows\WorkflowValidator::class)->diagnose(['nodes' => []])[0]['node']);
     }
 
+    public function test_the_preview_of_the_email_is_drawn_by_the_real_view_and_nothing_is_sent(): void
+    {
+        \Illuminate\Support\Facades\Queue::fake();
+
+        $response = $this->controller->emailPreview($this->request([
+            'subject' => 'Bienvenue Marie',
+            'body' => '<p onclick="x()">Bonjour</p><script>alert(1)</script>',
+            'design' => ['style' => 'branded', 'header_color' => '#112233'],
+        ]), $this->project);
+
+        $this->assertStringContainsString('background:#112233', $response['html']);
+        $this->assertStringContainsString('Bonjour', $response['html']);
+        $this->assertStringNotContainsString('onclick', $response['html']);
+        $this->assertStringNotContainsString('<script', $response['html']);
+        \Illuminate\Support\Facades\Queue::assertNothingPushed();
+    }
+
+    public function test_the_preview_refuses_a_wrong_design(): void
+    {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+
+        $this->controller->emailPreview($this->request(['body' => 'x', 'design' => ['header_color' => 'red']]), $this->project);
+    }
+
     // Publication and lifecycle
 
     public function test_an_invalid_draft_cannot_be_published(): void
@@ -487,6 +511,33 @@ class WorkflowApiTest extends TestCase
 
         $this->expectException(HttpException::class);
         $this->controller->providers($this->request(['capability' => 'fax'], 'GET'), $this->project, $registry);
+    }
+
+    public function test_the_operators_not_configured_yet_can_be_listed_with_the_window_that_configures_them(): void
+    {
+        $registry = app(\App\Workflows\Providers\ProviderRegistry::class);
+
+        $sms = $this->controller->providers($this->request(['capability' => 'sms', 'with_missing' => 1], 'GET'), $this->project, $registry);
+        $bySetup = array_column($sms, 'setup', 'ref');
+
+        // Configured first, then the others, each with the window to configure it
+        $this->assertSame('sms:smsbox', $sms[0]['ref']);
+        $this->assertTrue($sms[0]['configured']);
+        $this->assertEqualsCanonicalizing(
+            ['sms:smsbox' => 'setting-smsbox', 'sms:ultramsg' => 'setting-ultramsg', 'sms:mtarget' => 'setting-mtarget', 'sms:brevo' => 'setting-brevo'],
+            $bySetup
+        );
+        $this->assertSame(['sms:ultramsg', 'sms:mtarget', 'sms:brevo'], array_column(array_filter($sms, fn ($p) => !$p['configured']), 'ref') ?: []);
+
+        $email = $this->controller->providers($this->request(['capability' => 'email', 'with_missing' => 1], 'GET'), $this->project, $registry);
+        $this->assertSame(['email:project'], array_column($email, 'ref')); // there is always the email operator to choose
+        $this->assertSame('setting-email', $email[0]['setup']);
+
+        // Nothing secret, and without the parameter the list is the usual one (the engine only accepts what is configured)
+        $this->assertStringNotContainsString('SECRET', json_encode($sms));
+        $usual = $this->controller->providers($this->request(['capability' => 'sms'], 'GET'), $this->project, $registry);
+        $this->assertSame(['sms:smsbox'], array_column($usual, 'ref'));
+        $this->assertTrue($registry->find(1, 'sms:ultramsg', 'sms') === null); // not usable until configured
     }
 
     // Catalog: what the builder offers must be what the engine accepts

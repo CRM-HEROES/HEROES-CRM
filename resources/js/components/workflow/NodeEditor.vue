@@ -77,8 +77,11 @@
                         :type="field.type"
                         :field="field"
                         :variables="catalog.variables"
+                        :subject="config.subject || ''"
+                        :design="config.design || null"
                         :read-only="readOnly"
                         @update:model-value="setPath(field.key, $event)"
+                        @update:design="setConfig({ design: $event })"
                         @provider-label="setConfig({ provider_label: $event })"
                     />
                 </template>

@@ -427,6 +427,7 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
 
         // Workflow (automations)
         Route::get('workflow-catalog', [ProjectWorkflowController::class, 'catalog'])->name('workflow.catalog');
+        Route::post('workflow-email-preview', [ProjectWorkflowController::class, 'emailPreview'])->name('workflow.email-preview');
         Route::get('workflow-provider', [ProjectWorkflowController::class, 'providers'])->name('workflow.provider');
         Route::apiResource('workflow', ProjectWorkflowController::class);
         Route::post('workflow/{workflow}/validate', [ProjectWorkflowController::class, 'validateGraph'])->name('workflow.validate');

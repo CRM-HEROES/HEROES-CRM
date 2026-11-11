@@ -25,6 +25,14 @@ class Message extends Model
         'creator_id',
         'from_user',
         'thread_id',
+        'subject',
+        'cc',
+        'email_layout',
+    ];
+
+    protected $casts = [
+        'cc' => 'array',
+        'email_layout' => 'array',
     ];
 
 
