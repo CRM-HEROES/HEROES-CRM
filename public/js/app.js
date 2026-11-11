@@ -36664,10 +36664,14 @@ var getters = {
   /**
    * Prospect fields are read-only
    * when the user has the "view all prospects" permission
+   * without "update all prospects" nor "delete all prospects"
    * (super admins and project creators are not concerned)
    */
   prospectReadOnly: function prospectReadOnly(state, getters) {
-    return !getters.canAll && getters.permissions.indexOf("all.prospect.view") >= 0;
+    var has = function has(permission) {
+      return getters.permissions.indexOf(permission) >= 0;
+    };
+    return !getters.canAll && has("all.prospect.view") && !has("all.prospect.update") && !has("all.prospect.delete");
   },
   canMessage: function canMessage(state, getters, rootState) {
     if (rootState.auth && rootState.auth.user) {
