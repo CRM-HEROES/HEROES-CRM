@@ -71,6 +71,16 @@
                 @click.prevent="setting"
             />
             <icon
+                v-if="canResetPassword"
+                tag="a"
+                class="fa fa-key icon-red"
+                v-tooltip="'Envoyer un email de changement de mot de passe'"
+                :icon-size="16"
+                @click.prevent="sendPasswordReset"
+            >
+                <loading :loading="sendingPasswordReset" />
+            </icon>
+            <icon
                 v-if="can('all')"
                 tag="a"
                 class="fa fa-sign-in icon-purple"
@@ -222,6 +232,7 @@ export default {
     data() {
         return {
             impersonating: false,
+            sendingPasswordReset: false,
             movable: deviceType() == "desktop",
             openBlocs: deviceType() == "desktop",
         };
@@ -287,6 +298,46 @@ export default {
         },
 
         /**
+         * Envoie à l'utilisateur un email avec un lien pour choisir un nouveau mot de passe.
+         * Le mot de passe actuel reste valable tant que le lien n'est pas utilisé.
+         */
+        sendPasswordReset() {
+            hcConfirm(
+                "Envoyer un email à " +
+                    this.user.email +
+                    " pour qu'il choisisse un nouveau mot de passe ?",
+                async () => {
+                    this.sendingPasswordReset = true;
+                    try {
+                        await axios.post("/password/email", {
+                            email: this.user.email,
+                        });
+
+                        flashInfo({
+                            body: "Email de changement de mot de passe envoyé à " + this.user.email + ".",
+                            duration: 5000,
+                        });
+                    } catch (e) {
+                        const data = e && e.response && e.response.data;
+                        const detail =
+                            data && data.errors
+                                ? Object.values(data.errors).flat().join(" ")
+                                : "";
+
+                        flashError({
+                            body:
+                                "L'email n'a pas pu être envoyé." +
+                                (detail ? " " + detail : ""),
+                            duration: 5000,
+                        });
+                    } finally {
+                        this.sendingPasswordReset = false;
+                    }
+                }
+            );
+        },
+
+        /**
          *
          */
         async impersonate() {
@@ -344,13 +395,24 @@ export default {
         ]),
 
         profileFields() {
-            let fields = ["name", "phone_number", "email"];
+            // Pas de champ mot de passe : il se change via un email de confirmation
+            return ["name", "phone_number", "email"];
+        },
 
-            if (this.superAdmin) {
-                fields.push("password");
-            }
+        /**
+         * Un super admin, un utilisateur ayant la permission "all" sur le projet (comme pour les
+         * autres icônes d'administration), ou l'utilisateur lui-même, peut envoyer l'email de changement
+         */
+        canResetPassword() {
+            const me = this.$store.state.auth.user;
 
-            return fields;
+            return !!(
+                this.user &&
+                this.user.email &&
+                (this.superAdmin ||
+                    this.can("all") ||
+                    (me && me.id === this.user.id))
+            );
         },
     },
 };

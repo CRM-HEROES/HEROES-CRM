@@ -400,21 +400,32 @@ class UserInvitationTest extends TestCase
         $this->assertSame('super_admin', $user->fresh()->role);
     }
 
-    public function test_modification_refuse_un_mot_de_passe_faible(): void
+    public function test_modification_ignore_tout_mot_de_passe_envoye(): void
     {
         $user = $this->makeUser('simple@example.test');
         $hash = $user->password;
 
+        // Même un mot de passe fort : il ne se change plus ici, seulement par email de confirmation
         $this->actingAs($user, 'sanctum')
-            ->putJson('/api/user/' . $user->id, ['password' => 'faible'])
-            ->assertStatus(422);
+            ->putJson('/api/user/' . $user->id, ['name' => 'Nouveau nom', 'password' => self::STRONG])
+            ->assertOk();
 
-        $this->assertSame($hash, $user->fresh()->password);
+        $fresh = $user->fresh();
+        $this->assertSame('Nouveau nom', $fresh->name);
+        $this->assertSame($hash, $fresh->password);
+    }
 
-        $this->actingAs($user, 'sanctum')
+    public function test_un_super_admin_ne_peut_pas_non_plus_definir_le_mot_de_passe_dun_autre(): void
+    {
+        $admin = $this->makeUser('admin@example.test', 'super_admin');
+        $user = $this->makeUser('simple@example.test');
+        $hash = $user->password;
+
+        $this->actingAs($admin, 'sanctum')
             ->putJson('/api/user/' . $user->id, ['password' => self::STRONG])
             ->assertOk();
-        $this->assertTrue(Hash::check(self::STRONG, $user->fresh()->password));
+
+        $this->assertSame($hash, $user->fresh()->password);
     }
 
     // ---------- Changement de mot de passe (ancien flux) ----------

@@ -195,7 +195,12 @@ export default {
                 .post("/password/email", {
                     email: this.user.email,
                 })
-                .then((response) => {})
+                .then((response) => {
+                    flashInfo({
+                        body: "Email de changement de mot de passe envoyé à " + this.user.email + ".",
+                        duration: 5000,
+                    });
+                })
                 .catch(({ response: { data } }) => {
                     flashError({
                         title: this.$t("auth.init_password.title"),
