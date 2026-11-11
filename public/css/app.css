@@ -1061,6 +1061,84 @@ textarea.hc-default-cell-input {
   background-color: #282a28;
 }
 
+.hc-prospect-header-cell-options {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 6;
+}
+
+.hc-prospect-header-cell-options-trigger {
+  width: 22px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  background-color: white;
+  color: #777777;
+  cursor: pointer;
+  font-size: 22px;
+  line-height: 26px;
+}
+
+.filtered .hc-prospect-header-cell-options-trigger {
+  background-color: #1a73e8;
+  color: white;
+}
+
+.dark .hc-prospect-header-cell-options-trigger {
+  background-color: #282a28;
+  color: rgba(255, 255, 255, 0.6666666667);
+}
+
+.hc-prospect-header-cell-options-menu {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  z-index: 7;
+  min-width: 190px;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background-color: white;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.2666666667);
+}
+
+.hc-prospect-header-cell-options-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  background: transparent;
+  color: #333333;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 18px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.hc-prospect-header-cell-options-menu button:hover {
+  background-color: #f3f6f9;
+}
+
+.hc-prospect-header-cell-options-menu button > .fa {
+  width: 14px;
+  color: #777777;
+  text-align: center;
+}
+
+.dark .hc-prospect-header-cell-options-menu {
+  background-color: #282a28;
+  border-color: #444444;
+}
+
+.dark .hc-prospect-header-cell-options-menu button {
+  color: #ffffff;
+}
+
 /** Meta Cell */
 .hc-meta-cell-label {
   cursor: pointer;
