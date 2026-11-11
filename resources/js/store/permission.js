@@ -101,12 +101,17 @@ const getters = {
     /**
      * Prospect fields are read-only
      * when the user has the "view all prospects" permission
+     * without "update all prospects" nor "delete all prospects"
      * (super admins and project creators are not concerned)
      */
     prospectReadOnly: (state, getters) => {
+        const has = (permission) => getters.permissions.indexOf(permission) >= 0;
+
         return (
             !getters.canAll &&
-            getters.permissions.indexOf("all.prospect.view") >= 0
+            has("all.prospect.view") &&
+            !has("all.prospect.update") &&
+            !has("all.prospect.delete")
         );
     },
 

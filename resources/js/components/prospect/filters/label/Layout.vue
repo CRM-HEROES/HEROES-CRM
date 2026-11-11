@@ -59,6 +59,30 @@
                 >
                     <search v-model="labelKeyword" />
 
+                    <!-- Date range (label attached between) -->
+
+                    <div
+                        class="hc-label-date-range"
+                        style="display: flex; gap: 6px; padding: 4px 8px"
+                    >
+                        <label style="flex: 1; font-size: 11px">
+                            Du
+                            <input
+                                type="date"
+                                style="width: 100%"
+                                v-model="dateFrom"
+                            />
+                        </label>
+                        <label style="flex: 1; font-size: 11px">
+                            Au
+                            <input
+                                type="date"
+                                style="width: 100%"
+                                v-model="dateTo"
+                            />
+                        </label>
+                    </div>
+
                     <item-list
                         class="hc-flex-1"
                         style="overflow: auto"
@@ -167,6 +191,18 @@ export default {
     },
 
     methods: {
+        /**
+         * Set or clear a date range param then reload prospects
+         */
+        setDateParam(key, value) {
+            if (value) {
+                store.commit(ADD_PROSPECT_PARAMS, { key, value });
+            } else {
+                store.commit(REMOVE_PROSPECT_PARAMS, { key });
+            }
+            store.dispatch(FETCH_PROSPECTS);
+        },
+
         /**
          *
          * @param {*} category
@@ -308,6 +344,24 @@ export default {
             "prospectsParamValue",
             "can",
         ]),
+
+        dateFrom: {
+            get() {
+                return this.prospectsParamValue("labelDateFrom") || "";
+            },
+            set(value) {
+                this.setDateParam("labelDateFrom", value);
+            },
+        },
+
+        dateTo: {
+            get() {
+                return this.prospectsParamValue("labelDateTo") || "";
+            },
+            set(value) {
+                this.setDateParam("labelDateTo", value);
+            },
+        },
 
         all: {
             get() {

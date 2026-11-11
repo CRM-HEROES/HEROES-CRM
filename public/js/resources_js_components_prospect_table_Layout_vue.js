@@ -5238,6 +5238,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   methods: {
     /**
+     * Select all the cells of the column
+     * (handled by the table, see @/utils/table-selection.js)
+     */
+    selectColumn: function selectColumn(e) {
+      this.$el.dispatchEvent(new CustomEvent("hc-select-column", {
+        bubbles: true,
+        detail: {
+          key: this.column.key,
+          extend: e.shiftKey
+        }
+      }));
+    },
+    /**
      * Current column offet width
      */
     getCurrentWidth: function getCurrentWidth() {
@@ -5801,7 +5814,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
 /* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
@@ -5809,6 +5822,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Header_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./Header.vue */ "./resources/js/components/prospect/table/Header.vue");
 /* harmony import */ var _Footer_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Footer.vue */ "./resources/js/components/prospect/table/Footer.vue");
 /* harmony import */ var _Row_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Row.vue */ "./resources/js/components/prospect/table/Row.vue");
+/* harmony import */ var _utils_table_selection__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/utils/table-selection */ "./resources/js/utils/table-selection.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -5827,7 +5841,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+
+// Excel-like cells selection, copy & paste
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mixins: [_utils_table_selection__WEBPACK_IMPORTED_MODULE_7__["default"]],
   components: {
     HeaderRow: _Header_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
     FooterRow: _Footer_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
@@ -5961,7 +5979,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["projectUserSettingsProspectsTable", "fields", "categories", "calendars", "threads", "prospects", "project", "prospectsOptions",
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_8__.mapGetters)(["projectUserSettingsProspectsTable", "fields", "categories", "calendars", "threads", "prospects", "project", "prospectsOptions",
   // "prospectsMaxLinesPerRow",
   "projectUserSettingsProspectsMaxRowLines", "prospectsParamExists", "prospectsParamsUrl", "prospectsPage", "prospectsCount", "viewedProspect", "menus", "projectUserSettingsProspectsDefaultMenu", "can", "canEvent"])), {}, {
     /**
@@ -13757,7 +13775,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_sms_cell = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("sms-cell");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)((0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDynamicComponent)($props.tag), {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$options.isFiltered ? 'filtered' : '', $options.isDuplicateField ? 'duplicate' : '']),
-    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)([$options.style, $options.duplicateStyle])
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)([$options.style, $options.duplicateStyle]),
+    "data-col-key": $props.column.key,
+    "data-pid": $props.prospect.id
   }, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [$props.column.key == 'street' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_street_cell, {
@@ -13860,7 +13880,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["prospect", "items"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1 /* STABLE */
-  }, 8 /* PROPS */, ["class", "style"]);
+  }, 8 /* PROPS */, ["class", "style", "data-col-key", "data-pid"]);
 }
 
 /***/ }),
@@ -14258,20 +14278,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return _ctx.$emit('blur');
         }),
         column: $props.column
-      }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Remove column "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-        "class": "hc-header-cell-remove fa fa-times",
+      }, null, 8 /* PROPS */, ["column"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Select column (copy / paste) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        "class": "hc-header-cell-select fa fa-columns",
+        "data-select-column": "",
         onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $options.selectColumn && $options.selectColumn.apply($options, arguments);
+        }, ["stop"]))
+      }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Sélectionner cette colonne (Maj : étendre) puis Ctrl+C / Ctrl+V']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Remove column "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        "class": "hc-header-cell-remove fa fa-times",
+        onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.removeColumn && $options.removeColumn.apply($options, arguments);
         }, ["stop"]))
       }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Enlever cette colonne du tableau']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Pin column "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         "class": "hc-header-cell-pin fa fa-thumbtack",
-        onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.togglePinColumn && $options.togglePinColumn.apply($options, arguments);
         }, ["stop"]))
       }, null, 512 /* NEED_PATCH */), [[_directive_tooltip, 'Figer cette colonne']])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Resize column "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
         "class": "hc-header-cell-resize",
         ref: "resize",
-        onDblclick: _cache[4] || (_cache[4] = function () {
+        onDblclick: _cache[5] || (_cache[5] = function () {
           return $options.autoWidth && $options.autoWidth.apply($options, arguments);
         })
       }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */)];
@@ -14524,13 +14550,29 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = {
   key: 0
 };
+var _hoisted_2 = {
+  key: 1,
+  "class": "hc-table-progress"
+};
+var _hoisted_3 = {
+  "class": "hc-table-progress-label"
+};
+var _hoisted_4 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-spinner fa-spin"
+}, null, -1 /* HOISTED */);
+var _hoisted_5 = {
+  "class": "hc-table-progress-bar"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_header_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("header-row");
   var _component_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("row");
   var _component_footer_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("footer-row");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-table', _ctx.prospectsOptions ? 'hc-table-show-options' : '', 'max-lines-per-row-' + _ctx.projectUserSettingsProspectsMaxRowLines])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-table', _ctx.prospectsOptions ? 'hc-table-show-options' : '', 'max-lines-per-row-' + _ctx.projectUserSettingsProspectsMaxRowLines]),
+    onHcSelectColumn: _cache[0] || (_cache[0] = function () {
+      return _ctx.onSelectColumnEvent && _ctx.onSelectColumnEvent.apply(_ctx, arguments);
+    })
   }, [this.columns.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("table", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_header_row, {
     columns: $options.columns,
     "fixed-columns": $options.fixedColumns,
@@ -14548,7 +14590,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "not-fixed-columns": $options.notFixedColumns
   }, null, 8 /* PROPS */, ["fixed-columns", "not-fixed-columns"])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: $data.loading
-  }, null, 8 /* PROPS */, ["loading"])], 2 /* CLASS */);
+  }, null, 8 /* PROPS */, ["loading"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Progress of copy / paste / delete / undo operations "), _ctx.selectionProgress ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [_hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.selectionProgress.label) + " : " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.selectionProgress.done) + " / " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.selectionProgress.total) + " prospect(s) ", 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      width: (_ctx.selectionProgress.total ? _ctx.selectionProgress.done * 100 / _ctx.selectionProgress.total : 0) + '%'
+    })
+  }, null, 4 /* STYLE */)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 34 /* CLASS, HYDRATE_EVENTS */);
 }
 
 /***/ }),
@@ -17579,6 +17625,711 @@ function recordsLabelAddition(revision, name) {
   // This is also safe for names containing commas or SQL wildcard characters.
   return after.startsWith(name + ", ") && after.slice(name.length + 2) === before || after.endsWith(", " + name) && after.slice(0, -name.length - 2) === before || after.replace(", " + name + ", ", ", ") === before && after !== before;
 }
+
+/***/ }),
+
+/***/ "./resources/js/utils/table-selection.js":
+/*!***********************************************!*\
+  !*** ./resources/js/utils/table-selection.js ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
+/* harmony import */ var _actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/prospect */ "./resources/js/actions/project/prospect.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+/**
+ * Excel-like cell selection for the prospects table.
+ *
+ * - Drag the mouse over cells (or SHIFT + click) to select a range
+ * - Click on the "select column" button of a column header to select a column
+ * - CTRL/CMD + C copies the selection as tab separated values
+ *   (can be pasted in Excel, Google Sheets...)
+ * - CTRL/CMD + V pastes values (from the table, Excel, Sheets...)
+ *   starting from the top-left cell of the selection.
+ *   A single value is repeated on the whole selection.
+ * - CTRL/CMD + X cuts, BACKSPACE / DELETE clears the selected cells
+ * - CTRL/CMD + Z undoes, CTRL/CMD + Y (or CTRL + SHIFT + Z) redoes
+ * - ESC clears the selection
+ *
+ * The mixin is meant to be used by Table.vue, it expects
+ * `fixedColumns`, `notFixedColumns` and `prospects` to exist.
+ */
+
+
+var READ_ONLY_FIELDS = ["created_at", "updated_at"];
+var CONFIRM_THRESHOLD = 50;
+var HISTORY_LIMIT = 50;
+var CHUNK_SIZE = 5;
+
+/**
+ * Serialize a value the way Excel does in TSV
+ */
+function toTsvValue(value) {
+  value = value === null || value === undefined ? "" : String(value);
+  if (/[\t\n\r"]/.test(value)) {
+    return '"' + value.replace(/"/g, '""') + '"';
+  }
+  return value;
+}
+
+/**
+ * Parse tab separated values (supports quoted values)
+ */
+function parseTsv(text) {
+  var rows = [];
+  var row = [];
+  var value = "";
+  var quoted = false;
+  for (var i = 0; i < text.length; i++) {
+    var _char = text[i];
+    if (quoted) {
+      if (_char === '"' && text[i + 1] === '"') {
+        value += '"';
+        i++;
+      } else if (_char === '"') {
+        quoted = false;
+      } else {
+        value += _char;
+      }
+    } else if (_char === '"' && value === "") {
+      quoted = true;
+    } else if (_char === "\t") {
+      row.push(value);
+      value = "";
+    } else if (_char === "\n" || _char === "\r") {
+      if (_char === "\r" && text[i + 1] === "\n") {
+        i++;
+      }
+      row.push(value);
+      rows.push(row);
+      row = [];
+      value = "";
+    } else {
+      value += _char;
+    }
+  }
+
+  // Last value (Excel ends the text with a line break)
+  if (value !== "" || row.length > 0) {
+    row.push(value);
+    rows.push(row);
+  }
+  return rows;
+}
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  data: function data() {
+    return {
+      cellSelection: null,
+      // Progress of the running operation { label, done, total }
+      selectionProgress: null
+    };
+  },
+  mounted: function mounted() {
+    this._selPending = null;
+    this._selDragging = false;
+    this._selFrame = null;
+    this._selRows = "";
+    this._undoStack = [];
+    this._redoStack = [];
+    document.addEventListener("cut", this.onSelectionCut);
+    document.addEventListener("mousedown", this.onSelectionMouseDown);
+    document.addEventListener("mouseover", this.onSelectionMouseOver);
+    document.addEventListener("mouseup", this.onSelectionMouseUp);
+    document.addEventListener("copy", this.onSelectionCopy);
+    document.addEventListener("paste", this.onSelectionPaste);
+    document.addEventListener("keydown", this.onSelectionKeyDown);
+    document.addEventListener("selectstart", this.onSelectionSelectStart);
+  },
+  beforeUnmount: function beforeUnmount() {
+    document.removeEventListener("cut", this.onSelectionCut);
+    document.removeEventListener("mousedown", this.onSelectionMouseDown);
+    document.removeEventListener("mouseover", this.onSelectionMouseOver);
+    document.removeEventListener("mouseup", this.onSelectionMouseUp);
+    document.removeEventListener("copy", this.onSelectionCopy);
+    document.removeEventListener("paste", this.onSelectionPaste);
+    document.removeEventListener("keydown", this.onSelectionKeyDown);
+    document.removeEventListener("selectstart", this.onSelectionSelectStart);
+    document.body.classList.remove("hc-table-selecting");
+  },
+  updated: function updated() {
+    // Vue may have re-rendered some cells
+    if (this.cellSelection) {
+      this.paintSelection();
+    }
+  },
+  watch: {
+    // Rows changed (page, filters...): the selection is not valid anymore
+    // (a simple refresh of the same rows keeps it)
+    prospects: function prospects(rows) {
+      var signature = rows.map(function (p) {
+        return p.id;
+      }).join(",");
+      if (signature !== this._selRows) {
+        this._selRows = signature;
+        this.clearSelection();
+      }
+    }
+  },
+  computed: {
+    /**
+     * Columns in the same order as displayed
+     */
+    selectionColumns: function selectionColumns() {
+      return [].concat(_toConsumableArray(this.fixedColumns), _toConsumableArray(this.notFixedColumns));
+    },
+    /**
+     * Normalized rectangle of the selection
+     */
+    selectionRect: function selectionRect() {
+      var s = this.cellSelection;
+      if (!s) {
+        return null;
+      }
+      return {
+        r1: Math.min(s.anchor.r, s.focus.r),
+        r2: Math.max(s.anchor.r, s.focus.r),
+        c1: Math.min(s.anchor.c, s.focus.c),
+        c2: Math.max(s.anchor.c, s.focus.c)
+      };
+    }
+  },
+  methods: {
+    /**
+     * Find the cell position (row / column indexes) of an element
+     */
+    cellPosition: function cellPosition(element) {
+      var cell = element && element.closest ? element.closest("[data-col-key]") : null;
+      if (!cell || !this.$el || !this.$el.contains(cell)) {
+        return null;
+      }
+      var r = this.prospects.findIndex(function (p) {
+        return String(p.id) === cell.dataset.pid;
+      });
+      var c = this.selectionColumns.findIndex(function (col) {
+        return col.key === cell.dataset.colKey;
+      });
+      if (r < 0 || c < 0) {
+        return null;
+      }
+      return {
+        r: r,
+        c: c
+      };
+    },
+    clearSelection: function clearSelection() {
+      if (this.cellSelection) {
+        this.cellSelection = null;
+        this.paintSelection();
+      }
+    },
+    onSelectionMouseDown: function onSelectionMouseDown(e) {
+      if (e.button !== 0) {
+        return;
+      }
+      var inside = this.$el && this.$el.contains(e.target);
+
+      // Click on a header "select column" button
+      if (inside && e.target.closest("[data-select-column]")) {
+        return;
+      }
+      var pos = inside ? this.cellPosition(e.target) : null;
+      if (!pos) {
+        // Click outside the cells: leave the selection
+        // unless the click is inside the table (headers...)
+        if (!inside || !e.target.closest("thead, .hc-table-header")) {
+          this.clearSelection();
+        }
+        this._selPending = null;
+        return;
+      }
+
+      // SHIFT + click extends the selection
+      if (e.shiftKey && this.cellSelection) {
+        e.preventDefault();
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+        this.cellSelection = {
+          anchor: this.cellSelection.anchor,
+          focus: pos
+        };
+        this.paintSelection();
+        return;
+      }
+      this.clearSelection();
+      this._selPending = pos;
+      this._selDragging = false;
+    },
+    onSelectionMouseOver: function onSelectionMouseOver(e) {
+      if (!this._selPending) {
+        return;
+      }
+      var pos = this.cellPosition(e.target);
+      if (!pos) {
+        return;
+      }
+      var origin = this._selPending;
+      if (!this._selDragging && pos.r === origin.r && pos.c === origin.c) {
+        return;
+      }
+
+      // Start dragging: we stop editing the input
+      if (!this._selDragging) {
+        this._selDragging = true;
+        document.body.classList.add("hc-table-selecting");
+        if (document.activeElement) {
+          document.activeElement.blur();
+        }
+        window.getSelection && window.getSelection().removeAllRanges();
+      }
+      this.cellSelection = {
+        anchor: origin,
+        focus: pos
+      };
+      this.paintSelection();
+    },
+    onSelectionMouseUp: function onSelectionMouseUp() {
+      this._selPending = null;
+      this._selDragging = false;
+      document.body.classList.remove("hc-table-selecting");
+    },
+    onSelectionSelectStart: function onSelectionSelectStart(e) {
+      if (this._selDragging) {
+        e.preventDefault();
+      }
+    },
+    /**
+     * Is the user typing in a field ?
+     */
+    isEditingField: function isEditingField() {
+      var el = document.activeElement;
+      if (!el || el === document.body) {
+        return false;
+      }
+      if (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "SELECT") {
+        return true;
+      }
+      return el.tagName === "INPUT" && !["checkbox", "radio", "button", "submit"].includes(el.type);
+    },
+    onSelectionKeyDown: function onSelectionKeyDown(e) {
+      if (e.key === "Escape" && this.cellSelection) {
+        this.clearSelection();
+        return;
+      }
+      if (this.isEditingField()) {
+        return;
+      }
+
+      // Clear cells
+      if ((e.key === "Backspace" || e.key === "Delete") && this.cellSelection) {
+        e.preventDefault();
+        this.clearSelectedCells("Suppression");
+        return;
+      }
+      var mod = e.ctrlKey || e.metaKey;
+      var key = e.key.toLowerCase();
+      if (mod && key === "z" && !e.shiftKey && this._undoStack.length) {
+        e.preventDefault();
+        this.undo();
+      } else if (mod && (key === "y" || key === "z" && e.shiftKey) && this._redoStack.length) {
+        e.preventDefault();
+        this.redo();
+      }
+    },
+    /**
+     * Select a whole column (all loaded rows)
+     * SHIFT extends from the previously selected column
+     */
+    selectColumn: function selectColumn(key, extend) {
+      var c = this.selectionColumns.findIndex(function (col) {
+        return col.key === key;
+      });
+      if (c < 0 || this.prospects.length === 0) {
+        return;
+      }
+      var last = this.prospects.length - 1;
+      var anchorC = extend && this.cellSelection ? this.cellSelection.anchor.c : c;
+      if (document.activeElement) {
+        document.activeElement.blur();
+      }
+      this.cellSelection = {
+        anchor: {
+          r: 0,
+          c: anchorC
+        },
+        focus: {
+          r: last,
+          c: c
+        }
+      };
+      this.paintSelection();
+    },
+    onSelectColumnEvent: function onSelectColumnEvent(e) {
+      this.selectColumn(e.detail.key, e.detail.extend);
+    },
+    /**
+     * Apply CSS classes on the selected cells
+     */
+    paintSelection: function paintSelection() {
+      var _this = this;
+      if (this._selFrame) {
+        return;
+      }
+      this._selFrame = requestAnimationFrame(function () {
+        _this._selFrame = null;
+        if (!_this.$el || !_this.$el.querySelectorAll) {
+          return;
+        }
+        var rect = _this.selectionRect;
+        var rows = new Map(_this.prospects.map(function (p, i) {
+          return [String(p.id), i];
+        }));
+        var cols = new Map(_this.selectionColumns.map(function (col, i) {
+          return [col.key, i];
+        }));
+        _this.$el.querySelectorAll("[data-col-key]").forEach(function (cell) {
+          var r = rows.get(cell.dataset.pid);
+          var c = cols.get(cell.dataset.colKey);
+          var selected = rect && r >= rect.r1 && r <= rect.r2 && c >= rect.c1 && c <= rect.c2;
+          cell.classList.toggle("hc-cell-sel", !!selected);
+          cell.classList.toggle("hc-cell-sel-t", selected && r === rect.r1);
+          cell.classList.toggle("hc-cell-sel-b", selected && r === rect.r2);
+          cell.classList.toggle("hc-cell-sel-l", selected && c === rect.c1);
+          cell.classList.toggle("hc-cell-sel-r", selected && c === rect.c2);
+        });
+      });
+    },
+    /**
+     * Text value of a cell
+     */
+    selectionCellValue: function selectionCellValue(prospect, column) {
+      if (column.category === "default") {
+        return prospect[column.key];
+      }
+      if (column.category === "meta") {
+        return prospect.meta ? prospect.meta[column.id] : "";
+      }
+
+      // Other kind of cells (labels, users, history...)
+      // we copy what is displayed
+      var cell = this.$el.querySelector("#prospect-".concat(prospect.id, " [data-col-key=\"").concat(column.key, "\"]"));
+      return cell ? cell.textContent.replace(/\s+/g, " ").trim() : "";
+    },
+    /**
+     * Selection as tab separated values
+     */
+    selectionToTsv: function selectionToTsv() {
+      var rect = this.selectionRect;
+      var lines = [];
+      for (var r = rect.r1; r <= rect.r2; r++) {
+        var values = [];
+        for (var c = rect.c1; c <= rect.c2; c++) {
+          values.push(toTsvValue(this.selectionCellValue(this.prospects[r], this.selectionColumns[c])));
+        }
+        lines.push(values.join("\t"));
+      }
+      return lines.join("\n");
+    },
+    onSelectionCopy: function onSelectionCopy(e) {
+      if (!this.selectionRect || !e.clipboardData || this.isEditingField()) {
+        return;
+      }
+      e.clipboardData.setData("text/plain", this.selectionToTsv());
+      e.preventDefault();
+      var rect = this.selectionRect;
+      var count = (rect.r2 - rect.r1 + 1) * (rect.c2 - rect.c1 + 1);
+      flashInfo({
+        title: "Copié",
+        body: "".concat(count, " cellule(s) copi\xE9e(s)")
+      });
+    },
+    onSelectionCut: function onSelectionCut(e) {
+      if (!this.selectionRect || !e.clipboardData || this.isEditingField()) {
+        return;
+      }
+      e.clipboardData.setData("text/plain", this.selectionToTsv());
+      e.preventDefault();
+      this.clearSelectedCells("Coupe");
+    },
+    onSelectionPaste: function onSelectionPaste(e) {
+      if (!e.clipboardData || !this.$el) {
+        return;
+      }
+      var editing = this.isEditingField();
+      var text = e.clipboardData.getData("text/plain");
+      if (!text) {
+        return;
+      }
+      var rect = editing ? null : this.selectionRect;
+      var start;
+      if (rect) {
+        start = {
+          r: rect.r1,
+          c: rect.c1
+        };
+      } else {
+        // No selection: only handle multi-cells content pasted
+        // in a cell, a simple text is pasted normally in the input
+        var pos = this.cellPosition(e.target);
+        if (!pos || !/[\t\n\r]/.test(text.replace(/[\r\n]+$/, ""))) {
+          return;
+        }
+        start = pos;
+      }
+      var grid = parseTsv(text);
+      if (grid.length === 0) {
+        return;
+      }
+      e.preventDefault();
+
+      // Build list of target cells
+      var targets = [];
+      var single = grid.length === 1 && grid[0].length === 1;
+      if (single && rect) {
+        for (var r = rect.r1; r <= rect.r2; r++) {
+          for (var c = rect.c1; c <= rect.c2; c++) {
+            targets.push({
+              r: r,
+              c: c,
+              value: grid[0][0]
+            });
+          }
+        }
+      } else {
+        grid.forEach(function (line, i) {
+          line.forEach(function (value, j) {
+            targets.push({
+              r: start.r + i,
+              c: start.c + j,
+              value: value
+            });
+          });
+        });
+      }
+      this.changeCells(targets, "Collage");
+    },
+    /**
+     * Empty all the selected cells
+     */
+    clearSelectedCells: function clearSelectedCells(label) {
+      var rect = this.selectionRect;
+      if (!rect) {
+        return;
+      }
+      var targets = [];
+      for (var r = rect.r1; r <= rect.r2; r++) {
+        for (var c = rect.c1; c <= rect.c2; c++) {
+          targets.push({
+            r: r,
+            c: c,
+            value: ""
+          });
+        }
+      }
+      this.changeCells(targets, label);
+    },
+    /**
+     * Convert targets ({ r, c, value }) to changes
+     * then send them
+     */
+    changeCells: function changeCells(targets, label) {
+      var _this2 = this;
+      var changes = [];
+      var ignored = 0;
+      targets.forEach(function (_ref) {
+        var _this2$selectionCellV;
+        var r = _ref.r,
+          c = _ref.c,
+          value = _ref.value;
+        var prospect = _this2.prospects[r];
+        var column = _this2.selectionColumns[c];
+        if (!prospect || !column) {
+          return; // outside the table
+        }
+        var editable = (column.category === "default" || column.category === "meta") && !READ_ONLY_FIELDS.includes(column.key) && prospect.id > 0 && !_store__WEBPACK_IMPORTED_MODULE_0__["default"].getters.prospectReadOnly && !prospect.deleted_at && !prospect.processed_at;
+        if (!editable) {
+          ignored++;
+          return;
+        }
+        var before = (_this2$selectionCellV = _this2.selectionCellValue(prospect, column)) !== null && _this2$selectionCellV !== void 0 ? _this2$selectionCellV : "";
+        if (before === value) {
+          return;
+        }
+        changes.push({
+          pid: prospect.id,
+          meta: column.category === "meta",
+          key: column.category === "meta" ? column.id : column.key,
+          before: before,
+          after: value
+        });
+      });
+      if (changes.length === 0) {
+        if (ignored > 0) {
+          flashWarning({
+            title: label,
+            body: "Ces cellules ne sont pas modifiables."
+          });
+        }
+        return;
+      }
+      var run = function run() {
+        return _this2.executeChanges(changes, label, "do", ignored);
+      };
+      if (changes.length >= CONFIRM_THRESHOLD) {
+        hcConfirm("Voulez-vous vraiment modifier ".concat(changes.length, " cellule(s) ? (Ctrl+Z pour annuler)"), run);
+      } else {
+        run();
+      }
+    },
+    undo: function undo() {
+      var operation = this._undoStack.pop();
+      if (operation) {
+        this.executeChanges(operation.changes, "Annulation", "undo", 0, operation);
+      }
+    },
+    redo: function redo() {
+      var operation = this._redoStack.pop();
+      if (operation) {
+        this.executeChanges(operation.changes, "Rétablissement", "redo", 0, operation);
+      }
+    },
+    /**
+     * Send changes to the API, prospect by prospect,
+     * while showing the progress
+     *
+     * @param {Array} changes
+     * @param {String} label
+     * @param {String} mode do | undo | redo
+     * @param {Number} ignored Number of ignored cells
+     * @param {Object} operation Operation moved between undo/redo stacks
+     */
+    executeChanges: function executeChanges(changes, label, mode) {
+      var _arguments = arguments,
+        _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var ignored, operation, updates, list, failed, i, results, entry;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              ignored = _arguments.length > 3 && _arguments[3] !== undefined ? _arguments[3] : 0;
+              operation = _arguments.length > 4 && _arguments[4] !== undefined ? _arguments[4] : null;
+              if (!_this3.selectionProgress) {
+                _context.next = 7;
+                break;
+              }
+              flashWarning({
+                title: label,
+                body: "Une opération est déjà en cours, patientez un instant."
+              });
+
+              // Put the operation back
+              if (mode === "undo") _this3._undoStack.push(operation);
+              if (mode === "redo") _this3._redoStack.push(operation);
+              return _context.abrupt("return");
+            case 7:
+              // One update per prospect
+              updates = new Map();
+              changes.forEach(function (change) {
+                var value = mode === "undo" ? change.before : change.after;
+                var update = updates.get(change.pid) || {
+                  id: change.pid
+                };
+                if (change.meta) {
+                  update.meta = _objectSpread(_objectSpread({}, update.meta || {}), {}, _defineProperty({}, change.key, value));
+                } else {
+                  update[change.key] = value;
+                }
+                updates.set(change.pid, update);
+              });
+              list = _toConsumableArray(updates.values());
+              _this3.selectionProgress = {
+                label: label,
+                done: 0,
+                total: list.length
+              };
+              failed = 0;
+              _context.prev = 12;
+              i = 0;
+            case 14:
+              if (!(i < list.length)) {
+                _context.next = 22;
+                break;
+              }
+              _context.next = 17;
+              return Promise.allSettled(list.slice(i, i + CHUNK_SIZE).map(function (update) {
+                return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.UPDATE_PROSPECT, update)["finally"](function () {
+                  if (_this3.selectionProgress) {
+                    _this3.selectionProgress.done++;
+                  }
+                });
+              }));
+            case 17:
+              results = _context.sent;
+              failed += results.filter(function (r) {
+                return r.status === "rejected";
+              }).length;
+            case 19:
+              i += CHUNK_SIZE;
+              _context.next = 14;
+              break;
+            case 22:
+              _context.prev = 22;
+              _this3.selectionProgress = null;
+              return _context.finish(22);
+            case 25:
+              // History
+              entry = operation || {
+                changes: changes
+              };
+              if (mode === "undo") {
+                _this3._redoStack.push(entry);
+              } else {
+                _this3._undoStack.push(entry);
+                if (mode === "do") {
+                  _this3._redoStack = [];
+                }
+              }
+              if (_this3._undoStack.length > HISTORY_LIMIT) {
+                _this3._undoStack.shift();
+              }
+              if (failed > 0) {
+                flashError({
+                  title: label,
+                  body: "".concat(failed, " prospect(s) n'ont pas pu \xEAtre modifi\xE9s.")
+                });
+              } else {
+                flashInfo({
+                  title: label,
+                  body: "".concat(changes.length, " cellule(s) modifi\xE9e(s)") + (ignored > 0 ? ", ".concat(ignored, " ignor\xE9e(s)") : "")
+                });
+              }
+            case 29:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[12,, 22, 25]]);
+      }))();
+    }
+  }
+});
 
 /***/ }),
 
