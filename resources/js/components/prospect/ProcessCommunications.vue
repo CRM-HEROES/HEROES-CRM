@@ -64,6 +64,8 @@
 <script>
 import { markCommunicationsRead } from "@/utils/incoming-communications";
 import IncomingCommunicationService from "@/apis/project/incoming-communication";
+import { FETCH_PROSPECTS } from "@/actions/project/prospect";
+import store from "@/store";
 
 export default {
     props: {
@@ -133,6 +135,13 @@ export default {
             try {
                 if (await markCommunicationsRead(this.projectSlug, this.prospect.id, this.type, records)) {
                     this.processedIds.push(...records.map(record => Number(record.id)));
+                    if (store.state.project.prospectsParams?.incomingCommunications === true) {
+                        try {
+                            await store.dispatch(FETCH_PROSPECTS);
+                        } catch (error) {
+                            console.error("Could not refresh prospects after processing communications:", error);
+                        }
+                    }
                     if (this.showHistory) {
                         await this.loadHistory();
                     }

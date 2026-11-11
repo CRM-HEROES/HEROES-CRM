@@ -336,10 +336,25 @@ class ProspectFilters extends Filters
             return $builder;
         }
 
-        return $builder->where(function ($query) {
-            $query->whereHas('messages', fn ($messages) => IncomingCommunications::incoming($messages, 'email'))
-                ->orWhereHas('sms', fn ($sms) => IncomingCommunications::incoming($sms, 'sms'))
-                ->orWhereHas('interactions', fn ($interactions) => IncomingCommunications::incoming($interactions, 'voicemail'));
+        $userId = auth()->id();
+
+        return $builder->where(function ($query) use ($userId) {
+            $query->whereHas('messages', function ($messages) use ($userId) {
+                IncomingCommunications::incoming($messages, 'email');
+                if ($userId !== null) {
+                    IncomingCommunications::excludeRead($messages, 'email', (int) $userId);
+                }
+            })->orWhereHas('sms', function ($sms) use ($userId) {
+                IncomingCommunications::incoming($sms, 'sms');
+                if ($userId !== null) {
+                    IncomingCommunications::excludeRead($sms, 'sms', (int) $userId);
+                }
+            })->orWhereHas('interactions', function ($interactions) use ($userId) {
+                IncomingCommunications::incoming($interactions, 'voicemail');
+                if ($userId !== null) {
+                    IncomingCommunications::excludeRead($interactions, 'voicemail', (int) $userId);
+                }
+            });
         });
     }
 

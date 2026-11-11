@@ -66,9 +66,14 @@ class IncomingCommunications
 
     protected function unreadQuery(Project $project, string $type, int $userId): Builder
     {
+        return self::excludeRead($this->query($project, $type), $type, $userId);
+    }
+
+    public static function excludeRead(Builder $query, string $type, int $userId): Builder
+    {
         $model = self::TYPES[$type];
         $table = (new $model())->getTable();
-        $query = $this->query($project, $type)->whereNotExists(function ($read) use ($type, $table, $userId) {
+        $query->whereNotExists(function ($read) use ($type, $table, $userId) {
             $read->selectRaw('1')->from('communication_reads')
                 ->where('user_id', $userId)->where('communication_type', $type)
                 ->whereColumn('communication_id', $table . '.id');

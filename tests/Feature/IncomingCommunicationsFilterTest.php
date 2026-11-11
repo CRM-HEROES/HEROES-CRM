@@ -5,8 +5,11 @@ namespace Tests\Feature;
 use App\Filters\ProspectRequestFilters;
 use App\Http\Controllers\API\Project\ProspectController;
 use App\Models\Project;
+use App\Models\User;
+use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Event;
 use Tests\TestCase;
 
 class IncomingCommunicationsFilterTest extends TestCase
@@ -49,6 +52,16 @@ class IncomingCommunicationsFilterTest extends TestCase
             $table->boolean('from_user')->default(true);
             $table->string('status')->nullable();
             $table->json('data')->nullable();
+        });
+        $schema->create('communication_reads', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->string('communication_type');
+            $table->unsignedBigInteger('communication_id');
+        });
+        $schema->create('user_message', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('message_id');
+            $table->timestamp('archived_at')->nullable();
         });
 
         DB::table('projects')->insert([['id' => 1], ['id' => 2]]);
@@ -112,6 +125,21 @@ class IncomingCommunicationsFilterTest extends TestCase
     public function test_disabled_filter_does_not_restrict_the_list(): void
     {
         $this->assertSame([1, 2, 3, 4, 5, 6, 7, 8, 11, 12], $this->ids(false));
+    }
+
+    public function test_processed_incoming_communications_are_excluded_for_the_current_user(): void
+    {
+        Event::fake([Authenticated::class]);
+        auth()->setUser((new User())->forceFill(['id' => 1, 'role' => 'super_admin']));
+        $smsId = DB::table('sms')->where('prospect_id', 1)->value('id');
+        DB::table('communication_reads')->insert([
+            'user_id' => 1,
+            'communication_type' => 'sms',
+            'communication_id' => $smsId,
+        ]);
+
+        $this->assertNotContains(1, $this->ids());
+        $this->assertContains(7, $this->ids());
     }
 
     /** @dataProvider voicemailData */
