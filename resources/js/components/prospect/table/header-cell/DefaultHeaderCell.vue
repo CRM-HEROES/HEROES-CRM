@@ -7,45 +7,74 @@
         ]"
     >
         <div
-            class="hc-default-header-cell-options"
-            @click.stop="showOptions = !showOptions"
+            ref="options"
+            class="hc-prospect-header-cell-options"
         >
-            <span
-                :class="[
-                    'fa',
-                    sortedBy && sortedAsc ? 'fa-caret-down' : 'fa-caret-up',
-                ]"
-                @click.prevent="sortBy"
+            <button
+                type="button"
+                class="hc-prospect-header-cell-options-trigger"
+                aria-label="Options de la colonne"
+                :aria-expanded="showOptions"
+                @click.prevent="showOptions = !showOptions"
             >
-                <span>Trier</span>
-                <loading :loading="sorting" />
-            </span>
-            <span
-                v-if="can('all.project.field.update')"
-                class="fa fa-cog"
-                @click.prevent="edit"
+                ⁝
+            </button>
+            <ul
+                v-if="showOptions"
+                class="hc-prospect-header-cell-options-menu"
+                role="menu"
             >
-                <span>Modifier le champ</span>
-            </span>
-            <span
-                v-if="canFindReplace"
-                class="fa fa-exchange-alt"
-                @click.prevent.stop="findReplaceOpen = true"
-            >
-                <span>Rechercher et remplacer</span>
-            </span>
-            <span
-                v-if="canToggleUnique"
-                :class="['fa', 'fa-clone', field.unique ? 'icon-green' : '']"
-                v-tooltip="field.unique ? 'Détection des doublons activée' : 'Détecter les doublons'"
-                @click.prevent.stop="toggleUnique"
-            ></span>
+                <li role="none">
+                    <button type="button" role="menuitem" @click.prevent="sortBy">
+                        <span
+                            :class="[
+                                'fa',
+                                sortedBy && sortedAsc ? 'fa-caret-down' : 'fa-caret-up',
+                            ]"
+                        ></span>
+                        Trier
+                        <loading :loading="sorting" />
+                    </button>
+                </li>
+                <li v-if="can('all.project.field.update')" role="none">
+                    <button type="button" role="menuitem" @click.prevent="edit">
+                        <span class="fa fa-cog"></span>
+                        Modifier le champ
+                    </button>
+                </li>
+                <li v-if="canFindReplace" role="none">
+                    <button
+                        type="button"
+                        role="menuitem"
+                        @click.prevent="openFindReplace"
+                    >
+                        <span class="fa fa-exchange-alt"></span>
+                        Rechercher et remplacer
+                    </button>
+                </li>
+                <li v-if="canToggleUnique" role="none">
+                    <button
+                        type="button"
+                        role="menuitem"
+                        @click.prevent="toggleUnique"
+                    >
+                        <span
+                            :class="[
+                                'fa',
+                                'fa-clone',
+                                field.unique ? 'icon-green' : '',
+                            ]"
+                        ></span>
+                        {{ field.unique ? 'Détection des doublons activée' : 'Détecter les doublons' }}
+                    </button>
+                </li>
+            </ul>
         </div>
 
         <input
             :placeholder="column.name + ' ...'"
             @focus="$emit('focus'), showRequired()"
-            @blur="$emit('blur'), hideRequired(), hideOptions()"
+            @blur="$emit('blur'), hideRequired()"
             @change="search"
             ref="search"
         />
@@ -141,12 +170,30 @@ export default {
         };
     },
 
+    mounted() {
+        document.addEventListener("click", this.handleDocumentClick);
+    },
+
+    beforeUnmount() {
+        document.removeEventListener("click", this.handleDocumentClick);
+    },
+
     methods: {
+        handleDocumentClick(event) {
+            if (
+                this.$refs.options &&
+                !this.$refs.options.contains(event.target)
+            ) {
+                this.showOptions = false;
+            }
+        },
+
         /**
          * Sort prospects list by
          * the current field
          */
         async sortBy() {
+            this.showOptions = false;
             this.sorting = true;
 
             try {
@@ -201,11 +248,18 @@ export default {
          * Edit current field
          */
         edit() {
+            this.showOptions = false;
             store.commit(OPEN_MODAL, "field-update");
             store.commit(SET_FIELD, this.field);
         },
 
+        openFindReplace() {
+            this.showOptions = false;
+            this.findReplaceOpen = true;
+        },
+
         async toggleUnique() {
+            this.showOptions = false;
             await store.dispatch(UPDATE_FIELD, {
                 id: this.field.id,
                 unique: !this.field.unique,
@@ -299,13 +353,6 @@ export default {
             }, 200);
         },
 
-        /**
-         */
-        hideOptions() {
-            setTimeout(() => {
-                this.showOptions = false;
-            }, 200);
-        },
     },
 
     computed: {
