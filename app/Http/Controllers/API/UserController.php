@@ -167,12 +167,8 @@ class UserController extends Controller
     {
         abort_unless(auth()->user()->is_super_admin || auth()->id() == $user->id || $user->creator_id == auth()->id(), 404, 'You cannot update this user!');
 
-        if ($request->filled('password')) {
-            $this->validate($request, [
-                'password' => ['string', new \App\Rules\StrongPassword()],
-            ]);
-        }
-
+        // Le mot de passe ne se modifie JAMAIS ici : l'utilisateur le change lui-même via un email de confirmation
+        // (POST /password/email). Toute valeur "password" envoyée est ignorée.
         $data = $request->only($this->fields);
 
         // Le rôle n'est modifiable que par un super admin (avant : chacun pouvait se donner le rôle super_admin)
@@ -181,11 +177,6 @@ class UserController extends Controller
         }
 
         $user->update($data);
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt(request('password'));
-            $user->save();
-        }
 
         return ['message' => trans('common.success.updated_resource')];
     }

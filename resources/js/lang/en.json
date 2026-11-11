@@ -74,8 +74,9 @@
         "confirm_password": "Confirm password",
         "init_password": {
             "title": "Init password",
-            "success": "The password reset link was successfully sent to the email address<b>{email}</b>.",
-            "error": "We are currently encountering an error when sending the password reset link.<br><br>Check that the email entered is correct.",
+            "success": "If an account exists for <b>{email}</b>, an email with a password change link has just been sent (valid for 60 minutes).",
+            "error": "The password reset link could not be sent. Check the address and try again in a moment.",
+            "too_many": "Too many requests. Try again in a minute.",
             "send_verification_email": "Send verification email",
             "sending_verification_email": "Sending verification email"
         },

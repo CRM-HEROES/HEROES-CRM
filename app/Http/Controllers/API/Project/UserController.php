@@ -156,7 +156,7 @@ class UserController extends Controller
             ],
         )]);
 
-        $user->update($request->only([
+        $data = $request->only([
             'name',
             'last_name',
             'email',
@@ -169,12 +169,15 @@ class UserController extends Controller
             'country',
             'role',
             'default_projects',
-        ]));
+        ]);
 
-        if ($request->filled('password')) {
-            $user->password = bcrypt(request('password'));
-            $user->save();
+        // Le rôle n'est modifiable que par un super admin (sinon un gestionnaire de projet pourrait créer des super admins)
+        if (!auth()->user()->is_super_admin) {
+            unset($data['role']);
         }
+
+        // Le mot de passe ne se modifie jamais ici : email de confirmation (POST /password/email)
+        $user->update($data);
 
         return ['message' => trans('common.success.attached_resource')];
     }

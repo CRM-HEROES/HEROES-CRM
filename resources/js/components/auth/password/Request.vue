@@ -58,10 +58,11 @@
                             />
                         </label>
                     </div>
+                    <PasswordRules :password="user.password" />
                     <button
                         id="hc-password-request-form-submit"
                         type="submit"
-                        :disabled="processing"
+                        :disabled="processing || !canSubmit"
                         @click="resetPassword"
                     >
                         {{
@@ -205,8 +206,11 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
+import PasswordRules from "@/components/security/PasswordRules.vue";
+import { isStrongPassword } from "@/components/security/passwordRules";
 export default {
     name: "register",
+    components: { PasswordRules },
     data() {
         return {
             showPassword: false,
@@ -236,7 +240,11 @@ export default {
                     this.signIn();
                 })
                 .catch(({ response: { data } }) => {
-                    alert(data.message);
+                    alert(
+                        data && data.errors
+                            ? Object.values(data.errors).flat().join("\n")
+                            : data.message
+                    );
                 })
                 .finally(() => {
                     this.processing = false;
@@ -245,6 +253,13 @@ export default {
     },
     computed: {
         ...mapGetters("auth", ["passwordResetToken"]),
+
+        canSubmit() {
+            return (
+                isStrongPassword(this.user.password) &&
+                this.user.password === this.user.password_confirmation
+            );
+        },
     },
 };
 </script>

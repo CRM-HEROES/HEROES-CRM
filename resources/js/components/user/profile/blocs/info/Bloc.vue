@@ -57,11 +57,6 @@ export default {
                     meta: false,
                 },
                 {
-                    slug: "password",
-                    name: "Mot de passe",
-                    meta: false,
-                },
-                {
                     slug: "street",
                     name: "Rue",
                     meta: false,
