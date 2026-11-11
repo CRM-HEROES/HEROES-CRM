@@ -806,6 +806,7 @@ class ProspectFilters extends Filters
                 ->when(!empty($value), function($query) use($value) {
                     $query->whereIn('id', $value);
                 });
+            $this->applyLabelDateRange($query);
         });
     }
 
@@ -819,8 +820,32 @@ class ProspectFilters extends Filters
                 ->when(!empty($value), function($query) use($value) {
                     $query->whereIn('id', $value);
                 });
+            $this->applyLabelDateRange($query);
         });
     }
+
+    /**
+     * Restrict label filters to the labels attached
+     * during the date range (prospect_label.created_at)
+     */
+    protected function applyLabelDateRange($query) {
+        $from = $this->getFilter('labelDateFrom');
+        $to = $this->getFilter('labelDateTo');
+
+        if (!empty($from)) {
+            $query->where('prospect_label.created_at', '>=', $from . ' 00:00:00');
+        }
+        if (!empty($to)) {
+            $query->where('prospect_label.created_at', '<=', $to . ' 23:59:59');
+        }
+    }
+
+    /**
+     * Date range params: applied inside label filters
+     */
+    public function labelDateFrom($builder, $value) {}
+
+    public function labelDateTo($builder, $value) {}
 
     /**
      * Search by thread message

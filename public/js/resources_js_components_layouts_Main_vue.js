@@ -28715,6 +28715,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   methods: _defineProperty({
     /**
+     * Set or clear a date range param then reload prospects
+     */
+    setDateParam: function setDateParam(key, value) {
+      if (value) {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+          key: key,
+          value: value
+        });
+      } else {
+        _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+          key: key
+        });
+      }
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+    },
+    /**
      *
      * @param {*} category
      */
@@ -28855,6 +28871,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["categories", "prospectFilterCategory", "prospectsParamExists", "prospectsParamValue", "can"])), {}, {
+    dateFrom: {
+      get: function get() {
+        return this.prospectsParamValue("labelDateFrom") || "";
+      },
+      set: function set(value) {
+        this.setDateParam("labelDateFrom", value);
+      }
+    },
+    dateTo: {
+      get: function get() {
+        return this.prospectsParamValue("labelDateTo") || "";
+      },
+      set: function set(value) {
+        this.setDateParam("labelDateTo", value);
+      }
+    },
     all: {
       get: function get() {
         var _this4 = this;
@@ -84141,9 +84173,29 @@ var _hoisted_5 = {
     "position": "relative"
   }
 };
-var _hoisted_6 = ["textContent"];
-var _hoisted_7 = ["textContent"];
-var _hoisted_8 = ["textContent"];
+var _hoisted_6 = {
+  "class": "hc-label-date-range",
+  style: {
+    "display": "flex",
+    "gap": "6px",
+    "padding": "4px 8px"
+  }
+};
+var _hoisted_7 = {
+  style: {
+    "flex": "1",
+    "font-size": "11px"
+  }
+};
+var _hoisted_8 = {
+  style: {
+    "flex": "1",
+    "font-size": "11px"
+  }
+};
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_search = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("search");
   var _component_category_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("category-row");
@@ -84224,7 +84276,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
           return $data.labelKeyword = $event;
         })
-      }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+      }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Date range (label attached between) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Du "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "date",
+        style: {
+          "width": "100%"
+        },
+        "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+          return $options.dateFrom = $event;
+        })
+      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.dateFrom]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Au "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        type: "date",
+        style: {
+          "width": "100%"
+        },
+        "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+          return $options.dateTo = $event;
+        })
+      }, null, 512 /* NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.dateTo]])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
         "class": "hc-flex-1",
         style: {
           "overflow": "auto"
@@ -84244,7 +84312,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, ["style"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('Avec ' + _ctx.prospectFilterCategory.name)
-              }, null, 8 /* PROPS */, _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Exclude all labels from current category "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+              }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Exclude all labels from current category "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                 tag: "a",
                 "class": "fa fa-thumbs-down",
                 style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)($options.excludeCategoryStyle),
@@ -84265,9 +84333,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('all'))
-              }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.all,
-                "onUpdate:modelValue": _cache[5] || (_cache[5] = function ($event) {
+                "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
                   return $options.all = $event;
                 })
               }, null, 8 /* PROPS */, ["modelValue"])];
@@ -84286,11 +84354,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-            onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.addLabel && $options.addLabel.apply($options, arguments);
             }, ["prevent"])),
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('label.add.title'))
-          }, null, 8 /* PROPS */, _hoisted_8)];
+          }, null, 8 /* PROPS */, _hoisted_11)];
         }),
         _: 1 /* STABLE */
       })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -120497,7 +120565,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
