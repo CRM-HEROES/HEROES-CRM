@@ -33,10 +33,10 @@
                         {{
                             processing
                                 ? $t(
-                                      "auth.init_password.send_verification_email"
+                                      "auth.init_password.sending_verification_email"
                                   )
                                 : $t(
-                                      "auth.init_password.sending_verification_email"
+                                      "auth.init_password.send_verification_email"
                                   )
                         }}
                     </button>
@@ -203,10 +203,17 @@ export default {
                     });
                     this.emailSent = true;
                 })
-                .catch(({ response: { data } }) => {
+                .catch((error) => {
+                    const tooMany =
+                        error && error.response && error.response.status === 429;
+
                     flashError({
                         title: this.$t("auth.init_password.title"),
-                        body: this.$t("auth.init_password.error"),
+                        body: this.$t(
+                            tooMany
+                                ? "auth.init_password.too_many"
+                                : "auth.init_password.error"
+                        ),
                     });
                 })
                 .finally(() => {

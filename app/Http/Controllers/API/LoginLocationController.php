@@ -20,7 +20,7 @@ class LoginLocationController extends Controller
 
     public function confirm($id)
     {
-        $row = DB::table('user_login_locations')->where('id', $id)->where('status', 'pending')->first();
+        $row = $this->findPending($id);
 
         if (!$row) {
             return $this->page('⚠️', 'Lien non valable', 'Ce lien a déjà été utilisé ou n\'est plus valable.', 410);
@@ -31,12 +31,12 @@ class LoginLocationController extends Controller
             'updated_at' => now(),
         ]);
 
-        return $this->page('✅', 'Merci !', 'Ce pays est maintenant enregistré comme habituel pour votre compte.');
+        return $this->page('✅', 'Merci !', 'Ce lieu est maintenant enregistré comme habituel pour votre compte.');
     }
 
     public function deny($id)
     {
-        $row = DB::table('user_login_locations')->where('id', $id)->where('status', 'pending')->first();
+        $row = $this->findPending($id);
 
         if (!$row) {
             return $this->page('⚠️', 'Lien non valable', 'Ce lien a déjà été utilisé ou n\'est plus valable.', 410);
@@ -61,7 +61,7 @@ class LoginLocationController extends Controller
         $rows = DB::table('user_login_locations')
             ->where('user_id', auth()->id())
             ->where('status', 'pending')
-            ->where('created_at', '>', now()->subHours(48))
+            ->where('created_at', '>', now()->subMinutes(max(1, (int) config('login_location.link_ttl_minutes'))))
             ->orderByDesc('id')
             ->get(['id', 'country', 'city', 'ip', 'created_at']);
 
@@ -88,6 +88,18 @@ class LoginLocationController extends Controller
     }
 
     // ---- Logique commune ----
+
+    /**
+     * Ligne "pending" encore dans son délai de validité (le lien signé expire aussi, mais on revérifie).
+     */
+    private function findPending($id)
+    {
+        return DB::table('user_login_locations')
+            ->where('id', $id)
+            ->where('status', 'pending')
+            ->where('created_at', '>', now()->subMinutes(max(1, (int) config('login_location.link_ttl_minutes'))))
+            ->first();
+    }
 
     private function applyDeny($row): void
     {

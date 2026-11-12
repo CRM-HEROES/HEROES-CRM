@@ -104,6 +104,14 @@ class User extends Authenticatable // implements MustVerifyEmail
      *
      * @return string
      */
+    /**
+     * Email de changement / réinitialisation du mot de passe (lien à usage unique).
+     */
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\PasswordResetRequested($token));
+    }
+
     public function getIsSuperAdminAttribute()
     {
         // return true;

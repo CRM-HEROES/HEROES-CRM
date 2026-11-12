@@ -40,18 +40,6 @@
         />
         <span v-text="label"></span>
     </label>
-    <input
-        v-else-if="field == 'password'"
-        type="text"
-        class="hc-default-cell-input"
-        v-model.lazy="value"
-        :disabled="disabled"
-        :placeholder="placeholder"
-        @focus="select"
-        @keydown.enter="focusNextInput"
-        @keydown.up="focusPreviousProjectInput"
-        @keydown.down="focusNextProjectInput"
-    />
     <label v-else-if="field == 'website_url'" class="hc-default-cell-label">
         <input
             type="text"
@@ -216,45 +204,6 @@ export default {
                 }
             }
         },
-
-        updatePassword(value) {
-            if (!value) {
-                return;
-            }
-
-            hcConfirm(
-                this.$t("user.profile.password_update.confirm"),
-                async () => {
-                    try {
-                        if (this.project) {
-                            await ProjectUserService.update(
-                                this.project.slug,
-                                this.user.id,
-                                {
-                                    password: value,
-                                }
-                            );
-                        } else {
-                            await UserService.update(this.user.id, {
-                                password: value,
-                            });
-                        }
-
-                        flashInfo({
-                            body: this.$t(
-                                "user.profile.password_update.success"
-                            ),
-                            duration: 5000,
-                        });
-                    } catch (e) {
-                        flashError({
-                            body: this.$t("user.profile.password_update.error"),
-                            duration: 5000,
-                        });
-                    }
-                }
-            );
-        },
     },
 
     computed: {
@@ -270,10 +219,6 @@ export default {
             },
 
             async set(newValue) {
-                if (this.field == "password") {
-                    return this.updatePassword(newValue);
-                }
-
                 // Modification payload
                 const update = {
                     id: this.user.id,

@@ -123,6 +123,340 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js":
+/*!**************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js ***!
+  \**************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _apis_project_workflow__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/project/workflow */ "./resources/js/apis/project/workflow.js");
+/* harmony import */ var _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/utils/workflow-email */ "./resources/js/utils/workflow-email.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+
+
+var FONT_CSS = {
+  arial: "Arial, Helvetica, sans-serif",
+  verdana: "Verdana, Geneva, sans-serif",
+  tahoma: "Tahoma, Geneva, sans-serif",
+  trebuchet: "'Trebuchet MS', Helvetica, sans-serif",
+  georgia: "Georgia, 'Times New Roman', serif",
+  times: "'Times New Roman', Times, serif"
+};
+var PREVIEW_DELAY = 500;
+
+/**
+ * The email is written as in a word processor. What is stored is the HTML
+ * (cleaned again on the server before it is sent).
+ */
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  props: {
+    modelValue: {
+      type: String,
+      "default": ""
+    },
+    // { prospect: [...], user: [...], project: [...] }
+    variables: {
+      type: Object,
+      "default": function _default() {
+        return {};
+      }
+    },
+    // The subject, shown in the preview
+    subject: {
+      type: String,
+      "default": ""
+    },
+    // The look of the email (null: the usual look of the CRM)
+    design: {
+      type: Object,
+      "default": null
+    },
+    projectName: {
+      type: String,
+      "default": ""
+    },
+    readOnly: {
+      type: Boolean,
+      "default": false
+    }
+  },
+  emits: ["update:modelValue", "update:design"],
+  data: function data() {
+    return {
+      mode: "edit",
+      textColor: "#c0341d",
+      highlightColor: "#fff3a3",
+      range: null,
+      previewHtml: "",
+      previewLoading: false,
+      previewError: "",
+      previewTimer: null,
+      previewRequest: 0,
+      styles: _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.STYLES,
+      palettes: _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.PALETTES,
+      fonts: _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.FONTS,
+      fontCss: FONT_CSS,
+      colorKeys: _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.COLOR_KEYS,
+      textKeys: _utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.TEXT_KEYS
+    };
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_2__.mapGetters)(["project"])), {}, {
+    variableList: function variableList() {
+      return Object.entries(this.variables).flatMap(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+          group = _ref2[0],
+          names = _ref2[1];
+        return names.map(function (name) {
+          return "{{".concat(group, ".").concat(name, "}}");
+        });
+      });
+    },
+    /**
+     * The email as the prospect will get it, with examples in place of the variables
+     */
+    previewDocument: function previewDocument() {
+      var body = (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.hasContent)(this.modelValue) ? (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.withSamples)(this.modelValue, this.projectName) : "<p style=\"color:#9aa0b0\">".concat((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.escapeHtml)(this.$t("workflow.email.placeholder")), "</p>");
+      var subject = this.subject ? "<div class=\"subject\"><small>".concat((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.escapeHtml)(this.$t("workflow.email.subject_label")), "</small><strong>").concat((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.withSamples)((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.escapeHtml)(this.subject), this.projectName), "</strong></div>") : "";
+      return "<!doctype html><html><head><meta charset=\"utf-8\"><style>\nbody{margin:0;padding:12px;background:#eef0f6;font-family:Arial,Helvetica,sans-serif}\n.mail{max-width:560px;margin:0 auto;overflow:hidden;background:#fff;border-radius:10px;box-shadow:0 2px 10px rgba(30,35,60,.12)}\n.subject{display:flex;flex-direction:column;gap:2px;padding:10px 16px;background:#fafbfd;border-bottom:1px solid #e3e6ef;font-size:13px}\n.subject small{color:#8a8fa0}\n.head{padding:14px 16px;color:#fff;background:#4b5ce8;font-size:15px;font-weight:700}\n.body{padding:18px 16px;color:#222;font-size:14px;line-height:1.5;text-align:left;overflow-wrap:anywhere}\n.body img{max-width:100%}\n.foot{padding:10px 16px;color:#8a8fa0;background:#fafbfd;border-top:1px solid #e3e6ef;font-size:11px;text-align:center}\n</style></head><body><div class=\"mail\">".concat(subject, "<div class=\"head\">").concat((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.escapeHtml)(this.projectName || this.$t("workflow.email.your_project")), "</div><div class=\"body\">").concat(body, "</div><div class=\"foot\">").concat((0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.escapeHtml)(this.$t("workflow.email.preview_foot")), "</div></div></body></html>");
+    }
+  }),
+  beforeUnmount: function beforeUnmount() {
+    clearTimeout(this.previewTimer);
+  },
+  watch: {
+    // The drawing follows what is written and chosen (once the typing stops)
+    design: {
+      deep: true,
+      handler: "queuePreview"
+    },
+    subject: "queuePreview",
+    mode: "queuePreview",
+    // The text changed from outside (the HTML view, another step): show it, keeping the cursor otherwise
+    modelValue: function modelValue(value) {
+      this.queuePreview();
+      var area = this.$refs.area;
+      if (area && area.innerHTML !== (value || "")) {
+        area.innerHTML = value || "";
+      }
+    }
+  },
+  mounted: function mounted() {
+    this.$refs.area.innerHTML = this.modelValue || "";
+    // Colours as CSS (style="color: ...") rather than <font>, which mail clients render badly
+    try {
+      document.execCommand("styleWithCSS", false, true);
+    } catch (e) {
+      // not supported: the formatting still works
+    }
+  },
+  methods: {
+    /**
+     * The design chosen, changed by a few values
+     */
+    change: function change(patch) {
+      this.$emit("update:design", _objectSpread(_objectSpread({}, this.design), patch));
+    },
+    customize: function customize() {
+      this.$emit("update:design", (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.defaultDesign)(this.project ? this.project.name : ""));
+    },
+    // Not every text matters to every style
+    showsText: function showsText(key) {
+      return this.design.style === "branded" || !["brand_label", "category"].includes(key);
+    },
+    queuePreview: function queuePreview() {
+      var _this = this;
+      clearTimeout(this.previewTimer);
+      if (this.mode !== "preview" && this.mode !== "design") {
+        return;
+      }
+      if (!this.design) {
+        this.previewHtml = "";
+        this.previewError = "";
+        return;
+      }
+      this.previewTimer = setTimeout(function () {
+        return _this.loadPreview();
+      }, PREVIEW_DELAY);
+    },
+    /**
+     * The email drawn by the server, with the same view as the email sent
+     */
+    loadPreview: function loadPreview() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var request, _yield$WorkflowServic, data;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              request = ++_this2.previewRequest;
+              _this2.previewLoading = true;
+              _this2.previewError = "";
+              _context.prev = 3;
+              _context.next = 6;
+              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_0__["default"].emailPreview(_this2.project.slug, {
+                subject: (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.withSamples)(_this2.subject, _this2.projectName).replace(/&amp;|&lt;|&gt;|&quot;|&#39;/g, function (e) {
+                  return {
+                    "&amp;": "&",
+                    "&lt;": "<",
+                    "&gt;": ">",
+                    "&quot;": '"',
+                    "&#39;": "'"
+                  }[e];
+                }),
+                body: (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.hasContent)(_this2.modelValue) ? (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.withSamples)(_this2.modelValue, _this2.projectName) : "",
+                design: _this2.design
+              });
+            case 6:
+              _yield$WorkflowServic = _context.sent;
+              data = _yield$WorkflowServic.data;
+              // A slower answer to an older question is not the one wanted
+              if (request === _this2.previewRequest) {
+                _this2.previewHtml = data.html;
+              }
+              _context.next = 14;
+              break;
+            case 11:
+              _context.prev = 11;
+              _context.t0 = _context["catch"](3);
+              if (request === _this2.previewRequest) {
+                _this2.previewHtml = "";
+                _this2.previewError = _this2.$t("workflow.email.preview_error");
+              }
+            case 14:
+              _context.prev = 14;
+              if (request === _this2.previewRequest) {
+                _this2.previewLoading = false;
+              }
+              return _context.finish(14);
+            case 17:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[3, 11, 14, 17]]);
+      }))();
+    },
+    setMode: function setMode(mode) {
+      var _this3 = this;
+      this.mode = mode;
+      if (mode === "edit") {
+        this.$nextTick(function () {
+          _this3.$refs.area.innerHTML = _this3.modelValue || "";
+        });
+      }
+    },
+    onInput: function onInput() {
+      this.$emit("update:modelValue", this.cleanup(this.$refs.area.innerHTML));
+    },
+    /**
+     * An empty editor is an empty text (not "<br>")
+     */
+    cleanup: function cleanup(html) {
+      return (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.hasContent)(html) ? html : "";
+    },
+    /**
+     * Pasted text keeps its paragraphs but not the styles of where it comes from
+     */
+    onPaste: function onPaste(event) {
+      var text = event.clipboardData && event.clipboardData.getData("text/plain");
+      if (text === undefined || text === null || this.readOnly) {
+        return;
+      }
+      event.preventDefault();
+      this.restore();
+      document.execCommand("insertText", false, text);
+      this.onInput();
+    },
+    // The selection of the text, kept while the focus is on a button or a list
+    remember: function remember() {
+      var selection = window.getSelection();
+      if (selection && selection.rangeCount && this.$refs.area && this.$refs.area.contains(selection.anchorNode)) {
+        this.range = selection.getRangeAt(0).cloneRange();
+      }
+    },
+    restore: function restore() {
+      var area = this.$refs.area;
+      area.focus();
+      if (this.range) {
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(this.range);
+      }
+    },
+    run: function run(command) {
+      var value = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      if (this.readOnly) {
+        return;
+      }
+      this.restore();
+      document.execCommand(command, false, value);
+      this.remember();
+      this.onInput();
+    },
+    color: function color(command, value) {
+      this.run(command, value);
+    },
+    applyBlock: function applyBlock(event) {
+      var tag = event.target.value;
+      event.target.value = "";
+      if (tag) {
+        this.run("formatBlock", "<".concat(tag, ">"));
+      }
+    },
+    addLink: function addLink() {
+      var url = (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.safeUrl)(window.prompt(this.$t("workflow.email.link_ask"), "https://"));
+      if (!url) {
+        return;
+      }
+      this.restore();
+
+      // Nothing selected: the address is the text of the link
+      if (window.getSelection().isCollapsed) {
+        document.execCommand("insertHTML", false, "<a href=\"".concat(url, "\">").concat(url, "</a>"));
+      } else {
+        document.execCommand("createLink", false, url);
+      }
+      this.remember();
+      this.onInput();
+    },
+    addImage: function addImage() {
+      var url = (0,_utils_workflow_email__WEBPACK_IMPORTED_MODULE_1__.safeUrl)(window.prompt(this.$t("workflow.email.image_ask"), "https://"), {
+        image: true
+      });
+      if (url) {
+        this.run("insertImage", url);
+      }
+    },
+    /**
+     * A variable at the cursor
+     */
+    insert: function insert(variable) {
+      this.run("insertText", variable);
+    }
+  }
+});
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=script&lang=js":
 /*!*****************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=script&lang=js ***!
@@ -239,14 +573,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/workflow */ "./resources/js/apis/project/workflow.js");
-/* harmony import */ var _apis_project_label__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/project/label */ "./resources/js/apis/project/label.js");
-/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
-/* harmony import */ var _actions_project_group__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/group */ "./resources/js/actions/project/group.js");
-/* harmony import */ var _actions_project_thread__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/thread */ "./resources/js/actions/project/thread.js");
-/* harmony import */ var _actions_project_category__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/category */ "./resources/js/actions/project/category.js");
+/* harmony import */ var _EmailEditor_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EmailEditor.vue */ "./resources/js/components/workflow/EmailEditor.vue");
+/* harmony import */ var _apis_project_label__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/apis/project/label */ "./resources/js/apis/project/label.js");
+/* harmony import */ var _actions_project_user__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/project/user */ "./resources/js/actions/project/user.js");
+/* harmony import */ var _actions_project_group__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/group */ "./resources/js/actions/project/group.js");
+/* harmony import */ var _actions_project_thread__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/thread */ "./resources/js/actions/project/thread.js");
+/* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
+/* harmony import */ var _actions_project_category__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/category */ "./resources/js/actions/project/category.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -274,8 +610,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+
+
 var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  components: {
+    EmailEditor: _EmailEditor_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+  },
   props: {
     modelValue: {
       "default": null
@@ -299,16 +640,28 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
         return {};
       }
     },
+    // The subject of the email, shown in its preview
+    subject: {
+      type: String,
+      "default": ""
+    },
+    // The look of the email (null: the usual look of the CRM)
+    design: {
+      type: Object,
+      "default": null
+    },
     readOnly: {
       type: Boolean,
       "default": false
     }
   },
-  emits: ["update:modelValue", "provider-label"],
+  emits: ["update:modelValue", "update:design", "provider-label"],
   data: function data() {
     return {
       providers: [],
       providersLoading: false,
+      // The operator being configured in its window: chosen when it is done
+      pendingProvider: null,
       labels: [],
       labelsLoaded: false,
       loadingLists: false,
@@ -317,7 +670,7 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       allDays: ALL_DAYS
     };
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_7__.mapGetters)(["project", "users", "groups", "threads", "categories", "can"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "users", "groups", "threads", "categories", "can", "modals"])), {}, {
     isSingle: function isSingle() {
       return ["user", "group", "label", "thread"].includes(this.type);
     },
@@ -334,6 +687,12 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       return this.options.length ? this.$t("workflow.thread_create.automatic", {
         name: this.options[0].label
       }) : this.$t("workflow.choose");
+    },
+    /**
+     * The operator in the list is one that still has to be configured: say what is awaited
+     */
+    unconfiguredChosen: function unconfiguredChosen() {
+      return !!this.pendingProvider;
     },
     isLabels: function isLabels() {
       return this.type === "label" || this.type === "labels";
@@ -400,6 +759,12 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
     }
   }),
   watch: {
+    // The window of the operator was closed: is it configured now?
+    modals: function modals(list) {
+      if (this.pendingProvider && !list.includes(this.pendingProvider.setup)) {
+        this.afterSetup();
+      }
+    },
     // The same field can change of type (another criterion) or get its categories late
     type: function type() {
       this.refresh();
@@ -466,10 +831,10 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               needs = [];
-              if (["user", "users"].includes(_this3.type) && !_this3.users.length) needs.push(_actions_project_user__WEBPACK_IMPORTED_MODULE_3__.FETCH_USERS);
-              if (["group", "groups"].includes(_this3.type) && !_this3.groups.length) needs.push(_actions_project_group__WEBPACK_IMPORTED_MODULE_4__.FETCH_GROUPS);
-              if (_this3.type === "thread" && !_this3.threads.length) needs.push(_actions_project_thread__WEBPACK_IMPORTED_MODULE_5__.FETCH_THREADS);
-              if (["label", "labels"].includes(_this3.type) && !_this3.categories.length) needs.push(_actions_project_category__WEBPACK_IMPORTED_MODULE_6__.FETCH_CATEGORIES);
+              if (["user", "users"].includes(_this3.type) && !_this3.users.length) needs.push(_actions_project_user__WEBPACK_IMPORTED_MODULE_4__.FETCH_USERS);
+              if (["group", "groups"].includes(_this3.type) && !_this3.groups.length) needs.push(_actions_project_group__WEBPACK_IMPORTED_MODULE_5__.FETCH_GROUPS);
+              if (_this3.type === "thread" && !_this3.threads.length) needs.push(_actions_project_thread__WEBPACK_IMPORTED_MODULE_6__.FETCH_THREADS);
+              if (["label", "labels"].includes(_this3.type) && !_this3.categories.length) needs.push(_actions_project_category__WEBPACK_IMPORTED_MODULE_8__.FETCH_CATEGORIES);
               if (needs.length) {
                 _context3.next = 7;
                 break;
@@ -523,7 +888,7 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
               _this4.creatingThread = true;
               _context4.prev = 4;
               _context4.next = 7;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_thread__WEBPACK_IMPORTED_MODULE_5__.ADD_THREAD, {
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_thread__WEBPACK_IMPORTED_MODULE_6__.ADD_THREAD, {
                 name: name,
                 "private": false
               });
@@ -573,11 +938,81 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
      * Chosen operator: the node keeps its reference, and its name for the messages
      */
     chooseProvider: function chooseProvider(ref) {
-      var _this$providers$find;
-      this.$emit("update:modelValue", ref || null);
-      this.$emit("provider-label", ((_this$providers$find = this.providers.find(function (p) {
+      var provider = this.providers.find(function (p) {
         return p.ref === ref;
-      })) === null || _this$providers$find === void 0 ? void 0 : _this$providers$find.label) || null);
+      });
+
+      // Not configured yet: its window opens to configure it, the choice is made once it is
+      if (provider && provider.configured === false) {
+        this.setupProvider(provider);
+        return;
+      }
+      this.$emit("update:modelValue", ref || null);
+      this.$emit("provider-label", (provider === null || provider === void 0 ? void 0 : provider.label) || null);
+    },
+    providerLabel: function providerLabel(provider) {
+      return provider.configured === false ? "".concat(provider.label, " (").concat(this.$t("workflow.provider_setup.to_configure"), ")") : provider.label;
+    },
+    /**
+     * Opens the window of the CRM that configures the operator (the same as in the settings)
+     */
+    setupProvider: function setupProvider(provider) {
+      // The list shows what is really chosen, not the operator clicked
+      if (this.$refs.provider) {
+        this.$refs.provider.value = this.modelValue || "";
+      }
+      if (!provider.setup) {
+        flashWarning({
+          title: this.$t("workflow.title"),
+          body: this.$t("workflow.provider_setup.no_window", {
+            name: provider.label
+          })
+        });
+        return;
+      }
+      this.pendingProvider = provider;
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_7__.OPEN_MODAL, provider.setup);
+    },
+    /**
+     * Back from the window: the operator is chosen if it is configured now
+     */
+    afterSetup: function afterSetup() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var pending, provider;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              pending = _this5.pendingProvider;
+              _this5.pendingProvider = null;
+              _context5.next = 4;
+              return _this5.loadProviders();
+            case 4:
+              provider = _this5.providers.find(function (p) {
+                return p.ref === pending.ref;
+              });
+              if (provider && provider.configured) {
+                _this5.chooseProvider(provider.ref);
+                flash({
+                  title: _this5.$t("workflow.title"),
+                  body: _this5.$t("workflow.provider_setup.done", {
+                    name: provider.label
+                  })
+                });
+              } else {
+                flashWarning({
+                  title: _this5.$t("workflow.title"),
+                  body: _this5.$t("workflow.provider_setup.not_done", {
+                    name: pending.label
+                  })
+                });
+              }
+            case 6:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
+      }))();
     },
     insertVariable: function insertVariable(variable) {
       var area = this.$refs.text;
@@ -587,104 +1022,104 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       this.$emit("update:modelValue", text.slice(0, start) + variable + text.slice(end));
     },
     loadProviders: function loadProviders() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var capability, _yield$WorkflowServic, data;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _this5.providersLoading = true;
-              capability = _this5.field.capability;
-              _context5.prev = 2;
-              _context5.next = 5;
-              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this5.project.slug, capability);
+              _this6.providersLoading = true;
+              capability = _this6.field.capability;
+              _context6.prev = 2;
+              _context6.next = 5;
+              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this6.project.slug, capability, true);
             case 5:
-              _yield$WorkflowServic = _context5.sent;
+              _yield$WorkflowServic = _context6.sent;
               data = _yield$WorkflowServic.data;
-              if (!(capability !== _this5.field.capability)) {
-                _context5.next = 9;
+              if (!(capability !== _this6.field.capability)) {
+                _context6.next = 9;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context6.abrupt("return");
             case 9:
-              _this5.providers = data;
-              _context5.next = 15;
+              _this6.providers = data;
+              _context6.next = 15;
               break;
             case 12:
-              _context5.prev = 12;
-              _context5.t0 = _context5["catch"](2);
+              _context6.prev = 12;
+              _context6.t0 = _context6["catch"](2);
               flashError({
-                title: _this5.$t("workflow.title"),
-                body: _this5.$t("workflow.error.load")
+                title: _this6.$t("workflow.title"),
+                body: _this6.$t("workflow.error.load")
               });
             case 15:
-              _context5.prev = 15;
-              if (capability === _this5.field.capability) {
-                _this5.providersLoading = false;
+              _context6.prev = 15;
+              if (capability === _this6.field.capability) {
+                _this6.providersLoading = false;
               }
-              return _context5.finish(15);
+              return _context6.finish(15);
             case 18:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
-        }, _callee5, null, [[2, 12, 15, 18]]);
+        }, _callee6, null, [[2, 12, 15, 18]]);
       }))();
     },
     /**
      * Labels belong to categories: the ones of the prospects, all of them
      */
     loadLabels: function loadLabels() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var categories, lists;
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
+        return _regeneratorRuntime().wrap(function _callee8$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              categories = _this6.categories.filter(function (c) {
+              categories = _this7.categories.filter(function (c) {
                 return c["for"] === "prospect";
               });
-              _context7.next = 3;
+              _context8.next = 3;
               return Promise.all(categories.map(/*#__PURE__*/function () {
-                var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6(category) {
+                var _ref3 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7(category) {
                   var _yield$LabelService$g, data;
-                  return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-                    while (1) switch (_context6.prev = _context6.next) {
+                  return _regeneratorRuntime().wrap(function _callee7$(_context7) {
+                    while (1) switch (_context7.prev = _context7.next) {
                       case 0:
-                        _context6.prev = 0;
-                        _context6.next = 3;
-                        return _apis_project_label__WEBPACK_IMPORTED_MODULE_2__["default"].get(_this6.project.slug, category.id);
+                        _context7.prev = 0;
+                        _context7.next = 3;
+                        return _apis_project_label__WEBPACK_IMPORTED_MODULE_3__["default"].get(_this7.project.slug, category.id);
                       case 3:
-                        _yield$LabelService$g = _context6.sent;
+                        _yield$LabelService$g = _context7.sent;
                         data = _yield$LabelService$g.data;
-                        return _context6.abrupt("return", data.map(function (label) {
+                        return _context7.abrupt("return", data.map(function (label) {
                           return {
                             id: label.id,
                             label: "".concat(category.name, " / ").concat(label.name)
                           };
                         }));
                       case 8:
-                        _context6.prev = 8;
-                        _context6.t0 = _context6["catch"](0);
-                        return _context6.abrupt("return", []);
+                        _context7.prev = 8;
+                        _context7.t0 = _context7["catch"](0);
+                        return _context7.abrupt("return", []);
                       case 11:
                       case "end":
-                        return _context6.stop();
+                        return _context7.stop();
                     }
-                  }, _callee6, null, [[0, 8]]);
+                  }, _callee7, null, [[0, 8]]);
                 }));
                 return function (_x2) {
                   return _ref3.apply(this, arguments);
                 };
               }()));
             case 3:
-              lists = _context7.sent;
-              _this6.labels = lists.flat();
-              _this6.labelsLoaded = true;
+              lists = _context8.sent;
+              _this7.labels = lists.flat();
+              _this7.labelsLoaded = true;
             case 6:
             case "end":
-              return _context7.stop();
+              return _context8.stop();
           }
-        }, _callee7);
+        }, _callee8);
       }))();
     }
   }
@@ -2708,6 +3143,630 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
+/***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204 ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* binding */ render)
+/* harmony export */ });
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+var _hoisted_1 = {
+  "class": "hc-wfe-editor-tabs"
+};
+var _hoisted_2 = ["textContent"];
+var _hoisted_3 = ["textContent"];
+var _hoisted_4 = ["textContent"];
+var _hoisted_5 = {
+  key: 0,
+  "class": "hc-wfe-editor-toolbar"
+};
+var _hoisted_6 = ["title"];
+var _hoisted_7 = ["textContent"];
+var _hoisted_8 = ["textContent"];
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = ["textContent"];
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_13 = ["title"];
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("b", null, "B", -1 /* HOISTED */);
+var _hoisted_15 = [_hoisted_14];
+var _hoisted_16 = ["title"];
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", null, "I", -1 /* HOISTED */);
+var _hoisted_18 = [_hoisted_17];
+var _hoisted_19 = ["title"];
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("u", null, "U", -1 /* HOISTED */);
+var _hoisted_21 = [_hoisted_20];
+var _hoisted_22 = ["title"];
+var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("s", null, "S", -1 /* HOISTED */);
+var _hoisted_24 = [_hoisted_23];
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_26 = ["title"];
+var _hoisted_27 = ["title"];
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_29 = ["title"];
+var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-align-left"
+}, null, -1 /* HOISTED */);
+var _hoisted_31 = [_hoisted_30];
+var _hoisted_32 = ["title"];
+var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-align-center"
+}, null, -1 /* HOISTED */);
+var _hoisted_34 = [_hoisted_33];
+var _hoisted_35 = ["title"];
+var _hoisted_36 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-align-right"
+}, null, -1 /* HOISTED */);
+var _hoisted_37 = [_hoisted_36];
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_39 = ["title"];
+var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-list-ul"
+}, null, -1 /* HOISTED */);
+var _hoisted_41 = [_hoisted_40];
+var _hoisted_42 = ["title"];
+var _hoisted_43 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-list-ol"
+}, null, -1 /* HOISTED */);
+var _hoisted_44 = [_hoisted_43];
+var _hoisted_45 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_46 = ["title"];
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-link"
+}, null, -1 /* HOISTED */);
+var _hoisted_48 = [_hoisted_47];
+var _hoisted_49 = ["title"];
+var _hoisted_50 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-chain-broken"
+}, null, -1 /* HOISTED */);
+var _hoisted_51 = [_hoisted_50];
+var _hoisted_52 = ["title"];
+var _hoisted_53 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-picture-o"
+}, null, -1 /* HOISTED */);
+var _hoisted_54 = [_hoisted_53];
+var _hoisted_55 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfe-editor-sep"
+}, null, -1 /* HOISTED */);
+var _hoisted_56 = ["title"];
+var _hoisted_57 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-undo"
+}, null, -1 /* HOISTED */);
+var _hoisted_58 = [_hoisted_57];
+var _hoisted_59 = ["title"];
+var _hoisted_60 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-repeat"
+}, null, -1 /* HOISTED */);
+var _hoisted_61 = [_hoisted_60];
+var _hoisted_62 = ["title"];
+var _hoisted_63 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-eraser"
+}, null, -1 /* HOISTED */);
+var _hoisted_64 = [_hoisted_63];
+var _hoisted_65 = ["contenteditable", "data-placeholder"];
+var _hoisted_66 = {
+  key: 1,
+  "class": "hc-wfd"
+};
+var _hoisted_67 = {
+  key: 0,
+  "class": "hc-wfd-standard"
+};
+var _hoisted_68 = ["textContent"];
+var _hoisted_69 = ["textContent"];
+var _hoisted_70 = ["textContent"];
+var _hoisted_71 = ["textContent"];
+var _hoisted_72 = {
+  "class": "hc-wfd-styles"
+};
+var _hoisted_73 = ["disabled", "onClick"];
+var _hoisted_74 = {
+  "class": "hc-wfd-thumb"
+};
+var _hoisted_75 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfd-thumb-line"
+}, null, -1 /* HOISTED */);
+var _hoisted_76 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-wfd-thumb-line short"
+}, null, -1 /* HOISTED */);
+var _hoisted_77 = ["textContent"];
+var _hoisted_78 = ["textContent"];
+var _hoisted_79 = ["textContent"];
+var _hoisted_80 = {
+  "class": "hc-wfd-palettes"
+};
+var _hoisted_81 = ["title", "disabled", "onClick"];
+var _hoisted_82 = {
+  "class": "hc-wfd-colors"
+};
+var _hoisted_83 = ["value", "disabled", "onInput"];
+var _hoisted_84 = ["textContent"];
+var _hoisted_85 = ["textContent"];
+var _hoisted_86 = ["textContent"];
+var _hoisted_87 = {
+  "class": "hc-wfd-row"
+};
+var _hoisted_88 = ["textContent"];
+var _hoisted_89 = ["value", "disabled"];
+var _hoisted_90 = ["value", "textContent"];
+var _hoisted_91 = ["textContent"];
+var _hoisted_92 = {
+  "class": "hc-wfd-toggle"
+};
+var _hoisted_93 = ["checked", "disabled"];
+var _hoisted_94 = ["textContent"];
+var _hoisted_95 = {
+  key: 0,
+  "class": "hc-wfd-toggle"
+};
+var _hoisted_96 = ["checked", "disabled"];
+var _hoisted_97 = ["textContent"];
+var _hoisted_98 = {
+  "class": "hc-wfd-toggle"
+};
+var _hoisted_99 = ["checked", "disabled"];
+var _hoisted_100 = ["textContent"];
+var _hoisted_101 = {
+  "class": "hc-wfd-toggle"
+};
+var _hoisted_102 = ["checked", "disabled"];
+var _hoisted_103 = ["textContent"];
+var _hoisted_104 = ["textContent"];
+var _hoisted_105 = {
+  "class": "hc-wfd-texts"
+};
+var _hoisted_106 = ["textContent"];
+var _hoisted_107 = ["value", "disabled", "onInput"];
+var _hoisted_108 = ["textContent"];
+var _hoisted_109 = {
+  key: 2,
+  "class": "hc-wfe-editor-preview"
+};
+var _hoisted_110 = ["textContent"];
+var _hoisted_111 = ["textContent"];
+var _hoisted_112 = ["srcdoc", "title"];
+var _hoisted_113 = ["textContent"];
+var _hoisted_114 = {
+  key: 3,
+  "class": "hc-wff-variables"
+};
+var _hoisted_115 = ["textContent"];
+var _hoisted_116 = ["onMousedown", "textContent"];
+function render(_ctx, _cache, $props, $setup, $data, $options) {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfe-editor", {
+      disabled: $props.readOnly
+    }])
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
+      active: $data.mode === 'edit'
+    }),
+    onClick: _cache[0] || (_cache[0] = function ($event) {
+      return $options.setMode('edit');
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.tab_edit'))
+  }, null, 10 /* CLASS, PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
+      active: $data.mode === 'design'
+    }),
+    onClick: _cache[1] || (_cache[1] = function ($event) {
+      return $options.setMode('design');
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.tab_design'))
+  }, null, 10 /* CLASS, PROPS */, _hoisted_3), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)({
+      active: $data.mode === 'preview'
+    }),
+    onClick: _cache[2] || (_cache[2] = function ($event) {
+      return $options.setMode('preview');
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.tab_preview'))
+  }, null, 10 /* CLASS, PROPS */, _hoisted_4)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Toolbar: the buttons keep the selection of the text (mousedown is not taken by the button) "), $data.mode === 'edit' && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: '',
+    title: _ctx.$t('workflow.email.format'),
+    onChange: _cache[3] || (_cache[3] = function ($event) {
+      return $options.applyBlock($event);
+    }),
+    onMousedown: _cache[4] || (_cache[4] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.format'))
+  }, null, 8 /* PROPS */, _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "p",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.paragraph'))
+  }, null, 8 /* PROPS */, _hoisted_8), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "h1",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.title1'))
+  }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "h2",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.title2'))
+  }, null, 8 /* PROPS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "h3",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.title3'))
+  }, null, 8 /* PROPS */, _hoisted_11)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6), _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.bold'),
+    onMousedown: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('bold');
+    }, ["prevent"]))
+  }, _hoisted_15, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_13), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.italic'),
+    onMousedown: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('italic');
+    }, ["prevent"]))
+  }, _hoisted_18, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_16), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.underline'),
+    onMousedown: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('underline');
+    }, ["prevent"]))
+  }, _hoisted_21, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.strike'),
+    onMousedown: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('strikeThrough');
+    }, ["prevent"]))
+  }, _hoisted_24, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_22), _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "hc-wfe-editor-color",
+    title: _ctx.$t('workflow.email.color'),
+    onMousedown: _cache[11] || (_cache[11] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "hc-wfe-editor-color-a",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      borderBottomColor: $data.textColor
+    })
+  }, "A", 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "color",
+    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+      return $data.textColor = $event;
+    }),
+    onInput: _cache[10] || (_cache[10] = function ($event) {
+      return $options.color('foreColor', $data.textColor);
+    })
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.textColor]])], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "hc-wfe-editor-color",
+    title: _ctx.$t('workflow.email.highlight'),
+    onMousedown: _cache[14] || (_cache[14] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    "class": "hc-wfe-editor-color-a",
+    style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+      background: $data.highlightColor,
+      color: '#222'
+    })
+  }, "A", 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "color",
+    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+      return $data.highlightColor = $event;
+    }),
+    onInput: _cache[13] || (_cache[13] = function ($event) {
+      return $options.color('hiliteColor', $data.highlightColor);
+    })
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.highlightColor]])], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27), _hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.align_left'),
+    onMousedown: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('justifyLeft');
+    }, ["prevent"]))
+  }, _hoisted_31, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_29), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.align_center'),
+    onMousedown: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('justifyCenter');
+    }, ["prevent"]))
+  }, _hoisted_34, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_32), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.align_right'),
+    onMousedown: _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('justifyRight');
+    }, ["prevent"]))
+  }, _hoisted_37, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_35), _hoisted_38, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.bullets'),
+    onMousedown: _cache[18] || (_cache[18] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('insertUnorderedList');
+    }, ["prevent"]))
+  }, _hoisted_41, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.numbers'),
+    onMousedown: _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('insertOrderedList');
+    }, ["prevent"]))
+  }, _hoisted_44, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_42), _hoisted_45, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.link'),
+    onMousedown: _cache[20] || (_cache[20] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.addLink && $options.addLink.apply($options, arguments);
+    }, ["prevent"]))
+  }, _hoisted_48, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.unlink'),
+    onMousedown: _cache[21] || (_cache[21] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('unlink');
+    }, ["prevent"]))
+  }, _hoisted_51, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_49), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.image'),
+    onMousedown: _cache[22] || (_cache[22] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.addImage && $options.addImage.apply($options, arguments);
+    }, ["prevent"]))
+  }, _hoisted_54, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_52), _hoisted_55, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.undo'),
+    onMousedown: _cache[23] || (_cache[23] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('undo');
+    }, ["prevent"]))
+  }, _hoisted_58, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_56), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.redo'),
+    onMousedown: _cache[24] || (_cache[24] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('redo');
+    }, ["prevent"]))
+  }, _hoisted_61, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_59), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    title: _ctx.$t('workflow.email.clear'),
+    onMousedown: _cache[25] || (_cache[25] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+      return $options.run('removeFormat');
+    }, ["prevent"]))
+  }, _hoisted_64, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_62)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Writing "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    ref: "area",
+    "class": "hc-wfe-editor-area",
+    contenteditable: !$props.readOnly,
+    "data-placeholder": _ctx.$t('workflow.email.placeholder'),
+    onInput: _cache[26] || (_cache[26] = function () {
+      return $options.onInput && $options.onInput.apply($options, arguments);
+    }),
+    onBlur: _cache[27] || (_cache[27] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    }),
+    onKeyup: _cache[28] || (_cache[28] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    }),
+    onMouseup: _cache[29] || (_cache[29] = function () {
+      return $options.remember && $options.remember.apply($options, arguments);
+    }),
+    onPaste: _cache[30] || (_cache[30] = function () {
+      return $options.onPaste && $options.onPaste.apply($options, arguments);
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_65), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $data.mode === 'edit']]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The look of the email, chosen graphically "), $data.mode === 'design' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_66, [!$props.design ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_standard'))
+  }, null, 8 /* PROPS */, _hoisted_68), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_standard_help'))
+  }, null, 8 /* PROPS */, _hoisted_69), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 0,
+    type: "button",
+    "class": "hc-wfd-primary",
+    onClick: _cache[31] || (_cache[31] = function () {
+      return $options.customize && $options.customize.apply($options, arguments);
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_customize'))
+  }, null, 8 /* PROPS */, _hoisted_70)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 1
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-wfd-group",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_style'))
+  }, null, 8 /* PROPS */, _hoisted_71), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_72, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.styles, function (style) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: style,
+      type: "button",
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfd-style", [style, {
+        on: $props.design.style === style
+      }]]),
+      disabled: $props.readOnly,
+      onClick: function onClick($event) {
+        return $options.change({
+          style: style
+        });
+      }
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_74, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      "class": "hc-wfd-thumb-band",
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+        background: $props.design.header_color
+      })
+    }, null, 4 /* STYLE */), _hoisted_75, _hoisted_76]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.style.' + style))
+    }, null, 8 /* PROPS */, _hoisted_77), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("small", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.style_help.' + style))
+    }, null, 8 /* PROPS */, _hoisted_78)], 10 /* CLASS, PROPS */, _hoisted_73);
+  }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-wfd-group",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_colors'))
+  }, null, 8 /* PROPS */, _hoisted_79), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_80, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.palettes, function (palette) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: palette.key,
+      type: "button",
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfd-palette", {
+        on: $props.design.header_color === palette.header_color && $props.design.accent_color === palette.accent_color
+      }]),
+      title: _ctx.$t('workflow.email.palette.' + palette.key),
+      disabled: $props.readOnly,
+      onClick: function onClick($event) {
+        return $options.change({
+          header_color: palette.header_color,
+          accent_color: palette.accent_color
+        });
+      }
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+        background: palette.header_color
+      })
+    }, null, 4 /* STYLE */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+        background: palette.accent_color
+      })
+    }, null, 4 /* STYLE */)], 10 /* CLASS, PROPS */, _hoisted_81);
+  }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_82, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.colorKeys, function (key) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+      key: key,
+      "class": "hc-wfd-color"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "color",
+      value: $props.design[key],
+      disabled: $props.readOnly,
+      onInput: function onInput($event) {
+        return $options.change(_defineProperty({}, key, $event.target.value));
+      }
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_83), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.color.' + key))
+    }, null, 8 /* PROPS */, _hoisted_84), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("code", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.design[key])
+    }, null, 8 /* PROPS */, _hoisted_85)]);
+  }), 128 /* KEYED_FRAGMENT */))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-wfd-group",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_text'))
+  }, null, 8 /* PROPS */, _hoisted_86), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_87, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.font'))
+  }, null, 8 /* PROPS */, _hoisted_88), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $props.design.font,
+    disabled: $props.readOnly,
+    onChange: _cache[32] || (_cache[32] = function ($event) {
+      return $options.change({
+        font: $event.target.value
+      });
+    })
+  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.fonts, function (font) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: font,
+      value: font,
+      style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)({
+        fontFamily: $data.fontCss[font]
+      }),
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.fonts.' + font))
+    }, null, 12 /* STYLE, PROPS */, _hoisted_90);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_89)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-wfd-group",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_parts'))
+  }, null, 8 /* PROPS */, _hoisted_91), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_92, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: $props.design.logo === 'project',
+    disabled: $props.readOnly,
+    onChange: _cache[33] || (_cache[33] = function ($event) {
+      return $options.change({
+        logo: $event.target.checked ? 'project' : 'none'
+      });
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_93), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.logo'))
+  }, null, 8 /* PROPS */, _hoisted_94)]), $props.design.style === 'branded' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_95, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: $props.design.show_title,
+    disabled: $props.readOnly,
+    onChange: _cache[34] || (_cache[34] = function ($event) {
+      return $options.change({
+        show_title: $event.target.checked
+      });
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_96), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.show_title'))
+  }, null, 8 /* PROPS */, _hoisted_97)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_98, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: $props.design.show_signature,
+    disabled: $props.readOnly,
+    onChange: _cache[35] || (_cache[35] = function ($event) {
+      return $options.change({
+        show_signature: $event.target.checked
+      });
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_99), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.show_signature'))
+  }, null, 8 /* PROPS */, _hoisted_100)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_101, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: $props.design.show_footer,
+    disabled: $props.readOnly,
+    onChange: _cache[36] || (_cache[36] = function ($event) {
+      return $options.change({
+        show_footer: $event.target.checked
+      });
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_102), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.show_footer'))
+  }, null, 8 /* PROPS */, _hoisted_103)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+    "class": "hc-wfd-group",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_wording'))
+  }, null, 8 /* PROPS */, _hoisted_104), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_105, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.textKeys, function (key) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+      key: key
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.text.' + key))
+    }, null, 8 /* PROPS */, _hoisted_106), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "text",
+      value: $props.design[key],
+      maxlength: "255",
+      disabled: $props.readOnly,
+      onInput: function onInput($event) {
+        return $options.change(_defineProperty({}, key, $event.target.value));
+      }
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_107)])), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, $options.showsText(key)]]);
+  }), 128 /* KEYED_FRAGMENT */))]), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+    key: 1,
+    type: "button",
+    "class": "hc-wfd-reset",
+    onClick: _cache[37] || (_cache[37] = function ($event) {
+      return _ctx.$emit('update:design', null);
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.design_reset'))
+  }, null, 8 /* PROPS */, _hoisted_108)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" As the prospect will see it: the same drawing as the email sent "), $data.mode === 'preview' || $data.mode === 'design' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_109, [$data.previewError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 0,
+    "class": "hc-wff-warn",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.previewError)
+  }, null, 8 /* PROPS */, _hoisted_110)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.previewLoading ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 1,
+    "class": "hc-wff-count",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.loading'))
+  }, null, 8 /* PROPS */, _hoisted_111)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A frame without any right (sandbox): what the email contains cannot run here "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("iframe", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfe-mail-frame", {
+      small: $data.mode === 'design'
+    }]),
+    sandbox: "",
+    srcdoc: $data.previewHtml || $options.previewDocument,
+    title: _ctx.$t('workflow.email.tab_preview')
+  }, null, 10 /* CLASS, PROPS */, _hoisted_112), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    "class": "hc-wfe-editor-note",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.email.preview_note'))
+  }, null, 8 /* PROPS */, _hoisted_113)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Variables: inserted where the cursor is "), $data.mode === 'edit' && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_114, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.variables'))
+  }, null, 8 /* PROPS */, _hoisted_115), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.variableList, function (variable) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: variable,
+      type: "button",
+      onMousedown: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+        return $options.insert(variable);
+      }, ["prevent"]),
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(variable)
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_116);
+  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);
+}
+
+/***/ }),
+
 /***/ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=template&id=31626764":
 /*!*********************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=template&id=31626764 ***!
@@ -2832,50 +3891,53 @@ var _hoisted_2 = {
 var _hoisted_3 = ["checked", "disabled"];
 var _hoisted_4 = ["textContent"];
 var _hoisted_5 = ["value", "disabled"];
-var _hoisted_6 = ["value", "disabled"];
-var _hoisted_7 = {
+var _hoisted_6 = ["value", "placeholder", "disabled"];
+var _hoisted_7 = ["value", "disabled"];
+var _hoisted_8 = {
   key: 0,
   "class": "hc-wff-variables"
 };
-var _hoisted_8 = ["textContent"];
-var _hoisted_9 = ["onClick", "textContent"];
-var _hoisted_10 = ["value", "disabled"];
-var _hoisted_11 = ["textContent"];
-var _hoisted_12 = ["value", "textContent"];
-var _hoisted_13 = {
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["onClick", "textContent"];
+var _hoisted_11 = ["value", "disabled"];
+var _hoisted_12 = ["textContent"];
+var _hoisted_13 = ["value", "textContent"];
+var _hoisted_14 = {
   "class": "hc-wff-list"
 };
-var _hoisted_14 = ["checked", "disabled", "onChange"];
-var _hoisted_15 = ["textContent"];
+var _hoisted_15 = ["checked", "disabled", "onChange"];
 var _hoisted_16 = ["textContent"];
-var _hoisted_17 = ["value", "disabled"];
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["value", "textContent"];
+var _hoisted_17 = ["textContent"];
+var _hoisted_18 = ["value", "disabled"];
+var _hoisted_19 = ["textContent"];
 var _hoisted_20 = ["value", "textContent"];
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = ["value", "disabled"];
+var _hoisted_21 = ["value", "textContent"];
+var _hoisted_22 = ["textContent"];
 var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
-var _hoisted_25 = ["value", "disabled"];
-var _hoisted_26 = ["value", "disabled"];
-var _hoisted_27 = {
-  key: 9,
+var _hoisted_24 = ["value", "disabled"];
+var _hoisted_25 = ["textContent"];
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["value", "disabled"];
+var _hoisted_28 = ["value", "disabled"];
+var _hoisted_29 = {
+  key: 11,
   "class": "hc-wff-days"
 };
-var _hoisted_28 = ["checked", "disabled", "onChange"];
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = ["value", "disabled"];
+var _hoisted_30 = ["checked", "disabled", "onChange"];
 var _hoisted_31 = ["textContent"];
-var _hoisted_32 = {
-  key: 12,
+var _hoisted_32 = ["value", "disabled"];
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = {
+  key: 14,
   "class": "hc-wff-create"
 };
-var _hoisted_33 = ["textContent"];
-var _hoisted_34 = ["placeholder"];
-var _hoisted_35 = ["disabled", "textContent"];
-var _hoisted_36 = ["textContent"];
-var _hoisted_37 = ["textContent"];
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = ["placeholder"];
+var _hoisted_37 = ["disabled", "textContent"];
+var _hoisted_38 = ["textContent"];
+var _hoisted_39 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_email_editor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("email-editor");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Yes / no "), $props.type === 'boolean' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     checked: !!$props.modelValue,
@@ -2895,20 +3957,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onInput: _cache[1] || (_cache[1] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value));
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'text' || $props.type === 'html' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'html' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The email: written as in a word processor "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_email_editor, {
+    "model-value": $props.modelValue || '',
+    variables: $props.variables,
+    subject: $props.subject,
+    design: $props.design,
+    "project-name": _ctx.project ? _ctx.project.name : '',
+    "read-only": $props.readOnly,
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      return _ctx.$emit('update:modelValue', $event);
+    }),
+    "onUpdate:design": _cache[3] || (_cache[3] = function ($event) {
+      return _ctx.$emit('update:design', $event);
+    })
+  }, null, 8 /* PROPS */, ["model-value", "variables", "subject", "design", "project-name", "read-only"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'line' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 3
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" One line (the subject of an email) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    maxlength: "255",
+    value: $props.modelValue,
+    placeholder: _ctx.$t('workflow.line_placeholder.' + $props.field.key),
+    disabled: $props.readOnly,
+    onInput: _cache[4] || (_cache[4] = function ($event) {
+      return _ctx.$emit('update:modelValue', $event.target.value);
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 4
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Texts "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     ref: "text",
     rows: "5",
     maxlength: "5000",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[2] || (_cache[2] = function ($event) {
+    onInput: _cache[5] || (_cache[5] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.variables'))
-  }, null, 8 /* PROPS */, _hoisted_8), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.variableList, function (variable) {
+  }, null, 8 /* PROPS */, _hoisted_9), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.variableList, function (variable) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: variable,
       type: "button",
@@ -2916,27 +4004,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.insertVariable(variable);
       },
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(variable)
-    }, null, 8 /* PROPS */, _hoisted_9);
+    }, null, 8 /* PROPS */, _hoisted_10);
   }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $options.isSingle ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 3
+    key: 5
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" One or several items of the project "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onChange: _cache[3] || (_cache[3] = function ($event) {
+    onChange: _cache[6] || (_cache[6] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value));
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.emptyLabel)
-  }, null, 8 /* PROPS */, _hoisted_11), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
+  }, null, 8 /* PROPS */, _hoisted_12), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: option.id,
       value: option.id,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.label)
-    }, null, 8 /* PROPS */, _hoisted_12);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_10)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $options.isMultiple ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 4
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Several items: a click on a line ticks it, no key to hold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
+    }, null, 8 /* PROPS */, _hoisted_13);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_11)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $options.isMultiple ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 6
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Several items: a click on a line ticks it, no key to hold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
       key: option.id,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wff-item", {
@@ -2949,73 +4037,78 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onChange: function onChange($event) {
         return $options.toggleId(option.id);
       }
-    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.label)
-    }, null, 8 /* PROPS */, _hoisted_15)], 2 /* CLASS */);
+    }, null, 8 /* PROPS */, _hoisted_16)], 2 /* CLASS */);
   }), 128 /* KEYED_FRAGMENT */)), !$options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 0,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.chosen_count', {
       count: ($props.modelValue || []).length
     }))
-  }, null, 8 /* PROPS */, _hoisted_16)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'provider' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 5
+  }, null, 8 /* PROPS */, _hoisted_17)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'provider' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 7
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" An operator of the project "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    ref: "provider",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onChange: _cache[4] || (_cache[4] = function ($event) {
+    onChange: _cache[7] || (_cache[7] = function ($event) {
       return $options.chooseProvider($event.target.value);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.choose'))
-  }, null, 8 /* PROPS */, _hoisted_18), $props.modelValue && !$data.providers.some(function (p) {
+  }, null, 8 /* PROPS */, _hoisted_19), $props.modelValue && !$data.providers.some(function (p) {
     return p.ref === $props.modelValue;
   }) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
     key: 0,
     value: $props.modelValue,
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.provider_missing'))
-  }, null, 8 /* PROPS */, _hoisted_19)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.providers, function (provider) {
+  }, null, 8 /* PROPS */, _hoisted_20)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.providers, function (provider) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: provider.ref,
       value: provider.ref,
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(provider.label)
-    }, null, 8 /* PROPS */, _hoisted_20);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_17), !$data.providersLoading && !$data.providers.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.providerLabel(provider))
+    }, null, 8 /* PROPS */, _hoisted_21);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_18), $options.unconfiguredChosen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 0,
+    "class": "hc-wff-count",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.provider_setup.waiting'))
+  }, null, 8 /* PROPS */, _hoisted_22)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.providersLoading && !$data.providers.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 1,
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.no_provider.' + $props.field.capability))
-  }, null, 8 /* PROPS */, _hoisted_21)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.type === 'on_error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 6
+  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.type === 'on_error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 8
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What happens when the step fails "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $props.modelValue || 'fail',
     disabled: $props.readOnly,
-    onChange: _cache[5] || (_cache[5] = function ($event) {
+    onChange: _cache[8] || (_cache[8] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "fail",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.on_error.fail'))
-  }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "continue",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.on_error.continue'))
-  }, null, 8 /* PROPS */, _hoisted_24)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_22)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'time' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 7,
+  }, null, 8 /* PROPS */, _hoisted_26)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_24)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'time' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 9,
     type: "time",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[6] || (_cache[6] = function ($event) {
+    onInput: _cache[9] || (_cache[9] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_25)) : $props.type === 'date' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 8,
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27)) : $props.type === 'date' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 10,
     type: "date",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[7] || (_cache[7] = function ($event) {
+    onInput: _cache[10] || (_cache[10] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value || null);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_26)) : $props.type === 'weekdays' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(7, function (day) {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_28)) : $props.type === 'weekdays' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_29, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(7, function (day) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: day,
       "class": "hc-wff-check"
@@ -3026,52 +4119,52 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onChange: function onChange($event) {
         return $options.toggleDay(day);
       }
-    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.weekday.' + day))
-    }, null, 8 /* PROPS */, _hoisted_29)]);
+    }, null, 8 /* PROPS */, _hoisted_31)]);
   }), 64 /* STABLE_FRAGMENT */))])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 10,
+    key: 12,
     type: "text",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[8] || (_cache[8] = function ($event) {
+    onInput: _cache[11] || (_cache[11] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_30)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Not part of the chain above: it would take the place of its last \"else\" "), $options.isLabels && !$data.labelsLoaded ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-    key: 11,
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_32)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Not part of the chain above: it would take the place of its last \"else\" "), $options.isLabels && !$data.labelsLoaded ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 13,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.loading'))
-  }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A channel is needed to send emails: offer to create it right here "), $options.emptyList && $props.type === 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  }, null, 8 /* PROPS */, _hoisted_33)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A channel is needed to send emails: offer to create it right here "), $options.emptyList && $props.type === 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.why'))
-  }, null, 8 /* PROPS */, _hoisted_33), $options.canAddThread && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_35), $options.canAddThread && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[9] || (_cache[9] = function ($event) {
+    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
       return $data.newThreadName = $event;
     }),
     type: "text",
     maxlength: "50",
     placeholder: _ctx.$t('workflow.thread_create.placeholder'),
-    onKeydown: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onKeydown: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.createThread && $options.createThread.apply($options, arguments);
     }, ["prevent"]), ["enter"]))
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_34), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.newThreadName]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.newThreadName]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     disabled: !$data.newThreadName.trim() || $data.creatingThread,
-    onClick: _cache[11] || (_cache[11] = function () {
+    onClick: _cache[14] || (_cache[14] = function () {
       return $options.createThread && $options.createThread.apply($options, arguments);
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.button'))
-  }, null, 8 /* PROPS */, _hoisted_35)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+  }, null, 8 /* PROPS */, _hoisted_37)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 1,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.ask_admin'))
-  }, null, 8 /* PROPS */, _hoisted_36))])) : $options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-    key: 13,
+  }, null, 8 /* PROPS */, _hoisted_38))])) : $options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 15,
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.empty_list.' + $props.type))
-  }, null, 8 /* PROPS */, _hoisted_37)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -3370,16 +4463,23 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       type: field.type,
       field: field,
       variables: $props.catalog.variables,
+      subject: $options.config.subject || '',
+      design: $options.config.design || null,
       "read-only": $props.readOnly,
       "onUpdate:modelValue": function onUpdateModelValue($event) {
         return $options.setPath(field.key, $event);
       },
-      onProviderLabel: _cache[4] || (_cache[4] = function ($event) {
+      "onUpdate:design": _cache[4] || (_cache[4] = function ($event) {
+        return $options.setConfig({
+          design: $event
+        });
+      }),
+      onProviderLabel: _cache[5] || (_cache[5] = function ($event) {
         return $options.setConfig({
           provider_label: $event
         });
       })
-    }, null, 8 /* PROPS */, ["model-value", "type", "field", "variables", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */);
+    }, null, 8 /* PROPS */, ["model-value", "type", "field", "variables", "subject", "design", "read-only", "onUpdate:modelValue"])], 64 /* STABLE_FRAGMENT */);
   }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 3
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -3389,7 +4489,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.waitMode,
     disabled: $props.readOnly,
-    onChange: _cache[5] || (_cache[5] = function ($event) {
+    onChange: _cache[6] || (_cache[6] = function ($event) {
       return $options.setWaitMode($event.target.value);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
@@ -3423,7 +4523,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "model-value": $options.config.until_time,
     type: "time",
     "read-only": $props.readOnly,
-    "onUpdate:modelValue": _cache[6] || (_cache[6] = function ($event) {
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
       return $options.setConfig({
         until_time: $event
       });
@@ -3435,7 +4535,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "model-value": $options.config.days,
     type: "weekdays",
     "read-only": $props.readOnly,
-    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
       return $options.setConfig({
         days: $event
       });
@@ -3449,7 +4549,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "datetime-local",
     value: ($options.config.until_date || '').replace(' ', 'T'),
     disabled: $props.readOnly,
-    onInput: _cache[8] || (_cache[8] = function ($event) {
+    onInput: _cache[9] || (_cache[9] = function ($event) {
       return $options.setConfig({
         until_date: $event.target.value.replace('T', ' ')
       });
@@ -3467,7 +4567,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.config.event,
     disabled: $props.readOnly,
-    onChange: _cache[9] || (_cache[9] = function ($event) {
+    onChange: _cache[10] || (_cache[10] = function ($event) {
       return $options.setConfig({
         event: $event.target.value
       });
@@ -3538,7 +4638,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     type: "button",
     "class": "hc-wfn-delete",
     title: _ctx.$t('workflow.tip.remove_node'),
-    onClick: _cache[10] || (_cache[10] = function ($event) {
+    onClick: _cache[11] || (_cache[11] = function ($event) {
       return _ctx.$emit('remove');
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.remove_node'))
@@ -4551,6 +5651,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
+function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   get: function get(project) {
@@ -4567,6 +5673,12 @@ __webpack_require__.r(__webpack_exports__);
    */
   update: function update(project, workflow, params) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/workflow/").concat(workflow), params);
+  },
+  /**
+   * The email as it will be sent: { subject, body, design } -> { html }
+   */
+  emailPreview: function emailPreview(project, params) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/workflow-email-preview"), params);
   },
   destroy: function destroy(project, workflow) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/workflow/").concat(workflow));
@@ -4632,11 +5744,18 @@ __webpack_require__.r(__webpack_exports__);
   /**
    * Operators of the project (email, sms, call): reference and name only
    */
+  /**
+   * The operators of a capability. With withMissing, also the ones that are not
+   * configured yet ({ configured, setup }: the window that configures them).
+   */
   providers: function providers(project, capability) {
+    var withMissing = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].get("project/".concat(project, "/workflow-provider"), {
-      params: capability ? {
+      params: _objectSpread(_objectSpread({}, capability ? {
         capability: capability
-      } : {}
+      } : {}), withMissing ? {
+        with_missing: 1
+      } : {})
     });
   }
 });
@@ -4737,6 +5856,170 @@ function triggerConfig(catalog, type) {
   }
   return config;
 }
+
+/***/ }),
+
+/***/ "./resources/js/utils/workflow-email.js":
+/*!**********************************************!*\
+  !*** ./resources/js/utils/workflow-email.js ***!
+  \**********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   COLOR_KEYS: () => (/* binding */ COLOR_KEYS),
+/* harmony export */   FONTS: () => (/* binding */ FONTS),
+/* harmony export */   PALETTES: () => (/* binding */ PALETTES),
+/* harmony export */   STYLES: () => (/* binding */ STYLES),
+/* harmony export */   TEXT_KEYS: () => (/* binding */ TEXT_KEYS),
+/* harmony export */   defaultDesign: () => (/* binding */ defaultDesign),
+/* harmony export */   escapeHtml: () => (/* binding */ escapeHtml),
+/* harmony export */   hasContent: () => (/* binding */ hasContent),
+/* harmony export */   safeUrl: () => (/* binding */ safeUrl),
+/* harmony export */   withSamples: () => (/* binding */ withSamples)
+/* harmony export */ });
+/**
+ * Helpers of the email editor of the workflows. Pure functions, tested without Vue.
+ */
+
+// What the preview shows for each variable: an example, never real data
+var SAMPLE = {
+  prospect: {
+    firstname: "Marie",
+    lastname: "Dupont",
+    fullname: "Marie Dupont",
+    email: "marie.dupont@exemple.fr",
+    phone: "01 23 45 67 89",
+    mobile: "06 12 34 56 78",
+    company: "Société Exemple",
+    city: "Lyon",
+    postal_code: "69001",
+    country: "France"
+  },
+  user: {
+    firstname: "Paul",
+    lastname: "Martin",
+    fullname: "Paul Martin",
+    email: "paul.martin@exemple.fr"
+  },
+  project: {
+    name: "Votre projet"
+  }
+};
+function escapeHtml(text) {
+  return String(text).replace(/[&<>"']/g, function (c) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    }[c];
+  });
+}
+
+/**
+ * The text with the variables {{group.name}} replaced by an example. A
+ * variable that does not exist is left as it is, so that a typo can be seen.
+ */
+function withSamples(html) {
+  var projectName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+  return String(html || "").replace(/\{\{\s*(\w+)\.(\w+)\s*\}\}/g, function (match, group, name) {
+    var value = group.toLowerCase() === "project" && name.toLowerCase() === "name" && projectName ? projectName : (SAMPLE[group.toLowerCase()] || {})[name.toLowerCase()];
+    return value === undefined ? match : escapeHtml(value);
+  });
+}
+
+/**
+ * A link or an image address the editor accepts: web and mail addresses only
+ * (never "javascript:"). Returns the address, or null.
+ */
+function safeUrl(url) {
+  var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+    _ref$image = _ref.image,
+    image = _ref$image === void 0 ? false : _ref$image;
+  var value = String(url || "").trim();
+  if (!value) {
+    return null;
+  }
+  var allowed = image ? /^https?:\/\//i : /^(https?:\/\/|mailto:|tel:)/i;
+  if (allowed.test(value)) {
+    return value;
+  }
+
+  // "www.exemple.fr" and "exemple.fr/page" are links the way people write them
+  if (!image && /^[\w-]+(\.[\w-]+)+([/?#].*)?$/.test(value) && !/\s/.test(value)) {
+    return "https://" + value;
+  }
+  return null;
+}
+
+/**
+ * Is there something to read in the HTML? (An empty paragraph is not content.)
+ */
+function hasContent(html) {
+  var text = String(html || "").replace(/<img\b[^>]*>/gi, "x").replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+  return text !== "";
+}
+
+/**
+ * The design of an email, with what the server uses when nothing was chosen
+ * (App\Workflows\Actions\EmailDesign::defaults: keep both in step).
+ */
+function defaultDesign() {
+  var projectName = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "";
+  var name = projectName || "";
+  return {
+    style: "branded",
+    font: "arial",
+    header_color: "#163b52",
+    accent_color: "#4a8796",
+    background_color: "#f3f6f8",
+    text_color: "#42515b",
+    logo: "none",
+    show_title: true,
+    show_signature: true,
+    show_footer: true,
+    brand_name: name,
+    brand_label: "",
+    category: "",
+    closing: "Bien cordialement,",
+    signature_name: name,
+    sent_by: name ? "Un message envoy\xE9 par ".concat(name, ".") : "",
+    rights: name ? "\xA9 ".concat(new Date().getFullYear(), " ").concat(name, " \xB7 Tous droits r\xE9serv\xE9s.") : ""
+  };
+}
+
+// Colour schemes to start from: the header and the accent, one click
+var PALETTES = [{
+  key: "blue",
+  header_color: "#163b52",
+  accent_color: "#4a8796"
+}, {
+  key: "indigo",
+  header_color: "#3a49c9",
+  accent_color: "#7b88f0"
+}, {
+  key: "green",
+  header_color: "#14633a",
+  accent_color: "#2e9d5c"
+}, {
+  key: "purple",
+  header_color: "#5b2a86",
+  accent_color: "#8e5bd6"
+}, {
+  key: "orange",
+  header_color: "#a8470f",
+  accent_color: "#e8892f"
+}, {
+  key: "black",
+  header_color: "#1f2330",
+  accent_color: "#6b7080"
+}];
+var FONTS = ["arial", "verdana", "tahoma", "trebuchet", "georgia", "times"];
+var STYLES = ["branded", "simple"];
+var COLOR_KEYS = ["header_color", "accent_color", "text_color", "background_color"];
+var TEXT_KEYS = ["brand_name", "brand_label", "category", "closing", "signature_name", "sent_by", "rights"];
 
 /***/ }),
 
@@ -5565,6 +6848,29 @@ ___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfc { position: relative; paddin
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css":
+/*!***************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css ***!
+  \***************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0__);
+// Imports
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-wfe-editor {\n    display: flex;\n    flex-direction: column;\n    gap: 6px;\n    width: 100%;\n}\n.hc-wfe-editor-tabs {\n    display: flex;\n    gap: 4px;\n}\n.hc-wfe-editor .hc-wfe-editor-tabs button {\n    padding: 4px 12px;\n    color: #5d6272;\n    background: #f0f1f6;\n    border: 0;\n    border-radius: 14px;\n    font-size: 12px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-wfe-editor .hc-wfe-editor-tabs button.active {\n    color: #fff;\n    background: #4b5ce8;\n}\n.hc-wfe-editor-toolbar {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 2px;\n    padding: 4px;\n    background: #f6f7fb;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n}\n.hc-wfe-editor-toolbar button,\n.hc-wfe-editor-color {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-sizing: border-box;\n    width: 28px;\n    min-width: 28px;\n    height: 28px;\n    margin: 0;\n    padding: 0;\n    color: #2b2f3a;\n    background: transparent;\n    border: 0;\n    border-radius: 6px;\n    font-size: 13px;\n    cursor: pointer;\n}\n.hc-wfe-editor-toolbar button:hover,\n.hc-wfe-editor-color:hover {\n    background: #e3e6f3;\n}\n.hc-wfe-editor-toolbar select {\n    width: auto;\n    max-width: 120px;\n    padding: 4px 6px;\n    font-size: 12px;\n}\n.hc-wfe-editor-sep {\n    width: 1px;\n    height: 18px;\n    margin: 0 3px;\n    background: #d5d9e4;\n}\n.hc-wfe-editor-color {\n    position: relative;\n}\n.hc-wfe-editor-color input {\n    position: absolute;\n    inset: 0;\n    width: 100%;\n    height: 100%;\n    padding: 0;\n    opacity: 0;\n    cursor: pointer;\n}\n.hc-wfe-editor-color-a {\n    padding: 0 4px;\n    border-bottom: 3px solid #222;\n    font-size: 13px;\n    font-weight: 700;\n    line-height: 1.1;\n}\n.hc-wfe-editor-area {\n    min-height: 180px;\n    max-height: 420px;\n    padding: 12px;\n    overflow: auto;\n    color: #222;\n    background: #fff;\n    border: 1px solid #d5d9e4;\n    border-radius: 8px;\n    font-family: Arial, Helvetica, sans-serif;\n    font-size: 14px;\n    line-height: 1.5;\n}\n.hc-wfe-editor-area:focus {\n    border-color: #5b6cf0;\n    box-shadow: 0 0 0 3px rgba(91, 108, 240, 0.15);\n    outline: 0;\n}\n.hc-wfe-editor-area:empty::before {\n    color: #9aa0b0;\n    content: attr(data-placeholder);\n}\n.hc-wfe-editor-area h1 {\n    margin: 0 0 8px;\n    font-size: 22px;\n}\n.hc-wfe-editor-area h2 {\n    margin: 0 0 8px;\n    font-size: 18px;\n}\n.hc-wfe-editor-area h3 {\n    margin: 0 0 8px;\n    font-size: 15px;\n}\n.hc-wfe-editor-area p {\n    margin: 0 0 8px;\n}\n.hc-wfe-editor-area img {\n    max-width: 100%;\n}\n.hc-wfe-editor-preview {\n    padding: 12px;\n    background: #eef0f6;\n    border-radius: 8px;\n}\n.hc-wfd {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n    padding: 12px;\n    background: #f6f7fb;\n    border: 1px solid #e3e6ef;\n    border-radius: 10px;\n}\n.hc-wfd-group {\n    margin-top: 6px;\n    color: #3a49c9;\n    font-size: 11px;\n    font-weight: 700;\n    letter-spacing: 0.05em;\n    text-transform: uppercase;\n}\n.hc-wfd-standard p {\n    margin: 4px 0 10px;\n    color: #5d6272;\n    font-size: 12px;\n}\n.hc-wfd .hc-wfd-primary,\n.hc-wfd .hc-wfd-reset {\n    align-self: flex-start;\n    padding: 7px 14px;\n    border-radius: 8px;\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n}\n.hc-wfd .hc-wfd-primary {\n    color: #fff;\n    background: #4b5ce8;\n    border: 0;\n}\n.hc-wfd .hc-wfd-reset {\n    margin-top: 8px;\n    color: #5d6272;\n    background: #fff;\n    border: 1px solid #d5d9e4;\n}\n.hc-wfd-styles {\n    display: grid;\n    grid-template-columns: 1fr 1fr;\n    gap: 8px;\n}\n.hc-wfd .hc-wfd-style {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    padding: 8px;\n    text-align: left;\n    background: #fff;\n    border: 2px solid #e3e6ef;\n    border-radius: 10px;\n    cursor: pointer;\n}\n.hc-wfd .hc-wfd-style.on {\n    border-color: #4b5ce8;\n    box-shadow: 0 0 0 3px rgba(75, 92, 232, 0.15);\n}\n.hc-wfd-style strong {\n    font-size: 13px;\n}\n.hc-wfd-style small {\n    color: #7a7f90;\n    font-size: 11px;\n    line-height: 1.3;\n}\n.hc-wfd-thumb {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    height: 64px;\n    padding: 0 0 6px;\n    overflow: hidden;\n    background: #f3f6f8;\n    border-radius: 6px;\n}\n.hc-wfd-thumb-band {\n    height: 16px;\n}\n.hc-wfd-style.simple .hc-wfd-thumb {\n    background: #fff;\n    border: 1px solid #e3e6ef;\n}\n.hc-wfd-style.simple .hc-wfd-thumb-band {\n    display: none;\n}\n.hc-wfd-thumb-line {\n    height: 5px;\n    margin: 0 8px;\n    background: #cfd3de;\n    border-radius: 3px;\n}\n.hc-wfd-thumb-line.short {\n    width: 55%;\n}\n.hc-wfd-palettes {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 6px;\n}\n.hc-wfd .hc-wfd-palette {\n    display: flex;\n    overflow: hidden;\n    width: 44px;\n    height: 26px;\n    padding: 0;\n    background: transparent;\n    border: 2px solid #fff;\n    border-radius: 13px;\n    box-shadow: 0 0 0 1px #d5d9e4;\n    cursor: pointer;\n}\n.hc-wfd .hc-wfd-palette.on {\n    box-shadow: 0 0 0 2px #4b5ce8;\n}\n.hc-wfd-palette span {\n    flex: 1;\n}\n.hc-wfd-colors {\n    display: grid;\n    grid-template-columns: 1fr;\n    gap: 6px;\n}\n.hc-wfd-color {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin: 0;\n    font-size: 12px;\n}\n.hc-wfd-color input[type=\"color\"] {\n    flex: none;\n    width: 30px;\n    height: 26px;\n    padding: 0;\n    background: transparent;\n    border: 1px solid #d5d9e4;\n    border-radius: 6px;\n    cursor: pointer;\n}\n.hc-wfd-color span {\n    flex: 1;\n}\n.hc-wfd-color code {\n    color: #7a7f90;\n    font-size: 11px;\n}\n.hc-wfd-row label,\n.hc-wfd-texts label {\n    display: flex;\n    flex-direction: column;\n    gap: 2px;\n    margin: 0;\n    color: #5d6272;\n    font-size: 11px;\n}\n.hc-wfd-texts {\n    display: grid;\n    grid-template-columns: 1fr;\n    gap: 6px;\n}\n.hc-wfd-toggle {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    margin: 0;\n    font-size: 13px;\n    cursor: pointer;\n}\n.hc-wfe-mail-frame.small {\n    height: 340px;\n}\n.hc-wfe-mail-frame {\n    display: block;\n    width: 100%;\n    height: 420px;\n    background: #eef0f6;\n    border: 0;\n    border-radius: 8px;\n}\n.hc-wfe-editor-note {\n    margin: 8px 0 0;\n    color: #7a7f90;\n    font-size: 11px;\n    text-align: center;\n}\n.hc-wfe-editor.disabled .hc-wfe-editor-area {\n    background: #f6f7fb;\n}\n", ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=style&index=0&id=31626764&lang=css":
 /*!******************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ExecutionSteps.vue?vue&type=style&index=0&id=31626764&lang=css ***!
@@ -5752,6 +7058,35 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ConditionGroup_vue_vue_type_style_index_0_id_4b7d5fce_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css":
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! !../../../../node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js */ "./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js");
+/* harmony import */ var _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_style_index_0_id_7c8c3204_lang_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! !!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css */ "./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css");
+
+            
+
+var options = {};
+
+options.insert = "head";
+options.singleton = false;
+
+var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js__WEBPACK_IMPORTED_MODULE_0___default()(_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_style_index_0_id_7c8c3204_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"], options);
+
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_style_index_0_id_7c8c3204_lang_css__WEBPACK_IMPORTED_MODULE_1__["default"].locals || {});
 
 /***/ }),
 
@@ -5988,6 +7323,36 @@ if (false) {}
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/EmailEditor.vue":
+/*!**********************************************************!*\
+  !*** ./resources/js/components/workflow/EmailEditor.vue ***!
+  \**********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _EmailEditor_vue_vue_type_template_id_7c8c3204__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EmailEditor.vue?vue&type=template&id=7c8c3204 */ "./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204");
+/* harmony import */ var _EmailEditor_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EmailEditor.vue?vue&type=script&lang=js */ "./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js");
+/* harmony import */ var _EmailEditor_vue_vue_type_style_index_0_id_7c8c3204_lang_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css */ "./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css");
+/* harmony import */ var _node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../node_modules/vue-loader/dist/exportHelper.js */ "./node_modules/vue-loader/dist/exportHelper.js");
+
+
+
+
+;
+
+
+const __exports__ = /*#__PURE__*/(0,_node_modules_vue_loader_dist_exportHelper_js__WEBPACK_IMPORTED_MODULE_3__["default"])(_EmailEditor_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_1__["default"], [['render',_EmailEditor_vue_vue_type_template_id_7c8c3204__WEBPACK_IMPORTED_MODULE_0__.render],['__file',"resources/js/components/workflow/EmailEditor.vue"]])
+/* hot reload */
+if (false) {}
+
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__exports__);
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/ExecutionSteps.vue":
 /*!*************************************************************!*\
   !*** ./resources/js/components/workflow/ExecutionSteps.vue ***!
@@ -6213,6 +7578,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js":
+/*!**********************************************************************************!*\
+  !*** ./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__["default"])
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_script_lang_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./EmailEditor.vue?vue&type=script&lang=js */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=script&lang=js");
+ 
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/ExecutionSteps.vue?vue&type=script&lang=js":
 /*!*************************************************************************************!*\
   !*** ./resources/js/components/workflow/ExecutionSteps.vue?vue&type=script&lang=js ***!
@@ -6333,6 +7713,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204":
+/*!****************************************************************************************!*\
+  !*** ./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204 ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   render: () => (/* reexport safe */ _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_template_id_7c8c3204__WEBPACK_IMPORTED_MODULE_0__.render)
+/* harmony export */ });
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_clonedRuleSet_5_use_0_node_modules_vue_loader_dist_templateLoader_js_ruleSet_1_rules_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_template_id_7c8c3204__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!../../../../node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./EmailEditor.vue?vue&type=template&id=7c8c3204 */ "./node_modules/babel-loader/lib/index.js??clonedRuleSet-5.use[0]!./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=template&id=7c8c3204");
+
+
+/***/ }),
+
 /***/ "./resources/js/components/workflow/ExecutionSteps.vue?vue&type=template&id=31626764":
 /*!*******************************************************************************************!*\
   !*** ./resources/js/components/workflow/ExecutionSteps.vue?vue&type=template&id=31626764 ***!
@@ -6446,6 +7841,18 @@ __webpack_require__.r(__webpack_exports__);
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_ConditionGroup_vue_vue_type_style_index_0_id_4b7d5fce_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./ConditionGroup.vue?vue&type=style&index=0&id=4b7d5fce&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/ConditionGroup.vue?vue&type=style&index=0&id=4b7d5fce&lang=css");
+
+
+/***/ }),
+
+/***/ "./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css":
+/*!******************************************************************************************************!*\
+  !*** ./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css ***!
+  \******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_dist_cjs_js_node_modules_css_loader_dist_cjs_js_clonedRuleSet_9_use_1_node_modules_vue_loader_dist_stylePostLoader_js_node_modules_postcss_loader_dist_cjs_js_clonedRuleSet_9_use_2_node_modules_vue_loader_dist_index_js_ruleSet_0_use_0_EmailEditor_vue_vue_type_style_index_0_id_7c8c3204_lang_css__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../node_modules/style-loader/dist/cjs.js!../../../../node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!../../../../node_modules/vue-loader/dist/stylePostLoader.js!../../../../node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!../../../../node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css */ "./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js??clonedRuleSet-9.use[1]!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/postcss-loader/dist/cjs.js??clonedRuleSet-9.use[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./resources/js/components/workflow/EmailEditor.vue?vue&type=style&index=0&id=7c8c3204&lang=css");
 
 
 /***/ }),

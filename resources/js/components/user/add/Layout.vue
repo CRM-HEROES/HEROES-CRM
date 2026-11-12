@@ -158,7 +158,7 @@
                     </item>
                 </item-list>
                 <small class="temp-password-note">
-                    Un mot de passe temporaire sera envoyé par email à l'utilisateur (valable 24 h).
+                    Une invitation sera envoyée par email à l'utilisateur : il choisira lui-même son mot de passe via un lien valable 48 h.
                 </small>
                 <buttons>
                     <button v-text="$t('add')"></button>

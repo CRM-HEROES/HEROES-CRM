@@ -45,11 +45,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   duration: 5000
                 });
                 _this.emailSent = true;
-              })["catch"](function (_ref) {
-                var data = _ref.response.data;
+              })["catch"](function (error) {
+                var tooMany = error && error.response && error.response.status === 429;
                 flashError({
                   title: _this.$t("auth.init_password.title"),
-                  body: _this.$t("auth.init_password.error")
+                  body: _this.$t(tooMany ? "auth.init_password.too_many" : "auth.init_password.error")
                 });
               })["finally"](function () {
                 _this.processing = false;
@@ -123,7 +123,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = function () {
       return $options.resetPassword && $options.resetPassword.apply($options, arguments);
     })
-  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.processing ? _ctx.$t("auth.init_password.send_verification_email") : _ctx.$t("auth.init_password.sending_verification_email")), 9 /* TEXT, PROPS */, _hoisted_9)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash)]);
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.processing ? _ctx.$t("auth.init_password.sending_verification_email") : _ctx.$t("auth.init_password.send_verification_email")), 9 /* TEXT, PROPS */, _hoisted_9)])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_flash)]);
 }
 
 /***/ }),

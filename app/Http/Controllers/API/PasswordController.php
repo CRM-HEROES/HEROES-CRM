@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -12,19 +13,11 @@ class PasswordController extends Controller
     {
         $request->validate([
             'current_password' => ['required', 'string'],
-            'password' => [
-                'required',
-                'string',
-                'min:10',
-                'confirmed',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/',
-            ],
+            'password' => ['required', 'string', 'confirmed', new StrongPassword()],
         ], [
             'current_password.required' => 'Le mot de passe actuel est requis.',
             'password.required' => 'Le nouveau mot de passe est requis.',
-            'password.min' => 'Le nouveau mot de passe doit contenir au moins 10 caractères.',
             'password.confirmed' => 'La confirmation du mot de passe ne correspond pas.',
-            'password.regex' => 'Le nouveau mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre.',
         ]);
 
         $user = $request->user();

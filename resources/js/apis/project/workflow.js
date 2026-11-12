@@ -16,6 +16,12 @@ export default {
     update(project, workflow, params) {
         return ApiService.put(`project/${project}/workflow/${workflow}`, params);
     },
+    /**
+     * The email as it will be sent: { subject, body, design } -> { html }
+     */
+    emailPreview(project, params) {
+        return ApiService.post(`project/${project}/workflow-email-preview`, params);
+    },
     destroy(project, workflow) {
         return ApiService.delete(`project/${project}/workflow/${workflow}`);
     },
@@ -82,9 +88,13 @@ export default {
     /**
      * Operators of the project (email, sms, call): reference and name only
      */
-    providers(project, capability) {
+    /**
+     * The operators of a capability. With withMissing, also the ones that are not
+     * configured yet ({ configured, setup }: the window that configures them).
+     */
+    providers(project, capability, withMissing = false) {
         return ApiService.get(`project/${project}/workflow-provider`, {
-            params: capability ? { capability } : {},
+            params: { ...(capability ? { capability } : {}), ...(withMissing ? { with_missing: 1 } : {}) },
         });
     },
 };

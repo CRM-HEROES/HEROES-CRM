@@ -101,10 +101,13 @@ class AuthenticatorController extends Controller
                 ], 403);
             }
 
+            // Vérifié AVANT de créer le jeton : un nouveau pays non confirmé ne doit rien recevoir
+            if (\App\Services\LoginLocationCheck::check($user, $request->ip())) {
+                return \App\Services\LoginLocationCheck::blockedResponse();
+            }
+
             $token = $user->createToken('HeroesCRM')->plainTextToken;
             \Auth::login($user);
-
-            \App\Services\LoginLocationCheck::check($user, $request->ip());
 
             return $token;
         } catch (\Exception $e) {

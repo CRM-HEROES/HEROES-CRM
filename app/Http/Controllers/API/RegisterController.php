@@ -90,9 +90,15 @@ class RegisterController extends BaseController
                 return $this->sendError('Votre mot de passe temporaire a expiré. Veuillez contacter l’administrateur.', [], 403);
             }
 
-            $success['token'] =  $user->createToken('HeroesCRM')->plainTextToken; 
+            if (\App\Services\LoginLocationCheck::check($user, $request->ip())) {
+                Auth::logout();
+
+                return \App\Services\LoginLocationCheck::blockedResponse();
+            }
+
+            $success['token'] =  $user->createToken('HeroesCRM')->plainTextToken;
             $success['user'] =  $user;
-   
+
             return $this->sendResponse($success, 'User login successfully.');
         }
 

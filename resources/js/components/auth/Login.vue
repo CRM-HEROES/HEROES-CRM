@@ -576,6 +576,18 @@ export default {
                 })
                 .catch((error) => {
                     if (
+                        error.response &&
+                        error.response.status === 403 &&
+                        error.response.data &&
+                        error.response.data.code ===
+                            "location_confirmation_required"
+                    ) {
+                        // Nouveau pays : un email de confirmation a été envoyé
+                        flashError({
+                            title: "Authentification",
+                            body: error.response.data.message,
+                        });
+                    } else if (
                         !(
                             error.response &&
                             error.response.status === 422 &&

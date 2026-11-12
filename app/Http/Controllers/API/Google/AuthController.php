@@ -47,9 +47,13 @@ class AuthController extends Controller
                 ]);
             }
             
+            if (\App\Services\LoginLocationCheck::check($user, $request->ip())) {
+                return \App\Services\LoginLocationCheck::blockedResponse();
+            }
+
             $token = $user->createToken('HeroesCRM')->plainTextToken;
             \Auth::login($user);
-            
+
             return $token;
         }
     }

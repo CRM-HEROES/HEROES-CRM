@@ -94,6 +94,108 @@ class ProviderRegistry
         ];
     }
 
+    /**
+     * The window of the interface that configures an operator (the settings
+     * modals of the CRM), by operator reference
+     */
+    public const SETUP = [
+        self::EMAIL_REF => 'setting-email',
+        'sms:smsbox' => 'setting-smsbox',
+        'sms:ultramsg' => 'setting-ultramsg',
+        'sms:mtarget' => 'setting-mtarget',
+        'sms:brevo' => 'setting-brevo',
+    ];
+
+    /**
+     * The operators that can be configured from the settings, whether the
+     * project did it or not: what the builder offers to choose from.
+     * (The telephony lines are made one by one, they only appear once they exist.)
+     *
+     * @return array<string, array{label: string, operator: string, capability: string}>
+     */
+    protected function known(): array
+    {
+        $known = [self::EMAIL_REF => ['label' => 'Brevo (email)', 'operator' => 'brevo', 'capability' => self::EMAIL]];
+
+        foreach (self::SMS_GATEWAYS as $key => $label) {
+            $known["sms:$key"] = ['label' => $label, 'operator' => $key, 'capability' => self::SMS];
+        }
+
+        return $known;
+    }
+
+    /**
+     * The operators for a capability, the ones configured and the ones that
+     * could be: { ref, label, operator, capabilities, configured, setup }.
+     * "setup" is the window that configures it (null: no window for it).
+     * Still no credential.
+     */
+    public function withMissing(int $projectId, string $capability): array
+    {
+        $configured = $this->forProject($projectId, $capability);
+        $refs = array_column($configured, 'ref');
+        $all = array_map(fn ($provider) => self::public($provider) + [
+            'configured' => true,
+            'setup' => self::SETUP[$provider['ref']] ?? null,
+        ], $configured);
+
+        foreach ($this->known() as $ref => $operator) {
+            if ($operator['capability'] === $capability && !in_array($ref, $refs, true)) {
+                $all[] = [
+                    'ref' => $ref,
+                    'label' => $operator['label'],
+                    'operator' => $operator['operator'],
+                    'capabilities' => [$capability],
+                    'configured' => false,
+                    'setup' => self::SETUP[$ref] ?? null,
+                ];
+            }
+        }
+
+        return $all;
+    }
+
+    /**
+     * Mail servers by the name of the service that runs them, so that the
+     * operator is shown as "Brevo (SMTP)" and not as an address
+     * (host fragment => [name, operator])
+     */
+    protected const SMTP_SERVICES = [
+        'brevo' => ['Brevo', 'brevo'],
+        'sendinblue' => ['Brevo', 'brevo'],
+        'mailgun' => ['Mailgun', 'mailgun'],
+        'sendgrid' => ['SendGrid', 'sendgrid'],
+        'amazonaws' => ['Amazon SES', 'ses'],
+        'gmail' => ['Gmail', 'gmail'],
+        'google' => ['Google Workspace', 'gmail'],
+        'office365' => ['Microsoft 365', 'microsoft'],
+        'outlook' => ['Microsoft 365', 'microsoft'],
+        'ovh' => ['OVH', 'ovh'],
+        'ionos' => ['IONOS', 'ionos'],
+        'zoho' => ['Zoho', 'zoho'],
+        'mailjet' => ['Mailjet', 'mailjet'],
+        'postmark' => ['Postmark', 'postmark'],
+    ];
+
+    /**
+     * The service behind a mail server: [name, operator], or [null, 'smtp'] for
+     * a server that is not known
+     *
+     * @return array{0: ?string, 1: string}
+     */
+    public static function smtpService(string $host): array
+    {
+        $host = strtolower($host);
+
+        foreach (self::SMTP_SERVICES as $fragment => $service) {
+            if (str_contains($host, $fragment)) {
+                return $service;
+            }
+        }
+
+        return [null, 'smtp'];
+    }
+
     protected function fromSettings(int $projectId): array
     {
         $settings = DB::table('project_settings')
@@ -107,11 +209,21 @@ class ProviderRegistry
         // The email settings of the project (or the platform ones, see ProjectMail)
         $email = $settings->get('email');
 
-        if (!empty($email['api_key']) || !empty($email['host'])) {
+        if (!empty($email['api_key'])) {
             $providers[] = [
                 'ref' => self::EMAIL_REF,
-                'label' => !empty($email['api_key']) ? 'Brevo (email)' : 'SMTP ' . $email['host'],
-                'operator' => !empty($email['api_key']) ? 'brevo' : 'smtp',
+                'label' => 'Brevo (email)',
+                'operator' => 'brevo',
+                'capabilities' => [self::EMAIL],
+            ];
+        } elseif (!empty($email['host'])) {
+            // The mail server of the project: named after the service it belongs to
+            [$name, $operator] = self::smtpService((string) $email['host']);
+
+            $providers[] = [
+                'ref' => self::EMAIL_REF,
+                'label' => $name ? "$name (SMTP)" : 'SMTP ' . $email['host'],
+                'operator' => $operator,
                 'capabilities' => [self::EMAIL],
             ];
         } elseif (env('BREVO_API_KEY') && env('MAIL_FROM_ADDRESS')) {
