@@ -45,7 +45,7 @@ class ProspectAuth extends Notification
         )->url;
 
         $mailMessage = (new MailMessage)
-                    ->from("crm.diris@gmail.com", "Heroes CRM")
+                    ->from("sophie@careline.doctor", "Heroes CRM")
 					->subject("Lien de connexion")
 					->view('client.emails.prospect-auth', [
 						'prospect' => $this->prospect,
