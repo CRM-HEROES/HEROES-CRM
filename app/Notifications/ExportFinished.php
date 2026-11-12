@@ -36,7 +36,7 @@ class ExportFinished extends Mailable/*Notification implements ShouldQueue*/
     {
         $mailMessage = $this
                     ->subject("Export terminé.")
-                    ->from(env('MAIL_USERNAME', 'crm.diris@gmail.com'), "Heroes CRM")
+                    ->from(env('MAIL_USERNAME', 'sophie@careline.doctor'), "Heroes CRM")
                     ->view('emails.export-finished', [
                         'icon' => $this->icon(),
                         'title' => $this->export->project->name,
