@@ -436,7 +436,9 @@ export default {
          */
         hideRequired() {
             setTimeout(() => {
-                this.requiredShown = false;
+                if (!this.searchFocused) {
+                    this.requiredShown = false;
+                }
             }, 200);
         },
 

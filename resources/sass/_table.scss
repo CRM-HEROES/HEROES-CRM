@@ -944,6 +944,13 @@ textarea.hc-default-cell-input {
     transform: scale(1);
 }
 
+.hc-default-header-cell-label.required-shown
+    .hc-default-header-cell-label-different {
+    visibility: visible;
+    opacity: 1;
+    transform: scale(1);
+}
+
 .hc-default-header-cell-options {
     position: absolute;
     left: 0;
