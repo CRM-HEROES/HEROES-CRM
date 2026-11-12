@@ -14,50 +14,69 @@
             ref="search"
         />
 
-        <a
-            :class="[
-                'fa',
-                'fa-asterisk',
-                'hc-default-header-cell-label-required',
-                isRequiredFilter
-                    ? prospectsParamValue(isRequiredFilterKey) == 1
-                        ? 'icon-green'
-                        : 'icon-red'
-                    : 'icon-grey',
-            ]"
-            v-tooltip="
-                isRequiredFilter
-                    ? prospectsParamValue(isRequiredFilterKey) == 1
-                        ? 'Sans ' + column.name
-                        : 'Tous'
-                    : 'Avec ' + column.name
-            "
-            @click.prevent.stop="toggleWithField"
-        ></a>
-
-        <a
-            v-if="!column.meta && column.id == 'street'"
-            :class="[
-                'fa',
-                'fa-check',
-                'hc-default-header-cell-label-valid',
-                isValidFilter
-                    ? prospectsParamValue(isValidFilterKey) == 1
-                        ? 'icon-red'
-                        : 'icon-grey'
-                    : 'icon-green',
-            ]"
-            v-tooltip="
-                isValidFilter
-                    ? prospectsParamValue(isValidFilterKey) == 1
-                        ? column.name + ' non valide'
-                        : 'Tous'
-                    : column.name + ' valide'
-            "
-            @click.prevent.stop="toggleValidField"
-        ></a>
-
         <span v-text="column.name"></span>
+
+        <div class="hc-default-header-cell-label-icons">
+            <a
+                v-if="canDifferent"
+                :class="[
+                    'fa',
+                    'fa-not-equal',
+                    'hc-default-header-cell-label-required',
+                    'hc-default-header-cell-label-different',
+                    different ? 'icon-blue' : 'icon-grey',
+                ]"
+                v-tooltip="
+                    different
+                        ? 'Recherche inverse active : valeurs différentes de la saisie'
+                        : 'Rechercher les valeurs différentes de la saisie'
+                "
+                @click.prevent.stop="toggleDifferent"
+            ></a>
+
+            <a
+                :class="[
+                    'fa',
+                    'fa-asterisk',
+                    'hc-default-header-cell-label-required',
+                    isRequiredFilter
+                        ? prospectsParamValue(isRequiredFilterKey) == 1
+                            ? 'icon-green'
+                            : 'icon-red'
+                        : 'icon-grey',
+                ]"
+                v-tooltip="
+                    isRequiredFilter
+                        ? prospectsParamValue(isRequiredFilterKey) == 1
+                            ? 'Sans ' + column.name
+                            : 'Tous'
+                        : 'Avec ' + column.name
+                "
+                @click.prevent.stop="toggleWithField"
+            ></a>
+
+            <a
+                v-if="!column.meta && column.id == 'street'"
+                :class="[
+                    'fa',
+                    'fa-check',
+                    'hc-default-header-cell-label-valid',
+                    isValidFilter
+                        ? prospectsParamValue(isValidFilterKey) == 1
+                            ? 'icon-red'
+                            : 'icon-grey'
+                        : 'icon-green',
+                ]"
+                v-tooltip="
+                    isValidFilter
+                        ? prospectsParamValue(isValidFilterKey) == 1
+                            ? column.name + ' non valide'
+                            : 'Tous'
+                        : column.name + ' valide'
+                "
+                @click.prevent.stop="toggleValidField"
+            ></a>
+        </div>
 
         <div
             ref="options"
@@ -169,7 +188,15 @@ export default {
             requiredShown: false,
             showOptions: false,
             searchFocused: false,
+            different: false,
         };
+    },
+
+    created() {
+        // Restore the mode when a "different" search is already active
+        // (e.g. filters restored from a saved menu).
+        this.different =
+            this.prospectsParamValue(this.negatedSearchKey) !== undefined;
     },
 
     mounted() {
@@ -238,24 +265,69 @@ export default {
             const value = e.target.value;
             e.target.value = "";
 
+            // In "different" mode, the search excludes the values that
+            // start with the given keyword instead of matching them.
+            const key = this.different ? this.negatedSearchKey : this.searchKey;
+
             try {
                 // Perform search when keyword is given
                 if (value) {
+                    await store.commit(REMOVE_PROSPECT_PARAMS, {
+                        key: this.different ? this.searchKey : this.negatedSearchKey,
+                    });
                     await store.commit(ADD_PROSPECT_PARAMS, {
-                        key: this.searchKey,
+                        key: key,
                         value: value,
                         multiple: false,
                     });
                     // else cancel search
                 } else {
                     await store.commit(REMOVE_PROSPECT_PARAMS, {
-                        key: this.searchKey,
+                        key: key,
                     });
                 }
 
                 // Update prospects list
                 store.dispatch(FETCH_PROSPECTS);
             } finally {
+            }
+        },
+
+        /**
+         * Switch the current field search between "contains" and
+         * "different" (values that do not start with the keyword).
+         * An already active search is moved to the other mode and applied
+         * immediately, so the list flips without retyping the keyword.
+         */
+        async toggleDifferent() {
+            this.$refs.search.focus();
+
+            const positiveValue = this.prospectsParamValue(this.searchKey);
+            const negativeValue = this.prospectsParamValue(this.negatedSearchKey);
+            const value =
+                negativeValue !== undefined ? negativeValue : positiveValue;
+
+            if (negativeValue !== undefined) {
+                this.different = false;
+            } else if (positiveValue !== undefined) {
+                this.different = true;
+            } else {
+                this.different = !this.different;
+            }
+
+            await store.commit(REMOVE_PROSPECT_PARAMS, { key: this.searchKey });
+            await store.commit(REMOVE_PROSPECT_PARAMS, {
+                key: this.negatedSearchKey,
+            });
+
+            if (value !== undefined && value !== "") {
+                await store.commit(ADD_PROSPECT_PARAMS, {
+                    key: this.different ? this.negatedSearchKey : this.searchKey,
+                    value: value,
+                    multiple: false,
+                });
+
+                store.dispatch(FETCH_PROSPECTS);
             }
         },
 
@@ -404,6 +476,27 @@ export default {
             return this.column.category == "meta"
                 ? "meta_" + this.column.id
                 : "field_" + this.column.id;
+        },
+
+        /**
+         * Gest the prospect param used to search the values that are
+         * different from the current field search
+         */
+        negatedSearchKey() {
+            return this.column.category == "meta"
+                ? "withoutMeta_" + this.column.id
+                : "withoutField_" + this.column.id;
+        },
+
+        /**
+         * Text-like fields only (meta or default field)
+         */
+        canDifferent() {
+            return (
+                !!this.field &&
+                ["meta", "default"].includes(this.column.category) &&
+                !["id", "created_at", "updated_at"].includes(this.column.id)
+            );
         },
 
         /**

@@ -77,7 +77,9 @@ export default {
                 {
                     filters: this.fields
                         .map((f) => "field_" + f.slug)
-                        .concat(this.fields.map((f) => "withField_" + f.slug)),
+                        .concat(this.fields.map((f) => "withField_" + f.slug))
+                        .concat(this.fields.map((f) => "withoutField_" + f.slug))
+                        .concat(this.fields.map((f) => "withoutMeta_" + f.slug)),
                     name: "Champs",
                     icon: "fa fa-info icon-blue",
                     slide: "prospects-table-filter-field",

@@ -5479,11 +5479,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return this.prospectsParamExists("thread_" + this.column.id) || this.prospectsParamExists("withMessages", this.column.id);
         // By meta field
       } else if (this.column.category == "meta") {
-        return this.prospectsParamExists("meta_" + this.column.id) || this.prospectsParamExists("withMeta_" + this.column.id);
+        return this.prospectsParamExists("meta_" + this.column.id) || this.prospectsParamExists("withMeta_" + this.column.id) || this.prospectsParamExists("withoutMeta_" + this.column.id);
       }
 
       // By default field
-      return this.prospectsParamExists("field_" + this.column.key) || this.prospectsParamExists("withField_" + this.column.id);
+      return this.prospectsParamExists("field_" + this.column.key) || this.prospectsParamExists("withField_" + this.column.id) || this.prospectsParamExists("withoutField_" + this.column.id);
     },
     id: function id() {
       return "hc-prospects-table-header-" + this.column.category + "-" + this.column.id;
@@ -8662,8 +8662,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       sorting: false,
       requiredShown: false,
       showOptions: false,
-      searchFocused: false
+      searchFocused: false,
+      different: false
     };
+  },
+  created: function created() {
+    // Restore the mode when a "different" search is already active
+    // (e.g. filters restored from a saved menu).
+    this.different = this.prospectsParamValue(this.negatedSearchKey) !== undefined;
   },
   mounted: function mounted() {
     document.addEventListener("click", this.handleDocumentClick);
@@ -8729,42 +8735,104 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     search: function search(e) {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var value;
+        var value, key;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
               value = e.target.value;
               e.target.value = "";
-              _context2.prev = 2;
+
+              // In "different" mode, the search excludes the values that
+              // start with the given keyword instead of matching them.
+              key = _this2.different ? _this2.negatedSearchKey : _this2.searchKey;
+              _context2.prev = 3;
               if (!value) {
-                _context2.next = 8;
+                _context2.next = 11;
                 break;
               }
-              _context2.next = 6;
+              _context2.next = 7;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+                key: _this2.different ? _this2.searchKey : _this2.negatedSearchKey
+              });
+            case 7:
+              _context2.next = 9;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this2.searchKey,
+                key: key,
                 value: value,
                 multiple: false
               });
-            case 6:
-              _context2.next = 10;
+            case 9:
+              _context2.next = 13;
               break;
-            case 8:
-              _context2.next = 10;
+            case 11:
+              _context2.next = 13;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
-                key: _this2.searchKey
+                key: key
               });
-            case 10:
+            case 13:
               // Update prospects list
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
-            case 11:
-              _context2.prev = 11;
-              return _context2.finish(11);
-            case 13:
+            case 14:
+              _context2.prev = 14;
+              return _context2.finish(14);
+            case 16:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[2,, 11, 13]]);
+        }, _callee2, null, [[3,, 14, 16]]);
+      }))();
+    },
+    /**
+     * Switch the current field search between "contains" and
+     * "different" (values that do not start with the keyword).
+     * An already active search is moved to the other mode and applied
+     * immediately, so the list flips without retyping the keyword.
+     */
+    toggleDifferent: function toggleDifferent() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var positiveValue, negativeValue, value;
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
+            case 0:
+              _this3.$refs.search.focus();
+              positiveValue = _this3.prospectsParamValue(_this3.searchKey);
+              negativeValue = _this3.prospectsParamValue(_this3.negatedSearchKey);
+              value = negativeValue !== undefined ? negativeValue : positiveValue;
+              if (negativeValue !== undefined) {
+                _this3.different = false;
+              } else if (positiveValue !== undefined) {
+                _this3.different = true;
+              } else {
+                _this3.different = !_this3.different;
+              }
+              _context3.next = 7;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+                key: _this3.searchKey
+              });
+            case 7:
+              _context3.next = 9;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+                key: _this3.negatedSearchKey
+              });
+            case 9:
+              if (!(value !== undefined && value !== "")) {
+                _context3.next = 13;
+                break;
+              }
+              _context3.next = 12;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+                key: _this3.different ? _this3.negatedSearchKey : _this3.searchKey,
+                value: value,
+                multiple: false
+              });
+            case 12:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+            case 13:
+            case "end":
+              return _context3.stop();
+          }
+        }, _callee3);
       }))();
     },
     /**
@@ -8780,86 +8848,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.findReplaceOpen = true;
     },
     toggleUnique: function toggleUnique() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              _this3.showOptions = false;
-              _context3.next = 3;
+              _this4.showOptions = false;
+              _context4.next = 3;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.UPDATE_FIELD, {
-                id: _this3.field.id,
-                unique: !_this3.field.unique
+                id: _this4.field.id,
+                unique: !_this4.field.unique
               });
             case 3:
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
             case 4:
             case "end":
-              return _context3.stop();
+              return _context4.stop();
           }
-        }, _callee3);
+        }, _callee4);
       }))();
     },
     /**
      *
      */
     toggleWithField: function toggleWithField() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
-            case 0:
-              _this4.$refs.search.focus();
-              _context4.prev = 1;
-              if (_this4.isRequiredFilter) {
-                _context4.next = 7;
-                break;
-              }
-              _context4.next = 5;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this4.isRequiredFilterKey,
-                value: 1,
-                multiple: false
-              });
-            case 5:
-              _context4.next = 14;
-              break;
-            case 7:
-              if (!(_this4.prospectsParamValue(_this4.isRequiredFilterKey) == 1)) {
-                _context4.next = 12;
-                break;
-              }
-              _context4.next = 10;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this4.isRequiredFilterKey,
-                value: 0,
-                multiple: false
-              });
-            case 10:
-              _context4.next = 14;
-              break;
-            case 12:
-              _context4.next = 14;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
-                key: _this4.isRequiredFilterKey
-              });
-            case 14:
-              // Update prospects list
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
-            case 15:
-              _context4.prev = 15;
-              return _context4.finish(15);
-            case 17:
-            case "end":
-              return _context4.stop();
-          }
-        }, _callee4, null, [[1,, 15, 17]]);
-      }))();
-    },
-    /**
-     *
-     */
-    toggleValidField: function toggleValidField() {
       var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
@@ -8867,13 +8879,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               _this5.$refs.search.focus();
               _context5.prev = 1;
-              if (_this5.isValidFilter) {
+              if (_this5.isRequiredFilter) {
                 _context5.next = 7;
                 break;
               }
               _context5.next = 5;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this5.isValidFilterKey,
+                key: _this5.isRequiredFilterKey,
                 value: 1,
                 multiple: false
               });
@@ -8881,13 +8893,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context5.next = 14;
               break;
             case 7:
-              if (!(_this5.prospectsParamValue(_this5.isValidFilterKey) == 1)) {
+              if (!(_this5.prospectsParamValue(_this5.isRequiredFilterKey) == 1)) {
                 _context5.next = 12;
                 break;
               }
               _context5.next = 10;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
-                key: _this5.isValidFilterKey,
+                key: _this5.isRequiredFilterKey,
                 value: 0,
                 multiple: false
               });
@@ -8897,7 +8909,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 12:
               _context5.next = 14;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
-                key: _this5.isValidFilterKey
+                key: _this5.isRequiredFilterKey
               });
             case 14:
               // Update prospects list
@@ -8913,6 +8925,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }))();
     },
     /**
+     *
+     */
+    toggleValidField: function toggleValidField() {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
+            case 0:
+              _this6.$refs.search.focus();
+              _context6.prev = 1;
+              if (_this6.isValidFilter) {
+                _context6.next = 7;
+                break;
+              }
+              _context6.next = 5;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+                key: _this6.isValidFilterKey,
+                value: 1,
+                multiple: false
+              });
+            case 5:
+              _context6.next = 14;
+              break;
+            case 7:
+              if (!(_this6.prospectsParamValue(_this6.isValidFilterKey) == 1)) {
+                _context6.next = 12;
+                break;
+              }
+              _context6.next = 10;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.ADD_PROSPECT_PARAMS, {
+                key: _this6.isValidFilterKey,
+                value: 0,
+                multiple: false
+              });
+            case 10:
+              _context6.next = 14;
+              break;
+            case 12:
+              _context6.next = 14;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.REMOVE_PROSPECT_PARAMS, {
+                key: _this6.isValidFilterKey
+              });
+            case 14:
+              // Update prospects list
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect__WEBPACK_IMPORTED_MODULE_1__.FETCH_PROSPECTS);
+            case 15:
+              _context6.prev = 15;
+              return _context6.finish(15);
+            case 17:
+            case "end":
+              return _context6.stop();
+          }
+        }, _callee6, null, [[1,, 15, 17]]);
+      }))();
+    },
+    /**
      * Show asterisk sign for required search
      */
     showRequired: function showRequired() {
@@ -8922,9 +8990,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      * Hide asterisk sign for required search
      */
     hideRequired: function hideRequired() {
-      var _this6 = this;
+      var _this7 = this;
       setTimeout(function () {
-        _this6.requiredShown = false;
+        _this7.requiredShown = false;
       }, 200);
     }
   },
@@ -8950,12 +9018,25 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return this.column.category == "meta" ? "meta_" + this.column.id : "field_" + this.column.id;
     },
     /**
+     * Gest the prospect param used to search the values that are
+     * different from the current field search
+     */
+    negatedSearchKey: function negatedSearchKey() {
+      return this.column.category == "meta" ? "withoutMeta_" + this.column.id : "withoutField_" + this.column.id;
+    },
+    /**
+     * Text-like fields only (meta or default field)
+     */
+    canDifferent: function canDifferent() {
+      return !!this.field && ["meta", "default"].includes(this.column.category) && !["id", "created_at", "updated_at"].includes(this.column.id);
+    },
+    /**
      * Current field
      */
     field: function field() {
-      var _this7 = this;
+      var _this8 = this;
       return this.fields.find(function (f) {
-        return f["for"] == "prospect" && (_this7.column.category == "meta" ? f.meta && f.slug == _this7.column.id : !f.meta && f.slug == _this7.column.id);
+        return f["for"] == "prospect" && (_this8.column.category == "meta" ? f.meta && f.slug == _this8.column.id : !f.meta && f.slug == _this8.column.id);
       });
     },
     isRequiredFilterKey: function isRequiredFilterKey() {
@@ -15663,33 +15744,36 @@ __webpack_require__.r(__webpack_exports__);
 var _hoisted_1 = ["placeholder"];
 var _hoisted_2 = ["textContent"];
 var _hoisted_3 = {
+  "class": "hc-default-header-cell-label-icons"
+};
+var _hoisted_4 = {
   ref: "options",
   "class": "hc-prospect-header-cell-options"
 };
-var _hoisted_4 = ["aria-expanded"];
-var _hoisted_5 = {
+var _hoisted_5 = ["aria-expanded"];
+var _hoisted_6 = {
   key: 0,
   "class": "hc-prospect-header-cell-options-menu",
   role: "menu"
 };
-var _hoisted_6 = {
+var _hoisted_7 = {
   role: "none"
 };
-var _hoisted_7 = {
+var _hoisted_8 = {
   key: 0,
   role: "none"
 };
-var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "fa fa-cog"
 }, null, -1 /* HOISTED */);
-var _hoisted_9 = {
+var _hoisted_10 = {
   key: 1,
   role: "none"
 };
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "fa fa-exchange-alt"
 }, null, -1 /* HOISTED */);
-var _hoisted_11 = {
+var _hoisted_12 = {
   key: 2,
   role: "none"
 };
@@ -15711,61 +15795,67 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $options.search && $options.search.apply($options, arguments);
     }),
     ref: "search"
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_1), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_1), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.name)
+  }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [$options.canDifferent ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+    key: 0,
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-not-equal', 'hc-default-header-cell-label-required', 'hc-default-header-cell-label-different', $data.different ? 'icon-blue' : 'icon-grey']),
     onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.toggleDifferent && $options.toggleDifferent.apply($options, arguments);
+    }, ["prevent", "stop"]))
+  }, null, 2 /* CLASS */)), [[_directive_tooltip, $data.different ? 'Recherche inverse active : valeurs différentes de la saisie' : 'Rechercher les valeurs différentes de la saisie']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-asterisk', 'hc-default-header-cell-label-required', $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'icon-green' : 'icon-red' : 'icon-grey']),
+    onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleWithField && $options.toggleWithField.apply($options, arguments);
     }, ["prevent", "stop"]))
   }, null, 2 /* CLASS */), [[_directive_tooltip, $options.isRequiredFilter ? _ctx.prospectsParamValue($options.isRequiredFilterKey) == 1 ? 'Sans ' + $props.column.name : 'Tous' : 'Avec ' + $props.column.name]]), !$props.column.meta && $props.column.id == 'street' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
-    key: 0,
+    key: 1,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-check', 'hc-default-header-cell-label-valid', $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? 'icon-red' : 'icon-grey' : 'icon-green']),
-    onClick: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleValidField && $options.toggleValidField.apply($options, arguments);
     }, ["prevent", "stop"]))
-  }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.column.name)
-  }, null, 8 /* PROPS */, _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 2 /* CLASS */)), [[_directive_tooltip, $options.isValidFilter ? _ctx.prospectsParamValue($options.isValidFilterKey) == 1 ? $props.column.name + ' non valide' : 'Tous' : $props.column.name + ' valide']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     "class": "hc-prospect-header-cell-options-trigger",
     "aria-label": "Options de la colonne",
     "aria-expanded": $data.showOptions,
-    onClick: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $data.showOptions = !$data.showOptions;
     }, ["prevent", "stop"]))
-  }, " ⁝ ", 8 /* PROPS */, _hoisted_4), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.searchFocused]]), $data.showOptions ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " ⁝ ", 8 /* PROPS */, _hoisted_5), [[vue__WEBPACK_IMPORTED_MODULE_0__.vShow, !$data.searchFocused]]), $data.showOptions ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     role: "menuitem",
-    onClick: _cache[6] || (_cache[6] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.sortBy && $options.sortBy.apply($options, arguments);
     }, ["stop", "prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $options.sortedBy && $options.sortedAsc ? 'fa-caret-down' : 'fa-caret-up'])
   }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Trier "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
     loading: $data.sorting
-  }, null, 8 /* PROPS */, ["loading"])])]), _ctx.can('all.project.field.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    role: "menuitem",
-    onClick: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-      return $options.edit && $options.edit.apply($options, arguments);
-    }, ["stop", "prevent"]))
-  }, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Modifier le champ ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canFindReplace ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 8 /* PROPS */, ["loading"])])]), _ctx.can('all.project.field.update') ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     role: "menuitem",
     onClick: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-      return $options.openFindReplace && $options.openFindReplace.apply($options, arguments);
+      return $options.edit && $options.edit.apply($options, arguments);
     }, ["stop", "prevent"]))
-  }, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Rechercher et remplacer ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canToggleUnique ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Modifier le champ ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canFindReplace ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     role: "menuitem",
     onClick: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.openFindReplace && $options.openFindReplace.apply($options, arguments);
+    }, ["stop", "prevent"]))
+  }, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Rechercher et remplacer ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canToggleUnique ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    role: "menuitem",
+    onClick: _cache[10] || (_cache[10] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.toggleUnique && $options.toggleUnique.apply($options, arguments);
     }, ["stop", "prevent"]))
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', 'fa-clone', $options.field.unique ? 'icon-green' : ''])
   }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.field.unique ? 'Détection des doublons activée' : 'Détecter les doublons'), 1 /* TEXT */)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 512 /* NEED_PATCH */), $data.findReplaceOpen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_find_replace, {
-    key: 1,
+    key: 0,
     column: $props.column,
-    onClose: _cache[10] || (_cache[10] = function ($event) {
+    onClose: _cache[11] || (_cache[11] = function ($event) {
       return $data.findReplaceOpen = false;
     })
   }, null, 8 /* PROPS */, ["column"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);

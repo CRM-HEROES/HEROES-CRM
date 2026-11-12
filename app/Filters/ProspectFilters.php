@@ -767,6 +767,41 @@ class ProspectFilters extends Filters
     }
 
     /**
+     * Build a LIKE pattern matching the values starting with the given
+     * keyword, escaping the LIKE wildcards so they are searched literally.
+     */
+    protected function likePrefix($value) {
+        $value = Str::lower((string) $value);
+        $value = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
+
+        return $value . '%';
+    }
+
+    /**
+     * Search the values that are different from the given keyword: the
+     * comparison is made from the beginning of the value (the value must
+     * not start with the keyword), not inside it.
+     */
+    public function withoutDefaultField($builder, $slug, $value) {
+        return $builder
+            ->whereNotNull($slug)
+            ->where($slug, '<>', '')
+            ->whereRaw("LOWER(`$slug`) NOT LIKE ?", [$this->likePrefix($value)]);
+    }
+
+    /**
+     * Search the meta values that are different from the given keyword,
+     * from the beginning of the value (same rule as withoutDefaultField).
+     */
+    public function withoutMetaField($builder, $slug, $value) {
+        $raw = "JSON_EXTRACT(meta, '$.$slug')";
+
+        return $builder
+            ->whereRaw("$raw IS NOT NULL AND $raw <> ''")
+            ->whereRaw("LOWER($raw) NOT LIKE ?", [$this->likePrefix($value)]);
+    }
+
+    /**
      * Search by default field
      */
     public function withDefaultField($builder, $slug, $value) {
@@ -919,6 +954,24 @@ class ProspectFilters extends Filters
             return $this->withDefaultField(
                 $args[0],
                 Str::replace('withField_', '', $method),
+                $args[1]
+            );
+        }
+
+        // Default field search: values starting with something else
+        if (Str::startsWith($method, 'withoutField_')) {
+            return $this->withoutDefaultField(
+                $args[0],
+                Str::replace('withoutField_', '', $method),
+                $args[1]
+            );
+        }
+
+        // Meta field search: values starting with something else
+        if (Str::startsWith($method, 'withoutMeta_')) {
+            return $this->withoutMetaField(
+                $args[0],
+                Str::replace('withoutMeta_', '', $method),
                 $args[1]
             );
         }

@@ -25986,6 +25986,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           return "field_" + f.slug;
         }).concat(this.fields.map(function (f) {
           return "withField_" + f.slug;
+        })).concat(this.fields.map(function (f) {
+          return "withoutField_" + f.slug;
+        })).concat(this.fields.map(function (f) {
+          return "withoutMeta_" + f.slug;
         })),
         name: "Champs",
         icon: "fa fa-info icon-blue",
@@ -120249,7 +120253,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.force-password-change[data-v-20ca7a5c] {\r\n    position: fixed;\r\n    inset: 0;\r\n    z-index: 99999;\r\n    background-color: #f6f4f9;\r\n    background-image: url(\"/images/bg.jpg\");\r\n    background-size: cover;\r\n    background-position: center;\r\n    display: flex;\r\n    align-items: center;\r\n    justify-content: center;\r\n    padding: 1rem;\n}\n.force-password-card[data-v-20ca7a5c] {\r\n    width: min(420px, 92vw);\r\n    background: #fff8;\r\n    border-radius: 10px;\r\n    padding: 30px;\r\n    color: #212529;\n}\n.logo[data-v-20ca7a5c] {\r\n    display: block;\r\n    width: 140px;\r\n    margin: 0 auto 1rem;\n}\nh2[data-v-20ca7a5c] {\r\n    text-align: center;\r\n    margin-bottom: 1.5rem;\r\n    color: #212529;\n}\n.field-group[data-v-20ca7a5c] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    margin-bottom: 1rem;\n}\nlabel[data-v-20ca7a5c] {\r\n    margin-bottom: 0.35rem;\r\n    color: #212529;\r\n    font-size: 0.92rem;\n}\n.password-input[data-v-20ca7a5c] {\r\n    position: relative;\n}\n.password-input input[data-v-20ca7a5c] {\r\n    width: 100%;\r\n    height: 40px;\r\n    border: 1px solid #ccc;\r\n    border-radius: 5px;\r\n    background: #fff;\r\n    color: #212529;\r\n    padding: 0 40px 0 10px;\n}\n.toggle-password[data-v-20ca7a5c] {\r\n    position: absolute;\r\n    top: 0;\r\n    right: 0;\r\n    width: 40px;\r\n    height: 40px;\r\n    padding: 0;\r\n    border: 0;\r\n    background: transparent;\r\n    color: #555;\r\n    cursor: pointer;\n}\nbutton[data-v-20ca7a5c] {\r\n    width: 100%;\r\n    border: none;\r\n    border-radius: 5px;\r\n    height: 40px;\r\n    background: linear-gradient(121deg, #7939b8 0%, #7a59d8 100%);\r\n    color: white;\r\n    font-weight: 700;\r\n    cursor: pointer;\n}\nbutton[data-v-20ca7a5c]:disabled {\r\n    opacity: 0.7;\r\n    cursor: wait;\n}\n.errors[data-v-20ca7a5c] {\r\n    margin-bottom: 1rem;\r\n    padding: 0.75rem 1rem;\r\n    border-radius: 10px;\r\n    background: rgba(127, 29, 29, 0.45);\r\n    color: #fecaca;\n}\n.errors ul[data-v-20ca7a5c] {\r\n    margin: 0;\r\n    padding-left: 1.2rem;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.force-password-change[data-v-20ca7a5c] {\n    position: fixed;\n    inset: 0;\n    z-index: 99999;\n    background-color: #f6f4f9;\n    background-image: url(\"/images/bg.jpg\");\n    background-size: cover;\n    background-position: center;\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    padding: 1rem;\n}\n.force-password-card[data-v-20ca7a5c] {\n    width: min(420px, 92vw);\n    background: #fff8;\n    border-radius: 10px;\n    padding: 30px;\n    color: #212529;\n}\n.logo[data-v-20ca7a5c] {\n    display: block;\n    width: 140px;\n    margin: 0 auto 1rem;\n}\nh2[data-v-20ca7a5c] {\n    text-align: center;\n    margin-bottom: 1.5rem;\n    color: #212529;\n}\n.field-group[data-v-20ca7a5c] {\n    display: flex;\n    flex-direction: column;\n    margin-bottom: 1rem;\n}\nlabel[data-v-20ca7a5c] {\n    margin-bottom: 0.35rem;\n    color: #212529;\n    font-size: 0.92rem;\n}\n.password-input[data-v-20ca7a5c] {\n    position: relative;\n}\n.password-input input[data-v-20ca7a5c] {\n    width: 100%;\n    height: 40px;\n    border: 1px solid #ccc;\n    border-radius: 5px;\n    background: #fff;\n    color: #212529;\n    padding: 0 40px 0 10px;\n}\n.toggle-password[data-v-20ca7a5c] {\n    position: absolute;\n    top: 0;\n    right: 0;\n    width: 40px;\n    height: 40px;\n    padding: 0;\n    border: 0;\n    background: transparent;\n    color: #555;\n    cursor: pointer;\n}\nbutton[data-v-20ca7a5c] {\n    width: 100%;\n    border: none;\n    border-radius: 5px;\n    height: 40px;\n    background: linear-gradient(121deg, #7939b8 0%, #7a59d8 100%);\n    color: white;\n    font-weight: 700;\n    cursor: pointer;\n}\nbutton[data-v-20ca7a5c]:disabled {\n    opacity: 0.7;\n    cursor: wait;\n}\n.errors[data-v-20ca7a5c] {\n    margin-bottom: 1rem;\n    padding: 0.75rem 1rem;\n    border-radius: 10px;\n    background: rgba(127, 29, 29, 0.45);\n    color: #fecaca;\n}\n.errors ul[data-v-20ca7a5c] {\n    margin: 0;\n    padding-left: 1.2rem;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -120633,7 +120637,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.temp-password-note {\r\n    color: #6b7280;\r\n    font-size: 12px;\r\n    line-height: 1.4;\r\n    margin-top: 8px;\n}\n#hc-user-add-not-found {\r\n    padding: 10px;\r\n    font-size: 13px;\r\n    color: #880000;\r\n    text-align: center;\r\n    white-space: normal;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.temp-password-note {\n    color: #6b7280;\n    font-size: 12px;\n    line-height: 1.4;\n    margin-top: 8px;\n}\n#hc-user-add-not-found {\n    padding: 10px;\n    font-size: 13px;\n    color: #880000;\n    text-align: center;\n    white-space: normal;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -120729,7 +120733,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
