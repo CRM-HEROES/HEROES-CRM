@@ -31,10 +31,9 @@ class BanController extends Controller
         abort_unless(auth()->user()->is_super_admin, 404);
         abort_unless(auth()->id() != $user->id, 404);
 
-        $user
-            ->update([
-                'banned_at' => null
-            ]);
+        $user->banned_at = null;
+        $user->failed_login_attempts = 0;
+        $user->save();
 
         return ['message' => trans('common.success.detached_resource')];
     }

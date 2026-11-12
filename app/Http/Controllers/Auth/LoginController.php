@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
+use App\Models\User;
+use App\Services\LoginAttemptLimiter;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
@@ -41,11 +44,34 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
 
+    protected function credentials(Request $request): array
+    {
+        return array_merge(
+            $request->only($this->username(), 'password'),
+            ['banned_at' => null]
+        );
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        app(LoginAttemptLimiter::class)->recordFailure(
+            $request->input($this->username())
+        );
+
+        throw ValidationException::withMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
+    }
+
     /**
      * When user is authenticated
      */
     protected function authenticated(Request $request, Authenticatable $user)
     {
+        if ($user instanceof User) {
+            app(LoginAttemptLimiter::class)->reset($user);
+        }
+
         if (!empty($user->two_factors_secret)) {
             $session = DB::table('tracker_sessions')
                 ->where([

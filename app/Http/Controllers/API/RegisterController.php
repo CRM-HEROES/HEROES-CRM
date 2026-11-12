@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller as BaseController;
 use App\Models\User;
+use App\Services\LoginAttemptLimiter;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
    
@@ -76,18 +77,25 @@ class RegisterController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
-    public function login(Request $request)
+    public function login(Request $request, LoginAttemptLimiter $loginAttemptLimiter)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user = Auth::user(); 
+        if (Auth::attempt([
+            'email' => $request->email,
+            'password' => $request->password,
+            'banned_at' => null,
+        ])) {
+            $user = Auth::user();
+            if ($user instanceof User) {
+                $loginAttemptLimiter->reset($user);
+            }
             $success['token'] =  $user->createToken('HeroesCRM')->plainTextToken; 
             $success['user'] =  $user;
    
             return $this->sendResponse($success, 'User login successfully.');
         }
 
-        else{ 
-            return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
-        } 
+        $loginAttemptLimiter->recordFailure($request->input('email'));
+
+        return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
     }
 }

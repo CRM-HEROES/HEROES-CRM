@@ -50,6 +50,7 @@ trait UsesInMemoryDatabase
             $table->text('claude_api_key')->nullable();
             $table->unsignedBigInteger('last_project_id')->nullable();
             $table->timestamp('banned_at')->nullable();
+            $table->unsignedInteger('failed_login_attempts')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
