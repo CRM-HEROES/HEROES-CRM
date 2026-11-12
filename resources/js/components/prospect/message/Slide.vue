@@ -286,6 +286,25 @@
                                         </div>
                                         <loading :loading="addingMessage" />
                                     </form>
+
+                                    <!-- Same "Demande traité" as the SMS and voicemail slides -->
+                                    <process-communications
+                                        v-if="
+                                            prospect &&
+                                            tab === 1 &&
+                                            frameTab === 0 &&
+                                            selectedProspectsTab === 0 &&
+                                            slideOpen(name)
+                                        "
+                                        :key="project.slug + ':' + prospect.id"
+                                        :project-slug="project.slug"
+                                        :prospect="prospect"
+                                        type="email"
+                                        :records="prospectMessages"
+                                        :disabled="fetchingMessages"
+                                        show-history
+                                        @close="closeSlide"
+                                    />
                                 </div>
                             </template>
 
@@ -451,10 +470,10 @@
 </style>
 
 <script>
-import { markCommunicationsRead } from "@/utils/incoming-communications";
 import { mapGetters } from "vuex";
 import store from "@/store";
 import ProspectService from "@/apis/project/prospect";
+import { CLOSE_SLIDE } from "@/actions/slide";
 
 import {
     SET_PROSPECT,
@@ -487,6 +506,7 @@ import UploadingAttachmentRow from "./UploadingAttachmentRow.vue";
 import SelectedProspect from "./SelectedProspect.vue";
 import SelectProspect from "../select/Select.vue";
 import EmailComposer from "../email/Composer.vue";
+import ProcessCommunications from "../ProcessCommunications.vue";
 
 export default {
     components: {
@@ -499,6 +519,7 @@ export default {
         SelectedProspect,
         SelectProspect,
         EmailComposer,
+        ProcessCommunications,
     },
 
     data() {
@@ -537,17 +558,8 @@ export default {
     },
 
     methods: {
-        async markDisplayedMessagesRead(records = this.prospectMessages) {
-            const projectSlug = this.project?.slug;
-            const prospectId = this.prospect?.id;
-            const threadId = this.messageThread?.id;
-            await this.$nextTick();
-            if (this.project?.slug === projectSlug && this.prospect?.id === prospectId
-                && this.messageThread?.id === threadId && this.slideOpen(this.name)
-                && this.tab === 1 && this.frameTab === 0 && this.selectedProspectsTab === 0) {
-                return markCommunicationsRead(projectSlug, prospectId, "email",
-                    (records || []).filter(message => message.prospect_id == prospectId && message.thread_id == threadId));
-            }
+        closeSlide() {
+            store.commit(CLOSE_SLIDE);
         },
 
         /**
@@ -875,7 +887,6 @@ export default {
         async open() {
             this.fetchThreads();
             this.fetchSelectedProspects();
-            this.markDisplayedMessagesRead();
             await store.dispatch(GET_SETTING, "email");
         },
 
@@ -1008,7 +1019,6 @@ export default {
 
         async prospectMessages(newValue, oldValue) {
             await this.$nextTick();
-            this.markDisplayedMessagesRead(newValue);
 
             /*if (newValue.length != oldValue.length && this.$refs.messages) {
                 this.$refs.messages.scrollTop =
@@ -1027,7 +1037,6 @@ export default {
 
         async tab(newValue) {
             await this.$nextTick();
-            this.markDisplayedMessagesRead();
 
             if (newValue == 1) {
                 // this.$refs.message.scrollTop = this.$refs.message.scrollHeight;
@@ -1036,14 +1045,6 @@ export default {
                     this.fetchMessageTemplates();
                 }
             }
-        },
-
-        frameTab() {
-            this.markDisplayedMessagesRead();
-        },
-
-        selectedProspectsTab() {
-            this.markDisplayedMessagesRead();
         },
     },
 

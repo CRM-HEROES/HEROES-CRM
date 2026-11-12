@@ -71,7 +71,7 @@ export default {
     props: {
         projectSlug: { type: String, required: true },
         prospect: { type: Object, required: true },
-        type: { type: String, required: true, validator: value => ["sms", "voicemail"].includes(value) },
+        type: { type: String, required: true, validator: value => ["sms", "voicemail", "email"].includes(value) },
         records: { type: Array, default: () => [] },
         disabled: { type: Boolean, default: false },
         showHistory: { type: Boolean, default: false },
@@ -107,6 +107,9 @@ export default {
                 // Profiles opened directly may not have table unread metadata.
                 if (this.type === "sms") {
                     return record.is_incoming || record.from_user === false;
+                }
+                if (this.type === "email") {
+                    return Number(record.from_user) === 0;
                 }
                 return record.from_user === false && (record.call_outcome === "voicemail"
                     || ["voicemail", "voice_mail", "voice mail", "messagerie"].includes(record.status));
@@ -159,7 +162,8 @@ export default {
             try {
                 const { data } = await IncomingCommunicationService.smsHistory(
                     this.projectSlug,
-                    this.prospect.id
+                    this.prospect.id,
+                    this.type
                 );
                 this.history = data;
             } catch (error) {

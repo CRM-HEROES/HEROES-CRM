@@ -33259,6 +33259,12 @@ __webpack_require__.r(__webpack_exports__);
   test: function test(project, setting) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/setting/").concat(setting, "/test"));
   },
+  testImap: function testImap(project) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/setting/email/imap/test"));
+  },
+  syncImap: function syncImap(project) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].post("project/".concat(project, "/setting/email/imap/sync"));
+  },
   destroy: function destroy(project, setting) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/setting/").concat(setting));
   }

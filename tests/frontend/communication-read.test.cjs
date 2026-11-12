@@ -106,20 +106,14 @@ test('opening or refreshing SMS does not process incoming messages', async () =>
     assert.equal(component.methods.markDisplayedSmsRead, undefined);
 });
 
-test('email receipts contain only the displayed prospect and thread', async () => {
+test('opening or refreshing emails does not process incoming messages', async () => {
+    // Like SMS and voicemails, an incoming email is only processed by the
+    // "Demande traité" action, never by opening the conversation.
     const h = panel('email');
-    await h.vm.markDisplayedMessagesRead();
-    assert.deepEqual(h.calls, [['test', 2, 'email', [{ id: 3, prospect_id: 2, thread_id: 8 }]]]);
-});
-
-test('background email panels and a changed prospect do not mark messages read', async () => {
-    const h = panel('email');
-    h.vm.slideOpen = () => false;
-    await h.vm.markDisplayedMessagesRead();
-    assert.deepEqual(h.calls, []);
-    h.vm.slideOpen = () => true;
-    h.vm.$nextTick = async () => { h.vm.prospect = { id: 99 }; };
-    await h.vm.markDisplayedMessagesRead();
+    const component = load('components/prospect/message/Slide.vue', { vuex: { mapGetters: () => ({}) } }).default;
+    assert.equal(component.methods.markDisplayedMessagesRead, undefined);
+    await component.watch.prospectMessages.call(h.vm, h.vm.prospectMessages, []);
+    await component.watch.tab.call(h.vm, 1);
     assert.deepEqual(h.calls, []);
 });
 
@@ -135,6 +129,7 @@ test('playing a voicemail does not process it', () => {
 function processor(type, handler = async () => true) {
     const calls = [], historyRequests = [];
     const component = load('components/prospect/ProcessCommunications.vue', {
+        '@/store': { state: { project: {} }, dispatch: async () => {} },
         '@/utils/incoming-communications': { markCommunicationsRead: async (...args) => {
             calls.push(args); return handler(...args);
         } },
@@ -160,7 +155,7 @@ function processor(type, handler = async () => true) {
 }
 
 test('the process button handles only incoming messages of the displayed prospect', async () => {
-    for (const type of ['sms', 'voicemail']) {
+    for (const type of ['sms', 'voicemail', 'email']) {
         const h = processor(type);
         if (type === 'voicemail') h.vm.records.push({ id: 4, prospect_id: 2, from_user: false, call_outcome: 'missed' });
         await h.vm.process();
@@ -217,7 +212,7 @@ test('SMS processing history loads from the server and refreshes after processin
     const h = processor('sms');
     h.vm.showHistory = true;
     await h.component.created.call(h.vm);
-    assert.deepEqual(h.historyRequests, [['test', 2]]);
+    assert.deepEqual(h.historyRequests, [['test', 2, 'sms']]);
     assert.deepEqual(h.vm.history, [{ id: 1, message: 'Hello', user_name: 'Agent' }]);
 
     await h.vm.process();
@@ -249,19 +244,27 @@ test('SMS messages stay above the form, followed by actions and history', () => 
     assert.match(processorTemplate, /class="hc-button-warning"/);
     assert.match(processorTemplate, /class="hc-button-secondary"/);
 
-    for (const [kind, type] of [['interaction', 'voicemail'], ['message', null]]) {
-        const source = fs.readFileSync(path.join(sourceRoot, `components/prospect/${kind}/Slide.vue`), 'utf8');
+    {
+        const source = fs.readFileSync(path.join(sourceRoot, 'components/prospect/interaction/Slide.vue'), 'utf8');
         const template = baseParse(parse(source).descriptor.template.content);
         const slide = template.children.find(node => node.tag === 'slide');
         const children = slide.children.filter(node => node.type === 1);
         const footer = children.find(node => node.tag === 'process-communications');
-        if (!type) {
-            assert.equal(footer, undefined);
-            continue;
-        }
         assert.equal(children.at(-1), footer);
-        assert.equal(footer.props.find(prop => prop.name === 'type').value.content, type);
+        assert.equal(footer.props.find(prop => prop.name === 'type').value.content, 'voicemail');
         assert.ok(footer.props.some(prop => prop.name === 'if'));
+    }
+
+    {
+        // The email panel keeps the conversation form first, then the process
+        // action and its history, exactly like the SMS panel.
+        const source = fs.readFileSync(path.join(sourceRoot, 'components/prospect/message/Slide.vue'), 'utf8');
+        const formIndex = source.indexOf('<form');
+        const processIndex = source.indexOf('<process-communications');
+        assert.ok(formIndex >= 0 && processIndex > formIndex);
+        assert.match(source.slice(processIndex), /type="email"/);
+        assert.match(source.slice(processIndex), /show-history/);
+        assert.match(source.slice(processIndex), /@close="closeSlide"/);
     }
 });
 
@@ -273,4 +276,30 @@ test('the SMS non-processed action closes the slide', () => {
     }).default;
     component.methods.closeSlide();
     assert.deepEqual(commits, [['CLOSE_SLIDE']]);
+});
+
+test('the email non-processed action closes the slide', () => {
+    const commits = [];
+    const component = load('components/prospect/message/Slide.vue', {
+        vuex: { mapGetters: () => ({}) },
+        '@/store': { commit: (...args) => commits.push(args) },
+    }).default;
+    component.methods.closeSlide();
+    assert.deepEqual(commits, [['CLOSE_SLIDE']]);
+});
+
+test('email processing history is requested with its own type', async () => {
+    const h = processor('email');
+    h.vm.showHistory = true;
+    h.vm.records = [
+        { id: 7, prospect_id: 2, from_user: 0, subject: 'Bonjour', created_at: '2026-11-01T10:00:00Z' },
+    ];
+    h.vm.prospect.unread_communications = { email: [7] };
+    await h.component.created.call(h.vm);
+    assert.deepEqual(h.historyRequests, [['test', 2, 'email']]);
+
+    await h.vm.process();
+    assert.deepEqual(h.calls, [['test', 2, 'email', [h.vm.records[0]]]]);
+    assert.equal(h.historyRequests.length, 2);
+    assert.deepEqual(h.vm.pendingRecords, []);
 });

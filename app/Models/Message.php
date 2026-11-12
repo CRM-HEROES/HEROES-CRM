@@ -25,6 +25,7 @@ class Message extends Model
         'creator_id',
         'from_user',
         'thread_id',
+        'message_id',
         'subject',
         'cc',
         'email_layout',
