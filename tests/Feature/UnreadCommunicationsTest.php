@@ -102,8 +102,8 @@ class UnreadCommunicationsTest extends TestCase
         }
         DB::table('sms')->insert([
             ['id' => 4, 'prospect_id' => 1, 'message' => 'Outgoing', 'from_user' => true, 'is_incoming' => false],
-            ['id' => 5, 'prospect_id' => 3, 'from_user' => false, 'is_incoming' => true],
-            ['id' => 6, 'prospect_id' => 4, 'from_user' => false, 'is_incoming' => true],
+            ['id' => 5, 'prospect_id' => 3, 'message' => null, 'from_user' => false, 'is_incoming' => true],
+            ['id' => 6, 'prospect_id' => 4, 'message' => null, 'from_user' => false, 'is_incoming' => true],
         ]);
         foreach ([1, 2, 3, 4, 5, 6] as $id) {
             DB::table('messages')->insert([
@@ -138,7 +138,7 @@ class UnreadCommunicationsTest extends TestCase
         $this->assertSame(2, $this->counts(1)['sms']);
     }
 
-    public function test_reading_sms_decrements_only_the_current_users_count_and_is_idempotent(): void
+    public function test_reading_sms_is_shared_by_every_user_and_is_idempotent(): void
     {
         $this->actingAs(User::query()->findOrFail(1));
         $body = ['prospect_id' => 1, 'type' => 'sms', 'ids' => [1, 2, 4, 5], 'user_id' => 2];
@@ -146,7 +146,9 @@ class UnreadCommunicationsTest extends TestCase
             ->assertOk()->assertJson(['marked' => 2, 'count' => 4, 'sms' => 1]);
         $this->postJson('/api/project/test/incoming-communications/read', $body)
             ->assertOk()->assertJson(['marked' => 0, 'count' => 4, 'sms' => 1]);
-        $this->assertSame(5, $this->counts(2)['count']);
+        // Processed for the whole project: another user does not see them anymore.
+        $this->assertSame(4, $this->counts(2)['count']);
+        $this->assertSame(1, $this->counts(2)['sms']);
         $this->assertDatabaseCount('communication_reads', 2);
         $this->assertSame([1], DB::table('communication_reads')->distinct()->pluck('user_id')->all());
     }
@@ -171,13 +173,17 @@ class UnreadCommunicationsTest extends TestCase
 
         $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=1')
             ->assertOk()
-            ->assertJsonCount(1)
+            ->assertJsonCount(2)
             ->assertJsonFragment([
                 'id' => 2,
                 'message' => 'Message 2',
                 'user_name' => 'Agent One',
             ])
-            ->assertJsonMissing(['id' => 1, 'message' => 'Message 1']);
+            ->assertJsonFragment([
+                'id' => 1,
+                'message' => 'Message 1',
+                'user_name' => 'Agent One',
+            ]);
 
         $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=3')
             ->assertNotFound();
@@ -207,7 +213,7 @@ class UnreadCommunicationsTest extends TestCase
         $this->assertSame(1, $this->counts(1)['sms']);
     }
 
-    public function test_prospect_icons_receive_only_unread_incoming_ids_for_the_current_user(): void
+    public function test_prospect_icons_receive_only_unread_incoming_ids_shared_by_the_project(): void
     {
         $service = new IncomingCommunications();
         $project = Project::query()->findOrFail(1);
@@ -220,8 +226,10 @@ class UnreadCommunicationsTest extends TestCase
         $this->assertSame(['sms' => [3], 'email' => [2], 'voicemail' => []], $prospects[0]->unread_communications);
         $this->assertSame(['sms' => [], 'email' => [], 'voicemail' => []], $prospects[1]->unread_communications);
 
+        // Another user gets the same unread ids: the processing is shared.
         $service->appendUnread($prospects, $project, 2);
-        $this->assertSame(['sms' => [1, 2, 3], 'email' => [1, 2, 4], 'voicemail' => [1]], $prospects[0]->unread_communications);
+        $this->assertSame(['sms' => [3], 'email' => [2], 'voicemail' => []], $prospects[0]->unread_communications);
+        $this->assertSame(['sms' => [], 'email' => [], 'voicemail' => []], $prospects[1]->unread_communications);
     }
 
     public function test_prospect_unread_queries_are_batched_and_limited_to_the_current_page_and_project(): void

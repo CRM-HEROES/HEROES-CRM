@@ -20737,9 +20737,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
   },
   created: function created() {
-    if (this.showHistory) {
-      this.loadHistory();
-    }
+    // Always load the history: a communication processed by another user
+    // must not be proposed again, even when the history is not displayed.
+    this.loadHistory();
   },
   computed: {
     pendingRecords: function pendingRecords() {
@@ -20797,7 +20797,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return (0,_utils_incoming_communications__WEBPACK_IMPORTED_MODULE_0__.markCommunicationsRead)(_this2.projectSlug, _this2.prospect.id, _this2.type, records);
             case 9:
               if (!_context.sent) {
-                _context.next = 25;
+                _context.next = 24;
                 break;
               }
               (_this2$processedIds = _this2.processedIds).push.apply(_this2$processedIds, _toConsumableArray(records.map(function (record) {
@@ -20818,26 +20818,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context.t0 = _context["catch"](12);
               console.error("Could not refresh prospects after processing communications:", _context.t0);
             case 20:
-              if (!_this2.showHistory) {
-                _context.next = 23;
-                break;
-              }
-              _context.next = 23;
+              _context.next = 22;
               return _this2.loadHistory();
-            case 23:
-              _context.next = 26;
+            case 22:
+              _context.next = 25;
               break;
-            case 25:
+            case 24:
               _this2.error = true;
-            case 26:
-              _context.prev = 26;
+            case 25:
+              _context.prev = 25;
               _this2.processing = false;
-              return _context.finish(26);
-            case 29:
+              return _context.finish(25);
+            case 28:
             case "end":
               return _context.stop();
           }
-        }, _callee, null, [[6,, 26, 29], [12, 17]]);
+        }, _callee, null, [[6,, 25, 28], [12, 17]]);
       }))();
     },
     loadHistory: function loadHistory() {
@@ -20847,30 +20843,42 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
+              if (["sms", "email"].includes(_this3.type)) {
+                _context2.next = 2;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 2:
               _this3.loadingHistory = true;
               _this3.historyError = false;
-              _context2.prev = 2;
-              _context2.next = 5;
+              _context2.prev = 4;
+              _context2.next = 7;
               return _apis_project_incoming_communication__WEBPACK_IMPORTED_MODULE_1__["default"].smsHistory(_this3.projectSlug, _this3.prospect.id, _this3.type);
-            case 5:
+            case 7:
               _yield$IncomingCommun = _context2.sent;
               data = _yield$IncomingCommun.data;
               _this3.history = data;
-              _context2.next = 13;
+
+              // Each history entry is a communication already processed by
+              // someone: it is never pending again, for any user.
+              _this3.processedIds = _toConsumableArray(new Set([].concat(_toConsumableArray(_this3.processedIds), _toConsumableArray((data || []).map(function (entry) {
+                return Number(entry.id);
+              })))));
+              _context2.next = 16;
               break;
-            case 10:
-              _context2.prev = 10;
-              _context2.t0 = _context2["catch"](2);
-              _this3.historyError = true;
             case 13:
               _context2.prev = 13;
-              _this3.loadingHistory = false;
-              return _context2.finish(13);
+              _context2.t0 = _context2["catch"](4);
+              _this3.historyError = true;
             case 16:
+              _context2.prev = 16;
+              _this3.loadingHistory = false;
+              return _context2.finish(16);
+            case 19:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[2, 10, 13, 16]]);
+        }, _callee2, null, [[4, 13, 16, 19]]);
       }))();
     },
     formatDate: function formatDate(value) {

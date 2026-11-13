@@ -28126,6 +28126,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   ADD_MENU: () => (/* binding */ ADD_MENU),
 /* harmony export */   FETCH_MENUS: () => (/* binding */ FETCH_MENUS),
 /* harmony export */   REMOVE_MENU: () => (/* binding */ REMOVE_MENU),
+/* harmony export */   REORDER_MENUS: () => (/* binding */ REORDER_MENUS),
 /* harmony export */   SET_MENU: () => (/* binding */ SET_MENU),
 /* harmony export */   SET_MENUS: () => (/* binding */ SET_MENUS),
 /* harmony export */   SHOW_MENU: () => (/* binding */ SHOW_MENU),
@@ -28138,6 +28139,7 @@ var ADD_MENU = "addMenu";
 var SHOW_MENU = "showMenu";
 var UPDATE_MENU = "updateMenu";
 var REMOVE_MENU = "removeMenu";
+var REORDER_MENUS = "reorderMenus";
 
 /***/ }),
 
@@ -31570,6 +31572,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   destroy: function destroy(project, menu) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("project/".concat(project, "/menu/").concat(menu));
+  },
+  reorder: function reorder(project, ids) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("project/".concat(project, "/menu/order"), {
+      ids: ids
+    });
   }
 });
 
@@ -42840,6 +42847,22 @@ var actions = (_actions = {}, _defineProperty(_actions, _actions_project_menu__W
       }
     }, _callee5);
   }))();
+}), _defineProperty(_actions, _actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.REORDER_MENUS, function (context, ids) {
+  return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+    return _regeneratorRuntime().wrap(function _callee6$(_context6) {
+      while (1) switch (_context6.prev = _context6.next) {
+        case 0:
+          _context6.next = 2;
+          return _apis_project_menu__WEBPACK_IMPORTED_MODULE_0__["default"].reorder(context.state.project.slug, ids);
+        case 2:
+          context.commit(_actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.REORDER_MENUS, ids);
+          return _context6.abrupt("return", ids);
+        case 4:
+        case "end":
+          return _context6.stop();
+      }
+    }, _callee6);
+  }))();
 }), _actions);
 
 /**
@@ -42859,6 +42882,23 @@ var mutations = (_mutations = {}, _defineProperty(_mutations, _actions_project_m
 }), _defineProperty(_mutations, _actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.REMOVE_MENU, function (state, slug) {
   state.project.menus = state.project.menus.filter(function (o) {
     return o.id != slug;
+  });
+}), _defineProperty(_mutations, _actions_project_menu__WEBPACK_IMPORTED_MODULE_1__.REORDER_MENUS, function (state, ids) {
+  var _state$project$menus2;
+  var menus = (_state$project$menus2 = state.project.menus) !== null && _state$project$menus2 !== void 0 ? _state$project$menus2 : [];
+  var positions = new Map(ids.map(function (id, index) {
+    return [Number(id), index + 1];
+  }));
+  var position = function position(menu) {
+    var _positions$get;
+    return (_positions$get = positions.get(Number(menu.id))) !== null && _positions$get !== void 0 ? _positions$get : Number.MAX_SAFE_INTEGER;
+  };
+  state.project.menus = _toConsumableArray(menus).sort(function (menu1, menu2) {
+    return position(menu1) - position(menu2);
+  }).map(function (menu) {
+    return positions.has(Number(menu.id)) ? _objectSpread(_objectSpread({}, menu), {}, {
+      order: positions.get(Number(menu.id))
+    }) : menu;
   });
 }), _mutations);
 

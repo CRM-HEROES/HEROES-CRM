@@ -16,4 +16,7 @@ export default {
     destroy(project, menu) {
         return ApiService.delete(`project/${project}/menu/${menu}`);
     },
+    reorder(project, ids) {
+        return ApiService.put(`project/${project}/menu/order`, { ids });
+    },
 };

@@ -37,12 +37,12 @@ class ProspectFilters extends Filters
                 // Then show only:
                 // - prospects created by the user
                 // - or prospects affected to the user
-                $query
-                    ->where('creator_id', $user->id)
-                    ->orWhereHas('users', function($query) use($user) {
-                        $query->where('id', $user->id);
-                    });
-            });
+            $query
+                ->where('creator_id', $user->id)
+                ->orWhereHas('users', function($query) use($user) {
+                    $query->where('id', $user->id);
+                });
+        });
         });
     }
 
@@ -336,24 +336,18 @@ class ProspectFilters extends Filters
             return $builder;
         }
 
-        $userId = auth()->id();
-
-        return $builder->where(function ($query) use ($userId) {
-            $query->whereHas('messages', function ($messages) use ($userId) {
+        // A processed communication is processed for everyone: the filter only
+        // keeps the prospects having a communication nobody has handled yet.
+        return $builder->where(function ($query) {
+            $query->whereHas('messages', function ($messages) {
                 IncomingCommunications::incoming($messages, 'email');
-                if ($userId !== null) {
-                    IncomingCommunications::excludeRead($messages, 'email', (int) $userId);
-                }
-            })->orWhereHas('sms', function ($sms) use ($userId) {
+                IncomingCommunications::excludeRead($messages, 'email');
+            })->orWhereHas('sms', function ($sms) {
                 IncomingCommunications::incoming($sms, 'sms');
-                if ($userId !== null) {
-                    IncomingCommunications::excludeRead($sms, 'sms', (int) $userId);
-                }
-            })->orWhereHas('interactions', function ($interactions) use ($userId) {
+                IncomingCommunications::excludeRead($sms, 'sms');
+            })->orWhereHas('interactions', function ($interactions) {
                 IncomingCommunications::incoming($interactions, 'voicemail');
-                if ($userId !== null) {
-                    IncomingCommunications::excludeRead($interactions, 'voicemail', (int) $userId);
-                }
+                IncomingCommunications::excludeRead($interactions, 'voicemail');
             });
         });
     }

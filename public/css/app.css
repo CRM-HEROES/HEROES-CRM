@@ -1201,6 +1201,7 @@ textarea.hc-default-cell-input {
   cursor: pointer;
   font-size: 22px;
   line-height: 26px;
+  font-size: small;
 }
 
 .filtered .hc-prospect-header-cell-options-trigger {
