@@ -8992,7 +8992,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     hideRequired: function hideRequired() {
       var _this7 = this;
       setTimeout(function () {
-        _this7.requiredShown = false;
+        if (!_this7.searchFocused) {
+          _this7.requiredShown = false;
+        }
       }, 200);
     }
   },

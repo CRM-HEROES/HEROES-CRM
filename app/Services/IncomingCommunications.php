@@ -139,27 +139,43 @@ class IncomingCommunications
         ])->all());
     }
 
-    public function smsReadHistory(Project $project, int $prospectId): Collection
+    /**
+     * Process history of the incoming communications of a prospect (SMS or
+     * email): who processed it and when.
+     */
+    public function readHistory(Project $project, int $prospectId, string $type = 'sms'): Collection
     {
         $project->prospects()->findOrFail($prospectId);
 
+        if (!in_array($type, ['sms', 'email'], true)) {
+            $type = 'sms';
+        }
+
+        $model = self::TYPES[$type];
+        $table = (new $model())->getTable();
+
         return DB::table('communication_reads')
-            ->join('sms', 'sms.id', '=', 'communication_reads.communication_id')
+            ->join($table, $table . '.id', '=', 'communication_reads.communication_id')
             ->leftJoin('users', 'users.id', '=', 'communication_reads.user_id')
-            ->where('communication_reads.communication_type', 'sms')
-            ->where('sms.prospect_id', $prospectId)
-            ->where(function ($incoming) {
-                $incoming->where('sms.is_incoming', true)
+            ->where('communication_reads.communication_type', $type)
+            ->where($table . '.prospect_id', $prospectId)
+            ->when($type === 'sms', fn ($incoming) => $incoming->where(function ($sms) {
+                $sms->where('sms.is_incoming', true)
                     ->orWhere('sms.from_user', false);
-            })
+            }))
+            ->when($type === 'email', fn ($incoming) => $incoming->where('messages.from_user', false))
             ->orderByDesc('communication_reads.read_at')
-            // ->limit(1)
             ->get([
-                'sms.id',
-                'sms.message',
+                $table . '.id',
+                $type === 'email' ? 'messages.subject as message' : 'sms.message',
                 'communication_reads.user_id',
                 'communication_reads.read_at',
                 'users.name as user_name',
             ]);
+    }
+
+    public function smsReadHistory(Project $project, int $prospectId): Collection
+    {
+        return $this->readHistory($project, $prospectId, 'sms');
     }
 }

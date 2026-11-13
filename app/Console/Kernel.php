@@ -63,6 +63,10 @@ class Kernel extends ConsoleKernel
 
         // Run prospect exports when their requested date and time are reached.
         $schedule->command('exports:dispatch-scheduled-prospects')->everyMinute()->withoutOverlapping(10)->runInBackground();
+
+        // Incoming emails (IMAP). The command only reads the mailboxes of the
+        // projects someone currently has open (see App\Console\Commands\ImapSync).
+        $schedule->command('app:imap-sync')->everyFifteenMinutes()->withoutOverlapping(10)->runInBackground();
     }
 
     /**

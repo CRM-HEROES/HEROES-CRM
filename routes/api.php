@@ -721,6 +721,8 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::get('/setting/{setting}', [ProjectSettingController::class, 'show']);
         Route::match(['PUT', 'PATCH'], '/setting/{setting}', [ProjectSettingController::class, 'update']);
         Route::post('/setting/{setting}/test', [ProjectSettingController::class, 'test']);
+        Route::post('/setting/email/imap/test', [ProjectSettingController::class, 'testImap']);
+        Route::post('/setting/email/imap/sync', [ProjectSettingController::class, 'syncImap']);
         Route::delete('/setting/{setting}', [ProjectSettingController::class, 'destroy']);
 
         // Sms Template

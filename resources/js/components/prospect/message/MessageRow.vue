@@ -2,7 +2,12 @@
     <div class="hc-prospect-message hc-flex-column">
         <div class="hc-prospect-message-header">
             <icon
-                v-if="message.sent"
+                v-if="isIncoming"
+                class="fa fa-inbox icon-blue"
+                title="Email reçu"
+            />
+            <icon
+                v-else-if="message.sent"
                 class="fa fa-check-double icon-green"
                 title="Envoyé"
             />
@@ -12,14 +17,27 @@
             />
             <icon v-else class="fa fa-envelope" />
             <div
+                class="hc-prospect-message-author hc-prospect-message-incoming"
+                v-if="isIncoming"
+                v-text="'Email reçu'"
+            ></div>
+            <div
                 class="hc-prospect-message-author"
-                v-if="message.creator"
+                v-else-if="message.creator"
                 v-text="message.creator.name"
             ></div>
             <span
                 class="hc-item-main-content hc-prospect-message-date"
                 v-text="date"
             ></span>
+            <icon
+                v-if="canReply && isIncoming"
+                tag="a"
+                class="fa fa-reply hc-prospect-message-reply"
+                v-tooltip="'Répondre'"
+                :size="24"
+                @click.prevent="reply"
+            />
             <icon
                 v-if="canEdit"
                 tag="a"
@@ -36,8 +54,9 @@
                 @click.prevent="archive"
                 :size="24"
             />
+            <!-- A received email is never edited nor deleted from the CRM. -->
             <icon
-                v-if="canEdit"
+                v-if="canEdit && !isIncoming"
                 tag="a"
                 class="fa fa-pen"
                 :size="24"
@@ -45,7 +64,7 @@
                 @click.prevent="edit"
             />
             <icon
-                v-if="canEdit"
+                v-if="canEdit && !isIncoming"
                 tag="a"
                 class="fa fa-trash"
                 color="#d9402c"
@@ -54,6 +73,11 @@
                 :size="24"
             />
         </div>
+        <div
+            v-if="message.subject"
+            class="hc-prospect-message-subject"
+            v-text="message.subject"
+        ></div>
         <div class="hc-prospect-message-body" v-html="message.body"></div>
         <div
             v-if="message.error"
@@ -113,6 +137,16 @@
     font-size: 11px;
 }
 
+/* The reply action only appears while the message is hovered. */
+.hc-prospect-message-reply {
+    visibility: hidden;
+}
+
+.hc-prospect-message:hover .hc-prospect-message-reply,
+.hc-prospect-message-reply:focus-visible {
+    visibility: visible;
+}
+
 .hc-prospect-message > * {
     width: 100%;
 }
@@ -127,6 +161,17 @@
     white-space: normal;
     padding: 0 10px;
     word-break: break-all;
+}
+
+.hc-prospect-message-incoming {
+    color: #0b6b8a;
+    font-weight: 600;
+}
+
+.hc-prospect-message-subject {
+    padding: 2px 10px 0 10px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
 }
 
 .hc-prospect-message-error {
@@ -171,6 +216,14 @@ export default {
         message: {
             type: Object,
         },
+
+        /**
+         * The prospect has an email address to answer to.
+         */
+        canReply: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     data() {
@@ -202,6 +255,10 @@ export default {
             } finally {
                 this.removingMessageUser = false;
             }
+        },
+
+        reply() {
+            this.$emit("reply");
         },
 
         edit() {
@@ -244,6 +301,13 @@ export default {
         /**
          *
          */
+        /**
+         * An email sent by the prospect (from_user = 0), not by a user.
+         */
+        isIncoming() {
+            return Number(this.message.from_user) === 0;
+        },
+
         waiting() {
             if (!this.user || !this.message.users) {
                 return null;

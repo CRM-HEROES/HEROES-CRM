@@ -12,6 +12,12 @@ export default {
     test(project, setting) {
         return ApiService.post(`project/${project}/setting/${setting}/test`);
     },
+    testImap(project) {
+        return ApiService.post(`project/${project}/setting/email/imap/test`);
+    },
+    syncImap(project) {
+        return ApiService.post(`project/${project}/setting/email/imap/sync`);
+    },
     destroy(project, setting) {
         return ApiService.delete(`project/${project}/setting/${setting}`);
     },

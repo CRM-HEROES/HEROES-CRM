@@ -9,9 +9,9 @@ export default {
             prospect_id: prospectId, type, ids,
         });
     },
-    smsHistory(project, prospectId) {
+    smsHistory(project, prospectId, type = "sms") {
         return ApiService.get(`project/${project}/incoming-communications/sms-history`, {
-            params: { prospect_id: prospectId },
+            params: { prospect_id: prospectId, type },
         });
     },
 };

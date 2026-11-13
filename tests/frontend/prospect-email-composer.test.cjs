@@ -67,6 +67,59 @@ function panel(fetch = async () => ({ data: { data: [] } })) {
 
 const attachment = (name = 'document.pdf') => new File(['attachment content'], name, { type: 'application/pdf' });
 
+test('replying to an incoming email opens the composer with a Re: subject', () => {
+    const { vm } = panel();
+    vm.tab = 1;
+    vm.replyToEmail({ id: 3, from_user: 0, subject: 'test email entrant' });
+    assert.equal(vm.tab, 3);
+    assert.equal(vm.emailReturnTab, 1);
+    assert.equal(vm.emailDraft.prospect, 12);
+    assert.equal(vm.emailDraft.prospects, null);
+    assert.equal(vm.emailDraft.to, 'lea@example.com');
+    assert.equal(vm.emailDraft.subject, 'Re: test email entrant');
+    assert.match(vm.emailDraft.body, /^Bonjour Léa,/);
+});
+
+test('replying keeps an existing Re: prefix and needs a prospect email', () => {
+    const { vm } = panel();
+    vm.replyToEmail({ id: 3, from_user: 0, subject: 'Re: Suivi' });
+    assert.equal(vm.emailDraft.subject, 'Re: Suivi');
+
+    vm.emailDraft = null;
+    vm.prospect = { id: 12, first_name: 'Léa' };
+    vm.replyToEmail({ id: 3, from_user: 0, subject: 'Suivi' });
+    assert.equal(vm.emailDraft, null);
+    assert.equal(vm.tab, 3);
+});
+
+test('an incoming email shows its subject and never offers edit or delete', () => {
+    const source = fs.readFileSync(
+        path.resolve(__dirname, '../../resources/js/components/prospect/message/MessageRow.vue'),
+        'utf8'
+    );
+    assert.match(source, /v-if="message.subject"/);
+    assert.match(source, /v-text="'Email reçu'"/);
+    // Edit and delete stay available on the other messages only.
+    assert.equal((source.match(/v-if="canEdit && !isIncoming"/g) || []).length, 2);
+    assert.equal((source.match(/v-if="canEdit"/g) || []).length, 1);
+});
+
+test('the reply action is only shown on incoming messages', () => {
+    const source = fs.readFileSync(
+        path.resolve(__dirname, '../../resources/js/components/prospect/message/MessageRow.vue'),
+        'utf8'
+    );
+    assert.match(source, /v-if="canReply && isIncoming"/);
+    const component = load('components/prospect/message/MessageRow.vue', {
+        vuex: { mapGetters: () => ({}) },
+        '@/store': { dispatch: async () => ({}) },
+    });
+    const isIncoming = component.computed.isIncoming;
+    assert.equal(isIncoming.call({ message: { from_user: 0 } }), true);
+    assert.equal(isIncoming.call({ message: { from_user: 1 } }), false);
+    assert.equal(isIncoming.call({ message: { from_user: false } }), true);
+});
+
 test('each of the three reasons opens its form inside the slide without opening a modal', () => {
     for (let index = 0; index < 3; index++) {
         const { vm, commits } = panel();

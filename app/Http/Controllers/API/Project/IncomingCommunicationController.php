@@ -37,10 +37,11 @@ class IncomingCommunicationController extends Controller
         abort_unless($request->user(), 401);
         $values = $request->validate([
             'prospect_id' => ['required', 'integer'],
+            'type' => ['nullable', Rule::in(['sms', 'email'])],
         ]);
 
         return response()->json(
-            $communications->smsReadHistory($project, $values['prospect_id'])
+            $communications->readHistory($project, $values['prospect_id'], $values['type'] ?? 'sms')
         );
     }
 }
