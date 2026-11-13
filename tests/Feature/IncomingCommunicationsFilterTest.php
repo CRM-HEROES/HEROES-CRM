@@ -6,6 +6,7 @@ use App\Filters\ProspectRequestFilters;
 use App\Http\Controllers\API\Project\ProspectController;
 use App\Models\Project;
 use App\Models\User;
+use App\Services\IncomingCommunications;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,10 @@ class IncomingCommunicationsFilterTest extends TestCase
             ],
         ]);
         $schema = DB::connection()->getSchemaBuilder();
+        $schema->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('role')->nullable();
+        });
         $schema->create('projects', function (Blueprint $table) {
             $table->id();
             $table->softDeletes();
@@ -33,9 +38,15 @@ class IncomingCommunicationsFilterTest extends TestCase
             $table->unsignedBigInteger('project_id');
             $table->softDeletes();
         });
+        $schema->create('threads', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id');
+            $table->softDeletes();
+        });
         $schema->create('messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('thread_id')->nullable();
             $table->boolean('from_user')->default(true);
             $table->timestamp('archived_at')->nullable();
             $table->softDeletes();
@@ -64,6 +75,7 @@ class IncomingCommunicationsFilterTest extends TestCase
             $table->timestamp('archived_at')->nullable();
         });
 
+        DB::table('users')->insert(['id' => 1, 'role' => 'super_admin']);
         DB::table('projects')->insert([['id' => 1], ['id' => 2]]);
         foreach (range(1, 12) as $id) {
             DB::table('prospects')->insert([
@@ -79,12 +91,13 @@ class IncomingCommunicationsFilterTest extends TestCase
             ['prospect_id' => 11, 'from_user' => false, 'is_incoming' => false],
             ['prospect_id' => 12, 'from_user' => true, 'is_incoming' => true],
         ]);
+        DB::table('threads')->insert(['id' => 1, 'project_id' => 1]);
         DB::table('messages')->insert([
-            ['prospect_id' => 2, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 4, 'from_user' => true, 'deleted_at' => null],
-            ['prospect_id' => 7, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 7, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 8, 'from_user' => false, 'deleted_at' => '2026-10-19 10:00:00'],
+            ['prospect_id' => 2, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 4, 'thread_id' => 1, 'from_user' => true, 'deleted_at' => null],
+            ['prospect_id' => 7, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 7, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 8, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => '2026-10-19 10:00:00'],
         ]);
         DB::table('interactions')->insert([
             ['prospect_id' => 3, 'from_user' => false, 'status' => 'voicemail', 'data' => null],
@@ -107,6 +120,17 @@ class IncomingCommunicationsFilterTest extends TestCase
         $this->assertSame(6, $count);
     }
 
+    public function test_badge_counts_prospects_like_the_list_not_communications(): void
+    {
+        $project = Project::query()->findOrFail(1);
+        $counts = app(IncomingCommunications::class)->counts($project, 1);
+
+        // Prospect 7 has an unread SMS, two unread emails and a voicemail: it
+        // is one prospect for every number, and one line in the list.
+        $this->assertSame(['count' => 6, 'sms' => 4, 'email' => 2, 'voicemail' => 2], $counts);
+        $this->assertSame(count($this->ids()), $counts['count']);
+    }
+
     public function test_outgoing_messages_regular_recorded_calls_and_deleted_messages_are_excluded(): void
     {
         foreach ([4, 5, 6, 8] as $id) {
@@ -127,13 +151,14 @@ class IncomingCommunicationsFilterTest extends TestCase
         $this->assertSame([1, 2, 3, 4, 5, 6, 7, 8, 11, 12], $this->ids(false));
     }
 
-    public function test_processed_incoming_communications_are_excluded_for_the_current_user(): void
+    public function test_processed_incoming_communications_are_excluded_for_every_user(): void
     {
         Event::fake([Authenticated::class]);
         auth()->setUser((new User())->forceFill(['id' => 1, 'role' => 'super_admin']));
         $smsId = DB::table('sms')->where('prospect_id', 1)->value('id');
+        // Processed by another user: the current user must not see it either.
         DB::table('communication_reads')->insert([
-            'user_id' => 1,
+            'user_id' => 2,
             'communication_type' => 'sms',
             'communication_id' => $smsId,
         ]);

@@ -542,6 +542,7 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::post('logo', [ProjectLogoController::class, 'store']);
 
         // Menu
+        Route::put('menu/order', [ProjectMenuController::class, 'reorder']);
         Route::apiResource('menu', ProjectMenuController::class);
 
         // Menu icon

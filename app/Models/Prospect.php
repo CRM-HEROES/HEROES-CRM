@@ -24,7 +24,7 @@ class Prospect extends Authenticatable
         static::addGlobalScope(new ProspectScope());
     }
     
-    /**
+        /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

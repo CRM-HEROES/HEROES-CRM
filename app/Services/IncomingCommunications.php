@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Filters\ProspectFilters;
 use App\Models\Interaction;
 use App\Models\Message;
+use App\Models\Scopes\ProspectScope;
 use App\Models\Project;
 use App\Models\Sms;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -64,23 +67,31 @@ class IncomingCommunications
         return $query;
     }
 
-    protected function unreadQuery(Project $project, string $type, int $userId): Builder
+    protected function unreadQuery(Project $project, string $type): Builder
     {
-        return self::excludeRead($this->query($project, $type), $type, $userId);
+        return self::excludeRead($this->query($project, $type), $type);
     }
 
-    public static function excludeRead(Builder $query, string $type, int $userId): Builder
+    /**
+     * Remove the communications already processed.
+     *
+     * "Processed" is shared by the whole project: as soon as one user clicked
+     * "Demande traité" on a SMS, an email or a voicemail, it is no longer
+     * pending for the other users, who must not process it again. The user who
+     * processed it is kept in communication_reads, for the history.
+     */
+    public static function excludeRead(Builder $query, string $type): Builder
     {
         $model = self::TYPES[$type];
         $table = (new $model())->getTable();
-        $query->whereNotExists(function ($read) use ($type, $table, $userId) {
+        $query->whereNotExists(function ($read) use ($type, $table) {
             $read->selectRaw('1')->from('communication_reads')
-                ->where('user_id', $userId)->where('communication_type', $type)
+                ->where('communication_type', $type)
                 ->whereColumn('communication_id', $table . '.id');
         });
         if ($type === 'email') {
-            $query->whereNull('archived_at')->whereNotExists(function ($archived) use ($userId) {
-                $archived->selectRaw('1')->from('user_message')->where('user_id', $userId)
+            $query->whereNull('archived_at')->whereNotExists(function ($archived) {
+                $archived->selectRaw('1')->from('user_message')
                     ->whereColumn('message_id', 'messages.id')->whereNotNull('archived_at');
             });
         }
@@ -97,7 +108,7 @@ class IncomingCommunications
         // Load only the current page, with one query per communication type.
         $unread = [];
         foreach (self::TYPES as $type => $model) {
-            $unread[$type] = $this->unreadQuery($project, $type, $userId)
+            $unread[$type] = $this->unreadQuery($project, $type)
                 ->whereIn('prospect_id', $prospects->pluck('id'))
                 ->get(['id', 'prospect_id'])->groupBy('prospect_id');
         }
@@ -111,23 +122,78 @@ class IncomingCommunications
         }
     }
 
+    /**
+     * The numbers announced by the header badge.
+     *
+     * The list opened by that badge shows prospects, not communications: every
+     * number is therefore a number of visible prospects. A prospect with
+     * three unread SMS counts once, and one with multiple communication types
+     * counts once in the total.
+     */
     public function counts(Project $project, int $userId): array
     {
+        $visibleProspects = $this->visibleProspects($project, $userId);
         $counts = [];
         foreach (self::TYPES as $type => $model) {
-            $query = $this->unreadQuery($project, $type, $userId);
-            $counts[$type] = $type === 'sms'
-                ? $query->distinct()->count('prospect_id')
-                : $query->count();
+            $counts[$type] = $this->unreadQuery($project, $type)
+                ->whereIn('prospect_id', (clone $visibleProspects)->select('prospects.id'))
+                ->distinct()
+                ->count('prospect_id');
         }
 
-        return ['count' => array_sum($counts)] + $counts;
+        // Same filter as the list: prospects having at least one unread
+        // incoming communication, whatever its type.
+        $filters = new ProspectFilters();
+        $filters->addFilter('incomingCommunications', true);
+
+        return ['count' => (clone $visibleProspects)->filter($filters)->count()] + $counts;
+    }
+
+    /**
+     * Prospects visible to the user, using the same access rules as the
+     * prospects list and prospect detail routes.
+     */
+    protected function visibleProspects(Project $project, int $userId): Builder
+    {
+        $user = User::query()->findOrFail($userId);
+        $prospects = $project->prospects()->withoutGlobalScope(ProspectScope::class)->getQuery();
+
+        if (
+            $user->is_super_admin
+            || $project->creator_id == $userId
+            || $user->can('', $project)
+            || $user->can('prospectView', $project)
+        ) {
+            return $prospects;
+        }
+
+        return $prospects->where(function ($query) use ($userId) {
+            $query->where('prospects.creator_id', $userId)
+                ->orWhereExists(function ($assigned) use ($userId) {
+                    $assigned->selectRaw('1')->from('prospect_user')
+                        ->whereColumn('prospect_user.prospect_id', 'prospects.id')
+                        ->where('prospect_user.user_id', $userId);
+                })
+                ->orWhereExists(function ($group) use ($userId) {
+                    $group->selectRaw('1')->from('prospect_group')
+                        ->join('user_group', 'user_group.group_id', '=', 'prospect_group.group_id')
+                        ->whereColumn('prospect_group.prospect_id', 'prospects.id')
+                        ->where('user_group.user_id', $userId);
+                });
+        });
     }
 
     public function markRead(Project $project, int $userId, int $prospectId, string $type, array $ids): int
     {
         $project->prospects()->findOrFail($prospectId);
-        $ids = $this->query($project, $type)->where('prospect_id', $prospectId)->whereIn('id', $ids)->pluck('id');
+
+        // Already processed by someone else (or not part of this prospect):
+        // nothing to mark, the communication must not be processed twice.
+        $ids = self::excludeRead(
+            $this->query($project, $type)->where('prospect_id', $prospectId)->whereIn('id', $ids),
+            $type
+        )->pluck('id');
+
         if ($ids->isEmpty()) {
             return 0;
         }

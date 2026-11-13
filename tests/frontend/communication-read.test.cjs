@@ -214,10 +214,30 @@ test('SMS processing history loads from the server and refreshes after processin
     await h.component.created.call(h.vm);
     assert.deepEqual(h.historyRequests, [['test', 2, 'sms']]);
     assert.deepEqual(h.vm.history, [{ id: 1, message: 'Hello', user_name: 'Agent' }]);
+    // A communication already in the history is processed, whoever did it.
+    assert.deepEqual(h.vm.processedIds, [1]);
 
+    h.vm.records.push({ id: 5, prospect_id: 2, from_user: false });
     await h.vm.process();
     assert.equal(h.historyRequests.length, 2);
     assert.deepEqual(h.vm.history[0], { id: 1, message: 'Hello', user_name: 'Agent' });
+    assert.deepEqual(h.vm.processedIds, [1, 5]);
+});
+
+test('a communication processed by another user is not pending anymore', async () => {
+    const h = processor('sms');
+    h.vm.prospect.unread_communications = { sms: [1] };
+    await h.component.created.call(h.vm);
+
+    assert.deepEqual(h.vm.processedIds, [1]);
+    assert.deepEqual(h.vm.pendingRecords, []);
+});
+
+test('voicemail ids are never mixed with the sms processing history', async () => {
+    const h = processor('voicemail');
+    await h.component.created.call(h.vm);
+    assert.equal(h.historyRequests.length, 0);
+    assert.deepEqual(h.vm.processedIds, []);
 });
 
 test('the unread metadata identifies voicemails even when provider fields differ', async () => {

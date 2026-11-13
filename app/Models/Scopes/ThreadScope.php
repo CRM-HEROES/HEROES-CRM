@@ -13,7 +13,7 @@ class ThreadScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-    	if (!auth()->user() || auth()->user()->is_super_admin || auth()->user()->is_project_admin || !getPermissionsTeamId()) {
+    	if (!auth()->user() || auth()->user()->is_super_admin || !getPermissionsTeamId() || auth()->user()->is_project_admin) {
             return;
     	}
     

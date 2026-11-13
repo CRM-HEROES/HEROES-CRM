@@ -14,6 +14,7 @@ use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class UnreadCommunicationsTest extends TestCase
@@ -40,12 +41,53 @@ class UnreadCommunicationsTest extends TestCase
         $schema->create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('slug');
+            $table->unsignedBigInteger('creator_id')->nullable();
             $table->softDeletes();
         });
         $schema->create('prospects', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('creator_id')->nullable();
             $table->softDeletes();
+        });
+        $schema->create('prospect_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('user_id');
+        });
+        $schema->create('prospect_group', function (Blueprint $table) {
+            $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('group_id');
+        });
+        $schema->create('user_group', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('group_id');
+        });
+        $schema->create('permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('guard_name');
+        });
+        $schema->create('model_has_permissions', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->unsignedBigInteger('permission_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+        });
+        $schema->create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->string('name');
+            $table->string('guard_name');
+        });
+        $schema->create('model_has_roles', function (Blueprint $table) {
+            $table->unsignedBigInteger('project_id')->nullable();
+            $table->unsignedBigInteger('role_id');
+            $table->string('model_type');
+            $table->unsignedBigInteger('model_id');
+        });
+        $schema->create('role_has_permissions', function (Blueprint $table) {
+            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('permission_id');
         });
         $schema->create('threads', function (Blueprint $table) {
             $table->id();
@@ -80,10 +122,12 @@ class UnreadCommunicationsTest extends TestCase
             $table->json('data')->nullable();
         });
         (require database_path('migrations/2026_10_20_000000_create_communication_reads_table.php'))->up();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         DB::table('users')->insert([
-            ['id' => 1, 'name' => 'Agent One'],
-            ['id' => 2, 'name' => 'Agent Two'],
+            ['id' => 1, 'name' => 'Agent One', 'role' => 'super_admin'],
+            ['id' => 2, 'name' => 'Agent Two', 'role' => 'super_admin'],
+            ['id' => 3, 'name' => 'Agent Three', 'role' => 'agent'],
         ]);
         DB::table('projects')->insert([['id' => 1, 'slug' => 'test'], ['id' => 2, 'slug' => 'other']]);
         foreach ([1 => 1, 2 => 1, 3 => 2, 4 => 1] as $id => $projectId) {
@@ -102,8 +146,8 @@ class UnreadCommunicationsTest extends TestCase
         }
         DB::table('sms')->insert([
             ['id' => 4, 'prospect_id' => 1, 'message' => 'Outgoing', 'from_user' => true, 'is_incoming' => false],
-            ['id' => 5, 'prospect_id' => 3, 'from_user' => false, 'is_incoming' => true],
-            ['id' => 6, 'prospect_id' => 4, 'from_user' => false, 'is_incoming' => true],
+            ['id' => 5, 'prospect_id' => 3, 'message' => null, 'from_user' => false, 'is_incoming' => true],
+            ['id' => 6, 'prospect_id' => 4, 'message' => null, 'from_user' => false, 'is_incoming' => true],
         ]);
         foreach ([1, 2, 3, 4, 5, 6] as $id) {
             DB::table('messages')->insert([
@@ -123,12 +167,15 @@ class UnreadCommunicationsTest extends TestCase
     protected function tearDown(): void
     {
         DB::purge('unread_communications_test');
+        setPermissionsTeamId(null);
         parent::tearDown();
     }
 
     public function test_unread_sms_count_once_per_prospect(): void
     {
-        $this->assertSame(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1], $this->counts(1));
+        // The badge announces prospects, like the list it opens: prospect 1
+        // has unread SMS, emails and a voicemail, it counts once.
+        $this->assertSame(['count' => 1, 'sms' => 1, 'email' => 1, 'voicemail' => 1], $this->counts(1));
 
         DB::table('sms')->insert([
             'id' => 7,
@@ -136,17 +183,38 @@ class UnreadCommunicationsTest extends TestCase
             'message' => 'Another prospect',
         ]);
         $this->assertSame(2, $this->counts(1)['sms']);
+        $this->assertSame(2, $this->counts(1)['count']);
     }
 
-    public function test_reading_sms_decrements_only_the_current_users_count_and_is_idempotent(): void
+    public function test_count_includes_only_prospects_visible_to_the_user(): void
+    {
+        setPermissionsTeamId(1);
+        DB::table('prospect_user')->insert(['prospect_id' => 2, 'user_id' => 3]);
+        DB::table('sms')->insert(['id' => 7, 'prospect_id' => 2]);
+        DB::table('messages')->insert([
+            'id' => 7, 'prospect_id' => 2, 'thread_id' => 1, 'from_user' => false,
+        ]);
+        DB::table('interactions')->insert([
+            'id' => 4, 'prospect_id' => 2, 'from_user' => false, 'status' => 'voicemail', 'data' => null,
+        ]);
+
+        $this->assertSame(
+            ['count' => 1, 'sms' => 1, 'email' => 1, 'voicemail' => 1],
+            $this->counts(3)
+        );
+    }
+
+    public function test_reading_sms_is_shared_by_every_user_and_is_idempotent(): void
     {
         $this->actingAs(User::query()->findOrFail(1));
         $body = ['prospect_id' => 1, 'type' => 'sms', 'ids' => [1, 2, 4, 5], 'user_id' => 2];
         $this->postJson('/api/project/test/incoming-communications/read', $body)
-            ->assertOk()->assertJson(['marked' => 2, 'count' => 4, 'sms' => 1]);
+            ->assertOk()->assertJson(['marked' => 2, 'count' => 1, 'sms' => 1]);
         $this->postJson('/api/project/test/incoming-communications/read', $body)
-            ->assertOk()->assertJson(['marked' => 0, 'count' => 4, 'sms' => 1]);
-        $this->assertSame(5, $this->counts(2)['count']);
+            ->assertOk()->assertJson(['marked' => 0, 'count' => 1, 'sms' => 1]);
+        // Processed for the whole project: another user does not see them anymore.
+        $this->assertSame(1, $this->counts(2)['count']);
+        $this->assertSame(1, $this->counts(2)['sms']);
         $this->assertDatabaseCount('communication_reads', 2);
         $this->assertSame([1], DB::table('communication_reads')->distinct()->pluck('user_id')->all());
     }
@@ -171,23 +239,27 @@ class UnreadCommunicationsTest extends TestCase
 
         $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=1')
             ->assertOk()
-            ->assertJsonCount(1)
+            ->assertJsonCount(2)
             ->assertJsonFragment([
                 'id' => 2,
                 'message' => 'Message 2',
                 'user_name' => 'Agent One',
             ])
-            ->assertJsonMissing(['id' => 1, 'message' => 'Message 1']);
+            ->assertJsonFragment([
+                'id' => 1,
+                'message' => 'Message 1',
+                'user_name' => 'Agent One',
+            ]);
 
         $this->getJson('/api/project/test/incoming-communications/sms-history?prospect_id=3')
             ->assertNotFound();
     }
 
-    public function test_count_endpoint_returns_unread_messages_instead_of_prospects(): void
+    public function test_count_endpoint_returns_unread_prospects_like_the_list(): void
     {
         $this->actingAs(User::query()->findOrFail(1));
         $this->getJson('/api/project/test/incoming-communications/count')
-            ->assertOk()->assertExactJson(['count' => 4, 'sms' => 1, 'email' => 2, 'voicemail' => 1]);
+            ->assertOk()->assertExactJson(['count' => 1, 'sms' => 1, 'email' => 1, 'voicemail' => 1]);
     }
 
     public function test_reading_email_and_listening_to_voicemail_decrement_their_counts(): void
@@ -207,7 +279,7 @@ class UnreadCommunicationsTest extends TestCase
         $this->assertSame(1, $this->counts(1)['sms']);
     }
 
-    public function test_prospect_icons_receive_only_unread_incoming_ids_for_the_current_user(): void
+    public function test_prospect_icons_receive_only_unread_incoming_ids_shared_by_the_project(): void
     {
         $service = new IncomingCommunications();
         $project = Project::query()->findOrFail(1);
@@ -220,8 +292,10 @@ class UnreadCommunicationsTest extends TestCase
         $this->assertSame(['sms' => [3], 'email' => [2], 'voicemail' => []], $prospects[0]->unread_communications);
         $this->assertSame(['sms' => [], 'email' => [], 'voicemail' => []], $prospects[1]->unread_communications);
 
+        // Another user gets the same unread ids: the processing is shared.
         $service->appendUnread($prospects, $project, 2);
-        $this->assertSame(['sms' => [1, 2, 3], 'email' => [1, 2, 4], 'voicemail' => [1]], $prospects[0]->unread_communications);
+        $this->assertSame(['sms' => [3], 'email' => [2], 'voicemail' => []], $prospects[0]->unread_communications);
+        $this->assertSame(['sms' => [], 'email' => [], 'voicemail' => []], $prospects[1]->unread_communications);
     }
 
     public function test_prospect_unread_queries_are_batched_and_limited_to_the_current_page_and_project(): void

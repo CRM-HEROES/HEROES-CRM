@@ -5,3 +5,4 @@ export const ADD_MENU = "addMenu";
 export const SHOW_MENU = "showMenu";
 export const UPDATE_MENU = "updateMenu";
 export const REMOVE_MENU = "removeMenu";
+export const REORDER_MENUS = "reorderMenus";

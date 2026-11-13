@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class MenuController extends Controller
 {
@@ -32,12 +33,54 @@ class MenuController extends Controller
                     ->where('id', auth()->id())
                     ->withPivot('default');
             })
+            // The order must be stable: duplicated "order" values (older saves)
+            // would otherwise come back in a different order on each request.
             ->orderBy('order')
+            ->orderBy('id')
             ->get()
             ->transform(function ($menu) use($project) {
                 $menu->count = $this->countProspects($project, $menu);
                 return $menu;
             });
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function reorder(Request $request, Project $project)
+    {
+        $values = $request->validate([
+            'ids' => ['required', 'array', 'min:1', 'max:500'],
+            'ids.*' => ['required', 'integer', 'distinct'],
+        ]);
+
+        $ids = array_values(array_map('intval', $values['ids']));
+
+        // Whole project list, including the menus this user does not see: the
+        // "order" column belongs to the project, a partial renumbering would
+        // leave duplicated positions behind.
+        $all = Menu::withoutGlobalScopes()
+            ->where('project_id', $project->id)
+            ->orderBy('order')
+            ->orderBy('id')
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        // Every sent id must belong to this project: an unknown id is refused
+        // instead of silently reordering the others.
+        abort_unless(count(array_intersect($all, $ids)) === count($ids), 404);
+
+        // The sent menus first, in their new order, then the hidden ones.
+        $ordered = array_merge($ids, array_values(array_diff($all, $ids)));
+
+        DB::transaction(function () use ($ordered) {
+            foreach ($ordered as $index => $id) {
+                DB::table('menus')->where('id', $id)->update(['order' => $index + 1]);
+            }
+        });
+
+        return ['message' => trans('common.success.updated_resource')];
     }
 
     /**

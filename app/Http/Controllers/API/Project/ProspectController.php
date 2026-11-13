@@ -373,19 +373,16 @@ class ProspectController extends Controller
             $prospectsQuery->whereIn('id', $request->input('prospect_ids'));
         }
 
+        // "limit" bounds the number of examples returned, not the number of
+        // prospects scanned: every match of the project is counted (and
+        // replaced), wherever it is, whatever the limit.
         $limit = $request->input('limit');
-        $processed = 0;
-        $prospectsQuery->chunkById($limit === null ? 200 : $limit + 1, function ($prospects) use (
+        $prospectsQuery->chunkById(500, function ($prospects) use (
                 $meta, $slug, $search, $replace, $caseSensitive, $replacing, $replacingOccurrence,
                 $occurrenceIndex, $numericSearchPattern, $request,
-                $limit, &$processed, &$matches, &$prospectsCount, &$samples
+                $limit, &$matches, &$prospectsCount, &$samples
             ) {
                 foreach ($prospects as $prospect) {
-                    if ($limit !== null && $processed >= $limit) {
-                        return false;
-                    }
-                    $processed++;
-
                     $current = $meta ? data_get($prospect->meta, $slug) : $prospect->{$slug};
 
                     if (!is_string($current) || $current === '') {
@@ -436,7 +433,7 @@ class ProspectController extends Controller
                             : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
                     }
 
-                    if (count($samples) < 10) {
+                    if (count($samples) < ($limit ?? 10)) {
                         $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];
                     }
 

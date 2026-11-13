@@ -89,9 +89,9 @@ export default {
     },
 
     created() {
-        if (this.showHistory) {
-            this.loadHistory();
-        }
+        // Always load the history: a communication processed by another user
+        // must not be proposed again, even when the history is not displayed.
+        this.loadHistory();
     },
 
     computed: {
@@ -145,9 +145,7 @@ export default {
                             console.error("Could not refresh prospects after processing communications:", error);
                         }
                     }
-                    if (this.showHistory) {
-                        await this.loadHistory();
-                    }
+                    await this.loadHistory();
                 } else {
                     this.error = true;
                 }
@@ -157,6 +155,12 @@ export default {
         },
 
         async loadHistory() {
+            // The processing history only exists for SMS and emails: a voicemail
+            // id must never be confused with a SMS one.
+            if (!["sms", "email"].includes(this.type)) {
+                return;
+            }
+
             this.loadingHistory = true;
             this.historyError = false;
             try {
@@ -166,6 +170,15 @@ export default {
                     this.type
                 );
                 this.history = data;
+
+                // Each history entry is a communication already processed by
+                // someone: it is never pending again, for any user.
+                this.processedIds = [
+                    ...new Set([
+                        ...this.processedIds,
+                        ...(data || []).map((entry) => Number(entry.id)),
+                    ]),
+                ];
             } catch (error) {
                 this.historyError = true;
             } finally {

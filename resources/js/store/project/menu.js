@@ -8,6 +8,7 @@ import {
     SHOW_MENU,
     UPDATE_MENU,
     REMOVE_MENU,
+    REORDER_MENUS,
 } from "@/actions/project/menu";
 
 /**
@@ -87,6 +88,21 @@ const actions = {
         await menuService.destroy(context.state.project.slug, slug);
         context.commit(REMOVE_MENU, slug);
     },
+
+    /**
+     * Save the whole menu order (drag and drop).
+     *
+     * The ids are sent in their new order: the server renumbers every menu,
+     * so no two menus can keep the same "order" value.
+     *
+     * @param {*} context
+     * @param {Array} ids menu ids, in the displayed order
+     */
+    async [REORDER_MENUS](context, ids) {
+        await menuService.reorder(context.state.project.slug, ids);
+        context.commit(REORDER_MENUS, ids);
+        return ids;
+    },
 };
 
 /**
@@ -142,6 +158,29 @@ const mutations = {
      */
     [REMOVE_MENU](state, slug) {
         state.project.menus = state.project.menus.filter((o) => o.id != slug);
+    },
+
+    /**
+     * Apply the saved order locally, without refetching the list.
+     *
+     * @param {*} state
+     * @param {Array} ids menu ids, in their new order
+     */
+    [REORDER_MENUS](state, ids) {
+        const menus = state.project.menus ?? [];
+        const positions = new Map(
+            ids.map((id, index) => [Number(id), index + 1])
+        );
+        const position = (menu) =>
+            positions.get(Number(menu.id)) ?? Number.MAX_SAFE_INTEGER;
+
+        state.project.menus = [...menus]
+            .sort((menu1, menu2) => position(menu1) - position(menu2))
+            .map((menu) =>
+                positions.has(Number(menu.id))
+                    ? { ...menu, order: positions.get(Number(menu.id)) }
+                    : menu
+            );
     },
 };
 

@@ -23,12 +23,21 @@
                     <prospect-menu :default-menu="true" :menu="menu" />
                 </li>
             </ul>
+            <!-- Search results are read-only: the saved order covers the
+                 whole list, so it is only edited on the full list. -->
+            <ul v-if="menuKeyword">
+                <li v-for="menu in filteredMenus" :key="menu.id">
+                    <prospect-menu :default-menu="false" :menu="menu" />
+                </li>
+            </ul>
             <draggable
+                v-else
                 tag="ul"
-                :list="menuKeyword ? filteredMenus : menus"
-                :disabled="menuKeyword || !movable"
+                :list="localMenus"
+                :disabled="!movable"
                 style="overflow: auto"
                 item-key="id"
+                @start="dragging = true"
                 @end="updateMenuOrder"
             >
                 <template #item="{ element }">
@@ -239,7 +248,7 @@ import {
     UPDATE_PROSPECT,
     TOGGLE_PROSPECTS_MENUS,
 } from "@/actions/project/prospect";
-import { FETCH_MENUS, UPDATE_MENU } from "@/actions/project/menu";
+import { FETCH_MENUS, REORDER_MENUS } from "@/actions/project/menu";
 
 // Components
 import ProspectMenu from "./Menu.vue";
@@ -258,6 +267,10 @@ export default {
             fetchingDefaultMenus: false,
             menuKeyword: "",
             movable: deviceType() == "desktop",
+            // Local copy of the store list: the drag mutates this one, never
+            // the Vuex state directly.
+            localMenus: [],
+            dragging: false,
         };
     },
 
@@ -265,11 +278,6 @@ export default {
         if (this.prospectsMenus) {
             this.fetchDefaultMenus();
             this.fetchMenus();
-
-            setInterval(() => {
-                this.fetchDefaultMenus();
-                this.fetchMenus();
-            }, 300000);
         }
     },
 
@@ -297,17 +305,25 @@ export default {
          *
          * @param {*} e
          */
-        async updateMenuOrder(e) {
-            const menu = this.menus[e.newDraggableIndex];
-
+        async updateMenuOrder() {
             try {
-                await store.dispatch(UPDATE_MENU, {
-                    id: menu.id,
-                    order: e.newDraggableIndex + 1,
-                });
-                this.fetchMenus();
+                await store.dispatch(
+                    REORDER_MENUS,
+                    this.localMenus.map((menu) => menu.id)
+                );
+            } catch (error) {
+                // The save failed: show the stored order again.
+                this.syncLocalMenus();
             } finally {
+                this.dragging = false;
             }
+        },
+
+        /**
+         * Copy the stored menus in the local list used by the drag.
+         */
+        syncLocalMenus() {
+            this.localMenus = [...(this.menus ?? [])];
         },
 
         /**
@@ -456,6 +472,17 @@ export default {
                 this.fetchDefaultMenus();
                 this.fetchMenus();
             }
+        },
+
+        menus: {
+            immediate: true,
+            handler() {
+                // Never overwrite a drop in progress.
+                if (this.dragging) {
+                    return;
+                }
+                this.syncLocalMenus();
+            },
         },
     },
 

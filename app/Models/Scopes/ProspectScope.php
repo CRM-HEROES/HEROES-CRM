@@ -16,8 +16,8 @@ class ProspectScope implements Scope
     	if (
             !auth()->user() || 
             auth()->user()->is_super_admin || 
-            auth()->user()->is_project_admin || 
             !getPermissionsTeamId() ||
+            auth()->user()->is_project_admin ||
             (request()->project && auth()->user()->can('prospectView', request()->project))
         ) {
             return;
