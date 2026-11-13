@@ -34,9 +34,15 @@ class IncomingCommunicationsFilterTest extends TestCase
             $table->unsignedBigInteger('project_id');
             $table->softDeletes();
         });
+        $schema->create('threads', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id');
+            $table->softDeletes();
+        });
         $schema->create('messages', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('thread_id')->nullable();
             $table->boolean('from_user')->default(true);
             $table->timestamp('archived_at')->nullable();
             $table->softDeletes();
@@ -80,12 +86,13 @@ class IncomingCommunicationsFilterTest extends TestCase
             ['prospect_id' => 11, 'from_user' => false, 'is_incoming' => false],
             ['prospect_id' => 12, 'from_user' => true, 'is_incoming' => true],
         ]);
+        DB::table('threads')->insert(['id' => 1, 'project_id' => 1]);
         DB::table('messages')->insert([
-            ['prospect_id' => 2, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 4, 'from_user' => true, 'deleted_at' => null],
-            ['prospect_id' => 7, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 7, 'from_user' => false, 'deleted_at' => null],
-            ['prospect_id' => 8, 'from_user' => false, 'deleted_at' => '2026-10-19 10:00:00'],
+            ['prospect_id' => 2, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 4, 'thread_id' => 1, 'from_user' => true, 'deleted_at' => null],
+            ['prospect_id' => 7, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 7, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => null],
+            ['prospect_id' => 8, 'thread_id' => 1, 'from_user' => false, 'deleted_at' => '2026-10-19 10:00:00'],
         ]);
         DB::table('interactions')->insert([
             ['prospect_id' => 3, 'from_user' => false, 'status' => 'voicemail', 'data' => null],

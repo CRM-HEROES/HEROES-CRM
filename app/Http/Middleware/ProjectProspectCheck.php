@@ -32,7 +32,6 @@ class ProjectProspectCheck
         }
 
         if ($request->project && $request->prospect) {
-
             // Check if prospect is
             // associated to the current project
             abort_unless(
@@ -51,12 +50,16 @@ class ProjectProspectCheck
             );
 
             // Check if prospect is associated to the
-            // current user
+            // current user, or if the user may see all the
+            // prospects of the project: same rule as the
+            // ProspectScope of the prospects list, which
+            // shows them all to a user having "prospectView"
             abort_unless(
                 /*auth()->user()->can("project.{$request->project->id}") || */
                 !auth()->user() ||
                 auth()->user()->is_super_admin ||
                 auth()->user()->is_project_admin ||
+                auth()->user()->can('prospectView', $project) ||
                 $prospect->creator_id == auth()->id() ||
                 DB::table('prospect_user')
                     ->where(['prospect_id' => $prospect->id, 'user_id' => auth()->id()])
