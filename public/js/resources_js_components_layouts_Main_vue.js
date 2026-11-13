@@ -48485,7 +48485,11 @@ var PROVIDERS = {
       updatingSetting: false,
       showingSetting: false,
       imapBusy: false,
+      imapAction: null,
       imapMessage: null,
+      imapError: false,
+      // The IMAP folder is an advanced setting: hidden unless needed.
+      showAdvanced: false,
       key: "email",
       providers: PROVIDERS,
       setting: this.newSetting()
@@ -48651,7 +48655,7 @@ var PROVIDERS = {
     showSetting: function showSetting() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var data;
+        var data, folder;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
@@ -48664,15 +48668,19 @@ var PROVIDERS = {
               if (data) {
                 _this4.setting = _this4.normalize(data);
               }
-            case 6:
-              _context4.prev = 6;
+
+              // Show the advanced part when a custom folder is already used.
+              folder = _this4.setting.imap.folder;
+              _this4.showAdvanced = Boolean(folder && folder !== "INBOX");
+            case 8:
+              _context4.prev = 8;
               _this4.showingSetting = false;
-              return _context4.finish(6);
-            case 9:
+              return _context4.finish(8);
+            case 11:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[1,, 6, 9]]);
+        }, _callee4, null, [[1,, 8, 11]]);
       }))();
     },
     testImap: function testImap() {
@@ -48682,33 +48690,43 @@ var PROVIDERS = {
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
+              if (!_this5.imapBusy) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
               _this5.imapBusy = true;
+              _this5.imapAction = "test";
               _this5.imapMessage = null;
-              _context5.prev = 2;
-              _context5.next = 5;
+              _this5.imapError = false;
+              _context5.prev = 6;
+              _context5.next = 9;
               return _this5.save();
-            case 5:
-              _context5.next = 7;
+            case 9:
+              _context5.next = 11;
               return _apis_project_setting__WEBPACK_IMPORTED_MODULE_1__["default"].testImap(_store__WEBPACK_IMPORTED_MODULE_0__["default"].getters.project.slug);
-            case 7:
+            case 11:
               _yield$SettingService = _context5.sent;
               data = _yield$SettingService.data;
               _this5.imapMessage = "Connexion r\xE9ussie \xE0 ".concat(data.host, " (dossier ").concat(data.folder, ").");
-              _context5.next = 15;
+              _context5.next = 20;
               break;
-            case 12:
-              _context5.prev = 12;
-              _context5.t0 = _context5["catch"](2);
+            case 16:
+              _context5.prev = 16;
+              _context5.t0 = _context5["catch"](6);
+              _this5.imapError = true;
               _this5.imapMessage = _this5.errorMessage(_context5.t0);
-            case 15:
-              _context5.prev = 15;
+            case 20:
+              _context5.prev = 20;
               _this5.imapBusy = false;
-              return _context5.finish(15);
-            case 18:
+              _this5.imapAction = null;
+              return _context5.finish(20);
+            case 24:
             case "end":
               return _context5.stop();
           }
-        }, _callee5, null, [[2, 12, 15, 18]]);
+        }, _callee5, null, [[6, 16, 20, 24]]);
       }))();
     },
     syncImap: function syncImap() {
@@ -48718,40 +48736,50 @@ var PROVIDERS = {
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
+              if (!_this6.imapBusy) {
+                _context6.next = 2;
+                break;
+              }
+              return _context6.abrupt("return");
+            case 2:
               _this6.imapBusy = true;
+              _this6.imapAction = "sync";
               _this6.imapMessage = null;
-              _context6.prev = 2;
-              _context6.next = 5;
+              _this6.imapError = false;
+              _context6.prev = 6;
+              _context6.next = 9;
               return _this6.save();
-            case 5:
-              _context6.next = 7;
+            case 9:
+              _context6.next = 11;
               return _apis_project_setting__WEBPACK_IMPORTED_MODULE_1__["default"].syncImap(_store__WEBPACK_IMPORTED_MODULE_0__["default"].getters.project.slug);
-            case 7:
+            case 11:
               _yield$SettingService2 = _context6.sent;
               data = _yield$SettingService2.data;
               _this6.imapMessage = "".concat(data.imported, " email(s) import\xE9(s), ").concat(data.ignored, " ignor\xE9(s), ").concat(data.duplicates, " doublon(s).");
-              _context6.next = 12;
+              _context6.next = 16;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_setting__WEBPACK_IMPORTED_MODULE_3__.GET_SETTING, _this6.key);
-            case 12:
+            case 16:
               setting = _context6.sent;
               if (setting) {
                 _this6.setting = _this6.normalize(setting);
               }
-              _context6.next = 19;
+              _context6.next = 24;
               break;
-            case 16:
-              _context6.prev = 16;
-              _context6.t0 = _context6["catch"](2);
+            case 20:
+              _context6.prev = 20;
+              _context6.t0 = _context6["catch"](6);
+              _this6.imapError = true;
               _this6.imapMessage = _this6.errorMessage(_context6.t0);
-            case 19:
-              _context6.prev = 19;
+            case 24:
+              _context6.prev = 24;
               _this6.imapBusy = false;
-              return _context6.finish(19);
-            case 22:
+              _this6.imapAction = null;
+              return _context6.finish(24);
+            case 28:
             case "end":
               return _context6.stop();
           }
-        }, _callee6, null, [[2, 16, 19, 22]]);
+        }, _callee6, null, [[6, 20, 24, 28]]);
       }))();
     },
     errorMessage: function errorMessage(error) {
@@ -100515,20 +100543,29 @@ var _hoisted_15 = [_hoisted_11, _hoisted_12, _hoisted_13, _hoisted_14];
 var _hoisted_16 = ["textContent"];
 var _hoisted_17 = ["placeholder"];
 var _hoisted_18 = ["placeholder", "required"];
-var _hoisted_19 = ["placeholder"];
-var _hoisted_20 = {
-  "class": "hc-flex-row",
-  style: {
-    "gap": "8px"
-  }
+var _hoisted_19 = ["aria-expanded"];
+var _hoisted_20 = ["placeholder"];
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  "class": "hc-email-imap-help"
+}, " Dossier IMAP lu sur le serveur. Laisser vide pour INBOX : seuls les emails de ce dossier sont récupérés, rien n'est déplacé ni marqué comme lu. ", -1 /* HOISTED */);
+var _hoisted_22 = {
+  "class": "hc-email-imap-actions"
 };
-var _hoisted_21 = ["disabled"];
-var _hoisted_22 = ["disabled"];
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
+var _hoisted_23 = ["disabled"];
+var _hoisted_24 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-plug"
+}, null, -1 /* HOISTED */);
 var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["textContent"];
+var _hoisted_26 = ["disabled"];
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-download"
+}, null, -1 /* HOISTED */);
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = ["textContent"];
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_item_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item-list");
@@ -100548,7 +100585,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           "height": "100%",
           "min-height": "0"
         },
-        onSubmit: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.update && $options.update.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -100729,74 +100766,86 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_18), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.setting.imap.password]])];
             }),
             _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["required"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
-            label: "Dossier"
+          }, 8 /* PROPS */, ["required"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "hc-email-imap-advanced",
+            "aria-expanded": $data.showAdvanced ? 'true' : 'false',
+            onClick: _cache[11] || (_cache[11] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+              return $data.showAdvanced = !$data.showAdvanced;
+            }, ["prevent"]))
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $data.showAdvanced ? 'fa-caret-down' : 'fa-caret-right'])
+          }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Réglages avancés ")], 8 /* PROPS */, _hoisted_19), $data.showAdvanced ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+            key: 2
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_v_field, {
+            label: "Dossier (optionnel)"
           }, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref8) {
               var label = _ref8.label;
               return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
                 placeholder: label + ' ...',
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                   return $data.setting.imap.folder = $event;
                 })
-              }, null, 8 /* PROPS */, _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.setting.imap.folder]])];
+              }, null, 8 /* PROPS */, _hoisted_20), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.setting.imap.folder]])];
             }),
             _: 1 /* STABLE */
-          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          }), _hoisted_21], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             type: "button",
-            style: {
-              "flex": "1"
-            },
-            disabled: $data.imapBusy,
-            onClick: _cache[12] || (_cache[12] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
-              return $options.testImap && $options.testImap.apply($options, arguments);
-            }, ["prevent"]))
-          }, " Tester la connexion ", 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-            type: "button",
-            style: {
-              "flex": "1"
-            },
+            "class": "hc-button",
             disabled: $data.imapBusy,
             onClick: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+              return $options.testImap && $options.testImap.apply($options, arguments);
+            }, ["prevent"]))
+          }, [_hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.imapAction === 'test' ? 'Test en cours…' : 'Tester la connexion')
+          }, null, 8 /* PROPS */, _hoisted_25)], 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+            type: "button",
+            "class": "hc-button hc-email-imap-sync",
+            disabled: $data.imapBusy,
+            onClick: _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.syncImap && $options.syncImap.apply($options, arguments);
             }, ["prevent"]))
-          }, " Récupérer les emails ", 8 /* PROPS */, _hoisted_22)]), $data.imapMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-            key: 2,
-            style: {
-              "font-size": "11px",
-              "padding": "0 10px"
-            },
-            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.imapMessage)
-          }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.lastSync ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+          }, [_hoisted_27, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.imapAction === 'sync' ? 'Récupération…' : 'Récupérer les emails')
+          }, null, 8 /* PROPS */, _hoisted_28)], 8 /* PROPS */, _hoisted_26)]), $data.imapMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
             key: 3,
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-email-imap-message', $data.imapError ? 'hc-email-imap-message-error' : '']),
+            role: "status"
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+            "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', $data.imapError ? 'fa-exclamation-triangle' : 'fa-check'])
+          }, null, 2 /* CLASS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.imapMessage)
+          }, null, 8 /* PROPS */, _hoisted_29)], 2 /* CLASS */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.lastSync ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+            key: 4,
             style: {
               "font-size": "11px",
               "opacity": "0.6",
               "padding": "0 10px"
             },
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.lastSync)
-          }, null, 8 /* PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.setting.imap.last_error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-            key: 4,
+          }, null, 8 /* PROPS */, _hoisted_30)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.setting.imap.last_error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+            key: 5,
             style: {
               "font-size": "11px",
               "color": "#c0392b",
               "padding": "0 10px"
             },
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.setting.imap.last_error)
-          }, null, 8 /* PROPS */, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+          }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('update'))
-          }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          }, null, 8 /* PROPS */, _hoisted_32), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             "class": "hc-button-danger",
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('delete')),
-            onClick: _cache[14] || (_cache[14] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+            onClick: _cache[15] || (_cache[15] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
               return $options.remove && $options.remove.apply($options, arguments);
             }, ["prevent"]))
-          }, null, 8 /* PROPS */, _hoisted_27)];
+          }, null, 8 /* PROPS */, _hoisted_33)];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
@@ -120874,7 +120923,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-settings-modal .hc-modal-body {\n    min-height: 0;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-email-settings-modal .hc-modal-body {\n    min-height: 0;\n}\n.hc-email-imap-advanced {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    padding: 2px 10px;\n    background: none;\n    border: none;\n    color: #12a0f3;\n    font-size: 11px;\n    cursor: pointer;\n}\n.hc-email-imap-help {\n    padding: 0 10px;\n    font-size: 11px;\n    line-height: 1.4;\n    opacity: 0.7;\n}\n.hc-email-imap-actions {\n    display: flex;\n    flex-direction: row;\n    gap: 8px;\n    padding: 0 10px;\n}\n.hc-email-imap-actions > button {\n    flex: 1;\n    min-width: 0;\n    font-size: 11px;\n}\n.hc-email-imap-actions > button > i {\n    margin-right: 6px;\n}\n.hc-email-imap-actions > button > span {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-email-imap-sync {\n    background-color: #c36d34;\n}\n.hc-email-imap-sync:hover:not(:disabled) {\n    background-color: #a95b28;\n}\n.hc-email-imap-message {\n    display: flex;\n    align-items: flex-start;\n    gap: 6px;\n    padding: 0 10px;\n    font-size: 11px;\n    color: #1e7e34;\n}\n.hc-email-imap-message-error {\n    color: #c0392b;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

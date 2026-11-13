@@ -110,37 +110,86 @@
                             autocomplete="new-password"
                             :required="!setting.imap.has_password"
                     /></v-field>
-                    <v-field label="Dossier" v-slot="{ label }"
-                        ><input
-                            :placeholder="label + ' ...'"
-                            v-model="setting.imap.folder"
-                            placeholder="INBOX"
-                    /></v-field>
+                    <button
+                        type="button"
+                        class="hc-email-imap-advanced"
+                        :aria-expanded="showAdvanced ? 'true' : 'false'"
+                        @click.prevent="showAdvanced = !showAdvanced"
+                    >
+                        <i
+                            :class="[
+                                'fa',
+                                showAdvanced ? 'fa-caret-down' : 'fa-caret-right',
+                            ]"
+                        ></i>
+                        Réglages avancés
+                    </button>
 
-                    <div class="hc-flex-row" style="gap: 8px">
+                    <template v-if="showAdvanced">
+                        <v-field label="Dossier (optionnel)" v-slot="{ label }"
+                            ><input
+                                :placeholder="label + ' ...'"
+                                v-model="setting.imap.folder"
+                                placeholder="INBOX"
+                        /></v-field>
+                        <p class="hc-email-imap-help">
+                            Dossier IMAP lu sur le serveur. Laisser vide pour
+                            INBOX : seuls les emails de ce dossier sont
+                            récupérés, rien n'est déplacé ni marqué comme lu.
+                        </p>
+                    </template>
+
+                    <div class="hc-email-imap-actions">
                         <button
                             type="button"
-                            style="flex: 1"
+                            class="hc-button"
                             :disabled="imapBusy"
                             @click.prevent="testImap"
                         >
-                            Tester la connexion
+                            <i class="fa fa-plug"></i>
+                            <span
+                                v-text="
+                                    imapAction === 'test'
+                                        ? 'Test en cours…'
+                                        : 'Tester la connexion'
+                                "
+                            ></span>
                         </button>
                         <button
                             type="button"
-                            style="flex: 1"
+                            class="hc-button hc-email-imap-sync"
                             :disabled="imapBusy"
                             @click.prevent="syncImap"
                         >
-                            Récupérer les emails
+                            <i class="fa fa-download"></i>
+                            <span
+                                v-text="
+                                    imapAction === 'sync'
+                                        ? 'Récupération…'
+                                        : 'Récupérer les emails'
+                                "
+                            ></span>
                         </button>
                     </div>
 
                     <p
                         v-if="imapMessage"
-                        style="font-size: 11px; padding: 0 10px"
-                        v-text="imapMessage"
-                    ></p>
+                        :class="[
+                            'hc-email-imap-message',
+                            imapError ? 'hc-email-imap-message-error' : '',
+                        ]"
+                        role="status"
+                    >
+                        <i
+                            :class="[
+                                'fa',
+                                imapError
+                                    ? 'fa-exclamation-triangle'
+                                    : 'fa-check',
+                            ]"
+                        ></i>
+                        <span v-text="imapMessage"></span>
+                    </p>
                     <p
                         v-if="lastSync"
                         style="font-size: 11px; opacity: 0.6; padding: 0 10px"
@@ -169,6 +218,69 @@
 <style>
 .hc-email-settings-modal .hc-modal-body {
     min-height: 0;
+}
+
+.hc-email-imap-advanced {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 2px 10px;
+    background: none;
+    border: none;
+    color: #12a0f3;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.hc-email-imap-help {
+    padding: 0 10px;
+    font-size: 11px;
+    line-height: 1.4;
+    opacity: 0.7;
+}
+
+.hc-email-imap-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    padding: 0 10px;
+}
+
+.hc-email-imap-actions > button {
+    flex: 1;
+    min-width: 0;
+    font-size: 11px;
+}
+
+.hc-email-imap-actions > button > i {
+    margin-right: 6px;
+}
+
+.hc-email-imap-actions > button > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hc-email-imap-sync {
+    background-color: #c36d34;
+}
+
+.hc-email-imap-sync:hover:not(:disabled) {
+    background-color: #a95b28;
+}
+
+.hc-email-imap-message {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 0 10px;
+    font-size: 11px;
+    color: #1e7e34;
+}
+
+.hc-email-imap-message-error {
+    color: #c0392b;
 }
 </style>
 
@@ -241,7 +353,11 @@ export default {
             updatingSetting: false,
             showingSetting: false,
             imapBusy: false,
+            imapAction: null,
             imapMessage: null,
+            imapError: false,
+            // The IMAP folder is an advanced setting: hidden unless needed.
+            showAdvanced: false,
             key: "email",
             providers: PROVIDERS,
             setting: this.newSetting(),
@@ -395,14 +511,21 @@ export default {
                 if (data) {
                     this.setting = this.normalize(data);
                 }
+
+                // Show the advanced part when a custom folder is already used.
+                const folder = this.setting.imap.folder;
+                this.showAdvanced = Boolean(folder && folder !== "INBOX");
             } finally {
                 this.showingSetting = false;
             }
         },
 
         async testImap() {
+            if (this.imapBusy) return;
             this.imapBusy = true;
+            this.imapAction = "test";
             this.imapMessage = null;
+            this.imapError = false;
 
             try {
                 await this.save();
@@ -412,15 +535,20 @@ export default {
                 );
                 this.imapMessage = `Connexion réussie à ${data.host} (dossier ${data.folder}).`;
             } catch (error) {
+                this.imapError = true;
                 this.imapMessage = this.errorMessage(error);
             } finally {
                 this.imapBusy = false;
+                this.imapAction = null;
             }
         },
 
         async syncImap() {
+            if (this.imapBusy) return;
             this.imapBusy = true;
+            this.imapAction = "sync";
             this.imapMessage = null;
+            this.imapError = false;
 
             try {
                 await this.save();
@@ -435,9 +563,11 @@ export default {
                     this.setting = this.normalize(setting);
                 }
             } catch (error) {
+                this.imapError = true;
                 this.imapMessage = this.errorMessage(error);
             } finally {
                 this.imapBusy = false;
+                this.imapAction = null;
             }
         },
 
