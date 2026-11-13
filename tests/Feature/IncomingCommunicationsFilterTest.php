@@ -25,6 +25,10 @@ class IncomingCommunicationsFilterTest extends TestCase
             ],
         ]);
         $schema = DB::connection()->getSchemaBuilder();
+        $schema->create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('role')->nullable();
+        });
         $schema->create('projects', function (Blueprint $table) {
             $table->id();
             $table->softDeletes();
@@ -71,6 +75,7 @@ class IncomingCommunicationsFilterTest extends TestCase
             $table->timestamp('archived_at')->nullable();
         });
 
+        DB::table('users')->insert(['id' => 1, 'role' => 'super_admin']);
         DB::table('projects')->insert([['id' => 1], ['id' => 2]]);
         foreach (range(1, 12) as $id) {
             DB::table('prospects')->insert([
@@ -122,7 +127,7 @@ class IncomingCommunicationsFilterTest extends TestCase
 
         // Prospect 7 has an unread SMS, two unread emails and a voicemail: it
         // is one prospect for every number, and one line in the list.
-        $this->assertSame(['sms' => 4, 'email' => 2, 'voicemail' => 2, 'count' => 6], $counts);
+        $this->assertSame(['count' => 6, 'sms' => 4, 'email' => 2, 'voicemail' => 2], $counts);
         $this->assertSame(count($this->ids()), $counts['count']);
     }
 

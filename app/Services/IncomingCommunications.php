@@ -5,8 +5,10 @@ namespace App\Services;
 use App\Filters\ProspectFilters;
 use App\Models\Interaction;
 use App\Models\Message;
+use App\Models\Scopes\ProspectScope;
 use App\Models\Project;
 use App\Models\Sms;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -124,15 +126,17 @@ class IncomingCommunications
      * The numbers announced by the header badge.
      *
      * The list opened by that badge shows prospects, not communications: every
-     * number is therefore a number of prospects. A prospect with three unread
-     * SMS counts once, and a prospect having an unread SMS and an unread email
-     * counts once in the total (the total is the list's own count).
+     * number is therefore a number of visible prospects. A prospect with
+     * three unread SMS counts once, and one with multiple communication types
+     * counts once in the total.
      */
     public function counts(Project $project, int $userId): array
     {
+        $visibleProspects = $this->visibleProspects($project, $userId);
         $counts = [];
         foreach (self::TYPES as $type => $model) {
             $counts[$type] = $this->unreadQuery($project, $type)
+                ->whereIn('prospect_id', (clone $visibleProspects)->select('prospects.id'))
                 ->distinct()
                 ->count('prospect_id');
         }
@@ -142,7 +146,41 @@ class IncomingCommunications
         $filters = new ProspectFilters();
         $filters->addFilter('incomingCommunications', true);
 
-        return $counts + ['count' => $project->prospects()->filter($filters)->count()];
+        return ['count' => (clone $visibleProspects)->filter($filters)->count()] + $counts;
+    }
+
+    /**
+     * Prospects visible to the user, using the same access rules as the
+     * prospects list and prospect detail routes.
+     */
+    protected function visibleProspects(Project $project, int $userId): Builder
+    {
+        $user = User::query()->findOrFail($userId);
+        $prospects = $project->prospects()->withoutGlobalScope(ProspectScope::class)->getQuery();
+
+        if (
+            $user->is_super_admin
+            || $project->creator_id == $userId
+            || $user->can('', $project)
+            || $user->can('prospectView', $project)
+        ) {
+            return $prospects;
+        }
+
+        return $prospects->where(function ($query) use ($userId) {
+            $query->where('prospects.creator_id', $userId)
+                ->orWhereExists(function ($assigned) use ($userId) {
+                    $assigned->selectRaw('1')->from('prospect_user')
+                        ->whereColumn('prospect_user.prospect_id', 'prospects.id')
+                        ->where('prospect_user.user_id', $userId);
+                })
+                ->orWhereExists(function ($group) use ($userId) {
+                    $group->selectRaw('1')->from('prospect_group')
+                        ->join('user_group', 'user_group.group_id', '=', 'prospect_group.group_id')
+                        ->whereColumn('prospect_group.prospect_id', 'prospects.id')
+                        ->where('user_group.user_id', $userId);
+                });
+        });
     }
 
     public function markRead(Project $project, int $userId, int $prospectId, string $type, array $ids): int
