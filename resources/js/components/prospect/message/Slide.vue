@@ -187,6 +187,8 @@
                                             v-for="c in messages"
                                             :key="c.id"
                                             :message="c"
+                                            :can-reply="Boolean(prospect && prospect.email)"
+                                            @reply="replyToEmail(c)"
                                             @add-user="setWaitingUserMessage(c)"
                                             @edit="message = { ...c }"
                                         />
@@ -911,6 +913,36 @@ export default {
             };
             this.emailDraftKey++;
             this.emailReturnTab = this.tab;
+            this.tab = 3;
+        },
+
+        /**
+         * Answer an incoming email: the composer opens with the prospect as
+         * recipient and a "Re:" subject.
+         */
+        replyToEmail(message) {
+            const prospect = this.prospect;
+
+            if (!message || !prospect || !prospect.email) {
+                return;
+            }
+
+            const subject = String(message.subject || "").trim();
+
+            this.emailDraft = {
+                prospect: prospect.id,
+                prospects: null,
+                selectedProspects: [prospect],
+                to: prospect.email,
+                category: "Réponse",
+                subject: /^re\s*:/i.test(subject)
+                    ? subject
+                    : `Re: ${subject || "votre message"}`,
+                body: `Bonjour ${prospect.first_name || ""},\n\n`,
+            };
+            this.emailDraftKey++;
+            this.emailReturnTab = this.tab;
+            this.addingEmailProspect = false;
             this.tab = 3;
         },
 

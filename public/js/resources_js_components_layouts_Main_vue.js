@@ -35859,6 +35859,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      */
     message: {
       type: Object
+    },
+    /**
+     * The prospect has an email address to answer to.
+     */
+    canReply: {
+      type: Boolean,
+      "default": false
     }
   },
   data: function data() {
@@ -35913,6 +35920,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee2, null, [[1,, 4, 7]]);
       }))();
     },
+    reply: function reply() {
+      this.$emit("reply");
+    },
     edit: function edit() {
       this.$emit("edit");
     },
@@ -35942,6 +35952,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     /**
      *
      */
+    /**
+     * An email sent by the prospect (from_user = 0), not by a user.
+     */
+    isIncoming: function isIncoming() {
+      return Number(this.message.from_user) === 0;
+    },
     waiting: function waiting() {
       var _this3 = this;
       if (!this.user || !this.message.users) {
@@ -36503,6 +36519,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       };
       this.emailDraftKey++;
       this.emailReturnTab = this.tab;
+      this.tab = 3;
+    },
+    /**
+     * Answer an incoming email: the composer opens with the prospect as
+     * recipient and a "Re:" subject.
+     */
+    replyToEmail: function replyToEmail(message) {
+      var prospect = this.prospect;
+      if (!message || !prospect || !prospect.email) {
+        return;
+      }
+      var subject = String(message.subject || "").trim();
+      this.emailDraft = {
+        prospect: prospect.id,
+        prospects: null,
+        selectedProspects: [prospect],
+        to: prospect.email,
+        category: "Réponse",
+        subject: /^re\s*:/i.test(subject) ? subject : "Re: ".concat(subject || "votre message"),
+        body: "Bonjour ".concat(prospect.first_name || "", ",\n\n")
+      };
+      this.emailDraftKey++;
+      this.emailReturnTab = this.tab;
+      this.addingEmailProspect = false;
       this.tab = 3;
     },
     resetEmailComposer: function resetEmailComposer() {
@@ -89697,24 +89737,30 @@ var _hoisted_1 = {
 var _hoisted_2 = {
   "class": "hc-prospect-message-header"
 };
-var _hoisted_3 = ["textContent"];
+var _hoisted_3 = {
+  key: 4,
+  "class": "hc-prospect-message-author hc-prospect-message-incoming",
+  textContent: 'Email reçu'
+};
 var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["innerHTML"];
-var _hoisted_6 = ["innerHTML"];
-var _hoisted_7 = {
-  key: 1,
+var _hoisted_5 = ["textContent"];
+var _hoisted_6 = ["textContent"];
+var _hoisted_7 = ["innerHTML"];
+var _hoisted_8 = ["innerHTML"];
+var _hoisted_9 = {
+  key: 2,
   "class": "hc-prospect-message-users"
 };
-var _hoisted_8 = ["onClick"];
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_10 = ["onClick"];
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-times"
 }, null, -1 /* HOISTED */);
-var _hoisted_10 = {
+var _hoisted_12 = {
   key: 0,
   "class": "fa fa-lock"
 };
-var _hoisted_11 = {
-  key: 2,
+var _hoisted_13 = {
+  key: 3,
   "class": "hc-prospect-message-attachments"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -89722,56 +89768,70 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_attachment_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("attachment-row");
   var _component_loading = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("loading");
   var _directive_tooltip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveDirective)("tooltip");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [$props.message.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [$options.isIncoming ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
     key: 0,
+    "class": "fa fa-inbox icon-blue",
+    title: "Email reçu"
+  })) : $props.message.sent ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 1,
     "class": "fa fa-check-double icon-green",
     title: "Envoyé"
   })) : $props.message.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 1,
+    key: 2,
     "class": "fa fa-exclamation-triangle icon-red"
   })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 2,
-    "class": "fa fa-envelope"
-  })), $props.message.creator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
     key: 3,
+    "class": "fa fa-envelope"
+  })), $options.isIncoming ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3)) : $props.message.creator ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 5,
     "class": "hc-prospect-message-author",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.message.creator.name)
-  }, null, 8 /* PROPS */, _hoisted_3)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 8 /* PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     "class": "hc-item-main-content hc-prospect-message-date",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.date)
-  }, null, 8 /* PROPS */, _hoisted_4), $options.canEdit ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 4,
+  }, null, 8 /* PROPS */, _hoisted_5), $props.canReply && $options.isIncoming ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 6,
+    tag: "a",
+    "class": "fa fa-reply hc-prospect-message-reply",
+    size: 24,
+    onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.reply, ["prevent"])
+  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, 'Répondre']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canEdit ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 7,
     tag: "a",
     "class": "fa fa-user-plus",
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.addUser, ["prevent"]),
     size: 24
   }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, 'Attendre retour ...']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waiting && !($options.waiting.pivot && $options.waiting.pivot.archived_at) ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 5,
+    key: 8,
     tag: "a",
     "class": "fa fa-lock",
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.archive, ["prevent"]),
     size: 24
-  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, 'Archiver']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canEdit ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 6,
+  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, 'Archiver']]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A received email is never edited nor deleted from the CRM. "), $options.canEdit && !$options.isIncoming ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 9,
     tag: "a",
     "class": "fa fa-pen",
     size: 24,
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.edit, ["prevent"])
-  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('edit')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canEdit ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
-    key: 7,
+  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('edit')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canEdit && !$options.isIncoming ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+    key: 10,
     tag: "a",
     "class": "fa fa-trash",
     color: "#d9402c",
     onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.removeMessage, ["prevent"]),
     size: 24
-  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('delete')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  }, null, 8 /* PROPS */, ["onClick"])), [[_directive_tooltip, _ctx.$t('delete')]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), $props.message.subject ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 0,
+    "class": "hc-prospect-message-subject",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.message.subject)
+  }, null, 8 /* PROPS */, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
     "class": "hc-prospect-message-body",
     innerHTML: $props.message.body
-  }, null, 8 /* PROPS */, _hoisted_5), $props.message.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-    key: 0,
+  }, null, 8 /* PROPS */, _hoisted_7), $props.message.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 1,
     "class": "hc-prospect-message-error",
     innerHTML: $props.message.error
-  }, null, 8 /* PROPS */, _hoisted_6)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.message.users && $props.message.users.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.message.users, function (user) {
+  }, null, 8 /* PROPS */, _hoisted_8)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.message.users && $props.message.users.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.message.users, function (user) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
       key: user.id,
       "class": "hc-tag",
@@ -89783,8 +89843,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
         return $options.removeMessageUser(user);
       }, ["prevent"])
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.name) + " ", 1 /* TEXT */), _hoisted_9, user.pivot.archived_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_10)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_8);
-  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.message.attachments && $props.message.attachments.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.message.attachments, function (c) {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(user.name) + " ", 1 /* TEXT */), _hoisted_11, user.pivot.archived_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("i", _hoisted_12)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 8 /* PROPS */, _hoisted_10);
+  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.message.attachments && $props.message.attachments.length > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.message.attachments, function (c) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_attachment_row, {
       key: c.id,
       attachment: c
@@ -90190,13 +90250,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_message_row, {
                       key: c.id,
                       message: c,
+                      "can-reply": Boolean(_ctx.prospect && _ctx.prospect.email),
+                      onReply: function onReply($event) {
+                        return $options.replyToEmail(c);
+                      },
                       onAddUser: function onAddUser($event) {
                         return $options.setWaitingUserMessage(c);
                       },
                       onEdit: function onEdit($event) {
                         return $data.message = _objectSpread({}, c);
                       }
-                    }, null, 8 /* PROPS */, ["message", "onAddUser", "onEdit"]);
+                    }, null, 8 /* PROPS */, ["message", "can-reply", "onReply", "onAddUser", "onEdit"]);
                   }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
                     loading: $data.fetchingMessages
                   }, null, 8 /* PROPS */, ["loading"])], 512 /* NEED_PATCH */), !$options.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("form", {
@@ -120090,7 +120154,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-message {\n    padding: 0px 5px 5px 5px;\n    position: relative;\n    border-bottom: 1px solid #eee;\n}\n.hc-prospect-message-header {\n    align-items: center;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n    font-size: 12px;\n}\n.hc-prospect-message-users {\n    padding: 5px 10px;\n}\n.hc-prospect-message .hc-icon {\n    font-size: 11px;\n}\n.hc-prospect-message > * {\n    width: 100%;\n}\n.hc-prospect-message-date {\n    color: #777777;\n    font-size: 11px;\n    text-align: right;\n}\n.hc-prospect-message-body {\n    white-space: normal;\n    padding: 0 10px;\n    word-break: break-all;\n}\n.hc-prospect-message-error {\n    white-space: normal;\n    color: #b75959;\n    font-size: 12px;\n    padding: 0 10px;\n    word-break: break-all;\n}\n.hc-prospect-message-attachments {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    flex-wrap: wrap;\n    gap: 10px;\n    padding: 5px 10px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-message {\n    padding: 0px 5px 5px 5px;\n    position: relative;\n    border-bottom: 1px solid #eee;\n}\n.hc-prospect-message-header {\n    align-items: center;\n    display: flex;\n    flex-direction: row;\n    width: 100%;\n    font-size: 12px;\n}\n.hc-prospect-message-users {\n    padding: 5px 10px;\n}\n.hc-prospect-message .hc-icon {\n    font-size: 11px;\n}\n\n/* The reply action only appears while the message is hovered. */\n.hc-prospect-message-reply {\n    visibility: hidden;\n}\n.hc-prospect-message:hover .hc-prospect-message-reply,\n.hc-prospect-message-reply:focus-visible {\n    visibility: visible;\n}\n.hc-prospect-message > * {\n    width: 100%;\n}\n.hc-prospect-message-date {\n    color: #777777;\n    font-size: 11px;\n    text-align: right;\n}\n.hc-prospect-message-body {\n    white-space: normal;\n    padding: 0 10px;\n    word-break: break-all;\n}\n.hc-prospect-message-incoming {\n    color: #0b6b8a;\n    font-weight: 600;\n}\n.hc-prospect-message-subject {\n    padding: 2px 10px 0 10px;\n    font-weight: 600;\n    overflow-wrap: anywhere;\n}\n.hc-prospect-message-error {\n    white-space: normal;\n    color: #b75959;\n    font-size: 12px;\n    padding: 0 10px;\n    word-break: break-all;\n}\n.hc-prospect-message-attachments {\n    width: 100%;\n    display: flex;\n    flex-direction: row;\n    flex-wrap: wrap;\n    gap: 10px;\n    padding: 5px 10px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

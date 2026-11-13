@@ -12,7 +12,7 @@ $client = $cm->make([
     'encryption'    => 'ssl',
     'validate_cert' => true,
     'username'      => 'sophie@careline.doctor',
-    'password'      => 'Careline@2026',
+    'password'      => '......',
     'protocol'      => 'imap',
 ]);
 
