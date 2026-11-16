@@ -579,8 +579,9 @@ export default {
                         error.response &&
                         error.response.status === 403 &&
                         error.response.data &&
-                        error.response.data.code ===
-                            "location_confirmation_required"
+                        (error.response.data.code ===
+                            "location_confirmation_required" ||
+                            error.response.data.code === "account_locked")
                     ) {
                         // Nouveau pays : un email de confirmation a été envoyé
                         flashError({

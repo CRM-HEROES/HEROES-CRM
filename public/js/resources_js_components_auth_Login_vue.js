@@ -60,7 +60,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 var data = _ref.data;
                 _this.signIn();
               })["catch"](function (error) {
-                if (error.response && error.response.status === 403 && error.response.data && error.response.data.code === "location_confirmation_required") {
+                if (error.response && error.response.status === 403 && error.response.data && (error.response.data.code === "location_confirmation_required" || error.response.data.code === "account_locked")) {
                   // Nouveau pays : un email de confirmation a été envoyé
                   flashError({
                     title: "Authentification",

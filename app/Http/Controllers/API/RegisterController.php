@@ -78,8 +78,13 @@ class RegisterController extends BaseController
      */
     public function login(Request $request)
     {
+        if (\App\Services\LoginAttemptLimiter::isLocked($request->email)) {
+            return \App\Services\LoginAttemptLimiter::lockedResponse();
+        }
+
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
-            $user = Auth::user(); 
+            $user = Auth::user();
+            \App\Services\LoginAttemptLimiter::reset($user);
 
             if ($user->must_change_password && (
                 !$user->password_temporary_expires_at ||
@@ -102,7 +107,11 @@ class RegisterController extends BaseController
             return $this->sendResponse($success, 'User login successfully.');
         }
 
-        else{ 
+        else{
+            if (\App\Services\LoginAttemptLimiter::recordFailure($request->email)) {
+                return \App\Services\LoginAttemptLimiter::lockedResponse();
+            }
+
             return $this->sendError('Unauthorised.', ['error'=>'Unauthorised']);
         } 
     }
