@@ -529,6 +529,7 @@
                 <!-- Claude -->
 
                 <header-menu
+                    v-if="can('all.project.agent.view')"
                     label="Claude"
                     :to="{
                         name: 'agent',
