@@ -60,7 +60,8 @@ export default {
                 {
                     key: "workflow",
                     name: "Automatisation",
-                    icon: "fa-diagram-project",
+                    icon: "fa-diagram-project icon-green",
+                    iconImage: "/images/permission-icons/workflow.svg",
                     sub: [
                         {
                             key: "view",
@@ -98,6 +99,19 @@ export default {
                                     icon: "fa-eye",
                                 },
                             ],
+                        },
+                    ],
+                },
+                {
+                    key: "agent",
+                    name: "Assistant Claude",
+                    icon: "fa-robot icon-orange",
+                    iconImage: "/images/permission-icons/claude.svg",
+                    sub: [
+                        {
+                            key: "view",
+                            name: "Voir l'assistant Claude",
+                            icon: "fa-eye icon-blue",
                         },
                     ],
                 },
@@ -581,7 +595,8 @@ export default {
         {
             key: "prospect",
             name: "Prospect",
-            icon: "fa-users",
+            icon: "fa-users icon-blue",
+            iconImage: "/images/permission-icons/prospect.svg",
             sub: [
                 {
                     key: "view",
@@ -796,12 +811,14 @@ export default {
         {
             key: "map",
             name: "Utiliser la MAP",
-            icon: "fa-map-marker",
+            icon: "fa-map-marker icon-blue",
+            iconImage: "/images/permission-icons/map.svg",
         },
         {
             key: "stat",
             name: "Voir les statistiques",
-            icon: "fa-chart-bar",
+            icon: "fa-chart-bar icon-orange",
+            iconImage: "/images/permission-icons/stat.svg",
         },
     ],
 };

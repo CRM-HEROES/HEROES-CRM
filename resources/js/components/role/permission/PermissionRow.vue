@@ -1,6 +1,13 @@
 <template>
     <item :tag="permission.sub ? 'div' : 'label'">
-        <icon :class="['fa', permission.icon]" />
+        <icon v-if="permission.iconImage">
+            <img
+                :src="permission.iconImage"
+                alt=""
+                style="width: 22px; height: 22px; object-fit: contain"
+            />
+        </icon>
+        <icon v-else :class="['fa', permission.icon]" />
         <div class="hc-item-main-content" v-text="permission.name"></div>
         <icon
             v-if="permission.sub || permission.action"
