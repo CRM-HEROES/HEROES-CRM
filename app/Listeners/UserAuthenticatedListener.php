@@ -26,7 +26,7 @@ class UserAuthenticatedListener
             $data = app(\App\Utils\Tracker\Tracker::class)->makeSessionData();
             $bannedAt = $this->deviceBannedAt($data['user_id'], $data['device_id'], $data['client_ip']);
 
-            if ($event->user->banned_at || $bannedAt) {
+            if ($event->user->banned_at || $event->user->locked_at || $bannedAt) {
                 \Auth::logout();
             }
         }

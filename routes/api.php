@@ -147,6 +147,7 @@ use App\Http\Controllers\API\Project\TrashController as ProjectTrashController;
 
 use App\Http\Controllers\API\Project\UserController as ProjectUserController;
 use App\Http\Controllers\API\Project\User\ActionController as ProjectUserActionController;
+use App\Http\Controllers\API\Project\User\LockController as ProjectUserLockController;
 use App\Http\Controllers\API\Project\User\CalendarController as ProjectUserCalendarController;
 use App\Http\Controllers\API\Project\User\CategoryController as ProjectUserCategoryController;
 use App\Http\Controllers\API\Project\User\DocumentController as ProjectUserDocumentController;
@@ -182,6 +183,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\API\User\BanController as UserBanController;
+use App\Http\Controllers\API\User\LockController as UserLockController;
 use App\Http\Controllers\API\User\ClaudeSettingController;
 use App\Http\Controllers\API\User\EventsDailyDirectionController as UserEventsDailyDirectionController;
 use App\Http\Controllers\API\User\ProjectController as UserProjectController;
@@ -869,6 +871,10 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
             // Impersonate
             Route::post('impersonate', [ProjectUserImpersonateController::class, "impersonate"])->name('impersonate');
 
+            // Lock (blocage de connexion)
+            Route::match(['PUT', 'PATCH'], 'lock', [ProjectUserLockController::class, "update"])->name('lock.store');
+            Route::delete('lock', [ProjectUserLockController::class, "destroy"])->name('lock.delete');
+
             // User action
             Route::get('action', [ProjectUserActionController::class, "index"]);
             // User calendar
@@ -937,6 +943,10 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         // Ban
         Route::match(['PUT', 'PATCH'], '/ban', [UserBanController::class, "update"])->name('ban.store');
         Route::delete('/ban', [UserBanController::class, "destroy"])->name('ban.delete');
+
+        // Lock (blocage de connexion, débloquable par l'admin du projet)
+        Route::match(['PUT', 'PATCH'], '/lock', [UserLockController::class, "update"])->name('lock.store');
+        Route::delete('/lock', [UserLockController::class, "destroy"])->name('lock.delete');
 
         // Events daily direction
         Route::get('events-daily-direction/{date}/status', [UserEventsDailyDirectionController::class, 'status'])->withoutMiddleware("throttle:api");

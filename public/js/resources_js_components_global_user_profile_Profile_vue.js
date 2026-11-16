@@ -11,24 +11,25 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_user_ban__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/user/ban */ "./resources/js/apis/user/ban.js");
-/* harmony import */ var _actions_user__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/user */ "./resources/js/actions/user.js");
-/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
-/* harmony import */ var _blocs_calendar_Bloc_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./blocs/calendar/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/calendar/Bloc.vue");
-/* harmony import */ var _blocs_category_Bloc_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./blocs/category/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/category/Bloc.vue");
-/* harmony import */ var _blocs_folder_Bloc_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./blocs/folder/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/folder/Bloc.vue");
-/* harmony import */ var _blocs_geoip_Bloc_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./blocs/geoip/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/geoip/Bloc.vue");
-/* harmony import */ var _blocs_group_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./blocs/group/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/group/Bloc.vue");
-/* harmony import */ var _blocs_session_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./blocs/session/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/session/Bloc.vue");
-/* harmony import */ var _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./blocs/thread/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/thread/Bloc.vue");
-/* harmony import */ var _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./blocs/user/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/user/Bloc.vue");
-/* harmony import */ var _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./blocs/info/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/info/Bloc.vue");
-/* harmony import */ var _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./blocs/role/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/role/Bloc.vue");
-/* harmony import */ var _blocs_project_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./blocs/project/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/project/Bloc.vue");
-/* harmony import */ var _components_user_tracker_stat_Slide_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! @/components/user/tracker/stat/Slide.vue */ "./resources/js/components/user/tracker/stat/Slide.vue");
-/* harmony import */ var _project_Slide__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../project/Slide */ "./resources/js/components/global/user/project/Slide.vue");
+/* harmony import */ var _apis_user_lock__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/user/lock */ "./resources/js/apis/user/lock.js");
+/* harmony import */ var _actions_user__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/user */ "./resources/js/actions/user.js");
+/* harmony import */ var _actions_slide__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/actions/slide */ "./resources/js/actions/slide.js");
+/* harmony import */ var _blocs_calendar_Bloc_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./blocs/calendar/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/calendar/Bloc.vue");
+/* harmony import */ var _blocs_category_Bloc_vue__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./blocs/category/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/category/Bloc.vue");
+/* harmony import */ var _blocs_folder_Bloc_vue__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./blocs/folder/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/folder/Bloc.vue");
+/* harmony import */ var _blocs_geoip_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./blocs/geoip/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/geoip/Bloc.vue");
+/* harmony import */ var _blocs_group_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./blocs/group/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/group/Bloc.vue");
+/* harmony import */ var _blocs_session_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./blocs/session/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/session/Bloc.vue");
+/* harmony import */ var _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./blocs/thread/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/thread/Bloc.vue");
+/* harmony import */ var _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./blocs/user/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/user/Bloc.vue");
+/* harmony import */ var _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./blocs/info/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/info/Bloc.vue");
+/* harmony import */ var _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./blocs/role/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/role/Bloc.vue");
+/* harmony import */ var _blocs_project_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./blocs/project/Bloc.vue */ "./resources/js/components/global/user/profile/blocs/project/Bloc.vue");
+/* harmony import */ var _components_user_tracker_stat_Slide_vue__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! @/components/user/tracker/stat/Slide.vue */ "./resources/js/components/user/tracker/stat/Slide.vue");
+/* harmony import */ var _project_Slide__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../project/Slide */ "./resources/js/components/global/user/project/Slide.vue");
 var _components;
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
@@ -39,6 +40,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -61,30 +63,31 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: (_components = {
-    CalendarBloc: _blocs_calendar_Bloc_vue__WEBPACK_IMPORTED_MODULE_4__["default"],
-    CategoryBloc: _blocs_category_Bloc_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
-    FolderBloc: _blocs_folder_Bloc_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
-    GeoipBloc: _blocs_geoip_Bloc_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
-    GroupBloc: _blocs_group_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
-    InfoBloc: _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__["default"],
-    SessionBloc: _blocs_session_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
-    ThreadBloc: _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
-    UserBloc: _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__["default"]
-  }, _defineProperty(_components, "InfoBloc", _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__["default"]), _defineProperty(_components, "RoleBloc", _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__["default"]), _defineProperty(_components, "ProjectBloc", _blocs_project_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__["default"]), _defineProperty(_components, "ManageUserTrackerStatSlide", _components_user_tracker_stat_Slide_vue__WEBPACK_IMPORTED_MODULE_15__["default"]), _defineProperty(_components, "UserProjectSlide", _project_Slide__WEBPACK_IMPORTED_MODULE_16__["default"]), _components),
+    CalendarBloc: _blocs_calendar_Bloc_vue__WEBPACK_IMPORTED_MODULE_5__["default"],
+    CategoryBloc: _blocs_category_Bloc_vue__WEBPACK_IMPORTED_MODULE_6__["default"],
+    FolderBloc: _blocs_folder_Bloc_vue__WEBPACK_IMPORTED_MODULE_7__["default"],
+    GeoipBloc: _blocs_geoip_Bloc_vue__WEBPACK_IMPORTED_MODULE_8__["default"],
+    GroupBloc: _blocs_group_Bloc_vue__WEBPACK_IMPORTED_MODULE_9__["default"],
+    InfoBloc: _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__["default"],
+    SessionBloc: _blocs_session_Bloc_vue__WEBPACK_IMPORTED_MODULE_10__["default"],
+    ThreadBloc: _blocs_thread_Bloc_vue__WEBPACK_IMPORTED_MODULE_11__["default"],
+    UserBloc: _blocs_user_Bloc_vue__WEBPACK_IMPORTED_MODULE_12__["default"]
+  }, _defineProperty(_components, "InfoBloc", _blocs_info_Bloc_vue__WEBPACK_IMPORTED_MODULE_13__["default"]), _defineProperty(_components, "RoleBloc", _blocs_role_Bloc_vue__WEBPACK_IMPORTED_MODULE_14__["default"]), _defineProperty(_components, "ProjectBloc", _blocs_project_Bloc_vue__WEBPACK_IMPORTED_MODULE_15__["default"]), _defineProperty(_components, "ManageUserTrackerStatSlide", _components_user_tracker_stat_Slide_vue__WEBPACK_IMPORTED_MODULE_16__["default"]), _defineProperty(_components, "UserProjectSlide", _project_Slide__WEBPACK_IMPORTED_MODULE_17__["default"]), _components),
   data: function data() {
     return {
       impersonating: false,
-      banning: false
+      banning: false,
+      locking: false
     };
   },
-  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_17__.mapActions)({
+  methods: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_18__.mapActions)({
     signIn: "auth/login"
   })), {}, {
     /**
      *
      */
     showConnections: function showConnections() {
-      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_3__.OPEN_SLIDE, "user-logs-chart");
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_slide__WEBPACK_IMPORTED_MODULE_4__.OPEN_SLIDE, "user-logs-chart");
     },
     /**
      *
@@ -104,7 +107,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
               _context2.next = 5;
               return _apis_user_ban__WEBPACK_IMPORTED_MODULE_1__["default"].cancelBan(_this.globalUser.id);
             case 5:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_2__.UPDATE_GLOBAL_USER, {
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_3__.UPDATE_GLOBAL_USER, {
                 id: _this.globalUser.id,
                 banned_at: null
               });
@@ -125,7 +128,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                       _context.next = 4;
                       return _apis_user_ban__WEBPACK_IMPORTED_MODULE_1__["default"].ban(_this.globalUser.id);
                     case 4:
-                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_2__.UPDATE_GLOBAL_USER, {
+                      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_3__.UPDATE_GLOBAL_USER, {
                         id: _this.globalUser.id,
                         banned_at: new Date()
                       });
@@ -147,39 +150,82 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }))();
     },
     /**
-     *
+     * Bloquer / débloquer l'accès (lève aussi le blocage automatique après 3 échecs)
      */
-    impersonate: function impersonate() {
+    toggleLock: function toggleLock() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this2.impersonating = true;
+              _this2.locking = true;
               _context3.prev = 1;
-              _context3.next = 4;
-              return axios.post("/api/user/" + _this2.globalUser.id + "/impersonate");
-            case 4:
-              _context3.next = 6;
-              return _this2.signIn();
-            case 6:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_IMPERSONATING", true);
-              _this2.$router.push({
-                name: "dashboard"
+              if (!_this2.globalUser.locked_at) {
+                _context3.next = 8;
+                break;
+              }
+              _context3.next = 5;
+              return _apis_user_lock__WEBPACK_IMPORTED_MODULE_2__["default"].unlock(_this2.globalUser.id);
+            case 5:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_3__.UPDATE_GLOBAL_USER, {
+                id: _this2.globalUser.id,
+                locked_at: null
               });
+              _context3.next = 11;
+              break;
             case 8:
-              _context3.prev = 8;
-              _this2.impersonating = false;
-              return _context3.finish(8);
+              _context3.next = 10;
+              return _apis_user_lock__WEBPACK_IMPORTED_MODULE_2__["default"].lock(_this2.globalUser.id);
+            case 10:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_user__WEBPACK_IMPORTED_MODULE_3__.UPDATE_GLOBAL_USER, {
+                id: _this2.globalUser.id,
+                locked_at: new Date()
+              });
             case 11:
+              _context3.prev = 11;
+              _this2.locking = false;
+              return _context3.finish(11);
+            case 14:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[1,, 8, 11]]);
+        }, _callee3, null, [[1,, 11, 14]]);
+      }))();
+    },
+    /**
+     *
+     */
+    impersonate: function impersonate() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              _this3.impersonating = true;
+              _context4.prev = 1;
+              _context4.next = 4;
+              return axios.post("/api/user/" + _this3.globalUser.id + "/impersonate");
+            case 4:
+              _context4.next = 6;
+              return _this3.signIn();
+            case 6:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("auth/SET_IMPERSONATING", true);
+              _this3.$router.push({
+                name: "dashboard"
+              });
+            case 8:
+              _context4.prev = 8;
+              _this3.impersonating = false;
+              return _context4.finish(8);
+            case 11:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[1,, 8, 11]]);
       }))();
     }
   }),
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_17__.mapGetters)(["globalUser"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_18__.mapGetters)(["globalUser"])), {}, {
     userSettingsUserProfile: function userSettingsUserProfile() {
       return [[{
         type: "field",
@@ -2495,6 +2541,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8 /* PROPS */, ["loading"])];
     }),
     _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["class", "title", "onClick"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+    tag: "a",
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['fa', _ctx.globalUser.locked_at ? 'fa-lock' : 'fa-unlock', _ctx.globalUser.locked_at ? 'icon-red' : 'icon-grey']),
+    title: _ctx.globalUser.locked_at ? 'Débloquer l\'accès de cet utilisateur' : 'Bloquer l\'accès de cet utilisateur',
+    "icon-size": 16,
+    onClick: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)($options.toggleLock, ["prevent"])
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_loading, {
+        loading: $data.locking
+      }, null, 8 /* PROPS */, ["loading"])];
+    }),
+    _: 1 /* STABLE */
   }, 8 /* PROPS */, ["class", "title", "onClick"]), !_ctx.globalUser.banned_at ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
     key: 0,
     tag: "a",
@@ -4362,6 +4421,29 @@ __webpack_require__.r(__webpack_exports__);
   },
   cancelBan: function cancelBan(user) {
     return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("user/".concat(user, "/ban"));
+  }
+});
+
+/***/ }),
+
+/***/ "./resources/js/apis/user/lock.js":
+/*!****************************************!*\
+  !*** ./resources/js/apis/user/lock.js ***!
+  \****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _apis_api_service__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/apis/api.service */ "./resources/js/apis/api.service.js");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  lock: function lock(user) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"].put("user/".concat(user, "/lock"));
+  },
+  unlock: function unlock(user) {
+    return _apis_api_service__WEBPACK_IMPORTED_MODULE_0__["default"]["delete"]("user/".concat(user, "/lock"));
   }
 });
 

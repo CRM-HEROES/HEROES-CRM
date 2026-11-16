@@ -22,7 +22,28 @@ class LoginController extends Controller
     |
     */
 
-    use AuthenticatesUsers;
+    use AuthenticatesUsers {
+        login as protected traitLogin;
+        sendFailedLoginResponse as protected traitSendFailedLoginResponse;
+    }
+
+    public function login(Request $request)
+    {
+        if (\App\Services\LoginAttemptLimiter::isLocked($request->input('email'))) {
+            return \App\Services\LoginAttemptLimiter::lockedResponse();
+        }
+
+        return $this->traitLogin($request);
+    }
+
+    protected function sendFailedLoginResponse(Request $request)
+    {
+        if (\App\Services\LoginAttemptLimiter::recordFailure($request->input('email'))) {
+            return \App\Services\LoginAttemptLimiter::lockedResponse();
+        }
+
+        return $this->traitSendFailedLoginResponse($request);
+    }
 
     /**
      * Where to redirect users after login.
@@ -46,6 +67,8 @@ class LoginController extends Controller
      */
     protected function authenticated(Request $request, Authenticatable $user)
     {
+        \App\Services\LoginAttemptLimiter::reset($user);
+
         if ($user->must_change_password && (
             !$user->password_temporary_expires_at ||
             $user->password_temporary_expires_at->isPast()

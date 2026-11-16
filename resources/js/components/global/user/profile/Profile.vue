@@ -28,6 +28,23 @@
                 <loading :loading="banning" />
             </icon>
             <icon
+                tag="a"
+                :class="[
+                    'fa',
+                    globalUser.locked_at ? 'fa-lock' : 'fa-unlock',
+                    globalUser.locked_at ? 'icon-red' : 'icon-grey',
+                ]"
+                :title="
+                    globalUser.locked_at
+                        ? 'Débloquer l\'accès de cet utilisateur'
+                        : 'Bloquer l\'accès de cet utilisateur'
+                "
+                :icon-size="16"
+                @click.prevent="toggleLock"
+            >
+                <loading :loading="locking" />
+            </icon>
+            <icon
                 v-if="!globalUser.banned_at"
                 tag="a"
                 class="fa fa-sign-in"
@@ -211,6 +228,7 @@
 import { mapActions, mapGetters } from "vuex";
 import store from "@/store";
 import BanService from "@/apis/user/ban";
+import LockService from "@/apis/user/lock";
 
 // Actions
 import { UPDATE_GLOBAL_USER } from "@/actions/user";
@@ -256,6 +274,7 @@ export default {
         return {
             impersonating: false,
             banning: false,
+            locking: false,
         };
     },
 
@@ -306,6 +325,31 @@ export default {
                         }
                     }
                 );
+            }
+        },
+
+        /**
+         * Bloquer / débloquer l'accès (lève aussi le blocage automatique après 3 échecs)
+         */
+        async toggleLock() {
+            this.locking = true;
+
+            try {
+                if (this.globalUser.locked_at) {
+                    await LockService.unlock(this.globalUser.id);
+                    store.commit(UPDATE_GLOBAL_USER, {
+                        id: this.globalUser.id,
+                        locked_at: null,
+                    });
+                } else {
+                    await LockService.lock(this.globalUser.id);
+                    store.commit(UPDATE_GLOBAL_USER, {
+                        id: this.globalUser.id,
+                        locked_at: new Date(),
+                    });
+                }
+            } finally {
+                this.locking = false;
             }
         },
 

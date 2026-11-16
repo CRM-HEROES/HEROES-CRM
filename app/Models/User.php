@@ -92,6 +92,7 @@ class User extends Authenticatable // implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password_temporary_expires_at' => 'datetime',
         'must_change_password' => 'boolean',
+        'locked_at' => 'datetime',
         'default_projects' => 'json',
         'claude_api_key' => 'encrypted',
     ];

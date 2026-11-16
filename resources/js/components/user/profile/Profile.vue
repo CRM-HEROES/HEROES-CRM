@@ -81,6 +81,23 @@
                 <loading :loading="sendingPasswordReset" />
             </icon>
             <icon
+                v-if="canLock"
+                tag="a"
+                :class="[
+                    'fa',
+                    user.locked_at ? 'fa-lock icon-red' : 'fa-unlock icon-grey',
+                ]"
+                v-tooltip="
+                    user.locked_at
+                        ? 'Débloquer l\'accès de cet utilisateur'
+                        : 'Bloquer l\'accès de cet utilisateur'
+                "
+                :icon-size="16"
+                @click.prevent="toggleLock"
+            >
+                <loading :loading="locking" />
+            </icon>
+            <icon
                 v-if="can('all')"
                 tag="a"
                 class="fa fa-sign-in icon-purple"
@@ -207,6 +224,7 @@ import { mapActions, mapGetters } from "vuex";
 import store from "@/store";
 
 import { OPEN_SLIDE } from "@/actions/slide";
+import LockService from "@/apis/project/user/lock";
 import {
     GET_PROJECT_USER_SETTING,
     UPDATE_PROJECT_USER_SETTING,
@@ -232,6 +250,7 @@ export default {
     data() {
         return {
             impersonating: false,
+            locking: false,
             sendingPasswordReset: false,
             movable: deviceType() == "desktop",
             openBlocs: deviceType() == "desktop",
@@ -338,6 +357,28 @@ export default {
         },
 
         /**
+         * Bloquer / débloquer l'accès (lève aussi le blocage après 3 échecs de connexion)
+         */
+        async toggleLock() {
+            this.locking = true;
+
+            try {
+                if (this.user.locked_at) {
+                    await LockService.unlock(this.project.slug, this.user.id);
+                    store.commit("updateUser", { id: this.user.id, locked_at: null });
+                } else {
+                    await LockService.lock(this.project.slug, this.user.id);
+                    store.commit("updateUser", {
+                        id: this.user.id,
+                        locked_at: new Date().toISOString(),
+                    });
+                }
+            } finally {
+                this.locking = false;
+            }
+        },
+
+        /**
          *
          */
         async impersonate() {
@@ -403,6 +444,16 @@ export default {
          * Un super admin, un utilisateur ayant la permission "all" sur le projet (comme pour les
          * autres icônes d'administration), ou l'utilisateur lui-même, peut envoyer l'email de changement
          */
+        canLock() {
+            const me = this.$store.state.auth.user;
+
+            return !!(
+                this.user &&
+                !(me && me.id === this.user.id) &&
+                (this.superAdmin || this.can("all"))
+            );
+        },
+
         canResetPassword() {
             const me = this.$store.state.auth.user;
 
