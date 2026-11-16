@@ -106,6 +106,70 @@ class CloudTalkSmsAttachmentsTest extends TestCase
         parent::tearDown();
     }
 
+    public function test_manual_cloudtalk_sms_is_recorded_and_sent_with_the_configured_sender_even_when_numbers_match(): void
+    {
+        DB::table('lines')->where('id', 1)->update([
+            'config' => json_encode([
+                'numero' => '+12025550143',
+                'api_key_id' => 'test',
+                'api_key_secret' => 'secret',
+            ]),
+        ]);
+        Http::fake([
+            'my.cloudtalk.io/api/sms/send.json' => Http::response([
+                'responseData' => ['status' => 200, 'success' => true],
+            ]),
+        ]);
+
+        $this->postJson($this->endpoint(), [
+            'source' => 'cloudtalk',
+            'message' => 'Envoi manuel',
+        ])->assertCreated();
+
+        $sms = Sms::query()->sole();
+        $this->assertSame('cloudtalk', $sms->source);
+        $this->assertTrue((bool) $sms->from_user);
+
+        (new SendCloudTalk($sms))->handle(new CloudTalk());
+
+        Http::assertSent(fn (Request $request) => $request->url() === 'https://my.cloudtalk.io/api/sms/send.json'
+            && $request->isJson()
+            && $request->data() === [
+                'recipient' => '+12025550143',
+                'sender' => '+12025550143',
+                'message' => 'Envoi manuel',
+            ]);
+        $this->assertNotNull($sms->fresh()->sent_at);
+    }
+
+    public function test_manual_cloudtalk_call_route_sends_without_automated_eligibility_checks(): void
+    {
+        DB::table('lines')->where('id', 1)->update([
+            'config' => json_encode([
+                'numero' => '+12025550178',
+                'api_key_id' => 'test',
+                'api_key_secret' => 'secret',
+                'agent_id' => 77,
+            ]),
+        ]);
+        Http::fake([
+            'my.cloudtalk.io/api/calls/create.json' => Http::response([
+                'responseData' => ['status' => 200, 'data' => ['call_id' => 'manual-call']],
+            ]),
+        ]);
+
+        $this->postJson('/api/project/test/line/cloudtalk/call', [
+            'number' => '+12025550143',
+            'line_id' => 1,
+        ])->assertOk()->assertJsonPath('call_id', 'manual-call');
+
+        Http::assertSent(fn (Request $request) => $request->url() === 'https://my.cloudtalk.io/api/calls/create.json'
+            && $request->data() === [
+                'agent_id' => 77,
+                'callee_number' => '+12025550143',
+            ]);
+    }
+
     public function test_image_only_message_is_stored_privately_and_the_job_uploads_its_binary_to_cloudtalk(): void
     {
         $response = $this->post($this->endpoint(), [

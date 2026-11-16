@@ -190,6 +190,11 @@
     },
 
     "prospect": {
+        "call_controls": {
+            "consent": "Explicit consent to receive calls or SMS",
+            "do_not_call": "Do not call or text again",
+            "update_error": "Unable to save contact preferences."
+        },
         "communications": {
             "process": "Process",
             "request_process": "Request processing",
@@ -2096,6 +2101,68 @@
                 "product": "Products"
             }
         },
+        "calls_settings": {
+            "title": "Calls and messages",
+            "description": "Configure call availability and welcome messages for this project.",
+            "close": "Close",
+            "global_status": "Calls and messages: {status} (kill switch)",
+            "global_description": "The global kill switch applies to every project. Enabled = calls and messages allowed.",
+            "global_toggle": "Allow calls and messages",
+            "authorized": "authorized",
+            "suspended": "suspended",
+            "project_enabled": "Enable calls and messages for this project",
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "provider": "Voice and SMS provider",
+            "provider_priority": "Priority: the provider configured for this project overrides the global provider.",
+            "timezone": "Working-hours time zone",
+            "providers": {
+                "fake": "Simulation",
+                "cloudtalk": "CloudTalk",
+                "ai_voice": "AI voice"
+            },
+            "working_hours": "Availability hours",
+            "start": "Start",
+            "end": "End",
+            "days": {
+                "monday": "Mon",
+                "tuesday": "Tue",
+                "wednesday": "Wed",
+                "thursday": "Thu",
+                "friday": "Fri",
+                "saturday": "Sat",
+                "sunday": "Sun"
+            },
+            "greeting": "Welcome message",
+            "welcome_agent": "Welcome agent",
+            "transfer_adviser": "Transfer adviser",
+            "callback_label": "Callback label",
+            "manual_availability": "Manually set the adviser's availability",
+            "diagnostic_title": "Eligibility diagnostic (does not send)",
+            "prospect_id": "Prospect ID to check",
+            "diagnose": "Check a prospect",
+            "diagnosing": "Checking…",
+            "diagnostic_error": "Could not check this prospect.",
+            "timezone_used": "Time zone used: {timezone}",
+            "checks": {
+                "global": "Global kill switch",
+                "project": "Project activation",
+                "provider": "Provider",
+                "cloudtalk_line": "CloudTalk line",
+                "consent": "Explicit consent",
+                "contact_refusal": "Contact refusal",
+                "hours": "Working hours",
+                "frequency": "SMS frequency (48 h)",
+                "phone": "Phone number"
+            },
+            "none": "None",
+            "saved": "Settings saved.",
+            "saving": "Saving…",
+            "save": "Save",
+            "cancel": "Cancel",
+            "load_error": "Could not load call settings.",
+            "save_error": "Could not save call settings."
+        },
         "table": {
             "footer": {
                 "toggle_project_menus": "Toggle project menus",
@@ -2525,6 +2592,36 @@
         },
         "dashboard": {
             "between_dates": "Between {start} and {end}"
+        }
+    },
+
+    "agent": {
+        "tools": {
+            "agent_docs": "Reference documents"
+        },
+        "documents": {
+            "title": "Reference documents",
+            "description": "Add private PDF, TXT, or MD files to enrich the agent's answers.",
+            "pending_upload": "will be added after saving",
+            "invalid_file": "Choose a PDF, TXT, or MD file up to 10 MB.",
+            "status": {
+                "queued": "Analysis queued",
+                "ready": "Ready",
+                "failed": "Analysis failed"
+            }
+        },
+        "chat": {
+            "attach": "Add attachments",
+            "remove_attachment": "Remove attachment",
+            "invalid_file_type": "File type not allowed. Accepted formats: JPG, PNG, WebP, PDF, TXT, and MD.",
+            "file_too_large": "Each file must be 10 MB or smaller.",
+            "too_many_files": "You can attach up to 5 files.",
+            "add_to_knowledge": "Add to agent knowledge",
+            "knowledge_added": "Document added to agent knowledge.",
+            "listening": "Listening…",
+            "dictate": "Dictate a message",
+            "stop_listening": "Stop dictation",
+            "stop": "Stop"
         }
     },
 

@@ -2,6 +2,11 @@
 
 namespace App\Providers;
 
+use App\Agents\Tools\AppHelpTool;
+use App\Agents\Tools\AgentDocsTool;
+use App\Agents\Tools\CallStartTool;
+use App\Agents\Tools\CallTransferTool;
+use App\Agents\Tools\DoNotCallTool;
 use App\Agents\Tools\ComparePeriodsTool;
 use App\Agents\Tools\CrmAggregateTool;
 use App\Agents\Tools\CrmDescribeTool;
@@ -17,9 +22,14 @@ use App\Agents\Writes\WriteCapabilities;
 use App\Http\Requests\Validator\TwoFactorsTokenValidator;
 use App\Mail\BrevoTransport;
 use App\Workflows\Actions\ActionRegistry;
+use App\Workflows\Actions\AgentCallAction;
+use App\Workflows\Actions\AgentSmsAction;
 use App\Workflows\Actions\MakeCallAction;
 use App\Workflows\Actions\SendEmailAction;
 use App\Workflows\Actions\SendSmsAction;
+use App\Calls\Voice\ConfiguredVoiceProvider;
+use App\Calls\Voice\VoiceProvider;
+use App\Models\Prospect;
 use Illuminate\Database\Schema\Builder;
 use Illuminate\Mail\MailManager;
 use Illuminate\Support\ServiceProvider;
@@ -38,6 +48,8 @@ class AppServiceProvider extends ServiceProvider
             $registry->register('send_email', $app->make(SendEmailAction::class));
             $registry->register('send_sms', $app->make(SendSmsAction::class));
             $registry->register('make_call', $app->make(MakeCallAction::class));
+            $registry->register('agent_call', $app->make(AgentCallAction::class));
+            $registry->register('agent_sms', $app->make(AgentSmsAction::class));
 
             return $registry;
         });
@@ -45,7 +57,7 @@ class AppServiceProvider extends ServiceProvider
         // The tools of the AI agents. A new tool is registered here.
         $this->app->singleton(ToolRegistry::class, function ($app) {
             $registry = new ToolRegistry();
-            foreach ([CrmDescribeTool::class, CrmSearchTool::class, CrmAggregateTool::class, TeamPerformanceTool::class, ComparePeriodsTool::class] as $tool) {
+            foreach ([CrmDescribeTool::class, CrmSearchTool::class, CrmAggregateTool::class, TeamPerformanceTool::class, ComparePeriodsTool::class, AppHelpTool::class, AgentDocsTool::class, CallStartTool::class, CallTransferTool::class, DoNotCallTool::class] as $tool) {
                 $registry->register($app->make($tool));
             }
 
@@ -68,6 +80,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Builder::defaultStringLength(191);
+        $this->app->bind(VoiceProvider::class, ConfiguredVoiceProvider::class);
 
         $this->app->resolving(MailManager::class, function (MailManager $manager) {
             $manager->extend('brevo', function (array $config) {
@@ -78,7 +91,7 @@ class AppServiceProvider extends ServiceProvider
                 );
             });
         });
-        
+
         $this->app['validator']->resolver(function($translator, $data, $rules, $messages) {
             return new TwoFactorsTokenValidator($translator, $data, $rules, $messages);
         });

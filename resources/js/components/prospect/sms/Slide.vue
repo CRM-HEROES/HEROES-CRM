@@ -502,6 +502,12 @@
                       role="alert"
                       v-text="sendError"
                     ></div>
+                    <div
+                      v-if="sendNotice"
+                      class="hc-prospect-sms-notice"
+                      role="status"
+                      v-text="sendNotice"
+                    ></div>
 
                     <!-- Fold -->
 
@@ -789,6 +795,11 @@ button.hc-prospect-sms-refresh:disabled:hover {
   justify-content: flex-start;
 }
 
+.hc-prospect-sms-notice {
+  margin-top: 6px;
+  color: #27833b;
+}
+
 /* Textarea : s'agrandit avec le formulaire */
 #hc-prospect-sms-textarea {
   flex: 0 0 auto;
@@ -859,6 +870,7 @@ export default {
       addingSms: false,
       attachments: [],
       sendError: "",
+      sendNotice: "",
     };
   },
 
@@ -983,6 +995,7 @@ export default {
 
       this.addingSms = true;
       this.sendError = "";
+      this.sendNotice = "";
       const payload = { ...this.sms };
       if (payload.source === "cloudtalk" && this.attachments.length) {
         payload.attachments = [...this.attachments];
@@ -990,7 +1003,8 @@ export default {
 
       try {
         if (this.prospect) {
-          await store.dispatch(ADD_PROSPECT_SMS, payload);
+          const result = await store.dispatch(ADD_PROSPECT_SMS, payload);
+          this.sendNotice = result?.message || "";
         } else if (this.prospectsSelected.length > 0) {
           const result = await store.dispatch(BULK_PROSPECT_SMS, {
             ...payload,
@@ -1001,6 +1015,7 @@ export default {
             ...this.bulkSms,
             { ...this.sms, attachments: result?.attachments || [] },
           ];
+          this.sendNotice = result?.message || "";
         }
         this.sms.message = "";
         this.attachments = [];

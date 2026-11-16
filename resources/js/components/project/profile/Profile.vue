@@ -2,6 +2,15 @@
     <div id="hc-project-profile">
         <div id="hc-project-profile-header">
             <div id="hc-project-profile-title" v-text="project.name"></div>
+            <button
+                v-if="canManageCalls"
+                type="button"
+                class="hc-project-calls-settings-button"
+                @click="showCallsSettings = true"
+            >
+                <i class="fa fa-phone" aria-hidden="true"></i>
+                <span>{{ $t("project.calls_settings.title") }}</span>
+            </button>
             <icon
                 class="fa fa-envelope"
                 color="#da3c58"
@@ -96,6 +105,10 @@
                 </div>
             </div>
         </div>
+        <calls-settings
+            v-if="showCallsSettings"
+            @close="showCallsSettings = false"
+        />
         <project-profile-setting-slide />
     </div>
 </template>
@@ -120,6 +133,19 @@
     padding: 15px 0 15px 15px;
     font-weight: bold;
     font-size: 15px;
+}
+
+.hc-project-calls-settings-button {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 12px;
+    padding: 7px 10px;
+    border: 1px solid #d5d5d5;
+    border-radius: 5px;
+    background: white;
+    color: #333;
+    cursor: pointer;
 }
 
 #hc-project-profile-body {
@@ -217,9 +243,11 @@ import {
 } from "@/actions/project/user/setting";
 
 import ProfileBloc from "./ProfileBloc.vue";
+import CallsSettings from "./calls/Settings.vue";
 
 export default {
     components: {
+        CallsSettings,
         ProfileBloc,
     },
 
@@ -231,6 +259,7 @@ export default {
         return {
             updatingLogo: false,
             movable: deviceType() == "desktop",
+            showCallsSettings: false,
         };
     },
 
@@ -333,6 +362,20 @@ export default {
     },
 
     computed: {
+        canManageCalls() {
+            const user = this.$store.state.auth.user || {};
+
+            if (
+                user.is_super_admin ||
+                this.project.creator_id == user.id
+            ) {
+                return true;
+            }
+
+            return typeof this.can === "function"
+                ? this.can("all.project.role.update")
+                : false;
+        },
         ...mapGetters([
             "project",
             "categories",

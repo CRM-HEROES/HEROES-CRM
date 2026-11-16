@@ -110,9 +110,8 @@ class CloudTalk
         $cloudTalkStatus = (int) data_get($body, 'responseData.status', $response->status());
 
         if (!$response->successful() || $cloudTalkStatus !== 200) {
-            $message = data_get($body, 'responseData.message');
             throw new RuntimeException(
-                $this->messageForStatus($cloudTalkStatus, $message),
+                $this->messageForStatus($cloudTalkStatus),
                 $cloudTalkStatus ?: $response->status()
             );
         }
@@ -185,13 +184,8 @@ class CloudTalk
             $success === false ||
             $success === 'false'
         ) {
-            $data = data_get($body, 'responseData.data');
-            $message = data_get($body, 'responseData.message')
-                ?: data_get($body, 'responseData.data.message')
-                ?: (is_string($data) ? $data : null);
-
             throw new RuntimeException(
-                $this->messageForStatus($cloudTalkStatus, $message),
+                $this->messageForStatus($cloudTalkStatus),
                 $cloudTalkStatus ?: $response->status()
             );
         }
@@ -578,7 +572,7 @@ class CloudTalk
         return $label ?: 'Agent CloudTalk';
     }
 
-    protected function messageForStatus(int $status, ?string $message): string
+    protected function messageForStatus(int $status): string
     {
         return match ($status) {
             401 => 'Identifiants API CloudTalk invalides.',
@@ -588,8 +582,9 @@ class CloudTalk
             406 => 'Donnees CloudTalk invalides. Verifiez le numero E.164 et l agent.',
             409 => 'Agent CloudTalk deja en appel.',
             410 => 'Enregistrement CloudTalk expire.',
+            422 => 'Parametres CloudTalk invalides. Verifiez le numero et l agent.',
             500 => 'Erreur API CloudTalk.',
-            default => $message ?: 'Erreur CloudTalk.',
+            default => 'CloudTalk a refusé la demande (code ' . ($status ?: 'inconnu') . ').',
         };
     }
 }

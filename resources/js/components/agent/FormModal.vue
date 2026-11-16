@@ -116,6 +116,29 @@
                             :placeholder="$t('agent.persona_placeholder')"
                         ></textarea>
                     </v-field>
+                    <section class="hc-agent-documents">
+                        <strong>{{ $t("agent.documents.title") }}</strong>
+                        <p>{{ $t("agent.documents.description") }}</p>
+                        <input
+                            type="file"
+                            accept=".pdf,.txt,.md,application/pdf,text/plain,text/markdown"
+                            multiple
+                            :disabled="saving"
+                            @change="pickDocuments"
+                        />
+                        <ul v-if="documents.length">
+                            <li v-for="document in documents" :key="document.id">
+                                <span v-text="document.name"></span>
+                                <span v-text="$t(`agent.documents.status.${document.status}`)"></span>
+                            </li>
+                        </ul>
+                        <ul v-if="pendingDocuments.length">
+                            <li v-for="file in pendingDocuments" :key="file.name">
+                                <span v-text="file.name"></span>
+                                <span>{{ $t("agent.documents.pending_upload") }}</span>
+                            </li>
+                        </ul>
+                    </section>
                 </template>
 
                 <!-- 3. How free it is, and what will be created -->
@@ -277,6 +300,18 @@
     background: var(--ag-danger-soft);
     color: var(--ag-danger-strong);
     font-size: 13px;
+}
+
+.hc-agent-documents {
+    display: grid;
+    gap: 6px;
+    color: var(--ag-ink-soft);
+    font-size: 13px;
+}
+
+.hc-agent-documents p,
+.hc-agent-documents ul {
+    margin: 0;
 }
 
 .hc-agent-form-intro {
@@ -491,6 +526,8 @@ export default {
             photo: null,
             photoPreview: null,
             photoRemoved: false,
+            documents: [],
+            pendingDocuments: [],
         };
     },
 
@@ -587,6 +624,27 @@ export default {
             this.photoRemoved = !!this.agentEditing?.avatar_url;
         },
 
+        pickDocuments(event) {
+            const files = Array.from(event.target.files || []);
+            event.target.value = "";
+            for (const file of files) {
+                const extension = file.name.split(".").pop().toLowerCase();
+                if (!["pdf", "txt", "md"].includes(extension) || file.size > 10 * 1024 * 1024) {
+                    this.error = this.$t("agent.documents.invalid_file");
+                    continue;
+                }
+                this.pendingDocuments.push(file);
+            }
+        },
+
+        async uploadDocuments(id) {
+            while (this.pendingDocuments.length) {
+                await AgentService.uploadDocument(id, this.pendingDocuments[0]);
+                this.pendingDocuments.shift();
+            }
+            this.documents = (await AgentService.documents(id)).data;
+        },
+
         releasePreview() {
             if (this.photo && this.photoPreview) URL.revokeObjectURL(this.photoPreview);
         },
@@ -635,6 +693,8 @@ export default {
             this.photo = null;
             this.photoPreview = null;
             this.photoRemoved = false;
+            this.documents = [];
+            this.pendingDocuments = [];
 
             try {
                 if (!this.catalog.autonomies) {
@@ -644,6 +704,7 @@ export default {
                 if (this.agentEditing) {
                     // The list only has the summary: read the whole agent
                     const { data } = await AgentService.get(this.agentEditing.id);
+                    this.documents = (await AgentService.documents(this.agentEditing.id)).data;
                     this.form = {
                         ...this.form,
                         ...Object.fromEntries(
@@ -682,6 +743,7 @@ export default {
 
                 try {
                     await this.savePhoto(saved.id);
+                    await this.uploadDocuments(saved.id);
                 } catch (e) {
                     if (!this.agentEditing) {
                         // The agent exists, only its picture failed: from now on this window
@@ -696,6 +758,10 @@ export default {
                 await store.dispatch("FETCH_AGENTS");
                 store.commit(CLOSE_MODAL);
             } catch (e) {
+                if (!this.agentEditing && saved?.id) {
+                    store.commit("SET_AGENT_EDITING", saved);
+                    await store.dispatch("FETCH_AGENTS").catch(() => {});
+                }
                 this.error = this.message(e);
             } finally {
                 this.saving = false;

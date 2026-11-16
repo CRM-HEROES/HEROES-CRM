@@ -6,10 +6,12 @@ use App\Jobs\Agent\RunAgentTurn;
 use App\Models\Agent;
 use App\Models\AgentConversation;
 use App\Models\AgentMessage;
+use App\Models\AgentMessageAttachment;
 use App\Models\AgentRun;
 use App\Models\Project;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Receives a message for an agent: stores it with the context of the moment
@@ -25,11 +27,11 @@ class AgentConversationService
      * @throws AgentRequestException when the message cannot be accepted
      * @throws AgentAccessException when the user is not in the project
      */
-    public function ask(Agent $agent, User $user, Project $project, string $text, ?int $conversationId = null): AgentRun
+    public function ask(Agent $agent, User $user, Project $project, string $text, ?int $conversationId = null, array $attachments = []): AgentRun
     {
         $text = trim($text);
 
-        if ($text === '') {
+        if ($text === '' && !$attachments) {
             throw new AgentRequestException('Le message est vide.');
         }
 
@@ -49,7 +51,10 @@ class AgentConversationService
             throw new AgentAccessException("Vous n'avez pas accès à ce projet.");
         }
 
-        $run = DB::transaction(function () use ($agent, $user, $project, $text, $conversationId) {
+        $storedPaths = [];
+
+        try {
+            $run = DB::transaction(function () use ($agent, $user, $project, $text, $conversationId, $attachments, &$storedPaths) {
             if ($conversationId) {
                 $conversation = AgentConversation::query()
                     ->whereKey($conversationId)
@@ -77,11 +82,24 @@ class AgentConversationService
                 throw new AgentRequestException("L'agent est encore en train de répondre.");
             }
 
-            AgentMessage::create([
+            $message = AgentMessage::create([
                 'conversation_id' => $conversation->id,
                 'role' => AgentMessage::USER,
                 'content' => $this->prompts->turn($text, $user, $project),
             ]);
+
+            foreach ($attachments as $upload) {
+                $path = $upload->store((string) $conversation->id, 'agent_attachments');
+                $storedPaths[] = $path;
+
+                AgentMessageAttachment::create([
+                    'message_id' => $message->id,
+                    'name' => basename($upload->getClientOriginalName()),
+                    'mime' => $upload->getMimeType(),
+                    'path' => $path,
+                    'size' => $upload->getSize(),
+                ]);
+            }
 
             $conversation->forceFill(['last_message_at' => now()])->save();
 
@@ -95,7 +113,14 @@ class AgentConversationService
                 'status' => AgentRun::PENDING,
                 'model' => $agent->model,
             ]);
-        });
+            });
+        } catch (\Throwable $e) {
+            if ($storedPaths) {
+                Storage::disk('agent_attachments')->delete($storedPaths);
+            }
+
+            throw $e;
+        }
 
         RunAgentTurn::dispatch($run->id);
 

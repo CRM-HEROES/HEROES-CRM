@@ -46,4 +46,9 @@ class AgentMessage extends Model
     {
         return $this->belongsTo(AgentRun::class, 'run_id');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(AgentMessageAttachment::class, 'message_id');
+    }
 }

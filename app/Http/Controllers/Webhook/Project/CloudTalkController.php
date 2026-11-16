@@ -7,6 +7,8 @@ use App\Models\Interaction;
 use App\Models\Project;
 use App\Models\Prospect;
 use App\Models\Sms;
+use App\Calls\CloudTalkCallCompletionListener;
+use App\Utils\ProjectSetting;
 use App\Services\CloudTalkCallAttribution;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -24,22 +26,30 @@ class CloudTalkController extends Controller
      */
     public function store(Request $request, Project $project)
     {
-
         $payload = $request->all();
-        Log::info('CloudTalk Webhook - Payload reçu', [
-            'project_id' => $project->id,
-            'payload' => $payload,
-        ]);
         $event = data_get($payload, 'type');
+        $signatureVerified = $this->verifySignature($request, $project);
+        Log::info('CloudTalk Webhook reçu', [
+            'project_id' => $project->id,
+            'event' => is_string($event) ? $event : 'unknown',
+            'event_id' => $this->firstFilled($payload, ['event_id', 'data.event_id']),
+            'call_id' => $this->firstFilled($payload, ['data.call_id']),
+        ]);
 
         if (in_array($event, ['call.recording_ready', 'call.ended'], true)) {
-            return DB::transaction(function () use ($event, $payload, $project) {
+            return DB::transaction(function () use ($event, $payload, $project, $signatureVerified) {
                 // Serialize callbacks for this project to preserve both events and avoid duplicate voicemails.
                 $project->newQuery()->whereKey($project->id)->lockForUpdate()->first();
 
-                return $event === 'call.recording_ready'
+                $response = $event === 'call.recording_ready'
                     ? $this->storeRecording($payload, $project)
                     : $this->storeCallEnded($payload, $project);
+
+                if ($event === 'call.ended' && $signatureVerified) {
+                    app(CloudTalkCallCompletionListener::class)->handle($payload, $project);
+                }
+
+                return $response;
             }, 3);
         }
 
@@ -80,6 +90,25 @@ class CloudTalkController extends Controller
     public function sms(Request $request, Project $project)
     {
         return $this->store($request, $project);
+    }
+
+    protected function verifySignature(Request $request, Project $project): bool
+    {
+        $settings = ProjectSetting::get($project, 'calls', []);
+        $secret = is_object($settings) ? ($settings->webhook_secret ?? null) : ($settings['webhook_secret'] ?? null);
+        $secret = $secret ?: config('calls.webhook_secret');
+
+        if (!filled($secret)) {
+            return false;
+        }
+
+        $provided = (string) $request->header('X-CloudTalk-Signature', '');
+        $provided = preg_replace('/^sha256=/i', '', $provided);
+        $expected = hash_hmac('sha256', $request->getContent(), (string) $secret);
+
+        abort_unless($provided !== '' && hash_equals($expected, $provided), 401, 'Signature webhook CloudTalk invalide.');
+
+        return true;
     }
 
     /**

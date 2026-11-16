@@ -96,6 +96,12 @@ class ApprovalService
 
         $action = AgentAction::findOrFail($actionId);
 
+        if ($action->run()->where('status', AgentRun::CANCELLED)->exists()) {
+            $action->update(['status' => AgentAction::EXPIRED, 'error' => "Le tour de l'agent a été annulé."]);
+
+            return;
+        }
+
         try {
             $result = $this->run($action);
         } catch (AgentAccessException $e) {

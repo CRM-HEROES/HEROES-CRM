@@ -98,6 +98,11 @@ class Agent extends Model
         return $this->hasMany(AgentMemory::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(AgentDocument::class);
+    }
+
     public function schedules()
     {
         return $this->hasMany(AgentSchedule::class);

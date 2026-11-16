@@ -109,6 +109,27 @@ class WorkflowCatalog
                     $onError,
                 ],
             ],
+            [
+                'type' => 'agent_call', 'category' => 'communication',
+                'description' => 'Envoie un véritable appel. L’activation humaine du workflow autorise cet appel ; le consentement, les heures ouvrées et les limites restent vérifiés.',
+                'fields' => [
+                    ['key' => 'agent_id', 'type' => 'number', 'required' => true],
+                    ['key' => 'instruction', 'type' => 'text', 'required' => true],
+                    ['key' => 'documents', 'type' => 'text'],
+                    $onError,
+                ],
+            ],
+            [
+                'type' => 'agent_sms', 'category' => 'communication', 'capability' => ProviderRegistry::SMS,
+                'description' => 'Envoie un véritable SMS. L’activation humaine du workflow autorise cet envoi ; le consentement, les heures ouvrées et les limites restent vérifiés.',
+                'fields' => [
+                    ['key' => 'agent_id', 'type' => 'number', 'required' => true],
+                    ['key' => 'provider', 'type' => 'provider', 'capability' => ProviderRegistry::SMS, 'required' => true],
+                    ['key' => 'instruction', 'type' => 'text', 'required' => true],
+                    ['key' => 'documents', 'type' => 'text'],
+                    $onError,
+                ],
+            ],
             // The actions of the campaigns, reused as they are (value: their own format)
             ['type' => 'prospect-attach-user', 'category' => 'assignment', 'fields' => [['key' => 'value.user', 'type' => 'user', 'required' => true]]],
             ['type' => 'prospect-detach-user', 'category' => 'assignment', 'fields' => [['key' => 'value.user', 'type' => 'user', 'required' => true]]],
