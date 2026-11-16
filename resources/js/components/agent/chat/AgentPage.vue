@@ -26,11 +26,14 @@
                 :items="items"
                 :busy="busy"
                 :stalled="stalled"
+                :run-id="activeRunId"
                 :error="error"
                 :pending-actions="pendingActions"
                 :deciding="deciding"
                 :open-report-id="openedReportId"
                 @send="send"
+                @cancel-run="cancelRun"
+                @attachment-error="showAttachmentError"
                 @create="createAgent"
                 @approve="approve"
                 @reject="reject"
@@ -119,6 +122,7 @@ export default {
             deciding: {},
 
             busy: false,
+            activeRunId: null,
             stalled: false,
             error: "",
             // Changes with every conversation opened: late answers of the previous one are ignored
@@ -255,6 +259,7 @@ export default {
             this.reports = [];
             this.pendingActions = [];
             this.busy = false;
+            this.activeRunId = null;
             this.stalled = false;
             this.error = "";
         },
@@ -338,26 +343,33 @@ export default {
 
         // Sending
 
-        async send(text) {
+        async send(payload) {
             const agent = this.selectedAgent;
+            const text = payload?.text || "";
+            const attachments = payload?.attachments || [];
 
-            if (!agent || this.busy || !text.trim()) {
+            if (!agent || this.busy || (!text.trim() && !attachments.length)) {
                 return;
             }
 
             this.error = "";
             this.busy = true;
-            this.messages = [...this.messages, { role: "user", kind: "text", text }];
+            this.messages = [
+                ...this.messages,
+                ...(text.trim() ? [{ role: "user", kind: "text", text }] : []),
+                ...(attachments.length ? [{ role: "user", kind: "attachment", text: attachments.map((file) => file.name).join(", ") }] : []),
+            ];
             const token = this.token;
 
             try {
-                const { data } = await AgentService.ask(agent.id, this.project.slug, text, this.conversationId);
+                const { data } = await AgentService.ask(agent.id, this.project.slug, text, this.conversationId, attachments);
 
                 if (token !== this.token) {
                     return;
                 }
 
                 this.conversationId = data.conversation_id;
+                this.activeRunId = data.run_id;
                 this.follow(data.run_id, token);
             } catch (e) {
                 if (token === this.token) {
@@ -392,6 +404,7 @@ export default {
 
                 this.stalled = false;
                 this.busy = false;
+                this.activeRunId = null;
 
                 if (data.error) {
                     this.error = data.error;
@@ -405,6 +418,25 @@ export default {
                     this.error = this.message(e);
                 }
             }
+        },
+
+        async cancelRun() {
+            if (!this.activeRunId) return;
+
+            try {
+                await AgentService.cancelRun(this.activeRunId);
+                clearTimeout(this.timer);
+                this.timer = null;
+                this.busy = false;
+                this.stalled = false;
+                this.activeRunId = null;
+            } catch (e) {
+                this.error = this.message(e);
+            }
+        },
+
+        showAttachmentError(message) {
+            this.error = message;
         },
 
         async refresh(token = this.token) {

@@ -31,6 +31,9 @@ class Prospect extends Authenticatable
      */
     protected $fillable = [
         'company_name',
+        'call_consent',
+        'do_not_call',
+        'call_timezone',
         'country',
         'city',
         'creator_id',
@@ -70,6 +73,8 @@ class Prospect extends Authenticatable
         'duplicate_fields' => 'json',
         'date_of_birth' => 'date',
         'processed_at' => 'datetime',
+        'call_consent' => 'boolean',
+        'do_not_call' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

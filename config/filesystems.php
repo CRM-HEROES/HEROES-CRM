@@ -106,6 +106,16 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/agent-avatars'),
         ],
+        'agent_attachments' => [
+            'driver' => 'local',
+            'root' => storage_path('app/agent-attachments'),
+            'throw' => true,
+        ],
+        'agent_documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/agent-documents'),
+            'throw' => true,
+        ],
 
         /**
          * Logos disk

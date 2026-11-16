@@ -39,6 +39,7 @@ class AgentRunner
         protected PromptBuilder $prompts,
         protected ToolExecutor $executor,
         protected UsageMeter $usage,
+        protected AgentDocumentSummarizer $documentSummarizer,
     ) {
     }
 
@@ -57,11 +58,15 @@ class AgentRunner
         try {
             $this->advance($run);
         } catch (ClaudeException|AgentAccessException $e) {
-            // Messages written to be shown to the user
-            $this->finish($run, AgentRun::FAILED, $e->getMessage());
+            if (!$this->wasCancelled($run)) {
+                // Messages written to be shown to the user
+                $this->finish($run, AgentRun::FAILED, $e->getMessage());
+            }
         } catch (\Throwable $e) {
-            report($e);
-            $this->finish($run, AgentRun::FAILED, "Une erreur interne a interrompu l'agent.");
+            if (!$this->wasCancelled($run)) {
+                report($e);
+                $this->finish($run, AgentRun::FAILED, "Une erreur interne a interrompu l'agent.");
+            }
         }
     }
 
@@ -143,7 +148,11 @@ class AgentRunner
         $max = (int) config('agents.max_iterations');
 
         while ($run->iterations < $max) {
-            $messages = $this->history($conversation);
+            if ($this->wasCancelled($run)) {
+                return;
+            }
+
+            $messages = $this->history($conversation, $owner);
             $last = end($messages);
 
             // A previous attempt stopped after the model had answered
@@ -162,6 +171,10 @@ class AgentRunner
             }
 
             $response = $this->ask($run, $gateway, $request + ['messages' => $messages]);
+
+            if ($this->wasCancelled($run)) {
+                return;
+            }
 
             if ($response->content) {
                 $this->store($conversation, $run, AgentMessage::ASSISTANT, $response->content);
@@ -262,7 +275,15 @@ class AgentRunner
         $results = [];
 
         foreach ($uses as $use) {
+            if ($this->wasCancelled($run)) {
+                return;
+            }
+
             $results[] = $this->executor->execute($run, $agent, $context, $use, $allowed, $grants);
+        }
+
+        if ($this->wasCancelled($run)) {
+            return;
         }
 
         // All the results of a turn go back in ONE message
@@ -305,13 +326,91 @@ class AgentRunner
         });
     }
 
-    protected function history(AgentConversation $conversation): array
+    protected function history(AgentConversation $conversation, User $owner): array
     {
         return $conversation->messages()
             ->orderBy('id')
-            ->get(['role', 'content'])
-            ->map(fn (AgentMessage $message) => ['role' => $message->role, 'content' => $message->content])
+            ->with('attachments')
+            ->get(['id', 'role', 'content'])
+            ->map(fn (AgentMessage $message) => [
+                'role' => $message->role,
+                'content' => $this->messageContent($message, $owner),
+            ])
             ->all();
+    }
+
+    protected function messageContent(AgentMessage $message, User $owner): array
+    {
+        $content = $message->content;
+        $instruction = collect($message->content)
+            ->filter(fn ($part) => is_array($part) && ($part['type'] ?? null) === 'text')
+            ->pluck('text')
+            ->skip(1)
+            ->implode("\n");
+
+        foreach ($message->attachments as $attachment) {
+            try {
+                $bytes = \Illuminate\Support\Facades\Storage::disk('agent_attachments')->get($attachment->path);
+            } catch (\Illuminate\Contracts\Filesystem\FileNotFoundException) {
+                $attachment->update(['summary' => ['unavailable' => 'Le fichier joint est illisible.']]);
+                $content[] = ['type' => 'text', 'text' => 'Pièce jointe non résumée : le fichier est illisible. Ne cite aucun fait provenant de ce fichier.'];
+                continue;
+            }
+
+            if ($attachment->summary === null) {
+                try {
+                    $attachment->update([
+                        'summary' => $this->documentSummarizer->summarize(
+                            $owner,
+                            $attachment->name,
+                            $attachment->mime,
+                            $bytes,
+                            $instruction
+                        ),
+                    ]);
+                } catch (AgentDocumentSummaryException|\App\Agents\Claude\ClaudeException $exception) {
+                    $attachment->update(['summary' => ['unavailable' => $exception->getMessage()]]);
+                }
+            }
+
+            if (str_starts_with($attachment->mime, 'image/')) {
+                $content[] = [
+                    'type' => 'image',
+                    'source' => ['type' => 'base64', 'media_type' => $attachment->mime, 'data' => base64_encode($bytes)],
+                ];
+            } elseif ($attachment->mime === 'application/pdf') {
+                $content[] = [
+                    'type' => 'document',
+                    'source' => ['type' => 'base64', 'media_type' => 'application/pdf', 'data' => base64_encode($bytes)],
+                ];
+            } else {
+                $text = mb_substr($bytes, 0, 12000);
+                $name = htmlspecialchars($attachment->name, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $content[] = [
+                    'type' => 'text',
+                    'text' => "<piece_jointe untrusted=\"true\" nom=\"{$name}\">\n{$text}\n</piece_jointe>",
+                ];
+            }
+
+            if (is_array($attachment->summary) && isset($attachment->summary['unavailable'])) {
+                $content[] = [
+                    'type' => 'text',
+                    'text' => 'Pièce jointe non résumée : ' . $attachment->summary['unavailable'] . ' Ne cite pas de fait qui ne peut être vérifié.',
+                ];
+            } elseif (is_array($attachment->summary)) {
+                $content[] = [
+                    'type' => 'text',
+                    'text' => '<resume_piece_jointe untrusted="true">' . json_encode($attachment->summary, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE) . '</resume_piece_jointe>',
+                ];
+            }
+        }
+
+        return $content;
+    }
+
+    protected function wasCancelled(AgentRun $run): bool
+    {
+        return AgentRun::query()->whereKey($run->id)->value('status') === AgentRun::CANCELLED;
     }
 
     /**

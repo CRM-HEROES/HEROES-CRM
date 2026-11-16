@@ -9,6 +9,7 @@ use App\Agents\Tools\AgentToolInterface;
 use App\Agents\Tools\ProspectBulkTool;
 use App\Agents\Tools\ProspectRecordTool;
 use App\Agents\Tools\ToolResult;
+use App\Calls\GuardedMessaging;
 use App\Models\Field;
 use App\Models\Group;
 use App\Models\Label;
@@ -35,6 +36,7 @@ class WriteCapabilities
         protected ReadGateway $reader,
         protected EntityRegistry $entities,
         protected ProviderRegistry $providers,
+        protected GuardedMessaging $guardedMessaging,
     ) {
     }
 
@@ -299,7 +301,22 @@ class WriteCapabilities
                         return ToolResult::error("Ce prospect n'a aucun numéro de téléphone.", ToolResult::VALIDATION_FAILED);
                     }
 
-                    return ['POST', "prospect/{$prospect->id}/sms", ['source' => $provider['source'] ?? $provider['operator'], 'message' => $input['message']]];
+                    $source = $provider['source'] ?? $provider['operator'];
+                    $reason = $this->guardedMessaging->smsReason(
+                        $prospect,
+                        $context->project,
+                        $context->owner->id,
+                        $source
+                    );
+                    if ($reason) {
+                        return ToolResult::error(
+                            'SMS non envoyé [' . $reason . '] : '
+                            . $this->guardedMessaging->message($reason, $prospect, 'sms'),
+                            ToolResult::VALIDATION_FAILED
+                        );
+                    }
+
+                    return ['POST', "prospect/{$prospect->id}/sms", ['source' => $source, 'message' => $input['message']]];
                 },
                 'describe' => fn ($context, $input) => ['action' => 'Envoyer un SMS', 'canal' => $input['provider'], 'message' => $input['message']],
                 'result' => fn ($json) => ['sms_id' => $json['id'] ?? null, 'note' => "Le SMS est créé ; l'opérateur l'envoie aussitôt (en cas d'échec, l'erreur est enregistrée sur le SMS)."],
@@ -321,6 +338,15 @@ class WriteCapabilities
                 'request' => function ($context, $input, $prospect) {
                     if (!filled($prospect->email)) {
                         return ToolResult::error("Ce prospect n'a pas d'adresse e-mail.", ToolResult::VALIDATION_FAILED);
+                    }
+
+                    $reason = $this->guardedMessaging->emailReason($prospect, $context->project);
+                    if ($reason) {
+                        return ToolResult::error(
+                            'E-mail non envoyé [' . $reason . '] : '
+                            . $this->guardedMessaging->message($reason, $prospect, 'email'),
+                            ToolResult::VALIDATION_FAILED
+                        );
                     }
 
                     // The address is the one of the record, never one given by the model

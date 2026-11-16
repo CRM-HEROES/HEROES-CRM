@@ -17,6 +17,8 @@ export function buildItems(messages, reports = []) {
             items.push({ kind: "tool", tool: message.tool });
         } else if (message.kind === "system" || message.role === "system") {
             items.push({ kind: "system", text: message.text });
+        } else if (message.kind === "attachment") {
+            items.push({ kind: "attachment", text: message.text });
         } else if (message.role === "user") {
             items.push({ kind: "user", text: message.text });
         } else {

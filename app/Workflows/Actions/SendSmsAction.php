@@ -21,6 +21,11 @@ use Illuminate\Database\Eloquent\Model;
  */
 class SendSmsAction extends CommunicationAction
 {
+    public function __construct(ProviderRegistry $providers)
+    {
+        parent::__construct($providers);
+    }
+
     protected function capability(): string
     {
         return ProviderRegistry::SMS;
@@ -59,13 +64,17 @@ class SendSmsAction extends CommunicationAction
             throw new \RuntimeException("La ligne {$provider['label']} n'est affectée à aucun agent.");
         }
 
+        $message = (new VariableResolver($prospect))->render((string) $config['message'], 'text');
         $sms = $prospect->sms()->create([
-            'message' => (new VariableResolver($prospect))->render((string) $config['message'], 'text'),
+            'message' => $message,
             'source' => isset($provider['line_id']) ? $provider['operator'] : $provider['source'],
-            'from_user' => 1,
+            'from_user' => true,
             'creator_id' => $provider['user_id'] ?? null,
         ]);
 
-        return ['provider' => $provider['ref'], 'sms_id' => $sms->id];
+        return array_filter([
+            'provider' => $provider['ref'],
+            'sms_id' => $sms->id,
+        ], fn ($value) => $value !== null);
     }
 }

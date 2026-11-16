@@ -1,4 +1,6 @@
 import ApiService from "@/apis/api.service";
+import axios from "axios";
+import { API_URL } from "@/apis/common";
 
 export default {
     get(project, params) {
@@ -27,6 +29,12 @@ export default {
     update(project, prospect, params) {
         return ApiService.put(
             `project/${project}/prospect/${prospect}`,
+            params
+        );
+    },
+    updateCallConsent(project, prospect, params) {
+        return axios.patch(
+            `${API_URL}/project/${project}/prospect/${prospect}/call-consent`,
             params
         );
     },

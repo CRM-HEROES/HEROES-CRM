@@ -32,6 +32,10 @@ class Project extends Model
     protected $fillable = [
         'capital',
         'city',
+        'call_agent_id',
+        'calls_enabled',
+        'call_back_label_id',
+        'call_transfer_user_id',
         'country', 
         'creator_id',
         'description',
@@ -51,6 +55,10 @@ class Project extends Model
         'type',
         'job_category',
         'valid_address',
+    ];
+
+    protected $casts = [
+        'calls_enabled' => 'boolean',
     ];
 
     /**

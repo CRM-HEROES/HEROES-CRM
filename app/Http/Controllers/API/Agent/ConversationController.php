@@ -13,6 +13,8 @@ use App\Models\AgentReport;
 use App\Models\AgentRun;
 use App\Models\Project;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Talking to an agent: send a message, follow the answer, read the history.
@@ -103,17 +105,41 @@ class ConversationController extends Controller
     {
         $data = $request->validate([
             'project' => 'required|string',
-            'message' => 'required|string',
+            'message' => 'nullable|string',
             'conversation_id' => 'nullable|integer',
+            'attachments' => 'sometimes|array|max:5',
+            'attachments.*' => 'file|max:10240',
         ]);
+
+        $uploads = $request->file('attachments', []);
+        foreach ($uploads as $upload) {
+            $extension = strtolower($upload->getClientOriginalExtension());
+            $mime = strtolower((string) $upload->getMimeType());
+            $allowed = [
+                'jpg' => ['image/jpeg'],
+                'jpeg' => ['image/jpeg'],
+                'png' => ['image/png'],
+                'webp' => ['image/webp'],
+                'pdf' => ['application/pdf'],
+                'txt' => ['text/plain'],
+                'md' => ['text/plain', 'text/markdown'],
+            ];
+
+            if (!isset($allowed[$extension]) || !in_array($mime, $allowed[$extension], true)) {
+                throw ValidationException::withMessages([
+                    'attachments' => 'Un type de fichier joint est interdit ou ne correspond pas à son contenu.',
+                ]);
+            }
+        }
 
         try {
             $run = $this->conversations->ask(
                 $this->agent($request, $agent),
                 $request->user(),
                 $this->project($data['project']),
-                $data['message'],
-                $data['conversation_id'] ?? null
+                $data['message'] ?? '',
+                $data['conversation_id'] ?? null,
+                $uploads
             );
         } catch (AgentRequestException $e) {
             return response(['message' => $e->getMessage()], 422);
@@ -141,6 +167,17 @@ class ConversationController extends Controller
                 if ($item) {
                     $messages[] = $item + ['id' => $message->id, 'run_id' => $message->run_id, 'at' => $message->created_at];
                 }
+            }
+
+            if ($message->role === 'user' && $message->attachments()->exists()) {
+                $messages[] = [
+                    'role' => 'user',
+                    'kind' => 'attachment',
+                    'text' => implode(', ', $message->attachments()->pluck('name')->all()),
+                    'id' => $message->id,
+                    'run_id' => $message->run_id,
+                    'at' => $message->created_at,
+                ];
             }
         }
 
@@ -175,6 +212,28 @@ class ConversationController extends Controller
         $run = AgentRun::query()->where('user_id', $request->user()->id)->findOrFail($run);
 
         return $this->presentRun($run, true);
+    }
+
+    public function cancel(Request $request, int $run)
+    {
+        $run = AgentRun::query()->where('user_id', $request->user()->id)->findOrFail($run);
+        $cancelled = AgentRun::query()
+            ->whereKey($run->id)
+            ->whereNotIn('status', AgentRun::FINISHED)
+            ->update([
+                'status' => AgentRun::CANCELLED,
+                'finished_at' => now(),
+                'locked_at' => null,
+                'updated_at' => now(),
+            ]);
+
+        if ($cancelled) {
+            AgentAction::query()->where('run_id', $run->id)
+                ->where('status', AgentAction::PENDING)
+                ->update(['status' => AgentAction::EXPIRED, 'updated_at' => now()]);
+        }
+
+        return response(['status' => AgentRun::CANCELLED], 200);
     }
 
     // Helpers

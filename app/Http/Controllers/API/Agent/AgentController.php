@@ -187,7 +187,7 @@ class AgentController extends Controller
         $version = AgentVersion::create([
             'agent_id' => $agent->id,
             'version' => ((int) $agent->versions()->max('version')) + 1,
-            'config' => $agent->only(['name', 'persona', 'instructions', 'objectives', 'model', 'effort', 'autonomy']) + ['skills' => $agent->skillKeys(), 'tool_grants' => $agent->toolGrants()],
+            'config' => $agent->only(['name', 'specialty', 'description', 'persona', 'instructions', 'objectives', 'model', 'effort', 'autonomy']) + ['skills' => $agent->skillKeys(), 'tool_grants' => $agent->toolGrants()],
             'creator_id' => $userId,
         ]);
         $agent->update(['active_version_id' => $version->id]);

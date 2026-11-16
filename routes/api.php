@@ -240,6 +240,11 @@ Route::get('project/{project}/logo', [ProjectLogoController::class, 'show'])->na
 // Picture of an AI agent: shown in an <img>, so public; the name is random and unguessable
 Route::get('agent-avatar/{token}', [\App\Http\Controllers\API\Agent\AvatarController::class, 'show'])->name('agent.avatar');
 
+Route::prefix('voice')->middleware('throttle:120,1')->group(function () {
+    Route::post('{attempt}/tool', [\App\Http\Controllers\Webhook\VoiceWebhookController::class, 'tool'])->name('voice.tool');
+    Route::post('{attempt}/ended', [\App\Http\Controllers\Webhook\VoiceWebhookController::class, 'ended'])->name('voice.ended');
+});
+
 Route::group([
     'middleware' => ['auth:sanctum', \App\Http\Middleware\ForcePasswordChange::class]
 ], function () {
@@ -272,6 +277,7 @@ Route::group([
         Route::delete('conversation/{conversation}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'archive'])->name('conversation.archive');
         Route::get('report/{report}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'report'])->name('report.show');
         Route::get('run/{run}', [\App\Http\Controllers\API\Agent\ConversationController::class, 'run'])->name('run.show');
+        Route::post('run/{run}/cancel', [\App\Http\Controllers\API\Agent\ConversationController::class, 'cancel'])->name('run.cancel');
         Route::get('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'index'])->name('index');
         Route::post('/', [\App\Http\Controllers\API\Agent\AgentController::class, 'store'])->name('store');
         Route::get('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'show'])->name('show');
@@ -279,6 +285,9 @@ Route::group([
         Route::delete('{agent}', [\App\Http\Controllers\API\Agent\AgentController::class, 'destroy'])->name('destroy');
         Route::post('{agent}/avatar', [\App\Http\Controllers\API\Agent\AvatarController::class, 'store'])->middleware('throttle:20,1')->name('avatar.store');
         Route::delete('{agent}/avatar', [\App\Http\Controllers\API\Agent\AvatarController::class, 'destroy'])->name('avatar.destroy');
+        Route::get('{agent}/documents', [\App\Http\Controllers\API\Agent\DocumentController::class, 'index'])->name('documents.index');
+        Route::post('{agent}/documents', [\App\Http\Controllers\API\Agent\DocumentController::class, 'store'])->middleware('throttle:20,1')->name('documents.store');
+        Route::get('{agent}/documents/{document}', [\App\Http\Controllers\API\Agent\DocumentController::class, 'show'])->name('documents.show');
         Route::get('{agent}/conversation', [\App\Http\Controllers\API\Agent\ConversationController::class, 'index'])->name('conversation.index');
         Route::post('{agent}/ask', [\App\Http\Controllers\API\Agent\ConversationController::class, 'ask'])->middleware('throttle:30,1')->name('ask');
     });
@@ -622,6 +631,7 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::get('incoming-communications/count', [IncomingCommunicationController::class, 'count']);
         Route::post('incoming-communications/read', [IncomingCommunicationController::class, 'read']);
         Route::get('incoming-communications/sms-history', [IncomingCommunicationController::class, 'smsHistory']);
+        Route::patch('prospect/{prospect}/call-consent', [ProjectProspectController::class, 'callConsent']);
         Route::apiResource('prospect', ProjectProspectController::class);
         Route::post('prospect/{prospect}/duplicate', [ProjectProspectController::class, 'duplicate']);
 
@@ -720,6 +730,7 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::apiResource('questionnaire.section.question.option', ProjectQuestionnaireOptionController::class);
 
         // Setting
+        Route::post('/setting/calls/diagnostic', [ProjectSettingController::class, 'diagnoseCalls']);
         Route::get('/setting/{setting}/check', [ProjectSettingController::class, 'check']);
         Route::get('/setting/{setting}', [ProjectSettingController::class, 'show']);
         Route::match(['PUT', 'PATCH'], '/setting/{setting}', [ProjectSettingController::class, 'update']);
