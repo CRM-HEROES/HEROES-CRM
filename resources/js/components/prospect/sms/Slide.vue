@@ -96,7 +96,7 @@
               <span
                 v-if="cloudtalkSmsLine"
                 class="hc-prospect-sms-item-number"
-                v-text="cloudtalkSmsLine.numero"
+                v-text="prospect.mobile_phone_number"
               ></span>
             </div>
             <icon class="fa fa-caret-right" />
