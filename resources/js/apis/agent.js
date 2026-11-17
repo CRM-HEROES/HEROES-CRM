@@ -30,10 +30,29 @@ export default {
     removeAvatar(id) {
         return ApiService.delete(`agent/${id}/avatar`);
     },
+    documents(id) {
+        return ApiService.get(`agent/${id}/documents`);
+    },
+    uploadDocument(id, file) {
+        const body = new FormData();
+        body.append("document", file);
+
+        return ApiService.post(`agent/${id}/documents`, body);
+    },
     remove(id) {
         return ApiService.delete(`agent/${id}`);
     },
-    ask(id, project, message, conversationId) {
+    ask(id, project, message, conversationId, attachments = []) {
+        if (attachments.length) {
+            const body = new FormData();
+            body.append("project", project);
+            body.append("message", message || "");
+            if (conversationId) body.append("conversation_id", conversationId);
+            attachments.forEach((file) => body.append("attachments[]", file));
+
+            return ApiService.post(`agent/${id}/ask`, body);
+        }
+
         return ApiService.post(`agent/${id}/ask`, {
             project,
             message,
@@ -52,6 +71,9 @@ export default {
     },
     run(id) {
         return ApiService.get(`agent/run/${id}`);
+    },
+    cancelRun(id) {
+        return ApiService.post(`agent/run/${id}/cancel`);
     },
     // A document an agent produced
     report(id) {

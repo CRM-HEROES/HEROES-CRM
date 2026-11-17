@@ -56,10 +56,20 @@ class AgentApiTest extends CrmFixtureTestCase
 
     public function test_an_agent_is_created_configured_and_versioned(): void
     {
-        $id = $this->createAgent('admin', ['model' => 'claude-sonnet-5-5', 'effort' => 'low', 'tool_grants' => ['prospect_set_field' => 'deny']]);
+        $id = $this->createAgent('admin', [
+            'model' => 'claude-sonnet-5-5',
+            'effort' => 'low',
+            'specialty' => 'Conseil commercial',
+            'description' => 'Accompagner les prospects.',
+            'tool_grants' => ['prospect_set_field' => 'deny'],
+        ]);
 
         $response = $this->as('admin')->getJson("/api/agent/$id");
         $response->assertOk()->assertJson(['name' => 'Lyra', 'model' => 'claude-sonnet-5-5', 'effort' => 'low', 'autonomy' => 'propose', 'skills' => ['prospect_management'], 'tool_grants' => ['prospect_set_field' => 'deny']]);
+
+        $firstVersion = Agent::find($id)->activeVersion->config;
+        $this->assertSame('Conseil commercial', $firstVersion['specialty']);
+        $this->assertSame('Accompagner les prospects.', $firstVersion['description']);
 
         $this->as('admin')->putJson("/api/agent/$id", ['instructions' => 'Autre', 'skills' => ['crm_exploration', 'statistics_analysis']])->assertOk()->assertJson(['skills' => ['crm_exploration', 'statistics_analysis']]);
 
@@ -67,6 +77,8 @@ class AgentApiTest extends CrmFixtureTestCase
         $this->assertSame(2, $agent->versions()->count());
         $this->assertSame(2, $agent->activeVersion->version);
         $this->assertSame('Autre', $agent->activeVersion->config['instructions']);
+        $this->assertSame('Conseil commercial', $agent->activeVersion->config['specialty']);
+        $this->assertSame('Accompagner les prospects.', $agent->activeVersion->config['description']);
     }
 
     public function test_an_agent_created_without_a_list_of_skills_knows_every_function_of_the_crm(): void

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Filters\ProjectRequestFilters;
 use App\Http\Controllers\Controller;
+use App\Models\Agent;
+use App\Models\Label;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -229,9 +231,30 @@ class ProjectController extends Controller
     {
         abort_unless(auth()->user()->can('', $project), 404);
 
-        $project->update($request->only(
-            $this->fields
-        ));
+        $callSettings = $request->validate([
+            'calls_enabled' => 'sometimes|boolean',
+            'call_agent_id' => 'sometimes|nullable|integer',
+            'call_back_label_id' => 'sometimes|nullable|integer',
+            'call_transfer_user_id' => 'sometimes|nullable|integer',
+        ]);
+
+        if ($callSettings) {
+            abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        }
+
+        if (!empty($callSettings['call_agent_id'])) {
+            abort_unless(Agent::query()->where('project_id', $project->id)->whereKey($callSettings['call_agent_id'])->exists(), 422, 'L’agent d’accueil doit appartenir à ce projet.');
+        }
+        if (!empty($callSettings['call_back_label_id'])) {
+            abort_unless(Label::query()->whereKey($callSettings['call_back_label_id'])
+                ->whereHas('category', fn ($query) => $query->where('project_id', $project->id)->where('for', 'prospect'))
+                ->exists(), 422, 'Le label de rappel doit appartenir à ce projet.');
+        }
+        if (!empty($callSettings['call_transfer_user_id'])) {
+            abort_unless(DB::table('user_project')->where('project_id', $project->id)->where('user_id', $callSettings['call_transfer_user_id'])->exists(), 422, 'Le conseiller doit avoir accès à ce projet.');
+        }
+
+        $project->update($request->only($this->fields) + $callSettings);
 
         return ['message' => trans('common.success.updated_resource')];
     }

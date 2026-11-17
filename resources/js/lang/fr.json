@@ -203,6 +203,11 @@
     },
 
     "prospect": {
+        "call_controls": {
+            "consent": "Consentement explicite pour être appelé ou recevoir un SMS",
+            "do_not_call": "Ne plus appeler ni envoyer de SMS",
+            "update_error": "Impossible d’enregistrer les préférences de contact."
+        },
         "communications": {
             "process": "Traiter",
             "request_process": "Demande traité",
@@ -2652,6 +2657,68 @@
                 "product": "Produits"
             }
         },
+        "calls_settings": {
+            "title": "Appels et messages",
+            "description": "Configurez la disponibilité des appels et les messages d’accueil de ce projet.",
+            "close": "Fermer",
+            "global_status": "Appels et messages : {status} (coupe-circuit)",
+            "global_description": "Le coupe-circuit global s’applique à tous les projets. Activé = appels et messages autorisés.",
+            "global_toggle": "Autoriser les appels et messages",
+            "authorized": "autorisés",
+            "suspended": "suspendus",
+            "project_enabled": "Activer les appels et messages pour ce projet",
+            "enabled": "Activé",
+            "disabled": "Désactivé",
+            "provider": "Fournisseur vocal et SMS",
+            "provider_priority": "Priorité : le fournisseur défini pour ce projet remplace le fournisseur global.",
+            "timezone": "Fuseau horaire des heures de travail",
+            "providers": {
+                "fake": "Simulation",
+                "cloudtalk": "CloudTalk",
+                "ai_voice": "Voix IA"
+            },
+            "working_hours": "Horaires de disponibilité",
+            "start": "Début",
+            "end": "Fin",
+            "days": {
+                "monday": "Lun",
+                "tuesday": "Mar",
+                "wednesday": "Mer",
+                "thursday": "Jeu",
+                "friday": "Ven",
+                "saturday": "Sam",
+                "sunday": "Dim"
+            },
+            "greeting": "Message d’accueil",
+            "welcome_agent": "Agent d’accueil",
+            "transfer_adviser": "Conseiller de transfert",
+            "callback_label": "Label de rappel",
+            "manual_availability": "Définir manuellement la disponibilité du conseiller",
+            "diagnostic_title": "Diagnostic d’éligibilité (aucun envoi)",
+            "prospect_id": "ID du prospect à vérifier",
+            "diagnose": "Vérifier un prospect",
+            "diagnosing": "Vérification…",
+            "diagnostic_error": "Impossible de vérifier ce prospect.",
+            "timezone_used": "Fuseau utilisé : {timezone}",
+            "checks": {
+                "global": "Coupe-circuit global",
+                "project": "Activation du projet",
+                "provider": "Fournisseur",
+                "cloudtalk_line": "Ligne CloudTalk",
+                "consent": "Consentement explicite",
+                "contact_refusal": "Refus de contact",
+                "hours": "Heures de travail",
+                "frequency": "Fréquence SMS (48 h)",
+                "phone": "Numéro de téléphone"
+            },
+            "none": "Aucun",
+            "saved": "Paramètres enregistrés.",
+            "saving": "Enregistrement…",
+            "save": "Enregistrer",
+            "cancel": "Annuler",
+            "load_error": "Impossible de charger les paramètres des appels.",
+            "save_error": "Impossible d’enregistrer les paramètres des appels."
+        },
         "table": {
             "footer": {
                 "toggle_project_menus": "Afficher/cacher les menus",
@@ -3215,6 +3282,7 @@
             "workflow_set_status": "Activation de workflow",
             "workflow_delete": "Suppression de workflow",
             "report_create": "Rédaction d’un document",
+            "agent_docs": "Documents de référence",
             "interaction_log": "Enregistrement d’un appel",
             "order_create": "Création de commande",
             "order_update": "Modification de commande",
@@ -3272,6 +3340,17 @@
         "photo_type": "Ce fichier n'est pas une image JPEG, PNG, GIF ou WebP.",
         "photo_size": "Cette photo est trop lourde (2 Mo au plus).",
         "no_agent_page": "Ce projet n'a pas encore d'agent IA. Créez-en un pour commencer à discuter.",
+        "documents": {
+            "title": "Documents de référence",
+            "description": "Ajoutez des PDF, TXT ou MD privés pour enrichir les réponses de l'agent.",
+            "pending_upload": "sera ajouté après l'enregistrement",
+            "invalid_file": "Choisissez un PDF, TXT ou MD de 10 Mo au plus.",
+            "status": {
+                "queued": "Analyse en attente",
+                "ready": "Prêt",
+                "failed": "Échec de l'analyse"
+            }
+        },
         "chat": {
             "agents_of_project": "Agents IA du projet",
             "info": "Informations sur l'agent",
@@ -3300,7 +3379,18 @@
                 "appointments": "Quels sont mes prochains rendez-vous ?"
             },
             "hint": "Entrée pour envoyer · Maj + Entrée pour aller à la ligne",
-            "document": "Document"
+            "document": "Document",
+            "attach": "Ajouter des pièces jointes",
+            "remove_attachment": "Supprimer la pièce jointe",
+            "invalid_file_type": "Type de fichier interdit. Formats acceptés : JPG, PNG, WebP, PDF, TXT et MD.",
+            "file_too_large": "Chaque fichier doit faire 10 Mo ou moins.",
+            "too_many_files": "Vous pouvez joindre au maximum 5 fichiers.",
+            "add_to_knowledge": "Ajouter à la connaissance de l'agent",
+            "knowledge_added": "Document ajouté à la connaissance de l'agent.",
+            "listening": "J'écoute…",
+            "dictate": "Dicter un message",
+            "stop_listening": "Arrêter la dictée",
+            "stop": "Arrêter"
         },
         "perm": {
             "asks": "{agent} demande votre autorisation",

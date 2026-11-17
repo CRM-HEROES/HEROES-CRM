@@ -34,6 +34,10 @@
 
             <template v-for="(item, i) in items" :key="i">
                 <div v-if="item.kind === 'user'" class="hc-agent-msg is-user" v-text="item.text"></div>
+                <div v-if="item.kind === 'attachment'" class="hc-agent-msg is-user hc-agent-attachment-label">
+                    <i class="fa fa-paperclip" aria-hidden="true"></i>
+                    <span v-text="item.text"></span>
+                </div>
 
                 <div v-else-if="item.kind === 'agent'" class="hc-agent-msg is-agent">
                     <markdown :text="item.text" />
@@ -76,8 +80,33 @@
             <i class="fa fa-circle-exclamation" aria-hidden="true"></i>
             <span>{{ error }}</span>
         </p>
+        <p v-if="attachmentError" class="hc-agent-chat-error" role="alert">
+            <i class="fa fa-circle-exclamation" aria-hidden="true"></i>
+            <span>{{ attachmentError }}</span>
+        </p>
+        <p v-if="knowledgeSuccess" class="hc-agent-chat-hint" role="status">
+            {{ $t("agent.chat.knowledge_added") }}
+        </p>
 
-        <form class="hc-agent-chat-form" @submit.prevent="send(draft)">
+        <form class="hc-agent-chat-form" :class="{ 'has-attachments': attachments.length }" @submit.prevent="send(draft)">
+            <input
+                ref="attachments"
+                class="hc-agent-file-input"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.md,image/jpeg,image/png,image/webp,application/pdf,text/plain,text/markdown"
+                multiple
+                @change="pickAttachments"
+            />
+            <ag-button
+                type="button"
+                variant="ghost"
+                icon="fa fa-plus"
+                icon-only
+                :disabled="!agent || busy || attachments.length >= 5"
+                :aria-label="$t('agent.chat.attach')"
+                :title="$t('agent.chat.attach')"
+                @click="$refs.attachments.click()"
+            />
             <textarea
                 ref="input"
                 v-model="draft"
@@ -88,6 +117,55 @@
                 @input="grow"
                 @keydown.enter.exact.prevent="send(draft)"
             ></textarea>
+            <span v-if="listening" class="hc-agent-listening" role="status">{{ $t("agent.chat.listening") }}</span>
+            <ag-button
+                v-if="speechAvailable"
+                type="button"
+                variant="ghost"
+                :icon="listening ? 'fa fa-stop' : 'fa fa-microphone'"
+                icon-only
+                :aria-label="listening ? $t('agent.chat.stop_listening') : $t('agent.chat.dictate')"
+                :title="listening ? $t('agent.chat.stop_listening') : $t('agent.chat.dictate')"
+                @click="toggleDictation"
+            />
+            <ag-button
+                v-if="canAddToKnowledge"
+                type="button"
+                variant="ghost"
+                icon="fa fa-list"
+                :disabled="busy"
+            >
+                {{ attachments.length }}/5
+            </ag-button>
+            <ag-button
+                v-if="attachments.length"
+                type="button"
+                variant="ghost"
+                :loading="knowledgeSaving"
+                :disabled="busy || knowledgeSaving"
+                @click="addToKnowledge"
+            >
+                {{ $t("agent.chat.add_to_knowledge") }}
+            </ag-button>
+            <div v-if="attachments.length" class="hc-agent-attachment-previews">
+                <span v-for="(file, index) in attachments" :key="`${file.name}-${index}`">
+                    <img v-if="file.preview" :src="file.preview" alt="" />
+                    <span v-text="file.name"></span>
+                    <button type="button" :aria-label="$t('agent.chat.remove_attachment')" @click="removeAttachment(index)">
+                        <i class="fa fa-xmark" aria-hidden="true"></i>
+                    </button>
+                </span>
+            </div>
+            <ag-button
+                v-if="busy"
+                type="button"
+                variant="ghost-danger"
+                icon="fa fa-stop"
+                :disabled="!runId"
+                @click="$emit('cancel-run')"
+            >
+                {{ $t("agent.chat.stop") }}
+            </ag-button>
             <ag-button
                 type="submit"
                 variant="primary"
@@ -110,6 +188,64 @@
     flex-direction: column;
     background: #fff;
     color: var(--ag-ink);
+}
+
+.hc-agent-chat-form.has-attachments {
+    padding-bottom: 48px;
+}
+
+.hc-agent-file-input {
+    display: none;
+}
+
+.hc-agent-attachment-previews {
+    position: absolute;
+    bottom: 100%;
+    left: 16px;
+    right: 16px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 8px;
+    background: #fff;
+}
+
+.hc-agent-attachment-previews > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 180px;
+    padding: 4px 8px;
+    border: 1px solid var(--ag-line);
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.hc-agent-attachment-previews img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+}
+
+.hc-agent-attachment-previews span span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hc-agent-attachment-previews button {
+    border: 0;
+    background: transparent;
+    color: var(--ag-muted);
+}
+
+.hc-agent-listening {
+    color: #7c3aed;
+    font-size: 12px;
+}
+
+.hc-agent-attachment-label {
+    font-size: 12px;
 }
 
 .hc-agent-chat-header {
@@ -402,6 +538,7 @@
 }
 
 .hc-agent-chat-form {
+    position: relative;
     flex: 0 0 auto;
     display: flex;
     align-items: flex-end;
@@ -449,6 +586,7 @@
 
 <script>
 import ActionCard from "@/components/agent/ActionCard.vue";
+import AgentService from "@/apis/agent";
 import AgButton from "../ui/AgentButton.vue";
 import Markdown from "./Markdown.vue";
 
@@ -468,26 +606,47 @@ export default {
         items: { type: Array, default: () => [] },
         busy: { type: Boolean, default: false },
         stalled: { type: Boolean, default: false },
+        runId: { type: Number, default: null },
         error: { type: String, default: "" },
         pendingActions: { type: Array, default: () => [] },
         deciding: { type: Object, default: () => ({}) },
         openReportId: { type: Number, default: null },
     },
 
-    emits: ["send", "create", "approve", "reject", "open-report"],
+    emits: ["send", "create", "approve", "reject", "open-report", "cancel-run", "attachment-error"],
 
     data() {
         return {
             draft: "",
+            attachments: [],
+            recognition: null,
+            listening: false,
+            speechAvailable: false,
+            attachmentError: "",
+            knowledgeSaving: false,
+            knowledgeSuccess: false,
             suggestions: SUGGESTIONS,
             suggestionIcons: SUGGESTION_ICONS,
         };
     },
 
     computed: {
-        canSend() {
-            return !!this.agent && !this.busy && !!this.draft.trim();
+        canAddToKnowledge() {
+            const extension = this.attachments[0]?.name.split(".").pop().toLowerCase();
+            return ["pdf", "txt", "md"].includes(extension);
         },
+        canSend() {
+            return !!this.agent && !this.busy && (!!this.draft.trim() || this.attachments.length > 0);
+        },
+    },
+
+    mounted() {
+        this.speechAvailable = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+    },
+
+    beforeUnmount() {
+        this.stopDictation();
+        this.attachments.forEach((file) => file.preview && URL.revokeObjectURL(file.preview));
     },
 
     watch: {
@@ -502,15 +661,99 @@ export default {
 
     methods: {
         send(text) {
-            const message = (text || "").trim();
+            const message = (typeof text === "string" ? text : this.draft || "").trim();
 
-            if (!this.agent || this.busy || !message) {
+            if (!this.agent || this.busy || (!message && !this.attachments.length)) {
                 return;
             }
 
-            this.$emit("send", message);
+            this.$emit("send", { text: message, attachments: this.attachments.map(({ file }) => file) });
             this.draft = "";
+            this.attachments.forEach((file) => file.preview && URL.revokeObjectURL(file.preview));
+            this.attachments = [];
             this.$nextTick(this.grow);
+        },
+
+        pickAttachments(event) {
+            const selected = Array.from(event.target.files || []);
+            event.target.value = "";
+            const allowed = new Set(["jpg", "jpeg", "png", "webp", "pdf", "txt", "md"]);
+
+            for (const file of selected) {
+                const extension = file.name.split(".").pop().toLowerCase();
+                if (!allowed.has(extension)) {
+                    this.attachmentError = this.$t("agent.chat.invalid_file_type");
+                    continue;
+                }
+                if (file.size > 10 * 1024 * 1024) {
+                    this.attachmentError = this.$t("agent.chat.file_too_large");
+                    continue;
+                }
+                if (this.attachments.length >= 5) {
+                    this.attachmentError = this.$t("agent.chat.too_many_files");
+                    break;
+                }
+                this.attachmentError = "";
+                const preview = ["jpg", "jpeg", "png", "webp"].includes(extension) ? URL.createObjectURL(file) : null;
+                this.attachments.push({ file, name: file.name, preview });
+            }
+        },
+
+        removeAttachment(index) {
+            const [file] = this.attachments.splice(index, 1);
+            if (file?.preview) URL.revokeObjectURL(file.preview);
+        },
+
+        async addToKnowledge() {
+            if (!this.agent || !this.attachments.length || this.knowledgeSaving) return;
+            this.knowledgeSaving = true;
+            this.attachmentError = "";
+            this.knowledgeSuccess = false;
+            try {
+                await AgentService.uploadDocument(this.agent.id, this.attachments[0].file);
+                this.removeAttachment(0);
+                this.knowledgeSuccess = true;
+            } catch (e) {
+                this.attachmentError = e?.response?.data?.errors?.document?.[0]
+                    || e?.response?.data?.message
+                    || this.$t("agent.error");
+            } finally {
+                this.knowledgeSaving = false;
+            }
+        },
+
+        toggleDictation() {
+            if (this.listening) {
+                this.stopDictation();
+                return;
+            }
+
+            const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!Recognition) return;
+
+            this.recognition = new Recognition();
+            this.recognition.lang = ({ fr: "fr-FR", en: "en-US", es: "es-ES", it: "it-IT", pt: "pt-PT", ru: "ru-RU", hi: "hi-IN", ar: "ar-SA", zh_CN: "zh-CN" })[this.$store.getters.locale] || "en-US";
+            this.recognition.interimResults = false;
+            this.recognition.onresult = (event) => {
+                const recognized = Array.from(event.results).map((result) => result[0].transcript).join(" ");
+                this.draft = `${this.draft}${this.draft ? " " : ""}${recognized}`;
+                this.$nextTick(this.grow);
+            };
+            this.recognition.onend = () => {
+                this.listening = false;
+                this.recognition = null;
+            };
+            this.recognition.onerror = () => this.stopDictation();
+            this.recognition.start();
+            this.listening = true;
+        },
+
+        stopDictation() {
+            if (this.recognition) {
+                this.recognition.stop();
+                this.recognition = null;
+            }
+            this.listening = false;
         },
 
         // The box grows with what is typed

@@ -17,6 +17,10 @@ export default {
     },
     syncImap(project) {
         return ApiService.post(`project/${project}/setting/email/imap/sync`);
+    },diagnoseCalls(project, prospectId) {
+        return ApiService.post(`project/${project}/setting/calls/diagnostic`, {
+            prospect_id: prospectId,
+        });
     },
     destroy(project, setting) {
         return ApiService.delete(`project/${project}/setting/${setting}`);

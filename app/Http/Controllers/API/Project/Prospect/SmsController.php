@@ -36,9 +36,6 @@ class SmsController extends Controller
 
         $this->validateSms($request);
 
-        // See: App\Observers\SmsObserver:created
-        // To view which API we should use
-        // to send the SMS
         return $this->createSms($request, $project, $prospect);
     }
 
@@ -103,7 +100,10 @@ class SmsController extends Controller
             $firstSms ??= $sms;
         }
 
-        return ['count' => $prospects->count(), 'attachments' => $firstSms?->attachments ?? []];
+        return [
+            'count' => $prospects->count(),
+            'attachments' => $firstSms?->attachments ?? [],
+        ];
     }
 
     protected function validateSms(Request $request): void

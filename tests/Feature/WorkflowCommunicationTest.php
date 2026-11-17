@@ -4,8 +4,11 @@ namespace Tests\Feature;
 
 use App\Jobs\ProspectThreadMessage;
 use App\Models\KavkomCall;
+use App\Models\Prospect;
 use App\Observers\MessageObserver;
 use App\Workflows\Actions\EmailDesign;
+use App\Observers\ProspectCallObserver;
+use App\Jobs\PrepareAutomaticCall;
 use App\Models\Message;
 use App\Models\Sms;
 use App\Models\Workflow;
@@ -21,6 +24,7 @@ use App\Workflows\WorkflowTriggerResolver;
 use App\Workflows\WorkflowValidationException;
 use App\Workflows\WorkflowValidator;
 use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -44,7 +48,13 @@ class WorkflowCommunicationTest extends TestCase
                 'driver' => 'sqlite', 'database' => ':memory:', 'prefix' => '',
             ],
             'queue.default' => 'sync',
+            'calls.enabled' => true,
+            'calls.work_hours.start' => '08:00',
+            'calls.work_hours.end' => '17:00',
+            'calls.sms_frequency_hours' => 0,
         ]);
+        Carbon::setTestNow('2026-11-13 10:00:00');
+        CarbonImmutable::setTestNow('2026-11-13 10:00:00');
 
         // The model observers (SMS / email sending) are the CRM's, not under test
         Model::unsetEventDispatcher();
@@ -57,6 +67,8 @@ class WorkflowCommunicationTest extends TestCase
         $schema->create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('calls_enabled')->default(true);
+            $table->softDeletes();
         });
         $schema->create('users', function (Blueprint $table) {
             $table->id();
@@ -86,6 +98,9 @@ class WorkflowCommunicationTest extends TestCase
             $table->string('email')->nullable();
             $table->string('mobile_phone_number')->nullable();
             $table->string('phone_number')->nullable();
+            $table->boolean('call_consent')->nullable();
+            $table->boolean('do_not_call')->nullable();
+            $table->string('call_timezone', 64)->nullable();
             $table->string('company_name')->nullable();
             $table->string('city')->nullable();
             $table->timestamps();
@@ -159,12 +174,15 @@ class WorkflowCommunicationTest extends TestCase
             $table->timestamps();
         });
 
-        DB::table('projects')->insert([['id' => 1, 'name' => 'Heroes'], ['id' => 2, 'name' => 'Other']]);
+        DB::table('projects')->insert([
+            ['id' => 1, 'name' => 'Heroes', 'calls_enabled' => true],
+            ['id' => 2, 'name' => 'Other', 'calls_enabled' => true],
+        ]);
         DB::table('users')->insert(['id' => 7, 'name' => 'Tonny', 'last_name' => 'Andritina', 'email' => 'tonny@example.com']);
         DB::table('prospects')->insert([
-            ['id' => 1, 'project_id' => 1, 'first_name' => 'Marie', 'last_name' => 'Curie', 'email' => 'marie@example.com', 'mobile_phone_number' => '0611223344', 'company_name' => 'Radium'],
-            ['id' => 2, 'project_id' => 1, 'first_name' => 'Pierre', 'last_name' => 'Curie', 'email' => null, 'mobile_phone_number' => null, 'company_name' => null],
-            ['id' => 3, 'project_id' => 1, 'first_name' => 'Irene', 'last_name' => 'Joliot', 'email' => 'irene@example.com', 'mobile_phone_number' => '0655667788', 'company_name' => null],
+            ['id' => 1, 'project_id' => 1, 'first_name' => 'Marie', 'last_name' => 'Curie', 'email' => 'marie@example.com', 'mobile_phone_number' => '0611223344', 'company_name' => 'Radium', 'call_consent' => true],
+            ['id' => 2, 'project_id' => 1, 'first_name' => 'Pierre', 'last_name' => 'Curie', 'email' => null, 'mobile_phone_number' => null, 'company_name' => null, 'call_consent' => true],
+            ['id' => 3, 'project_id' => 1, 'first_name' => 'Irene', 'last_name' => 'Joliot', 'email' => 'irene@example.com', 'mobile_phone_number' => '0655667788', 'company_name' => null, 'call_consent' => true],
         ]);
         DB::table('prospect_user')->insert(['prospect_id' => 1, 'user_id' => 7, 'created_at' => now()]);
         DB::table('threads')->insert([
@@ -191,6 +209,7 @@ class WorkflowCommunicationTest extends TestCase
     protected function tearDown(): void
     {
         Carbon::setTestNow();
+        CarbonImmutable::setTestNow();
 
         parent::tearDown();
     }
@@ -343,7 +362,10 @@ class WorkflowCommunicationTest extends TestCase
 
         $this->fire(1);
 
-        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status, json_encode([
+            'error' => $this->execution()->error,
+            'node' => $this->nodeRow('a1')->error,
+        ]));
         $sms = Sms::first();
         $this->assertSame('Bonjour Marie', $sms->message);
         $this->assertSame('smsbox', $sms->source);
@@ -688,6 +710,36 @@ class WorkflowCommunicationTest extends TestCase
         $this->assertSame('outbound', $call->direction);
     }
 
+    public function test_prospect_call_observer_does_not_duplicate_an_agent_call_workflow(): void
+    {
+        \Illuminate\Support\Facades\Schema::table('projects', function (Blueprint $table): void {
+            $table->unsignedBigInteger('call_agent_id')->nullable();
+        });
+        DB::table('projects')->where('id', 1)->update(['call_agent_id' => 7]);
+        $workflowId = DB::table('workflows')->insertGetId([
+            'project_id' => 1,
+            'name' => 'Agent call on creation',
+            'status' => 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        $versionId = DB::table('workflow_versions')->insertGetId([
+            'workflow_id' => $workflowId,
+            'version' => 1,
+            'trigger_type' => 'prospect.created',
+            'graph' => json_encode($this->graph(['action' => 'agent_call'])),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+        DB::table('workflows')->where('id', $workflowId)->update(['active_version_id' => $versionId]);
+        WorkflowTriggerResolver::forgetIndex();
+        Queue::fake();
+
+        (new ProspectCallObserver())->created(new Prospect(['project_id' => 1]));
+
+        Queue::assertNotPushed(PrepareAutomaticCall::class);
+    }
+
     public function test_a_refused_call_fails_the_step_with_the_message_of_the_telephony_service(): void
     {
         $this->mockKavkom(['success' => false, 'message' => 'Extension indisponible']);
@@ -872,13 +924,31 @@ class WorkflowCommunicationTest extends TestCase
     {
         $registry = app(ActionRegistry::class);
 
-        foreach (['send_email', 'send_sms', 'make_call'] as $type) {
+        foreach (['send_email', 'send_sms', 'make_call', 'agent_call', 'agent_sms'] as $type) {
             $this->assertNotNull($registry->get($type));
             $this->assertTrue($registry->has($type, 'prospect'));
         }
 
         // The campaign actions are reused as they are
         $this->assertTrue($registry->has('prospect-attach-label', 'prospect'));
+    }
+
+    public function test_agent_communication_actions_are_catalogued_as_human_activated_real_messages(): void
+    {
+        $catalog = app(\App\Workflows\WorkflowCatalog::class)->build();
+        $actions = collect($catalog['actions'])->keyBy('type');
+
+        foreach (['agent_call', 'agent_sms'] as $type) {
+            $this->assertArrayHasKey($type, $actions);
+            $this->assertStringContainsString('véritable', $actions[$type]['description']);
+            $this->assertStringContainsString('activation humaine', $actions[$type]['description']);
+            $fields = array_column($actions[$type]['fields'], 'key');
+            $this->assertContains('agent_id', $fields);
+            $this->assertContains('instruction', $fields);
+            $this->assertContains('documents', $fields);
+            $this->assertContains('on_error', $fields);
+        }
+        $this->assertContains('provider', array_column($actions['agent_sms']['fields'], 'key'));
     }
 
     public function test_resolving_the_registry_does_not_need_the_test_double(): void

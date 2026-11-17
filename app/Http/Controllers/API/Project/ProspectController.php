@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Project;
 
 use App\Filters\ProspectRequestFilters;
+use App\Calls\ProspectCallConsent;
 use App\Http\Controllers\Controller;
 use App\Models\Project;
 use App\Models\Prospect;
@@ -180,6 +181,10 @@ class ProspectController extends Controller
      */
     public function update(Request $request, Project $project, Prospect $prospect)
     {
+        $callTimezone = $request->validate([
+            'call_timezone' => 'sometimes|nullable|timezone',
+        ]);
+
         $defaultFieldValues = $request->only(
             $project->fields()
                 ->where('for', "prospect")
@@ -199,7 +204,9 @@ class ProspectController extends Controller
         )->toArray();
 
         $prospect->update(array_merge(
-            $defaultFieldValues, ['meta' => array_merge($prospect->meta ?: [], $metaFieldValues)]
+            $defaultFieldValues,
+            $callTimezone,
+            ['meta' => array_merge($prospect->meta ?: [], $metaFieldValues)]
         ));
 
         $response = ['message' => trans('common.success.updated_resource')];
@@ -215,6 +222,24 @@ class ProspectController extends Controller
         }
 
         return $response;
+    }
+
+    public function callConsent(Request $request, Project $project, Prospect $prospect, ProspectCallConsent $consent)
+    {
+        abort_unless(auth()->user()->can('prospectUpdate', $project), 403);
+        abort_unless($prospect->project_id === $project->id, 404);
+
+        $validated = $request->validate([
+            'call_consent' => 'required|boolean',
+            'do_not_call' => 'required|boolean',
+        ]);
+
+        return $consent->update(
+            $prospect,
+            (bool) $validated['call_consent'],
+            (bool) $validated['do_not_call'],
+            auth()->id()
+        );
     }
 
     /**
