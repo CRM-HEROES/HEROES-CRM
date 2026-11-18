@@ -100,6 +100,8 @@
                         :operator="lineToUpdate.operator"
                         :config="lineToUpdate.config"
                         :fields="operatorFields"
+                        :project-slug="project.slug"
+                        :user-id="lineToUpdate.user_id"
                     />
                 </item-list>
                 <buttons>
@@ -124,6 +126,7 @@ import {
     FETCH_LINE_AVAILABLE_USERS,
 } from "@/actions/project/line";
 import { CLOSE_MODAL } from "@/actions/modal";
+import lineService from "@/apis/project/line";
 
 // Constants
 import lineOperators from "@/constants/lineOperators";
@@ -215,6 +218,15 @@ export default {
                     });
                 }
 
+                const projectErrors = await this.saveSelectedProjectLines(this.linePayload());
+                if (projectErrors.length) {
+                    flashError({
+                        title: "Ligne enregistrée partiellement",
+                        body: `La ligne est enregistrée dans ce projet, mais n’a pas pu être copiée dans : ${projectErrors.join(", ")}.`,
+                        duration: 9000,
+                    });
+                }
+
                 store.commit(CLOSE_MODAL);
             } catch (error) {
                 flashError({
@@ -254,6 +266,33 @@ export default {
                 user_id: this.lineToUpdate.user_id,
                 config: { ...(this.lineToUpdate.config ?? {}) },
             };
+        },
+
+        async saveSelectedProjectLines(payload) {
+            const selectedProjects = this.$refs.operatorConfigFields?.sourceProjects ?? [];
+            const errors = [];
+
+            for (const projectSlug of selectedProjects) {
+                try {
+                    const { data: lines } = await lineService.get(projectSlug);
+                    const existing = lines.find(
+                        (line) => line.operator === payload.operator && line.user_id == payload.user_id
+                    );
+
+                    if (existing) {
+                        await lineService.update(projectSlug, existing.id, payload);
+                    } else {
+                        await lineService.create(projectSlug, payload);
+                    }
+                } catch (error) {
+                    const project = this.$refs.operatorConfigFields?.projects.find(
+                        (item) => item.slug === projectSlug
+                    );
+                    errors.push(project?.name ?? projectSlug);
+                }
+            }
+
+            return errors;
         },
 
         /**

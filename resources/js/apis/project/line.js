@@ -9,6 +9,9 @@ export default {
             params,
         });
     },
+    availableProjects(project, user) {
+        return ApiService.get(`project/${project}/line/available-projects/${user}`);
+    },
     create(project, params) {
         return ApiService.post(`project/${project}/line`, params);
     },
