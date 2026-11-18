@@ -15,6 +15,8 @@ return [
     'holidays' => [],
     'max_attempts' => 3,
     'callback_delay_hours' => 48,
+    // An outgoing call with no result from the provider after this delay is closed as failed
+    'stale_after_minutes' => 60,
     'sms_frequency_hours' => 48,
     'max_daily_calls_per_project' => 100,
     'fake_outcome' => 'no_answer',

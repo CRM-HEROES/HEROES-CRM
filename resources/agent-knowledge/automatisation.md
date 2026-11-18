@@ -7,10 +7,10 @@ Les workflows automatisent des traitements à partir de déclencheurs, condition
 Consulte `workflow-catalog` et `workflow-provider`, crée ou modifie un brouillon, valide son graphe, puis publie-le. L’API permet aussi d’activer, mettre en pause ou archiver un workflow, et de consulter ou annuler des exécutions.
 
 ## Règles
-Le graphe est nettoyé et diagnostiqué par le serveur. Les opérateurs de communication sont fournis selon les capacités configurées du projet; leurs références publiques n’exposent pas leurs identifiants secrets.
+Le graphe est nettoyé et diagnostiqué par le serveur. Les actions de communication incluent `send_sms`, `send_email`, `make_call` et, pour les agents IA, `agent_sms` et `agent_call` (consigne, agent et documents de référence; l’activation du workflow par un humain autorise l’envoi ou l’appel réel). Les opérateurs de communication sont fournis selon les capacités configurées du projet; leurs références publiques n’exposent pas leurs identifiants secrets.
 
 ## Limites
-La publication et l’activation sont des actions distinctes. Les limites opérationnelles exactes et les délais de traitement sont À vérifier dans le catalogue et la configuration en vigueur.
+La publication et l’activation sont des actions distinctes. Limites du moteur : un schéma de 100 étapes au plus et 50 étapes au plus exécutées par passage (exécution), attente maximale de 365 jours, exécution considérée bloquée après 15 minutes, historique conservé 90 jours. Les communications sont limitées par minute et par opérateur et par projet (e-mails 120, SMS 60, appels 20) : au-delà, l’étape est reportée, jamais perdue ni envoyée deux fois. Les workflows avancent seulement si un worker écoute la file `workflows`.
 
 ## Dans l'interface
 Chemin : barre du haut du projet > « Automatisations » ouvre `workflow` (`components/workflow/Workflow.vue`). L’écran affiche une notice à la place de l’outil sur mobile.
@@ -30,3 +30,6 @@ Sources d’interface : `components/layouts/Header.vue`, `components/workflow/Wo
 **« Publier » démarre-t-il le workflow ?** Non, la publication et l’activation sont distinctes; « Activer » démarre l’automatisation.
 
 **Pourquoi ne vois-je pas « Suivi » ?** Il faut le droit `all.project.workflow.execution.view`.
+
+## Pour aller plus loin
+Le détail de tous les déclencheurs, conditions, attentes, actions, variables, modèles prêts à l’emploi, limites (étapes, attente) et le suivi des exécutions se trouve dans le sujet `workflows-catalogue`.

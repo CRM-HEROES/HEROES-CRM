@@ -124,11 +124,14 @@ class Agent extends Model
             return array_keys(config('agents.skills', []));
         }
 
-        return \Illuminate\Support\Facades\DB::table('agent_skills')
+        $skills = \Illuminate\Support\Facades\DB::table('agent_skills')
             ->where('agent_id', $this->id)
             ->orderBy('skill_key')
             ->pluck('skill_key')
             ->all();
+
+        // Every agent can explain how the CRM works: that skill only reads the help sheets, it gives no right
+        return array_values(array_unique(array_merge($skills, ['app_help'])));
     }
 
     /**

@@ -63,8 +63,14 @@ class AgentCallAction implements ActionHandlerInterface, ConfigurableAction, Thr
         $prospect = $this->prospect($subject);
         $project = Project::withoutGlobalScopes()->findOrFail($execution->project_id);
         $agent = $this->agent($config, $project);
-        $attempt = $this->eligibility->prepare($prospect, $agent, $project);
         $reason = $this->eligibility->reason($prospect, $project);
+
+        // Outside the working hours of the prospect the call is not lost: it starts at the next opening
+        if ($reason === 'outside_calling_hours' && config('queue.default') !== 'sync') {
+            return $this->schedule($prospect, $agent, $project, $config);
+        }
+
+        $attempt = $this->eligibility->prepare($prospect, $agent, $project);
 
         if ($reason) {
             $attempt->update(['status' => CallAttempt::SKIPPED, 'skip_reason' => $reason, 'scheduled_at' => null]);
@@ -107,6 +113,53 @@ class AgentCallAction implements ActionHandlerInterface, ConfigurableAction, Thr
         $this->completion->complete($attempt, $prospect, $project, $agent->user, $result);
 
         return ['call_attempt_id' => $attempt->id, 'status' => $attempt->fresh()->status, 'outcome' => $result['outcome'] ?? null];
+    }
+
+    /**
+     * The briefing is prepared now and stored on the attempt; StartCallAttempt checks everything again at the opening.
+     */
+    protected function schedule(\App\Models\Prospect $prospect, Agent $agent, Project $project, array $config): array
+    {
+        $existing = CallAttempt::query()
+            ->where('prospect_id', $prospect->id)->where('agent_id', $agent->id)
+            ->where('status', CallAttempt::QUEUED)->whereNotNull('scheduled_at')
+            ->latest('id')->first();
+        if ($existing) {
+            return $this->scheduled($existing);
+        }
+
+        $opening = $this->eligibility->nextOpening($prospect);
+        $documents = $this->documentSummaries($agent, $this->documentIds($config['documents'] ?? []));
+        $instruction = (new VariableResolver($prospect))->render((string) $config['instruction'], 'text');
+        $draft = $this->composer->compose($agent, $prospect, 'call', $instruction, $documents['ready'], $project->name);
+
+        $attempt = CallAttempt::create([
+            'prospect_id' => $prospect->id,
+            'agent_id' => $agent->id,
+            'project_id' => $project->id,
+            'provider' => \App\Calls\CallSettings::provider($project),
+            'status' => CallAttempt::QUEUED,
+            // Stored in the application timezone: the column has none
+            'scheduled_at' => $opening->setTimezone(config('app.timezone')),
+            'summary' => json_encode(array_merge($draft, [
+                'instruction' => $instruction,
+                'documents' => $documents['ready'],
+                'document_warnings' => $documents['warnings'],
+            ]), JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE),
+        ]);
+        \App\Jobs\Agent\StartCallAttempt::dispatch($attempt->id)->delay($opening);
+
+        return $this->scheduled($attempt);
+    }
+
+    protected function scheduled(CallAttempt $attempt): array
+    {
+        return [
+            'call_attempt_id' => $attempt->id,
+            'status' => CallAttempt::QUEUED,
+            'scheduled_at' => $attempt->scheduled_at?->toIso8601String(),
+            'reason' => 'outside_calling_hours',
+        ];
     }
 
     protected function agent(array $config, Project $project): Agent

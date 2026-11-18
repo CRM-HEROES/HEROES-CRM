@@ -47,6 +47,9 @@ class CloudTalkController extends Controller
 
                 if ($event === 'call.ended' && $signatureVerified) {
                     app(CloudTalkCallCompletionListener::class)->handle($payload, $project);
+                } elseif ($event === 'call.ended') {
+                    // Not signed: the outcome is read again from the CloudTalk API before an agent call is closed
+                    $this->confirmAgentCall($payload, $project);
                 }
 
                 return $response;
@@ -92,21 +95,49 @@ class CloudTalkController extends Controller
         return $this->store($request, $project);
     }
 
+    protected function confirmAgentCall(array $payload, Project $project): void
+    {
+        $callId = $this->firstFilled($payload, ['data.call_id']);
+        if ($callId === null) {
+            return;
+        }
+
+        // The CRM webhook must answer CloudTalk whatever happens to the agent calls
+        try {
+            $pending = \Illuminate\Support\Facades\Schema::hasTable('call_attempts')
+                && \App\Models\CallAttempt::query()
+                    ->where('project_id', $project->id)
+                    ->where('external_id', (string) $callId)
+                    ->where('status', \App\Models\CallAttempt::CALLING)
+                    ->exists();
+            if ($pending) {
+                \App\Jobs\Agent\ConfirmCloudTalkCall::dispatch($project->id, (string) $callId)->afterCommit();
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Confirmation d’un appel d’agent CloudTalk impossible.', ['project_id' => $project->id, 'error' => $exception->getMessage()]);
+        }
+    }
+
+    /**
+     * true: the delivery is signed and valid. false: it is not signed (no secret configured, or CloudTalk did not
+     * send a signature): it is processed as before, but never trusted to close an agent call by itself.
+     * A signature that is present and wrong is refused.
+     */
     protected function verifySignature(Request $request, Project $project): bool
     {
-        $settings = ProjectSetting::get($project, 'calls', []);
-        $secret = is_object($settings) ? ($settings->webhook_secret ?? null) : ($settings['webhook_secret'] ?? null);
+        $settings = \App\Calls\CallSettings::forProject($project);
+        $secret = $settings['webhook_secret'] ?? null;
         $secret = $secret ?: config('calls.webhook_secret');
 
-        if (!filled($secret)) {
+        $provided = (string) $request->header('X-CloudTalk-Signature', '');
+        if (!filled($secret) || $provided === '') {
             return false;
         }
 
-        $provided = (string) $request->header('X-CloudTalk-Signature', '');
         $provided = preg_replace('/^sha256=/i', '', $provided);
         $expected = hash_hmac('sha256', $request->getContent(), (string) $secret);
 
-        abort_unless($provided !== '' && hash_equals($expected, $provided), 401, 'Signature webhook CloudTalk invalide.');
+        abort_unless(hash_equals($expected, $provided), 401, 'Signature webhook CloudTalk invalide.');
 
         return true;
     }

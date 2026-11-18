@@ -360,6 +360,8 @@ class CloudTalkDialerTest extends TestCase
     private function line(): Line
     {
         $line = new Line();
+        // The agent name is only exposed for a CloudTalk line
+        $line->operator = 'cloudtalk';
         $line->config = [
             'api_key_id' => 'access-key',
             'api_key_secret' => 'secret-key',

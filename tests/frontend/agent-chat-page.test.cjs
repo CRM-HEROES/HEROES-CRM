@@ -151,14 +151,15 @@ test('a message is shown at once, sent to the selected agent for this project, a
     const h = page();
     await h.vm.start();
 
-    await h.vm.send('Rapport de la semaine');
+    await h.vm.send({ text: 'Rapport de la semaine' });
     // The question is already there, before the answer
     assert.deepEqual(h.vm.messages.map(m => m.text), ['Rapport de la semaine']);
     assert.equal(h.vm.busy, true);
 
     await settle();
 
-    assert.deepEqual(h.calls.ask, [[1, 'alpha', 'Rapport de la semaine', null]]);
+    // The files joined to the message go with it (none here)
+    assert.deepEqual(h.calls.ask, [[1, 'alpha', 'Rapport de la semaine', null, []]]);
     assert.equal(h.vm.conversationId, 50);
     assert.equal(h.vm.busy, false);
     assert.equal(h.vm.conversationTitle, 'Titre');
@@ -167,13 +168,31 @@ test('a message is shown at once, sent to the selected agent for this project, a
     assert.equal(h.calls.conversations.length, 2);
 });
 
+test('files joined to a message are shown and sent with it, even without a text', async () => {
+    const h = page();
+    await h.vm.start();
+    const file = { name: 'offre.pdf' };
+
+    await h.vm.send({ text: 'Résume ce document', attachments: [file] });
+    // The question and the name of the file are there before the answer
+    assert.deepEqual(h.vm.messages.map(m => [m.kind, m.text]), [['text', 'Résume ce document'], ['attachment', 'offre.pdf']]);
+    assert.deepEqual(h.calls.ask[0].slice(2), ['Résume ce document', null, [file]]);
+    await settle();
+
+    const g = page();
+    await g.vm.start();
+    await g.vm.send({ text: '   ', attachments: [file] });
+    assert.deepEqual(g.vm.messages.map(m => m.kind), ['attachment']);
+    assert.equal(g.calls.ask.length, 1);
+});
+
 test('a second message continues the same conversation', async () => {
     const h = page();
     await h.vm.start();
-    await h.vm.send('Un');
+    await h.vm.send({ text: 'Un' });
     await settle();
 
-    await h.vm.send('Deux');
+    await h.vm.send({ text: 'Deux' });
     await settle();
 
     assert.deepEqual(h.calls.ask.map(a => a[3]), [null, 50]);
@@ -182,14 +201,14 @@ test('a second message continues the same conversation', async () => {
 test('nothing is sent while the agent answers, when empty, or without an agent', async () => {
     const h = page({ agents: [] });
     await h.vm.start();
-    await h.vm.send('Salut');
+    await h.vm.send({ text: 'Salut' });
     assert.deepEqual(h.calls.ask, []);
 
     const g = page();
     await g.vm.start();
-    await g.vm.send('   ');
+    await g.vm.send({ text: '   ' });
     g.vm.busy = true;
-    await g.vm.send('Pendant');
+    await g.vm.send({ text: 'Pendant' });
     assert.deepEqual(g.calls.ask, []);
 });
 
@@ -203,11 +222,11 @@ test('a refusal of the server is shown and the question can be sent again', asyn
     } } });
     await h.vm.start();
 
-    await h.vm.send('Question');
+    await h.vm.send({ text: 'Question' });
     assert.equal(h.vm.busy, false);
     assert.equal(h.vm.error, "L'agent est encore en train de répondre.");
 
-    await h.vm.send('Question');
+    await h.vm.send({ text: 'Question' });
     await settle();
     assert.equal(h.calls.ask.length, 1);
     assert.equal(h.vm.error, '');
@@ -218,7 +237,7 @@ test('a run nobody picks up warns after 20 seconds and gives up after two minute
     const h = page({ api: { run: async () => ({ data: { finished: false, waiting_seconds: waiting } }) } });
     await h.vm.start();
     h.vm.schedule = () => {};
-    await h.vm.send('Question');
+    await h.vm.send({ text: 'Question' });
     await settle();
 
     assert.equal(h.vm.stalled, false);
@@ -240,7 +259,7 @@ test('the answer of a conversation left in the meantime is ignored', async () =>
     const gate = new Promise(r => { release = r; });
     const h = page({ api: { run: async () => { await gate; return { data: { finished: true, waiting_seconds: 0, error: 'vieille erreur' } }; } } });
     await h.vm.start();
-    await h.vm.send('Question');
+    await h.vm.send({ text: 'Question' });
     await settle(2);
 
     // The user starts another conversation while the first one is being answered
@@ -256,7 +275,7 @@ test('the answer of a conversation left in the meantime is ignored', async () =>
 test('choosing another agent starts a new conversation', async () => {
     const h = page();
     await h.vm.start();
-    await h.vm.send('Un');
+    await h.vm.send({ text: 'Un' });
     await settle();
     assert.equal(h.vm.conversationId, 50);
 
@@ -308,7 +327,7 @@ test('a document written by the agent opens by itself, beside the conversation',
     await h.vm.start();
     assert.equal(h.vm.canvasOpen, false);
 
-    await h.vm.send('Rapport');
+    await h.vm.send({ text: 'Rapport' });
     await settle(20);
 
     assert.deepEqual(h.calls.report, [9]);

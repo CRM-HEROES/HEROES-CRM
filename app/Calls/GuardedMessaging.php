@@ -29,9 +29,6 @@ class GuardedMessaging
         if ((bool) $prospect->do_not_call) {
             return 'do_not_call';
         }
-        if ($prospect->call_consent !== true) {
-            return $prospect->call_consent === false ? 'consent_declined' : 'no_consent';
-        }
         if (!$this->workingHours->isOpen($prospect)) {
             return 'outside_calling_hours';
         }

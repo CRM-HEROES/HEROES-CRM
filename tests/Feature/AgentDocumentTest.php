@@ -70,7 +70,7 @@ class AgentDocumentTest extends TestCase
             ], 200),
         ]);
 
-        (new SummarizeAgentDocument($document->id))->handle();
+        (new SummarizeAgentDocument($document->id))->handle(app(\App\Agents\AgentDocumentSummarizer::class));
 
         $this->assertSame('ready', $document->fresh()->status);
         $this->assertSame(['CRM setup'], $document->fresh()->summary['services']);
