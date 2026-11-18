@@ -80,6 +80,7 @@ class SettingController extends Controller
         // the stored one, a new value is encrypted before being stored.
         if ($setting === 'email' && is_array($value)) {
             $value = $this->protectImapSecrets($project, $value);
+            $value = $this->startImapWindow($project, $value);
         }
 
         ProjectSetting::set($project, $setting, $value);
@@ -222,6 +223,38 @@ class SettingController extends Controller
         $data['imap']['password'] = '';
 
         return $data;
+    }
+
+    /**
+     * Start of the incoming emails window.
+     *
+     * The mailbox history is never imported: the first extraction only reads
+     * the emails received from the moment IMAP is enabled, the following ones
+     * from the last synchronisation. Switching IMAP off then on again starts a
+     * new window, so the emails of the period it was off are not imported
+     * either (the history of the mailbox is never fetched).
+     */
+    protected function startImapWindow(Project $project, array $value): array
+    {
+        if (!is_array(data_get($value, 'imap')) || !data_get($value, 'imap.enabled')) {
+            return $value;
+        }
+
+        $stored = ProjectSetting::get($project, 'email');
+
+        // Already enabled: keep the date of its first extraction, or the last
+        // synchronisation for a mailbox enabled by an older version.
+        if (data_get($stored, 'imap.enabled')) {
+            $value['imap']['since'] = data_get($stored, 'imap.since')
+                ?: data_get($stored, 'imap.last_sync_at');
+
+            return $value;
+        }
+
+        $value['imap']['since'] = now()->toIso8601String();
+        $value['imap']['last_sync_at'] = null;
+
+        return $value;
     }
 
     /**

@@ -33,9 +33,12 @@ class ImapInboxSync
     public const MAX_PER_SYNC = 100;
 
     /**
-     * Window of the first run, when there is no previous synchronisation.
+     * The mailbox history is never imported: the first extraction starts at
+     * the date the mailbox was enabled (the "since" of the setting), and the
+     * following ones at the last synchronisation. Only the new emails are
+     * therefore extracted, the ones already in the mailbox before the CRM
+     * are ignored.
      */
-    public const DEFAULT_WINDOW_DAYS = 7;
 
     /**
      * Known providers: choosing one fills the server settings.
@@ -142,9 +145,10 @@ class ImapInboxSync
             $upToDate = false;
 
             // 1) Headers only, newest first: the mailbox is read from the day
-            //    of the last sync, and the loop stops at the first message
-            //    older than the exact date/time of that sync. Nothing older
-            //    than the last sync is downloaded.
+            //    of the last sync (or from the date the mailbox was enabled on
+            //    the first extraction), and the loop stops at the first
+            //    message older than that exact date/time. The emails already
+            //    in the mailbox before the CRM are never downloaded.
             $query = $folder->query()
                 ->setFetchOrder('desc')
                 ->setFetchBody(false)
@@ -506,20 +510,27 @@ class ImapInboxSync
 
     /**
      * Exact start of the window (date and time): the last synchronisation,
-     * or the last days on the first run. IMAP only filters by day (SINCE),
-     * so this precise value is used to stop the reading.
+     * or the date the mailbox was enabled on the first extraction. When there
+     * is neither (mailbox enabled by an older version), the extraction starts
+     * now: the emails already in the mailbox are never imported. IMAP only
+     * filters by day (SINCE), so this precise value is used to stop the
+     * reading.
      */
     protected function cutoff(array $config): Carbon
     {
-        if (empty($config['last_sync_at'])) {
-            return Carbon::now()->subDays(self::DEFAULT_WINDOW_DAYS);
+        foreach (['last_sync_at', 'since'] as $key) {
+            if (empty($config[$key])) {
+                continue;
+            }
+
+            try {
+                return Carbon::parse($config[$key]);
+            } catch (\Throwable $exception) {
+                // Unreadable date: fall back on the next starting point.
+            }
         }
 
-        try {
-            return Carbon::parse($config['last_sync_at']);
-        } catch (\Throwable $exception) {
-            return Carbon::now()->subDays(self::DEFAULT_WINDOW_DAYS);
-        }
+        return Carbon::now();
     }
 
     /**
@@ -568,6 +579,7 @@ class ImapInboxSync
             'username' => $username,
             'password' => $password,
             'folder' => trim((string) data_get($imap, 'folder')) ?: self::DEFAULT_FOLDER,
+            'since' => data_get($imap, 'since'),
             'last_sync_at' => data_get($imap, 'last_sync_at'),
         ];
     }
@@ -615,7 +627,17 @@ class ImapInboxSync
         $settings = ProjectSetting::get($project, self::SETTING);
         $settings = $settings ? json_decode(json_encode($settings), true) : [];
 
+        // Start of the first extraction, kept on the setting so that the next
+        // runs never go further back than the mailbox activation. A failed
+        // run does not move it: the emails received meanwhile stay pending.
+        $since = data_get($settings, 'imap.since');
+
+        if (!$since && $error === null) {
+            $since = now()->toIso8601String();
+        }
+
         $settings['imap'] = array_merge($settings['imap'] ?? [], [
+            'since' => $since,
             'last_sync_at' => $upToDate ? now()->toIso8601String() : data_get($settings, 'imap.last_sync_at'),
             'last_synced' => $counts['imported'],
             'last_error' => $error,

@@ -711,7 +711,7 @@ export default {
         EventBus.on(COMMUNICATIONS_READ, this.onCommunicationsRead);
         this.incomingCommunicationsInterval = setInterval(() => {
             if (!document.hidden) this.fetchIncomingCommunicationsCount();
-        }, 120000);
+        }, 600000);
     },
 
     beforeUnmount() {
