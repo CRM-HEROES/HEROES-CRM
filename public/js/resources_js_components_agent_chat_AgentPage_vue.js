@@ -281,6 +281,7 @@ var WIDE_SCREEN = 1100;
       pendingActions: [],
       deciding: {},
       busy: false,
+      activeRunId: null,
       stalled: false,
       error: "",
       // Changes with every conversation opened: late answers of the previous one are ignored
@@ -439,6 +440,7 @@ var WIDE_SCREEN = 1100;
       this.reports = [];
       this.pendingActions = [];
       this.busy = false;
+      this.activeRunId = null;
       this.stalled = false;
       this.error = "";
     },
@@ -556,56 +558,65 @@ var WIDE_SCREEN = 1100;
       this.pendingActions = data.pending_actions || [];
     },
     // Sending
-    send: function send(text) {
+    send: function send(payload) {
       var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        var agent, token, _yield$AgentService$a, data;
+        var agent, text, attachments, token, _yield$AgentService$a, data;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
               agent = _this8.selectedAgent;
-              if (!(!agent || _this8.busy || !text.trim())) {
-                _context5.next = 3;
+              text = (payload === null || payload === void 0 ? void 0 : payload.text) || "";
+              attachments = (payload === null || payload === void 0 ? void 0 : payload.attachments) || [];
+              if (!(!agent || _this8.busy || !text.trim() && !attachments.length)) {
+                _context5.next = 5;
                 break;
               }
               return _context5.abrupt("return");
-            case 3:
+            case 5:
               _this8.error = "";
               _this8.busy = true;
-              _this8.messages = [].concat(_toConsumableArray(_this8.messages), [{
+              _this8.messages = [].concat(_toConsumableArray(_this8.messages), _toConsumableArray(text.trim() ? [{
                 role: "user",
                 kind: "text",
                 text: text
-              }]);
+              }] : []), _toConsumableArray(attachments.length ? [{
+                role: "user",
+                kind: "attachment",
+                text: attachments.map(function (file) {
+                  return file.name;
+                }).join(", ")
+              }] : []));
               token = _this8.token;
-              _context5.prev = 7;
-              _context5.next = 10;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].ask(agent.id, _this8.project.slug, text, _this8.conversationId);
-            case 10:
+              _context5.prev = 9;
+              _context5.next = 12;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].ask(agent.id, _this8.project.slug, text, _this8.conversationId, attachments);
+            case 12:
               _yield$AgentService$a = _context5.sent;
               data = _yield$AgentService$a.data;
               if (!(token !== _this8.token)) {
-                _context5.next = 14;
+                _context5.next = 16;
                 break;
               }
               return _context5.abrupt("return");
-            case 14:
+            case 16:
               _this8.conversationId = data.conversation_id;
+              _this8.activeRunId = data.run_id;
               _this8.follow(data.run_id, token);
-              _context5.next = 21;
+              _context5.next = 24;
               break;
-            case 18:
-              _context5.prev = 18;
-              _context5.t0 = _context5["catch"](7);
+            case 21:
+              _context5.prev = 21;
+              _context5.t0 = _context5["catch"](9);
               if (token === _this8.token) {
                 _this8.busy = false;
                 _this8.error = _this8.message(_context5.t0);
               }
-            case 21:
+            case 24:
             case "end":
               return _context5.stop();
           }
-        }, _callee5, null, [[7, 18]]);
+        }, _callee5, null, [[9, 21]]);
       }))();
     },
     // Ask for the run until it is over, then show the whole conversation
@@ -648,110 +659,148 @@ var WIDE_SCREEN = 1100;
             case 14:
               _this9.stalled = false;
               _this9.busy = false;
+              _this9.activeRunId = null;
               if (data.error) {
                 _this9.error = data.error;
               }
-              _context6.next = 19;
+              _context6.next = 20;
               return _this9.refresh(token);
-            case 19:
+            case 20:
               _this9.loadHistory();
-              _context6.next = 25;
+              _context6.next = 26;
               break;
-            case 22:
-              _context6.prev = 22;
+            case 23:
+              _context6.prev = 23;
               _context6.t0 = _context6["catch"](0);
               if (token === _this9.token) {
                 _this9.busy = false;
                 _this9.error = _this9.message(_context6.t0);
               }
-            case 25:
+            case 26:
             case "end":
               return _context6.stop();
           }
-        }, _callee6, null, [[0, 22]]);
+        }, _callee6, null, [[0, 23]]);
       }))();
     },
-    refresh: function refresh() {
-      var _arguments = arguments,
-        _this10 = this;
+    cancelRun: function cancelRun() {
+      var _this10 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        var token, before, _yield$AgentService$c3, data, created;
         return _regeneratorRuntime().wrap(function _callee7$(_context7) {
           while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              token = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : _this10.token;
-              if (_this10.conversationId) {
-                _context7.next = 3;
+              if (_this10.activeRunId) {
+                _context7.next = 2;
                 break;
               }
               return _context7.abrupt("return");
-            case 3:
-              before = _this10.reports;
-              _context7.next = 6;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].conversation(_this10.conversationId);
-            case 6:
-              _yield$AgentService$c3 = _context7.sent;
-              data = _yield$AgentService$c3.data;
-              if (!(token !== _this10.token)) {
-                _context7.next = 10;
-                break;
-              }
-              return _context7.abrupt("return");
-            case 10:
-              _this10.apply(data);
-
-              // A document the agent has just written opens by itself
-              created = (0,_items__WEBPACK_IMPORTED_MODULE_8__.newReports)(before, _this10.reports);
-              if (created.length) {
-                _this10.openReportById(created[created.length - 1].id);
-              }
-            case 13:
+            case 2:
+              _context7.prev = 2;
+              _context7.next = 5;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].cancelRun(_this10.activeRunId);
+            case 5:
+              clearTimeout(_this10.timer);
+              _this10.timer = null;
+              _this10.busy = false;
+              _this10.stalled = false;
+              _this10.activeRunId = null;
+              _context7.next = 15;
+              break;
+            case 12:
+              _context7.prev = 12;
+              _context7.t0 = _context7["catch"](2);
+              _this10.error = _this10.message(_context7.t0);
+            case 15:
             case "end":
               return _context7.stop();
           }
-        }, _callee7);
+        }, _callee7, null, [[2, 12]]);
       }))();
     },
-    // Documents
-    openReportById: function openReportById(id) {
-      var _this11 = this;
+    showAttachmentError: function showAttachmentError(message) {
+      this.error = message;
+    },
+    refresh: function refresh() {
+      var _arguments = arguments,
+        _this11 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
-        var _yield$AgentService$r2, data;
+        var token, before, _yield$AgentService$c3, data, created;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              _this11.canvasOpen = true;
-              if (!(_this11.openedReport && _this11.openedReport.id === id)) {
+              token = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : _this11.token;
+              if (_this11.conversationId) {
                 _context8.next = 3;
                 break;
               }
               return _context8.abrupt("return");
             case 3:
-              _this11.openedReport = null;
-              _this11.reportError = "";
-              _this11.reportLoading = true;
-              _context8.prev = 6;
-              _context8.next = 9;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].report(id);
-            case 9:
-              _yield$AgentService$r2 = _context8.sent;
-              data = _yield$AgentService$r2.data;
-              _this11.openedReport = data;
-              _context8.next = 17;
-              break;
-            case 14:
-              _context8.prev = 14;
-              _context8.t0 = _context8["catch"](6);
-              _this11.reportError = _this11.message(_context8.t0);
-            case 17:
-              _context8.prev = 17;
-              _this11.reportLoading = false;
-              return _context8.finish(17);
-            case 20:
+              before = _this11.reports;
+              _context8.next = 6;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].conversation(_this11.conversationId);
+            case 6:
+              _yield$AgentService$c3 = _context8.sent;
+              data = _yield$AgentService$c3.data;
+              if (!(token !== _this11.token)) {
+                _context8.next = 10;
+                break;
+              }
+              return _context8.abrupt("return");
+            case 10:
+              _this11.apply(data);
+
+              // A document the agent has just written opens by itself
+              created = (0,_items__WEBPACK_IMPORTED_MODULE_8__.newReports)(before, _this11.reports);
+              if (created.length) {
+                _this11.openReportById(created[created.length - 1].id);
+              }
+            case 13:
             case "end":
               return _context8.stop();
           }
-        }, _callee8, null, [[6, 14, 17, 20]]);
+        }, _callee8);
+      }))();
+    },
+    // Documents
+    openReportById: function openReportById(id) {
+      var _this12 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
+        var _yield$AgentService$r2, data;
+        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
+            case 0:
+              _this12.canvasOpen = true;
+              if (!(_this12.openedReport && _this12.openedReport.id === id)) {
+                _context9.next = 3;
+                break;
+              }
+              return _context9.abrupt("return");
+            case 3:
+              _this12.openedReport = null;
+              _this12.reportError = "";
+              _this12.reportLoading = true;
+              _context9.prev = 6;
+              _context9.next = 9;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].report(id);
+            case 9:
+              _yield$AgentService$r2 = _context9.sent;
+              data = _yield$AgentService$r2.data;
+              _this12.openedReport = data;
+              _context9.next = 17;
+              break;
+            case 14:
+              _context9.prev = 14;
+              _context9.t0 = _context9["catch"](6);
+              _this12.reportError = _this12.message(_context9.t0);
+            case 17:
+              _context9.prev = 17;
+              _this12.reportLoading = false;
+              return _context9.finish(17);
+            case 20:
+            case "end":
+              return _context9.stop();
+          }
+        }, _callee9, null, [[6, 14, 17, 20]]);
       }))();
     },
     closeCanvas: function closeCanvas() {
@@ -760,23 +809,6 @@ var WIDE_SCREEN = 1100;
     },
     // Decisions on what an agent proposed
     approve: function approve(action) {
-      var _this12 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee9() {
-        return _regeneratorRuntime().wrap(function _callee9$(_context9) {
-          while (1) switch (_context9.prev = _context9.next) {
-            case 0:
-              _context9.next = 2;
-              return _this12.decide(action, function () {
-                return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].approve(action.id);
-              });
-            case 2:
-            case "end":
-              return _context9.stop();
-          }
-        }, _callee9);
-      }))();
-    },
-    reject: function reject(action) {
       var _this13 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee10() {
         return _regeneratorRuntime().wrap(function _callee10$(_context10) {
@@ -784,7 +816,7 @@ var WIDE_SCREEN = 1100;
             case 0:
               _context10.next = 2;
               return _this13.decide(action, function () {
-                return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].reject(action.id);
+                return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].approve(action.id);
               });
             case 2:
             case "end":
@@ -793,72 +825,89 @@ var WIDE_SCREEN = 1100;
         }, _callee10);
       }))();
     },
-    decide: function decide(action, call) {
+    reject: function reject(action) {
       var _this14 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee11() {
         return _regeneratorRuntime().wrap(function _callee11$(_context11) {
           while (1) switch (_context11.prev = _context11.next) {
             case 0:
-              _this14.error = "";
-              _this14.deciding = _objectSpread(_objectSpread({}, _this14.deciding), {}, _defineProperty({}, action.id, true));
-              _context11.prev = 2;
-              _context11.next = 5;
-              return call();
-            case 5:
-              _context11.next = 10;
-              break;
-            case 7:
-              _context11.prev = 7;
-              _context11.t0 = _context11["catch"](2);
-              _this14.error = _this14.message(_context11.t0);
-            case 10:
-              _this14.deciding = _objectSpread(_objectSpread({}, _this14.deciding), {}, _defineProperty({}, action.id, false));
-              _context11.next = 13;
-              return _this14.refresh()["catch"](function () {});
-            case 13:
+              _context11.next = 2;
+              return _this14.decide(action, function () {
+                return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].reject(action.id);
+              });
+            case 2:
             case "end":
               return _context11.stop();
           }
-        }, _callee11, null, [[2, 7]]);
+        }, _callee11);
+      }))();
+    },
+    decide: function decide(action, call) {
+      var _this15 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
+          while (1) switch (_context12.prev = _context12.next) {
+            case 0:
+              _this15.error = "";
+              _this15.deciding = _objectSpread(_objectSpread({}, _this15.deciding), {}, _defineProperty({}, action.id, true));
+              _context12.prev = 2;
+              _context12.next = 5;
+              return call();
+            case 5:
+              _context12.next = 10;
+              break;
+            case 7:
+              _context12.prev = 7;
+              _context12.t0 = _context12["catch"](2);
+              _this15.error = _this15.message(_context12.t0);
+            case 10:
+              _this15.deciding = _objectSpread(_objectSpread({}, _this15.deciding), {}, _defineProperty({}, action.id, false));
+              _context12.next = 13;
+              return _this15.refresh()["catch"](function () {});
+            case 13:
+            case "end":
+              return _context12.stop();
+          }
+        }, _callee12, null, [[2, 7]]);
       }))();
     },
     // Agents
     showInfo: function showInfo(id) {
-      var _this15 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee12() {
+      var _this16 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee13() {
         var _yield$AgentService$g, data;
-        return _regeneratorRuntime().wrap(function _callee12$(_context12) {
-          while (1) switch (_context12.prev = _context12.next) {
+        return _regeneratorRuntime().wrap(function _callee13$(_context13) {
+          while (1) switch (_context13.prev = _context13.next) {
             case 0:
-              _this15.infoOpen = true;
-              _this15.infoAgent = null;
-              _this15.infoError = "";
-              _this15.infoLoading = true;
-              _context12.prev = 4;
-              _context12.next = 7;
+              _this16.infoOpen = true;
+              _this16.infoAgent = null;
+              _this16.infoError = "";
+              _this16.infoLoading = true;
+              _context13.prev = 4;
+              _context13.next = 7;
               return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].get(id);
             case 7:
-              _yield$AgentService$g = _context12.sent;
+              _yield$AgentService$g = _context13.sent;
               data = _yield$AgentService$g.data;
               // Another agent may have been asked for in the meantime
-              if (_this15.infoOpen) {
-                _this15.infoAgent = data;
+              if (_this16.infoOpen) {
+                _this16.infoAgent = data;
               }
-              _context12.next = 15;
+              _context13.next = 15;
               break;
             case 12:
-              _context12.prev = 12;
-              _context12.t0 = _context12["catch"](4);
-              _this15.infoError = _this15.message(_context12.t0);
+              _context13.prev = 12;
+              _context13.t0 = _context13["catch"](4);
+              _this16.infoError = _this16.message(_context13.t0);
             case 15:
-              _context12.prev = 15;
-              _this15.infoLoading = false;
-              return _context12.finish(15);
+              _context13.prev = 15;
+              _this16.infoLoading = false;
+              return _context13.finish(15);
             case 18:
             case "end":
-              return _context12.stop();
+              return _context13.stop();
           }
-        }, _callee12, null, [[4, 12, 15, 18]]);
+        }, _callee13, null, [[4, 12, 15, 18]]);
       }))();
     },
     // See: @/components/agent/FormModal.vue
@@ -887,8 +936,20 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _components_agent_ActionCard_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/components/agent/ActionCard.vue */ "./resources/js/components/agent/ActionCard.vue");
-/* harmony import */ var _ui_AgentButton_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ui/AgentButton.vue */ "./resources/js/components/agent/ui/AgentButton.vue");
-/* harmony import */ var _Markdown_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Markdown.vue */ "./resources/js/components/agent/chat/Markdown.vue");
+/* harmony import */ var _apis_agent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/agent */ "./resources/js/apis/agent.js");
+/* harmony import */ var _ui_AgentButton_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../ui/AgentButton.vue */ "./resources/js/components/agent/ui/AgentButton.vue");
+/* harmony import */ var _Markdown_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Markdown.vue */ "./resources/js/components/agent/chat/Markdown.vue");
+function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
+function _iterableToArrayLimit(arr, i) { var _i = null == arr ? null : "undefined" != typeof Symbol && arr[Symbol.iterator] || arr["@@iterator"]; if (null != _i) { var _s, _e, _x, _r, _arr = [], _n = !0, _d = !1; try { if (_x = (_i = _i.call(arr)).next, 0 === i) { if (Object(_i) !== _i) return; _n = !1; } else for (; !(_n = (_s = _x.call(_i)).done) && (_arr.push(_s.value), _arr.length !== i); _n = !0); } catch (err) { _d = !0, _e = err; } finally { try { if (!_n && null != _i["return"] && (_r = _i["return"](), Object(_r) !== _r)) return; } finally { if (_d) throw _e; } } return _arr; } }
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
 
 
 
@@ -901,8 +962,8 @@ var SUGGESTION_ICONS = {
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     ActionCard: _components_agent_ActionCard_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    AgButton: _ui_AgentButton_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
-    Markdown: _Markdown_vue__WEBPACK_IMPORTED_MODULE_2__["default"]
+    AgButton: _ui_AgentButton_vue__WEBPACK_IMPORTED_MODULE_2__["default"],
+    Markdown: _Markdown_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   props: {
     agent: {
@@ -927,6 +988,10 @@ var SUGGESTION_ICONS = {
       type: Boolean,
       "default": false
     },
+    runId: {
+      type: Number,
+      "default": null
+    },
     error: {
       type: String,
       "default": ""
@@ -948,18 +1013,39 @@ var SUGGESTION_ICONS = {
       "default": null
     }
   },
-  emits: ["send", "create", "approve", "reject", "open-report"],
+  emits: ["send", "create", "approve", "reject", "open-report", "cancel-run", "attachment-error"],
   data: function data() {
     return {
       draft: "",
+      attachments: [],
+      recognition: null,
+      listening: false,
+      speechAvailable: false,
+      attachmentError: "",
+      knowledgeSaving: false,
+      knowledgeSuccess: false,
       suggestions: SUGGESTIONS,
       suggestionIcons: SUGGESTION_ICONS
     };
   },
   computed: {
+    canAddToKnowledge: function canAddToKnowledge() {
+      var _this$attachments$;
+      var extension = (_this$attachments$ = this.attachments[0]) === null || _this$attachments$ === void 0 ? void 0 : _this$attachments$.name.split(".").pop().toLowerCase();
+      return ["pdf", "txt", "md"].includes(extension);
+    },
     canSend: function canSend() {
-      return !!this.agent && !this.busy && !!this.draft.trim();
+      return !!this.agent && !this.busy && (!!this.draft.trim() || this.attachments.length > 0);
     }
+  },
+  mounted: function mounted() {
+    this.speechAvailable = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+  },
+  beforeUnmount: function beforeUnmount() {
+    this.stopDictation();
+    this.attachments.forEach(function (file) {
+      return file.preview && URL.revokeObjectURL(file.preview);
+    });
   },
   watch: {
     // Stay at the bottom while the conversation grows
@@ -972,13 +1058,141 @@ var SUGGESTION_ICONS = {
   },
   methods: {
     send: function send(text) {
-      var message = (text || "").trim();
-      if (!this.agent || this.busy || !message) {
+      var message = (typeof text === "string" ? text : this.draft || "").trim();
+      if (!this.agent || this.busy || !message && !this.attachments.length) {
         return;
       }
-      this.$emit("send", message);
+      this.$emit("send", {
+        text: message,
+        attachments: this.attachments.map(function (_ref) {
+          var file = _ref.file;
+          return file;
+        })
+      });
       this.draft = "";
+      this.attachments.forEach(function (file) {
+        return file.preview && URL.revokeObjectURL(file.preview);
+      });
+      this.attachments = [];
       this.$nextTick(this.grow);
+    },
+    pickAttachments: function pickAttachments(event) {
+      var selected = Array.from(event.target.files || []);
+      event.target.value = "";
+      var allowed = new Set(["jpg", "jpeg", "png", "webp", "pdf", "txt", "md"]);
+      for (var _i = 0, _selected = selected; _i < _selected.length; _i++) {
+        var file = _selected[_i];
+        var extension = file.name.split(".").pop().toLowerCase();
+        if (!allowed.has(extension)) {
+          this.attachmentError = this.$t("agent.chat.invalid_file_type");
+          continue;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+          this.attachmentError = this.$t("agent.chat.file_too_large");
+          continue;
+        }
+        if (this.attachments.length >= 5) {
+          this.attachmentError = this.$t("agent.chat.too_many_files");
+          break;
+        }
+        this.attachmentError = "";
+        var preview = ["jpg", "jpeg", "png", "webp"].includes(extension) ? URL.createObjectURL(file) : null;
+        this.attachments.push({
+          file: file,
+          name: file.name,
+          preview: preview
+        });
+      }
+    },
+    removeAttachment: function removeAttachment(index) {
+      var _this$attachments$spl = this.attachments.splice(index, 1),
+        _this$attachments$spl2 = _slicedToArray(_this$attachments$spl, 1),
+        file = _this$attachments$spl2[0];
+      if (file !== null && file !== void 0 && file.preview) URL.revokeObjectURL(file.preview);
+    },
+    addToKnowledge: function addToKnowledge() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var _e$response, _e$response2;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              if (!(!_this.agent || !_this.attachments.length || _this.knowledgeSaving)) {
+                _context.next = 2;
+                break;
+              }
+              return _context.abrupt("return");
+            case 2:
+              _this.knowledgeSaving = true;
+              _this.attachmentError = "";
+              _this.knowledgeSuccess = false;
+              _context.prev = 5;
+              _context.next = 8;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadDocument(_this.agent.id, _this.attachments[0].file);
+            case 8:
+              _this.removeAttachment(0);
+              _this.knowledgeSuccess = true;
+              _context.next = 15;
+              break;
+            case 12:
+              _context.prev = 12;
+              _context.t0 = _context["catch"](5);
+              _this.attachmentError = (_context.t0 === null || _context.t0 === void 0 || (_e$response = _context.t0.response) === null || _e$response === void 0 || (_e$response = _e$response.data) === null || _e$response === void 0 || (_e$response = _e$response.errors) === null || _e$response === void 0 || (_e$response = _e$response.document) === null || _e$response === void 0 ? void 0 : _e$response[0]) || (_context.t0 === null || _context.t0 === void 0 || (_e$response2 = _context.t0.response) === null || _e$response2 === void 0 || (_e$response2 = _e$response2.data) === null || _e$response2 === void 0 ? void 0 : _e$response2.message) || _this.$t("agent.error");
+            case 15:
+              _context.prev = 15;
+              _this.knowledgeSaving = false;
+              return _context.finish(15);
+            case 18:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[5, 12, 15, 18]]);
+      }))();
+    },
+    toggleDictation: function toggleDictation() {
+      var _this2 = this;
+      if (this.listening) {
+        this.stopDictation();
+        return;
+      }
+      var Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!Recognition) return;
+      this.recognition = new Recognition();
+      this.recognition.lang = {
+        fr: "fr-FR",
+        en: "en-US",
+        es: "es-ES",
+        it: "it-IT",
+        pt: "pt-PT",
+        ru: "ru-RU",
+        hi: "hi-IN",
+        ar: "ar-SA",
+        zh_CN: "zh-CN"
+      }[this.$store.getters.locale] || "en-US";
+      this.recognition.interimResults = false;
+      this.recognition.onresult = function (event) {
+        var recognized = Array.from(event.results).map(function (result) {
+          return result[0].transcript;
+        }).join(" ");
+        _this2.draft = "".concat(_this2.draft).concat(_this2.draft ? " " : "").concat(recognized);
+        _this2.$nextTick(_this2.grow);
+      };
+      this.recognition.onend = function () {
+        _this2.listening = false;
+        _this2.recognition = null;
+      };
+      this.recognition.onerror = function () {
+        return _this2.stopDictation();
+      };
+      this.recognition.start();
+      this.listening = true;
+    },
+    stopDictation: function stopDictation() {
+      if (this.recognition) {
+        this.recognition.stop();
+        this.recognition = null;
+      }
+      this.listening = false;
     },
     // The box grows with what is typed
     grow: function grow() {
@@ -1669,16 +1883,19 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     items: $options.items,
     busy: $data.busy,
     stalled: $data.stalled,
+    "run-id": $data.activeRunId,
     error: $data.error,
     "pending-actions": $data.pendingActions,
     deciding: $data.deciding,
     "open-report-id": $options.openedReportId,
     onSend: $options.send,
+    onCancelRun: $options.cancelRun,
+    onAttachmentError: $options.showAttachmentError,
     onCreate: $options.createAgent,
     onApprove: $options.approve,
     onReject: $options.reject,
     onOpenReport: $options.openReportById
-  }, null, 8 /* PROPS */, ["agent", "title", "items", "busy", "stalled", "error", "pending-actions", "deciding", "open-report-id", "onSend", "onCreate", "onApprove", "onReject", "onOpenReport"]), $data.canvasOpen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_report_panel, {
+  }, null, 8 /* PROPS */, ["agent", "title", "items", "busy", "stalled", "run-id", "error", "pending-actions", "deciding", "open-report-id", "onSend", "onCancelRun", "onAttachmentError", "onCreate", "onApprove", "onReject", "onOpenReport"]), $data.canvasOpen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_report_panel, {
     key: 0,
     report: $data.openedReport,
     loading: $data.reportLoading,
@@ -1761,57 +1978,97 @@ var _hoisted_18 = ["onClick"];
 var _hoisted_19 = ["textContent"];
 var _hoisted_20 = {
   key: 1,
+  "class": "hc-agent-msg is-user hc-agent-attachment-label"
+};
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-paperclip",
+  "aria-hidden": "true"
+}, null, -1 /* HOISTED */);
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = {
+  key: 2,
   "class": "hc-agent-msg is-agent"
 };
-var _hoisted_21 = {
-  key: 2,
+var _hoisted_24 = {
+  key: 3,
   "class": "hc-agent-msg-tool"
 };
-var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-wrench",
   "aria-hidden": "true"
 }, null, -1 /* HOISTED */);
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["onClick"];
-var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = ["onClick"];
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "hc-agent-report-card-icon",
   "aria-hidden": "true"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-file-lines"
 })], -1 /* HOISTED */);
-var _hoisted_26 = {
+var _hoisted_29 = {
   "class": "hc-agent-report-card-text"
 };
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = {
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = {
   "class": "hc-agent-report-card-kind"
 };
-var _hoisted_29 = {
+var _hoisted_32 = {
   "class": "hc-agent-report-card-open"
 };
-var _hoisted_30 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-arrow-right",
   "aria-hidden": "true"
 }, null, -1 /* HOISTED */);
-var _hoisted_31 = {
+var _hoisted_34 = {
   key: 2,
   "class": "hc-agent-msg is-agent is-working"
 };
-var _hoisted_32 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "hc-agent-dots",
   "aria-hidden": "true"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i")], -1 /* HOISTED */);
-var _hoisted_33 = {
+var _hoisted_36 = {
   key: 0,
   "class": "hc-agent-chat-error",
   role: "alert"
 };
-var _hoisted_34 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+var _hoisted_37 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
   "class": "fa fa-circle-exclamation",
   "aria-hidden": "true"
 }, null, -1 /* HOISTED */);
-var _hoisted_35 = ["disabled", "placeholder"];
-var _hoisted_36 = {
+var _hoisted_38 = {
+  key: 1,
+  "class": "hc-agent-chat-error",
+  role: "alert"
+};
+var _hoisted_39 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-circle-exclamation",
+  "aria-hidden": "true"
+}, null, -1 /* HOISTED */);
+var _hoisted_40 = {
+  key: 2,
+  "class": "hc-agent-chat-hint",
+  role: "status"
+};
+var _hoisted_41 = ["disabled", "placeholder"];
+var _hoisted_42 = {
+  key: 0,
+  "class": "hc-agent-listening",
+  role: "status"
+};
+var _hoisted_43 = {
+  key: 4,
+  "class": "hc-agent-attachment-previews"
+};
+var _hoisted_44 = ["src"];
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = ["aria-label", "onClick"];
+var _hoisted_47 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("i", {
+  "class": "fa fa-xmark",
+  "aria-hidden": "true"
+}, null, -1 /* HOISTED */);
+var _hoisted_48 = [_hoisted_47];
+var _hoisted_49 = {
   "class": "hc-agent-chat-hint"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -1872,16 +2129,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: 0,
       "class": "hc-agent-msg is-user",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.text)
-    }, null, 8 /* PROPS */, _hoisted_19)) : item.kind === 'agent' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_markdown, {
+    }, null, 8 /* PROPS */, _hoisted_19)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), item.kind === 'attachment' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_20, [_hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.text)
+    }, null, 8 /* PROPS */, _hoisted_22)])) : item.kind === 'agent' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_markdown, {
       text: item.text
-    }, null, 8 /* PROPS */, ["text"])])) : item.kind === 'tool' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.tool_used", {
+    }, null, 8 /* PROPS */, ["text"])])) : item.kind === 'tool' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_24, [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.tool_used", {
       tool: _ctx.$t("agent.tools.".concat(item.tool), item.tool)
     })), 1 /* TEXT */)])) : item.kind === 'system' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-      key: 3,
+      key: 4,
       "class": "hc-agent-msg-system",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.text)
-    }, null, 8 /* PROPS */, _hoisted_23)) : item.kind === 'report' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 4,
+    }, null, 8 /* PROPS */, _hoisted_26)) : item.kind === 'report' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 5,
       type: "button",
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-agent-report-card", {
         'is-open': item.id === $props.openReportId
@@ -1889,11 +2148,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return _ctx.$emit('open-report', item.id);
       }
-    }, [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, [_hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       "class": "hc-agent-report-card-title",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.title)
-    }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_28, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.document")), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.open_document")) + " ", 1 /* TEXT */), _hoisted_30])], 10 /* CLASS, PROPS */, _hoisted_24)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
-  }), 128 /* KEYED_FRAGMENT */)), $props.busy ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_31, [_hoisted_32, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($props.stalled ? "agent.waiting_worker" : "agent.working")), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.pendingActions, function (action) {
+    }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_31, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.document")), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.open_document")) + " ", 1 /* TEXT */), _hoisted_33])], 10 /* CLASS, PROPS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */);
+  }), 128 /* KEYED_FRAGMENT */)), $props.busy ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($props.stalled ? "agent.waiting_worker" : "agent.working")), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.pendingActions, function (action) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: action.id,
       "class": "hc-agent-chat-action"
@@ -1907,14 +2166,36 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return _ctx.$emit('reject', action);
       }
     }, null, 8 /* PROPS */, ["action", "working", "onApprove", "onReject"])]);
-  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_33, [_hoisted_34, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.error), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-    "class": "hc-agent-chat-form",
-    onSubmit: _cache[4] || (_cache[4] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+  }), 128 /* KEYED_FRAGMENT */))], 512 /* NEED_PATCH */), $props.error ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_36, [_hoisted_37, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.error), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.attachmentError ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_38, [_hoisted_39, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.attachmentError), 1 /* TEXT */)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.knowledgeSuccess ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_40, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.knowledge_added")), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-agent-chat-form", {
+      'has-attachments': $data.attachments.length
+    }]),
+    onSubmit: _cache[7] || (_cache[7] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $options.send($data.draft);
     }, ["prevent"]))
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    ref: "attachments",
+    "class": "hc-agent-file-input",
+    type: "file",
+    accept: ".jpg,.jpeg,.png,.webp,.pdf,.txt,.md,image/jpeg,image/png,image/webp,application/pdf,text/plain,text/markdown",
+    multiple: "",
+    onChange: _cache[1] || (_cache[1] = function () {
+      return $options.pickAttachments && $options.pickAttachments.apply($options, arguments);
+    })
+  }, null, 544 /* HYDRATE_EVENTS, NEED_PATCH */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ag_button, {
+    type: "button",
+    variant: "ghost",
+    icon: "fa fa-plus",
+    "icon-only": "",
+    disabled: !$props.agent || $props.busy || $data.attachments.length >= 5,
+    "aria-label": _ctx.$t('agent.chat.attach'),
+    title: _ctx.$t('agent.chat.attach'),
+    onClick: _cache[2] || (_cache[2] = function ($event) {
+      return _ctx.$refs.attachments.click();
+    })
+  }, null, 8 /* PROPS */, ["disabled", "aria-label", "title"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     ref: "input",
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $data.draft = $event;
     }),
     rows: "1",
@@ -1923,13 +2204,75 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     placeholder: $props.agent ? _ctx.$t('agent.chat.placeholder', {
       name: $props.agent.name
     }) : '',
-    onInput: _cache[2] || (_cache[2] = function () {
+    onInput: _cache[4] || (_cache[4] = function () {
       return $options.grow && $options.grow.apply($options, arguments);
     }),
-    onKeydown: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+    onKeydown: _cache[5] || (_cache[5] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
       return $options.send($data.draft);
     }, ["exact", "prevent"]), ["enter"]))
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_35), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ag_button, {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_41), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.draft]]), $data.listening ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_42, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.listening")), 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.speechAvailable ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+    key: 1,
+    type: "button",
+    variant: "ghost",
+    icon: $data.listening ? 'fa fa-stop' : 'fa fa-microphone',
+    "icon-only": "",
+    "aria-label": $data.listening ? _ctx.$t('agent.chat.stop_listening') : _ctx.$t('agent.chat.dictate'),
+    title: $data.listening ? _ctx.$t('agent.chat.stop_listening') : _ctx.$t('agent.chat.dictate'),
+    onClick: $options.toggleDictation
+  }, null, 8 /* PROPS */, ["icon", "aria-label", "title", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.canAddToKnowledge ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+    key: 2,
+    type: "button",
+    variant: "ghost",
+    icon: "fa fa-list",
+    disabled: $props.busy
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.attachments.length) + "/5 ", 1 /* TEXT */)];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["disabled"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+    key: 3,
+    type: "button",
+    variant: "ghost",
+    loading: $data.knowledgeSaving,
+    disabled: $props.busy || $data.knowledgeSaving,
+    onClick: $options.addToKnowledge
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.add_to_knowledge")), 1 /* TEXT */)];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["loading", "disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.attachments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_43, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.attachments, function (file, index) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+      key: "".concat(file.name, "-").concat(index)
+    }, [file.preview ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("img", {
+      key: 0,
+      src: file.preview,
+      alt: ""
+    }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
+    }, null, 8 /* PROPS */, _hoisted_45), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      type: "button",
+      "aria-label": _ctx.$t('agent.chat.remove_attachment'),
+      onClick: function onClick($event) {
+        return $options.removeAttachment(index);
+      }
+    }, _hoisted_48, 8 /* PROPS */, _hoisted_46)]);
+  }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.busy ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+    key: 5,
+    type: "button",
+    variant: "ghost-danger",
+    icon: "fa fa-stop",
+    disabled: !$props.runId,
+    onClick: _cache[6] || (_cache[6] = function ($event) {
+      return _ctx.$emit('cancel-run');
+    })
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.stop")), 1 /* TEXT */)];
+    }),
+    _: 1 /* STABLE */
+  }, 8 /* PROPS */, ["disabled"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ag_button, {
     type: "submit",
     variant: "primary",
     icon: "fa fa-arrow-up",
@@ -1937,7 +2280,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: !$options.canSend,
     "aria-label": _ctx.$t('agent.send'),
     title: _ctx.$t('agent.send')
-  }, null, 8 /* PROPS */, ["disabled", "aria-label", "title"])], 32 /* HYDRATE_EVENTS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_36, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.hint")), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_1);
+  }, null, 8 /* PROPS */, ["disabled", "aria-label", "title"])], 34 /* CLASS, HYDRATE_EVENTS */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_49, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.chat.hint")), 1 /* TEXT */)], 8 /* PROPS */, _hoisted_1);
 }
 
 /***/ }),
@@ -2248,6 +2591,11 @@ function buildItems(messages) {
     } else if (message.kind === "system" || message.role === "system") {
       items.push({
         kind: "system",
+        text: message.text
+      });
+    } else if (message.kind === "attachment") {
+      items.push({
+        kind: "attachment",
         text: message.text
       });
     } else if (message.role === "user") {
@@ -2645,7 +2993,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-chat {\n    flex: 1;\n    min-width: 0;\n    display: flex;\n    flex-direction: column;\n    background: #fff;\n    color: var(--ag-ink);\n}\n.hc-agent-chat-header {\n    flex: 0 0 auto;\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 12px 22px;\n    border-bottom: 1px solid var(--ag-line);\n}\n.hc-agent-chat-header img,\n.hc-agent-chat-header .fa-robot {\n    width: 34px;\n    height: 34px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: var(--ag-surface);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    color: var(--ag-muted);\n}\n.hc-agent-chat-heading {\n    display: flex;\n    flex-direction: column;\n    min-width: 0;\n    line-height: 1.25;\n}\n.hc-agent-chat-heading span {\n    color: var(--ag-muted);\n    font-size: 12px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-agent-chat-messages {\n    flex: 1;\n    overflow-y: auto;\n    padding: 24px 22px;\n    display: flex;\n    flex-direction: column;\n    gap: 14px;\n    scroll-behavior: smooth;\n}\n.hc-agent-chat-welcome {\n    margin: auto;\n    max-width: 560px;\n    text-align: center;\n    color: var(--ag-muted);\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-chat-welcome img,\n.hc-agent-chat-welcome > .fa-robot {\n    width: 88px;\n    height: 88px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: var(--ag-surface);\n    box-shadow: var(--ag-shadow);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 38px;\n    color: #94a3b8;\n}\n.hc-agent-chat-welcome h3 {\n    margin: 6px 0 0;\n    color: var(--ag-ink);\n    font-size: 22px;\n}\n.hc-agent-chat-welcome p {\n    margin: 0;\n}\n.hc-agent-chat-suggestions {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n    margin-top: 18px;\n    width: 100%;\n}\n.hc-agent-chat-suggestions button {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 12px 16px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    color: var(--ag-ink-soft);\n    text-align: left;\n    cursor: pointer;\n    font: inherit;\n    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;\n}\n.hc-agent-chat-suggestions button i {\n    flex: 0 0 18px;\n    color: var(--ag-accent);\n    text-align: center;\n}\n.hc-agent-chat-suggestions button:hover {\n    border-color: var(--ag-accent);\n    box-shadow: var(--ag-shadow);\n    transform: translateY(-1px);\n}\n.hc-agent-chat-suggestions button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-msg {\n    max-width: min(760px, 94%);\n    line-height: 1.55;\n}\n.hc-agent-msg.is-user {\n    align-self: flex-end;\n    padding: 10px 16px;\n    border-radius: 18px 18px 4px 18px;\n    background: var(--ag-accent-soft);\n    color: var(--ag-ink);\n    white-space: pre-wrap;\n    overflow-wrap: anywhere;\n}\n.hc-agent-msg.is-agent {\n    align-self: flex-start;\n    padding: 2px 4px;\n    color: var(--ag-ink);\n    font-size: 15px;\n}\n.hc-agent-msg.is-working {\n    display: inline-flex;\n    align-items: center;\n    gap: 10px;\n    padding: 8px 14px;\n    border-radius: 999px;\n    background: var(--ag-surface);\n    color: var(--ag-muted);\n    font-size: 13px;\n}\n.hc-agent-dots {\n    display: inline-flex;\n    gap: 4px;\n}\n.hc-agent-dots i {\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background: var(--ag-accent);\n    animation: hc-agent-blink 1.2s infinite ease-in-out;\n}\n.hc-agent-dots i:nth-child(2) { animation-delay: 0.2s;\n}\n.hc-agent-dots i:nth-child(3) { animation-delay: 0.4s;\n}\n@keyframes hc-agent-blink {\n0%, 80%, 100% { opacity: 0.25; transform: scale(0.85);\n}\n40% { opacity: 1; transform: scale(1);\n}\n}\n.hc-agent-msg-tool {\n    align-self: flex-start;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    padding: 3px 12px;\n    border: 1px solid var(--ag-line);\n    border-radius: 999px;\n    background: var(--ag-surface);\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-msg-system {\n    align-self: center;\n    max-width: 90%;\n    padding: 5px 14px;\n    border-radius: 999px;\n    background: var(--ag-warn-soft);\n    color: #92400e;\n    font-size: 12px;\n    overflow-wrap: anywhere;\n}\n.hc-agent-report-card {\n    align-self: flex-start;\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    width: min(460px, 94%);\n    padding: 12px 16px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    box-shadow: var(--ag-shadow);\n    cursor: pointer;\n    font: inherit;\n    text-align: left;\n    transition: border-color 0.15s ease, transform 0.15s ease;\n}\n.hc-agent-report-card:hover,\n.hc-agent-report-card.is-open {\n    border-color: var(--ag-accent);\n}\n.hc-agent-report-card:hover {\n    transform: translateY(-1px);\n}\n.hc-agent-report-card:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-report-card-icon {\n    flex: 0 0 40px;\n    width: 40px;\n    height: 40px;\n    border-radius: 10px;\n    background: var(--ag-accent-soft);\n    color: var(--ag-accent);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 18px;\n}\n.hc-agent-report-card-text {\n    flex: 1;\n    min-width: 0;\n    display: flex;\n    flex-direction: column;\n}\n.hc-agent-report-card-title {\n    font-weight: 600;\n    color: var(--ag-ink);\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-agent-report-card-kind {\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-report-card-open {\n    color: var(--ag-accent-strong);\n    font-size: 13px;\n    font-weight: 600;\n    white-space: nowrap;\n}\n.hc-agent-chat-action {\n    width: min(660px, 100%);\n}\n.hc-agent-chat-error {\n    flex: 0 0 auto;\n    margin: 0 22px 10px;\n    padding: 10px 14px;\n    border-radius: 10px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    display: flex;\n    gap: 10px;\n    align-items: flex-start;\n    font-size: 13px;\n}\n.hc-agent-chat-form {\n    flex: 0 0 auto;\n    display: flex;\n    align-items: flex-end;\n    gap: 10px;\n    margin: 0 22px;\n    padding: 8px 8px 8px 18px;\n    border: 1px solid var(--ag-line);\n    border-radius: 22px;\n    background: #fff;\n    box-shadow: var(--ag-shadow);\n    transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-chat-form:focus-within {\n    border-color: var(--ag-accent);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.18), var(--ag-shadow);\n}\n.hc-agent-chat-form textarea {\n    flex: 1;\n    border: 0;\n    outline: 0;\n    resize: none;\n    max-height: 200px;\n    padding: 8px 0;\n    font: inherit;\n    font-size: 15px;\n    line-height: 1.4;\n    color: var(--ag-ink);\n    background: transparent;\n}\n.hc-agent-chat-form textarea::-moz-placeholder {\n    color: #94a3b8;\n}\n.hc-agent-chat-form textarea::placeholder {\n    color: #94a3b8;\n}\n.hc-agent-chat-hint {\n    flex: 0 0 auto;\n    margin: 6px 22px 12px;\n    text-align: center;\n    color: #94a3b8;\n    font-size: 11px;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-chat {\n    flex: 1;\n    min-width: 0;\n    display: flex;\n    flex-direction: column;\n    background: #fff;\n    color: var(--ag-ink);\n}\n.hc-agent-chat-form.has-attachments {\n    padding-bottom: 48px;\n}\n.hc-agent-file-input {\n    display: none;\n}\n.hc-agent-attachment-previews {\n    position: absolute;\n    bottom: 100%;\n    left: 16px;\n    right: 16px;\n    display: flex;\n    gap: 8px;\n    overflow-x: auto;\n    padding: 8px;\n    background: #fff;\n}\n.hc-agent-attachment-previews > span {\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    max-width: 180px;\n    padding: 4px 8px;\n    border: 1px solid var(--ag-line);\n    border-radius: 6px;\n    font-size: 12px;\n}\n.hc-agent-attachment-previews img {\n    width: 28px;\n    height: 28px;\n    -o-object-fit: cover;\n       object-fit: cover;\n}\n.hc-agent-attachment-previews span span {\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-agent-attachment-previews button {\n    border: 0;\n    background: transparent;\n    color: var(--ag-muted);\n}\n.hc-agent-listening {\n    color: #7c3aed;\n    font-size: 12px;\n}\n.hc-agent-attachment-label {\n    font-size: 12px;\n}\n.hc-agent-chat-header {\n    flex: 0 0 auto;\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 12px 22px;\n    border-bottom: 1px solid var(--ag-line);\n}\n.hc-agent-chat-header img,\n.hc-agent-chat-header .fa-robot {\n    width: 34px;\n    height: 34px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: var(--ag-surface);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    color: var(--ag-muted);\n}\n.hc-agent-chat-heading {\n    display: flex;\n    flex-direction: column;\n    min-width: 0;\n    line-height: 1.25;\n}\n.hc-agent-chat-heading span {\n    color: var(--ag-muted);\n    font-size: 12px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-agent-chat-messages {\n    flex: 1;\n    overflow-y: auto;\n    padding: 24px 22px;\n    display: flex;\n    flex-direction: column;\n    gap: 14px;\n    scroll-behavior: smooth;\n}\n.hc-agent-chat-welcome {\n    margin: auto;\n    max-width: 560px;\n    text-align: center;\n    color: var(--ag-muted);\n    display: flex;\n    flex-direction: column;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-chat-welcome img,\n.hc-agent-chat-welcome > .fa-robot {\n    width: 88px;\n    height: 88px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: var(--ag-surface);\n    box-shadow: var(--ag-shadow);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 38px;\n    color: #94a3b8;\n}\n.hc-agent-chat-welcome h3 {\n    margin: 6px 0 0;\n    color: var(--ag-ink);\n    font-size: 22px;\n}\n.hc-agent-chat-welcome p {\n    margin: 0;\n}\n.hc-agent-chat-suggestions {\n    display: flex;\n    flex-direction: column;\n    gap: 10px;\n    margin-top: 18px;\n    width: 100%;\n}\n.hc-agent-chat-suggestions button {\n    display: flex;\n    align-items: center;\n    gap: 12px;\n    padding: 12px 16px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    color: var(--ag-ink-soft);\n    text-align: left;\n    cursor: pointer;\n    font: inherit;\n    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;\n}\n.hc-agent-chat-suggestions button i {\n    flex: 0 0 18px;\n    color: var(--ag-accent);\n    text-align: center;\n}\n.hc-agent-chat-suggestions button:hover {\n    border-color: var(--ag-accent);\n    box-shadow: var(--ag-shadow);\n    transform: translateY(-1px);\n}\n.hc-agent-chat-suggestions button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-msg {\n    max-width: min(760px, 94%);\n    line-height: 1.55;\n}\n.hc-agent-msg.is-user {\n    align-self: flex-end;\n    padding: 10px 16px;\n    border-radius: 18px 18px 4px 18px;\n    background: var(--ag-accent-soft);\n    color: var(--ag-ink);\n    white-space: pre-wrap;\n    overflow-wrap: anywhere;\n}\n.hc-agent-msg.is-agent {\n    align-self: flex-start;\n    padding: 2px 4px;\n    color: var(--ag-ink);\n    font-size: 15px;\n}\n.hc-agent-msg.is-working {\n    display: inline-flex;\n    align-items: center;\n    gap: 10px;\n    padding: 8px 14px;\n    border-radius: 999px;\n    background: var(--ag-surface);\n    color: var(--ag-muted);\n    font-size: 13px;\n}\n.hc-agent-dots {\n    display: inline-flex;\n    gap: 4px;\n}\n.hc-agent-dots i {\n    width: 6px;\n    height: 6px;\n    border-radius: 50%;\n    background: var(--ag-accent);\n    animation: hc-agent-blink 1.2s infinite ease-in-out;\n}\n.hc-agent-dots i:nth-child(2) { animation-delay: 0.2s;\n}\n.hc-agent-dots i:nth-child(3) { animation-delay: 0.4s;\n}\n@keyframes hc-agent-blink {\n0%, 80%, 100% { opacity: 0.25; transform: scale(0.85);\n}\n40% { opacity: 1; transform: scale(1);\n}\n}\n.hc-agent-msg-tool {\n    align-self: flex-start;\n    display: inline-flex;\n    align-items: center;\n    gap: 8px;\n    padding: 3px 12px;\n    border: 1px solid var(--ag-line);\n    border-radius: 999px;\n    background: var(--ag-surface);\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-msg-system {\n    align-self: center;\n    max-width: 90%;\n    padding: 5px 14px;\n    border-radius: 999px;\n    background: var(--ag-warn-soft);\n    color: #92400e;\n    font-size: 12px;\n    overflow-wrap: anywhere;\n}\n.hc-agent-report-card {\n    align-self: flex-start;\n    display: flex;\n    align-items: center;\n    gap: 14px;\n    width: min(460px, 94%);\n    padding: 12px 16px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    box-shadow: var(--ag-shadow);\n    cursor: pointer;\n    font: inherit;\n    text-align: left;\n    transition: border-color 0.15s ease, transform 0.15s ease;\n}\n.hc-agent-report-card:hover,\n.hc-agent-report-card.is-open {\n    border-color: var(--ag-accent);\n}\n.hc-agent-report-card:hover {\n    transform: translateY(-1px);\n}\n.hc-agent-report-card:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-report-card-icon {\n    flex: 0 0 40px;\n    width: 40px;\n    height: 40px;\n    border-radius: 10px;\n    background: var(--ag-accent-soft);\n    color: var(--ag-accent);\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    font-size: 18px;\n}\n.hc-agent-report-card-text {\n    flex: 1;\n    min-width: 0;\n    display: flex;\n    flex-direction: column;\n}\n.hc-agent-report-card-title {\n    font-weight: 600;\n    color: var(--ag-ink);\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-agent-report-card-kind {\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-report-card-open {\n    color: var(--ag-accent-strong);\n    font-size: 13px;\n    font-weight: 600;\n    white-space: nowrap;\n}\n.hc-agent-chat-action {\n    width: min(660px, 100%);\n}\n.hc-agent-chat-error {\n    flex: 0 0 auto;\n    margin: 0 22px 10px;\n    padding: 10px 14px;\n    border-radius: 10px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    display: flex;\n    gap: 10px;\n    align-items: flex-start;\n    font-size: 13px;\n}\n.hc-agent-chat-form {\n    position: relative;\n    flex: 0 0 auto;\n    display: flex;\n    align-items: flex-end;\n    gap: 10px;\n    margin: 0 22px;\n    padding: 8px 8px 8px 18px;\n    border: 1px solid var(--ag-line);\n    border-radius: 22px;\n    background: #fff;\n    box-shadow: var(--ag-shadow);\n    transition: border-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-chat-form:focus-within {\n    border-color: var(--ag-accent);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.18), var(--ag-shadow);\n}\n.hc-agent-chat-form textarea {\n    flex: 1;\n    border: 0;\n    outline: 0;\n    resize: none;\n    max-height: 200px;\n    padding: 8px 0;\n    font: inherit;\n    font-size: 15px;\n    line-height: 1.4;\n    color: var(--ag-ink);\n    background: transparent;\n}\n.hc-agent-chat-form textarea::-moz-placeholder {\n    color: #94a3b8;\n}\n.hc-agent-chat-form textarea::placeholder {\n    color: #94a3b8;\n}\n.hc-agent-chat-hint {\n    flex: 0 0 auto;\n    margin: 6px 22px 12px;\n    text-align: center;\n    color: #94a3b8;\n    font-size: 11px;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

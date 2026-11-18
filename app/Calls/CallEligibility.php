@@ -52,8 +52,6 @@ class CallEligibility
             return 'invalid_phone';
         } elseif ((bool) $prospect->do_not_call) {
             return 'do_not_call';
-        } elseif ($this->consentReason($prospect) !== null) {
-            return $this->consentReason($prospect);
         } elseif (!$this->workingHours->isOpen($prospect)) {
             return 'outside_calling_hours';
         } elseif (CallAttempt::query()->where('prospect_id', $prospect->id)
@@ -200,14 +198,6 @@ class CallEligibility
             $this->check('provider', $providerConfigured, 'provider_unconfigured', 'Le fournisseur CloudTalk n’est pas sélectionné ou ses identifiants sont incomplets.'),
             $this->check('cloudtalk_line', !$cloudTalk || $line !== null, 'cloudtalk_line_missing', 'Aucune ligne CloudTalk SMS n’est configurée pour cet utilisateur dans le projet.'),
             $this->check('contact_refusal', !(bool) $prospect->do_not_call, 'do_not_call', 'Le prospect a demandé à ne plus être contacté.'),
-            $this->check(
-                'consent',
-                $prospect->call_consent === true,
-                $this->consentReason($prospect) ?? 'no_consent',
-                $this->consentReason($prospect) === 'consent_declined'
-                    ? 'Le prospect a explicitement refusé les communications.'
-                    : 'Le prospect n’a pas donné son consentement explicite aux communications.'
-            ),
             $this->check('hours', $open, 'outside_calling_hours', $this->smsMessage('outside_calling_hours', $prospect)),
             $this->check('frequency', $frequencyPassed, 'sms_frequency_limit', 'Un SMS a déjà été envoyé à ce prospect au cours des 48 dernières heures.'),
             $this->check('phone', (bool) $isValidPhone, 'invalid_phone', 'Le numéro du prospect est absent ou invalide.'),
@@ -223,15 +213,6 @@ class CallEligibility
             'reason' => $passed ? null : $reason,
             'message' => $passed ? 'Contrôle réussi.' : $message,
         ];
-    }
-
-    protected function consentReason(Prospect $prospect): ?string
-    {
-        return match ($prospect->call_consent) {
-            true => null,
-            false => 'consent_declined',
-            default => 'no_consent',
-        };
     }
 
     public function smsMessage(string $reason, Prospect $prospect): string

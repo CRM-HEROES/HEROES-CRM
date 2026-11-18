@@ -110,8 +110,9 @@ class CloudTalk
         $cloudTalkStatus = (int) data_get($body, 'responseData.status', $response->status());
 
         if (!$response->successful() || $cloudTalkStatus !== 200) {
+            $message = data_get($body, 'responseData.message');
             throw new RuntimeException(
-                $this->messageForStatus($cloudTalkStatus),
+                $this->messageForStatus($cloudTalkStatus, is_string($message) ? $message : null),
                 $cloudTalkStatus ?: $response->status()
             );
         }
@@ -184,8 +185,13 @@ class CloudTalk
             $success === false ||
             $success === 'false'
         ) {
+            $data = data_get($body, 'responseData.data');
+            $providerMessage = data_get($body, 'responseData.message')
+                ?: data_get($body, 'responseData.data.message')
+                ?: (is_string($data) ? $data : null);
+
             throw new RuntimeException(
-                $this->messageForStatus($cloudTalkStatus),
+                $this->messageForStatus($cloudTalkStatus, is_string($providerMessage) ? $providerMessage : null),
                 $cloudTalkStatus ?: $response->status()
             );
         }
@@ -572,7 +578,11 @@ class CloudTalk
         return $label ?: 'Agent CloudTalk';
     }
 
-    protected function messageForStatus(int $status): string
+    /**
+     * Known statuses have their own French message; for the others, what CloudTalk answered is shown
+     * (cleaned and shortened: it ends up on screen and in the agent results).
+     */
+    protected function messageForStatus(int $status, ?string $message = null): string
     {
         return match ($status) {
             401 => 'Identifiants API CloudTalk invalides.',
@@ -584,7 +594,15 @@ class CloudTalk
             410 => 'Enregistrement CloudTalk expire.',
             422 => 'Parametres CloudTalk invalides. Verifiez le numero et l agent.',
             500 => 'Erreur API CloudTalk.',
-            default => 'CloudTalk a refusé la demande (code ' . ($status ?: 'inconnu') . ').',
+            default => $this->providerMessage($message)
+                ?? 'CloudTalk a refusé la demande (code ' . ($status ?: 'inconnu') . ').',
         };
+    }
+
+    protected function providerMessage(?string $message): ?string
+    {
+        $message = trim(preg_replace('/\s+/u', ' ', strip_tags((string) $message)) ?? '');
+
+        return $message === '' ? null : 'CloudTalk : ' . mb_substr($message, 0, 200);
     }
 }

@@ -172,7 +172,9 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
       // The picture: the file chosen (sent when saving), the address shown, and a removal asked
       photo: null,
       photoPreview: null,
-      photoRemoved: false
+      photoRemoved: false,
+      documents: [],
+      pendingDocuments: []
     };
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project", "agentEditing"])), {}, {
@@ -259,37 +261,78 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
       // Only an existing picture has to be removed on the server
       this.photoRemoved = !!((_this$agentEditing2 = this.agentEditing) !== null && _this$agentEditing2 !== void 0 && _this$agentEditing2.avatar_url);
     },
-    releasePreview: function releasePreview() {
-      if (this.photo && this.photoPreview) URL.revokeObjectURL(this.photoPreview);
+    pickDocuments: function pickDocuments(event) {
+      var files = Array.from(event.target.files || []);
+      event.target.value = "";
+      for (var _i2 = 0, _files = files; _i2 < _files.length; _i2++) {
+        var file = _files[_i2];
+        var extension = file.name.split(".").pop().toLowerCase();
+        if (!["pdf", "txt", "md"].includes(extension) || file.size > 10 * 1024 * 1024) {
+          this.error = this.$t("agent.documents.invalid_file");
+          continue;
+        }
+        this.pendingDocuments.push(file);
+      }
     },
-    // Send the picture chosen, or remove the one that was taken off
-    savePhoto: function savePhoto(id) {
+    uploadDocuments: function uploadDocuments(id) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              if (!_this.photo) {
-                _context.next = 5;
+              if (!_this.pendingDocuments.length) {
+                _context.next = 6;
                 break;
               }
               _context.next = 3;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadAvatar(id, _this.photo);
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadDocument(id, _this.pendingDocuments[0]);
             case 3:
-              _context.next = 8;
+              _this.pendingDocuments.shift();
+              _context.next = 0;
               break;
-            case 5:
-              if (!_this.photoRemoved) {
-                _context.next = 8;
-                break;
-              }
+            case 6:
               _context.next = 8;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].removeAvatar(id);
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].documents(id);
             case 8:
+              _this.documents = _context.sent.data;
+            case 9:
             case "end":
               return _context.stop();
           }
         }, _callee);
+      }))();
+    },
+    releasePreview: function releasePreview() {
+      if (this.photo && this.photoPreview) URL.revokeObjectURL(this.photoPreview);
+    },
+    // Send the picture chosen, or remove the one that was taken off
+    savePhoto: function savePhoto(id) {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!_this2.photo) {
+                _context2.next = 5;
+                break;
+              }
+              _context2.next = 3;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadAvatar(id, _this2.photo);
+            case 3:
+              _context2.next = 8;
+              break;
+            case 5:
+              if (!_this2.photoRemoved) {
+                _context2.next = 8;
+                break;
+              }
+              _context2.next = 8;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].removeAvatar(id);
+            case 8:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
       }))();
     },
     // Steps
@@ -312,180 +355,197 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
     },
     // Load
     load: function load() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var _yield$AgentService$g, data;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this2.error = "";
-              _this2.step = 0;
-              _this2.loading = true;
-              _this2.form = _this2.blank();
-              _this2.releasePreview();
-              _this2.photo = null;
-              _this2.photoPreview = null;
-              _this2.photoRemoved = false;
-              _context2.prev = 8;
-              if (_this2.catalog.autonomies) {
-                _context2.next = 13;
+              _this3.error = "";
+              _this3.step = 0;
+              _this3.loading = true;
+              _this3.form = _this3.blank();
+              _this3.releasePreview();
+              _this3.photo = null;
+              _this3.photoPreview = null;
+              _this3.photoRemoved = false;
+              _this3.documents = [];
+              _this3.pendingDocuments = [];
+              _context3.prev = 10;
+              if (_this3.catalog.autonomies) {
+                _context3.next = 15;
                 break;
               }
-              _context2.next = 12;
+              _context3.next = 14;
               return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].catalog();
-            case 12:
-              _this2.catalog = _context2.sent.data;
-            case 13:
-              if (!_this2.agentEditing) {
-                _context2.next = 20;
+            case 14:
+              _this3.catalog = _context3.sent.data;
+            case 15:
+              if (!_this3.agentEditing) {
+                _context3.next = 25;
                 break;
               }
-              _context2.next = 16;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this2.agentEditing.id);
-            case 16:
-              _yield$AgentService$g = _context2.sent;
+              _context3.next = 18;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this3.agentEditing.id);
+            case 18:
+              _yield$AgentService$g = _context3.sent;
               data = _yield$AgentService$g.data;
-              _this2.form = _objectSpread(_objectSpread({}, _this2.form), Object.fromEntries(FIELDS.map(function (key) {
-                var _data$key;
-                return [key, (_data$key = data[key]) !== null && _data$key !== void 0 ? _data$key : _this2.form[key]];
-              })));
-              _this2.photoPreview = data.avatar_url || null;
-            case 20:
-              _context2.next = 25;
-              break;
+              _context3.next = 22;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].documents(_this3.agentEditing.id);
             case 22:
-              _context2.prev = 22;
-              _context2.t0 = _context2["catch"](8);
-              _this2.error = _this2.message(_context2.t0);
+              _this3.documents = _context3.sent.data;
+              _this3.form = _objectSpread(_objectSpread({}, _this3.form), Object.fromEntries(FIELDS.map(function (key) {
+                var _data$key;
+                return [key, (_data$key = data[key]) !== null && _data$key !== void 0 ? _data$key : _this3.form[key]];
+              })));
+              _this3.photoPreview = data.avatar_url || null;
             case 25:
-              _context2.prev = 25;
-              _this2.loading = false;
-              return _context2.finish(25);
-            case 28:
+              _context3.next = 30;
+              break;
+            case 27:
+              _context3.prev = 27;
+              _context3.t0 = _context3["catch"](10);
+              _this3.error = _this3.message(_context3.t0);
+            case 30:
+              _context3.prev = 30;
+              _this3.loading = false;
+              return _context3.finish(30);
+            case 33:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[8, 22, 25, 28]]);
+        }, _callee3, null, [[10, 27, 30, 33]]);
       }))();
     },
     // Save
     save: function save() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var body, saved;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              if (!(!_this3.canSave || !_this3.last)) {
-                _context3.next = 2;
-                break;
-              }
-              return _context3.abrupt("return");
-            case 2:
-              _this3.error = "";
-              _this3.saving = true;
-              body = Object.fromEntries(FIELDS.map(function (key) {
-                return [key, _this3.form[key]];
-              }));
-              saved = _this3.agentEditing;
-              _context3.prev = 6;
-              if (!_this3.agentEditing) {
-                _context3.next = 12;
-                break;
-              }
-              _context3.next = 10;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].update(_this3.agentEditing.id, body);
-            case 10:
-              _context3.next = 15;
-              break;
-            case 12:
-              _context3.next = 14;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].create(_objectSpread(_objectSpread({}, body), {}, {
-                project: _this3.project.slug
-              }));
-            case 14:
-              saved = _context3.sent.data;
-            case 15:
-              _context3.prev = 15;
-              _context3.next = 18;
-              return _this3.savePhoto(saved.id);
-            case 18:
-              _context3.next = 27;
-              break;
-            case 20:
-              _context3.prev = 20;
-              _context3.t0 = _context3["catch"](15);
-              if (_this3.agentEditing) {
-                _context3.next = 26;
-                break;
-              }
-              // The agent exists, only its picture failed: from now on this window
-              // edits it, so a retry updates it and never creates a second one
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
-              _context3.next = 26;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
-            case 26:
-              throw _context3.t0;
-            case 27:
-              _context3.next = 29;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
-            case 29:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
-              _context3.next = 35;
-              break;
-            case 32:
-              _context3.prev = 32;
-              _context3.t1 = _context3["catch"](6);
-              _this3.error = _this3.message(_context3.t1);
-            case 35:
-              _context3.prev = 35;
-              _this3.saving = false;
-              return _context3.finish(35);
-            case 38:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3, null, [[6, 32, 35, 38], [15, 20]]);
-      }))();
-    },
-    remove: function remove() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var body, saved, _saved;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              if (confirm(_this4.$t("agent.confirm_delete", {
-                name: _this4.form.name
-              }))) {
+              if (!(!_this4.canSave || !_this4.last)) {
                 _context4.next = 2;
                 break;
               }
               return _context4.abrupt("return");
             case 2:
+              _this4.error = "";
               _this4.saving = true;
-              _context4.prev = 3;
-              _context4.next = 6;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].remove(_this4.agentEditing.id);
-            case 6:
-              _context4.next = 8;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
-            case 8:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
-              _context4.next = 14;
+              body = Object.fromEntries(FIELDS.map(function (key) {
+                return [key, _this4.form[key]];
+              }));
+              saved = _this4.agentEditing;
+              _context4.prev = 6;
+              if (!_this4.agentEditing) {
+                _context4.next = 12;
+                break;
+              }
+              _context4.next = 10;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].update(_this4.agentEditing.id, body);
+            case 10:
+              _context4.next = 15;
               break;
-            case 11:
-              _context4.prev = 11;
-              _context4.t0 = _context4["catch"](3);
-              _this4.error = _this4.message(_context4.t0);
+            case 12:
+              _context4.next = 14;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].create(_objectSpread(_objectSpread({}, body), {}, {
+                project: _this4.project.slug
+              }));
             case 14:
-              _context4.prev = 14;
+              saved = _context4.sent.data;
+            case 15:
+              _context4.prev = 15;
+              _context4.next = 18;
+              return _this4.savePhoto(saved.id);
+            case 18:
+              _context4.next = 20;
+              return _this4.uploadDocuments(saved.id);
+            case 20:
+              _context4.next = 29;
+              break;
+            case 22:
+              _context4.prev = 22;
+              _context4.t0 = _context4["catch"](15);
+              if (_this4.agentEditing) {
+                _context4.next = 28;
+                break;
+              }
+              // The agent exists, only its picture failed: from now on this window
+              // edits it, so a retry updates it and never creates a second one
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
+              _context4.next = 28;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
+            case 28:
+              throw _context4.t0;
+            case 29:
+              _context4.next = 31;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
+            case 31:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
+              _context4.next = 41;
+              break;
+            case 34:
+              _context4.prev = 34;
+              _context4.t1 = _context4["catch"](6);
+              if (!(!_this4.agentEditing && (_saved = saved) !== null && _saved !== void 0 && _saved.id)) {
+                _context4.next = 40;
+                break;
+              }
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
+              _context4.next = 40;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
+            case 40:
+              _this4.error = _this4.message(_context4.t1);
+            case 41:
+              _context4.prev = 41;
               _this4.saving = false;
-              return _context4.finish(14);
-            case 17:
+              return _context4.finish(41);
+            case 44:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[3, 11, 14, 17]]);
+        }, _callee4, null, [[6, 34, 41, 44], [15, 22]]);
+      }))();
+    },
+    remove: function remove() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (confirm(_this5.$t("agent.confirm_delete", {
+                name: _this5.form.name
+              }))) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
+              _this5.saving = true;
+              _context5.prev = 3;
+              _context5.next = 6;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].remove(_this5.agentEditing.id);
+            case 6:
+              _context5.next = 8;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
+            case 8:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
+              _context5.next = 14;
+              break;
+            case 11:
+              _context5.prev = 11;
+              _context5.t0 = _context5["catch"](3);
+              _this5.error = _this5.message(_context5.t0);
+            case 14:
+              _context5.prev = 14;
+              _this5.saving = false;
+              return _context5.finish(14);
+            case 17:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[3, 11, 14, 17]]);
       }))();
     }
   }
@@ -40395,7 +40455,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       fetchingSms: false,
       addingSms: false,
       attachments: [],
-      sendError: ""
+      sendError: "",
+      sendNotice: ""
     };
   },
   methods: {
@@ -40542,7 +40603,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     sendSMS: function sendSMS() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var payload, result, _error$response, _error$response2, errors;
+        var payload, result, _result, _error$response, _error$response2, errors;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
@@ -40554,53 +40615,57 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             case 2:
               _this3.addingSms = true;
               _this3.sendError = "";
+              _this3.sendNotice = "";
               payload = _objectSpread({}, _this3.sms);
               if (payload.source === "cloudtalk" && _this3.attachments.length) {
                 payload.attachments = _toConsumableArray(_this3.attachments);
               }
-              _context3.prev = 6;
+              _context3.prev = 7;
               if (!_this3.prospect) {
-                _context3.next = 12;
+                _context3.next = 15;
                 break;
               }
-              _context3.next = 10;
+              _context3.next = 11;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_SMS, payload);
-            case 10:
-              _context3.next = 17;
+            case 11:
+              result = _context3.sent;
+              _this3.sendNotice = (result === null || result === void 0 ? void 0 : result.message) || "";
+              _context3.next = 21;
               break;
-            case 12:
+            case 15:
               if (!(_this3.prospectsSelected.length > 0)) {
-                _context3.next = 17;
+                _context3.next = 21;
                 break;
               }
-              _context3.next = 15;
+              _context3.next = 18;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_3__.BULK_PROSPECT_SMS, _objectSpread(_objectSpread({}, payload), {}, {
                 prospects: _this3.prospectsSelected
               }));
-            case 15:
-              result = _context3.sent;
+            case 18:
+              _result = _context3.sent;
               _this3.bulkSms = [].concat(_toConsumableArray(_this3.bulkSms), [_objectSpread(_objectSpread({}, _this3.sms), {}, {
-                attachments: (result === null || result === void 0 ? void 0 : result.attachments) || []
+                attachments: (_result === null || _result === void 0 ? void 0 : _result.attachments) || []
               })]);
-            case 17:
+              _this3.sendNotice = (_result === null || _result === void 0 ? void 0 : _result.message) || "";
+            case 21:
               _this3.sms.message = "";
               _this3.attachments = [];
-              _context3.next = 25;
+              _context3.next = 29;
               break;
-            case 21:
-              _context3.prev = 21;
-              _context3.t0 = _context3["catch"](6);
-              errors = (_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
-              _this3.sendError = errors && Object.values(errors).flat()[0] || ((_error$response2 = _context3.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _this3.$t("prospect.sms.send_error");
             case 25:
               _context3.prev = 25;
+              _context3.t0 = _context3["catch"](7);
+              errors = (_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
+              _this3.sendError = errors && Object.values(errors).flat()[0] || ((_error$response2 = _context3.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _this3.$t("prospect.sms.send_error");
+            case 29:
+              _context3.prev = 29;
               _this3.addingSms = false;
-              return _context3.finish(25);
-            case 28:
+              return _context3.finish(29);
+            case 32:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[6, 21, 25, 28]]);
+        }, _callee3, null, [[7, 25, 29, 32]]);
       }))();
     },
     configureSmsbox: function configureSmsbox() {
@@ -60003,26 +60068,39 @@ var _hoisted_15 = {
 var _hoisted_16 = ["placeholder"];
 var _hoisted_17 = ["placeholder"];
 var _hoisted_18 = {
+  "class": "hc-agent-documents"
+};
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = {
+  key: 0
+};
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = {
+  key: 1
+};
+var _hoisted_24 = ["textContent"];
+var _hoisted_25 = {
   "class": "hc-agent-form-intro"
 };
-var _hoisted_19 = ["value"];
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = {
+var _hoisted_26 = ["value"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = {
   "class": "hc-agent-recap",
   "aria-live": "polite"
 };
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
-var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = {
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = ["textContent"];
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = ["textContent"];
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = {
   "class": "hc-agent-form-footer"
 };
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "hc-agent-form-spacer"
 }, null, -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -60040,7 +60118,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
         "class": "hc-flex-column",
-        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.submit && $options.submit.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.steps, function (key, i) {
@@ -60175,9 +60253,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_17), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.persona]])];
             }),
             _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["label"])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.title")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.description")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+            type: "file",
+            accept: ".pdf,.txt,.md,application/pdf,text/plain,text/markdown",
+            multiple: "",
+            disabled: $data.saving,
+            onChange: _cache[7] || (_cache[7] = function () {
+              return $options.pickDocuments && $options.pickDocuments.apply($options, arguments);
+            })
+          }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19), $data.documents.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_20, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.documents, function (document) {
+            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+              key: document.id
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(document.name)
+            }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.status.".concat(document.status)))
+            }, null, 8 /* PROPS */, _hoisted_22)]);
+          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.pendingDocuments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_23, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.pendingDocuments, function (file) {
+            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+              key: file.name
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
+            }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.pending_upload")), 1 /* TEXT */)]);
+          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
             key: 3
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. How free it is, and what will be created "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.step_intro.autonomy")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.autonomyLevels, function (level) {
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. How free it is, and what will be created "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.step_intro.autonomy")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.autonomyLevels, function (level) {
             return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
               key: level.value,
               "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-agent-autonomy", {
@@ -60187,35 +60287,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               type: "radio",
               name: "agent-autonomy",
               value: level.value,
-              "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+              "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
                 return $data.form.autonomy = $event;
               })
-            }, null, 8 /* PROPS */, _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.form.autonomy]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+            }, null, 8 /* PROPS */, _hoisted_26), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.form.autonomy]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
               textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.autonomy_short.".concat(level.value)))
-            }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
               "class": "hc-agent-autonomy-detail",
               textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(level.label)
-            }, null, 8 /* PROPS */, _hoisted_21)])], 2 /* CLASS */);
-          }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
+            }, null, 8 /* PROPS */, _hoisted_28)])], 2 /* CLASS */);
+          }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.recap'))
-          }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dl", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
+          }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dl", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.name'))
-          }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.name)
-          }, null, 8 /* PROPS */, _hoisted_25), $data.form.specialty ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          }, null, 8 /* PROPS */, _hoisted_32), $data.form.specialty ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
             key: 0
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.specialty'))
-          }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.specialty)
-          }, null, 8 /* PROPS */, _hoisted_27)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
+          }, null, 8 /* PROPS */, _hoisted_34)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.scope'))
-          }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scopeText)
-          }, null, 8 /* PROPS */, _hoisted_29)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.knows_all")), 1 /* TEXT */)])], 64 /* STABLE_FRAGMENT */))];
+          }, null, 8 /* PROPS */, _hoisted_36)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.knows_all")), 1 /* TEXT */)])], 64 /* STABLE_FRAGMENT */))];
         }),
         _: 1 /* STABLE */
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [$options.editing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [$options.editing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
         key: 0,
         variant: "ghost-danger",
         icon: "fa fa-trash",
@@ -60226,7 +60326,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.delete")), 1 /* TEXT */)];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_31, $data.step > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+      }, 8 /* PROPS */, ["disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_38, $data.step > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
         key: 1,
         variant: "ghost",
         icon: "fa fa-arrow-left",
@@ -93754,26 +93854,27 @@ var _hoisted_43 = {
   "class": "hc-prospect-sms-attachments"
 };
 var _hoisted_44 = ["textContent"];
-var _hoisted_45 = {
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = {
   "class": "hc-flex-row"
 };
-var _hoisted_46 = ["textContent"];
-var _hoisted_47 = {
+var _hoisted_47 = ["textContent"];
+var _hoisted_48 = {
   "class": "hc-flex-column hc-prospect-sms-ringover",
   style: {
     "height": "100%",
     "min-height": "0"
   }
 };
-var _hoisted_48 = ["textContent"];
-var _hoisted_49 = {
+var _hoisted_49 = ["textContent"];
+var _hoisted_50 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_50 = ["textContent"];
 var _hoisted_51 = ["textContent"];
+var _hoisted_52 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -94212,7 +94313,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "class": "hc-prospect-sms-error",
                     role: "alert",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-                  }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sendNotice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                    key: 2,
+                    "class": "hc-prospect-sms-notice",
+                    role: "status",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendNotice)
+                  }, null, 8 /* PROPS */, _hoisted_45)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
@@ -94234,7 +94340,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       "align-items": "center"
                     },
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.charsCount + '/' + $options.page)
-                  }, null, 8 /* PROPS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_47), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
                     onClick: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -94301,7 +94407,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.prospect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[21] || (_cache[21] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -94315,7 +94421,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                       source: $options.source
                     }))
-                  }, null, 8 /* PROPS */, _hoisted_48)];
+                  }, null, 8 /* PROPS */, _hoisted_49)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
@@ -94335,7 +94441,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
             onClick: _cache[23] || (_cache[23] = function ($event) {
               return $data.tab = 1;
             }),
@@ -94347,7 +94453,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.templates'))
-              }, null, 8 /* PROPS */, _hoisted_50)];
+              }, null, 8 /* PROPS */, _hoisted_51)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
@@ -94379,7 +94485,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   return $options.addSmsTemplate && $options.addSmsTemplate.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_51)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              }, null, 8 /* PROPS */, _hoisted_52)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })])];
@@ -119146,7 +119252,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-steps {\n    display: flex;\n    gap: 8px;\n    list-style: none;\n    padding: 0;\n    margin: 0 0 6px;\n}\n.hc-agent-steps li {\n    flex: 1;\n}\n.hc-agent-steps button {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 4px 10px;\n    border: 0;\n    border-bottom: 3px solid var(--ag-line);\n    background: transparent;\n    color: var(--ag-muted);\n    cursor: pointer;\n    font: inherit;\n    font-size: 13px;\n    transition: color 0.15s ease, border-color 0.15s ease;\n}\n.hc-agent-steps button:disabled {\n    cursor: default;\n}\n.hc-agent-steps button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n    border-radius: 6px;\n}\n.hc-agent-steps li.is-done button {\n    border-bottom-color: var(--ag-success);\n    color: var(--ag-ink-soft);\n}\n.hc-agent-steps li.is-current button {\n    border-bottom-color: var(--ag-accent);\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-step-number {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background: var(--ag-line);\n    color: var(--ag-ink-soft);\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-agent-steps li.is-done .hc-agent-step-number {\n    background: var(--ag-success);\n    color: #fff;\n}\n.hc-agent-steps li.is-current .hc-agent-step-number {\n    background: var(--ag-accent);\n    color: #fff;\n}\n.hc-agent-form-error {\n    margin: 0;\n    padding: 9px 12px;\n    border-radius: 8px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    font-size: 13px;\n}\n.hc-agent-form-intro {\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.45;\n    margin: 0;\n}\n.hc-agent-photo {\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n}\n.hc-agent-photo > img,\n.hc-agent-photo > .fa {\n    width: 76px;\n    height: 76px;\n    flex: 0 0 76px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: #e2e8f0;\n    color: #94a3b8;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);\n}\n.hc-agent-photo-actions {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-photo-choose {\n    display: inline-flex;\n    align-items: center;\n    padding: 7px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: 8px;\n    background: #fff;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease;\n}\n.hc-agent-photo-choose:hover {\n    border-color: #cbd5e1;\n    background: var(--ag-surface);\n}\n.hc-agent-photo-choose:focus-within {\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-photo-choose input {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    opacity: 0;\n    overflow: hidden;\n}\n.hc-agent-photo-hint {\n    flex-basis: 100%;\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-autonomy {\n    display: flex;\n    gap: 12px;\n    align-items: flex-start;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-autonomy:hover {\n    border-color: #cbd5e1;\n}\n.hc-agent-autonomy.is-selected {\n    border-color: var(--ag-accent);\n    background: var(--ag-accent-soft);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.12);\n}\n.hc-agent-autonomy input {\n    margin-top: 3px;\n    accent-color: var(--ag-accent);\n}\n.hc-agent-autonomy-detail {\n    display: block;\n    margin-top: 2px;\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.4;\n}\n.hc-agent-recap {\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n    padding: 12px 14px;\n    font-size: 13px;\n}\n.hc-agent-recap h4 {\n    margin: 0 0 8px;\n    font-size: 11px;\n    font-weight: 700;\n    color: var(--ag-muted);\n    text-transform: uppercase;\n    letter-spacing: 0.06em;\n}\n.hc-agent-recap dl {\n    display: grid;\n    grid-template-columns: max-content 1fr;\n    gap: 4px 14px;\n    margin: 0 0 10px;\n}\n.hc-agent-recap dt {\n    color: var(--ag-muted);\n}\n.hc-agent-recap dd {\n    margin: 0;\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-recap p {\n    margin: 0;\n    color: var(--ag-ink-soft);\n    line-height: 1.45;\n}\n.hc-agent-form-footer {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding-top: 12px;\n    margin-top: 4px;\n    border-top: 1px solid var(--ag-line);\n}\n.hc-agent-form-spacer {\n    flex: 1;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-steps {\n    display: flex;\n    gap: 8px;\n    list-style: none;\n    padding: 0;\n    margin: 0 0 6px;\n}\n.hc-agent-steps li {\n    flex: 1;\n}\n.hc-agent-steps button {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 4px 10px;\n    border: 0;\n    border-bottom: 3px solid var(--ag-line);\n    background: transparent;\n    color: var(--ag-muted);\n    cursor: pointer;\n    font: inherit;\n    font-size: 13px;\n    transition: color 0.15s ease, border-color 0.15s ease;\n}\n.hc-agent-steps button:disabled {\n    cursor: default;\n}\n.hc-agent-steps button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n    border-radius: 6px;\n}\n.hc-agent-steps li.is-done button {\n    border-bottom-color: var(--ag-success);\n    color: var(--ag-ink-soft);\n}\n.hc-agent-steps li.is-current button {\n    border-bottom-color: var(--ag-accent);\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-step-number {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background: var(--ag-line);\n    color: var(--ag-ink-soft);\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-agent-steps li.is-done .hc-agent-step-number {\n    background: var(--ag-success);\n    color: #fff;\n}\n.hc-agent-steps li.is-current .hc-agent-step-number {\n    background: var(--ag-accent);\n    color: #fff;\n}\n.hc-agent-form-error {\n    margin: 0;\n    padding: 9px 12px;\n    border-radius: 8px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    font-size: 13px;\n}\n.hc-agent-documents {\n    display: grid;\n    gap: 6px;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n}\n.hc-agent-documents p,\n.hc-agent-documents ul {\n    margin: 0;\n}\n.hc-agent-form-intro {\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.45;\n    margin: 0;\n}\n.hc-agent-photo {\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n}\n.hc-agent-photo > img,\n.hc-agent-photo > .fa {\n    width: 76px;\n    height: 76px;\n    flex: 0 0 76px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: #e2e8f0;\n    color: #94a3b8;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);\n}\n.hc-agent-photo-actions {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-photo-choose {\n    display: inline-flex;\n    align-items: center;\n    padding: 7px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: 8px;\n    background: #fff;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease;\n}\n.hc-agent-photo-choose:hover {\n    border-color: #cbd5e1;\n    background: var(--ag-surface);\n}\n.hc-agent-photo-choose:focus-within {\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-photo-choose input {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    opacity: 0;\n    overflow: hidden;\n}\n.hc-agent-photo-hint {\n    flex-basis: 100%;\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-autonomy {\n    display: flex;\n    gap: 12px;\n    align-items: flex-start;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-autonomy:hover {\n    border-color: #cbd5e1;\n}\n.hc-agent-autonomy.is-selected {\n    border-color: var(--ag-accent);\n    background: var(--ag-accent-soft);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.12);\n}\n.hc-agent-autonomy input {\n    margin-top: 3px;\n    accent-color: var(--ag-accent);\n}\n.hc-agent-autonomy-detail {\n    display: block;\n    margin-top: 2px;\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.4;\n}\n.hc-agent-recap {\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n    padding: 12px 14px;\n    font-size: 13px;\n}\n.hc-agent-recap h4 {\n    margin: 0 0 8px;\n    font-size: 11px;\n    font-weight: 700;\n    color: var(--ag-muted);\n    text-transform: uppercase;\n    letter-spacing: 0.06em;\n}\n.hc-agent-recap dl {\n    display: grid;\n    grid-template-columns: max-content 1fr;\n    gap: 4px 14px;\n    margin: 0 0 10px;\n}\n.hc-agent-recap dt {\n    color: var(--ag-muted);\n}\n.hc-agent-recap dd {\n    margin: 0;\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-recap p {\n    margin: 0;\n    color: var(--ag-ink-soft);\n    line-height: 1.45;\n}\n.hc-agent-form-footer {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding-top: 12px;\n    margin-top: 4px;\n    border-top: 1px solid var(--ag-line);\n}\n.hc-agent-form-spacer {\n    flex: 1;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -120754,7 +120860,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n  padding: 4px 0 !important;\n  text-decoration: none;\n}\n.hc-prospect-sms-unconfigured-operators {\n  display: flex;\n  flex-direction: row;\n  justify-content: center;\n  gap: 12px;\n  margin-top: auto;\n  padding: 8px 0;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item {\n  width: auto;\n  padding: 4px;\n  border: 0;\n  background: transparent;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item svg {\n  width: 25px;\n  height: 25px;\n}\n.hc-prospect-sms-item-number {\n  font-size: 11px;\n  color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n  display: block;\n  max-width: 26px;\n  max-height: 26px;\n  -o-object-fit: contain;\n     object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n  color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n  color: #bbbbbb;\n  cursor: not-allowed;\n  text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n  display: flex;\n  overflow-x: auto;\n  max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n  color: #bbbbbb;\n  cursor: wait;\n  text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n  display: flex;\n  flex-direction: row;\n  border-bottom: 1px solid #eee;\n  padding: 5px 5px 0 5px;\n  max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n  height: auto;\n  overflow: auto;\n  flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n  height: 35px;\n  overflow: hidden;\n}\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n  display: flex;\n  flex-direction: column;\n  flex: 0 1 auto;\n  min-height: 0;\n  max-height: 60%;\n  width: 100%;\n  position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  min-height: 0;\n  padding: 15px;\n  gap: 12px;\n  overflow-y: auto;\n  scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n  flex: 0 0 auto;\n  min-height: 0;\n  padding: 10px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n  flex: 0 0 auto;\n  height: 80px;\n  min-height: 50px;\n  max-height: 400px;\n  width: 100%;\n\n  resize: vertical;\n  overflow-y: auto;\n\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  box-sizing: border-box;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n  padding: 4px 0 !important;\n  text-decoration: none;\n}\n.hc-prospect-sms-unconfigured-operators {\n  display: flex;\n  flex-direction: row;\n  justify-content: center;\n  gap: 12px;\n  margin-top: auto;\n  padding: 8px 0;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item {\n  width: auto;\n  padding: 4px;\n  border: 0;\n  background: transparent;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item svg {\n  width: 25px;\n  height: 25px;\n}\n.hc-prospect-sms-item-number {\n  font-size: 11px;\n  color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n  display: block;\n  max-width: 26px;\n  max-height: 26px;\n  -o-object-fit: contain;\n     object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n  color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n  color: #bbbbbb;\n  cursor: not-allowed;\n  text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n  display: flex;\n  overflow-x: auto;\n  max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n  color: #bbbbbb;\n  cursor: wait;\n  text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n  display: flex;\n  flex-direction: row;\n  border-bottom: 1px solid #eee;\n  padding: 5px 5px 0 5px;\n  max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n  height: auto;\n  overflow: auto;\n  flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n  height: 35px;\n  overflow: hidden;\n}\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n  display: flex;\n  flex-direction: column;\n  flex: 0 1 auto;\n  min-height: 0;\n  max-height: 60%;\n  width: 100%;\n  position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  min-height: 0;\n  padding: 15px;\n  gap: 12px;\n  overflow-y: auto;\n  scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n  flex: 0 0 auto;\n  min-height: 0;\n  padding: 10px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n.hc-prospect-sms-notice {\n  margin-top: 6px;\n  color: #27833b;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n  flex: 0 0 auto;\n  height: 80px;\n  min-height: 50px;\n  max-height: 400px;\n  width: 100%;\n\n  resize: vertical;\n  overflow-y: auto;\n\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  box-sizing: border-box;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -121378,7 +121484,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\n    display: flex;\n    flex-direction: column;\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\n    margin: 5px 10px;\n    color: #a32121;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-phone-code-slide[data-v-0b72b899] {\r\n    display: flex;\r\n    flex-direction: column;\r\n    height: 100%;\n}\n.hc-phone-code-error[data-v-0b72b899] {\r\n    margin: 5px 10px;\r\n    color: #a32121;\n}\r\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

@@ -37,7 +37,7 @@ class CallStartTool implements AgentToolInterface
 
     public function description(): string
     {
-        return "Prépare un appel à un seul prospect visible après vérification du consentement, du téléphone, des heures de travail et des limites. L'appel attend toujours la validation humaine.";
+        return "Prépare un appel à un seul prospect visible après vérification du téléphone, des heures de travail et des limites. L'appel attend toujours la validation humaine.";
     }
 
     public function inputSchema(): array

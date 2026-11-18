@@ -27,6 +27,7 @@ class AgentAttachmentApiTest extends TestCase
             $table->string('ip_address')->nullable();
         });
         (require database_path('migrations/2026_11_13_000001_create_agent_message_attachments_table.php'))->up();
+        (require database_path('migrations/2026_11_14_000001_add_summary_to_agent_message_attachments.php'))->up();
         Storage::fake('agent_attachments');
         Queue::fake();
     }

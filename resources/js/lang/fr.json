@@ -1377,6 +1377,9 @@
           "event_ended": "Se déclenche quand un RDV se termine."
         },
         "help": {
+          "agent_id": "Identifiant de l'agent IA qui prépare l'action. Il doit appartenir à ce projet : l'appel ou le SMS part avec les droits et la ligne de son propriétaire.",
+          "instruction": "Ce que l'agent doit dire ou écrire, par exemple « Présente l'offre et propose un rendez-vous ». Vous pouvez y mettre une variable, par exemple le prénom du prospect. L'activation du workflow par un humain vaut autorisation d'envoyer un vrai SMS ou de passer un vrai appel. Hors des heures de travail du prospect, l'envoi est programmé à la prochaine ouverture.",
+          "documents": "Facultatif. Identifiants des documents de référence de l'agent, séparés par des virgules. Ils doivent être rattachés à cet agent : il n'utilise que leur contenu pour préparer le message ou le script.",
           "provider": "Le compte qui envoie le message, tel qu'il est configuré dans les paramètres du projet. Rien à saisir ici : on choisit seulement parmi ceux qui existent.",
           "thread": "Un canal est une conversation du CRM, par exemple « Commercial » ou « Support » : l'email y est classé et les réponses du prospect y arrivent. Laissez « Automatique » pour utiliser le premier canal public du projet. Les canaux privés n'envoient pas d'email, ils ne sont donc pas proposés.",
           "body": "Rédigez l'email comme dans un traitement de texte : gras, couleurs, listes, liens, images. Cliquez sur une variable pour l'insérer, par exemple le prénom du prospect. L'aperçu montre l'email tel que le prospect le recevra.",
@@ -1585,6 +1588,8 @@
             "send_email": "Envoyer un email",
             "send_sms": "Envoyer un SMS",
             "make_call": "Effectuer un appel",
+            "agent_call": "Appel par un agent IA",
+            "agent_sms": "SMS rédigé par un agent IA",
             "prospect_attach_user": "Affecter à un utilisateur",
             "prospect_detach_user": "Désaffecter un utilisateur",
             "prospect_attach_group": "Affecter à un groupe",
@@ -1617,6 +1622,9 @@
         "field": {
             "action": "Action",
             "event": "Événement attendu",
+            "agent_id": "Agent IA",
+            "instruction": "Consigne pour l'agent",
+            "documents": "Documents de référence",
             "provider": "Opérateur",
             "thread": "Canal de discussion",
             "body": "Message de l'email",
@@ -3259,6 +3267,10 @@
             "note": "Note"
         },
         "tools": {
+            "app_help": "Aide sur le CRM",
+            "call_start": "Préparer un appel",
+            "call_transfer": "Transférer un appel",
+            "do_not_call": "Ne plus appeler un prospect",
             "prospect_set_labels": "Modifier les labels",
             "prospect_set_groups": "Modifier les groupes",
             "prospect_assign_users": "Assigner des utilisateurs",

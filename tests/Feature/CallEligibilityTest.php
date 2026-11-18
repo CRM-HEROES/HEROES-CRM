@@ -228,15 +228,17 @@ class CallEligibilityTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_calls_without_explicit_consent_are_skipped(): void
+    public function test_calls_do_not_depend_on_consent(): void
     {
+        \Carbon\Carbon::setTestNow('2026-03-10 10:00:00');
+        \Carbon\CarbonImmutable::setTestNow('2026-03-10 10:00:00');
         DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null]);
         $this->prospect->refresh();
 
         $attempt = app(CallEligibility::class)->prepare($this->prospect, $this->agent, $this->project);
 
-        $this->assertSame(CallAttempt::SKIPPED, $attempt->status);
-        $this->assertSame('no_consent', $attempt->skip_reason);
+        $this->assertSame(CallAttempt::QUEUED, $attempt->status);
+        $this->assertNull($attempt->skip_reason);
     }
 
     public function test_global_kill_switch_blocks_calls_and_sms(): void
@@ -306,7 +308,7 @@ class CallEligibilityTest extends TestCase
         $this->assertStringContainsString('identique au mobile du prospect', $senderCheck['message']);
     }
 
-    public function test_agent_sms_and_call_actions_refuse_missing_consent_with_distinct_reasons(): void
+    public function test_agent_sms_and_call_actions_refuse_do_not_call(): void
     {
         \Carbon\Carbon::setTestNow('2026-03-10 10:00:00');
         \Carbon\CarbonImmutable::setTestNow('2026-03-10 10:00:00');
@@ -322,7 +324,7 @@ class CallEligibilityTest extends TestCase
                 'api_key_secret' => 'secret',
             ]),
         ]);
-        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null]);
+        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null, 'do_not_call' => true]);
         $this->prospect->refresh();
         $execution = new WorkflowExecution();
         $execution->project_id = $this->project->id;
@@ -333,9 +335,9 @@ class CallEligibilityTest extends TestCase
                 'provider' => 'line:' . $lineId,
                 'instruction' => 'Envoyer le message préparé.',
             ], $execution);
-            $this->fail('L’action SMS agent doit refuser le prospect sans consentement.');
+            $this->fail('L’action SMS agent doit refuser le prospect en refus de contact.');
         } catch (\RuntimeException $exception) {
-            $this->assertStringContainsString('[no_consent]', $exception->getMessage());
+            $this->assertStringContainsString('[do_not_call]', $exception->getMessage());
         }
 
         try {
@@ -343,22 +345,22 @@ class CallEligibilityTest extends TestCase
                 'agent_id' => $this->agent->id,
                 'instruction' => 'Appeler le prospect.',
             ], $execution);
-            $this->fail('L’action d’appel agent doit refuser le prospect sans consentement.');
+            $this->fail('L’action d’appel agent doit refuser le prospect en refus de contact.');
         } catch (\RuntimeException $exception) {
-            $this->assertStringContainsString('[no_consent]', $exception->getMessage());
+            $this->assertStringContainsString('[do_not_call]', $exception->getMessage());
         }
 
         $this->assertSame(0, DB::table('sms')->count());
-        $this->assertSame('no_consent', CallAttempt::query()->latest('id')->value('skip_reason'));
+        $this->assertSame('do_not_call', CallAttempt::query()->latest('id')->value('skip_reason'));
         Http::assertNothingSent();
     }
 
-    public function test_agent_sms_send_tool_refuses_missing_consent_before_calling_the_manual_route(): void
+    public function test_agent_sms_send_tool_refuses_do_not_call_before_calling_the_manual_route(): void
     {
         \Carbon\Carbon::setTestNow('2026-03-10 10:00:00');
         \Carbon\CarbonImmutable::setTestNow('2026-03-10 10:00:00');
         ProjectSetting::set($this->project, 'smsbox', ['api_key' => 'fake']);
-        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null]);
+        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null, 'do_not_call' => true]);
         $this->prospect->refresh();
         $context = new AgentExecutionContext($this->owner, $this->project);
         $tool = collect(app(WriteCapabilities::class)->tools())
@@ -372,7 +374,7 @@ class CallEligibilityTest extends TestCase
 
         $this->assertTrue($result->isError);
         $this->assertSame('VALIDATION_FAILED', $result->code);
-        $this->assertStringContainsString('[no_consent]', $result->summary);
+        $this->assertStringContainsString('[do_not_call]', $result->summary);
         $this->assertSame(0, DB::table('sms')->count());
         Http::assertNothingSent();
     }
@@ -395,12 +397,6 @@ class CallEligibilityTest extends TestCase
                 break;
             case 'project_disabled':
                 DB::table('projects')->where('id', $this->project->id)->update(['calls_enabled' => false]);
-                break;
-            case 'no_consent':
-                DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null]);
-                break;
-            case 'consent_declined':
-                DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => false]);
                 break;
             case 'do_not_call':
                 DB::table('prospects')->where('id', $this->prospect->id)->update(['do_not_call' => true]);
@@ -429,7 +425,7 @@ class CallEligibilityTest extends TestCase
                 break;
         }
 
-        if (in_array($reason, ['no_consent', 'consent_declined', 'do_not_call', 'invalid_phone'], true)) {
+        if (in_array($reason, ['do_not_call', 'invalid_phone'], true)) {
             $this->prospect->refresh();
         }
 
@@ -453,8 +449,6 @@ class CallEligibilityTest extends TestCase
         return [
             'global kill switch' => ['global_disabled', 'Les appels et messages sont suspendus'],
             'project disabled' => ['project_disabled', 'ne sont pas activés pour ce projet'],
-            'missing consent' => ['no_consent', 'consentement explicite'],
-            'explicit consent refusal' => ['consent_declined', 'explicitement refusé'],
             'contact refusal' => ['do_not_call', 'demandé à ne plus être contacté'],
             'outside working hours' => ['outside_calling_hours', 'Prochaine ouverture : 16/03/2026 à 08:00 (Europe/Paris)'],
             '48 hour frequency' => ['sms_frequency_limit', '48 dernières heures'],
@@ -493,7 +487,7 @@ class CallEligibilityTest extends TestCase
         }
     }
 
-    public function test_out_of_hours_agent_sms_is_refused_with_next_opening_and_timezone(): void
+    public function test_out_of_hours_agent_sms_is_scheduled_at_the_next_opening(): void
     {
         \Carbon\Carbon::setTestNow('2026-03-14 10:00:00');
         \Carbon\CarbonImmutable::setTestNow('2026-03-14 10:00:00');
@@ -504,22 +498,115 @@ class CallEligibilityTest extends TestCase
         Queue::fake();
         ProjectSetting::set($this->project, 'calls', ['timezone' => 'Europe/Paris']);
 
+        $send = fn () => app(SmsScheduler::class)->sendOrSchedule(
+            $this->prospect,
+            $this->project,
+            $this->owner->id,
+            'smsbox',
+            'Message de test'
+        );
+        $result = $send();
+
+        $this->assertArrayNotHasKey('sms', $result);
+        $this->assertSame('outside_calling_hours', $result['reason']);
+        $this->assertStringContainsString('16/03/2026 à 08:00 (Europe/Paris)', $result['message']);
+        $this->assertSame(\Carbon\CarbonImmutable::parse('2026-03-16 08:00', 'Europe/Paris')->toIso8601String(), $result['scheduled_at']);
+        Queue::assertPushed(\App\Jobs\Agent\SendScheduledSms::class, fn ($job) => $job->prospectId === $this->prospect->id
+            && $job->message === 'Message de test'
+            && $job->delay !== null);
+        $this->assertSame(0, DB::table('sms')->count());
+
+        // A retried step does not schedule the same message twice
+        $send();
+        Queue::assertPushed(\App\Jobs\Agent\SendScheduledSms::class, 1);
+    }
+
+    public function test_scheduled_sms_is_checked_again_when_it_leaves(): void
+    {
+        $job = new \App\Jobs\Agent\SendScheduledSms($this->prospect->id, $this->project->id, $this->owner->id, 'smsbox', 'Message de test');
+
+        // Still closed: nothing leaves
+        \Carbon\Carbon::setTestNow('2026-03-14 10:00:00');
+        \Carbon\CarbonImmutable::setTestNow('2026-03-14 10:00:00');
+        app()->call([$job, 'handle']);
+        $this->assertSame(0, DB::table('sms')->count());
+
+        // The prospect asked not to be contacted in the meantime: nothing leaves
+        \Carbon\Carbon::setTestNow('2026-03-16 09:00:00');
+        \Carbon\CarbonImmutable::setTestNow('2026-03-16 09:00:00');
+        DB::table('prospects')->where('id', $this->prospect->id)->update(['do_not_call' => true]);
+        app()->call([$job, 'handle']);
+        $this->assertSame(0, DB::table('sms')->count());
+    }
+
+    public function test_out_of_hours_agent_call_is_scheduled_at_the_next_opening(): void
+    {
+        \Carbon\Carbon::setTestNow('2026-03-14 10:00:00');
+        \Carbon\CarbonImmutable::setTestNow('2026-03-14 10:00:00');
+        config([
+            'queue.default' => 'database',
+            'queue.connections.database.driver' => 'database',
+        ]);
+        Queue::fake();
+        ProjectSetting::set($this->project, 'calls', ['timezone' => 'Europe/Paris']);
+        if (!\Illuminate\Support\Facades\Schema::hasTable('agent_documents')) {
+            \Illuminate\Support\Facades\Schema::create('agent_documents', function ($table) {
+                $table->id();
+                $table->unsignedBigInteger('agent_id');
+                $table->string('name')->nullable();
+                $table->string('status')->nullable();
+                $table->json('summary')->nullable();
+                $table->timestamps();
+            });
+        }
+        $composer = new class extends \App\Agents\AgentCommunicationComposer {
+            public function compose(\App\Models\Agent $agent, \App\Models\Prospect $prospect, string $kind, string $instruction, array $documents, string $projectName): array
+            {
+                return ['script' => 'Bonjour', 'points_a_dire' => [], 'objections_probables' => []];
+            }
+        };
+        app()->instance(\App\Agents\AgentCommunicationComposer::class, $composer);
+        $execution = new WorkflowExecution();
+        $execution->project_id = $this->project->id;
+        $config = ['agent_id' => $this->agent->id, 'instruction' => 'Appeler le prospect.'];
+
+        $result = app(AgentCallAction::class)->handle($this->prospect, $config, $execution);
+
+        $this->assertSame(CallAttempt::QUEUED, $result['status']);
+        $this->assertSame('outside_calling_hours', $result['reason']);
+        $this->assertTrue(\Carbon\CarbonImmutable::parse('2026-03-16 08:00', 'Europe/Paris')->equalTo(\Carbon\CarbonImmutable::parse($result['scheduled_at'])));
+        $attempt = CallAttempt::findOrFail($result['call_attempt_id']);
+        $this->assertSame(CallAttempt::QUEUED, $attempt->status);
+        $this->assertSame('Bonjour', json_decode($attempt->summary, true)['script']);
+        Queue::assertPushed(\App\Jobs\Agent\StartCallAttempt::class, fn ($job) => $job->attemptId === $attempt->id && $job->delay !== null);
+
+        // A retried step reuses the scheduled call
+        $again = app(AgentCallAction::class)->handle($this->prospect, $config, $execution);
+        $this->assertSame($attempt->id, $again['call_attempt_id']);
+        Queue::assertPushed(\App\Jobs\Agent\StartCallAttempt::class, 1);
+        $this->assertSame(1, CallAttempt::query()->where('prospect_id', $this->prospect->id)->count());
+    }
+
+    public function test_out_of_hours_sms_with_another_refusal_is_not_scheduled(): void
+    {
+        \Carbon\Carbon::setTestNow('2026-03-14 10:00:00');
+        \Carbon\CarbonImmutable::setTestNow('2026-03-14 10:00:00');
+        config([
+            'queue.default' => 'database',
+            'queue.connections.database.driver' => 'database',
+        ]);
+        Queue::fake();
+        DB::table('prospects')->where('id', $this->prospect->id)->update(['do_not_call' => true]);
+        $this->prospect->refresh();
+
         try {
-            app(SmsScheduler::class)->sendOrSchedule(
-                $this->prospect,
-                $this->project,
-                $this->owner->id,
-                'smsbox',
-                'Message de test'
-            );
-            $this->fail('Un SMS agent hors horaires doit être refusé.');
+            app(SmsScheduler::class)->sendOrSchedule($this->prospect, $this->project, $this->owner->id, 'smsbox', 'Message de test');
+            $this->fail('Un prospect en do_not_call ne reçoit aucun SMS, même programmé.');
         } catch (\App\Calls\SmsEligibilityException $exception) {
-            $this->assertSame('outside_calling_hours', $exception->reason);
-            $this->assertStringContainsString('16/03/2026 à 08:00 (Europe/Paris)', $exception->getMessage());
+            $this->assertSame('do_not_call', $exception->reason);
         }
 
         Queue::assertNotPushed(\App\Jobs\Agent\SendScheduledSms::class);
-        $this->assertSame(0, DB::table('sms')->count());
     }
 
     public function test_sms_is_accepted_and_cloudtalk_request_is_faked_and_verified(): void
@@ -672,7 +759,7 @@ class CallEligibilityTest extends TestCase
             ->assertJsonPath('checks.0.key', 'global')
             ->assertJsonPath('checks.1.key', 'project')
             ->assertJsonPath('checks.2.key', 'provider')
-            ->assertJsonPath('checks.8.key', 'phone');
+            ->assertJsonPath('checks.7.key', 'phone');
 
         Http::assertNothingSent();
     }
@@ -697,16 +784,16 @@ class CallEligibilityTest extends TestCase
         $this->assertNull($attempt->scheduled_at);
     }
 
-    public function test_sms_refuses_weekends_consent_and_do_not_call_and_does_not_send_synchronously(): void
+    public function test_sms_refuses_weekends_and_do_not_call_but_ignores_consent_and_does_not_send_synchronously(): void
     {
         $at = \Carbon\CarbonImmutable::parse('2026-03-14 10:00:00');
         \Carbon\CarbonImmutable::setTestNow($at);
         \Carbon\Carbon::setTestNow($at);
         DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null]);
         $this->prospect->refresh();
-        $this->assertSame('no_consent', app(CallEligibility::class)->checkSms($this->prospect, $this->project, $at));
+        $this->assertNotSame('no_consent', app(CallEligibility::class)->checkSms($this->prospect, $this->project, $at));
 
-        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => true, 'do_not_call' => true]);
+        DB::table('prospects')->where('id', $this->prospect->id)->update(['call_consent' => null, 'do_not_call' => true]);
         $this->prospect->refresh();
         $this->assertSame('do_not_call', app(CallEligibility::class)->checkSms($this->prospect, $this->project, $at));
 
@@ -872,6 +959,89 @@ class CallEligibilityTest extends TestCase
         Http::assertNothingSent();
     }
 
+    protected function cloudTalkEndedAttempt(): CallAttempt
+    {
+        return CallAttempt::create([
+            'prospect_id' => $this->prospect->id,
+            'agent_id' => $this->agent->id,
+            'project_id' => $this->project->id,
+            'provider' => 'cloudtalk',
+            'external_id' => '987654',
+            'status' => CallAttempt::CALLING,
+            'started_at' => now(),
+        ]);
+    }
+
+    protected function cloudTalkEndedBody(): string
+    {
+        return json_encode(['type' => 'call.ended', 'data' => ['call_id' => '987654', 'talking_time' => 30]]);
+    }
+
+    public function test_unsigned_cloudtalk_call_ended_is_confirmed_with_the_api_instead_of_being_trusted(): void
+    {
+        Queue::fake();
+        ProjectSetting::set($this->project, 'calls', ['webhook_secret' => 'cloudtalk-secret']);
+        $attempt = $this->cloudTalkEndedAttempt();
+
+        // No signature header: processed as before (never a 401), but the call is not closed by the delivery itself
+        $this->call('POST', '/webhook/project/' . $this->project->slug . '/cloudtalk', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], $this->cloudTalkEndedBody())->assertSuccessful();
+
+        $this->assertSame(CallAttempt::CALLING, $attempt->fresh()->status);
+        Queue::assertPushed(\App\Jobs\Agent\ConfirmCloudTalkCall::class, fn ($job) => $job->callId === '987654' && $job->projectId === $this->project->id);
+    }
+
+    public function test_wrong_cloudtalk_signature_is_refused(): void
+    {
+        Queue::fake();
+        ProjectSetting::set($this->project, 'calls', ['webhook_secret' => 'cloudtalk-secret']);
+        $attempt = $this->cloudTalkEndedAttempt();
+
+        $this->call('POST', '/webhook/project/' . $this->project->slug . '/cloudtalk', [], [], [], [
+            'CONTENT_TYPE' => 'application/json',
+            'HTTP_X_CLOUDTALK_SIGNATURE' => 'forged',
+        ], $this->cloudTalkEndedBody())->assertStatus(401);
+
+        $this->assertSame(CallAttempt::CALLING, $attempt->fresh()->status);
+        Queue::assertNothingPushed();
+    }
+
+    public function test_confirmation_job_closes_the_call_only_with_what_the_cloudtalk_api_says(): void
+    {
+        $attempt = $this->cloudTalkEndedAttempt();
+        DB::table('lines')->insert([
+            'project_id' => $this->project->id,
+            'user_id' => $this->owner->id,
+            'name' => 'CloudTalk',
+            'operator' => 'cloudtalk',
+            'config' => json_encode(['api_key_id' => 'id', 'api_key_secret' => 'secret', 'agent_id' => 5, 'numero' => '+33111111111']),
+        ]);
+        $job = new \App\Jobs\Agent\ConfirmCloudTalkCall($this->project->id, '987654');
+        $job->setJob(\Mockery::mock(\Illuminate\Contracts\Queue\Job::class)->shouldIgnoreMissing());
+
+        // A fresh HTTP client: the stubs of setUp would answer first
+        Http::swap(new \Illuminate\Http\Client\Factory());
+        $answers = 0;
+        Http::fake(['my.cloudtalk.io/api/calls/index.json*' => function () use (&$answers) {
+            // First the API does not know a finished call yet, then it confirms an answered call
+            return $answers++ === 0
+                ? Http::response(['responseData' => ['status' => 200, 'data' => []]])
+                : Http::response(['responseData' => ['status' => 200, 'data' => [[
+                    'Cdr' => ['id' => '987654', 'ended_at' => '2026-03-10 10:05:00', 'talking_time' => 42, 'type' => 'outbound'],
+                ]]]]);
+        }]);
+
+        app()->call([$job, 'handle']);
+        $this->assertSame(CallAttempt::CALLING, $attempt->fresh()->status);
+
+        app()->call([$job, 'handle']);
+
+        $this->assertSame(CallAttempt::COMPLETED, $attempt->fresh()->status);
+        $this->assertSame('answered', $attempt->fresh()->outcome);
+        $this->assertSame(42, $attempt->fresh()->duration_seconds);
+    }
+
     public function test_unavailable_transfer_adds_recall_label_and_schedules_the_next_opening(): void
     {
         $categoryId = DB::table('categories')->insertGetId([
@@ -998,6 +1168,28 @@ class CallEligibilityTest extends TestCase
         (new ProspectCallObserver())->created($this->prospect);
 
         Queue::assertPushed(\App\Jobs\PrepareAutomaticCall::class, 1);
+    }
+
+    public function test_calls_without_a_provider_outcome_are_closed_after_the_delay(): void
+    {
+        $make = fn (string $status, $startedAt) => CallAttempt::create([
+            'prospect_id' => $this->prospect->id,
+            'agent_id' => $this->agent->id,
+            'project_id' => $this->project->id,
+            'provider' => 'cloudtalk',
+            'status' => $status,
+            'started_at' => $startedAt,
+        ]);
+        $stale = $make(CallAttempt::CALLING, now()->subMinutes(90));
+        $recent = $make(CallAttempt::CALLING, now()->subMinutes(5));
+        $done = $make(CallAttempt::COMPLETED, now()->subMinutes(90));
+
+        $this->artisan('calls:expire-stale')->assertSuccessful();
+
+        $this->assertSame(CallAttempt::FAILED, $stale->fresh()->status);
+        $this->assertNotNull($stale->fresh()->ended_at);
+        $this->assertSame(CallAttempt::CALLING, $recent->fresh()->status);
+        $this->assertSame(CallAttempt::COMPLETED, $done->fresh()->status);
     }
 
     public function test_call_tool_requires_human_approval(): void

@@ -130,13 +130,13 @@ class AgentHelpCallToolsTest extends TestCase
         $this->assertFalse($list->isError);
         $files = glob(resource_path('agent-knowledge/*.md'));
         $this->assertCount(count($files), $list->data['topics']);
-        $this->assertSame(
-            array_map(
-                static fn (string $file): string => pathinfo($file, PATHINFO_FILENAME),
-                $files
-            ),
-            array_keys($list->data['topics'])
+        // The topics are sorted by name: "rendez-vous" comes before "rendez-vous-itineraires-rappels"
+        $names = array_map(
+            static fn (string $file): string => pathinfo($file, PATHINFO_FILENAME),
+            $files
         );
+        sort($names);
+        $this->assertSame($names, array_keys($list->data['topics']));
         $this->assertSame(array_keys($list->data['topics']), $tool->inputSchema()['properties']['topic']['enum']);
         $this->assertSame('Prospection', $list->data['topics']['prospection']);
 
@@ -305,10 +305,10 @@ class AgentHelpCallToolsTest extends TestCase
         $this->assertSame('aucun numéro', $tool->preview($context, ['prospect_id' => $prospectId])['numero']);
     }
 
-    public function test_call_start_refuses_missing_consent_without_dialing(): void
+    public function test_call_start_refuses_do_not_call_without_dialing(): void
     {
         Http::fake();
-        DB::table('prospects')->where('id', $this->prospectId)->update(['call_consent' => false]);
+        DB::table('prospects')->where('id', $this->prospectId)->update(['do_not_call' => true]);
         $context = $this->context();
         $tool = app(CallStartTool::class);
 
@@ -316,8 +316,8 @@ class AgentHelpCallToolsTest extends TestCase
 
         $this->assertTrue($result->isError);
         $this->assertSame('VALIDATION_FAILED', $result->code);
-        $this->assertStringContainsString('[consent_declined]', $result->summary);
-        $this->assertSame('consent_declined', CallAttempt::query()->latest('id')->value('skip_reason'));
+        $this->assertStringContainsString('[do_not_call]', $result->summary);
+        $this->assertSame('do_not_call', CallAttempt::query()->latest('id')->value('skip_reason'));
         Http::assertNothingSent();
     }
 

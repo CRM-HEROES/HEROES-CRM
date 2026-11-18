@@ -55,7 +55,10 @@ function harness(options = {}) {
             const ids = JSON.parse(config.params.filters).ids.map(String);
             return { data: { data: (options.prospects || [second, first]).filter(p => ids.includes(String(p.id))) } };
         } },
-        '@/apis/project/line': { async createCloudtalkParallelCampaign(slug, params) {
+        '@/apis/project/line': {
+            // No campaign is running unless a test says so
+            async getActiveCloudtalkParallelCampaigns() { return { data: { campaigns: options.activeCampaigns || [] } }; },
+            async createCloudtalkParallelCampaign(slug, params) {
             lineCalls.push({ slug, params });
             if (options.parallelError) throw options.parallelError;
             return { data: options.parallelResult || {
@@ -96,7 +99,8 @@ function harness(options = {}) {
         project: { slug: 'test' }, cloudtalkLine: { id: 7 }, user: { id: 3 },
         prospectsSelected: [1, 2], interactionProspect: null,
         can: () => true, leftSlideOpen: () => true,
-        $nextTick: async () => {}, $t: key => key,
+        // Like Vue: the callback runs once the DOM is updated (here, at once)
+        $nextTick: async callback => { if (callback) callback(); }, $t: key => key,
         setActiveInteractionProspect(prospect) { this.interactionProspect = prospect; },
         fetchInteractions: async () => {},
     });
@@ -121,7 +125,7 @@ function harness(options = {}) {
     phone.mounted.call(child);
     const makeCalls = () => calls.filter(c => c.action === 'MAKE_CLOUDTALK_CALL');
     const start = (ids = [1, 2]) => bus.emit('cloudtalk:start-sequence', { projectSlug: vm.project.slug, prospectIds: ids });
-    const startParallel = (ids = [1, 2]) => bus.emit('cloudtalk:parallel-dialer', { projectSlug: vm.project.slug, prospectIds: ids });
+    const startParallel = (ids = [1, 2]) => bus.emit('cloudtalk:parallel-dialer', { projectSlug: vm.project.slug, prospectIds: ids, campaignName: 'Ma campagne' });
     const message = (event, properties = {}, overrides = {}) => windowListeners.get('message')?.({
         origin: child.origin, source: frameWindow, data: JSON.stringify({ event, properties }), ...overrides,
     });
@@ -268,8 +272,9 @@ test('menu action opens a mode choice and sequential mode preserves the existing
     const h = harness({ prospects: [second, { id: 3, mobile_phone_number: ' ' }, first] });
     const menu = h.load('components/prospect/table/CardMenus.vue').default;
     await menu.methods.bulkCloudtalkInteraction.call({ ...h.vm, prospectsSelected: [1, 3, 2, 1] });
+    // The campaign of a parallel mode is named after the project unless another name is given
     assert.deepEqual(h.vm.cloudtalkCallModeSelection, {
-        projectSlug: 'test', prospectIds: ['1', '3', '2'],
+        projectSlug: 'test', prospectIds: ['1', '3', '2'], campaignName: 'test',
     });
     assert.equal(h.makeCalls().length, 0);
     h.vm.selectCloudtalkCallMode('sequential');
@@ -291,7 +296,8 @@ test('parallel mode forwards the selected prospects without starting a sequentia
     await menu.methods.bulkCloudtalkInteraction.call({ ...h.vm, prospectsSelected: [2, 1, 2] });
     h.vm.selectCloudtalkCallMode('parallel');
 
-    assert.deepEqual(parallelSelection, { projectSlug: 'test', prospectIds: ['2', '1'] });
+    // The campaign is named after the project unless the window of the choice gives another name
+    assert.deepEqual(parallelSelection, { projectSlug: 'test', prospectIds: ['2', '1'], campaignName: 'test' });
     assert.equal(h.vm.cloudtalkSequence, null);
     assert.equal(h.makeCalls().length, 0);
 });
@@ -301,7 +307,7 @@ test('parallel mode syncs only the selected ids and opens the existing phone ifr
     await h.startParallel([2, 1, 2]);
     assert.deepEqual(h.lineCalls, [{
         slug: 'test',
-        params: { line_id: 7, prospect_ids: ['2', '1'] },
+        params: { line_id: 7, prospect_ids: ['2', '1'], campaign_name: 'Ma campagne' },
     }]);
     assert.equal(h.vm.cloudtalkPhoneVisible, true);
     assert.equal(h.vm.frameTab, 5);
