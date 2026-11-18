@@ -3267,6 +3267,10 @@
             "note": "Note"
         },
         "tools": {
+            "app_help": "Aide sur le CRM",
+            "call_start": "Préparer un appel",
+            "call_transfer": "Transférer un appel",
+            "do_not_call": "Ne plus appeler un prospect",
             "prospect_set_labels": "Modifier les labels",
             "prospect_set_groups": "Modifier les groupes",
             "prospect_assign_users": "Assigner des utilisateurs",

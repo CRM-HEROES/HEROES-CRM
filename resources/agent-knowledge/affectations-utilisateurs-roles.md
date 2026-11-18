@@ -1,17 +1,17 @@
 # Affectations des utilisateurs et des rôles
 
 ## À quoi ça sert
-Dans le CRM, un utilisateur ne voit et n’utilise que ce qui lui est « affecté ». C’est la règle qui explique pourquoi un calendrier, un filtre, un menu, un modèle ou un état de devis apparaît chez un collègue et pas chez un autre.
+Dans le CRM, un utilisateur ne voit et n’utilise que ce qui lui est « affecté ». C’est la règle qui explique pourquoi un calendrier, un filtre, un menu, un document ou un état de devis apparaît chez un collègue et pas chez un autre.
 
 ## Comment faire
 Pour affecter un élément à un utilisateur : « Paramètres » > « Liste des utilisateurs » > l’utilisateur > bloc d’affectation (par exemple « Calendriers affectés »). Pour affecter à tout un rôle : fiche du projet > bloc « Rôles » > le rôle. Dans le panneau, cochez les éléments voulus (la case « Tous » les coche tous) ou utilisez la recherche, puis fermez.
 
 ## Règles
-- **Éléments concernés :** calendriers (types de RDV), catégories de filtres et leurs filtres, documents (modèles), dossiers, groupes, menus, canaux de discussion, questionnaires, modèles de message et de SMS, actions, étapes et états de devis, produits et pipelines.
+- **Éléments concernés :** calendriers (types de RDV), catégories de filtres et leurs filtres, documents (modèles), dossiers, groupes, menus, canaux de discussion, questionnaires, actions, étapes et états de devis, produits et pipelines. Les modèles de SMS, de message et de description de rendez-vous ne sont pas concernés : tous les utilisateurs du projet voient tous les modèles.
 - **Direct ou par rôle :** un élément est utilisable si on l’a affecté à l’utilisateur ou à l’un de ses rôles. Affecter à un rôle équivaut à l’affecter à tous les utilisateurs qui ont ce rôle.
 - **Exceptions :** un super-administrateur et un administrateur du projet voient tout, sans affectation.
 - **Prospects :** sans le droit `all.prospect.view`, un utilisateur ne voit que les prospects qu’il a créés, ceux qui lui sont affectés et ceux de ses groupes. Pour les rendez-vous, il voit notamment ceux qu’il a créés ou auxquels il participe.
-- **Droits pour affecter (rubrique) :** gérer les affectations d’un utilisateur demande le droit correspondant : `all.user.calendar`, `all.user.category`, `all.user.document`, `all.user.folder`, `all.user.group`, `all.user.message-template`, `all.user.questionnaire`, `all.user.role`, `all.user.sms-template`, `all.user.thread`, `all.user.order.action`, `all.user.order.step`, `all.user.order.status` et `all.user.user`.
+- **Droits pour affecter (rubrique) :** gérer les affectations d’un utilisateur demande le droit correspondant : `all.user.calendar`, `all.user.category`, `all.user.document`, `all.user.folder`, `all.user.group`, `all.user.questionnaire`, `all.user.role`, `all.user.thread`, `all.user.order.action`, `all.user.order.step`, `all.user.order.status` et `all.user.user`.
 - **Droits d’usage :** pouvoir utiliser un élément affecté ne dit pas pouvoir en créer : créer un élément demande son droit d’ajout (par exemple `all.project.calendar.add`).
 
 ## Limites

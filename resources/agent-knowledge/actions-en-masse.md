@@ -8,7 +8,7 @@ Dans « Prospects », cochez des prospects (ou utilisez « Sélectionner tous le
 
 ## Règles
 - Une action en masse porte sur les prospects sélectionnés du projet; les prospects déjà traités ne reçoivent pas la plupart des actions (« Archiver » en a fait des prospects traités) : « Re traiter » les remet en circulation.
-- Les envois en masse (« SMS » et « Message ») ne partent qu’après confirmation et ne concernent que les prospects que l’utilisateur peut écrire (sans le droit `prospectView`, seulement ceux qui lui sont affectés).
+- Les envois en masse (« SMS » et « Message ») partent dès le clic sur « Envoyer » : le CRM ne demande aucune confirmation supplémentaire, vérifiez donc le texte, le canal et le nombre de prospects avant. Le CRM ne retire pas lui-même de la sélection les prospects sans numéro : excluez-les avant avec un filtre, et retrouvez les SMS en erreur avec le filtre « Avec erreur ». Ils ne concernent que les prospects que l’utilisateur peut écrire (sans le droit `prospectView`, seulement ceux qui lui sont affectés).
 - Malgré son nom, le bouton « Supprimer définitivement » du pied du tableau met les prospects dans la corbeille : ils peuvent être restaurés. L’effacement réel se fait ensuite depuis la Corbeille (« Paramètres » > « Corbeille », bouton « Supprimer »).
 
 ## Limites
@@ -20,7 +20,7 @@ Chemin : « Prospects » > pied du tableau (`components/prospect/table/CardMenus
 1. « Assigner ou rétirer des utilisateurs » : affecte ou retire des utilisateurs aux prospects sélectionnés.
 2. « Assigner ou rétirer des groupes » et « Assigner ou rétirer des filtres » : classent les prospects.
 3. « Copier les prospects vers un autre projet » : crée une copie dans un autre projet.
-4. « SMS » et « Message » : envoient le même texte à tous (voir la fiche SMS et e-mails). « SMS » demande `all.prospect.sms`.
+4. « SMS » et « Message » : envoient le même texte à tous (voir la fiche SMS et e-mails). Le bouton « SMS » du pied du tableau est affiché avec `all.prospect.sms`, et l’envoi demande `all.prospect.sms.add`; accorder le groupe `all.prospect.sms` donne les deux. Le formulaire propose aussi l’icône « Modèle de SMS » pour partir d’un modèle, y compris en envoi en masse.
 5. « Update » (ouvre « Modifier un champ ») : donne la même valeur d’un champ à tous les prospects sélectionnés. Le champ doit exister dans le projet.
 6. « Archiver » (droit `all.prospect.archive`) marque les prospects comme traités; « Re traiter » les remet à traiter.
 7. « Supprimer définitivement » (droit `all.prospect.delete`) demande une confirmation, puis envoie les prospects à la corbeille.
