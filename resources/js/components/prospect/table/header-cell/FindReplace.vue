@@ -11,12 +11,14 @@
                     v-model="search"
                     placeholder="Rechercher ..."
                     ref="search"
+                    :disabled="loading"
                     @input="resetResult"
                     @keyup.enter="find"
                 />
                 <input
                     v-model="replace"
                     placeholder="Remplacer par ..."
+                    :disabled="loading"
                     @keyup.enter="result ? apply() : find()"
                 />
 
@@ -25,6 +27,7 @@
                         <input
                             type="checkbox"
                             v-model="caseSensitive"
+                            :disabled="loading"
                             @change="resetResult"
                         />
                         Respecter la casse
@@ -34,6 +37,7 @@
                         <select
                             v-model="searchLimit"
                             aria-label="Nombre maximum de prospects à rechercher"
+                            :disabled="loading"
                             @click.stop
                         >
                             <option v-for="limit in searchLimits" :key="limit" :value="limit">
@@ -48,6 +52,7 @@
                             min="1"
                             max="200"
                             aria-label="Nombre maximum personnalisé"
+                            :disabled="loading"
                             @click.stop
                             @keyup.enter="find"
                         />
@@ -72,6 +77,7 @@
                                         v-model="selectedSamples"
                                         type="checkbox"
                                         :value="s.id"
+                                        :disabled="loading"
                                         :aria-label="'Remplacer dans le prospect ' + s.id"
                                     />
                                     <del>
@@ -147,6 +153,10 @@
                     </template>
                 </div>
 
+                <p v-if="loading && progressCount" class="hc-find-replace-review" aria-live="polite">
+                    {{ loadingMode === "replace" ? "Remplacement" : "Recherche" }} en cours :
+                    {{ progressCount }} prospect(s) traité(s)…
+                </p>
                 <p v-if="error" class="hc-find-replace-error" v-text="error"></p>
 
                 <div class="hc-find-replace-actions">
@@ -212,6 +222,8 @@ export default {
             selectedSamples: [],
             confirming: false,
             loading: false,
+            loadingMode: null,
+            progressCount: 0,
             error: null,
             reviewQueue: [],
             reviewPosition: 0,
@@ -234,38 +246,72 @@ export default {
             this.reviewCompleted = false;
         },
 
+        async requestBatch(mode, extraParams = {}) {
+            const params = {
+                field: this.field,
+                search: this.search,
+                replace: this.replace,
+                case_sensitive: this.caseSensitive,
+                limit: this.limit,
+                mode,
+                ...extraParams,
+            };
+
+            if (mode === "replace" && this.selectedSamples.length) {
+                params.prospect_ids = this.selectedSamples;
+            }
+
+            if (this.hasFilters) {
+                params.filters = JSON.stringify(this.prospectsParams);
+            }
+
+            const { data } = await ProspectService.findReplace(
+                this.project.slug,
+                params
+            );
+            return data;
+        },
+
         async run(mode, extraParams = {}) {
             this.loading = true;
+            this.loadingMode = mode;
+            this.progressCount = 0;
             this.error = null;
 
             try {
-                const params = {
-                    field: this.field,
-                    search: this.search,
-                    replace: this.replace,
-                    case_sensitive: this.caseSensitive,
-                    limit: this.limit,
-                    mode,
-                    ...extraParams,
-                };
+                const paginated = mode === "preview" || mode === "replace";
+                const result = { prospects: 0, matches: 0, samples: [] };
+                let cursor = null;
 
-                if (mode === "replace" && this.selectedSamples.length) {
-                    params.prospect_ids = this.selectedSamples;
-                }
+                do {
+                    const params = paginated
+                        ? { ...extraParams, batch_size: 100, ...(cursor !== null ? { after_id: cursor } : {}) }
+                        : extraParams;
+                    const data = await this.requestBatch(mode, params);
 
-                if (this.hasFilters) {
-                    params.filters = JSON.stringify(this.prospectsParams);
-                }
+                    if (!paginated) {
+                        return data;
+                    }
 
-                const { data } = await ProspectService.findReplace(
-                    this.project.slug,
-                    params
-                );
-                return data;
+                    result.prospects += data.prospects || 0;
+                    result.matches += data.matches || 0;
+                    if (mode === "preview") {
+                        result.samples.push(...(data.samples || []));
+                        result.samples = result.samples.slice(0, Number(this.limit));
+                    }
+                    this.progressCount += data.scanned || 0;
+                    cursor = data.next_cursor ?? null;
+                } while (cursor !== null);
+
+                return result;
             } catch (e) {
-                this.error = "Une erreur est survenue.";
+                this.error = mode === "replace" && this.progressCount > 0
+                    ? `Le remplacement a été interrompu après ${this.progressCount} prospect(s) analysé(s). Les lots déjà traités restent enregistrés.`
+                    : "Une erreur est survenue.";
+                return null;
             } finally {
                 this.loading = false;
+                this.loadingMode = null;
             }
         },
 

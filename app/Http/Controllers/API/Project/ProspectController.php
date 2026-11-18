@@ -350,7 +350,9 @@ class ProspectController extends Controller
             'mode' => 'required|in:preview,replace,replace_occurrence',
             'case_sensitive' => 'nullable|boolean',
             'limit' => 'sometimes|integer|min:1|max:200',
-            'prospect_ids' => 'sometimes|array|min:1|max:10',
+            'batch_size' => 'sometimes|integer|min:1|max:200',
+            'after_id' => 'nullable|integer|min:0',
+            'prospect_ids' => 'sometimes|array|min:1|max:200',
             'prospect_ids.*' => 'required|integer|distinct',
             'occurrence_index' => 'required_if:mode,replace_occurrence|integer|min:0',
             'expected_value' => 'required_if:mode,replace_occurrence|string',
@@ -398,86 +400,98 @@ class ProspectController extends Controller
             $prospectsQuery->whereIn('id', $request->input('prospect_ids'));
         }
 
-        // "limit" bounds the number of examples returned, not the number of
-        // prospects scanned: every match of the project is counted (and
-        // replaced), wherever it is, whatever the limit.
         $limit = $request->input('limit');
-        $prospectsQuery->chunkById(500, function ($prospects) use (
-                $meta, $slug, $search, $replace, $caseSensitive, $replacing, $replacingOccurrence,
-                $occurrenceIndex, $numericSearchPattern, $request,
-                $limit, &$matches, &$prospectsCount, &$samples
-            ) {
-                foreach ($prospects as $prospect) {
-                    $current = $meta ? data_get($prospect->meta, $slug) : $prospect->{$slug};
+        $batchSize = (int) $request->input('batch_size', 100);
+        if ($request->filled('after_id')) {
+            $prospectsQuery->where('id', '>', (int) $request->input('after_id'));
+        }
 
-                    if (!is_string($current) || $current === '') {
-                        continue;
-                    }
+        // Keep each HTTP request bounded. The caller follows next_cursor to
+        // process the full result set over a sequence of short requests.
+        $prospects = $prospectsQuery
+            ->reorder('id')
+            ->limit($batchSize + 1)
+            ->get();
+        $hasMore = $prospects->count() > $batchSize;
+        if ($hasMore) {
+            $prospects->pop();
+        }
+        $nextCursor = $hasMore && $prospects->isNotEmpty()
+            ? $prospects->last()->id
+            : null;
 
-                    if ($replacingOccurrence && $current !== $request->input('expected_value')) {
-                        abort(409, 'The prospect field changed since the preview.');
-                    }
+        foreach ($prospects as $prospect) {
+            $current = $meta ? data_get($prospect->meta, $slug) : $prospect->{$slug};
 
-                    if ($numericSearchPattern !== null) {
-                        $occurrences = preg_match_all('/' . $numericSearchPattern . '/u', $current);
-                    } else {
-                        $occurrences = $caseSensitive
-                            ? substr_count($current, $search)
-                            : substr_count(mb_strtolower($current), mb_strtolower($search));
-                    }
+            if (!is_string($current) || $current === '') {
+                continue;
+            }
 
-                    if ($occurrences === 0) {
-                        continue;
-                    }
+            if ($replacingOccurrence && $current !== $request->input('expected_value')) {
+                abort(409, 'The prospect field changed since the preview.');
+            }
 
-                    $matches += $occurrences;
-                    $prospectsCount++;
+            if ($numericSearchPattern !== null) {
+                $occurrences = preg_match_all('/' . $numericSearchPattern . '/u', $current);
+            } else {
+                $occurrences = $caseSensitive
+                    ? substr_count($current, $search)
+                    : substr_count(mb_strtolower($current), mb_strtolower($search));
+            }
 
-                    if ($replacingOccurrence) {
-                        abort_if($occurrenceIndex >= $occurrences, 409, 'The selected occurrence no longer exists.');
-                        $pattern = $numericSearchPattern !== null
-                            ? '/' . $numericSearchPattern . '/u'
-                            : '/' . preg_quote($search, '/') . '/' . ($caseSensitive ? 'u' : 'iu');
-                        $currentOccurrence = 0;
-                        $new = preg_replace_callback($pattern, function ($match) use (
-                            &$currentOccurrence, $occurrenceIndex, $replace
-                        ) {
-                            return $currentOccurrence++ === $occurrenceIndex
-                                ? $replace
-                                : $match[0];
-                        }, $current);
-                    } elseif ($numericSearchPattern !== null) {
-                        $new = preg_replace_callback(
-                            '/' . $numericSearchPattern . '/u',
-                            fn () => $replace,
-                            $current
-                        );
-                    } else {
-                        $new = $caseSensitive
-                            ? Str::replace($search, $replace, $current)
-                            : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
-                    }
+            if ($occurrences === 0) {
+                continue;
+            }
 
-                    if (count($samples) < ($limit ?? 10)) {
-                        $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];
-                    }
+            $matches += $occurrences;
+            $prospectsCount++;
 
-                    if ($replacing || $replacingOccurrence) {
-                        if ($meta) {
-                            $values = $prospect->meta ?: [];
-                            $values[$slug] = $new;
-                            $prospect->update(['meta' => $values]);
-                        } else {
-                            $prospect->update([$slug => $new]);
-                        }
-                    }
+            if ($replacingOccurrence) {
+                abort_if($occurrenceIndex >= $occurrences, 409, 'The selected occurrence no longer exists.');
+                $pattern = $numericSearchPattern !== null
+                    ? '/' . $numericSearchPattern . '/u'
+                    : '/' . preg_quote($search, '/') . '/' . ($caseSensitive ? 'u' : 'iu');
+                $currentOccurrence = 0;
+                $new = preg_replace_callback($pattern, function ($match) use (
+                    &$currentOccurrence, $occurrenceIndex, $replace
+                ) {
+                    return $currentOccurrence++ === $occurrenceIndex
+                        ? $replace
+                        : $match[0];
+                }, $current);
+            } elseif ($numericSearchPattern !== null) {
+                $new = preg_replace_callback(
+                    '/' . $numericSearchPattern . '/u',
+                    fn () => $replace,
+                    $current
+                );
+            } else {
+                $new = $caseSensitive
+                    ? Str::replace($search, $replace, $current)
+                    : preg_replace('/' . preg_quote($search, '/') . '/iu', addcslashes($replace, '\\$'), $current);
+            }
+
+            if (!$replacing && count($samples) < ($limit ?? 10)) {
+                $samples[] = ['id' => $prospect->id, 'before' => $current, 'after' => $new];
+            }
+
+            if (($replacing || $replacingOccurrence) && $new !== $current) {
+                if ($meta) {
+                    $values = $prospect->meta ?: [];
+                    $values[$slug] = $new;
+                    $prospect->update(['meta' => $values]);
+                } else {
+                    $prospect->update([$slug => $new]);
                 }
-            });
+            }
+        }
 
         return [
             'prospects' => $prospectsCount,
             'matches' => $matches,
             'samples' => $samples,
+            'scanned' => $prospects->count(),
+            'next_cursor' => $nextCursor,
         ];
     }
 

@@ -66,7 +66,7 @@ class Kernel extends ConsoleKernel
 
         // Incoming emails (IMAP). The command only reads the mailboxes of the
         // projects someone currently has open (see App\Console\Commands\ImapSync).
-        $schedule->command('app:imap-sync')->everyFifteenMinutes()->withoutOverlapping(10)->runInBackground();
+        $schedule->command('app:imap-sync')->everyThirtyMinutes()->withoutOverlapping(10)->runInBackground();
     }
 
     /**
