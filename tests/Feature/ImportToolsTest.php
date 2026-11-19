@@ -120,7 +120,17 @@ class ImportToolsTest extends TestCase
         $this->assertSame(['Prénom', 'Nom'], $result->data['columns_mapped']);
         $this->assertSame(['Colonne libre'], $result->data['columns_not_mapped']);
         $this->assertSame(['email'], $result->data['duplicates_fields']);
+        $this->assertNull($result->data['processed_at']);
         $this->assertSame(2, $result->data['prospects_created']);
+    }
+
+    public function test_the_date_of_a_finished_import_is_given(): void
+    {
+        $result = (new ImportStatusTool())->handle($this->context, ['view' => 'detail', 'import_id' => 2]);
+
+        $this->assertSame('done', $result->data['state']);
+        $this->assertNotNull($result->data['processed_at']);
+        $this->assertStringContainsString('T', $result->data['processed_at']);
     }
 
     public function test_an_import_of_another_project_or_unknown_is_not_found(): void
