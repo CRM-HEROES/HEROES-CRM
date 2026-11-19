@@ -136,7 +136,7 @@ test('the header polls for arrivals and removes its timer and listener on unmoun
     let refreshes = 0;
     h.vm.fetchIncomingCommunicationsCount = () => { refreshes++; };
     h.component.mounted.call(h.vm);
-    assert.equal(h.timers[0].delay, 120000);
+    assert.equal(h.timers[0].delay, 600000);
     h.timers[0].callback();
     assert.equal(refreshes, 1);
     h.component.beforeUnmount.call(h.vm);

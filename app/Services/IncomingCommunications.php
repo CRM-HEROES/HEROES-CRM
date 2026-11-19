@@ -99,6 +99,38 @@ class IncomingCommunications
         return $query;
     }
 
+    /**
+     * The prospects the user may see who have communications still to process, with the identifiers of those
+     * communications by type (the same data the list of the header badge carries). The text is not part of it.
+     *
+     * @return array{total: int, prospects: array<int, array<string, mixed>>}
+     */
+    public function pending(Project $project, int $userId, ?int $prospectId = null, int $limit = 20): array
+    {
+        $filters = new ProspectFilters();
+        $filters->addFilter('incomingCommunications', true);
+
+        $query = $this->visibleProspects($project, $userId)->filter($filters);
+        $prospectId && $query->where('prospects.id', $prospectId);
+
+        $total = (clone $query)->count();
+        $prospects = $query->orderByDesc('prospects.id')->limit(max(1, min(50, $limit)))
+            ->get(['prospects.id', 'prospects.first_name', 'prospects.last_name', 'prospects.company_name']);
+
+        $this->appendUnread($prospects, $project, $userId);
+
+        return ['total' => $total, 'prospects' => $prospects->map(function ($prospect) {
+            $name = trim("{$prospect->first_name} {$prospect->last_name}");
+
+            return [
+                'id' => $prospect->id,
+                'name' => $name !== '' ? $name : (string) ($prospect->company_name ?: 'Sans nom'),
+                // At most 100 identifiers by type: more is a backlog to treat by batches
+                'pending' => collect($prospect->unread_communications)->map(fn ($ids) => array_slice($ids, 0, 100))->all(),
+            ];
+        })->all()];
+    }
+
     public function appendUnread(Collection $prospects, Project $project, int $userId): void
     {
         if ($prospects->isEmpty()) {

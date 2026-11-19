@@ -18,6 +18,20 @@ use App\Agents\Tools\ReportCreateTool;
 use App\Agents\Tools\ToolRegistry;
 use App\Agents\Tools\WorkflowCatalogTool;
 use App\Agents\Tools\WorkflowDraftTool;
+use App\Agents\Tools\CampaignSetActiveTool;
+use App\Agents\Tools\CampaignStatusTool;
+use App\Agents\Tools\DocumentGenerateTool;
+use App\Agents\Tools\DocumentTemplatesTool;
+use App\Agents\Tools\ImportRunTool;
+use App\Agents\Tools\IncomingCommunicationsTool;
+use App\Agents\Tools\IncomingMarkTreatedTool;
+use App\Agents\Tools\ImportStatusTool;
+use App\Agents\Tools\MessageTemplatesTool;
+use App\Agents\Tools\PipelineOverviewTool;
+use App\Agents\Tools\TrashListTool;
+use App\Agents\Tools\TrashRestoreTool;
+use App\Agents\Tools\WorkflowCancelExecutionTool;
+use App\Agents\Tools\WorkflowExecutionsTool;
 use App\Agents\Writes\WriteCapabilities;
 use App\Http\Requests\Validator\TwoFactorsTokenValidator;
 use App\Mail\BrevoTransport;
@@ -61,7 +75,7 @@ class AppServiceProvider extends ServiceProvider
                 $registry->register($app->make($tool));
             }
 
-            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, ReportCreateTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class] as $tool) {
+            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, ReportCreateTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class, WorkflowExecutionsTool::class, TrashListTool::class, TrashRestoreTool::class, ImportStatusTool::class, ImportRunTool::class, CampaignStatusTool::class, CampaignSetActiveTool::class, DocumentTemplatesTool::class, DocumentGenerateTool::class, IncomingCommunicationsTool::class, IncomingMarkTreatedTool::class, MessageTemplatesTool::class, PipelineOverviewTool::class, WorkflowCancelExecutionTool::class] as $tool) {
                 $registry->register($app->make($tool));
             }
 
