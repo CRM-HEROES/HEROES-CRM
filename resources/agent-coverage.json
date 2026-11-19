@@ -1,0 +1,961 @@
+{
+  "_help": "Pour chaque groupe de routes de l'API : fiches d'aide (resources/agent-knowledge), outils de lecture et d'écriture de l'agent, et raison si le groupe est volontairement exclu. Le test AgentCoverageTest échoue si un groupe de routes n'est pas classé ici.",
+  "groups": {
+    "project/prospect": {
+      "label": "Prospects (fiche, tableau, actions en masse)",
+      "sheets": [
+        "prospection",
+        "fiche-prospect",
+        "tableau-prospects",
+        "actions-en-masse",
+        "communications-recues"
+      ],
+      "read_tools": [
+        "crm_search",
+        "crm_describe",
+        "prospect_history"
+      ],
+      "write_tools": [
+        "prospect_create",
+        "prospect_update",
+        "prospect_delete",
+        "prospect_set_field",
+        "prospect_set_groups",
+        "prospect_set_labels",
+        "prospect_assign_users",
+        "sms_send",
+        "sms_send_bulk",
+        "email_send",
+        "email_send_bulk",
+        "interaction_log",
+        "call_start",
+        "do_not_call",
+        "order_create",
+        "order_update",
+        "order_delete",
+        "appointment_create",
+        "appointment_update",
+        "appointment_delete"
+      ]
+    },
+    "project/user": {
+      "label": "Utilisateurs du projet et leurs affectations",
+      "sheets": [
+        "gestion-utilisateurs",
+        "affectations-utilisateurs-roles",
+        "utilisateurs-roles"
+      ],
+      "read_tools": [
+        "crm_search",
+        "project_config"
+      ],
+      "write_tools": [],
+      "excluded": "Sensible : création, blocage, droits et affectations d'utilisateurs ne sont pas confiés à l'agent (décision à confirmer)."
+    },
+    "project/role": {
+      "label": "Rôles et permissions",
+      "sheets": [
+        "utilisateurs-roles",
+        "droits-permissions",
+        "affectations-utilisateurs-roles"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "excluded": "Sensible : les droits ne sont pas modifiables par l'agent."
+    },
+    "project/import": {
+      "label": "Imports de prospects (fichier, Google Sheets)",
+      "sheets": [
+        "prospection"
+      ],
+      "read_tools": [
+        "import_status"
+      ],
+      "write_tools": [
+        "import_run"
+      ],
+      "note": "Le téléversement du fichier et le mapping des colonnes restent à faire dans l'interface.",
+      "priority": "haute"
+    },
+    "project/document": {
+      "label": "Modèles de documents (PDF)",
+      "sheets": [
+        "documents"
+      ],
+      "read_tools": [
+        "document_templates"
+      ],
+      "write_tools": [
+        "document_generate"
+      ],
+      "priority": "haute",
+      "note": "Créer ou modifier un modèle (pages, champs, polices) reste à faire dans l'éditeur de l'interface."
+    },
+    "project/document-template": {
+      "label": "Modèles de documents prêts à l'emploi",
+      "sheets": [
+        "documents"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+    },
+    "project/questionnaire": {
+      "label": "Questionnaires",
+      "sheets": [
+        "questionnaires"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+    },
+    "project/campaign": {
+      "label": "Campagnes",
+      "sheets": [
+        "campagnes"
+      ],
+      "read_tools": [
+        "crm_search",
+        "campaign_status"
+      ],
+      "write_tools": [
+        "campaign_set_active"
+      ],
+      "priority": "haute"
+    },
+    "project/campaign-action": {
+      "label": "Actions de campagne",
+      "sheets": [
+        "campagnes"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "haute",
+      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+    },
+    "project/campaign-operator": {
+      "label": "Opérateurs de campagne",
+      "sheets": [
+        "campagnes"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "haute",
+      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+    },
+    "project/campaign-rule": {
+      "label": "Règles de campagne",
+      "sheets": [
+        "campagnes"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "haute",
+      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+    },
+    "project/category": {
+      "label": "Catégories de filtres",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/label": {
+      "label": "Filtres (labels)",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": []
+    },
+    "project/field": {
+      "label": "Champs de prospects",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/group": {
+      "label": "Groupes",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/folder": {
+      "label": "Dossiers",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/thread": {
+      "label": "Canaux de discussion",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/calendar": {
+      "label": "Calendriers",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/menu": {
+      "label": "Menus de prospects",
+      "sheets": [
+        "menus-prospects"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/menu-icon": {
+      "label": "Icônes des menus",
+      "sheets": [
+        "menus-prospects"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Réglage d'icônes de l'écran : sans intérêt pour l'agent."
+    },
+    "project/default-menu": {
+      "label": "Menus de base",
+      "sheets": [
+        "menus-prospects"
+      ],
+      "read_tools": [],
+      "write_tools": []
+    },
+    "project/vehicle": {
+      "label": "Véhicules",
+      "sheets": [
+        "vehicules-duplication-suivi"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+    },
+    "project/line": {
+      "label": "Lignes téléphoniques",
+      "sheets": [
+        "lignes-telephoniques"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : contient des identifiants d'opérateurs."
+    },
+    "project/pipeline": {
+      "label": "Pipelines",
+      "sheets": [
+        "pipeline"
+      ],
+      "read_tools": [
+        "pipeline_overview"
+      ],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Lecture seule : créer un pipeline ou ses étapes se fait dans le CRM."
+    },
+    "project/product": {
+      "label": "Produits",
+      "sheets": [
+        "devis-produits-commissions"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/order": {
+      "label": "Devis (tableau)",
+      "sheets": [
+        "commandes",
+        "devis-produits-commissions"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": [
+        "order_create",
+        "order_update",
+        "order_delete"
+      ]
+    },
+    "project/order-action": {
+      "label": "Actions sur les devis",
+      "sheets": [
+        "devis-produits-commissions"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/order-status": {
+      "label": "États de devis",
+      "sheets": [
+        "devis-produits-commissions"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/order-step": {
+      "label": "Étapes de devis",
+      "sheets": [
+        "devis-produits-commissions"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/commission": {
+      "label": "Commissions",
+      "sheets": [
+        "devis-produits-commissions"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+    },
+    "project/event": {
+      "label": "Rendez-vous",
+      "sheets": [
+        "rendez-vous",
+        "rendez-vous-itineraires-rappels"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": [
+        "appointment_create",
+        "appointment_update",
+        "appointment_delete"
+      ]
+    },
+    "project/event-description-template": {
+      "label": "Modèles de description de RDV",
+      "sheets": [
+        "modeles-messages"
+      ],
+      "read_tools": [
+        "message_templates"
+      ],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+    },
+    "project/events-daily-directions": {
+      "label": "Itinéraires journaliers",
+      "sheets": [
+        "rendez-vous-itineraires-rappels"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Calcul d'itinéraire fait par l'écran : pas d'intérêt pour l'agent."
+    },
+    "project/sms": {
+      "label": "SMS",
+      "sheets": [
+        "sms-emails"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": [
+        "sms_send",
+        "sms_send_bulk"
+      ]
+    },
+    "project/sms-template": {
+      "label": "Modèles de SMS",
+      "sheets": [
+        "modeles-messages"
+      ],
+      "read_tools": [
+        "message_templates"
+      ],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+    },
+    "project/message-template": {
+      "label": "Modèles de messages",
+      "sheets": [
+        "modeles-messages"
+      ],
+      "read_tools": [
+        "message_templates"
+      ],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+    },
+    "project/export": {
+      "label": "Exports de prospects",
+      "sheets": [
+        "prospection"
+      ],
+      "read_tools": [],
+      "write_tools": [
+        "export_prospects"
+      ]
+    },
+    "project/duplicate": {
+      "label": "Doublons",
+      "sheets": [
+        "corbeille-doublons"
+      ],
+      "read_tools": [],
+      "write_tools": [
+        "duplicates_detect",
+        "duplicates_resolve"
+      ]
+    },
+    "project/trash": {
+      "label": "Corbeille",
+      "sheets": [
+        "corbeille-doublons"
+      ],
+      "read_tools": [
+        "trash_list"
+      ],
+      "write_tools": [
+        "trash_restore"
+      ],
+      "priority": "haute"
+    },
+    "project/workflow": {
+      "label": "Automatisations",
+      "sheets": [
+        "automatisation",
+        "workflows-catalogue"
+      ],
+      "read_tools": [
+        "workflow_catalog",
+        "crm_search"
+      ],
+      "write_tools": [
+        "workflow_save_draft",
+        "workflow_publish",
+        "workflow_set_status",
+        "workflow_delete"
+      ]
+    },
+    "project/workflow-catalog": {
+      "label": "Catalogue des automatisations",
+      "sheets": [
+        "workflows-catalogue"
+      ],
+      "read_tools": [
+        "workflow_catalog"
+      ],
+      "write_tools": []
+    },
+    "project/workflow-email-preview": {
+      "label": "Aperçu d'e-mail d'automatisation",
+      "sheets": [
+        "workflows-catalogue"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Aperçu visuel : pas d'intérêt pour l'agent."
+    },
+    "project/workflow-execution": {
+      "label": "Exécutions d'automatisations",
+      "sheets": [
+        "workflows-catalogue",
+        "automatisation"
+      ],
+      "read_tools": [
+        "workflow_executions"
+      ],
+      "write_tools": [
+        "workflow_cancel_execution"
+      ],
+      "priority": "moyenne",
+      "note": "Historique, détail et erreurs : lus par workflow_executions. L'annulation d'une exécution en attente est faite par workflow_cancel_execution."
+    },
+    "project/workflow-provider": {
+      "label": "Opérateurs d'automatisation",
+      "sheets": [
+        "workflows-catalogue"
+      ],
+      "read_tools": [],
+      "write_tools": []
+    },
+    "project/workflow-stats": {
+      "label": "Statistiques d'automatisation",
+      "sheets": [
+        "workflows-catalogue"
+      ],
+      "read_tools": [],
+      "write_tools": []
+    },
+    "project/stat": {
+      "label": "Statistiques",
+      "sheets": [
+        "statistiques"
+      ],
+      "read_tools": [
+        "crm_aggregate",
+        "team_performance",
+        "compare_periods",
+        "report_create"
+      ],
+      "write_tools": [],
+      "excluded": "Mise en page ou réglage de l'écran : sans intérêt pour l'agent (il lit déjà les chiffres avec crm_aggregate)."
+    },
+    "project/stat-chart": {
+      "label": "Graphiques",
+      "sheets": [
+        "statistiques"
+      ],
+      "read_tools": [
+        "crm_aggregate",
+        "team_performance",
+        "compare_periods",
+        "report_create"
+      ],
+      "write_tools": [],
+      "excluded": "Mise en page ou réglage de l'écran : sans intérêt pour l'agent (il lit déjà les chiffres avec crm_aggregate)."
+    },
+    "project/stat-dashboard": {
+      "label": "Tableau de bord statistique",
+      "sheets": [
+        "statistiques"
+      ],
+      "read_tools": [
+        "crm_aggregate",
+        "team_performance",
+        "compare_periods",
+        "report_create"
+      ],
+      "write_tools": [],
+      "excluded": "Mise en page ou réglage de l'écran : sans intérêt pour l'agent (il lit déjà les chiffres avec crm_aggregate)."
+    },
+    "project/metric": {
+      "label": "Mesures",
+      "sheets": [
+        "statistiques"
+      ],
+      "read_tools": [
+        "crm_aggregate",
+        "team_performance",
+        "compare_periods",
+        "report_create"
+      ],
+      "write_tools": [],
+      "excluded": "Mise en page ou réglage de l'écran : sans intérêt pour l'agent (il lit déjà les chiffres avec crm_aggregate)."
+    },
+    "stat-chart": {
+      "label": "Graphiques (global)",
+      "sheets": [
+        "statistiques"
+      ],
+      "read_tools": [
+        "crm_aggregate",
+        "team_performance",
+        "compare_periods",
+        "report_create"
+      ],
+      "write_tools": [],
+      "excluded": "Mise en page ou réglage de l'écran : sans intérêt pour l'agent (il lit déjà les chiffres avec crm_aggregate)."
+    },
+    "project/incoming-communications": {
+      "label": "Communications reçues",
+      "sheets": [
+        "communications-recues"
+      ],
+      "read_tools": [
+        "crm_search",
+        "incoming_communications"
+      ],
+      "write_tools": [
+        "incoming_mark_treated"
+      ],
+      "priority": "haute"
+    },
+    "project/setting": {
+      "label": "Réglages du projet",
+      "sheets": [
+        "parametres",
+        "services-sms-email-telephonie"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : contient des clés et identifiants de services."
+    },
+    "settings": {
+      "label": "Réglages de l'utilisateur",
+      "sheets": [
+        "parametres",
+        "google-pappers-claude"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : clé Claude et comptes de l'utilisateur."
+    },
+    "project/api": {
+      "label": "Pappers (import de propriétaires)",
+      "sheets": [
+        "google-pappers-claude"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Appelle un service payant et crée des prospects en masse : à décider."
+    },
+    "project/google": {
+      "label": "Google Drive du projet",
+      "sheets": [
+        "google-pappers-claude"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Compte externe de l'utilisateur."
+    },
+    "google": {
+      "label": "Comptes Google",
+      "sheets": [
+        "google-pappers-claude",
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Comptes externes et double authentification."
+    },
+    "project/pipedrive": {
+      "label": "Pipedrive",
+      "sheets": [],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Désactivé dans les réglages (décision du propriétaire du produit)."
+    },
+    "project/ocr": {
+      "label": "Scan de cartes de visite",
+      "sheets": [
+        "actions-en-masse"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "priority": "moyenne",
+      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+    },
+    "project/logo": {
+      "label": "Logo du projet",
+      "sheets": [
+        "projets"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Image : pas d'intérêt pour l'agent."
+    },
+    "project": {
+      "label": "Projets",
+      "sheets": [
+        "projets",
+        "tableau-de-bord"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": [],
+      "priority": "moyenne"
+    },
+    "project/assignable-user": {
+      "label": "Utilisateurs affectables",
+      "sheets": [
+        "affectations-utilisateurs-roles"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": []
+    },
+    "default-field": {
+      "label": "Champs par défaut",
+      "sheets": [
+        "configuration-projet"
+      ],
+      "read_tools": [
+        "project_config"
+      ],
+      "write_tools": []
+    },
+    "project/permission": {
+      "label": "Droits de l'utilisateur dans le projet",
+      "sheets": [
+        "droits-permissions"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Lecture de ses propres droits par l'interface."
+    },
+    "permission": {
+      "label": "Droits de l'utilisateur",
+      "sheets": [
+        "droits-permissions"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Lecture de ses propres droits par l'interface."
+    },
+    "dashboard": {
+      "label": "Accueil",
+      "sheets": [
+        "tableau-de-bord"
+      ],
+      "read_tools": [],
+      "write_tools": []
+    },
+    "event": {
+      "label": "Agenda global",
+      "sheets": [
+        "rendez-vous"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": []
+    },
+    "agent": {
+      "label": "Agents IA (plateforme)",
+      "sheets": [
+        "agents-ia"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "C'est la plateforme des agents elle-même."
+    },
+    "agent-avatar": {
+      "label": "Photo d'un agent",
+      "sheets": [
+        "agents-ia"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Image publique : pas d'intérêt pour l'agent."
+    },
+    "user": {
+      "label": "Utilisateurs (global)",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": [],
+      "excluded": "Sensible : comptes et invitations."
+    },
+    "user/ban": {
+      "label": "Bannissement d'appareil",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/lock": {
+      "label": "Blocage d'un utilisateur",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/impersonate": {
+      "label": "Connexion à la place d'un utilisateur",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/invitation": {
+      "label": "Invitation d'un utilisateur",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/session": {
+      "label": "Appareils connectés",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/setting": {
+      "label": "Réglages d'un utilisateur",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Réglage personnel de l'écran : pas d'intérêt pour l'agent."
+    },
+    "user/project": {
+      "label": "Projets d'un utilisateur",
+      "sheets": [
+        "gestion-utilisateurs"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Sensible : sécurité des comptes."
+    },
+    "user/tracker": {
+      "label": "Suivi d'activité",
+      "sheets": [
+        "vehicules-duplication-suivi"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Lecture d'activité des collègues : à décider."
+    },
+    "user/tracker-stat": {
+      "label": "Statistiques d'activité",
+      "sheets": [
+        "vehicules-duplication-suivi"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Lecture d'activité des collègues : à décider."
+    },
+    "user/events-daily-direction": {
+      "label": "Itinéraires d'un utilisateur",
+      "sheets": [
+        "rendez-vous-itineraires-rappels"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Calcul d'itinéraire fait par l'écran : pas d'intérêt pour l'agent."
+    },
+    "auth": {
+      "label": "Authentification",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "login": {
+      "label": "Connexion",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "register": {
+      "label": "Inscription",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "password": {
+      "label": "Mot de passe",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "invitation": {
+      "label": "Acceptation d'invitation",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "login-location": {
+      "label": "Contrôle du lieu de connexion",
+      "sheets": [
+        "connexion-securite"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Authentification : jamais confiée à l'agent."
+    },
+    "voice": {
+      "label": "Webhooks de la voix IA",
+      "sheets": [],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Webhook technique signé, appelé par un fournisseur."
+    },
+    "webservice": {
+      "label": "Services web techniques",
+      "sheets": [],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Technique : à confirmer avec l'équipe."
+    },
+    "server-monitoring": {
+      "label": "Monitoring serveur",
+      "sheets": [
+        "monitoring"
+      ],
+      "read_tools": [],
+      "write_tools": [],
+      "excluded": "Réservé aux super-administrateurs."
+    }
+  }
+}

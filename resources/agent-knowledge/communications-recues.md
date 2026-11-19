@@ -7,7 +7,7 @@ La barre du haut propose une vue des prospects associés aux communications entr
 Ouvrez « Communications reçues » pour afficher le tableau de prospects avec le filtre des communications reçues. Depuis la fiche du prospect, consultez les messages et SMS selon les droits.
 
 ## Règles
-La liste suit la visibilité des prospects et communications accordée au compte. Le compteur est actualisé toutes les 2 minutes (si l’onglet est visible) et dès qu’une communication est marquée comme traitée.
+La liste suit la visibilité des prospects et communications accordée au compte. Le compteur est actualisé toutes les 10 minutes (si l’onglet est visible) et dès qu’une communication est marquée comme traitée.
 
 ## Limites
 Trois types de communications entrantes sont comptés : les SMS reçus, les e-mails reçus (dans un canal de discussion du projet) et les messages vocaux (messagerie d’un appel, détectée à partir de l’issue de l’appel ou d’un lien d’enregistrement vocal). Une communication reste « à traiter » tant que personne ne l’a marquée comme traitée avec « Demande traité » : dès qu’un utilisateur la traite, elle disparaît pour tous les autres (l’historique garde qui l’a traitée). Le badge de l’en-tête et la liste comptent des prospects, pas des messages : un prospect avec trois SMS non traités compte une fois.
@@ -26,6 +26,6 @@ Sources d’interface : `components/layouts/Header.vue`, `components/prospect/ta
 ## Questions fréquentes
 **Où trouver les communications entrantes ?** Sélectionnez « Communications reçues » en haut de la page projet.
 
-**Le compteur est-il instantané ?** Non : il est rafraîchi toutes les 2 minutes et après chaque traitement. Il compte les prospects ayant au moins une communication non traitée, tous types confondus.
+**Le compteur est-il instantané ?** Non : il est rafraîchi toutes les 10 minutes et après chaque traitement. Il compte les prospects ayant au moins une communication non traitée, tous types confondus.
 
 **Comment ouvrir l’échange lié ?** Ouvrez le prospect concerné puis « Message » ou « SMS », selon le type.
