@@ -10,7 +10,7 @@ Ouvrez l’icône engrenage dans la barre du haut. Sélectionnez l’entrée vou
 Certaines entrées ne sont affichées que pour un projet ou selon des droits. Monitoring Serveur est réservé au super-admin.
 
 ## Limites
-Les réglages et intégrations disponibles diffèrent selon l’utilisateur et le projet. Les critères complets sont À vérifier.
+Les entrées toujours affichées sont « Langue » (si la langue est disponible), « Google Authenticator (2 facteurs) », « Google Calendar », « Google Contact », « claude.ai » (clé de l’API Claude, indispensable pour utiliser les agents IA), « Appareils connectés », « Modifier les icones des menus », « Gérer les tutoriels » et « Notifier les RDVs proches ». Les entrées liées à un projet ouvert sont « Gérer mes fichiers », « Pipeline », « Corbeille » et, avec `all.project`, « Paramètre du project {project} », « Liste des utilisateurs » et « Google Drive ». « Monitoring Serveur » est réservé aux super-administrateurs. L’entrée Pipedrive existe dans le code mais elle est désactivée (commentée).
 
 ## Dans l'interface
 Chemin : icône engrenage en haut de page > panneau « Paramètres » (`layouts/setting/Slide.vue`, `layouts/setting/Layout.vue`).
@@ -21,7 +21,7 @@ Chemin : icône engrenage en haut de page > panneau « Paramètres » (`layouts/
 4. « Gérer mes fichiers », « Pipeline », « Appareils connectés », « Corbeille », « Modifier les icones des menus », « Gérer les tutoriels » et « Notifier les RDVs proches » ouvrent leur panneau, page ou réglage associé.
 5. « Monitoring Serveur » apparaît uniquement pour `user.is_super_admin`.
 
-Droits requis : projet + `all.project` pour les entrées projet/utilisateurs; super-admin pour « Monitoring Serveur ». D’autres conditions sont À vérifier. Après action, le panneau concerné s’ouvre ou l’état de connexion est actualisé.
+Droits requis : projet + `all.project` pour les entrées projet/utilisateurs; super-admin pour « Monitoring Serveur ». Les autres entrées ne demandent aucun droit particulier. La ligne « claude.ai » affiche une coche verte quand la clé API enregistrée est valide; sinon un message précise la cause (clé invalide ou expirée, trop de demandes, vérification impossible). Après action, le panneau concerné s’ouvre ou l’état de connexion est actualisé.
 
 Sources d’interface : `components/layouts/Header.vue`, `components/layouts/setting/Slide.vue`, `components/layouts/setting/Layout.vue`, `components/server-monitoring/Dashboard.vue`, `router/index.js`, `lang/fr.json` (`setting.*`).
 
@@ -31,3 +31,6 @@ Sources d’interface : `components/layouts/Header.vue`, `components/layouts/set
 **Pourquoi « Liste des utilisateurs » est-elle absente ?** Elle nécessite un projet et `all.project`.
 
 **Qui voit « Monitoring Serveur » ?** Un utilisateur super-admin uniquement.
+
+## Pour aller plus loin
+Google, Pappers et clé Claude : sujet `google-pappers-claude`. Services d’envoi : sujet `services-sms-email-telephonie`. Utilisateurs : sujet `gestion-utilisateurs`.

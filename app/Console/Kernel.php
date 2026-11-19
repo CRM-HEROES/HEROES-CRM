@@ -58,6 +58,9 @@ class Kernel extends ConsoleKernel
         // Old history, by batches, at night
         $schedule->command('workflows:prune')->dailyAt('3:30')->withoutOverlapping(60)->runInBackground();
 
+        // AI agent calls whose provider never reported an outcome
+        $schedule->command('calls:expire-stale')->everyTenMinutes()->withoutOverlapping(10);
+
         // Google Sheets instant sync: recover rows left behind by a crash / restart
         $schedule->command('sheet-sync:recover')->everyMinute()->withoutOverlapping();
 

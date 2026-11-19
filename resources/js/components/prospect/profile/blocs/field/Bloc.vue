@@ -2,27 +2,6 @@
     <bloc icon="fa fa-user icon-blue" :name="bloc.name">
         <template #body>
             <div style="padding: 10px 15px">
-                <div v-if="showCallControls" class="hc-prospect-call-controls">
-                    <label>
-                        <input
-                            :checked="!!prospect.call_consent"
-                            :disabled="savingCallControls"
-                            type="checkbox"
-                            @change="saveCallControl('call_consent', $event)"
-                        />
-                        <span>{{ $t("prospect.call_controls.consent") }}</span>
-                    </label>
-                    <label>
-                        <input
-                            :checked="!!prospect.do_not_call"
-                            :disabled="savingCallControls"
-                            type="checkbox"
-                            @change="saveCallControl('do_not_call', $event)"
-                        />
-                        <span>{{ $t("prospect.call_controls.do_not_call") }}</span>
-                    </label>
-                    <p v-if="callControlsError" role="alert">{{ callControlsError }}</p>
-                </div>
                 <draggable
                     tag="div"
                     :list="this.bloc.items"
@@ -45,7 +24,7 @@
                         />
                     </template>
                     <template #footer>
-                        <buttons>
+                        <buttons v-if="blocFields.length > 0">
                             <button
                                 v-text="'Valider'"
                                 @click="validate"
@@ -64,7 +43,6 @@
 <script>
 import { mapGetters } from "vuex";
 import store from "@/store";
-import ProspectService from "@/apis/project/prospect";
 
 // Actions
 import { UPDATE_PROSPECT } from "@/actions/project/prospect";
@@ -94,8 +72,6 @@ export default {
         return {
             movable: deviceType() == "desktop",
             updating: false,
-            savingCallControls: false,
-            callControlsError: "",
         };
     },
 
@@ -131,43 +107,6 @@ export default {
                 this.updating = false;
             }
         },
-
-        async saveCallControl(field, event) {
-            if (this.savingCallControls) {
-                return;
-            }
-
-            const value = event.target.checked;
-            const updates = {
-                call_consent: !!this.prospect.call_consent,
-                do_not_call: !!this.prospect.do_not_call,
-            };
-            updates[field] = value;
-            if (updates.do_not_call) {
-                updates.call_consent = false;
-            }
-
-            this.savingCallControls = true;
-            this.callControlsError = "";
-            try {
-                const { data } = await ProspectService.updateCallConsent(
-                    this.project.slug,
-                    this.prospect.id,
-                    updates
-                );
-                store.commit(UPDATE_PROSPECT, { id: this.prospect.id, ...data });
-                event.target.checked = !!data[field];
-            } catch (error) {
-                event.target.checked = !!this.prospect[field];
-                this.callControlsError =
-                    (error.response &&
-                        error.response.data &&
-                        error.response.data.message) ||
-                    this.$t("prospect.call_controls.update_error");
-            } finally {
-                this.savingCallControls = false;
-            }
-        },
     },
 
     computed: {
@@ -177,18 +116,6 @@ export default {
             "prospect",
             "projectUserSettingsProspectProfile",
         ]),
-
-        showCallControls() {
-            for (const column of this.projectUserSettingsProspectProfile || []) {
-                for (const item of column) {
-                    if (item.type === "field") {
-                        return item === this.bloc;
-                    }
-                }
-            }
-
-            return false;
-        },
 
         blocFields() {
             if (!this.bloc.items) {
@@ -208,20 +135,3 @@ export default {
     },
 };
 </script>
-
-<style scoped>
-.hc-prospect-call-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 12px;
-    font-size: 12px;
-}
-
-.hc-prospect-call-controls label {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin: 0;
-}
-</style>

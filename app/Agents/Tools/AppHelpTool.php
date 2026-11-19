@@ -63,6 +63,7 @@ class AppHelpTool implements AgentToolInterface
 
         if (!isset($input['topic'])) {
             $titles = [];
+            $summaries = [];
 
             foreach ($topics as $topic => $file) {
                 $content = $this->readTopic($topic, $file);
@@ -72,9 +73,11 @@ class AppHelpTool implements AgentToolInterface
                 }
 
                 $titles[$topic] = $this->title($content);
+                $summaries[$topic] = $this->summary($content);
             }
 
-            return ToolResult::ok(['topics' => $titles], 'Liste des sujets d’aide', count($titles));
+            // The summaries tell what each sheet covers, to open the right one when the first is not enough
+            return ToolResult::ok(['topics' => $titles, 'summaries' => $summaries], 'Liste des sujets d’aide', count($titles));
         }
 
         $topic = $input['topic'];
@@ -167,6 +170,18 @@ class AppHelpTool implements AgentToolInterface
         }
 
         return 'Titre indisponible';
+    }
+
+    /**
+     * What the sheet is for: the first sentences of its "À quoi ça sert" section, shortened.
+     */
+    protected function summary(string $content): string
+    {
+        if (!preg_match('/^##\s+À quoi ça sert\s*\R(.+?)(?:\R\R|\z)/msu', $content, $matches)) {
+            return '';
+        }
+
+        return mb_substr(trim(preg_replace('/\s+/u', ' ', $matches[1])), 0, 220);
     }
 
     protected function sectionIndex(string $content): string

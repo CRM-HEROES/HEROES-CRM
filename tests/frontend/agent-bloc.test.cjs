@@ -147,13 +147,15 @@ const CATALOG = {
 function form({ editing = null, api = {} } = {}) {
     const commits = [];
     const dispatches = [];
-    const calls = { create: [], update: [], remove: [], get: [], upload: [], removeAvatar: [] };
+    const calls = { create: [], update: [], remove: [], get: [], upload: [], removeAvatar: [], documents: [], uploadDocument: [] };
     const apis = {
         catalog: async () => ({ data: CATALOG }),
         get: async id => { calls.get.push(id); return { data: { id, name: 'Lyra', avatar_url: '/api/agent-avatar/actuelle', persona: 'Posée', instructions: 'Aide-moi', autonomy: 'auto', project: { id: 7, slug: 'alpha', name: 'Alpha' }, all_skills: true } }; },
         create: async body => { calls.create.push(body); return { data: { id: 9, name: body.name } }; },
         uploadAvatar: async (id, file) => { calls.upload.push([id, file]); return { data: { avatar_url: '/api/agent-avatar/x' } }; },
         removeAvatar: async id => { calls.removeAvatar.push(id); return { data: {} }; },
+        documents: async id => { calls.documents.push(id); return { data: [] }; },
+        uploadDocument: async (id, file) => { calls.uploadDocument.push([id, file]); return { data: {} }; },
         update: async (id, body) => { calls.update.push([id, body]); return { data: {} }; },
         remove: async id => { calls.remove.push(id); return { data: {} }; },
         ...api,

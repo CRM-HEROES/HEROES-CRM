@@ -495,6 +495,22 @@ class WorkflowApiTest extends TestCase
 
     public function test_operators_are_listed_without_any_credential_and_filtered_by_capability(): void
     {
+        // The platform e-mail of the .env of the machine is another operator: this test is about the project ones
+        $saved = [$_ENV['BREVO_API_KEY'] ?? null, $_SERVER['BREVO_API_KEY'] ?? null, getenv('BREVO_API_KEY')];
+        unset($_ENV['BREVO_API_KEY'], $_SERVER['BREVO_API_KEY']);
+        putenv('BREVO_API_KEY');
+        $this->beforeApplicationDestroyed(function () use ($saved) {
+            if ($saved[0] !== null) {
+                $_ENV['BREVO_API_KEY'] = $saved[0];
+            }
+            if ($saved[1] !== null) {
+                $_SERVER['BREVO_API_KEY'] = $saved[1];
+            }
+            if ($saved[2] !== false) {
+                putenv('BREVO_API_KEY=' . $saved[2]);
+            }
+        });
+
         $registry = app(\App\Workflows\Providers\ProviderRegistry::class);
 
         $all = $this->controller->providers($this->request([], 'GET'), $this->project, $registry);

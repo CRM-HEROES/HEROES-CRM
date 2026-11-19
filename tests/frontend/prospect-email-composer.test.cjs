@@ -45,6 +45,8 @@ function composer(handler = async () => ({}), overrides = {}) {
     };
     Object.assign(vm, component.data.call(vm), { project: { slug: 'test' }, messageTemplates: [] });
     Object.defineProperty(vm, 'canSend', { get: () => component.computed.canSend.call(vm) });
+    // What Vue does when the component is created: the layout of the e-mail starts from the draft
+    component.created.call(vm);
     return { vm, calls, commits, component };
 }
 
