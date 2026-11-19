@@ -172,7 +172,9 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
       // The picture: the file chosen (sent when saving), the address shown, and a removal asked
       photo: null,
       photoPreview: null,
-      photoRemoved: false
+      photoRemoved: false,
+      documents: [],
+      pendingDocuments: []
     };
   },
   computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project", "agentEditing"])), {}, {
@@ -259,37 +261,78 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
       // Only an existing picture has to be removed on the server
       this.photoRemoved = !!((_this$agentEditing2 = this.agentEditing) !== null && _this$agentEditing2 !== void 0 && _this$agentEditing2.avatar_url);
     },
-    releasePreview: function releasePreview() {
-      if (this.photo && this.photoPreview) URL.revokeObjectURL(this.photoPreview);
+    pickDocuments: function pickDocuments(event) {
+      var files = Array.from(event.target.files || []);
+      event.target.value = "";
+      for (var _i2 = 0, _files = files; _i2 < _files.length; _i2++) {
+        var file = _files[_i2];
+        var extension = file.name.split(".").pop().toLowerCase();
+        if (!["pdf", "txt", "md"].includes(extension) || file.size > 10 * 1024 * 1024) {
+          this.error = this.$t("agent.documents.invalid_file");
+          continue;
+        }
+        this.pendingDocuments.push(file);
+      }
     },
-    // Send the picture chosen, or remove the one that was taken off
-    savePhoto: function savePhoto(id) {
+    uploadDocuments: function uploadDocuments(id) {
       var _this = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
         return _regeneratorRuntime().wrap(function _callee$(_context) {
           while (1) switch (_context.prev = _context.next) {
             case 0:
-              if (!_this.photo) {
-                _context.next = 5;
+              if (!_this.pendingDocuments.length) {
+                _context.next = 6;
                 break;
               }
               _context.next = 3;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadAvatar(id, _this.photo);
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadDocument(id, _this.pendingDocuments[0]);
             case 3:
-              _context.next = 8;
+              _this.pendingDocuments.shift();
+              _context.next = 0;
               break;
-            case 5:
-              if (!_this.photoRemoved) {
-                _context.next = 8;
-                break;
-              }
+            case 6:
               _context.next = 8;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].removeAvatar(id);
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].documents(id);
             case 8:
+              _this.documents = _context.sent.data;
+            case 9:
             case "end":
               return _context.stop();
           }
         }, _callee);
+      }))();
+    },
+    releasePreview: function releasePreview() {
+      if (this.photo && this.photoPreview) URL.revokeObjectURL(this.photoPreview);
+    },
+    // Send the picture chosen, or remove the one that was taken off
+    savePhoto: function savePhoto(id) {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              if (!_this2.photo) {
+                _context2.next = 5;
+                break;
+              }
+              _context2.next = 3;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].uploadAvatar(id, _this2.photo);
+            case 3:
+              _context2.next = 8;
+              break;
+            case 5:
+              if (!_this2.photoRemoved) {
+                _context2.next = 8;
+                break;
+              }
+              _context2.next = 8;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].removeAvatar(id);
+            case 8:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2);
       }))();
     },
     // Steps
@@ -312,180 +355,197 @@ var FIELDS = ["name", "specialty", "description", "persona", "instructions", "ob
     },
     // Load
     load: function load() {
-      var _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var _yield$AgentService$g, data;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
+        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
+          while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              _this2.error = "";
-              _this2.step = 0;
-              _this2.loading = true;
-              _this2.form = _this2.blank();
-              _this2.releasePreview();
-              _this2.photo = null;
-              _this2.photoPreview = null;
-              _this2.photoRemoved = false;
-              _context2.prev = 8;
-              if (_this2.catalog.autonomies) {
-                _context2.next = 13;
+              _this3.error = "";
+              _this3.step = 0;
+              _this3.loading = true;
+              _this3.form = _this3.blank();
+              _this3.releasePreview();
+              _this3.photo = null;
+              _this3.photoPreview = null;
+              _this3.photoRemoved = false;
+              _this3.documents = [];
+              _this3.pendingDocuments = [];
+              _context3.prev = 10;
+              if (_this3.catalog.autonomies) {
+                _context3.next = 15;
                 break;
               }
-              _context2.next = 12;
+              _context3.next = 14;
               return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].catalog();
-            case 12:
-              _this2.catalog = _context2.sent.data;
-            case 13:
-              if (!_this2.agentEditing) {
-                _context2.next = 20;
+            case 14:
+              _this3.catalog = _context3.sent.data;
+            case 15:
+              if (!_this3.agentEditing) {
+                _context3.next = 25;
                 break;
               }
-              _context2.next = 16;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this2.agentEditing.id);
-            case 16:
-              _yield$AgentService$g = _context2.sent;
+              _context3.next = 18;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].get(_this3.agentEditing.id);
+            case 18:
+              _yield$AgentService$g = _context3.sent;
               data = _yield$AgentService$g.data;
-              _this2.form = _objectSpread(_objectSpread({}, _this2.form), Object.fromEntries(FIELDS.map(function (key) {
-                var _data$key;
-                return [key, (_data$key = data[key]) !== null && _data$key !== void 0 ? _data$key : _this2.form[key]];
-              })));
-              _this2.photoPreview = data.avatar_url || null;
-            case 20:
-              _context2.next = 25;
-              break;
+              _context3.next = 22;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].documents(_this3.agentEditing.id);
             case 22:
-              _context2.prev = 22;
-              _context2.t0 = _context2["catch"](8);
-              _this2.error = _this2.message(_context2.t0);
+              _this3.documents = _context3.sent.data;
+              _this3.form = _objectSpread(_objectSpread({}, _this3.form), Object.fromEntries(FIELDS.map(function (key) {
+                var _data$key;
+                return [key, (_data$key = data[key]) !== null && _data$key !== void 0 ? _data$key : _this3.form[key]];
+              })));
+              _this3.photoPreview = data.avatar_url || null;
             case 25:
-              _context2.prev = 25;
-              _this2.loading = false;
-              return _context2.finish(25);
-            case 28:
+              _context3.next = 30;
+              break;
+            case 27:
+              _context3.prev = 27;
+              _context3.t0 = _context3["catch"](10);
+              _this3.error = _this3.message(_context3.t0);
+            case 30:
+              _context3.prev = 30;
+              _this3.loading = false;
+              return _context3.finish(30);
+            case 33:
             case "end":
-              return _context2.stop();
+              return _context3.stop();
           }
-        }, _callee2, null, [[8, 22, 25, 28]]);
+        }, _callee3, null, [[10, 27, 30, 33]]);
       }))();
     },
     // Save
     save: function save() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var body, saved;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
-            case 0:
-              if (!(!_this3.canSave || !_this3.last)) {
-                _context3.next = 2;
-                break;
-              }
-              return _context3.abrupt("return");
-            case 2:
-              _this3.error = "";
-              _this3.saving = true;
-              body = Object.fromEntries(FIELDS.map(function (key) {
-                return [key, _this3.form[key]];
-              }));
-              saved = _this3.agentEditing;
-              _context3.prev = 6;
-              if (!_this3.agentEditing) {
-                _context3.next = 12;
-                break;
-              }
-              _context3.next = 10;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].update(_this3.agentEditing.id, body);
-            case 10:
-              _context3.next = 15;
-              break;
-            case 12:
-              _context3.next = 14;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].create(_objectSpread(_objectSpread({}, body), {}, {
-                project: _this3.project.slug
-              }));
-            case 14:
-              saved = _context3.sent.data;
-            case 15:
-              _context3.prev = 15;
-              _context3.next = 18;
-              return _this3.savePhoto(saved.id);
-            case 18:
-              _context3.next = 27;
-              break;
-            case 20:
-              _context3.prev = 20;
-              _context3.t0 = _context3["catch"](15);
-              if (_this3.agentEditing) {
-                _context3.next = 26;
-                break;
-              }
-              // The agent exists, only its picture failed: from now on this window
-              // edits it, so a retry updates it and never creates a second one
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
-              _context3.next = 26;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
-            case 26:
-              throw _context3.t0;
-            case 27:
-              _context3.next = 29;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
-            case 29:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
-              _context3.next = 35;
-              break;
-            case 32:
-              _context3.prev = 32;
-              _context3.t1 = _context3["catch"](6);
-              _this3.error = _this3.message(_context3.t1);
-            case 35:
-              _context3.prev = 35;
-              _this3.saving = false;
-              return _context3.finish(35);
-            case 38:
-            case "end":
-              return _context3.stop();
-          }
-        }, _callee3, null, [[6, 32, 35, 38], [15, 20]]);
-      }))();
-    },
-    remove: function remove() {
       var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var body, saved, _saved;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              if (confirm(_this4.$t("agent.confirm_delete", {
-                name: _this4.form.name
-              }))) {
+              if (!(!_this4.canSave || !_this4.last)) {
                 _context4.next = 2;
                 break;
               }
               return _context4.abrupt("return");
             case 2:
+              _this4.error = "";
               _this4.saving = true;
-              _context4.prev = 3;
-              _context4.next = 6;
-              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].remove(_this4.agentEditing.id);
-            case 6:
-              _context4.next = 8;
-              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
-            case 8:
-              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
-              _context4.next = 14;
+              body = Object.fromEntries(FIELDS.map(function (key) {
+                return [key, _this4.form[key]];
+              }));
+              saved = _this4.agentEditing;
+              _context4.prev = 6;
+              if (!_this4.agentEditing) {
+                _context4.next = 12;
+                break;
+              }
+              _context4.next = 10;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].update(_this4.agentEditing.id, body);
+            case 10:
+              _context4.next = 15;
               break;
-            case 11:
-              _context4.prev = 11;
-              _context4.t0 = _context4["catch"](3);
-              _this4.error = _this4.message(_context4.t0);
+            case 12:
+              _context4.next = 14;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].create(_objectSpread(_objectSpread({}, body), {}, {
+                project: _this4.project.slug
+              }));
             case 14:
-              _context4.prev = 14;
+              saved = _context4.sent.data;
+            case 15:
+              _context4.prev = 15;
+              _context4.next = 18;
+              return _this4.savePhoto(saved.id);
+            case 18:
+              _context4.next = 20;
+              return _this4.uploadDocuments(saved.id);
+            case 20:
+              _context4.next = 29;
+              break;
+            case 22:
+              _context4.prev = 22;
+              _context4.t0 = _context4["catch"](15);
+              if (_this4.agentEditing) {
+                _context4.next = 28;
+                break;
+              }
+              // The agent exists, only its picture failed: from now on this window
+              // edits it, so a retry updates it and never creates a second one
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
+              _context4.next = 28;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
+            case 28:
+              throw _context4.t0;
+            case 29:
+              _context4.next = 31;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
+            case 31:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
+              _context4.next = 41;
+              break;
+            case 34:
+              _context4.prev = 34;
+              _context4.t1 = _context4["catch"](6);
+              if (!(!_this4.agentEditing && (_saved = saved) !== null && _saved !== void 0 && _saved.id)) {
+                _context4.next = 40;
+                break;
+              }
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit("SET_AGENT_EDITING", saved);
+              _context4.next = 40;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS")["catch"](function () {});
+            case 40:
+              _this4.error = _this4.message(_context4.t1);
+            case 41:
+              _context4.prev = 41;
               _this4.saving = false;
-              return _context4.finish(14);
-            case 17:
+              return _context4.finish(41);
+            case 44:
             case "end":
               return _context4.stop();
           }
-        }, _callee4, null, [[3, 11, 14, 17]]);
+        }, _callee4, null, [[6, 34, 41, 44], [15, 22]]);
+      }))();
+    },
+    remove: function remove() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (confirm(_this5.$t("agent.confirm_delete", {
+                name: _this5.form.name
+              }))) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return");
+            case 2:
+              _this5.saving = true;
+              _context5.prev = 3;
+              _context5.next = 6;
+              return _apis_agent__WEBPACK_IMPORTED_MODULE_1__["default"].remove(_this5.agentEditing.id);
+            case 6:
+              _context5.next = 8;
+              return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch("FETCH_AGENTS");
+            case 8:
+              _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_3__.CLOSE_MODAL);
+              _context5.next = 14;
+              break;
+            case 11:
+              _context5.prev = 11;
+              _context5.t0 = _context5["catch"](3);
+              _this5.error = _this5.message(_context5.t0);
+            case 14:
+              _context5.prev = 14;
+              _this5.saving = false;
+              return _context5.finish(14);
+            case 17:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5, null, [[3, 11, 14, 17]]);
       }))();
     }
   }
@@ -10859,7 +10919,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     _utils_event_bus__WEBPACK_IMPORTED_MODULE_2__["default"].on(_utils_incoming_communications__WEBPACK_IMPORTED_MODULE_3__.COMMUNICATIONS_READ, this.onCommunicationsRead);
     this.incomingCommunicationsInterval = setInterval(function () {
       if (!document.hidden) _this.fetchIncomingCommunicationsCount();
-    }, 120000);
+    }, 600000);
   },
   beforeUnmount: function beforeUnmount() {
     clearInterval(this.incomingCommunicationsInterval);
@@ -14818,20 +14878,28 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _apis_project_line__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/apis/project/line */ "./resources/js/apis/project/line.js");
 /* harmony import */ var _KavkomDiagnostic_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./KavkomDiagnostic.vue */ "./resources/js/components/line/KavkomDiagnostic.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
-function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+var _components$props$dat;
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 
 
 
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (_components$props$dat = {
   components: {
     KavkomDiagnostic: _KavkomDiagnostic_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
@@ -14851,6 +14919,14 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       "default": function _default() {
         return [];
       }
+    },
+    projectSlug: {
+      type: String,
+      "default": ""
+    },
+    userId: {
+      type: [Number, String],
+      "default": null
     }
   },
   data: function data() {
@@ -14864,16 +14940,152 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       cloudtalkAgentsRequestId: 0,
       autoFilledCloudtalkSmsNumber: "",
       confirmedCloudtalkSmsAgentId: "",
-      editingFields: {}
+      editingFields: {},
+      projects: [],
+      sourceProjects: [],
+      projectConfigMessage: "",
+      loadingProjectConfig: false
     };
   },
   mounted: function mounted() {
     this.fetchInitialCloudtalkAgents();
+    this.fetchAssignedProjects();
+  },
+  watch: {
+    userId: function userId() {
+      this.fetchAssignedProjects();
+    }
   },
   beforeUnmount: function beforeUnmount() {
     this.cloudtalkAgentsRequestId += 1;
   },
   methods: {
+    toggleSourceProject: function toggleSourceProject(projectSlug, checked) {
+      this.sourceProjects = checked ? [].concat(_toConsumableArray(this.sourceProjects), [projectSlug]) : this.sourceProjects.filter(function (slug) {
+        return slug !== projectSlug;
+      });
+      this.loadProjectConfig();
+    },
+    fetchAssignedProjects: function fetchAssignedProjects() {
+      var _this = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
+        var _yield$lineService$av, data;
+        return _regeneratorRuntime().wrap(function _callee$(_context) {
+          while (1) switch (_context.prev = _context.next) {
+            case 0:
+              _this.projects = [];
+              _this.sourceProjects = [];
+              _this.projectConfigMessage = "";
+              if (!(!_this.userId || !_this.projectSlug)) {
+                _context.next = 5;
+                break;
+              }
+              return _context.abrupt("return");
+            case 5:
+              _context.prev = 5;
+              _context.next = 8;
+              return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].availableProjects(_this.projectSlug, _this.userId);
+            case 8:
+              _yield$lineService$av = _context.sent;
+              data = _yield$lineService$av.data;
+              _this.projects = data.filter(function (project) {
+                return project.slug !== _this.projectSlug;
+              });
+              _context.next = 16;
+              break;
+            case 13:
+              _context.prev = 13;
+              _context.t0 = _context["catch"](5);
+              _this.projectConfigMessage = "Impossible de charger les projets affectés à cet utilisateur.";
+            case 16:
+            case "end":
+              return _context.stop();
+          }
+        }, _callee, null, [[5, 13]]);
+      }))();
+    },
+    loadProjectConfig: function loadProjectConfig() {
+      var _this2 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var loadedCount, _iterator, _step, _fullLine$config, projectSlug, _yield$lineService$ge, lines, source, _yield$lineService$sh, fullLine, reusable;
+        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
+          while (1) switch (_context2.prev = _context2.next) {
+            case 0:
+              _this2.projectConfigMessage = "";
+              if (_this2.sourceProjects.length) {
+                _context2.next = 3;
+                break;
+              }
+              return _context2.abrupt("return");
+            case 3:
+              _this2.loadingProjectConfig = true;
+              _context2.prev = 4;
+              loadedCount = 0;
+              _iterator = _createForOfIteratorHelper(_this2.sourceProjects);
+              _context2.prev = 7;
+              _iterator.s();
+            case 9:
+              if ((_step = _iterator.n()).done) {
+                _context2.next = 28;
+                break;
+              }
+              projectSlug = _step.value;
+              _context2.next = 13;
+              return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].get(projectSlug);
+            case 13:
+              _yield$lineService$ge = _context2.sent;
+              lines = _yield$lineService$ge.data;
+              source = lines.find(function (line) {
+                return line.operator === _this2.operator && line.user_id == _this2.userId;
+              });
+              if (source) {
+                _context2.next = 18;
+                break;
+              }
+              return _context2.abrupt("continue", 26);
+            case 18:
+              _context2.next = 20;
+              return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].show(projectSlug, source.id);
+            case 20:
+              _yield$lineService$sh = _context2.sent;
+              fullLine = _yield$lineService$sh.data;
+              reusable = _objectSpread({}, (_fullLine$config = fullLine.config) !== null && _fullLine$config !== void 0 ? _fullLine$config : {});
+              delete reusable.agent_id;
+              Object.assign(_this2.config, reusable);
+              loadedCount += 1;
+            case 26:
+              _context2.next = 9;
+              break;
+            case 28:
+              _context2.next = 33;
+              break;
+            case 30:
+              _context2.prev = 30;
+              _context2.t0 = _context2["catch"](7);
+              _iterator.e(_context2.t0);
+            case 33:
+              _context2.prev = 33;
+              _iterator.f();
+              return _context2.finish(33);
+            case 36:
+              _this2.projectConfigMessage = loadedCount ? "Configuration charg\xE9e depuis ".concat(loadedCount, " projet(s). En cas de doublon, le dernier projet s\xE9lectionn\xE9 est prioritaire.") : "Aucune configuration trouvée pour cet utilisateur dans les projets sélectionnés.";
+              _context2.next = 42;
+              break;
+            case 39:
+              _context2.prev = 39;
+              _context2.t1 = _context2["catch"](4);
+              _this2.projectConfigMessage = "Impossible de charger la configuration de ce projet.";
+            case 42:
+              _context2.prev = 42;
+              _this2.loadingProjectConfig = false;
+              return _context2.finish(42);
+            case 45:
+            case "end":
+              return _context2.stop();
+          }
+        }, _callee2, null, [[4, 39, 42, 45], [7, 30, 33, 36]]);
+      }))();
+    },
     confirmCloudtalkSmsNumber: function confirmCloudtalkSmsNumber(checked) {
       if (!checked) {
         this.clearCloudtalkSmsConfirmation();
@@ -14928,164 +15140,164 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.editingFields = _objectSpread(_objectSpread({}, this.editingFields), {}, _defineProperty({}, field.key, true));
     },
     fetchInitialCloudtalkAgents: function fetchInitialCloudtalkAgents() {
-      var _this = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
-        return _regeneratorRuntime().wrap(function _callee$(_context) {
-          while (1) switch (_context.prev = _context.next) {
-            case 0:
-              if (!(_this.operator !== "cloudtalk" || !_this.cloudtalkCredentialsReady)) {
-                _context.next = 2;
-                break;
-              }
-              return _context.abrupt("return");
-            case 2:
-              _context.next = 4;
-              return _this.fetchCloudtalkAgents(false);
-            case 4:
-            case "end":
-              return _context.stop();
-          }
-        }, _callee);
-      }))();
-    },
-    fetchCloudtalkAgents: function fetchCloudtalkAgents() {
-      var _arguments = arguments,
-        _this2 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
-        var showSuccessMessage, requestId, credentialsKey, isCurrentRequest, _yield$lineService$ge, data, _error$response;
-        return _regeneratorRuntime().wrap(function _callee2$(_context2) {
-          while (1) switch (_context2.prev = _context2.next) {
-            case 0:
-              showSuccessMessage = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : true;
-              if (!(_this2.operator !== "cloudtalk")) {
-                _context2.next = 3;
-                break;
-              }
-              return _context2.abrupt("return", false);
-            case 3:
-              if (_this2.cloudtalkCredentialsReady) {
-                _context2.next = 6;
-                break;
-              }
-              _this2.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
-              return _context2.abrupt("return", false);
-            case 6:
-              requestId = ++_this2.cloudtalkAgentsRequestId;
-              credentialsKey = _this2.currentCloudtalkCredentialsKey;
-              isCurrentRequest = function isCurrentRequest() {
-                return requestId === _this2.cloudtalkAgentsRequestId && _this2.operator === "cloudtalk" && credentialsKey === _this2.currentCloudtalkCredentialsKey;
-              };
-              _this2.fetchingCloudtalkAgents = true;
-              _this2.cloudtalkMessage = "";
-              _this2.cloudtalkMessageType = "";
-              _context2.prev = 12;
-              _context2.next = 15;
-              return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].getCloudtalkAgents(_this2.project.slug, {
-                api_key_id: _this2.config.api_key_id,
-                api_key_secret: _this2.config.api_key_secret
-              });
-            case 15:
-              _yield$lineService$ge = _context2.sent;
-              data = _yield$lineService$ge.data;
-              if (isCurrentRequest()) {
-                _context2.next = 19;
-                break;
-              }
-              return _context2.abrupt("return", false);
-            case 19:
-              _this2.cloudtalkAgents = data.agents || [];
-              _this2.cloudtalkCredentialsVerified = true;
-              _this2.cloudtalkCredentialsKey = credentialsKey;
-              if (_this2.config.agent_id && !_this2.cloudtalkAgents.some(function (agent) {
-                return agent.id == _this2.config.agent_id;
-              })) {
-                _this2.clearCloudtalkSmsConfirmation();
-                _this2.config.agent_id = "";
-              }
-              if (_this2.autoFilledCloudtalkSmsNumber && _this2.autoFilledCloudtalkSmsNumber !== _this2.cloudtalkAgentSmsNumber) {
-                _this2.clearCloudtalkSmsConfirmation();
-              }
-              if (showSuccessMessage) {
-                _this2.cloudtalkMessage = _this2.cloudtalkAgents.length ? _this2.cloudtalkAgents.length + " agent(s) chargé(s)." : "Identifiants valides, mais aucun agent CloudTalk trouvé.";
-                _this2.cloudtalkMessageType = "success";
-              }
-              return _context2.abrupt("return", true);
-            case 28:
-              _context2.prev = 28;
-              _context2.t0 = _context2["catch"](12);
-              if (isCurrentRequest()) {
-                _context2.next = 32;
-                break;
-              }
-              return _context2.abrupt("return", false);
-            case 32:
-              _this2.cloudtalkAgents = [];
-              _this2.clearCloudtalkSmsConfirmation();
-              _this2.config.agent_id = "";
-              _this2.cloudtalkCredentialsVerified = false;
-              _this2.cloudtalkCredentialsKey = null;
-              _this2.setCloudtalkError(((_error$response = _context2.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Impossible de vérifier les identifiants CloudTalk.");
-              return _context2.abrupt("return", false);
-            case 39:
-              _context2.prev = 39;
-              if (requestId === _this2.cloudtalkAgentsRequestId) {
-                _this2.fetchingCloudtalkAgents = false;
-              }
-              return _context2.finish(39);
-            case 42:
-            case "end":
-              return _context2.stop();
-          }
-        }, _callee2, null, [[12, 28, 39, 42]]);
-      }))();
-    },
-    validate: function validate() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var loaded;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
-              if (!(_this3.operator !== "cloudtalk")) {
+              if (!(_this3.operator !== "cloudtalk" || !_this3.cloudtalkCredentialsReady)) {
                 _context3.next = 2;
                 break;
               }
-              return _context3.abrupt("return", true);
+              return _context3.abrupt("return");
             case 2:
-              if (_this3.cloudtalkCredentialsReady) {
-                _context3.next = 5;
-                break;
-              }
-              _this3.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
-              return _context3.abrupt("return", false);
-            case 5:
-              if (!(!_this3.cloudtalkCredentialsVerified || _this3.cloudtalkCredentialsKey !== _this3.currentCloudtalkCredentialsKey)) {
-                _context3.next = 11;
-                break;
-              }
-              _context3.next = 8;
+              _context3.next = 4;
               return _this3.fetchCloudtalkAgents(false);
-            case 8:
-              loaded = _context3.sent;
-              if (loaded) {
-                _context3.next = 11;
-                break;
-              }
-              return _context3.abrupt("return", false);
-            case 11:
-              if (_this3.config.agent_id) {
-                _context3.next = 14;
-                break;
-              }
-              _this3.setCloudtalkError("Veuillez sélectionner un agent CloudTalk.");
-              return _context3.abrupt("return", false);
-            case 14:
-              return _context3.abrupt("return", true);
-            case 15:
+            case 4:
             case "end":
               return _context3.stop();
           }
         }, _callee3);
+      }))();
+    },
+    fetchCloudtalkAgents: function fetchCloudtalkAgents() {
+      var _arguments = arguments,
+        _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var showSuccessMessage, requestId, credentialsKey, isCurrentRequest, _yield$lineService$ge2, data, _error$response;
+        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              showSuccessMessage = _arguments.length > 0 && _arguments[0] !== undefined ? _arguments[0] : true;
+              if (!(_this4.operator !== "cloudtalk")) {
+                _context4.next = 3;
+                break;
+              }
+              return _context4.abrupt("return", false);
+            case 3:
+              if (_this4.cloudtalkCredentialsReady) {
+                _context4.next = 6;
+                break;
+              }
+              _this4.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
+              return _context4.abrupt("return", false);
+            case 6:
+              requestId = ++_this4.cloudtalkAgentsRequestId;
+              credentialsKey = _this4.currentCloudtalkCredentialsKey;
+              isCurrentRequest = function isCurrentRequest() {
+                return requestId === _this4.cloudtalkAgentsRequestId && _this4.operator === "cloudtalk" && credentialsKey === _this4.currentCloudtalkCredentialsKey;
+              };
+              _this4.fetchingCloudtalkAgents = true;
+              _this4.cloudtalkMessage = "";
+              _this4.cloudtalkMessageType = "";
+              _context4.prev = 12;
+              _context4.next = 15;
+              return _apis_project_line__WEBPACK_IMPORTED_MODULE_2__["default"].getCloudtalkAgents(_this4.project.slug, {
+                api_key_id: _this4.config.api_key_id,
+                api_key_secret: _this4.config.api_key_secret
+              });
+            case 15:
+              _yield$lineService$ge2 = _context4.sent;
+              data = _yield$lineService$ge2.data;
+              if (isCurrentRequest()) {
+                _context4.next = 19;
+                break;
+              }
+              return _context4.abrupt("return", false);
+            case 19:
+              _this4.cloudtalkAgents = data.agents || [];
+              _this4.cloudtalkCredentialsVerified = true;
+              _this4.cloudtalkCredentialsKey = credentialsKey;
+              if (_this4.config.agent_id && !_this4.cloudtalkAgents.some(function (agent) {
+                return agent.id == _this4.config.agent_id;
+              })) {
+                _this4.clearCloudtalkSmsConfirmation();
+                _this4.config.agent_id = "";
+              }
+              if (_this4.autoFilledCloudtalkSmsNumber && _this4.autoFilledCloudtalkSmsNumber !== _this4.cloudtalkAgentSmsNumber) {
+                _this4.clearCloudtalkSmsConfirmation();
+              }
+              if (showSuccessMessage) {
+                _this4.cloudtalkMessage = _this4.cloudtalkAgents.length ? _this4.cloudtalkAgents.length + " agent(s) chargé(s)." : "Identifiants valides, mais aucun agent CloudTalk trouvé.";
+                _this4.cloudtalkMessageType = "success";
+              }
+              return _context4.abrupt("return", true);
+            case 28:
+              _context4.prev = 28;
+              _context4.t0 = _context4["catch"](12);
+              if (isCurrentRequest()) {
+                _context4.next = 32;
+                break;
+              }
+              return _context4.abrupt("return", false);
+            case 32:
+              _this4.cloudtalkAgents = [];
+              _this4.clearCloudtalkSmsConfirmation();
+              _this4.config.agent_id = "";
+              _this4.cloudtalkCredentialsVerified = false;
+              _this4.cloudtalkCredentialsKey = null;
+              _this4.setCloudtalkError(((_error$response = _context4.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.message) || "Impossible de vérifier les identifiants CloudTalk.");
+              return _context4.abrupt("return", false);
+            case 39:
+              _context4.prev = 39;
+              if (requestId === _this4.cloudtalkAgentsRequestId) {
+                _this4.fetchingCloudtalkAgents = false;
+              }
+              return _context4.finish(39);
+            case 42:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee4, null, [[12, 28, 39, 42]]);
+      }))();
+    },
+    validate: function validate() {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var loaded;
+        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              if (!(_this5.operator !== "cloudtalk")) {
+                _context5.next = 2;
+                break;
+              }
+              return _context5.abrupt("return", true);
+            case 2:
+              if (_this5.cloudtalkCredentialsReady) {
+                _context5.next = 5;
+                break;
+              }
+              _this5.setCloudtalkError("Veuillez saisir l'identifiant et le secret de la clé API.");
+              return _context5.abrupt("return", false);
+            case 5:
+              if (!(!_this5.cloudtalkCredentialsVerified || _this5.cloudtalkCredentialsKey !== _this5.currentCloudtalkCredentialsKey)) {
+                _context5.next = 11;
+                break;
+              }
+              _context5.next = 8;
+              return _this5.fetchCloudtalkAgents(false);
+            case 8:
+              loaded = _context5.sent;
+              if (loaded) {
+                _context5.next = 11;
+                break;
+              }
+              return _context5.abrupt("return", false);
+            case 11:
+              if (_this5.config.agent_id) {
+                _context5.next = 14;
+                break;
+              }
+              _this5.setCloudtalkError("Veuillez sélectionner un agent CloudTalk.");
+              return _context5.abrupt("return", false);
+            case 14:
+              return _context5.abrupt("return", true);
+            case 15:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee5);
       }))();
     },
     resetCloudtalkAgents: function resetCloudtalkAgents() {
@@ -15108,67 +15320,68 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     },
     openCloudtalkWebhookModal: function openCloudtalkWebhookModal() {
       _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "setting-cloudtalk");
+    },
+    openCloudtalkApiHelp: function openCloudtalkApiHelp() {
+      _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_1__.OPEN_MODAL, "cloudtalk-api-help");
+    }
+  }
+}, _defineProperty(_components$props$dat, "watch", {
+  operator: function operator() {
+    this.clearCloudtalkSmsConfirmation(false);
+    this.editingFields = {};
+    this.resetCloudtalkAgents();
+    this.fetchInitialCloudtalkAgents();
+  },
+  config: function config() {
+    this.editingFields = {};
+    this.resetCloudtalkAgents(false);
+    this.fetchInitialCloudtalkAgents();
+  },
+  "config.agent_id": function configAgent_id(value, oldValue) {
+    if (value !== oldValue) {
+      this.clearCloudtalkSmsConfirmation();
     }
   },
-  watch: {
-    operator: function operator() {
+  "config.numero": function configNumero(value) {
+    if (this.autoFilledCloudtalkSmsNumber && value !== this.autoFilledCloudtalkSmsNumber) {
       this.clearCloudtalkSmsConfirmation(false);
-      this.editingFields = {};
-      this.resetCloudtalkAgents();
-      this.fetchInitialCloudtalkAgents();
-    },
-    config: function config() {
-      this.editingFields = {};
-      this.resetCloudtalkAgents(false);
-      this.fetchInitialCloudtalkAgents();
-    },
-    "config.agent_id": function configAgent_id(value, oldValue) {
-      if (value !== oldValue) {
-        this.clearCloudtalkSmsConfirmation();
-      }
-    },
-    "config.numero": function configNumero(value) {
-      if (this.autoFilledCloudtalkSmsNumber && value !== this.autoFilledCloudtalkSmsNumber) {
-        this.clearCloudtalkSmsConfirmation(false);
-      }
-    },
-    "config.api_key_id": function configApi_key_id(value, oldValue) {
-      if (value !== oldValue && oldValue !== undefined) {
-        this.resetCloudtalkAgents();
-      }
-    },
-    "config.api_key_secret": function configApi_key_secret(value, oldValue) {
-      if (value !== oldValue && oldValue !== undefined) {
-        this.resetCloudtalkAgents();
-      }
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project"])), {}, {
-    selectedCloudtalkAgent: function selectedCloudtalkAgent() {
-      var _this4 = this;
-      if (this.operator !== "cloudtalk" || !this.cloudtalkCredentialsVerified || this.cloudtalkCredentialsKey !== this.currentCloudtalkCredentialsKey) {
-        return null;
-      }
-      return this.cloudtalkAgents.find(function (agent) {
-        return String(agent.id) === String(_this4.config.agent_id);
-      }) || null;
-    },
-    cloudtalkAgentSmsNumber: function cloudtalkAgentSmsNumber() {
-      var _this$selectedCloudta;
-      var number = (_this$selectedCloudta = this.selectedCloudtalkAgent) === null || _this$selectedCloudta === void 0 ? void 0 : _this$selectedCloudta.default_number;
-      return typeof number === "string" && /^\+[1-9]\d{1,14}$/.test(number) ? number : "";
-    },
-    cloudtalkSmsConfirmed: function cloudtalkSmsConfirmed() {
-      return !!this.cloudtalkAgentSmsNumber && this.autoFilledCloudtalkSmsNumber === this.cloudtalkAgentSmsNumber && this.confirmedCloudtalkSmsAgentId === String(this.config.agent_id) && this.config.numero === this.cloudtalkAgentSmsNumber;
-    },
-    cloudtalkCredentialsReady: function cloudtalkCredentialsReady() {
-      return !!this.config.api_key_id && !!this.config.api_key_secret;
-    },
-    currentCloudtalkCredentialsKey: function currentCloudtalkCredentialsKey() {
-      return [this.config.api_key_id || "", this.config.api_key_secret || ""].join(":");
+  "config.api_key_id": function configApi_key_id(value, oldValue) {
+    if (value !== oldValue && oldValue !== undefined) {
+      this.resetCloudtalkAgents();
     }
-  })
-});
+  },
+  "config.api_key_secret": function configApi_key_secret(value, oldValue) {
+    if (value !== oldValue && oldValue !== undefined) {
+      this.resetCloudtalkAgents();
+    }
+  }
+}), _defineProperty(_components$props$dat, "computed", _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_4__.mapGetters)(["project"])), {}, {
+  selectedCloudtalkAgent: function selectedCloudtalkAgent() {
+    var _this6 = this;
+    if (this.operator !== "cloudtalk" || !this.cloudtalkCredentialsVerified || this.cloudtalkCredentialsKey !== this.currentCloudtalkCredentialsKey) {
+      return null;
+    }
+    return this.cloudtalkAgents.find(function (agent) {
+      return String(agent.id) === String(_this6.config.agent_id);
+    }) || null;
+  },
+  cloudtalkAgentSmsNumber: function cloudtalkAgentSmsNumber() {
+    var _this$selectedCloudta;
+    var number = (_this$selectedCloudta = this.selectedCloudtalkAgent) === null || _this$selectedCloudta === void 0 ? void 0 : _this$selectedCloudta.default_number;
+    return typeof number === "string" && /^\+[1-9]\d{1,14}$/.test(number) ? number : "";
+  },
+  cloudtalkSmsConfirmed: function cloudtalkSmsConfirmed() {
+    return !!this.cloudtalkAgentSmsNumber && this.autoFilledCloudtalkSmsNumber === this.cloudtalkAgentSmsNumber && this.confirmedCloudtalkSmsAgentId === String(this.config.agent_id) && this.config.numero === this.cloudtalkAgentSmsNumber;
+  },
+  cloudtalkCredentialsReady: function cloudtalkCredentialsReady() {
+    return !!this.config.api_key_id && !!this.config.api_key_secret;
+  },
+  currentCloudtalkCredentialsKey: function currentCloudtalkCredentialsKey() {
+    return [this.config.api_key_id || "", this.config.api_key_secret || ""].join(":");
+  }
+})), _components$props$dat);
 
 /***/ }),
 
@@ -15183,18 +15396,22 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_project_line__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/line */ "./resources/js/actions/project/line.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-/* harmony import */ var _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/constants/lineOperators */ "./resources/js/constants/lineOperators.js");
-/* harmony import */ var _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../OperatorConfigFields.vue */ "./resources/js/components/line/OperatorConfigFields.vue");
+/* harmony import */ var _apis_project_line__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/apis/project/line */ "./resources/js/apis/project/line.js");
+/* harmony import */ var _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/constants/lineOperators */ "./resources/js/constants/lineOperators.js");
+/* harmony import */ var _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../OperatorConfigFields.vue */ "./resources/js/components/line/OperatorConfigFields.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -15205,6 +15422,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
 // Constants
 
 
@@ -15212,7 +15430,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    OperatorConfigFields: _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+    OperatorConfigFields: _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   data: function data() {
     return {
@@ -15267,6 +15485,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     storeLine: function storeLine() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var projectErrors;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -15297,90 +15516,186 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               _context2.next = 13;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.ADD_LINE, _this2.line);
             case 13:
+              _context2.next = 15;
+              return _this2.saveSelectedProjectLines(_this2.line);
+            case 15:
+              projectErrors = _context2.sent;
+              if (projectErrors.length) {
+                flashError({
+                  title: "Ligne enregistrée partiellement",
+                  body: "La ligne est cr\xE9\xE9e dans ce projet, mais n\u2019a pas pu \xEAtre copi\xE9e dans : ".concat(projectErrors.join(", "), "."),
+                  duration: 9000
+                });
+              }
               _this2.line = _this2.newLine();
               _this2.availableUsers = [];
               _this2.configPrefilledFor = "";
               _this2.tab = 0;
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context2.next = 23;
+              _context2.next = 27;
               break;
-            case 20:
-              _context2.prev = 20;
+            case 24:
+              _context2.prev = 24;
               _context2.t0 = _context2["catch"](9);
               flashError({
                 title: "Ligne",
                 body: _this2.errorMessage(_context2.t0),
                 duration: 7000
               });
-            case 23:
-              _context2.prev = 23;
+            case 27:
+              _context2.prev = 27;
               _this2.addingLine = false;
-              return _context2.finish(23);
-            case 26:
+              return _context2.finish(27);
+            case 30:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[9, 20, 23, 26]]);
+        }, _callee2, null, [[9, 24, 27, 30]]);
+      }))();
+    },
+    saveSelectedProjectLines: function saveSelectedProjectLines(payload) {
+      var _this3 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+        var _this3$$refs$operator, _this3$$refs$operator2;
+        var selectedProjects, errors, _iterator, _step, _loop;
+        return _regeneratorRuntime().wrap(function _callee3$(_context4) {
+          while (1) switch (_context4.prev = _context4.next) {
+            case 0:
+              selectedProjects = (_this3$$refs$operator = (_this3$$refs$operator2 = _this3.$refs.operatorConfigFields) === null || _this3$$refs$operator2 === void 0 ? void 0 : _this3$$refs$operator2.sourceProjects) !== null && _this3$$refs$operator !== void 0 ? _this3$$refs$operator : [];
+              errors = [];
+              _iterator = _createForOfIteratorHelper(selectedProjects);
+              _context4.prev = 3;
+              _loop = /*#__PURE__*/_regeneratorRuntime().mark(function _loop() {
+                var projectSlug, _yield$lineService$ge, lines, existing, _this3$$refs$operator3, _project$name, project;
+                return _regeneratorRuntime().wrap(function _loop$(_context3) {
+                  while (1) switch (_context3.prev = _context3.next) {
+                    case 0:
+                      projectSlug = _step.value;
+                      _context3.prev = 1;
+                      _context3.next = 4;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].get(projectSlug);
+                    case 4:
+                      _yield$lineService$ge = _context3.sent;
+                      lines = _yield$lineService$ge.data;
+                      existing = lines.find(function (line) {
+                        return line.operator === payload.operator && line.user_id == payload.user_id;
+                      });
+                      if (!existing) {
+                        _context3.next = 12;
+                        break;
+                      }
+                      _context3.next = 10;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].update(projectSlug, existing.id, payload);
+                    case 10:
+                      _context3.next = 14;
+                      break;
+                    case 12:
+                      _context3.next = 14;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].create(projectSlug, payload);
+                    case 14:
+                      _context3.next = 20;
+                      break;
+                    case 16:
+                      _context3.prev = 16;
+                      _context3.t0 = _context3["catch"](1);
+                      project = (_this3$$refs$operator3 = _this3.$refs.operatorConfigFields) === null || _this3$$refs$operator3 === void 0 ? void 0 : _this3$$refs$operator3.projects.find(function (item) {
+                        return item.slug === projectSlug;
+                      });
+                      errors.push((_project$name = project === null || project === void 0 ? void 0 : project.name) !== null && _project$name !== void 0 ? _project$name : projectSlug);
+                    case 20:
+                    case "end":
+                      return _context3.stop();
+                  }
+                }, _loop, null, [[1, 16]]);
+              });
+              _iterator.s();
+            case 6:
+              if ((_step = _iterator.n()).done) {
+                _context4.next = 10;
+                break;
+              }
+              return _context4.delegateYield(_loop(), "t0", 8);
+            case 8:
+              _context4.next = 6;
+              break;
+            case 10:
+              _context4.next = 15;
+              break;
+            case 12:
+              _context4.prev = 12;
+              _context4.t1 = _context4["catch"](3);
+              _iterator.e(_context4.t1);
+            case 15:
+              _context4.prev = 15;
+              _iterator.f();
+              return _context4.finish(15);
+            case 18:
+              return _context4.abrupt("return", errors);
+            case 19:
+            case "end":
+              return _context4.stop();
+          }
+        }, _callee3, null, [[3, 12, 15, 18]]);
       }))();
     },
     loadAvailableUsers: function loadAvailableUsers() {
-      var _this3 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var operator, users;
-        return _regeneratorRuntime().wrap(function _callee3$(_context3) {
-          while (1) switch (_context3.prev = _context3.next) {
+        return _regeneratorRuntime().wrap(function _callee4$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              operator = _this3.line.operator;
+              operator = _this4.line.operator;
               if (operator) {
-                _context3.next = 5;
+                _context5.next = 5;
                 break;
               }
-              _this3.availableUsers = [];
-              _this3.fetchingAvailableUsers = false;
-              return _context3.abrupt("return");
+              _this4.availableUsers = [];
+              _this4.fetchingAvailableUsers = false;
+              return _context5.abrupt("return");
             case 5:
-              _this3.fetchingAvailableUsers = true;
-              _context3.prev = 6;
-              _context3.next = 9;
+              _this4.fetchingAvailableUsers = true;
+              _context5.prev = 6;
+              _context5.next = 9;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_LINE_AVAILABLE_USERS, {
                 operator: operator
               });
             case 9:
-              users = _context3.sent;
-              if (!(_this3.line.operator !== operator)) {
-                _context3.next = 12;
+              users = _context5.sent;
+              if (!(_this4.line.operator !== operator)) {
+                _context5.next = 12;
                 break;
               }
-              return _context3.abrupt("return");
+              return _context5.abrupt("return");
             case 12:
-              _this3.availableUsers = users;
-              if (!_this3.availableUsers.some(function (user) {
-                return user.id == _this3.line.user_id;
+              _this4.availableUsers = users;
+              if (!_this4.availableUsers.some(function (user) {
+                return user.id == _this4.line.user_id;
               })) {
-                _this3.line.user_id = null;
+                _this4.line.user_id = null;
               }
-              _context3.next = 20;
+              _context5.next = 20;
               break;
             case 16:
-              _context3.prev = 16;
-              _context3.t0 = _context3["catch"](6);
-              _this3.availableUsers = _this3.localAvailableUsers(operator);
+              _context5.prev = 16;
+              _context5.t0 = _context5["catch"](6);
+              _this4.availableUsers = _this4.localAvailableUsers(operator);
               flashError({
                 title: "Ligne",
-                body: _this3.errorMessage(_context3.t0, "Impossible de charger les agents disponibles."),
+                body: _this4.errorMessage(_context5.t0, "Impossible de charger les agents disponibles."),
                 duration: 7000
               });
             case 20:
-              _context3.prev = 20;
-              if (_this3.line.operator === operator) {
-                _this3.fetchingAvailableUsers = false;
+              _context5.prev = 20;
+              if (_this4.line.operator === operator) {
+                _this4.fetchingAvailableUsers = false;
               }
-              return _context3.finish(20);
+              return _context5.finish(20);
             case 23:
             case "end":
-              return _context3.stop();
+              return _context5.stop();
           }
-        }, _callee3, null, [[6, 16, 20, 23]]);
+        }, _callee4, null, [[6, 16, 20, 23]]);
       }))();
     },
     localAvailableUsers: function localAvailableUsers(operator) {
@@ -15401,66 +15716,66 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       });
     },
     hasExistingConfigForSelection: function hasExistingConfigForSelection() {
-      var _this4 = this;
+      var _this5 = this;
       return this.lines.some(function (line) {
-        return line.operator === _this4.line.operator && line.user_id == _this4.line.user_id;
+        return line.operator === _this5.line.operator && line.user_id == _this5.line.user_id;
       });
     },
     prepareLine: function prepareLine() {
       this.line.name = this.generatedLineName;
     },
     prefillOperatorConfig: function prefillOperatorConfig() {
-      var _this5 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var operator, sourceLine, _this5$line$config, fullLine;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this6 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var operator, sourceLine, _this6$line$config, fullLine;
+        return _regeneratorRuntime().wrap(function _callee5$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              operator = _this5.line.operator;
-              if (!(!operator || _this5.configPrefilledFor === operator)) {
-                _context4.next = 3;
+              operator = _this6.line.operator;
+              if (!(!operator || _this6.configPrefilledFor === operator)) {
+                _context6.next = 3;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 3:
-              sourceLine = _this5.lines.find(function (line) {
+              sourceLine = _this6.lines.find(function (line) {
                 return line.operator === operator;
               });
-              _this5.configPrefilledFor = operator;
+              _this6.configPrefilledFor = operator;
               if (sourceLine) {
-                _context4.next = 7;
+                _context6.next = 7;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 7:
-              _this5.prefillingConfig = true;
-              _context4.prev = 8;
-              _context4.next = 11;
+              _this6.prefillingConfig = true;
+              _context6.prev = 8;
+              _context6.next = 11;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceLine.id);
             case 11:
-              fullLine = _context4.sent;
-              if (!(_this5.line.operator !== operator)) {
-                _context4.next = 14;
+              fullLine = _context6.sent;
+              if (!(_this6.line.operator !== operator)) {
+                _context6.next = 14;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 14:
-              if (!(_this5.project && fullLine.project_id && fullLine.project_id != _this5.project.id)) {
-                _context4.next = 16;
+              if (!(_this6.project && fullLine.project_id && fullLine.project_id != _this6.project.id)) {
+                _context6.next = 16;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 16:
-              _this5.line.config = _objectSpread(_objectSpread({}, _this5.reusableConfig(fullLine.config)), (_this5$line$config = _this5.line.config) !== null && _this5$line$config !== void 0 ? _this5$line$config : {});
+              _this6.line.config = _objectSpread(_objectSpread({}, _this6.reusableConfig(fullLine.config)), (_this6$line$config = _this6.line.config) !== null && _this6$line$config !== void 0 ? _this6$line$config : {});
             case 17:
-              _context4.prev = 17;
-              _this5.prefillingConfig = false;
-              return _context4.finish(17);
+              _context6.prev = 17;
+              _this6.prefillingConfig = false;
+              return _context6.finish(17);
             case 20:
             case "end":
-              return _context4.stop();
+              return _context6.stop();
           }
-        }, _callee4, null, [[8,, 17, 20]]);
+        }, _callee5, null, [[8,, 17, 20]]);
       }))();
     },
     reusableConfig: function reusableConfig(config) {
@@ -15469,34 +15784,34 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return reusable;
     },
     normalizeConfig: function normalizeConfig() {
-      var _this6 = this;
+      var _this7 = this;
       Object.keys(this.line.config).forEach(function (key) {
-        if (_this6.line.config[key] !== null && _this6.line.config[key] !== undefined) {
-          _this6.line.config[key] = String(_this6.line.config[key]);
+        if (_this7.line.config[key] !== null && _this7.line.config[key] !== undefined) {
+          _this7.line.config[key] = String(_this7.line.config[key]);
         }
       });
     },
     validateOperatorConfig: function validateOperatorConfig() {
-      var _this7 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+      var _this8 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
+        return _regeneratorRuntime().wrap(function _callee6$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (_this7.$refs.operatorConfigFields) {
-                _context5.next = 2;
+              if (_this8.$refs.operatorConfigFields) {
+                _context7.next = 2;
                 break;
               }
-              return _context5.abrupt("return", true);
+              return _context7.abrupt("return", true);
             case 2:
-              _context5.next = 4;
-              return _this7.$refs.operatorConfigFields.validate();
+              _context7.next = 4;
+              return _this8.$refs.operatorConfigFields.validate();
             case 4:
-              return _context5.abrupt("return", _context5.sent);
+              return _context7.abrupt("return", _context7.sent);
             case 5:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
-        }, _callee5);
+        }, _callee6);
       }))();
     },
     errorMessage: function errorMessage(error) {
@@ -15525,17 +15840,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       this.prefillOperatorConfig();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "users", "lines"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "users", "lines"])), {}, {
     lineOperators: function lineOperators() {
-      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
+      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"];
     },
     /**
      *
      */
     operatorFields: function operatorFields() {
-      var _this8 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
-        return o.value === _this8.line.operator;
+      var _this9 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"].find(function (o) {
+        return o.value === _this9.line.operator;
       });
       return operator ? operator.fields : [];
     },
@@ -15543,15 +15858,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
      *
      */
     assignedUser: function assignedUser() {
-      var _this9 = this;
+      var _this10 = this;
       return this.users.find(function (u) {
-        return u.id == _this9.line.user_id;
+        return u.id == _this10.line.user_id;
       });
     },
     generatedLineName: function generatedLineName() {
-      var _this10 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (operator) {
-        return operator.value === _this10.line.operator;
+      var _this11 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"].find(function (operator) {
+        return operator.value === _this11.line.operator;
       });
       var operatorName = operator ? operator.label : this.line.operator;
       var userName = this.assignedUser ? this.assignedUser.name : "Agent";
@@ -15594,13 +15909,17 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _actions_project_line__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/actions/project/line */ "./resources/js/actions/project/line.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-/* harmony import */ var _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/constants/lineOperators */ "./resources/js/constants/lineOperators.js");
-/* harmony import */ var _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../OperatorConfigFields.vue */ "./resources/js/components/line/OperatorConfigFields.vue");
+/* harmony import */ var _apis_project_line__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/apis/project/line */ "./resources/js/apis/project/line.js");
+/* harmony import */ var _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/constants/lineOperators */ "./resources/js/constants/lineOperators.js");
+/* harmony import */ var _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../OperatorConfigFields.vue */ "./resources/js/components/line/OperatorConfigFields.vue");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _regeneratorRuntime() { "use strict"; /*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */ _regeneratorRuntime = function _regeneratorRuntime() { return exports; }; var exports = {}, Op = Object.prototype, hasOwn = Op.hasOwnProperty, defineProperty = Object.defineProperty || function (obj, key, desc) { obj[key] = desc.value; }, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag"; function define(obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: !0, configurable: !0, writable: !0 }), obj[key]; } try { define({}, ""); } catch (err) { define = function define(obj, key, value) { return obj[key] = value; }; } function wrap(innerFn, outerFn, self, tryLocsList) { var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator, generator = Object.create(protoGenerator.prototype), context = new Context(tryLocsList || []); return defineProperty(generator, "_invoke", { value: makeInvokeMethod(innerFn, self, context) }), generator; } function tryCatch(fn, obj, arg) { try { return { type: "normal", arg: fn.call(obj, arg) }; } catch (err) { return { type: "throw", arg: err }; } } exports.wrap = wrap; var ContinueSentinel = {}; function Generator() {} function GeneratorFunction() {} function GeneratorFunctionPrototype() {} var IteratorPrototype = {}; define(IteratorPrototype, iteratorSymbol, function () { return this; }); var getProto = Object.getPrototypeOf, NativeIteratorPrototype = getProto && getProto(getProto(values([]))); NativeIteratorPrototype && NativeIteratorPrototype !== Op && hasOwn.call(NativeIteratorPrototype, iteratorSymbol) && (IteratorPrototype = NativeIteratorPrototype); var Gp = GeneratorFunctionPrototype.prototype = Generator.prototype = Object.create(IteratorPrototype); function defineIteratorMethods(prototype) { ["next", "throw", "return"].forEach(function (method) { define(prototype, method, function (arg) { return this._invoke(method, arg); }); }); } function AsyncIterator(generator, PromiseImpl) { function invoke(method, arg, resolve, reject) { var record = tryCatch(generator[method], generator, arg); if ("throw" !== record.type) { var result = record.arg, value = result.value; return value && "object" == _typeof(value) && hasOwn.call(value, "__await") ? PromiseImpl.resolve(value.__await).then(function (value) { invoke("next", value, resolve, reject); }, function (err) { invoke("throw", err, resolve, reject); }) : PromiseImpl.resolve(value).then(function (unwrapped) { result.value = unwrapped, resolve(result); }, function (error) { return invoke("throw", error, resolve, reject); }); } reject(record.arg); } var previousPromise; defineProperty(this, "_invoke", { value: function value(method, arg) { function callInvokeWithMethodAndArg() { return new PromiseImpl(function (resolve, reject) { invoke(method, arg, resolve, reject); }); } return previousPromise = previousPromise ? previousPromise.then(callInvokeWithMethodAndArg, callInvokeWithMethodAndArg) : callInvokeWithMethodAndArg(); } }); } function makeInvokeMethod(innerFn, self, context) { var state = "suspendedStart"; return function (method, arg) { if ("executing" === state) throw new Error("Generator is already running"); if ("completed" === state) { if ("throw" === method) throw arg; return doneResult(); } for (context.method = method, context.arg = arg;;) { var delegate = context.delegate; if (delegate) { var delegateResult = maybeInvokeDelegate(delegate, context); if (delegateResult) { if (delegateResult === ContinueSentinel) continue; return delegateResult; } } if ("next" === context.method) context.sent = context._sent = context.arg;else if ("throw" === context.method) { if ("suspendedStart" === state) throw state = "completed", context.arg; context.dispatchException(context.arg); } else "return" === context.method && context.abrupt("return", context.arg); state = "executing"; var record = tryCatch(innerFn, self, context); if ("normal" === record.type) { if (state = context.done ? "completed" : "suspendedYield", record.arg === ContinueSentinel) continue; return { value: record.arg, done: context.done }; } "throw" === record.type && (state = "completed", context.method = "throw", context.arg = record.arg); } }; } function maybeInvokeDelegate(delegate, context) { var methodName = context.method, method = delegate.iterator[methodName]; if (undefined === method) return context.delegate = null, "throw" === methodName && delegate.iterator["return"] && (context.method = "return", context.arg = undefined, maybeInvokeDelegate(delegate, context), "throw" === context.method) || "return" !== methodName && (context.method = "throw", context.arg = new TypeError("The iterator does not provide a '" + methodName + "' method")), ContinueSentinel; var record = tryCatch(method, delegate.iterator, context.arg); if ("throw" === record.type) return context.method = "throw", context.arg = record.arg, context.delegate = null, ContinueSentinel; var info = record.arg; return info ? info.done ? (context[delegate.resultName] = info.value, context.next = delegate.nextLoc, "return" !== context.method && (context.method = "next", context.arg = undefined), context.delegate = null, ContinueSentinel) : info : (context.method = "throw", context.arg = new TypeError("iterator result is not an object"), context.delegate = null, ContinueSentinel); } function pushTryEntry(locs) { var entry = { tryLoc: locs[0] }; 1 in locs && (entry.catchLoc = locs[1]), 2 in locs && (entry.finallyLoc = locs[2], entry.afterLoc = locs[3]), this.tryEntries.push(entry); } function resetTryEntry(entry) { var record = entry.completion || {}; record.type = "normal", delete record.arg, entry.completion = record; } function Context(tryLocsList) { this.tryEntries = [{ tryLoc: "root" }], tryLocsList.forEach(pushTryEntry, this), this.reset(!0); } function values(iterable) { if (iterable) { var iteratorMethod = iterable[iteratorSymbol]; if (iteratorMethod) return iteratorMethod.call(iterable); if ("function" == typeof iterable.next) return iterable; if (!isNaN(iterable.length)) { var i = -1, next = function next() { for (; ++i < iterable.length;) if (hasOwn.call(iterable, i)) return next.value = iterable[i], next.done = !1, next; return next.value = undefined, next.done = !0, next; }; return next.next = next; } } return { next: doneResult }; } function doneResult() { return { value: undefined, done: !0 }; } return GeneratorFunction.prototype = GeneratorFunctionPrototype, defineProperty(Gp, "constructor", { value: GeneratorFunctionPrototype, configurable: !0 }), defineProperty(GeneratorFunctionPrototype, "constructor", { value: GeneratorFunction, configurable: !0 }), GeneratorFunction.displayName = define(GeneratorFunctionPrototype, toStringTagSymbol, "GeneratorFunction"), exports.isGeneratorFunction = function (genFun) { var ctor = "function" == typeof genFun && genFun.constructor; return !!ctor && (ctor === GeneratorFunction || "GeneratorFunction" === (ctor.displayName || ctor.name)); }, exports.mark = function (genFun) { return Object.setPrototypeOf ? Object.setPrototypeOf(genFun, GeneratorFunctionPrototype) : (genFun.__proto__ = GeneratorFunctionPrototype, define(genFun, toStringTagSymbol, "GeneratorFunction")), genFun.prototype = Object.create(Gp), genFun; }, exports.awrap = function (arg) { return { __await: arg }; }, defineIteratorMethods(AsyncIterator.prototype), define(AsyncIterator.prototype, asyncIteratorSymbol, function () { return this; }), exports.AsyncIterator = AsyncIterator, exports.async = function (innerFn, outerFn, self, tryLocsList, PromiseImpl) { void 0 === PromiseImpl && (PromiseImpl = Promise); var iter = new AsyncIterator(wrap(innerFn, outerFn, self, tryLocsList), PromiseImpl); return exports.isGeneratorFunction(outerFn) ? iter : iter.next().then(function (result) { return result.done ? result.value : iter.next(); }); }, defineIteratorMethods(Gp), define(Gp, toStringTagSymbol, "Generator"), define(Gp, iteratorSymbol, function () { return this; }), define(Gp, "toString", function () { return "[object Generator]"; }), exports.keys = function (val) { var object = Object(val), keys = []; for (var key in object) keys.push(key); return keys.reverse(), function next() { for (; keys.length;) { var key = keys.pop(); if (key in object) return next.value = key, next.done = !1, next; } return next.done = !0, next; }; }, exports.values = values, Context.prototype = { constructor: Context, reset: function reset(skipTempReset) { if (this.prev = 0, this.next = 0, this.sent = this._sent = undefined, this.done = !1, this.delegate = null, this.method = "next", this.arg = undefined, this.tryEntries.forEach(resetTryEntry), !skipTempReset) for (var name in this) "t" === name.charAt(0) && hasOwn.call(this, name) && !isNaN(+name.slice(1)) && (this[name] = undefined); }, stop: function stop() { this.done = !0; var rootRecord = this.tryEntries[0].completion; if ("throw" === rootRecord.type) throw rootRecord.arg; return this.rval; }, dispatchException: function dispatchException(exception) { if (this.done) throw exception; var context = this; function handle(loc, caught) { return record.type = "throw", record.arg = exception, context.next = loc, caught && (context.method = "next", context.arg = undefined), !!caught; } for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i], record = entry.completion; if ("root" === entry.tryLoc) return handle("end"); if (entry.tryLoc <= this.prev) { var hasCatch = hasOwn.call(entry, "catchLoc"), hasFinally = hasOwn.call(entry, "finallyLoc"); if (hasCatch && hasFinally) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } else if (hasCatch) { if (this.prev < entry.catchLoc) return handle(entry.catchLoc, !0); } else { if (!hasFinally) throw new Error("try statement without catch or finally"); if (this.prev < entry.finallyLoc) return handle(entry.finallyLoc); } } } }, abrupt: function abrupt(type, arg) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc <= this.prev && hasOwn.call(entry, "finallyLoc") && this.prev < entry.finallyLoc) { var finallyEntry = entry; break; } } finallyEntry && ("break" === type || "continue" === type) && finallyEntry.tryLoc <= arg && arg <= finallyEntry.finallyLoc && (finallyEntry = null); var record = finallyEntry ? finallyEntry.completion : {}; return record.type = type, record.arg = arg, finallyEntry ? (this.method = "next", this.next = finallyEntry.finallyLoc, ContinueSentinel) : this.complete(record); }, complete: function complete(record, afterLoc) { if ("throw" === record.type) throw record.arg; return "break" === record.type || "continue" === record.type ? this.next = record.arg : "return" === record.type ? (this.rval = this.arg = record.arg, this.method = "return", this.next = "end") : "normal" === record.type && afterLoc && (this.next = afterLoc), ContinueSentinel; }, finish: function finish(finallyLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.finallyLoc === finallyLoc) return this.complete(entry.completion, entry.afterLoc), resetTryEntry(entry), ContinueSentinel; } }, "catch": function _catch(tryLoc) { for (var i = this.tryEntries.length - 1; i >= 0; --i) { var entry = this.tryEntries[i]; if (entry.tryLoc === tryLoc) { var record = entry.completion; if ("throw" === record.type) { var thrown = record.arg; resetTryEntry(entry); } return thrown; } } throw new Error("illegal catch attempt"); }, delegateYield: function delegateYield(iterable, resultName, nextLoc) { return this.delegate = { iterator: values(iterable), resultName: resultName, nextLoc: nextLoc }, "next" === this.method && (this.arg = undefined), ContinueSentinel; } }, exports; }
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -15616,6 +15935,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 
 
+
 // Constants
 
 
@@ -15623,7 +15943,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    OperatorConfigFields: _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_4__["default"]
+    OperatorConfigFields: _OperatorConfigFields_vue__WEBPACK_IMPORTED_MODULE_5__["default"]
   },
   data: function data() {
     return {
@@ -15682,6 +16002,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     update: function update() {
       var _this2 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
+        var projectErrors;
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
@@ -15724,26 +16045,37 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
                 id: _this2.lineToUpdate.id
               }));
             case 18:
+              _context2.next = 20;
+              return _this2.saveSelectedProjectLines(_this2.linePayload());
+            case 20:
+              projectErrors = _context2.sent;
+              if (projectErrors.length) {
+                flashError({
+                  title: "Ligne enregistrée partiellement",
+                  body: "La ligne est enregistr\xE9e dans ce projet, mais n\u2019a pas pu \xEAtre copi\xE9e dans : ".concat(projectErrors.join(", "), "."),
+                  duration: 9000
+                });
+              }
               _store__WEBPACK_IMPORTED_MODULE_0__["default"].commit(_actions_modal__WEBPACK_IMPORTED_MODULE_2__.CLOSE_MODAL);
-              _context2.next = 24;
+              _context2.next = 28;
               break;
-            case 21:
-              _context2.prev = 21;
+            case 25:
+              _context2.prev = 25;
               _context2.t0 = _context2["catch"](9);
               flashError({
                 title: "Ligne",
                 body: _this2.errorMessage(_context2.t0),
                 duration: 7000
               });
-            case 24:
-              _context2.prev = 24;
+            case 28:
+              _context2.prev = 28;
               _this2.updatingLine = false;
-              return _context2.finish(24);
-            case 27:
+              return _context2.finish(28);
+            case 31:
             case "end":
               return _context2.stop();
           }
-        }, _callee2, null, [[9, 21, 24, 27]]);
+        }, _callee2, null, [[9, 25, 28, 31]]);
       }))();
     },
     /**
@@ -15783,6 +16115,91 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         config: _objectSpread({}, (_this$lineToUpdate$co = this.lineToUpdate.config) !== null && _this$lineToUpdate$co !== void 0 ? _this$lineToUpdate$co : {})
       };
     },
+    saveSelectedProjectLines: function saveSelectedProjectLines(payload) {
+      var _this4 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
+        var _this4$$refs$operator, _this4$$refs$operator2;
+        var selectedProjects, errors, _iterator, _step, _loop;
+        return _regeneratorRuntime().wrap(function _callee4$(_context5) {
+          while (1) switch (_context5.prev = _context5.next) {
+            case 0:
+              selectedProjects = (_this4$$refs$operator = (_this4$$refs$operator2 = _this4.$refs.operatorConfigFields) === null || _this4$$refs$operator2 === void 0 ? void 0 : _this4$$refs$operator2.sourceProjects) !== null && _this4$$refs$operator !== void 0 ? _this4$$refs$operator : [];
+              errors = [];
+              _iterator = _createForOfIteratorHelper(selectedProjects);
+              _context5.prev = 3;
+              _loop = /*#__PURE__*/_regeneratorRuntime().mark(function _loop() {
+                var projectSlug, _yield$lineService$ge, lines, existing, _this4$$refs$operator3, _project$name, project;
+                return _regeneratorRuntime().wrap(function _loop$(_context4) {
+                  while (1) switch (_context4.prev = _context4.next) {
+                    case 0:
+                      projectSlug = _step.value;
+                      _context4.prev = 1;
+                      _context4.next = 4;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].get(projectSlug);
+                    case 4:
+                      _yield$lineService$ge = _context4.sent;
+                      lines = _yield$lineService$ge.data;
+                      existing = lines.find(function (line) {
+                        return line.operator === payload.operator && line.user_id == payload.user_id;
+                      });
+                      if (!existing) {
+                        _context4.next = 12;
+                        break;
+                      }
+                      _context4.next = 10;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].update(projectSlug, existing.id, payload);
+                    case 10:
+                      _context4.next = 14;
+                      break;
+                    case 12:
+                      _context4.next = 14;
+                      return _apis_project_line__WEBPACK_IMPORTED_MODULE_3__["default"].create(projectSlug, payload);
+                    case 14:
+                      _context4.next = 20;
+                      break;
+                    case 16:
+                      _context4.prev = 16;
+                      _context4.t0 = _context4["catch"](1);
+                      project = (_this4$$refs$operator3 = _this4.$refs.operatorConfigFields) === null || _this4$$refs$operator3 === void 0 ? void 0 : _this4$$refs$operator3.projects.find(function (item) {
+                        return item.slug === projectSlug;
+                      });
+                      errors.push((_project$name = project === null || project === void 0 ? void 0 : project.name) !== null && _project$name !== void 0 ? _project$name : projectSlug);
+                    case 20:
+                    case "end":
+                      return _context4.stop();
+                  }
+                }, _loop, null, [[1, 16]]);
+              });
+              _iterator.s();
+            case 6:
+              if ((_step = _iterator.n()).done) {
+                _context5.next = 10;
+                break;
+              }
+              return _context5.delegateYield(_loop(), "t0", 8);
+            case 8:
+              _context5.next = 6;
+              break;
+            case 10:
+              _context5.next = 15;
+              break;
+            case 12:
+              _context5.prev = 12;
+              _context5.t1 = _context5["catch"](3);
+              _iterator.e(_context5.t1);
+            case 15:
+              _context5.prev = 15;
+              _iterator.f();
+              return _context5.finish(15);
+            case 18:
+              return _context5.abrupt("return", errors);
+            case 19:
+            case "end":
+              return _context5.stop();
+          }
+        }, _callee4, null, [[3, 12, 15, 18]]);
+      }))();
+    },
     /**
      * Fetch the operator configuration with an HTTP request when the
      * user clicks on "next".
@@ -15792,79 +16209,79 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *   for this operator in the project, shared by every agent.
      */
     loadOperatorConfig: function loadOperatorConfig() {
-      var _this4 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
-        var operator, sourceId, fullLine, _fullLine$config, _this4$lineToUpdate$c;
-        return _regeneratorRuntime().wrap(function _callee4$(_context4) {
-          while (1) switch (_context4.prev = _context4.next) {
+      var _this5 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+        var operator, sourceId, fullLine, _fullLine$config, _this5$lineToUpdate$c;
+        return _regeneratorRuntime().wrap(function _callee5$(_context6) {
+          while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              if (_this4.lineToUpdate) {
-                _context4.next = 2;
+              if (_this5.lineToUpdate) {
+                _context6.next = 2;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 2:
-              operator = _this4.lineToUpdate.operator;
-              if (!(!operator || _this4.configPrefilledFor === operator)) {
-                _context4.next = 5;
+              operator = _this5.lineToUpdate.operator;
+              if (!(!operator || _this5.configPrefilledFor === operator)) {
+                _context6.next = 5;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 5:
-              sourceId = _this4.operatorConfigSourceId(operator);
+              sourceId = _this5.operatorConfigSourceId(operator);
               if (sourceId) {
-                _context4.next = 9;
+                _context6.next = 9;
                 break;
               }
-              _this4.configPrefilledFor = operator;
-              return _context4.abrupt("return");
+              _this5.configPrefilledFor = operator;
+              return _context6.abrupt("return");
             case 9:
-              _this4.prefillingConfig = true;
-              _context4.prev = 10;
-              _context4.next = 13;
+              _this5.prefillingConfig = true;
+              _context6.prev = 10;
+              _context6.next = 13;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, sourceId);
             case 13:
-              fullLine = _context4.sent;
-              if (!(_this4.lineToUpdate.operator !== operator)) {
-                _context4.next = 16;
+              fullLine = _context6.sent;
+              if (!(_this5.lineToUpdate.operator !== operator)) {
+                _context6.next = 16;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 16:
-              if (!(_this4.project && fullLine.project_id && fullLine.project_id != _this4.project.id)) {
-                _context4.next = 18;
+              if (!(_this5.project && fullLine.project_id && fullLine.project_id != _this5.project.id)) {
+                _context6.next = 18;
                 break;
               }
-              return _context4.abrupt("return");
+              return _context6.abrupt("return");
             case 18:
-              if (_this4.isOperatorUpdated(operator)) {
+              if (_this5.isOperatorUpdated(operator)) {
                 // UPDATE: keep every value stored on the line
-                _this4.lineToUpdate.config = _objectSpread({}, (_fullLine$config = fullLine.config) !== null && _fullLine$config !== void 0 ? _fullLine$config : {});
+                _this5.lineToUpdate.config = _objectSpread({}, (_fullLine$config = fullLine.config) !== null && _fullLine$config !== void 0 ? _fullLine$config : {});
               } else {
                 // AJOUT: reuse the project credentials of the operator,
                 // shared by all the agents (without agent_id)
-                _this4.lineToUpdate.config = _objectSpread(_objectSpread({}, _this4.reusableConfig(fullLine.config)), (_this4$lineToUpdate$c = _this4.lineToUpdate.config) !== null && _this4$lineToUpdate$c !== void 0 ? _this4$lineToUpdate$c : {});
+                _this5.lineToUpdate.config = _objectSpread(_objectSpread({}, _this5.reusableConfig(fullLine.config)), (_this5$lineToUpdate$c = _this5.lineToUpdate.config) !== null && _this5$lineToUpdate$c !== void 0 ? _this5$lineToUpdate$c : {});
               }
-              _this4.configPrefilledFor = operator;
-              _context4.next = 25;
+              _this5.configPrefilledFor = operator;
+              _context6.next = 25;
               break;
             case 22:
-              _context4.prev = 22;
-              _context4.t0 = _context4["catch"](10);
+              _context6.prev = 22;
+              _context6.t0 = _context6["catch"](10);
               flashError({
                 title: "Ligne",
-                body: _this4.errorMessage(_context4.t0, "Impossible de charger la configuration de l'opérateur."),
+                body: _this5.errorMessage(_context6.t0, "Impossible de charger la configuration de l'opérateur."),
                 duration: 7000
               });
             case 25:
-              _context4.prev = 25;
-              _this4.prefillingConfig = false;
-              return _context4.finish(25);
+              _context6.prev = 25;
+              _this5.prefillingConfig = false;
+              return _context6.finish(25);
             case 28:
             case "end":
-              return _context4.stop();
+              return _context6.stop();
           }
-        }, _callee4, null, [[10, 22, 25, 28]]);
+        }, _callee5, null, [[10, 22, 25, 28]]);
       }))();
     },
     /**
@@ -15872,12 +16289,12 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      * operator fields.
      */
     operatorConfigSourceId: function operatorConfigSourceId(operator) {
-      var _this5 = this;
+      var _this6 = this;
       if (this.isOperatorUpdated(operator)) {
         return this.lineToUpdate.id;
       }
       var sourceLine = this.lines.find(function (line) {
-        return line.operator === operator && line.id != _this5.lineToUpdate.id;
+        return line.operator === operator && line.id != _this6.lineToUpdate.id;
       });
       return sourceLine ? sourceLine.id : null;
     },
@@ -15888,70 +16305,70 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       return !!this.line && this.line.operator === operator;
     },
     loadAvailableUsers: function loadAvailableUsers() {
-      var _this6 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
+      var _this7 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var operator, users;
-        return _regeneratorRuntime().wrap(function _callee5$(_context5) {
-          while (1) switch (_context5.prev = _context5.next) {
+        return _regeneratorRuntime().wrap(function _callee6$(_context7) {
+          while (1) switch (_context7.prev = _context7.next) {
             case 0:
-              if (_this6.lineToUpdate) {
-                _context5.next = 2;
+              if (_this7.lineToUpdate) {
+                _context7.next = 2;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context7.abrupt("return");
             case 2:
-              operator = _this6.lineToUpdate.operator;
+              operator = _this7.lineToUpdate.operator;
               if (operator) {
-                _context5.next = 7;
+                _context7.next = 7;
                 break;
               }
-              _this6.availableUsers = [];
-              _this6.fetchingAvailableUsers = false;
-              return _context5.abrupt("return");
+              _this7.availableUsers = [];
+              _this7.fetchingAvailableUsers = false;
+              return _context7.abrupt("return");
             case 7:
-              _this6.fetchingAvailableUsers = true;
-              _context5.prev = 8;
-              _context5.next = 11;
+              _this7.fetchingAvailableUsers = true;
+              _context7.prev = 8;
+              _context7.next = 11;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.FETCH_LINE_AVAILABLE_USERS, {
                 operator: operator,
-                exclude_line_id: _this6.lineToUpdate.id
+                exclude_line_id: _this7.lineToUpdate.id
               });
             case 11:
-              users = _context5.sent;
-              if (!(!_this6.lineToUpdate || _this6.lineToUpdate.operator !== operator)) {
-                _context5.next = 14;
+              users = _context7.sent;
+              if (!(!_this7.lineToUpdate || _this7.lineToUpdate.operator !== operator)) {
+                _context7.next = 14;
                 break;
               }
-              return _context5.abrupt("return");
+              return _context7.abrupt("return");
             case 14:
-              _this6.availableUsers = users;
-              if (!_this6.isOperatorUpdated(operator) && !_this6.availableUsers.some(function (user) {
-                return user.id == _this6.lineToUpdate.user_id;
+              _this7.availableUsers = users;
+              if (!_this7.isOperatorUpdated(operator) && !_this7.availableUsers.some(function (user) {
+                return user.id == _this7.lineToUpdate.user_id;
               })) {
-                _this6.lineToUpdate.user_id = null;
+                _this7.lineToUpdate.user_id = null;
               }
-              _context5.next = 22;
+              _context7.next = 22;
               break;
             case 18:
-              _context5.prev = 18;
-              _context5.t0 = _context5["catch"](8);
-              _this6.resetAvailableUsersFromLocal(operator);
+              _context7.prev = 18;
+              _context7.t0 = _context7["catch"](8);
+              _this7.resetAvailableUsersFromLocal(operator);
               flashError({
                 title: "Ligne",
-                body: _this6.errorMessage(_context5.t0, "Impossible de charger les agents disponibles."),
+                body: _this7.errorMessage(_context7.t0, "Impossible de charger les agents disponibles."),
                 duration: 7000
               });
             case 22:
-              _context5.prev = 22;
-              if (_this6.lineToUpdate && _this6.lineToUpdate.operator === operator) {
-                _this6.fetchingAvailableUsers = false;
+              _context7.prev = 22;
+              if (_this7.lineToUpdate && _this7.lineToUpdate.operator === operator) {
+                _this7.fetchingAvailableUsers = false;
               }
-              return _context5.finish(22);
+              return _context7.finish(22);
             case 25:
             case "end":
-              return _context5.stop();
+              return _context7.stop();
           }
-        }, _callee5, null, [[8, 18, 22, 25]]);
+        }, _callee6, null, [[8, 18, 22, 25]]);
       }))();
     },
     resetAvailableUsersFromLocal: function resetAvailableUsersFromLocal() {
@@ -15978,9 +16395,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
     },
     hasExistingConfigForSelection: function hasExistingConfigForSelection() {
-      var _this7 = this;
+      var _this8 = this;
       return this.lines.some(function (line) {
-        return line.operator === _this7.lineToUpdate.operator && line.user_id == _this7.lineToUpdate.user_id && line.id != _this7.lineToUpdate.id;
+        return line.operator === _this8.lineToUpdate.operator && line.user_id == _this8.lineToUpdate.user_id && line.id != _this8.lineToUpdate.id;
       });
     },
     reusableConfig: function reusableConfig(config) {
@@ -15989,34 +16406,34 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       return reusable;
     },
     normalizeConfig: function normalizeConfig() {
-      var _this8 = this;
+      var _this9 = this;
       Object.keys(this.lineToUpdate.config).forEach(function (key) {
-        if (_this8.lineToUpdate.config[key] !== null && _this8.lineToUpdate.config[key] !== undefined) {
-          _this8.lineToUpdate.config[key] = String(_this8.lineToUpdate.config[key]);
+        if (_this9.lineToUpdate.config[key] !== null && _this9.lineToUpdate.config[key] !== undefined) {
+          _this9.lineToUpdate.config[key] = String(_this9.lineToUpdate.config[key]);
         }
       });
     },
     validateOperatorConfig: function validateOperatorConfig() {
-      var _this9 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
-        return _regeneratorRuntime().wrap(function _callee6$(_context6) {
-          while (1) switch (_context6.prev = _context6.next) {
+      var _this10 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
+        return _regeneratorRuntime().wrap(function _callee7$(_context8) {
+          while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              if (_this9.$refs.operatorConfigFields) {
-                _context6.next = 2;
+              if (_this10.$refs.operatorConfigFields) {
+                _context8.next = 2;
                 break;
               }
-              return _context6.abrupt("return", true);
+              return _context8.abrupt("return", true);
             case 2:
-              _context6.next = 4;
-              return _this9.$refs.operatorConfigFields.validate();
+              _context8.next = 4;
+              return _this10.$refs.operatorConfigFields.validate();
             case 4:
-              return _context6.abrupt("return", _context6.sent);
+              return _context8.abrupt("return", _context8.sent);
             case 5:
             case "end":
-              return _context6.stop();
+              return _context8.stop();
           }
-        }, _callee6);
+        }, _callee7);
       }))();
     },
     errorMessage: function errorMessage(error) {
@@ -16034,47 +16451,47 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
   },
   watch: {
     line: function line(newValue) {
-      var _this10 = this;
-      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee7() {
-        return _regeneratorRuntime().wrap(function _callee7$(_context7) {
-          while (1) switch (_context7.prev = _context7.next) {
+      var _this11 = this;
+      return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
+        return _regeneratorRuntime().wrap(function _callee8$(_context9) {
+          while (1) switch (_context9.prev = _context9.next) {
             case 0:
               if (!newValue) {
-                _context7.next = 16;
+                _context9.next = 16;
                 break;
               }
-              _this10.fetchingLine = true;
-              _this10.lineToUpdate = _this10.cloneLine(newValue);
-              _this10.tab = 0;
-              _this10.configPrefilledFor = "";
-              _this10.resetAvailableUsersFromLocal();
-              _context7.prev = 6;
-              _context7.t0 = _this10;
-              _context7.next = 10;
+              _this11.fetchingLine = true;
+              _this11.lineToUpdate = _this11.cloneLine(newValue);
+              _this11.tab = 0;
+              _this11.configPrefilledFor = "";
+              _this11.resetAvailableUsersFromLocal();
+              _context9.prev = 6;
+              _context9.t0 = _this11;
+              _context9.next = 10;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_line__WEBPACK_IMPORTED_MODULE_1__.SHOW_LINE, newValue.id);
             case 10:
-              _context7.t1 = _context7.sent;
-              _this10.lineToUpdate = _context7.t0.cloneLine.call(_context7.t0, _context7.t1);
-              _this10.resetAvailableUsersFromLocal();
+              _context9.t1 = _context9.sent;
+              _this11.lineToUpdate = _context9.t0.cloneLine.call(_context9.t0, _context9.t1);
+              _this11.resetAvailableUsersFromLocal();
             case 13:
-              _context7.prev = 13;
-              _this10.fetchingLine = false;
-              return _context7.finish(13);
+              _context9.prev = 13;
+              _this11.fetchingLine = false;
+              return _context9.finish(13);
             case 16:
             case "end":
-              return _context7.stop();
+              return _context9.stop();
           }
-        }, _callee7, null, [[6,, 13, 16]]);
+        }, _callee8, null, [[6,, 13, 16]]);
       }))();
     },
     "lineToUpdate.operator": function lineToUpdateOperator(value, oldValue) {
-      var _this11 = this;
+      var _this12 = this;
       if (this.fetchingLine || !this.lineToUpdate || !oldValue || value === oldValue) {
         return;
       }
       this.resetAvailableUsersFromLocal(value);
       if (!this.availableUsers.some(function (user) {
-        return user.id == _this11.lineToUpdate.user_id;
+        return user.id == _this12.lineToUpdate.user_id;
       })) {
         this.lineToUpdate.user_id = null;
       }
@@ -16088,9 +16505,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.loadOperatorConfig();
     }
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["project", "line", "can", "users", "lines"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_6__.mapGetters)(["project", "line", "can", "users", "lines"])), {}, {
     lineOperators: function lineOperators() {
-      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"];
+      return _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"];
     },
     isCreatingNewLine: function isCreatingNewLine() {
       return !!this.lineToUpdate && !this.isOperatorUpdated(this.lineToUpdate.operator);
@@ -16102,9 +16519,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     operatorFields: function operatorFields() {
-      var _this12 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (o) {
-        return o.value === _this12.lineToUpdate.operator;
+      var _this13 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"].find(function (o) {
+        return o.value === _this13.lineToUpdate.operator;
       });
       return operator ? operator.fields : [];
     },
@@ -16112,9 +16529,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
      *
      */
     assignedUser: function assignedUser() {
-      var _this13 = this;
+      var _this14 = this;
       return this.users.find(function (u) {
-        return u.id == _this13.lineToUpdate.user_id;
+        return u.id == _this14.lineToUpdate.user_id;
       });
     },
     /**
@@ -16125,9 +16542,9 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       return this.isOperatorUpdated(this.lineToUpdate.operator) || !this.lineToUpdate.operator || this.fetchingAvailableUsers || this.availableUsers.length === 0;
     },
     generatedLineName: function generatedLineName() {
-      var _this14 = this;
-      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_3__["default"].find(function (operator) {
-        return operator.value === _this14.lineToUpdate.operator;
+      var _this15 = this;
+      var operator = _constants_lineOperators__WEBPACK_IMPORTED_MODULE_4__["default"].find(function (operator) {
+        return operator.value === _this15.lineToUpdate.operator;
       });
       var operatorName = operator ? operator.label : this.lineToUpdate.operator;
       var userName = this.assignedUser ? this.assignedUser.name : "Agent";
@@ -26830,6 +27247,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           eventParams.endedAt = value;
         } else if (eventParams.endedAt) {
           delete eventParams.endedAt;
+        }
+        this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
+      }
+    },
+    filterEntryDate: {
+      get: function get() {
+        var eventParams = this.eventParams;
+        return eventParams && eventParams.entryDate == 1;
+      },
+      set: function set(value) {
+        var eventParams = this.eventParams || {};
+        if (value) {
+          eventParams.entryDate = 1;
+        } else if (eventParams.entryDate !== undefined) {
+          delete eventParams.entryDate;
         }
         this.eventParams = Object.keys(eventParams).length > 0 ? eventParams : null;
       }
@@ -40395,7 +40827,8 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       fetchingSms: false,
       addingSms: false,
       attachments: [],
-      sendError: ""
+      sendError: "",
+      sendNotice: ""
     };
   },
   methods: {
@@ -40542,7 +40975,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     sendSMS: function sendSMS() {
       var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
-        var payload, result, _error$response, _error$response2, errors;
+        var payload, result, _result, _error$response, _error$response2, errors;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
@@ -40554,53 +40987,57 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
             case 2:
               _this3.addingSms = true;
               _this3.sendError = "";
+              _this3.sendNotice = "";
               payload = _objectSpread({}, _this3.sms);
               if (payload.source === "cloudtalk" && _this3.attachments.length) {
                 payload.attachments = _toConsumableArray(_this3.attachments);
               }
-              _context3.prev = 6;
+              _context3.prev = 7;
               if (!_this3.prospect) {
-                _context3.next = 12;
+                _context3.next = 15;
                 break;
               }
-              _context3.next = 10;
+              _context3.next = 11;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_3__.ADD_PROSPECT_SMS, payload);
-            case 10:
-              _context3.next = 17;
+            case 11:
+              result = _context3.sent;
+              _this3.sendNotice = (result === null || result === void 0 ? void 0 : result.message) || "";
+              _context3.next = 21;
               break;
-            case 12:
+            case 15:
               if (!(_this3.prospectsSelected.length > 0)) {
-                _context3.next = 17;
+                _context3.next = 21;
                 break;
               }
-              _context3.next = 15;
+              _context3.next = 18;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_prospect_sms__WEBPACK_IMPORTED_MODULE_3__.BULK_PROSPECT_SMS, _objectSpread(_objectSpread({}, payload), {}, {
                 prospects: _this3.prospectsSelected
               }));
-            case 15:
-              result = _context3.sent;
+            case 18:
+              _result = _context3.sent;
               _this3.bulkSms = [].concat(_toConsumableArray(_this3.bulkSms), [_objectSpread(_objectSpread({}, _this3.sms), {}, {
-                attachments: (result === null || result === void 0 ? void 0 : result.attachments) || []
+                attachments: (_result === null || _result === void 0 ? void 0 : _result.attachments) || []
               })]);
-            case 17:
+              _this3.sendNotice = (_result === null || _result === void 0 ? void 0 : _result.message) || "";
+            case 21:
               _this3.sms.message = "";
               _this3.attachments = [];
-              _context3.next = 25;
+              _context3.next = 29;
               break;
-            case 21:
-              _context3.prev = 21;
-              _context3.t0 = _context3["catch"](6);
-              errors = (_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
-              _this3.sendError = errors && Object.values(errors).flat()[0] || ((_error$response2 = _context3.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _this3.$t("prospect.sms.send_error");
             case 25:
               _context3.prev = 25;
+              _context3.t0 = _context3["catch"](7);
+              errors = (_error$response = _context3.t0.response) === null || _error$response === void 0 || (_error$response = _error$response.data) === null || _error$response === void 0 ? void 0 : _error$response.errors;
+              _this3.sendError = errors && Object.values(errors).flat()[0] || ((_error$response2 = _context3.t0.response) === null || _error$response2 === void 0 || (_error$response2 = _error$response2.data) === null || _error$response2 === void 0 ? void 0 : _error$response2.message) || _this3.$t("prospect.sms.send_error");
+            case 29:
+              _context3.prev = 29;
               _this3.addingSms = false;
-              return _context3.finish(25);
-            case 28:
+              return _context3.finish(29);
+            case 32:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[6, 21, 25, 28]]);
+        }, _callee3, null, [[7, 25, 29, 32]]);
       }))();
     },
     configureSmsbox: function configureSmsbox() {
@@ -60003,26 +60440,39 @@ var _hoisted_15 = {
 var _hoisted_16 = ["placeholder"];
 var _hoisted_17 = ["placeholder"];
 var _hoisted_18 = {
+  "class": "hc-agent-documents"
+};
+var _hoisted_19 = ["disabled"];
+var _hoisted_20 = {
+  key: 0
+};
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["textContent"];
+var _hoisted_23 = {
+  key: 1
+};
+var _hoisted_24 = ["textContent"];
+var _hoisted_25 = {
   "class": "hc-agent-form-intro"
 };
-var _hoisted_19 = ["value"];
-var _hoisted_20 = ["textContent"];
-var _hoisted_21 = ["textContent"];
-var _hoisted_22 = {
+var _hoisted_26 = ["value"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = {
   "class": "hc-agent-recap",
   "aria-live": "polite"
 };
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["textContent"];
-var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = ["textContent"];
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = {
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = ["textContent"];
+var _hoisted_32 = ["textContent"];
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = ["textContent"];
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = {
   "class": "hc-agent-form-footer"
 };
-var _hoisted_31 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "hc-agent-form-spacer"
 }, null, -1 /* HOISTED */);
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -60040,7 +60490,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
         "class": "hc-flex-column",
-        onSubmit: _cache[8] || (_cache[8] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[9] || (_cache[9] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $options.submit && $options.submit.apply($options, arguments);
         }, ["prevent"]))
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.steps, function (key, i) {
@@ -60175,9 +60625,31 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }, null, 8 /* PROPS */, _hoisted_17), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.form.persona]])];
             }),
             _: 1 /* STABLE */
-          }, 8 /* PROPS */, ["label"])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          }, 8 /* PROPS */, ["label"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.title")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.description")), 1 /* TEXT */), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+            type: "file",
+            accept: ".pdf,.txt,.md,application/pdf,text/plain,text/markdown",
+            multiple: "",
+            disabled: $data.saving,
+            onChange: _cache[7] || (_cache[7] = function () {
+              return $options.pickDocuments && $options.pickDocuments.apply($options, arguments);
+            })
+          }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19), $data.documents.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_20, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.documents, function (document) {
+            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+              key: document.id
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(document.name)
+            }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.status.".concat(document.status)))
+            }, null, 8 /* PROPS */, _hoisted_22)]);
+          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.pendingDocuments.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("ul", _hoisted_23, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.pendingDocuments, function (file) {
+            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("li", {
+              key: file.name
+            }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+              textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(file.name)
+            }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.documents.pending_upload")), 1 /* TEXT */)]);
+          }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
             key: 3
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. How free it is, and what will be created "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.step_intro.autonomy")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.autonomyLevels, function (level) {
+          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" 3. How free it is, and what will be created "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.step_intro.autonomy")), 1 /* TEXT */), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.autonomyLevels, function (level) {
             return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
               key: level.value,
               "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-agent-autonomy", {
@@ -60187,35 +60659,35 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               type: "radio",
               name: "agent-autonomy",
               value: level.value,
-              "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+              "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
                 return $data.form.autonomy = $event;
               })
-            }, null, 8 /* PROPS */, _hoisted_19), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.form.autonomy]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
+            }, null, 8 /* PROPS */, _hoisted_26), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelRadio, $data.form.autonomy]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", {
               textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.autonomy_short.".concat(level.value)))
-            }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+            }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
               "class": "hc-agent-autonomy-detail",
               textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(level.label)
-            }, null, 8 /* PROPS */, _hoisted_21)])], 2 /* CLASS */);
-          }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
+            }, null, 8 /* PROPS */, _hoisted_28)])], 2 /* CLASS */);
+          }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("section", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("h4", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.recap'))
-          }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dl", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
+          }, null, 8 /* PROPS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dl", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.name'))
-          }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_31), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.name)
-          }, null, 8 /* PROPS */, _hoisted_25), $data.form.specialty ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          }, null, 8 /* PROPS */, _hoisted_32), $data.form.specialty ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
             key: 0
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.specialty'))
-          }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.form.specialty)
-          }, null, 8 /* PROPS */, _hoisted_27)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
+          }, null, 8 /* PROPS */, _hoisted_34)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dt", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('agent.scope'))
-          }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
+          }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("dd", {
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.scopeText)
-          }, null, 8 /* PROPS */, _hoisted_29)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.knows_all")), 1 /* TEXT */)])], 64 /* STABLE_FRAGMENT */))];
+          }, null, 8 /* PROPS */, _hoisted_36)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.knows_all")), 1 /* TEXT */)])], 64 /* STABLE_FRAGMENT */))];
         }),
         _: 1 /* STABLE */
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [$options.editing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_37, [$options.editing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
         key: 0,
         variant: "ghost-danger",
         icon: "fa fa-trash",
@@ -60226,7 +60698,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("agent.delete")), 1 /* TEXT */)];
         }),
         _: 1 /* STABLE */
-      }, 8 /* PROPS */, ["disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_31, $data.step > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
+      }, 8 /* PROPS */, ["disabled", "onClick"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), _hoisted_38, $data.step > 0 ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_ag_button, {
         key: 1,
         variant: "ghost",
         icon: "fa fa-arrow-left",
@@ -72380,40 +72852,83 @@ var _hoisted_1 = {
 };
 var _hoisted_2 = {
   key: 0,
+  "class": "hc-cloudtalk-api-help"
+};
+var _hoisted_3 = {
+  key: 0,
   "class": "hc-cloudtalk-agent-loader"
 };
-var _hoisted_3 = ["disabled"];
-var _hoisted_4 = ["textContent"];
-var _hoisted_5 = ["onUpdate:modelValue", "disabled", "required"];
-var _hoisted_6 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_4 = ["disabled"];
+var _hoisted_5 = ["textContent"];
+var _hoisted_6 = ["onUpdate:modelValue", "disabled", "required"];
+var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: "",
   disabled: ""
 }, null, -1 /* HOISTED */);
-var _hoisted_7 = ["value", "textContent"];
-var _hoisted_8 = {
+var _hoisted_8 = ["value", "textContent"];
+var _hoisted_9 = {
   key: 2,
   "class": "hc-line-secret-preview"
 };
-var _hoisted_9 = ["textContent"];
-var _hoisted_10 = ["title", "onClick"];
-var _hoisted_11 = ["type", "placeholder", "onUpdate:modelValue", "required"];
-var _hoisted_12 = {
-  key: 0,
+var _hoisted_10 = ["textContent"];
+var _hoisted_11 = ["title", "onClick"];
+var _hoisted_12 = ["type", "placeholder", "onUpdate:modelValue", "required"];
+var _hoisted_13 = {
+  key: 1,
   "class": "hc-cloudtalk-sms-confirmation"
 };
-var _hoisted_13 = ["checked"];
-var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Je confirme que ce numéro peut envoyer des SMS.", -1 /* HOISTED */);
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.", -1 /* HOISTED */);
+var _hoisted_14 = ["checked"];
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Je confirme que ce numéro peut envoyer des SMS.", -1 /* HOISTED */);
 var _hoisted_16 = {
-  key: 1
+  key: 2,
+  "class": "hc-config-project-picker"
 };
-var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "comment recevoir des SMS", -1 /* HOISTED */);
-var _hoisted_18 = [_hoisted_17];
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+  "class": "hc-config-project-picker-heading"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Enregistrer cette ligne dans d’autres projets"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "La configuration sélectionnée sera créée ou mise à jour dans chaque projet coché.")], -1 /* HOISTED */);
+var _hoisted_18 = {
+  "class": "hc-config-project-list"
+};
+var _hoisted_19 = ["value", "checked", "disabled", "onChange"];
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = {
+  key: 0,
+  "class": "hc-config-project-status"
+};
+var _hoisted_22 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  "class": "hc-config-project-spinner"
+}, null, -1 /* HOISTED */);
+var _hoisted_23 = ["textContent"];
+var _hoisted_24 = {
+  key: 2,
+  "class": "hc-config-project-status"
+};
+var _hoisted_25 = {
+  key: 3,
+  "class": "hc-cloudtalk-api-help"
+};
+var _hoisted_26 = {
+  "class": "hc-cloudtalk-api-instructions"
+};
+var _hoisted_27 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Pour récupérer l’"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "API Key ID"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et l’"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "API Key Secret"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" :")], -1 /* HOISTED */);
+var _hoisted_28 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("ol", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, "Connectez-vous à votre compte CloudTalk avec un compte administrateur."), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Ouvrez "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Account → Settings → Integrations and automation → API Keys"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(".")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Cliquez sur "), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Add API Key"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" pour créer une clé dédiée à cette intégration.")]), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("li", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Copiez l’"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Access Key ID"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" et l’"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, "Access Key Secret"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" dans les champs correspondants ici.")])], -1 /* HOISTED */);
+var _hoisted_29 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Gardez le Secret confidentiel. Si la page ne permet plus de le consulter, créez une nouvelle clé.", -1 /* HOISTED */);
+var _hoisted_30 = {
+  href: "https://dashboard.cloudtalk.io/menu/account/settings/API-keys",
+  target: "_blank",
+  rel: "noopener noreferrer"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_kavkom_diagnostic = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("kavkom-diagnostic");
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.fields, function (field) {
+  var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal");
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [$props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    href: "#",
+    onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+      return $options.openCloudtalkApiHelp && $options.openCloudtalkApiHelp.apply($options, arguments);
+    }, ["prevent"]))
+  }, " Comment récupérer les clés API ? ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.fields, function (field) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_v_field, {
       key: field.key,
       label: field.label,
@@ -72421,34 +72936,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref) {
         var label = _ref.label;
-        return [$props.operator === 'cloudtalk' && field.key === 'agent_id' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        return [$props.operator === 'cloudtalk' && field.key === 'agent_id' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
           "class": "hc-button-secondary",
           disabled: $data.fetchingCloudtalkAgents || !$options.cloudtalkCredentialsReady,
-          onClick: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
+          onClick: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
             return $options.fetchCloudtalkAgents(true);
           }, ["prevent"]))
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fetchingCloudtalkAgents ? "Vérification en cours..." : "Tester et charger les agents"), 9 /* TEXT, PROPS */, _hoisted_3), $data.cloudtalkMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.fetchingCloudtalkAgents ? "Vérification en cours..." : "Tester et charger les agents"), 9 /* TEXT, PROPS */, _hoisted_4), $data.cloudtalkMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: 0,
           "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(['hc-cloudtalk-agent-message', $data.cloudtalkMessageType]),
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.cloudtalkMessage)
-        }, null, 10 /* CLASS, PROPS */, _hoisted_4)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), field.type === 'select' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
+        }, null, 10 /* CLASS, PROPS */, _hoisted_5)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), field.type === 'select' ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
           key: 1,
           "onUpdate:modelValue": function onUpdateModelValue($event) {
             return $props.config[field.key] = $event;
           },
           disabled: $options.fieldDisabled(field),
           required: $options.fieldRequired(field)
-        }, [_hoisted_6, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.fieldOptions(field), function (option) {
+        }, [_hoisted_7, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.fieldOptions(field), function (option) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
             key: option.value,
             value: option.value,
             textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.label)
-          }, null, 8 /* PROPS */, _hoisted_7);
-        }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_5)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $props.config[field.key]]]) : $options.isSensitiveField(field) && $options.hasFieldValue(field) && !$data.editingFields[field.key] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+          }, null, 8 /* PROPS */, _hoisted_8);
+        }), 128 /* KEYED_FRAGMENT */))], 8 /* PROPS */, _hoisted_6)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $props.config[field.key]]]) : $options.isSensitiveField(field) && $options.hasFieldValue(field) && !$data.editingFields[field.key] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           "class": "hc-line-secret-preview-value",
           textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.maskedValue(field))
-        }, null, 8 /* PROPS */, _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        }, null, 8 /* PROPS */, _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           type: "button",
           "class": "hc-line-secret-preview-edit",
           title: _ctx.$t('edit'),
@@ -72457,7 +72972,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, ["prevent"])
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
           "class": "fa fa-pen"
-        })], 8 /* PROPS */, _hoisted_10)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+        })], 8 /* PROPS */, _hoisted_11)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
           key: 3,
           type: field.type,
           placeholder: label + ' ...',
@@ -72465,26 +72980,59 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             return $props.config[field.key] = $event;
           },
           required: $options.fieldRequired(field)
-        }, null, 8 /* PROPS */, _hoisted_11)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $props.config[field.key]]])];
+        }, null, 8 /* PROPS */, _hoisted_12)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $props.config[field.key]]])];
       }),
       _: 2 /* DYNAMIC */
     }, 1032 /* PROPS, DYNAMIC_SLOTS */, ["label", "required"]);
-  }), 128 /* KEYED_FRAGMENT */)), $options.cloudtalkAgentSmsNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Numéro de l’agent : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkAgentSmsNumber), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }), 128 /* KEYED_FRAGMENT */)), $options.cloudtalkAgentSmsNumber ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Numéro de l’agent : "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("strong", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.cloudtalkAgentSmsNumber), 1 /* TEXT */)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "checkbox",
     checked: $options.cloudtalkSmsConfirmed,
-    onChange: _cache[1] || (_cache[1] = function ($event) {
+    onChange: _cache[2] || (_cache[2] = function ($event) {
       return $options.confirmCloudtalkSmsNumber($event.target.checked);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_13), _hoisted_14]), _hoisted_15])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    type: "button",
-    "class": "hc-button-secondary hc-line-cloudtalk-webhook-button",
-    onClick: _cache[2] || (_cache[2] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14), _hoisted_15]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <p>Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.</p> ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.projects.length > 0 && $props.userId ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("section", _hoisted_16, [_hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.projects, function (project) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
+      key: project.id,
+      "class": "hc-config-project-option"
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      type: "checkbox",
+      value: project.slug,
+      checked: $data.sourceProjects.includes(project.slug),
+      disabled: $data.loadingProjectConfig,
+      onChange: function onChange($event) {
+        return $options.toggleSourceProject(project.slug, $event.target.checked);
+      }
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+      "class": "hc-config-project-option-name",
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(project.name)
+    }, null, 8 /* PROPS */, _hoisted_20), $data.sourceProjects.includes(project.slug) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+      key: 0,
+      "class": "fa fa-check hc-config-project-check"
+    })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }), 128 /* KEYED_FRAGMENT */))]), $data.loadingProjectConfig ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [_hoisted_22, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Chargement des configurations… ")])) : $data.projectConfigMessage ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+    key: 1,
+    "class": "hc-config-project-status",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.projectConfigMessage)
+  }, null, 8 /* PROPS */, _hoisted_23)) : $data.sourceProjects.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_24, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sourceProjects.length) + " projet(s) sélectionné(s) ", 1 /* TEXT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'cloudtalk' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_25, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", {
+    href: "#",
+    onClick: _cache[3] || (_cache[3] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.openCloudtalkWebhookModal && $options.openCloudtalkWebhookModal.apply($options, arguments);
     }, ["prevent"]))
-  }, _hoisted_18)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
-    key: 2,
+  }, " comment recevoir des SMS ? ")])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.operator === 'kavkom' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_kavkom_diagnostic, {
+    key: 4,
     config: $props.config
-  }, null, 8 /* PROPS */, ["config"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, null, 8 /* PROPS */, ["config"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_modal, {
+    name: "cloudtalk-api-help",
+    title: "Récupérer les clés API CloudTalk",
+    width: 520
+  }, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [_hoisted_27, _hoisted_28, _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("a", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)(" Ouvrir le tableau de bord CloudTalk "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+        "class": "fa fa-external-link-alt"
+      })])])];
+    }),
+    _: 1 /* STABLE */
+  })]);
 }
 
 /***/ }),
@@ -72639,8 +73187,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             ref: "operatorConfigFields",
             operator: $data.line.operator,
             config: $data.line.config,
-            fields: $options.operatorFields
-          }, null, 8 /* PROPS */, ["operator", "config", "fields"])];
+            fields: $options.operatorFields,
+            "project-slug": _ctx.project.slug,
+            "user-id": $data.line.user_id
+          }, null, 8 /* PROPS */, ["operator", "config", "fields", "project-slug", "user-id"])];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
@@ -72850,8 +73400,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             ref: "operatorConfigFields",
             operator: $data.lineToUpdate.operator,
             config: $data.lineToUpdate.config,
-            fields: $options.operatorFields
-          }, null, 8 /* PROPS */, ["operator", "config", "fields"])];
+            fields: $options.operatorFields,
+            "project-slug": _ctx.project.slug,
+            "user-id": $data.lineToUpdate.user_id
+          }, null, 8 /* PROPS */, ["operator", "config", "fields", "project-slug", "user-id"])];
         }),
         _: 1 /* STABLE */
       }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_buttons, null, {
@@ -82955,30 +83507,31 @@ var _hoisted_22 = ["textContent"];
 var _hoisted_23 = ["textContent"];
 var _hoisted_24 = ["textContent"];
 var _hoisted_25 = ["textContent"];
-var _hoisted_26 = {
+var _hoisted_26 = ["textContent"];
+var _hoisted_27 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_27 = ["textContent"];
-var _hoisted_28 = {
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_29 = ["textContent"];
-var _hoisted_30 = {
+var _hoisted_30 = ["textContent"];
+var _hoisted_31 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%",
     "position": "relative"
   }
 };
-var _hoisted_31 = ["textContent"];
+var _hoisted_32 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
@@ -83166,6 +83719,26 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }))];
             }),
             _: 1 /* STABLE */
+          }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Use event entry date instead of appointment date "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            tag: "label"
+          }, {
+            "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                "class": "fa fa-calendar-day"
+              }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+                "class": "hc-item-main-content",
+                textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.entry_date'))
+              }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+                modelValue: $options.filterEntryDate,
+                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                  return $options.filterEntryDate = $event;
+                }),
+                style: {
+                  "margin-right": "5px"
+                }
+              }, null, 8 /* PROPS */, ["modelValue"])];
+            }),
+            _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Only the latest appointment for each prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
             tag: "label"
           }, {
@@ -83175,9 +83748,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.latest_only'))
-              }, null, 8 /* PROPS */, _hoisted_19), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterLatest,
-                "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
                   return $options.filterLatest = $event;
                 }),
                 style: {
@@ -83195,9 +83768,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.future'))
-              }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterComing,
-                "onUpdate:modelValue": _cache[11] || (_cache[11] = function ($event) {
+                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
                   return $options.filterComing = $event;
                 }),
                 style: {
@@ -83215,9 +83788,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.old'))
-              }, null, 8 /* PROPS */, _hoisted_21), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotComing,
-                "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
                   return $options.filterNotComing = $event;
                 }),
                 style: {
@@ -83235,9 +83808,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_22), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterConfirmed,
-                "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
+                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
                   return $options.filterConfirmed = $event;
                 }),
                 style: {
@@ -83255,9 +83828,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_confirmed'))
-              }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotConfirmed,
-                "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
+                "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
                   return $options.filterNotConfirmed = $event;
                 }),
                 style: {
@@ -83275,9 +83848,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.done'))
-              }, null, 8 /* PROPS */, _hoisted_24), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterDone,
-                "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
+                "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
                   return $options.filterDone = $event;
                 }),
                 style: {
@@ -83295,9 +83868,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.not_done'))
-              }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
+              }, null, 8 /* PROPS */, _hoisted_26), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
                 modelValue: $options.filterNotDone,
-                "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+                "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
                   return $options.filterNotDone = $event;
                 }),
                 style: {
@@ -83318,8 +83891,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "hc-flex-1"
       }, {
         "1": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[17] || (_cache[17] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[18] || (_cache[18] = function ($event) {
               return $data.tab = 0;
             }),
             "class": "bordered"
@@ -83330,12 +83903,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.select_calendars'))
-              }, null, 8 /* PROPS */, _hoisted_27)];
+              }, null, 8 /* PROPS */, _hoisted_28)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.calendarKeyword,
-            "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
+            "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
               return $data.calendarKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -83351,7 +83924,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: calendar.id,
                   calendar: calendar,
                   modelValue: $options.filterCalendars,
-                  "onUpdate:modelValue": _cache[19] || (_cache[19] = function ($event) {
+                  "onUpdate:modelValue": _cache[20] || (_cache[20] = function ($event) {
                     return $options.filterCalendars = $event;
                   })
                 }, null, 8 /* PROPS */, ["calendar", "modelValue"]);
@@ -83363,8 +83936,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "2": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[20] || (_cache[20] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[21] || (_cache[21] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -83377,12 +83950,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.affected_to'))
-              }, null, 8 /* PROPS */, _hoisted_29)];
+              }, null, 8 /* PROPS */, _hoisted_30)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[21] || (_cache[21] = function ($event) {
+            "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -83398,7 +83971,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterUsers,
-                  "onUpdate:modelValue": _cache[22] || (_cache[22] = function ($event) {
+                  "onUpdate:modelValue": _cache[23] || (_cache[23] = function ($event) {
                     return $options.filterUsers = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);
@@ -83410,8 +83983,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           })])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_30, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
-            onClick: _cache[23] || (_cache[23] = function ($event) {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+            onClick: _cache[24] || (_cache[24] = function ($event) {
               return $data.tab = 0;
             }),
             style: {
@@ -83424,12 +83997,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content hc-flex-column",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.table.filters.appointments.created_by'))
-              }, null, 8 /* PROPS */, _hoisted_31)];
+              }, null, 8 /* PROPS */, _hoisted_32)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
             modelValue: $data.userKeyword,
-            "onUpdate:modelValue": _cache[24] || (_cache[24] = function ($event) {
+            "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
               return $data.userKeyword = $event;
             })
           }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
@@ -83445,7 +84018,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   key: user.id,
                   user: user,
                   modelValue: $options.filterCreators,
-                  "onUpdate:modelValue": _cache[25] || (_cache[25] = function ($event) {
+                  "onUpdate:modelValue": _cache[26] || (_cache[26] = function ($event) {
                     return $options.filterCreators = $event;
                   })
                 }, null, 8 /* PROPS */, ["user", "modelValue"]);
@@ -93754,26 +94327,27 @@ var _hoisted_43 = {
   "class": "hc-prospect-sms-attachments"
 };
 var _hoisted_44 = ["textContent"];
-var _hoisted_45 = {
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = {
   "class": "hc-flex-row"
 };
-var _hoisted_46 = ["textContent"];
-var _hoisted_47 = {
+var _hoisted_47 = ["textContent"];
+var _hoisted_48 = {
   "class": "hc-flex-column hc-prospect-sms-ringover",
   style: {
     "height": "100%",
     "min-height": "0"
   }
 };
-var _hoisted_48 = ["textContent"];
-var _hoisted_49 = {
+var _hoisted_49 = ["textContent"];
+var _hoisted_50 = {
   "class": "hc-flex-column",
   style: {
     "height": "100%"
   }
 };
-var _hoisted_50 = ["textContent"];
 var _hoisted_51 = ["textContent"];
+var _hoisted_52 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_icon = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("icon");
   var _component_item = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("item");
@@ -94212,7 +94786,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "class": "hc-prospect-sms-error",
                     role: "alert",
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendError)
-                  }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_45, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_44)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.sendNotice ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
+                    key: 2,
+                    "class": "hc-prospect-sms-notice",
+                    role: "status",
+                    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.sendNotice)
+                  }, null, 8 /* PROPS */, _hoisted_45)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Fold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_46, [$data.showTextEditor ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_icon, {
                     key: 0,
                     tag: "a",
                     "class": "fa fa-caret-down",
@@ -94234,7 +94813,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                       "align-items": "center"
                     },
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.charsCount + '/' + $options.page)
-                  }, null, 8 /* PROPS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
+                  }, null, 8 /* PROPS */, _hoisted_47), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Sms templates "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
                     tag: "a",
                     "class": "fa fa-file-alt",
                     onClick: _cache[16] || (_cache[16] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function ($event) {
@@ -94301,7 +94880,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }, [_ctx.prospect ? {
             name: "2",
             fn: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+              return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
                 onClick: _cache[21] || (_cache[21] = function ($event) {
                   return $data.tab = 0;
                 }),
@@ -94315,7 +94894,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.via_source', {
                       source: $options.source
                     }))
-                  }, null, 8 /* PROPS */, _hoisted_48)];
+                  }, null, 8 /* PROPS */, _hoisted_49)];
                 }),
                 _: 1 /* STABLE */
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ringover, {
@@ -94335,7 +94914,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           } : undefined]), 1032 /* PROPS, DYNAMIC_SLOTS */, ["tab"])];
         }),
         "3": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item, {
             onClick: _cache[23] || (_cache[23] = function ($event) {
               return $data.tab = 1;
             }),
@@ -94347,7 +94926,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
               }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
                 "class": "hc-item-main-content",
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('prospect.sms.templates'))
-              }, null, 8 /* PROPS */, _hoisted_50)];
+              }, null, 8 /* PROPS */, _hoisted_51)];
             }),
             _: 1 /* STABLE */
           }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
@@ -94379,7 +94958,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                   return $options.addSmsTemplate && $options.addSmsTemplate.apply($options, arguments);
                 }, ["prevent"])),
                 textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('add'))
-              }, null, 8 /* PROPS */, _hoisted_51)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+              }, null, 8 /* PROPS */, _hoisted_52)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
             }),
             _: 1 /* STABLE */
           })])];
@@ -119146,7 +119725,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-steps {\n    display: flex;\n    gap: 8px;\n    list-style: none;\n    padding: 0;\n    margin: 0 0 6px;\n}\n.hc-agent-steps li {\n    flex: 1;\n}\n.hc-agent-steps button {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 4px 10px;\n    border: 0;\n    border-bottom: 3px solid var(--ag-line);\n    background: transparent;\n    color: var(--ag-muted);\n    cursor: pointer;\n    font: inherit;\n    font-size: 13px;\n    transition: color 0.15s ease, border-color 0.15s ease;\n}\n.hc-agent-steps button:disabled {\n    cursor: default;\n}\n.hc-agent-steps button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n    border-radius: 6px;\n}\n.hc-agent-steps li.is-done button {\n    border-bottom-color: var(--ag-success);\n    color: var(--ag-ink-soft);\n}\n.hc-agent-steps li.is-current button {\n    border-bottom-color: var(--ag-accent);\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-step-number {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background: var(--ag-line);\n    color: var(--ag-ink-soft);\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-agent-steps li.is-done .hc-agent-step-number {\n    background: var(--ag-success);\n    color: #fff;\n}\n.hc-agent-steps li.is-current .hc-agent-step-number {\n    background: var(--ag-accent);\n    color: #fff;\n}\n.hc-agent-form-error {\n    margin: 0;\n    padding: 9px 12px;\n    border-radius: 8px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    font-size: 13px;\n}\n.hc-agent-form-intro {\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.45;\n    margin: 0;\n}\n.hc-agent-photo {\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n}\n.hc-agent-photo > img,\n.hc-agent-photo > .fa {\n    width: 76px;\n    height: 76px;\n    flex: 0 0 76px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: #e2e8f0;\n    color: #94a3b8;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);\n}\n.hc-agent-photo-actions {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-photo-choose {\n    display: inline-flex;\n    align-items: center;\n    padding: 7px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: 8px;\n    background: #fff;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease;\n}\n.hc-agent-photo-choose:hover {\n    border-color: #cbd5e1;\n    background: var(--ag-surface);\n}\n.hc-agent-photo-choose:focus-within {\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-photo-choose input {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    opacity: 0;\n    overflow: hidden;\n}\n.hc-agent-photo-hint {\n    flex-basis: 100%;\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-autonomy {\n    display: flex;\n    gap: 12px;\n    align-items: flex-start;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-autonomy:hover {\n    border-color: #cbd5e1;\n}\n.hc-agent-autonomy.is-selected {\n    border-color: var(--ag-accent);\n    background: var(--ag-accent-soft);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.12);\n}\n.hc-agent-autonomy input {\n    margin-top: 3px;\n    accent-color: var(--ag-accent);\n}\n.hc-agent-autonomy-detail {\n    display: block;\n    margin-top: 2px;\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.4;\n}\n.hc-agent-recap {\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n    padding: 12px 14px;\n    font-size: 13px;\n}\n.hc-agent-recap h4 {\n    margin: 0 0 8px;\n    font-size: 11px;\n    font-weight: 700;\n    color: var(--ag-muted);\n    text-transform: uppercase;\n    letter-spacing: 0.06em;\n}\n.hc-agent-recap dl {\n    display: grid;\n    grid-template-columns: max-content 1fr;\n    gap: 4px 14px;\n    margin: 0 0 10px;\n}\n.hc-agent-recap dt {\n    color: var(--ag-muted);\n}\n.hc-agent-recap dd {\n    margin: 0;\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-recap p {\n    margin: 0;\n    color: var(--ag-ink-soft);\n    line-height: 1.45;\n}\n.hc-agent-form-footer {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding-top: 12px;\n    margin-top: 4px;\n    border-top: 1px solid var(--ag-line);\n}\n.hc-agent-form-spacer {\n    flex: 1;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-agent-steps {\n    display: flex;\n    gap: 8px;\n    list-style: none;\n    padding: 0;\n    margin: 0 0 6px;\n}\n.hc-agent-steps li {\n    flex: 1;\n}\n.hc-agent-steps button {\n    width: 100%;\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding: 8px 4px 10px;\n    border: 0;\n    border-bottom: 3px solid var(--ag-line);\n    background: transparent;\n    color: var(--ag-muted);\n    cursor: pointer;\n    font: inherit;\n    font-size: 13px;\n    transition: color 0.15s ease, border-color 0.15s ease;\n}\n.hc-agent-steps button:disabled {\n    cursor: default;\n}\n.hc-agent-steps button:focus-visible {\n    outline: 0;\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n    border-radius: 6px;\n}\n.hc-agent-steps li.is-done button {\n    border-bottom-color: var(--ag-success);\n    color: var(--ag-ink-soft);\n}\n.hc-agent-steps li.is-current button {\n    border-bottom-color: var(--ag-accent);\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-step-number {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    width: 22px;\n    height: 22px;\n    border-radius: 50%;\n    background: var(--ag-line);\n    color: var(--ag-ink-soft);\n    font-size: 12px;\n    font-weight: 700;\n}\n.hc-agent-steps li.is-done .hc-agent-step-number {\n    background: var(--ag-success);\n    color: #fff;\n}\n.hc-agent-steps li.is-current .hc-agent-step-number {\n    background: var(--ag-accent);\n    color: #fff;\n}\n.hc-agent-form-error {\n    margin: 0;\n    padding: 9px 12px;\n    border-radius: 8px;\n    background: var(--ag-danger-soft);\n    color: var(--ag-danger-strong);\n    font-size: 13px;\n}\n.hc-agent-documents {\n    display: grid;\n    gap: 6px;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n}\n.hc-agent-documents p,\n.hc-agent-documents ul {\n    margin: 0;\n}\n.hc-agent-form-intro {\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.45;\n    margin: 0;\n}\n.hc-agent-photo {\n    display: flex;\n    align-items: center;\n    gap: 16px;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n}\n.hc-agent-photo > img,\n.hc-agent-photo > .fa {\n    width: 76px;\n    height: 76px;\n    flex: 0 0 76px;\n    border-radius: 50%;\n    -o-object-fit: cover;\n       object-fit: cover;\n    background: #e2e8f0;\n    color: #94a3b8;\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.15);\n}\n.hc-agent-photo-actions {\n    display: flex;\n    flex-wrap: wrap;\n    align-items: center;\n    gap: 8px;\n}\n.hc-agent-photo-choose {\n    display: inline-flex;\n    align-items: center;\n    padding: 7px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: 8px;\n    background: #fff;\n    color: var(--ag-ink-soft);\n    font-size: 13px;\n    font-weight: 600;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease;\n}\n.hc-agent-photo-choose:hover {\n    border-color: #cbd5e1;\n    background: var(--ag-surface);\n}\n.hc-agent-photo-choose:focus-within {\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.35);\n}\n.hc-agent-photo-choose input {\n    position: absolute;\n    width: 1px;\n    height: 1px;\n    opacity: 0;\n    overflow: hidden;\n}\n.hc-agent-photo-hint {\n    flex-basis: 100%;\n    color: var(--ag-muted);\n    font-size: 12px;\n}\n.hc-agent-autonomy {\n    display: flex;\n    gap: 12px;\n    align-items: flex-start;\n    padding: 12px 14px;\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: #fff;\n    cursor: pointer;\n    transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;\n}\n.hc-agent-autonomy:hover {\n    border-color: #cbd5e1;\n}\n.hc-agent-autonomy.is-selected {\n    border-color: var(--ag-accent);\n    background: var(--ag-accent-soft);\n    box-shadow: 0 0 0 3px rgba(18, 160, 243, 0.12);\n}\n.hc-agent-autonomy input {\n    margin-top: 3px;\n    accent-color: var(--ag-accent);\n}\n.hc-agent-autonomy-detail {\n    display: block;\n    margin-top: 2px;\n    color: var(--ag-muted);\n    font-size: 13px;\n    line-height: 1.4;\n}\n.hc-agent-recap {\n    border: 1px solid var(--ag-line);\n    border-radius: var(--ag-radius);\n    background: var(--ag-surface);\n    padding: 12px 14px;\n    font-size: 13px;\n}\n.hc-agent-recap h4 {\n    margin: 0 0 8px;\n    font-size: 11px;\n    font-weight: 700;\n    color: var(--ag-muted);\n    text-transform: uppercase;\n    letter-spacing: 0.06em;\n}\n.hc-agent-recap dl {\n    display: grid;\n    grid-template-columns: max-content 1fr;\n    gap: 4px 14px;\n    margin: 0 0 10px;\n}\n.hc-agent-recap dt {\n    color: var(--ag-muted);\n}\n.hc-agent-recap dd {\n    margin: 0;\n    color: var(--ag-ink);\n    font-weight: 600;\n}\n.hc-agent-recap p {\n    margin: 0;\n    color: var(--ag-ink-soft);\n    line-height: 1.45;\n}\n.hc-agent-form-footer {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    padding-top: 12px;\n    margin-top: 4px;\n    border-top: 1px solid var(--ag-line);\n}\n.hc-agent-form-spacer {\n    flex: 1;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -119554,7 +120133,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n.hc-cloudtalk-sms-confirmation {\n    padding: 10px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n    color: #333333;\n    font-size: 12px;\n}\n.hc-cloudtalk-sms-confirmation > p {\n    margin: 0 0 8px;\n}\n.hc-cloudtalk-sms-confirmation > p:last-child {\n    margin: 8px 0 0;\n}\n.hc-cloudtalk-sms-confirmation > label {\n    display: flex;\n    align-items: flex-start;\n    gap: 8px;\n    cursor: pointer;\n}\n.hc-cloudtalk-sms-confirmation input {\n    flex-shrink: 0;\n    margin: 3px 0 0;\n}\n.dark .hc-cloudtalk-sms-confirmation {\n    background: #1e293b;\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.hc-line-cloudtalk-webhook {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 10px;\n    padding: 8px 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-line-cloudtalk-webhook-label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    min-width: 0;\n    font-size: 12px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-line-cloudtalk-webhook-label span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-line-cloudtalk-webhook-button {\n    flex: 0 0 auto;\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 12px;\n}\n.dark .hc-line-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-line-operator-config-fields {\n    display: flex;\n    flex-direction: column;\n    gap: 5px;\n}\n.hc-cloudtalk-api-help {\n    display: flex;\n    align-items: center;\n    justify-content: flex-start;\n    gap: 6px;\n    padding: 2px 0;\n    font-size: 11px;\n}\n.hc-cloudtalk-api-help a {\n    color: #12a0f3;\n    font-weight: 600;\n    text-decoration: none;\n    cursor: pointer;\n}\n.hc-cloudtalk-api-instructions {\n    padding: 4px 8px 12px;\n    color: #334155;\n    font-size: 13px;\n    line-height: 1.6;\n}\n.hc-cloudtalk-api-instructions ol {\n    padding-left: 22px;\n}\n.hc-cloudtalk-api-instructions li {\n    margin: 8px 0;\n}\n.hc-cloudtalk-api-instructions a {\n    color: #12a0f3;\n    font-weight: 600;\n}\n.dark .hc-cloudtalk-api-instructions {\n    color: #e2e8f0;\n}\n.hc-cloudtalk-api-help a:hover {\n    text-decoration: underline;\n}\n.hc-config-project-picker {\n    padding: 12px;\n    border: 1px solid #d9e2ec;\n    border-radius: 8px;\n    background: #f8fafc;\n}\n.hc-config-project-picker-heading {\n    display: flex;\n    flex-direction: column;\n    gap: 4px;\n    margin-bottom: 10px;\n    color: #334155;\n    font-size: 13px;\n}\n.hc-config-project-picker-heading span,\n.hc-config-project-status {\n    color: #64748b;\n    font-size: 12px;\n}\n.hc-config-project-list {\n    display: flex;\n    flex-wrap: wrap;\n    gap: 6px;\n    max-height: 180px;\n    overflow-y: auto;\n}\n.hc-config-project-option {\n    display: flex;\n    align-items: center;\n    gap: 9px;\n    min-width: 0;\n    padding: 9px 10px;\n    border: 1px solid #e2e8f0;\n    border-radius: 6px;\n    background: #fff;\n    cursor: pointer;\n}\n.hc-config-project-option:has(input:checked) {\n    border-color: #12a0f3;\n    background: #eff8ff;\n}\n.hc-config-project-option input {\n    flex: 0 0 auto;\n    margin: 0;\n    accent-color: #12a0f3;\n}\n.hc-config-project-option-name {\n    flex: 1;\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #334155;\n    font-size: 12px;\n}\n.hc-config-project-check {\n    color: #12a0f3;\n    font-size: 12px;\n}\n.hc-config-project-status {\n    display: flex;\n    align-items: center;\n    gap: 7px;\n    margin-top: 9px;\n}\n.hc-config-project-spinner {\n    width: 13px;\n    height: 13px;\n    border: 2px solid #cbd5e1;\n    border-top-color: #12a0f3;\n    border-radius: 50%;\n    animation: hc-config-spin 0.7s linear infinite;\n}\n@keyframes hc-config-spin {\nto { transform: rotate(360deg);\n}\n}\n.dark .hc-config-project-picker {\n    border-color: #334155;\n    background: #1e293b;\n}\n.dark .hc-config-project-picker-heading,\n.dark .hc-config-project-option-name {\n    color: #e2e8f0;\n}\n.dark .hc-config-project-option {\n    border-color: #334155;\n    background: #0f172a;\n}\n.dark .hc-config-project-option:has(input:checked) {\n    background: #172f45;\n}\n.hc-line-secret-preview {\n    display: flex;\n    align-items: center;\n    gap: 8px;\n    min-height: 34px;\n}\n.hc-line-secret-preview-value {\n    flex: 1;\n    min-width: 0;\n    padding: 5px 10px;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n    color: #333333;\n}\n.hc-line-secret-preview-edit {\n    display: inline-flex;\n    align-items: center;\n    justify-content: center;\n    flex: 0 0 34px;\n    width: 34px;\n    min-height: 34px;\n    border: none;\n    border-left: 1px solid #dddddd;\n    background: transparent;\n    color: #12a0f3;\n    cursor: pointer;\n}\n.hc-line-secret-preview-edit:focus {\n    outline: 2px solid #12a0f3;\n    outline-offset: -2px;\n}\n.dark .hc-line-secret-preview-value {\n    color: #bbbbbb;\n}\n.dark .hc-line-secret-preview-edit {\n    border-left-color: #444444;\n}\n.hc-cloudtalk-agent-loader {\n    display: flex;\n    flex-direction: column;\n    gap: 8px;\n}\n.hc-cloudtalk-agent-message {\n    font-size: 12px;\n    padding: 8px 10px;\n    border-radius: 6px;\n    background: #f8f9fa;\n    color: #495057;\n}\n.hc-cloudtalk-agent-message.success {\n    background: #e8f5e9;\n    color: #2e7d32;\n}\n.hc-cloudtalk-agent-message.error {\n    background: #ffebee;\n    color: #c62828;\n}\n.hc-cloudtalk-sms-confirmation {\n    padding: 10px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n    color: #333333;\n    font-size: 12px;\n}\n.hc-cloudtalk-sms-confirmation > p {\n    margin: 0 0 8px;\n}\n.hc-cloudtalk-sms-confirmation > p:last-child {\n    margin: 8px 0 0;\n}\n.hc-cloudtalk-sms-confirmation > label {\n    display: flex;\n    align-items: flex-start;\n    gap: 8px;\n    cursor: pointer;\n}\n.hc-cloudtalk-sms-confirmation input {\n    flex-shrink: 0;\n    margin: 3px 0 0;\n}\n.dark .hc-cloudtalk-sms-confirmation {\n    background: #1e293b;\n    border-color: #334155;\n    color: #bbbbbb;\n}\n.hc-line-cloudtalk-webhook {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;\n    gap: 10px;\n    padding: 8px 10px;\n    margin-top: 5px;\n    border: 1px solid #d6e4f0;\n    border-radius: 6px;\n    background: #f4f9ff;\n}\n.hc-line-cloudtalk-webhook-label {\n    display: flex;\n    align-items: center;\n    gap: 6px;\n    min-width: 0;\n    font-size: 12px;\n    font-weight: 600;\n    color: #12a0f3;\n}\n.hc-line-cloudtalk-webhook-label span {\n    min-width: 0;\n    overflow: hidden;\n    text-overflow: ellipsis;\n    white-space: nowrap;\n}\n.hc-line-cloudtalk-webhook-button {\n    flex: 0 0 auto;\n    display: inline-flex;\n    align-items: center;\n    gap: 6px;\n    font-size: 12px;\n}\n.dark .hc-line-cloudtalk-webhook {\n    border-color: #334155;\n    background: #1e293b;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -120754,7 +121333,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n  padding: 4px 0 !important;\n  text-decoration: none;\n}\n.hc-prospect-sms-unconfigured-operators {\n  display: flex;\n  flex-direction: row;\n  justify-content: center;\n  gap: 12px;\n  margin-top: auto;\n  padding: 8px 0;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item {\n  width: auto;\n  padding: 4px;\n  border: 0;\n  background: transparent;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item svg {\n  width: 25px;\n  height: 25px;\n}\n.hc-prospect-sms-item-number {\n  font-size: 11px;\n  color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n  display: block;\n  max-width: 26px;\n  max-height: 26px;\n  -o-object-fit: contain;\n     object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n  color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n  color: #bbbbbb;\n  cursor: not-allowed;\n  text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n  display: flex;\n  overflow-x: auto;\n  max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n  color: #bbbbbb;\n  cursor: wait;\n  text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n  display: flex;\n  flex-direction: row;\n  border-bottom: 1px solid #eee;\n  padding: 5px 5px 0 5px;\n  max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n  height: auto;\n  overflow: auto;\n  flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n  height: 35px;\n  overflow: hidden;\n}\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n  display: flex;\n  flex-direction: column;\n  flex: 0 1 auto;\n  min-height: 0;\n  max-height: 60%;\n  width: 100%;\n  position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  min-height: 0;\n  padding: 15px;\n  gap: 12px;\n  overflow-y: auto;\n  scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n  flex: 0 0 auto;\n  min-height: 0;\n  padding: 10px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n  flex: 0 0 auto;\n  height: 80px;\n  min-height: 50px;\n  max-height: 400px;\n  width: 100%;\n\n  resize: vertical;\n  overflow-y: auto;\n\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  box-sizing: border-box;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.hc-prospect-sms-item {\n  padding: 4px 0 !important;\n  text-decoration: none;\n}\n.hc-prospect-sms-unconfigured-operators {\n  display: flex;\n  flex-direction: row;\n  justify-content: center;\n  gap: 12px;\n  margin-top: auto;\n  padding: 8px 0;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item {\n  width: auto;\n  padding: 4px;\n  border: 0;\n  background: transparent;\n}\n.hc-prospect-sms-unconfigured-operators .hc-item svg {\n  width: 25px;\n  height: 25px;\n}\n.hc-prospect-sms-item-number {\n  font-size: 11px;\n  color: #999999;\n}\n.hc-prospect-sms-cloudtalk-logo img {\n  display: block;\n  max-width: 26px;\n  max-height: 26px;\n  -o-object-fit: contain;\n     object-fit: contain;\n}\nbutton.hc-prospect-sms-send {\n  color: #8641a6;\n}\nbutton.hc-prospect-sms-send:disabled,\nbutton.hc-prospect-sms-send:disabled:hover,\nbutton.hc-prospect-sms-attach:disabled,\nbutton.hc-prospect-sms-attach:disabled:hover {\n  color: #bbbbbb;\n  cursor: not-allowed;\n  text-shadow: none;\n}\n.hc-prospect-sms-attachments {\n  display: flex;\n  overflow-x: auto;\n  max-height: 120px;\n}\nbutton.hc-prospect-sms-refresh:disabled,\nbutton.hc-prospect-sms-refresh:disabled:hover {\n  color: #bbbbbb;\n  cursor: wait;\n  text-shadow: none;\n}\n#hc-prospect-sms-textarea {\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  max-height: 200px;\n}\n#hc-prospect-sms-selected-prospects {\n  display: flex;\n  flex-direction: row;\n  border-bottom: 1px solid #eee;\n  padding: 5px 5px 0 5px;\n  max-height: 100%;\n}\n#hc-prospect-sms-selected-prospects-list {\n  height: auto;\n  overflow: auto;\n  flex: 1;\n}\n.folded #hc-prospect-sms-selected-prospects-list {\n  height: 35px;\n  overflow: hidden;\n}\n\n/* Liste des SMS : hauteur selon le contenu */\n.hc-prospect-sms-list {\n  display: flex;\n  flex-direction: column;\n  flex: 0 1 auto;\n  min-height: 0;\n  max-height: 60%;\n  width: 100%;\n  position: relative;\n}\n\n/* Messages avec scroll si nécessaire */\n.hc-prospect-sms-messages {\n  display: flex;\n  flex-direction: column;\n  width: 100%;\n  min-height: 0;\n  padding: 15px;\n  gap: 12px;\n  overflow-y: auto;\n  scroll-behavior: smooth;\n}\n\n/* Formulaire : suit directement les messages */\n.hc-prospect-sms-form {\n  flex: 0 0 auto;\n  min-height: 0;\n  padding: 10px;\n  position: relative;\n  display: flex;\n  flex-direction: column;\n  justify-content: flex-start;\n}\n.hc-prospect-sms-notice {\n  margin-top: 6px;\n  color: #27833b;\n}\n\n/* Textarea : s'agrandit avec le formulaire */\n#hc-prospect-sms-textarea {\n  flex: 0 0 auto;\n  height: 80px;\n  min-height: 50px;\n  max-height: 400px;\n  width: 100%;\n\n  resize: vertical;\n  overflow-y: auto;\n\n  border: 1px solid #dddddd;\n  border-radius: 5px;\n  padding: 10px;\n  box-sizing: border-box;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 

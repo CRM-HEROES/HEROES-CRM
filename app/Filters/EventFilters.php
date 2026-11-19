@@ -261,7 +261,40 @@ class EventFilters extends Filters
      * Filter by started at
      */
     public function startedAt(Builder $builder, $value) {
+        if ($this->getFilter('entryDate')) {
+            return $this->enteredAfter($builder, $value);
+        }
+
         $builder->where('started_at', '>=', substr($value, 0, 10) . " 00:00:00");
+    }
+
+    /**
+     * Select whether date range filters use event entry dates.
+     */
+    public function entryDate(Builder $builder, $value) {
+        return $builder;
+    }
+
+    /**
+     * Filter events whose most recent creation or modification date is on or after a date.
+     */
+    public function enteredAfter(Builder $builder, $value) {
+        $date = substr($value, 0, 10) . ' 00:00:00';
+
+        return $builder->where(function($query) use($date) {
+            $query->where('events.created_at', '>=', $date)
+                ->orWhere('events.updated_at', '>=', $date);
+        });
+    }
+
+    /**
+     * Filter events whose most recent creation or modification date is on or before a date.
+     */
+    public function enteredBefore(Builder $builder, $value) {
+        $date = substr($value, 0, 10) . ' 23:59:59';
+
+        return $builder->where('events.created_at', '<=', $date)
+            ->where('events.updated_at', '<=', $date);
     }
 
     /**
@@ -303,6 +336,10 @@ class EventFilters extends Filters
      * Filter by ended at
      */
     public function endedAt(Builder $builder, $value) {
+        if ($this->getFilter('entryDate')) {
+            return $this->enteredBefore($builder, $value);
+        }
+
         $builder->where('ended_at', '<=', substr($value, 0, 10) . " 23:59:59");
     }
 

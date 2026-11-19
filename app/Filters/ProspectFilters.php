@@ -585,6 +585,7 @@ class ProspectFilters extends Filters
         return $builder->whereHas('events', function($query) use($value) {
             $query->when(!empty($value), function($query) use($value) {
                 $eventFilter = new EventFilters();
+                $eventFilter->addFilters($value);
 
                 foreach ($value as $k => $v) {
                     $eventFilter->{$k}($query, $v);
@@ -600,6 +601,7 @@ class ProspectFilters extends Filters
         return $builder->whereDoesntHave('events', function($query) use($value) {
             $query->when(!empty($value), function($query) use($value) {
                 $eventFilter = new EventFilters();
+                $eventFilter->addFilters($value);
 
                 foreach ($value as $k => $v) {
                     $eventFilter->{$k}($query, $v);

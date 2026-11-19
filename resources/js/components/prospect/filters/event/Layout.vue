@@ -204,6 +204,23 @@
                     <icon v-else class="fa fa-plus" />
                 </item>
 
+                <!-- Use event entry date instead of appointment date -->
+                <item tag="label">
+                    <icon class="fa fa-calendar-day" />
+                    <div
+                        class="hc-item-main-content"
+                        v-text="
+                            $t(
+                                'prospect.table.filters.appointments.entry_date'
+                            )
+                        "
+                    ></div>
+                    <checkbox
+                        v-model="filterEntryDate"
+                        style="margin-right: 5px"
+                    />
+                </item>
+
                 <!-- Only the latest appointment for each prospect -->
                 <item tag="label">
                     <icon class="fa fa-calendar-check" />
@@ -754,6 +771,24 @@ export default {
                     eventParams.endedAt = value;
                 } else if (eventParams.endedAt) {
                     delete eventParams.endedAt;
+                }
+                this.eventParams =
+                    Object.keys(eventParams).length > 0 ? eventParams : null;
+            },
+        },
+
+        filterEntryDate: {
+            get() {
+                const eventParams = this.eventParams;
+
+                return eventParams && eventParams.entryDate == 1;
+            },
+            set(value) {
+                const eventParams = this.eventParams || {};
+                if (value) {
+                    eventParams.entryDate = 1;
+                } else if (eventParams.entryDate !== undefined) {
+                    delete eventParams.entryDate;
                 }
                 this.eventParams =
                     Object.keys(eventParams).length > 0 ? eventParams : null;
