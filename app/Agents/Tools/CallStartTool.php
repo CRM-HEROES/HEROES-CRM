@@ -131,7 +131,17 @@ class CallStartTool implements AgentToolInterface
             ], 'Appel lancé par ' . $this->providerLabel($context) . ' ; l’issue sera enregistrée après le webhook.', 1);
         }
 
-        $this->completion->complete($attempt, $prospect, $context->project, $context->owner, $result);
+        try {
+            $this->completion->complete($attempt, $prospect, $context->project, $context->owner, $result);
+        } catch (RuntimeException $exception) {
+            // The call took place and its outcome is recorded: only the follow-up (label, calendar) could not be set up.
+            // Saying so matters: a vague error would let the agent dial the prospect a second time.
+            return ToolResult::error(
+                'L’appel a bien eu lieu (issue : ' . ($result['outcome'] ?? 'inconnue') . ') et il est enregistré, mais la suite n’a pas pu être planifiée : '
+                . $exception->getMessage() . ' Ne relance pas cet appel.',
+                ToolResult::UNAVAILABLE
+            );
+        }
         $attempt->refresh();
 
         return ToolResult::ok([
@@ -224,7 +234,8 @@ class CallStartTool implements AgentToolInterface
             ->limit(5)
             ->get(['status', 'data', 'started_at'])
             ->map(fn (Interaction $interaction) => [
-                'at' => $interaction->started_at?->toIso8601String(),
+                // The column is not cast to a date by the model: it comes as text
+                'at' => $interaction->started_at ? \Carbon\Carbon::parse($interaction->started_at)->toIso8601String() : null,
                 'status' => $interaction->status,
                 'summary' => mb_substr((string) data_get($interaction->data, 'note', data_get($interaction->data, 'summary', '')), 0, 300),
             ])

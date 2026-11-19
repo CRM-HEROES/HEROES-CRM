@@ -61,7 +61,8 @@ class TrashItems
             'event' => $base + [
                 'prospect_id' => $item->prospect_id,
                 'name' => $this->text($item->name),
-                'starts_at' => optional($item->started_at)->toIso8601String(),
+                // started_at is not cast by the model: it comes as text
+                'starts_at' => $item->started_at ? \Carbon\Carbon::parse($item->started_at)->toIso8601String() : null,
             ],
         };
     }

@@ -130,7 +130,8 @@ class ImportStatusTool implements AgentToolInterface
             'state' => $this->state($import),
             'rows' => $import->rows_count,
             'columns' => $import->cols_count,
-            'processed_at' => optional($import->processed_at)->toIso8601String(),
+            // processed_at is not cast by the model: it comes as text
+            'processed_at' => $import->processed_at ? \Carbon\Carbon::parse($import->processed_at)->toIso8601String() : null,
             'sync_enabled' => (bool) $import->sync_enabled,
             'last_synced_at' => optional($import->last_synced_at)->toIso8601String(),
         ];
