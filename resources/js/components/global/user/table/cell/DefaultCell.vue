@@ -65,6 +65,7 @@
     </label>
     <input
         v-else
+        :type="field == 'password' ? 'password' : 'text'"
         class="hc-default-cell-input"
         v-model.lazy="value"
         @focus="select"

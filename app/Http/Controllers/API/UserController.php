@@ -6,6 +6,7 @@ use App\Filters\UserRequestFilters;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserSetting;
+use App\Rules\StrongPassword;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -167,9 +168,25 @@ class UserController extends Controller
     {
         abort_unless(auth()->user()->is_super_admin || auth()->id() == $user->id || $user->creator_id == auth()->id(), 404, 'You cannot update this user!');
 
-        // Le mot de passe ne se modifie JAMAIS ici : l'utilisateur le change lui-même via un email de confirmation
-        // (POST /password/email). Toute valeur "password" envoyée est ignorée.
         $data = $request->only($this->fields);
+        $passwordUpdated = false;
+
+        if ($request->exists('password')) {
+            $validated = $request->validate([
+                'password' => ['required', 'string', new StrongPassword()],
+            ], [
+                'password.required' => 'Le nouveau mot de passe est requis.',
+            ]);
+
+            if (Hash::check($validated['password'], $user->password)) {
+                return response()->json([
+                    'message' => 'Le nouveau mot de passe doit être différent du mot de passe actuel.',
+                ], 422);
+            }
+
+            $data['password'] = Hash::make($validated['password']);
+            $passwordUpdated = true;
+        }
 
         // Le rôle n'est modifiable que par un super admin (avant : chacun pouvait se donner le rôle super_admin)
         if (!auth()->user()->is_super_admin) {
@@ -177,6 +194,13 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        if ($passwordUpdated) {
+            $user->forceFill([
+                'must_change_password' => false,
+                'password_temporary_expires_at' => null,
+            ])->save();
+        }
 
         return ['message' => trans('common.success.updated_resource')];
     }
