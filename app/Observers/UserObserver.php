@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\UserSetting;
 use App\Notifications\UserRegistration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class UserObserver
 {
@@ -66,6 +67,29 @@ class UserObserver
         $categoryStatus = $demoProject->categories()->where('name', trans('label.category.status.name'))->first();
         if ($categoryStatus) {
             $setting = array_values(array_merge([["key"=>"category->" . $categoryStatus->id]], $setting));
+        }
+
+        // Les prospects de démonstration sont un bonus : leur échec (fichier absent,
+        // fichier illisible…) ne doit jamais empêcher la création de l'utilisateur.
+        try {
+            $this->importDemoProspects($user, $demoProject, $setting);
+        } catch (\Throwable $e) {
+            Log::error('UserObserver: import des prospects de démonstration impossible', [
+                'user_id' => $user->id,
+                'project_id' => $demoProject->id,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * Import the demo prospects into the demo project
+     */
+    protected function importDemoProspects(User $user, $demoProject, array $setting)
+    {
+        if (!is_file(storage_path('app/imports/demo.xlsx'))) {
+            Log::warning('UserObserver: storage/app/imports/demo.xlsx introuvable, projet démo créé sans prospects');
+            return;
         }
 
         $demoImport = $demoProject->imports()->create([
