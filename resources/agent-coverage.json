@@ -46,11 +46,13 @@
         "utilisateurs-roles"
       ],
       "read_tools": [
-        "crm_search",
-        "project_config"
+        "team_members"
       ],
-      "write_tools": [],
-      "excluded": "Sensible : création, blocage, droits et affectations d'utilisateurs ne sont pas confiés à l'agent (décision à confirmer)."
+      "write_tools": [
+        "project_user_membership",
+        "user_roles_set"
+      ],
+      "note": "Décision : lecture, rattachement de comptes existants et rôles, toujours validés par un humain. Pas de création de compte, d'invitation, de blocage ni de modification de fiche utilisateur ; jamais un super-administrateur, le créateur du projet ni le propriétaire de l'agent."
     },
     "project/role": {
       "label": "Rôles et permissions",
@@ -60,10 +62,10 @@
         "affectations-utilisateurs-roles"
       ],
       "read_tools": [
-        "project_config"
+        "team_members"
       ],
       "write_tools": [],
-      "excluded": "Sensible : les droits ne sont pas modifiables par l'agent."
+      "note": "Décision : l'agent lit les rôles et leurs permissions mais ne les modifie pas (création de rôle, permissions) : c'est l'écran des rôles."
     },
     "project/import": {
       "label": "Imports de prospects (fichier, Google Sheets)",
@@ -71,12 +73,14 @@
         "prospection"
       ],
       "read_tools": [
-        "import_status"
+        "import_status",
+        "import_mapping"
       ],
       "write_tools": [
-        "import_run"
+        "import_run",
+        "import_configure"
       ],
-      "note": "Le téléversement du fichier et le mapping des colonnes restent à faire dans l'interface.",
+      "note": "Le téléversement du fichier, le choix des feuilles, la création d'un champ à la volée et l'affectation d'utilisateurs aux prospects importés restent à faire dans l'interface.",
       "priority": "haute"
     },
     "project/document": {
@@ -645,8 +649,10 @@
         "google-pappers-claude"
       ],
       "read_tools": [],
-      "write_tools": [],
-      "excluded": "Appelle un service payant et crée des prospects en masse : à décider."
+      "write_tools": [
+        "pappers_search"
+      ],
+      "note": "Service payant qui crée des prospects (dont des personnes physiques) : toujours validé par un humain, filtre de lieu obligatoire, 25 résultats par page, un appel par tour, budget par jour et par projet (config agents.pappers_*). L'agent ne reçoit pas les données renvoyées."
     },
     "project/google": {
       "label": "Google Drive du projet",
@@ -860,7 +866,7 @@
       ],
       "read_tools": [],
       "write_tools": [],
-      "excluded": "Lecture d'activité des collègues : à décider."
+      "excluded": "Décision définitive du propriétaire du produit : l'agent ne lit pas l'activité des collègues (pas de surveillance individuelle). Il garde les statistiques d'équipe agrégées (team_performance, compare_periods)."
     },
     "user/tracker-stat": {
       "label": "Statistiques d'activité",
@@ -869,7 +875,7 @@
       ],
       "read_tools": [],
       "write_tools": [],
-      "excluded": "Lecture d'activité des collègues : à décider."
+      "excluded": "Décision définitive du propriétaire du produit : l'agent ne lit pas l'activité des collègues (pas de surveillance individuelle). Il garde les statistiques d'équipe agrégées (team_performance, compare_periods)."
     },
     "user/events-daily-direction": {
       "label": "Itinéraires d'un utilisateur",

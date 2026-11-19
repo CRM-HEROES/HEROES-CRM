@@ -41,6 +41,9 @@ class LabelController extends Controller
      */
     public function update(Project $project, Role $role, Label $label)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $label->category->project_id, 404);
         abort_unless($label->category->for == "role", 404);
 
@@ -61,6 +64,9 @@ class LabelController extends Controller
      */
     public function destroy(Project $project, Role $role, Label $label)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $label->category->project_id, 404);
         abort_unless($label->category->for == "role", 404);
 
@@ -74,6 +80,8 @@ class LabelController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'labels' => 'required',
             'roles' => 'required',

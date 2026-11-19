@@ -14,6 +14,24 @@ use Illuminate\Http\Request;
 class TrashController extends Controller
 {
     /**
+     * The right to delete each kind of item: the one needed to restore it or to erase it for good
+     */
+    public const RIGHTS = [
+        'prospects' => 'prospectDelete',
+        'orders' => 'prospectOrderDelete',
+        'events' => 'prospectEventDelete',
+        'categories' => 'projectCategoryDelete',
+        'labels' => 'projectCategoryLabelDelete',
+        'threads' => 'projectThreadDelete',
+        'messages' => 'projectThreadDelete',
+        'folders' => 'projectFolderDelete',
+        'files' => 'projectFolderDelete',
+        'order-actions' => 'projectOrderActionDelete',
+        'order-status' => 'projectOrderStatusDelete',
+        'calendars' => 'projectCalendarDelete',
+    ];
+
+    /**
      * Prospects
      */
     public function prospect(Project $project, Request $request)
@@ -338,6 +356,9 @@ class TrashController extends Controller
             if (empty($request->input($type))) {
                 continue;
             }
+
+            // Restoring or erasing needs the right that deleting this kind of item needs (the route checked nothing)
+            abort_unless(auth()->user()->can(self::RIGHTS[$type], $project), 403);
 
             $items = $this->bulkItems($project, $request->input($type), $type)->onlyTrashed();
 

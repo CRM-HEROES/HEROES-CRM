@@ -41,6 +41,10 @@ class CalendarController extends Controller
      */
     public function update(Project $project, Role $role, Calendar $calendar)
     {
+        // Giving a role access to items decides what its members see: the right to update roles (same as the role screen).
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $calendar->project_id, 404);
 
         $role
@@ -60,6 +64,9 @@ class CalendarController extends Controller
      */
     public function destroy(Project $project, Role $role, Calendar $calendar)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $calendar->project_id, 404);
 
         $role->calendars()->detach($calendar->id);
@@ -72,6 +79,8 @@ class CalendarController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'calendars' => 'required',
             'roles' => 'required',

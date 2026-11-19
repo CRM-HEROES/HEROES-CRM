@@ -26,6 +26,9 @@ class LabelController extends Controller
      */
     public function update(Project $project, Pipeline $pipeline, Label $label)
     {
+        // The stages of a pipeline: the right to update pipelines (same as the pipeline screen).
+        abort_unless(auth()->user()->can('projectPipelineUpdate', $project), 404);
+
         // Label category associated to the current project
         abort_unless($project->id == $pipeline->project_id, 404);
         abort_unless($project->id == $label->category->project_id, 404);
@@ -47,6 +50,8 @@ class LabelController extends Controller
      */
     public function destroy(Project $project, Pipeline $pipeline, Label $label)
     {
+        abort_unless(auth()->user()->can('projectPipelineUpdate', $project), 404);
+
         // Pipeline associated to the current project
         abort_unless($project->id == $pipeline->project_id, 404);
         abort_unless($project->id == $label->category->project_id, 404);
@@ -86,6 +91,8 @@ class LabelController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectPipelineUpdate', $project), 404);
+
         $this->validate($request, [
             'labels' => 'required',
             'pipelines' => 'required',

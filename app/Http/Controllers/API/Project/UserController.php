@@ -200,8 +200,12 @@ class UserController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        // Same rule as removing one user (destroy): only a super administrator or an administrator of the project.
+        // The route used to check nothing: any member could take the others out of the project.
+        abort_unless(auth()->user()->is_super_admin || auth()->user()->can('', $project), 404);
+
         $this->validate($request, [
-            'users' => 'required',
+            'users' => 'required|array',
             'action' => 'required',
         ]);
 
