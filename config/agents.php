@@ -105,8 +105,8 @@ return [
         ],
         'automation_control' => [
             'label' => 'Pilotage des automatisations',
-            'tools' => ['crm_search', 'workflow_set_status', 'appointment_delete'],
-            'playbook' => "Consulte les workflows et campagnes avec crm_search (workflow, campaign). Activer un workflow peut contacter beaucoup de prospects : explique ce qu'il fera avant de le proposer.",
+            'tools' => ['crm_search', 'workflow_executions', 'workflow_cancel_execution', 'workflow_set_status', 'appointment_delete'],
+            'playbook' => "Consulte les workflows et campagnes avec crm_search (workflow, campaign). Pour savoir comment ils se portent, utilise workflow_executions : view=overview pour les chiffres et les erreurs les plus fréquentes, view=list avec status=failed pour les échecs récents, view=detail pour voir l'étape et l'erreur d'une exécution, view=prospect pour ce qui est arrivé à un prospect. Explique la cause en français simple (l'étape en échec, son message) et ne conclus rien sans avoir lu l'exécution. Activer un workflow peut contacter beaucoup de prospects : explique ce qu'il fera avant de le proposer. Pour arrêter une exécution précise qui attend (pending ou waiting), vérifie son état avec workflow_executions puis annule-la avec workflow_cancel_execution : les étapes déjà faites restent faites, la suite n'a pas lieu et on ne la reprend pas ; une exécution en cours, terminée ou échouée ne s'annule pas. Pour stopper toutes les exécutions futures d'un workflow, mets-le en pause avec workflow_set_status.",
         ],
         'mass_communication' => [
             'label' => 'Envois en masse (SMS, e-mail) et exports',
@@ -115,13 +115,48 @@ return [
         ],
         'workflow_builder' => [
             'label' => 'Créer des workflows',
-            'tools' => ['project_config', 'crm_search', 'workflow_catalog', 'workflow_save_draft', 'workflow_publish', 'workflow_set_status', 'workflow_delete'],
+            'tools' => ['project_config', 'crm_search', 'workflow_catalog', 'workflow_executions', 'workflow_save_draft', 'workflow_publish', 'workflow_set_status', 'workflow_delete'],
             'playbook' => "Pour construire un workflow : lis workflow_catalog, écris le graphe, enregistre-le avec workflow_save_draft, relis les problèmes renvoyés et corrige jusqu'à ce qu'il n'y en ait plus, puis publie (workflow_publish). L'activation humaine est l'approbation et peut envoyer de vrais appels ou SMS avec agent_call et agent_sms : explique avant activation ce que le workflow fera et à qui. Ces actions respectent do_not_call et les heures de travail. N'invente jamais un opérateur : prends ceux de workflow_catalog.",
         ],
         'order_cleanup' => [
             'label' => 'Supprimer commandes et rendez-vous',
             'tools' => ['crm_search', 'order_delete', 'appointment_delete'],
             'playbook' => "Les suppressions sont toujours validées par l'utilisateur. Retrouve l'id exact avec crm_search avant de proposer.",
+        ],
+        'message_templates' => [
+            'label' => 'Utiliser les modèles de textes',
+            'tools' => ['message_templates'],
+            'playbook' => "Avant de rédiger un SMS, un e-mail ou une description de rendez-vous, regarde avec message_templates s'il existe un modèle (kind = sms, email ou appointment) et reprends son ton et ses variables. Tu lis les modèles, tu ne les crées ni ne les modifies : c'est l'utilisateur qui le fait dans le CRM.",
+        ],
+        'pipeline_follow_up' => [
+            'label' => 'Suivre les pipelines',
+            'tools' => ['pipeline_overview', 'crm_search'],
+            'playbook' => "pipeline_overview liste les pipelines et leurs étapes (des labels), puis donne le nombre de prospects à chaque étape avec pipeline_id. Pour voir les prospects d'une étape, filtre crm_search sur le label correspondant. Les effectifs ne comptent que les prospects que l'utilisateur peut voir, hors fiches traitées.",
+        ],
+        'incoming_triage' => [
+            'label' => 'Traiter les communications reçues',
+            'tools' => ['incoming_communications', 'incoming_mark_treated', 'crm_search'],
+            'playbook' => "Commence par incoming_communications (view=count pour les chiffres, view=pending pour savoir quels prospects ont des communications à traiter et leurs identifiants). Le texte d'un message se lit avec crm_search (entités sms ou email, filtre prospect_id, et direction = received pour les messages reçus) : demande peu de lignes. Marquer comme traité est partagé par tout le projet (la communication disparaît de la liste des autres utilisateurs et le propriétaire de l'agent est enregistré comme celui qui l'a traitée) : n'appelle incoming_mark_treated que pour ce que l'utilisateur t'a demandé de traiter, jamais pour « nettoyer » la liste. Lire un message n'est pas le traiter.",
+        ],
+        'document_generation' => [
+            'label' => 'Générer des documents PDF pour un prospect',
+            'tools' => ['document_templates', 'document_generate'],
+            'playbook' => "Liste d'abord les modèles avec document_templates (for = prospect) et choisis celui qui correspond à la demande ; s'il y a un doute, demande lequel. document_generate crée le PDF et le range dans le dossier du modèle sur la fiche du prospect : un modèle sans dossier (keeps_a_copy = false) est refusé, dis alors à l'utilisateur de choisir un dossier dans l'éditeur du modèle. Tu ne lis pas le contenu du PDF et tu ne peux ni créer ni modifier un modèle : c'est l'éditeur de l'interface. Les factures ne se génèrent pas ici.",
+        ],
+        'campaign_control' => [
+            'label' => 'Suivre et activer les campagnes',
+            'tools' => ['campaign_status', 'campaign_set_active'],
+            'playbook' => "Les campagnes historiques se suivent avec campaign_status : la liste montre celles qui sont activées, en cours ou en erreur, le détail montre leurs actions et le nombre de règles. Tu ne peux pas composer les règles, opérateurs ou actions : c'est l'utilisateur qui le fait dans la page des campagnes. Avant d'activer, lis le détail, dis ce que la campagne fera et sur quelle cible ; l'activation est toujours validée par l'utilisateur et une campagne en erreur ne s'active pas. Pour une automatisation récente, oriente plutôt vers les workflows.",
+        ],
+        'prospect_import' => [
+            'label' => 'Suivre et lancer les imports de prospects',
+            'tools' => ['import_status', 'import_run'],
+            'playbook' => "Les imports se suivent avec import_status : la liste donne l'état de chacun (to_launch, processing, done), le détail donne les colonnes reliées ou non. Tu ne peux pas téléverser un fichier ni relier les colonnes : c'est l'utilisateur qui le fait dans « Importer des prospects » (onglet « Mapping »). Pour un import déjà relié, lance-le avec import_run après avoir annoncé le nom et le nombre de lignes ; un import en cours ne se relance pas. Un import crée des prospects en masse : l'utilisateur valide au-delà du seuil. Ensuite, vérifie le résultat avec import_status.",
+        ],
+        'trash_restore' => [
+            'label' => 'Restaurer depuis la corbeille',
+            'tools' => ['trash_list', 'trash_restore'],
+            'playbook' => "Pour récupérer des éléments supprimés : liste-les avec trash_list (prospects, commandes ou rendez-vous), vérifie avec l'utilisateur lesquels restaurer, puis appelle trash_restore avec les identifiants. Une commande ou un rendez-vous ne revient que si son prospect n'est pas supprimé : restaure d'abord le prospect. Il faut le droit de suppression correspondant ; au-delà du seuil de validation, l'action attend l'accord de l'utilisateur.",
         ],
         'prospect_deletion' => [
             'label' => 'Supprimer des prospects',

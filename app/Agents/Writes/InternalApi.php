@@ -28,7 +28,7 @@ class InternalApi
     /**
      * @return InternalResponse
      */
-    public function call(AgentExecutionContext $context, string $method, string $path, array $data = []): InternalResponse
+    public function call(AgentExecutionContext $context, string $method, string $path, array $data = [], bool $discardFile = false): InternalResponse
     {
         $uri = '/api/project/' . $context->project->getRouteKey() . '/' . ltrim($path, '/');
         $isRead = strtoupper($method) === 'GET';
@@ -54,6 +54,17 @@ class InternalApi
             auth()->shouldUse($defaultGuard);
             // The project middleware set the team: it is the same project
             setPermissionsTeamId($context->project->id);
+        }
+
+        // A route that answers with a file (a generated PDF) the caller does not read: let it delete its temporary file
+        // as it would after sending it, without keeping the content
+        if ($discardFile && $response instanceof \Symfony\Component\HttpFoundation\BinaryFileResponse) {
+            ob_start();
+            try {
+                $response->sendContent();
+            } finally {
+                ob_end_clean();
+            }
         }
 
         $json = json_decode((string) $response->getContent(), true);
