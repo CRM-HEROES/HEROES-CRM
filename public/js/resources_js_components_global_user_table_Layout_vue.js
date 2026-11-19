@@ -3615,7 +3615,7 @@ var _hoisted_11 = {
 var _hoisted_12 = ["disabled"];
 var _hoisted_13 = ["textContent"];
 var _hoisted_14 = ["href"];
-var _hoisted_15 = ["disabled"];
+var _hoisted_15 = ["type", "disabled"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return $props.field == 'created_at' || $props.field == 'updated_at' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label)
@@ -3691,6 +3691,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "fa fa-external-link"
   }, null, 8 /* PROPS */, _hoisted_14)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
     key: 5,
+    type: $props.field == 'password' ? 'password' : 'text',
     "class": "hc-default-cell-input",
     "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
       return $options.value = $event;
@@ -3706,7 +3707,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, ["up"])), _cache[19] || (_cache[19] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)(function () {
       return $options.focusNextProjectInput && $options.focusNextProjectInput.apply($options, arguments);
     }, ["down"]))]
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $options.value, void 0, {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $options.value, void 0, {
     lazy: true
   }]]);
 }

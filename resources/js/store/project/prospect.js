@@ -64,7 +64,6 @@ import userStore from "@/store/project/prospect/user";
  */
 export const state = {
     prospects: [],
-    prospectRevisionLoading: {},
     prospectsSelected: [],
     prospectsSelectedIndex: null,
     prospectsPage: 1,
