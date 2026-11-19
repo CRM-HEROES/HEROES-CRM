@@ -69,8 +69,8 @@
 
 <script>
 import { mapGetters } from "vuex";
-import DefaultCell from "@/components/user/table/cell/DefaultCell.vue";
-import StreetCell from "@/components/user/table/cell/StreetCell.vue";
+import DefaultCell from "@/components/global/user/table/cell/DefaultCell.vue";
+import StreetCell from "@/components/global/user/table/cell/StreetCell.vue";
 
 export default {
     components: {

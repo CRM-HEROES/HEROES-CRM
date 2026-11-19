@@ -113,9 +113,43 @@ export const actions = {
      * @returns
      */
     async [UPDATE_GLOBAL_USER](context, params) {
-        context.commit(UPDATE_GLOBAL_USER, params);
-        const { data } = await UserService.update(params.id, params);
-        return data;
+        const isPasswordUpdate = Object.prototype.hasOwnProperty.call(
+            params,
+            "password"
+        );
+
+        if (!isPasswordUpdate) {
+            context.commit(UPDATE_GLOBAL_USER, params);
+        }
+
+        try {
+            const { data } = await UserService.update(params.id, params);
+            return data;
+        } catch (error) {
+            if (!isPasswordUpdate) {
+                throw error;
+            }
+
+            const responseData = error?.response?.data;
+            const validationMessage = responseData?.errors
+                ? Object.values(responseData.errors).flat().join(" ")
+                : "";
+
+            window.flashError({
+                title: "Mot de passe",
+                body:
+                    responseData?.message ||
+                    validationMessage ||
+                    "Impossible de modifier le mot de passe.",
+            });
+        } finally {
+            if (isPasswordUpdate) {
+                context.commit(UPDATE_GLOBAL_USER, {
+                    id: params.id,
+                    password: "",
+                });
+            }
+        }
     },
 
     /**
