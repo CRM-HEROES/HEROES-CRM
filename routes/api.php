@@ -547,6 +547,7 @@ Route::post('/login-location/{id}/report', [\App\Http\Controllers\API\LoginLocat
         Route::get('line/cloudtalk/active-parallel-campaign', [ProjectLineCloudTalkController::class, 'activeParallelCampaigns']);
         Route::post('line/cloudtalk/parallel-campaign', [ProjectLineCloudTalkController::class, 'parallelCampaign']);
         Route::get('line/available-users', [ProjectLineController::class, 'availableUsers']);
+        Route::get('line/available-projects/{user}', [ProjectLineController::class, 'availableProjects']);
         Route::apiResource('line', ProjectLineController::class);
 
         // Logo

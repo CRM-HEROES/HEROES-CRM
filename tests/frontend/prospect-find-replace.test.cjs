@@ -16,7 +16,12 @@ const compiled = transformSync(script, {
     plugins: ['@babel/plugin-transform-modules-commonjs'],
 }).code;
 const store = { dispatch: async () => {} };
+<<<<<<< HEAD
+const prospectService = { findReplace: async () => ({ data: {} }) };
+const componentModule = { exports: {} };
+=======
 const loaded = { exports: {} };
+>>>>>>> origin/main
 
 new Function('require', 'module', 'exports', compiled)(specifier => {
     if (specifier === 'vuex') {
@@ -27,14 +32,22 @@ new Function('require', 'module', 'exports', compiled)(specifier => {
         };
     }
     if (specifier === '@/store') return store;
-    if (specifier === '@/apis/project/prospect') return { default: {} };
+    if (specifier === '@/apis/project/prospect') {
+        return { __esModule: true, default: prospectService };
+    }
     if (specifier === '@/actions/project/prospect') {
         return { FETCH_PROSPECTS: 'fetchProspects' };
     }
     throw new Error(`Unexpected dependency: ${specifier}`);
+<<<<<<< HEAD
+}, componentModule, componentModule.exports);
+
+const component = componentModule.exports.default;
+=======
 }, loaded, loaded.exports);
 
 const component = loaded.exports.default;
+>>>>>>> origin/main
 
 function instance({ search, replace = 'X', caseSensitive = true, sample }) {
     const vm = {
@@ -88,4 +101,52 @@ test('numeric searches allow whitespace between digits like the server', () => {
     const vm = instance({ search: '123', sample });
 
     assert.deepEqual(vm.findOccurrences(sample.before).map(match => match.text), ['12 3', '123']);
+});
+
+test('preview follows bounded cursor batches and aggregates counts and samples', async () => {
+    const vm = instance({ search: 'needle', sample: { id: 1, before: 'needle', after: '' } });
+    Object.assign(vm, {
+        field: 'first_name',
+        limit: 2,
+        project: { slug: 'test' },
+        hasFilters: false,
+        selectedSamples: [],
+    });
+
+    const calls = [];
+    prospectService.findReplace = async (project, params) => {
+        calls.push({ project, params });
+        return {
+            data: calls.length === 1
+                ? {
+                    prospects: 3,
+                    matches: 4,
+                    scanned: 100,
+                    next_cursor: 100,
+                    samples: [
+                        { id: 1, before: 'needle', after: 'X' },
+                        { id: 2, before: 'needle', after: 'X' },
+                    ],
+                }
+                : {
+                    prospects: 1,
+                    matches: 2,
+                    scanned: 25,
+                    next_cursor: null,
+                    samples: [{ id: 3, before: 'needle', after: 'X' }],
+                },
+        };
+    };
+
+    const result = await vm.run('preview');
+
+    assert.equal(calls.length, 2);
+    assert.equal(calls[0].params.batch_size, 100);
+    assert.equal(calls[0].params.after_id, undefined);
+    assert.equal(calls[1].params.after_id, 100);
+    assert.deepEqual(
+        { prospects: result.prospects, matches: result.matches, ids: result.samples.map(sample => sample.id) },
+        { prospects: 4, matches: 6, ids: [1, 2] }
+    );
+    assert.equal(vm.progressCount, 125);
 });

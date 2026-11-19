@@ -1,5 +1,10 @@
 <template>
     <div class="hc-line-operator-config-fields">
+        <div v-if="operator === 'cloudtalk'" class="hc-cloudtalk-api-help">
+            <a href="#" @click.prevent="openCloudtalkApiHelp">
+                Comment récupérer les clés API ?
+            </a>
+        </div>
         <v-field
             v-for="field in fields"
             :key="field.key"
@@ -88,20 +93,59 @@
                 />
                 <span>Je confirme que ce numéro peut envoyer des SMS.</span>
             </label>
-            <p>Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.</p>
+            <!-- <p>Vérifiez l’activation des SMS dans CloudTalk avant de confirmer. Le numéro sera alors renseigné dans le champ SMS.</p> -->
         </div>
 
-        <div v-if="operator === 'cloudtalk'">
-            <button
-                type="button"
-                class="hc-button-secondary hc-line-cloudtalk-webhook-button"
-                @click.prevent="openCloudtalkWebhookModal"
-            >
-                <span>comment recevoir des SMS</span>
-            </button>
+        <section v-if="projects.length > 0 && userId" class="hc-config-project-picker">
+            <div class="hc-config-project-picker-heading">
+                <strong>Enregistrer cette ligne dans d’autres projets</strong>
+                <span>La configuration sélectionnée sera créée ou mise à jour dans chaque projet coché.</span>
+            </div>
+            <div class="hc-config-project-list">
+                <label v-for="project in projects" :key="project.id" class="hc-config-project-option">
+                    <input
+                        type="checkbox"
+                        :value="project.slug"
+                        :checked="sourceProjects.includes(project.slug)"
+                        :disabled="loadingProjectConfig"
+                        @change="toggleSourceProject(project.slug, $event.target.checked)"
+                    />
+                    <span class="hc-config-project-option-name" v-text="project.name"></span>
+                    <icon v-if="sourceProjects.includes(project.slug)" class="fa fa-check hc-config-project-check" />
+                </label>
+            </div>
+            <div v-if="loadingProjectConfig" class="hc-config-project-status">
+                <span class="hc-config-project-spinner"></span> Chargement des configurations…
+            </div>
+            <div v-else-if="projectConfigMessage" class="hc-config-project-status" v-text="projectConfigMessage"></div>
+            <div v-else-if="sourceProjects.length" class="hc-config-project-status">
+                {{ sourceProjects.length }} projet(s) sélectionné(s)
+            </div>
+        </section>
+
+        <div v-if="operator === 'cloudtalk'" class="hc-cloudtalk-api-help">
+            <a href="#" @click.prevent="openCloudtalkWebhookModal">
+                comment recevoir des SMS ?
+            </a>
         </div>
 
         <kavkom-diagnostic v-if="operator === 'kavkom'" :config="config" />
+
+        <modal name="cloudtalk-api-help" title="Récupérer les clés API CloudTalk" :width="520">
+            <div class="hc-cloudtalk-api-instructions">
+                <p>Pour récupérer l’<strong>API Key ID</strong> et l’<strong>API Key Secret</strong> :</p>
+                <ol>
+                    <li>Connectez-vous à votre compte CloudTalk avec un compte administrateur.</li>
+                    <li>Ouvrez <strong>Account → Settings → Integrations and automation → API Keys</strong>.</li>
+                    <li>Cliquez sur <strong>Add API Key</strong> pour créer une clé dédiée à cette intégration.</li>
+                    <li>Copiez l’<strong>Access Key ID</strong> et l’<strong>Access Key Secret</strong> dans les champs correspondants ici.</li>
+                </ol>
+                <p>Gardez le Secret confidentiel. Si la page ne permet plus de le consulter, créez une nouvelle clé.</p>
+                <a href="https://dashboard.cloudtalk.io/menu/account/settings/API-keys" target="_blank" rel="noopener noreferrer">
+                    Ouvrir le tableau de bord CloudTalk <icon class="fa fa-external-link-alt" />
+                </a>
+            </div>
+        </modal>
     </div>
 </template>
 
@@ -110,6 +154,157 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+}
+
+.hc-cloudtalk-api-help {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 2px 0;
+    font-size: 11px;
+}
+
+.hc-cloudtalk-api-help a {
+    color: #12a0f3;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.hc-cloudtalk-api-instructions {
+    padding: 4px 8px 12px;
+    color: #334155;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.hc-cloudtalk-api-instructions ol {
+    padding-left: 22px;
+}
+
+.hc-cloudtalk-api-instructions li {
+    margin: 8px 0;
+}
+
+.hc-cloudtalk-api-instructions a {
+    color: #12a0f3;
+    font-weight: 600;
+}
+
+.dark .hc-cloudtalk-api-instructions {
+    color: #e2e8f0;
+}
+
+.hc-cloudtalk-api-help a:hover {
+    text-decoration: underline;
+}
+
+.hc-config-project-picker {
+    padding: 12px;
+    border: 1px solid #d9e2ec;
+    border-radius: 8px;
+    background: #f8fafc;
+}
+
+.hc-config-project-picker-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+    color: #334155;
+    font-size: 13px;
+}
+
+.hc-config-project-picker-heading span,
+.hc-config-project-status {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hc-config-project-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.hc-config-project-option {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+    padding: 9px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.hc-config-project-option:has(input:checked) {
+    border-color: #12a0f3;
+    background: #eff8ff;
+}
+
+.hc-config-project-option input {
+    flex: 0 0 auto;
+    margin: 0;
+    accent-color: #12a0f3;
+}
+
+.hc-config-project-option-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #334155;
+    font-size: 12px;
+}
+
+.hc-config-project-check {
+    color: #12a0f3;
+    font-size: 12px;
+}
+
+.hc-config-project-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 9px;
+}
+
+.hc-config-project-spinner {
+    width: 13px;
+    height: 13px;
+    border: 2px solid #cbd5e1;
+    border-top-color: #12a0f3;
+    border-radius: 50%;
+    animation: hc-config-spin 0.7s linear infinite;
+}
+
+@keyframes hc-config-spin {
+    to { transform: rotate(360deg); }
+}
+
+.dark .hc-config-project-picker {
+    border-color: #334155;
+    background: #1e293b;
+}
+
+.dark .hc-config-project-picker-heading,
+.dark .hc-config-project-option-name {
+    color: #e2e8f0;
+}
+
+.dark .hc-config-project-option {
+    border-color: #334155;
+    background: #0f172a;
+}
+
+.dark .hc-config-project-option:has(input:checked) {
+    background: #172f45;
 }
 
 .hc-line-secret-preview {
@@ -285,6 +480,11 @@ export default {
             type: Array,
             default: () => [],
         },
+        projectSlug: { type: String, default: "" },
+        userId: {
+            type: [Number, String],
+            default: null,
+        },
     },
 
     data() {
@@ -299,11 +499,22 @@ export default {
             autoFilledCloudtalkSmsNumber: "",
             confirmedCloudtalkSmsAgentId: "",
             editingFields: {},
+            projects: [],
+            sourceProjects: [],
+            projectConfigMessage: "",
+            loadingProjectConfig: false,
         };
     },
 
     mounted() {
         this.fetchInitialCloudtalkAgents();
+        this.fetchAssignedProjects();
+    },
+
+    watch: {
+        userId() {
+            this.fetchAssignedProjects();
+        },
     },
 
     beforeUnmount() {
@@ -311,6 +522,49 @@ export default {
     },
 
     methods: {
+        toggleSourceProject(projectSlug, checked) {
+            this.sourceProjects = checked
+                ? [...this.sourceProjects, projectSlug]
+                : this.sourceProjects.filter((slug) => slug !== projectSlug);
+            this.loadProjectConfig();
+        },
+        async fetchAssignedProjects() {
+            this.projects = [];
+            this.sourceProjects = [];
+            this.projectConfigMessage = "";
+            if (!this.userId || !this.projectSlug) return;
+            try {
+                const { data } = await lineService.availableProjects(this.projectSlug, this.userId);
+                this.projects = data.filter((project) => project.slug !== this.projectSlug);
+            } catch (error) {
+                this.projectConfigMessage = "Impossible de charger les projets affectés à cet utilisateur.";
+            }
+        },
+        async loadProjectConfig() {
+            this.projectConfigMessage = "";
+            if (!this.sourceProjects.length) return;
+            this.loadingProjectConfig = true;
+            try {
+                let loadedCount = 0;
+                for (const projectSlug of this.sourceProjects) {
+                    const { data: lines } = await lineService.get(projectSlug);
+                    const source = lines.find((line) => line.operator === this.operator && line.user_id == this.userId);
+                    if (!source) continue;
+                    const { data: fullLine } = await lineService.show(projectSlug, source.id);
+                    const reusable = { ...(fullLine.config ?? {}) };
+                    delete reusable.agent_id;
+                    Object.assign(this.config, reusable);
+                    loadedCount += 1;
+                }
+                this.projectConfigMessage = loadedCount
+                    ? `Configuration chargée depuis ${loadedCount} projet(s). En cas de doublon, le dernier projet sélectionné est prioritaire.`
+                    : "Aucune configuration trouvée pour cet utilisateur dans les projets sélectionnés.";
+            } catch (error) {
+                this.projectConfigMessage = "Impossible de charger la configuration de ce projet.";
+            } finally {
+                this.loadingProjectConfig = false;
+            }
+        },
         confirmCloudtalkSmsNumber(checked) {
             if (!checked) {
                 this.clearCloudtalkSmsConfirmation();
@@ -539,6 +793,10 @@ export default {
 
         openCloudtalkWebhookModal() {
             store.commit(OPEN_MODAL, "setting-cloudtalk");
+        },
+
+        openCloudtalkApiHelp() {
+            store.commit(OPEN_MODAL, "cloudtalk-api-help");
         },
     },
 

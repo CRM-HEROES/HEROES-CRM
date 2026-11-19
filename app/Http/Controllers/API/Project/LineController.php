@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\Project;
 use App\Http\Controllers\Controller;
 use App\Models\Line;
 use App\Models\Project;
+use App\Models\User;
 use App\Services\CloudTalk;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -97,6 +98,21 @@ class LineController extends Controller
             ->forCurrentUser()
             ->whereNotIn('users.id', $assignedUserIds)
             ->orderBy('users.name')
+            ->get();
+    }
+
+    /** Projects assigned to a line user, used to reuse that user's operator config. */
+    public function availableProjects(Project $project, User $user)
+    {
+        abort_unless(
+            auth()->user()->can('projectLineAdd', $project) ||
+                auth()->user()->can('projectLineUpdate', $project),
+            404
+        );
+        abort_unless($project->users()->where('users.id', $user->id)->exists(), 404);
+        return $user->projects()
+            ->select('projects.id', 'projects.name', 'projects.slug')
+            ->orderBy('projects.name')
             ->get();
     }
 
