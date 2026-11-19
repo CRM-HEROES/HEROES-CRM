@@ -28,6 +28,9 @@ class DocumentController extends Controller
      */
     public function update(Project $project, Role $role, Document $document)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $document->project_id, 404);
 
         $role
@@ -47,6 +50,9 @@ class DocumentController extends Controller
      */
     public function destroy(Project $project, Role $role, Document $document)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $document->project_id, 404);
 
         $role->documents()->detach($document->id);
@@ -59,6 +65,8 @@ class DocumentController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'documents' => 'required',
             'roles' => 'required',

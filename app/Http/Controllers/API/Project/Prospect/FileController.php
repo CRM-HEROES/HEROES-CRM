@@ -179,6 +179,9 @@ class FileController extends Controller
      */
     public function bulk(Request $request, Project $project, Prospect $prospect, Folder $folder)
     {
+        // Who may open a file: the right the screen asks for ("Gérer les accès").
+        abort_unless(auth()->user()->can('projectDocumentUpdate', $project), 404);
+
         $this->validate($request, [
             'files' => 'required',
             'users' => 'required',

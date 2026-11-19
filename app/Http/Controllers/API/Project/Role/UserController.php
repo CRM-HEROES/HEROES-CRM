@@ -41,6 +41,9 @@ class UserController extends Controller
      */
     public function update(Project $project, Role $role, User $assignableUser)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->users()->find($assignableUser->id), 404);
 
         DB::table('role_assignable_user')
@@ -61,6 +64,9 @@ class UserController extends Controller
      */
     public function destroy(Project $project, Role $role, User $assignableUser)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $assignableUser->project_id, 404);
 
         DB::table('role_assignable_user')
@@ -79,6 +85,8 @@ class UserController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'assignableUsers' => 'required',
             'roles' => 'required',

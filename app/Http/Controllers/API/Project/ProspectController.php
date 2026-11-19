@@ -258,9 +258,21 @@ class ProspectController extends Controller
     public function bulk(Request $request, Project $project)
     {
         $this->validate($request, [
-            'prospects' => 'required',
+            'prospects' => 'required|array',
             'action' => 'required',
         ]);
+
+        // The right each action asks on the screen: deleting, restoring and erasing need the right to delete,
+        // archiving the right to archive, setting a field the right to update. (The route checked nothing.)
+        $ability = [
+            'delete' => 'prospectDelete',
+            'force_delete' => 'prospectDelete',
+            'restore' => 'prospectDelete',
+            'processed' => 'prospectArchive',
+            'not_processed' => 'prospectArchive',
+            'field' => 'prospectUpdate',
+        ][$request->input('action')] ?? null;
+        abort_if($ability && !auth()->user()->can($ability, $project), 403);
 
         // Only prospects
         // associated to the current project
