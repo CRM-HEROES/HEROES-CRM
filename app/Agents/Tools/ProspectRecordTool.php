@@ -20,8 +20,10 @@ use App\Agents\Writes\InternalApi;
  *   request            fn (context, input, ?Prospect): array [method, path, body] | ToolResult
  *   describe           fn (context, input): array — what will be done, for the approval
  *   result             fn (array $json): array — what the model gets back (default: ids only)
+ *   verify             fn (context, array $json): ?ToolResult — what the CRM did after the route answered (an operator
+ *                      that refused an SMS is only known by reading it back); an error is given to the model
  */
-class ProspectRecordTool implements AgentToolInterface
+class ProspectRecordTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public function __construct(
         protected array $definition,
@@ -65,7 +67,19 @@ class ProspectRecordTool implements AgentToolInterface
         return $this->definition['ability'];
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $prepared = $this->prepare($context, $input);
+
+        return $prepared instanceof ToolResult ? $prepared : null;
+    }
+
+    /**
+     * Everything that can refuse the request before the route of the CRM is called: [prospect, [method, path, body]], or the refusal.
+     *
+     * @return ToolResult|array{0: ?\App\Models\Prospect, 1: array}
+     */
+    protected function prepare(AgentExecutionContext $context, array $input): ToolResult|array
     {
         $prospect = null;
 
@@ -85,15 +99,26 @@ class ProspectRecordTool implements AgentToolInterface
 
         $request = ($this->definition['request'])($context, $input, $prospect);
 
-        if ($request instanceof ToolResult) {
-            return $request;
+        return $request instanceof ToolResult ? $request : [$prospect, $request];
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $prepared = $this->prepare($context, $input);
+
+        if ($prepared instanceof ToolResult) {
+            return $prepared;
         }
 
-        [$method, $path, $body] = $request;
+        [$prospect, [$method, $path, $body]] = $prepared;
         $response = $this->api->call($context, $method, $path, $body);
 
         if (!$response->ok()) {
             return $response->toError();
+        }
+
+        if (isset($this->definition['verify']) && ($problem = ($this->definition['verify'])($context, $response->json ?? []))) {
+            return $problem;
         }
 
         $data = isset($this->definition['result'])

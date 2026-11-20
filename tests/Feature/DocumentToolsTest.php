@@ -133,4 +133,34 @@ class DocumentToolsTest extends TestCase
 
         $this->assertTrue($result->isError);
     }
+
+    public function test_the_catalog_of_ready_made_templates_is_listed_without_touching_the_templates_of_the_project(): void
+    {
+        $result = (new DocumentTemplatesTool())->handle($this->context, ['catalog' => true]);
+
+        $this->assertFalse($result->isError);
+        $this->assertContains('empty', array_column($result->data['catalog'], 'key'));
+        $this->assertSame('document_template_install', $result->data['install_with']);
+        $this->assertArrayNotHasKey('templates', $result->data);
+    }
+
+    public function test_a_ready_made_template_is_installed_through_the_route_of_the_crm(): void
+    {
+        $api = Mockery::mock(InternalApi::class);
+        $api->shouldReceive('call')->andReturnUsing(function ($context, $method, $path, $data = []) {
+            $this->sent[] = [$method, $path];
+
+            return new InternalResponse(200, ['id' => 55], '{}');
+        });
+        $tool = new \App\Agents\Tools\DocumentTemplateInstallTool($api);
+
+        $this->assertFalse($tool->handle($this->context, ['template' => 'empty'])->isError);
+        $this->assertSame([['POST', 'document-template/empty']], $this->sent);
+
+        $this->assertSame(ToolResult::NOT_FOUND, $tool->precheck($this->context, ['template' => 'inconnu'])->code);
+        $this->assertSame(ToolResult::NOT_FOUND, $tool->handle($this->context, ['template' => 'inconnu'])->code);
+        $this->assertCount(1, $this->sent);
+        $this->assertSame('projectDocumentAdd', $tool->ability());
+        $this->assertSame(\App\Agents\Tools\DocumentTemplateInstallTool::WRITE, $tool->risk());
+    }
 }

@@ -171,6 +171,17 @@ class ImportToolsTest extends TestCase
         $this->assertSame([], $this->sent);
     }
 
+    public function test_a_launch_that_will_be_refused_is_refused_before_the_human_is_asked(): void
+    {
+        $tool = $this->runTool();
+
+        $this->assertNull($tool->precheck($this->context, ['import_id' => 1]));
+        foreach ([3 => ToolResult::INVALID_INPUT, 4 => ToolResult::INVALID_INPUT, 5 => ToolResult::NOT_FOUND] as $id => $code) {
+            $this->assertSame($code, $tool->precheck($this->context, ['import_id' => $id])->code, (string) $id);
+        }
+        $this->assertSame([], $this->sent);
+    }
+
     public function test_the_number_of_rows_drives_the_confirmation(): void
     {
         $this->assertSame(120, $this->runTool()->affectedCount($this->context, ['import_id' => 1]));

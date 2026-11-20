@@ -3,6 +3,7 @@
 namespace App\Agents;
 
 use App\Agents\Tools\AgentToolInterface;
+use App\Agents\Tools\ChecksBeforeApproval;
 use App\Agents\Tools\InputValidator;
 use App\Agents\Tools\ToolRegistry;
 use App\Agents\Tools\ToolResult;
@@ -97,6 +98,23 @@ class ToolExecutor
         }
 
         if ($decision->needsApproval()) {
+            // A request that will certainly be refused is not worth the time of a human: the model is told right away
+            if ($tool instanceof ChecksBeforeApproval) {
+                try {
+                    $refusal = $context->run(fn () => $tool->precheck($context, $toolUse['input']));
+                } catch (AgentAccessException $e) {
+                    throw $e;
+                } catch (\Throwable $e) {
+                    // The check itself failed: the action is proposed, the tool will check again when it runs
+                    report($e);
+                    $refusal = null;
+                }
+
+                if ($refusal) {
+                    return $this->finish($step, $toolUse, AgentRunStep::FAILED, $decision->outcome, $refusal, $started);
+                }
+            }
+
             $action = $this->keepForApproval($run, $agent, $context, $tool, $toolUse);
 
             return $this->finish(

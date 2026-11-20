@@ -25,6 +25,9 @@ class MappingController extends Controller
      */
     public function field(Project $project, Import $import, $index, $slug)
     {
+        // Importing prospects: the right of the import screen (the routes of the import checked nothing).
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->fields()->where('meta', false)->where('slug', $slug)->first(), 400);
 
         return $this->update($project, $import, $index, $slug);
@@ -35,6 +38,8 @@ class MappingController extends Controller
      */
     public function meta(Project $project, Import $import, $index, $slug)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->fields()->where('meta', true)->where('slug', $slug)->first(), 400);
 
         return $this->update($project, $import, $index, "meta->" . $slug);
@@ -45,6 +50,8 @@ class MappingController extends Controller
      */
     public function category(Project $project, Import $import, $index, Category $category)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $category->project_id, 400);
 
         return $this->update($project, $import, $index, "category->" . $category->id);
@@ -55,6 +62,8 @@ class MappingController extends Controller
      */
     public function thread(Project $project, Import $import, $index, Thread $thread)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $thread->project_id, 400);
 
         return $this->update($project, $import, $index, "thread->" . $thread->id);
@@ -65,6 +74,8 @@ class MappingController extends Controller
      */
     public function event(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "events");
     }
 
@@ -73,6 +84,8 @@ class MappingController extends Controller
      */
     public function order(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "orders");
     }
 
@@ -81,6 +94,8 @@ class MappingController extends Controller
      */
     public function sms(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "sms");
     }
 
@@ -89,6 +104,8 @@ class MappingController extends Controller
      */
     public function interaction(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "interactions");
     }
 
@@ -97,6 +114,8 @@ class MappingController extends Controller
      */
     public function link(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "links");
     }
 
@@ -105,6 +124,8 @@ class MappingController extends Controller
      */
     public function user(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         return $this->update($project, $import, $index, "users");
     }
 
@@ -139,6 +160,8 @@ class MappingController extends Controller
      */
     public function destroy(Project $project, Import $import, $index)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_unless(count($import->mapping ?: []) > $index, 400);
         abort_if($import->is_processing, 404);

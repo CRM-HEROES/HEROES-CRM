@@ -30,7 +30,7 @@ use Closure;
  *   request     fn (input, int[] ids, context): array [method, path, body]
  *   describe    fn (context, input): string  — what will be done, for the human who approves
  */
-class ProspectBulkTool implements AgentToolInterface, ConfirmsLargeActions
+class ProspectBulkTool implements AgentToolInterface, ConfirmsLargeActions, ChecksBeforeApproval
 {
     public function __construct(
         protected array $definition,
@@ -96,6 +96,23 @@ class ProspectBulkTool implements AgentToolInterface, ConfirmsLargeActions
             // The call itself will answer with the reason
             return 0;
         }
+    }
+
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        try {
+            $selection = $this->select($context, $input);
+        } catch (AgentReadException $e) {
+            return ToolResult::error($e->getMessage(), $e->errorCode);
+        }
+
+        if ($error = $this->check($context, $input)) {
+            return $error;
+        }
+
+        return $selection['truncated']
+            ? ToolResult::error('La sélection dépasse ' . $this->max() . ' prospects : affine les filtres.', ToolResult::LIMIT_EXCEEDED)
+            : null;
     }
 
     public function handle(AgentExecutionContext $context, array $input): ToolResult

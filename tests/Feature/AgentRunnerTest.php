@@ -7,6 +7,7 @@ use App\Agents\Claude\ClaudeException;
 use App\Agents\Claude\ClaudeGatewayFactory;
 use App\Agents\Claude\ClaudeResponse;
 use App\Agents\Tools\ToolRegistry;
+use App\Agents\Tools\ToolResult;
 use App\Models\Agent;
 use App\Models\AgentAction;
 use App\Models\AgentConversation;
@@ -18,6 +19,7 @@ use App\Models\AgentUsageDaily;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Tests\Support\FakeAgentTool;
+use Tests\Support\PrecheckingFakeTool;
 use Tests\Support\ScriptedGateway;
 use Tests\Support\ScriptedGatewayFactory;
 use Tests\Support\UsesInMemoryDatabase;
@@ -313,6 +315,66 @@ class AgentRunnerTest extends TestCase
         $this->assertSame(0, $this->sms->calls);
         $this->assertSame('sms', AgentAction::first()->tool_key);
         $this->assertSame('communication', AgentAction::first()->risk);
+    }
+
+    public function test_a_request_that_will_certainly_be_refused_is_not_put_to_a_human(): void
+    {
+        $tool = new PrecheckingFakeTool('wire', 'communication');
+        $tool->refusal = ToolResult::error('Il faut un lieu.', ToolResult::VALIDATION_FAILED);
+        app(ToolRegistry::class)->register($tool);
+        config(['agents.skills.test_skill.tools' => ['echo', 'boom', 'save', 'sms', 'wire']]);
+        $agent = $this->makeAgent(['name' => 'Prop', 'autonomy' => Agent::PROPOSE]);
+        $this->gateway([ScriptedGateway::toolUse('wire', ['text' => 'x'], 'toolu_r'), ScriptedGateway::text('Refusé.')]);
+
+        $run = $this->runIt($this->newRun($agent));
+
+        $this->assertSame(1, $tool->prechecks);
+        $this->assertSame(0, $tool->calls);
+        $this->assertSame(0, AgentAction::count(), 'Rien à valider pour un humain');
+        $this->assertStringContainsString('Il faut un lieu.', json_encode($this->lastToolResultBlock($run), JSON_UNESCAPED_UNICODE));
+        $this->assertSame(AgentRunStep::FAILED, AgentRunStep::where('tool_use_id', 'toolu_r')->value('status'));
+    }
+
+    public function test_a_request_that_passes_the_check_is_proposed_as_usual(): void
+    {
+        $tool = new PrecheckingFakeTool('wire', 'communication');
+        app(ToolRegistry::class)->register($tool);
+        config(['agents.skills.test_skill.tools' => ['echo', 'boom', 'save', 'sms', 'wire']]);
+        $agent = $this->makeAgent(['name' => 'Auto', 'autonomy' => Agent::AUTO]);
+        $this->gateway([ScriptedGateway::toolUse('wire', ['text' => 'x']), ScriptedGateway::text('ok')]);
+
+        $this->runIt($this->newRun($agent));
+
+        $this->assertSame(1, $tool->prechecks);
+        $this->assertSame(0, $tool->calls, 'Il attend toujours la validation');
+        $this->assertSame('wire', AgentAction::first()->tool_key);
+    }
+
+    public function test_a_check_that_fails_by_itself_does_not_block_the_proposal(): void
+    {
+        $tool = new PrecheckingFakeTool('wire', 'communication');
+        $tool->precheckThrows = new \RuntimeException('base indisponible');
+        app(ToolRegistry::class)->register($tool);
+        config(['agents.skills.test_skill.tools' => ['echo', 'boom', 'save', 'sms', 'wire']]);
+        $agent = $this->makeAgent(['name' => 'Prop', 'autonomy' => Agent::PROPOSE]);
+        $this->gateway([ScriptedGateway::toolUse('wire', ['text' => 'x']), ScriptedGateway::text('ok')]);
+
+        $this->runIt($this->newRun($agent));
+
+        $this->assertSame(1, AgentAction::count(), 'La vérification a échoué : l’action est proposée, l’outil revérifiera à l’exécution');
+    }
+
+    public function test_a_check_is_not_made_for_a_tool_that_needs_no_approval(): void
+    {
+        $tool = new PrecheckingFakeTool('look', 'read');
+        app(ToolRegistry::class)->register($tool);
+        config(['agents.skills.test_skill.tools' => ['echo', 'boom', 'save', 'sms', 'look']]);
+        $this->gateway([ScriptedGateway::toolUse('look'), ScriptedGateway::text('ok')]);
+
+        $this->runIt($this->newRun());
+
+        $this->assertSame(0, $tool->prechecks);
+        $this->assertSame(1, $tool->calls);
     }
 
     public function test_a_tool_granted_one_by_one_works_without_a_skill(): void

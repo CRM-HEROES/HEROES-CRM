@@ -21,7 +21,7 @@ class DocumentTemplatesTool implements AgentToolInterface
     public function description(): string
     {
         return "Liste les modèles de documents (PDF) du projet que l'utilisateur peut utiliser : nom, destination (for = prospect pour une fiche, invoice pour une facture), description, "
-            . "et si le PDF généré est conservé dans un dossier de la fiche (keeps_a_copy). Donne les identifiants à utiliser avec document_generate.";
+            . "et si le PDF généré est conservé dans un dossier de la fiche (keeps_a_copy). Donne les identifiants à utiliser avec document_generate. Avec catalog=true : le catalogue des modèles prêts à l'emploi.";
     }
 
     public function inputSchema(): array
@@ -30,6 +30,7 @@ class DocumentTemplatesTool implements AgentToolInterface
             'type' => 'object',
             'properties' => [
                 'for' => ['type' => 'string', 'enum' => self::TARGETS, 'description' => 'Limiter à une destination.'],
+                'catalog' => ['type' => 'boolean', 'description' => 'true : le catalogue des modèles prêts à l\'emploi (à installer avec document_template_install) au lieu des modèles du projet.'],
                 'search' => ['type' => 'string', 'maxLength' => 100, 'description' => 'Une partie du nom.'],
             ],
             'additionalProperties' => false,
@@ -53,6 +54,17 @@ class DocumentTemplatesTool implements AgentToolInterface
 
     public function handle(AgentExecutionContext $context, array $input): ToolResult
     {
+        if (!empty($input['catalog'])) {
+            $catalog = collect((array) config('document.templates'))->map(fn ($template, $key) => [
+                'key' => (string) $key,
+                'name' => mb_substr(strip_tags((string) ($template['name'] ?? '')), 0, 120),
+                'description' => mb_substr(strip_tags((string) ($template['description'] ?? '')), 0, 200),
+                'for' => $template['for'] ?? null,
+            ])->values();
+
+            return ToolResult::ok(['catalog' => $catalog->all(), 'install_with' => 'document_template_install'], 'Modèles de documents prêts à l\'emploi', $catalog->count());
+        }
+
         // The usual access rule of the CRM applies: a template not given to the user is not listed
         $query = Document::query()->where('documents.project_id', $context->project->id);
 

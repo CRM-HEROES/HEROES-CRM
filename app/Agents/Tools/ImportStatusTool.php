@@ -21,7 +21,7 @@ class ImportStatusTool implements AgentToolInterface
     public function description(): string
     {
         return "Imports de prospects du projet (fichier ou Google Sheets). view=list : les imports avec leur état (to_launch = pas encore lancé, processing = en cours, done = terminé), "
-            . "le nombre de lignes et la synchronisation. view=detail : un import avec les colonnes déjà reliées à un champ, celles qui ne le sont pas, les champs de détection des doublons et le nombre de prospects créés. "
+            . "le nombre de lignes et la synchronisation. view=detail : un import avec les colonnes déjà reliées à un champ, celles qui ne le sont pas, les champs de détection des doublons (des identifiants de champs : leurs noms avec import_mapping) et le nombre de prospects créés. "
             . "Ne donne jamais le contenu des lignes du fichier.";
     }
 

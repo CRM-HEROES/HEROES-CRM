@@ -41,6 +41,9 @@ class FolderController extends Controller
      */
     public function update(Project $project, Role $role, Folder $folder)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $folder->project_id, 404);
 
         $role
@@ -60,6 +63,9 @@ class FolderController extends Controller
      */
     public function destroy(Project $project, Role $role, Folder $folder)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $folder->project_id, 404);
 
         $role->folders()->detach($folder->id);
@@ -72,6 +78,8 @@ class FolderController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'folders' => 'required',
             'roles' => 'required',

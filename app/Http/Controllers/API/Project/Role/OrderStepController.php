@@ -41,6 +41,9 @@ class OrderStepController extends Controller
      */
     public function update(Project $project, Role $role, OrderStep $orderStep)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $orderStep->project_id, 404);
 
         $role
@@ -60,6 +63,9 @@ class OrderStepController extends Controller
      */
     public function destroy(Project $project, Role $role, OrderStep $orderStep)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+        abort_unless($project->id == $role->project_id, 404);
+
         abort_unless($project->id == $orderStep->project_id, 404);
 
         $role->orderSteps()->detach($orderStep->id);
@@ -72,6 +78,8 @@ class OrderStepController extends Controller
      */
     public function bulk(Request $request, Project $project)
     {
+        abort_unless(auth()->user()->can('projectRoleUpdate', $project), 404);
+
         $this->validate($request, [
             'orderSteps' => 'required',
             'roles' => 'required',

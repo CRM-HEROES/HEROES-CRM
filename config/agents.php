@@ -140,18 +140,53 @@ return [
         ],
         'document_generation' => [
             'label' => 'Générer des documents PDF pour un prospect',
-            'tools' => ['document_templates', 'document_generate'],
-            'playbook' => "Liste d'abord les modèles avec document_templates (for = prospect) et choisis celui qui correspond à la demande ; s'il y a un doute, demande lequel. document_generate crée le PDF et le range dans le dossier du modèle sur la fiche du prospect : un modèle sans dossier (keeps_a_copy = false) est refusé, dis alors à l'utilisateur de choisir un dossier dans l'éditeur du modèle. Tu ne lis pas le contenu du PDF et tu ne peux ni créer ni modifier un modèle : c'est l'éditeur de l'interface. Les factures ne se génèrent pas ici.",
+            'tools' => ['project_config', 'document_templates', 'document_generate', 'document_template_install', 'project_entity_save'],
+            'playbook' => "Liste d'abord les modèles avec document_templates (for = prospect) et choisis celui qui correspond à la demande ; s'il y a un doute, demande lequel. document_generate crée le PDF et le range dans le dossier du modèle sur la fiche du prospect : un modèle sans dossier (keeps_a_copy = false) est refusé : propose alors de lui donner un dossier avec project_entity_save (entity = document, id, values.folder_id ; les dossiers se lisent avec project_config). Pour un nouveau modèle : le catalogue des modèles prêts à l'emploi se lit avec document_templates (catalog = true) et s'installe avec document_template_install ; un modèle vide se crée avec project_entity_save (entity = document, name, for, folder_id). Les pages et les champs d'un modèle se composent dans l'éditeur de l'interface : tu ne peux pas les écrire. Tu ne lis pas le contenu d'un PDF. Les factures ne se génèrent pas ici.",
         ],
         'campaign_control' => [
             'label' => 'Suivre et activer les campagnes',
             'tools' => ['campaign_status', 'campaign_set_active'],
             'playbook' => "Les campagnes historiques se suivent avec campaign_status : la liste montre celles qui sont activées, en cours ou en erreur, le détail montre leurs actions et le nombre de règles. Tu ne peux pas composer les règles, opérateurs ou actions : c'est l'utilisateur qui le fait dans la page des campagnes. Avant d'activer, lis le détail, dis ce que la campagne fera et sur quelle cible ; l'activation est toujours validée par l'utilisateur et une campagne en erreur ne s'active pas. Pour une automatisation récente, oriente plutôt vers les workflows.",
         ],
+        'team_overview' => [
+            'label' => "Voir l'équipe du projet",
+            'tools' => ['team_members'],
+            'playbook' => "team_members donne les utilisateurs du projet avec leurs rôles (view=users) et les rôles avec leurs membres et leurs permissions (view=roles). Il ne donne ni e-mail ni téléphone. Tu lis, tu ne modifies rien.",
+        ],
+        'team_management' => [
+            'label' => "Gérer l'équipe du projet (accès et rôles)",
+            'tools' => ['team_members', 'project_user_membership', 'user_roles_set'],
+            'playbook' => "Lis d'abord l'équipe avec team_members. Pour donner ou retirer des rôles : user_roles_set (10 utilisateurs et 5 rôles au plus). Pour rattacher un compte existant au projet ou en retirer un : project_user_membership (attach avec l'adresse e-mail que l'utilisateur te donne, detach avec les identifiants). Ces actions changent des accès et des droits : l'utilisateur les valide toujours, annonce précisément qui reçoit ou perd quoi. Tu ne touches jamais à un super-administrateur, au créateur du projet ni au propriétaire de l'agent, tu ne crées aucun compte et n'envoies aucune invitation, et tu ne peux pas modifier les permissions d'un rôle : c'est l'utilisateur dans l'écran des rôles. Un rôle qui porte des permissions que le propriétaire n'a pas lui-même ne peut pas être donné.",
+        ],
+        'pappers_prospecting' => [
+            'label' => 'Chercher des propriétaires avec Pappers',
+            'tools' => ['pappers_search', 'crm_search'],
+            'playbook' => "Pappers est un service PAYANT qui ajoute des propriétaires comme prospects du projet. Avant tout appel, dis à l'utilisateur ce que tu vas chercher (lieu, filtres), combien de résultats (commence par 10) et que chaque résultat coûte un appel. Un filtre de lieu est obligatoire (code postal, commune, département, région, parcelle, ou coordonnées et distance). L'utilisateur valide chaque appel, il y a un seul appel par tour et un budget par jour et par projet : pour la page suivante, il te relance. Tu ne reçois pas les données, seulement le nombre de prospects ajoutés ; retrouve-les ensuite avec crm_search. Les propriétaires déjà présents (même SIREN) sont ignorés ; zéro ajouté peut aussi vouloir dire une erreur du service, que le CRM ne renvoie pas. Les résultats peuvent contenir des personnes physiques : ne les utilise que pour la prospection demandée.",
+        ],
+        'project_configuration' => [
+            'label' => 'Configurer le projet (textes, filtres, groupes, pipelines, dossiers, champs)',
+            'tools' => ['project_config', 'message_templates', 'pipeline_overview', 'project_entity_save', 'project_entity_delete'],
+            'playbook' => "Pour configurer le projet : lis d'abord ce qui existe (project_config pour les catégories, filtres, groupes, champs, dossiers ; message_templates pour les textes ; pipeline_overview pour les pipelines) afin de ne pas créer de doublon, puis project_entity_save pour créer (sans id) ou modifier (avec id) : modèle de SMS, de message ou de description de rendez-vous, catégorie de filtres et ses filtres (label : parent_id = la catégorie, name, color et bgcolor « #RRGGBB »), groupe, pipeline, dossier de prospect, champ personnalisé, état, action ou étape de devis, calendrier (type de rendez-vous), modèle de document, questionnaire (son nom). Un pipeline reçoit ses étapes en y rangeant des filtres : cela se fait dans l'écran des pipelines. Pour supprimer : project_entity_delete, toujours validé par l'utilisateur : annonce ce qui disparaît, et vérifie avant qu'une catégorie ou un champ n'est pas utilisé. Tu ne touches ni aux rôles, ni aux canaux, ni aux produits, ni aux calendriers partagés. Reprends le ton des modèles existants pour un nouveau texte.",
+        ],
+        'questionnaires' => [
+            'label' => 'Questionnaires (lire, construire, lire les réponses)',
+            'tools' => ['questionnaire_overview', 'questionnaire_responses', 'questionnaire_build', 'project_entity_save', 'project_entity_delete', 'crm_search'],
+            'playbook' => "Lis d'abord les questionnaires existants avec questionnaire_overview (la liste, puis la structure d'un questionnaire). Pour en construire un : questionnaire_build en une seule demande, avec des sections et des questions (radio ou checkbox avec au moins deux choix, text, textarea, date, image, file) ; sans questionnaire_id il en crée un nouveau, avec questionnaire_id il ajoute des sections à un questionnaire existant. Annonce la structure à l'utilisateur avant de la proposer. Renommer ou supprimer un questionnaire : project_entity_save / project_entity_delete (entity = questionnaire). Les réponses d'un prospect se lisent avec questionnaire_responses : ce sont des données personnelles, ne les cite que pour la demande. Affecter un questionnaire à des rôles ou à des prospects se fait dans l'interface.",
+        ],
+        'vehicles_view' => [
+            'label' => 'Voir les véhicules du projet',
+            'tools' => ['vehicles'],
+            'playbook' => "vehicles donne la liste des véhicules (nom, utilisateur affecté, date de la dernière position). Les positions elles-mêmes (view = position) sont réservées à qui gère les véhicules, limitées aux cinq dernières et arrondies à environ 100 m : c'est le déplacement d'une personne, ne le cite que pour la demande et ne le recoupe pas avec d'autres données pour suivre quelqu'un. Tu ne crées ni ne modifies de véhicule : c'est l'interface.",
+        ],
+        'commissions_view' => [
+            'label' => 'Voir les commissions du projet',
+            'tools' => ['commissions'],
+            'playbook' => "commissions donne, par utilisateur, produit et action de devis, le type et la valeur de la commission. C'est de la rémunération de collègues : réservé à qui gère les commissions, lecture seule, à ne citer que pour la demande. Tu ne modifies aucun montant : une personne le fait dans le CRM.",
+        ],
         'prospect_import' => [
             'label' => 'Suivre et lancer les imports de prospects',
-            'tools' => ['import_status', 'import_run'],
-            'playbook' => "Les imports se suivent avec import_status : la liste donne l'état de chacun (to_launch, processing, done), le détail donne les colonnes reliées ou non. Tu ne peux pas téléverser un fichier ni relier les colonnes : c'est l'utilisateur qui le fait dans « Importer des prospects » (onglet « Mapping »). Pour un import déjà relié, lance-le avec import_run après avoir annoncé le nom et le nombre de lignes ; un import en cours ne se relance pas. Un import crée des prospects en masse : l'utilisateur valide au-delà du seuil. Ensuite, vérifie le résultat avec import_status.",
+            'tools' => ['project_config', 'import_status', 'import_mapping', 'import_configure', 'import_run'],
+            'playbook' => "Les imports se suivent avec import_status (état : to_launch, processing, done). Pour relier les colonnes d'un import déjà téléversé : lis import_mapping (colonnes, cibles actuelles, colonnes non reliées), puis import_mapping avec view=targets pour les cibles possibles, et applique avec import_configure (mapping, champs de doublons, labels et groupes appliqués aux prospects importés). Les identifiants de labels et de groupes viennent de project_config. Propose le mapping à l'utilisateur avant de l'appliquer quand un titre de colonne est ambigu. Tu ne peux pas téléverser un fichier, choisir les feuilles d'un classeur, créer un champ à la volée ni affecter des utilisateurs : c'est l'utilisateur dans « Importer des prospects ». Un import en cours ne se modifie pas. Configurer ne lance rien : lance ensuite avec import_run après avoir annoncé le nom et le nombre de lignes (validation de l'utilisateur au-delà du seuil), puis vérifie le résultat avec import_status.",
         ],
         'trash_restore' => [
             'label' => 'Restaurer depuis la corbeille',
@@ -217,6 +252,18 @@ return [
     'bulk_chunk' => 500,            // prospects per call of the CRM
     'bulk_max' => 20000,            // prospects per action
     'bulk_confirm_threshold' => 20, // above it, a human approves, whatever the autonomy
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pappers (paid service)
+    |--------------------------------------------------------------------------
+    |
+    | pappers_search adds owners as prospects and spends one paid call per result.
+    | A page is at most "pappers_max_per_page" results (100 at the very most: the
+    | route refuses more) and a project gets "pappers_daily_calls" calls a day.
+    */
+    'pappers_max_per_page' => 25,
+    'pappers_daily_calls' => 10,
     'action_ttl_hours' => 24,       // an action nobody approved expires
 
     // Strict tool use makes the API guarantee the arguments of a tool call, but
