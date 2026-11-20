@@ -217,19 +217,20 @@
                                     </item>
                                     <!-- Users list -->
                                     <item-list class="hc-flex-1" padding="12px">
-                                        <item tag="label">
-                                            <icon class="fa fa-check-square" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="$t('all')"
-                                            ></div>
-                                            <checkbox v-model="allUsers" />
-                                        </item>
-                                        <user-row
-                                            v-for="user in filteredUsers"
-                                            :key="user.id"
-                                            :user="user"
-                                        />
+                                        <selection-list
+                                            v-model="allUsers"
+                                            :items="filteredUsers"
+                                            :selected="eventsParamsValue('withUsers') || []"
+                                            :render-when-empty="true"
+                                        >
+                                            <template #default="{ sortedItems }">
+                                                <user-row
+                                                    v-for="user in sortedItems"
+                                                    :key="user.id"
+                                                    :user="user"
+                                                />
+                                            </template>
+                                        </selection-list>
                                     </item-list>
                                 </div>
                             </template>

@@ -26,23 +26,28 @@
                     <icon class="fa fa-caret-right" />
                 </item>
                 <item-list class="hc-flex-1" style="position: relative">
-                    <item tag="label">
-                        <icon class="fa fa-check-square" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('all')"
-                        ></div>
-                        <checkbox v-model="all" />
-                    </item>
-                    <duplicate-row
-                        v-for="(duplicate, i) in duplicates"
-                        :key="duplicate.id"
-                        :index="i - 1"
-                        :duplicate="duplicate"
-                        :prospect="duplicate.duplicate"
-                        v-model="selectedProspects"
-                        @duplicate-checked="duplicateChecked"
-                    />
+                    <selection-list
+                        v-model="all"
+                        :items="duplicates"
+                        :selected="selectedProspects"
+                        :render-when-empty="true"
+                    >
+                        <template #default="{ sortedItems }">
+                            <duplicate-row
+                                v-for="duplicate in sortedItems"
+                                :key="duplicate.id"
+                                :index="
+                                    duplicates.findIndex(
+                                        (item) => item.id == duplicate.id
+                                    ) - 1
+                                "
+                                :duplicate="duplicate"
+                                :prospect="duplicate.duplicate"
+                                v-model="selectedProspects"
+                                @duplicate-checked="duplicateChecked"
+                            />
+                        </template>
+                    </selection-list>
 
                     <buttons>
                         <button

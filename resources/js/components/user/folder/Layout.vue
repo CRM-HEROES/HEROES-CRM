@@ -2,17 +2,21 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="folderKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <folder-row
-                v-for="folder in filteredFolders"
-                :key="folder.id"
-                :folder="folder"
-                :value="isFolderChecked(folder)"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredFolders"
+                :selected="userFolders"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <folder-row
+                        v-for="folder in sortedItems"
+                        :key="folder.id"
+                        :folder="folder"
+                        :value="isFolderChecked(folder)"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.folder.add')">
             <a @click.prevent="addFolder" v-text="$t('add')"></a>

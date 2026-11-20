@@ -24,11 +24,19 @@
                     @change="changePipedriveAccount"
                 />
             </item>
-            <pipedrive-account-row
-                v-for="pipedriveAccount in filteredPipedriveAccounts"
-                :key="pipedriveAccount.id"
-                :pipedrive-account="pipedriveAccount"
-            />
+            <selection-list
+                :items="filteredPipedriveAccounts"
+                :is-selected="isPipedriveAccountSelected"
+                @select-all="selectAllPipedriveAccounts"
+            >
+                <template #default="{ sortedItems }">
+                    <pipedrive-account-row
+                        v-for="pipedriveAccount in sortedItems"
+                        :key="pipedriveAccount.id"
+                        :pipedrive-account="pipedriveAccount"
+                    />
+                </template>
+            </selection-list>
         </item-list>
     </div>
 </template>
@@ -43,12 +51,15 @@ import {
     ADD_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import PipedriveAccountRow from "./PipedriveAccountRow.vue";
 
 export default {
     components: {
+        SelectionList,
         PipedriveAccountRow,
     },
 
@@ -60,6 +71,28 @@ export default {
     },
 
     methods: {
+        isPipedriveAccountSelected(pipedriveAccount) {
+            return (
+                this.prospectsParamExists(
+                    this.withKeyPipedriveAccount,
+                    pipedriveAccount.id
+                ) ||
+                this.prospectsParamExists(
+                    this.withoutKeyPipedriveAccount,
+                    pipedriveAccount.id
+                )
+            );
+        },
+
+        selectAllPipedriveAccounts(checked) {
+            setProspectFilterSelection(
+                this.filteredPipedriveAccounts,
+                checked,
+                this.withKeyPipedriveAccount,
+                this.withoutKeyPipedriveAccount
+            );
+        },
+
         /**
          *
          * @param {*} event
@@ -115,6 +148,7 @@ export default {
             "pipedriveAccounts",
             "prospect",
             "prospectFullName",
+            "prospectsParamExists",
             "prospectsParamValue",
             "can",
         ]),

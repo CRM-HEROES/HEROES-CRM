@@ -324,6 +324,12 @@
                 "all": {
                     "title": "Filters"
                 },
+                "selection": {
+                    "select_all": "Select all",
+                    "sort_items": "Sort items",
+                    "selected_first": "Show checked items first",
+                    "unselected_first": "Show unchecked items first"
+                },
                 "users": {
                     "title": "Filter by affected users",
                     "with": "With users ...",

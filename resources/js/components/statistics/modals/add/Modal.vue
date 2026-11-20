@@ -407,29 +407,31 @@
                                             ></div>
                                         </item>
                                         <search v-model="labelKeyword" />
-                                        <item v-if="!labelKeyword" tag="label">
-                                            <icon class="fa fa-check-square" />
-                                            <div
-                                                class="hc-item-main-content"
-                                                v-text="$t('all')"
-                                            ></div>
-                                            <checkbox v-model="allLabels" />
-                                        </item>
-                                        <item-list
-                                            class="hc-flex-1"
-                                            style="
-                                                overflow-y: auto;
-                                                overflow-x: hidden;
-                                            "
-                                            :padding="5"
+                                        <selection-list
+                                            v-model="allLabels"
+                                            :items="filteredLabels"
+                                            :selected="newChart.labels"
+                                            :show-select-all="!labelKeyword"
+                                            :render-when-empty="!labelKeyword"
                                         >
-                                            <label-row
-                                                v-for="label in filteredLabels"
-                                                :key="label.id"
-                                                :label="label"
-                                                v-model="newChart.labels"
-                                            />
-                                        </item-list>
+                                            <template #default="{ sortedItems }">
+                                                <item-list
+                                                    class="hc-flex-1"
+                                                    style="
+                                                        overflow-y: auto;
+                                                        overflow-x: hidden;
+                                                    "
+                                                    :padding="5"
+                                                >
+                                                    <label-row
+                                                        v-for="label in sortedItems"
+                                                        :key="label.id"
+                                                        :label="label"
+                                                        v-model="newChart.labels"
+                                                    />
+                                                </item-list>
+                                            </template>
+                                        </selection-list>
                                     </div>
                                 </template>
                             </tab-layout>

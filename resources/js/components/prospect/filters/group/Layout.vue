@@ -17,11 +17,19 @@
                 />
                 <checkbox :model-value="isCheckedGroup" @change="changeGroup" />
             </item>
-            <group-row
-                v-for="group in filteredGroups"
-                :key="group.id"
-                :group="group"
-            />
+            <selection-list
+                :items="filteredGroups"
+                :is-selected="isGroupSelected"
+                @select-all="selectAllGroups"
+            >
+                <template #default="{ sortedItems }">
+                    <group-row
+                        v-for="group in sortedItems"
+                        :key="group.id"
+                        :group="group"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.group.add')">
             <a @click.prevent="addGroup" v-text="$t('add')"></a>
@@ -40,12 +48,15 @@ import {
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import GroupRow from "./GroupRow.vue";
 
 export default {
     components: {
+        SelectionList,
         GroupRow,
     },
 
@@ -105,10 +116,31 @@ export default {
 
             store.dispatch(FETCH_PROSPECTS);
         },
+
+        isGroupSelected(group) {
+            return (
+                this.prospectsParamExists(this.withKeyGroup, group.id) ||
+                this.prospectsParamExists(this.withoutKeyGroup, group.id)
+            );
+        },
+
+        selectAllGroups(checked) {
+            setProspectFilterSelection(
+                this.filteredGroups,
+                checked,
+                this.withKeyGroup,
+                this.withoutKeyGroup
+            );
+        },
     },
 
     computed: {
-        ...mapGetters(["groups", "prospectsParamValue", "can"]),
+        ...mapGetters([
+            "groups",
+            "prospectsParamExists",
+            "prospectsParamValue",
+            "can",
+        ]),
 
         /**
          *

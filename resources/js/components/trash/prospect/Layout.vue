@@ -3,19 +3,21 @@
         <div class="hc-flex-column hc-flex-1" style="overflow: hidden">
             <search v-model="keyword" />
             <item-list class="hc-flex-1" padding="5px" style="overflow: auto">
-                <item tag="label">
-                    <icon class="fa fa-check-square" />
-                    <div class="hc-item-main-content" v-text="$t('all')"></div>
-
-                    <checkbox v-model="all" />
-                </item>
-
-                <prospect-row
-                    v-for="prospect in prospects"
-                    :key="prospect.id"
-                    :prospect="prospect"
-                    v-model="selected"
-                />
+                <selection-list
+                    v-model="all"
+                    :items="prospects"
+                    :selected="selected"
+                    :render-when-empty="true"
+                >
+                    <template #default="{ sortedItems }">
+                        <prospect-row
+                            v-for="prospect in sortedItems"
+                            :key="prospect.id"
+                            :prospect="prospect"
+                            v-model="selected"
+                        />
+                    </template>
+                </selection-list>
                 <loading :loading="removing || restoring" />
             </item-list>
             <buttons>

@@ -2,18 +2,21 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="threadKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" @change="change" />
-            </item>
-            <thread-row
-                v-for="thread in filteredThreads"
-                :key="thread.id"
-                :thread="thread"
-                :value="isThreadChecked(thread)"
-                :disabled="canAll"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredThreads"
+                :is-selected="isThreadChecked"
+             :render-when-empty="true">
+                <template #default="{ sortedItems }">
+                    <thread-row
+                        v-for="thread in sortedItems"
+                        :key="thread.id"
+                        :thread="thread"
+                        :value="isThreadChecked(thread)"
+                        :disabled="canAll"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.thread.add')">
             <a @click.prevent="addThread" v-text="$t('add')"></a>

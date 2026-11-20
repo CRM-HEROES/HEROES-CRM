@@ -2,18 +2,21 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="categoryKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" @change="change" :disabled="canAll" />
-            </item>
-            <category-row
-                v-for="category in filteredCategories"
-                :key="category.id"
-                :category="category"
-                :value="isCategoryChecked(category)"
-                :disabled="canAll"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredCategories"
+                :is-selected="isCategoryChecked"
+             :render-when-empty="true">
+                <template #default="{ sortedItems }">
+                    <category-row
+                        v-for="category in sortedItems"
+                        :key="category.id"
+                        :category="category"
+                        :value="isCategoryChecked(category)"
+                        :disabled="canAll"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.category.add')">
             <a @click.prevent="addCategory" v-text="$t('add')"></a>

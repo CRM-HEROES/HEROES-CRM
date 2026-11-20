@@ -99,20 +99,21 @@
                     style="max-height: 400px"
                 >
                     <!-- All -->
-                    <item tag="label">
-                        <icon class="fa fa-check-square" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('all')"
-                        ></div>
-                        <checkbox v-model="all" />
-                    </item>
-                    <user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                        v-model="productUsers"
-                    />
+                    <selection-list
+                        v-model="all"
+                        :items="filteredUsers"
+                        :selected="productUsers"
+                        :render-when-empty="true"
+                    >
+                        <template #default="{ sortedItems }">
+                            <user-row
+                                v-for="user in sortedItems"
+                                :key="user.id"
+                                :user="user"
+                                v-model="productUsers"
+                            />
+                        </template>
+                    </selection-list>
                 </item-list>
             </div>
         </template>

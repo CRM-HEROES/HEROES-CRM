@@ -165,12 +165,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <source-row
-                                v-for="source in sources"
-                                :key="source.key"
-                                :source="source"
-                                v-model="filterSources"
-                            />
+                            <selection-list
+                                :items="sources"
+                                :is-selected="isSmsSourceSelected"
+                                @select-all="selectAllSmsSources"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <source-row
+                                        v-for="source in sortedItems"
+                                        :key="source.key"
+                                        :source="source"
+                                        v-model="filterSources"
+                                    />
+                                </template>
+                            </selection-list>
                         </item-list>
                     </div>
                 </template>
@@ -198,12 +206,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <user-row
-                                v-for="user in filteredUsers"
-                                :key="user.id"
-                                :user="user"
-                                v-model="filterCreators"
-                            />
+                            <selection-list
+                                :items="filteredUsers"
+                                :is-selected="isSmsCreatorSelected"
+                                @select-all="selectAllSmsCreators"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <user-row
+                                        v-for="user in sortedItems"
+                                        :key="user.id"
+                                        :user="user"
+                                        v-model="filterCreators"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingUsers" />
                         </item-list>
                     </div>
@@ -223,13 +239,16 @@ import {
     ADD_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { mergeVisibleSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import SourceRow from "./SourceRow.vue";
 import UserRow from "./UserRow.vue";
 
 export default {
     components: {
+        SelectionList,
         SourceRow,
         UserRow,
     },
@@ -275,6 +294,31 @@ export default {
     },
 
     methods: {
+        isSmsSourceSelected(source) {
+            return this.filterSources.includes(source.key);
+        },
+
+        selectAllSmsSources(checked) {
+            this.filterSources = mergeVisibleSelection(
+                this.filterSources,
+                this.sources,
+                checked,
+                (source) => source.key
+            );
+        },
+
+        isSmsCreatorSelected(user) {
+            return this.filterCreators.some((id) => id == user.id);
+        },
+
+        selectAllSmsCreators(checked) {
+            this.filterCreators = mergeVisibleSelection(
+                this.filterCreators,
+                this.filteredUsers,
+                checked
+            );
+        },
+
         changeSms(event) {
             // Remove without param
             store.commit(REMOVE_PROSPECT_PARAMS, {

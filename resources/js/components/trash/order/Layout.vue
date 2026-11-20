@@ -3,33 +3,51 @@
         <div class="hc-flex-column hc-flex-1" style="overflow: hidden">
             <search v-model="keyword" />
             <item-list class="hc-flex-1" padding="5px" style="overflow: auto">
-                <item tag="label">
-                    <icon class="fa fa-check-square" />
-                    <div class="hc-item-main-content" v-text="$t('all')"></div>
+                <selection-list
+                    v-model="all"
+                    :items="orderActions"
+                    :selected="selectedOrderActions"
+                    :render-when-empty="true"
+                >
+                    <template #default="{ sortedItems }">
+                        <order-action-row
+                            v-for="orderAction in sortedItems"
+                            :key="orderAction.id"
+                            :orderAction="orderAction"
+                            v-model="selectedOrderActions"
+                        />
+                    </template>
+                </selection-list>
 
-                    <checkbox v-model="all" />
-                </item>
+                <selection-list
+                    :items="orderStatuses"
+                    :selected="selectedOrderStatuses"
+                    :show-select-all="false"
+                >
+                    <template #default="{ sortedItems }">
+                        <order-status-row
+                            v-for="orderStatus in sortedItems"
+                            :key="orderStatus.id"
+                            :orderAction="orderStatus"
+                            v-model="selectedOrderStatuses"
+                        />
+                    </template>
+                </selection-list>
 
-                <order-action-row
-                    v-for="orderAction in orderActions"
-                    :key="orderAction.id"
-                    :orderAction="orderAction"
-                    v-model="selectedOrderActions"
-                />
-
-                <order-status-row
-                    v-for="orderStatus in orderStatuses"
-                    :key="orderStatus.id"
-                    :orderAction="orderStatus"
-                    v-model="selectedOrderStatuses"
-                />
-
-                <order-row
-                    v-for="order in orders"
-                    :key="order.id"
-                    :order="order"
-                    v-model="selectedOrders"
-                />
+                <selection-list
+                    :items="orders"
+                    :selected="selectedOrders"
+                    :show-select-all="false"
+                >
+                    <template #default="{ sortedItems }">
+                        <order-row
+                            v-for="order in sortedItems"
+                            :key="order.id"
+                            :order="order"
+                            v-model="selectedOrders"
+                        />
+                    </template>
+                </selection-list>
                 <loading :loading="removing" />
             </item-list>
             <buttons>

@@ -325,6 +325,12 @@
                 "all": {
                     "title": "Filtres"
                 },
+                "selection": {
+                    "select_all": "Tout sélectionner",
+                    "sort_items": "Trier les éléments",
+                    "selected_first": "Afficher les éléments cochés en premier",
+                    "unselected_first": "Afficher les éléments décochés en premier"
+                },
                 "users": {
                     "title": "Filtrer par utilisateurs affectés",
                     "with": "Avec utilisateurs ...",

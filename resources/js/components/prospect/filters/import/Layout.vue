@@ -20,11 +20,19 @@
                     @change="changeImport"
                 />
             </item>
-            <import-row
-                v-for="prospectImport in filteredImports"
-                :key="prospectImport.id"
-                :prospect-import="prospectImport"
-            />
+            <selection-list
+                :items="filteredImports"
+                :is-selected="isImportSelected"
+                @select-all="selectAllImports"
+            >
+                <template #default="{ sortedItems }">
+                    <import-row
+                        v-for="prospectImport in sortedItems"
+                        :key="prospectImport.id"
+                        :prospect-import="prospectImport"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.prospect.import')">
             <a @click.prevent="addImport" v-text="$t('add')"></a>
@@ -43,12 +51,15 @@ import {
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import ImportRow from "./ImportRow.vue";
 
 export default {
     components: {
+        SelectionList,
         ImportRow,
     },
 
@@ -108,6 +119,22 @@ export default {
 
             store.dispatch(FETCH_PROSPECTS);
         },
+
+        isImportSelected(prospectImport) {
+            return (
+                this.prospectsParamExists(this.withKeyImport, prospectImport.id) ||
+                this.prospectsParamExists(this.withoutKeyImport, prospectImport.id)
+            );
+        },
+
+        selectAllImports(checked) {
+            setProspectFilterSelection(
+                this.filteredImports,
+                checked,
+                this.withKeyImport,
+                this.withoutKeyImport
+            );
+        },
     },
 
     computed: {
@@ -115,6 +142,7 @@ export default {
             "imports",
             "prospect",
             "prospectFullName",
+            "prospectsParamExists",
             "prospectsParamValue",
             "can",
         ]),

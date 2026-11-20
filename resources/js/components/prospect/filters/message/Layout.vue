@@ -22,11 +22,19 @@
                     @change="changeThread"
                 />
             </item>
-            <thread-row
-                v-for="thread in filteredThreads"
-                :key="thread.id"
-                :thread="thread"
-            />
+            <selection-list
+                :items="filteredThreads"
+                :is-selected="isThreadSelected"
+                @select-all="selectAllThreads"
+            >
+                <template #default="{ sortedItems }">
+                    <thread-row
+                        v-for="thread in sortedItems"
+                        :key="thread.id"
+                        :thread="thread"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.thread.add')">
             <a @click.prevent="addThread" v-text="$t('add')"></a>
@@ -45,12 +53,15 @@ import {
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import ThreadRow from "./ThreadRow.vue";
 
 export default {
     components: {
+        SelectionList,
         ThreadRow,
     },
 
@@ -67,6 +78,22 @@ export default {
          */
         addThread() {
             store.commit(OPEN_MODAL, "thread-add");
+        },
+
+        isThreadSelected(thread) {
+            return (
+                this.prospectsParamExists(this.withKeyThread, thread.id) ||
+                this.prospectsParamExists(this.withoutKeyThread, thread.id)
+            );
+        },
+
+        selectAllThreads(checked) {
+            setProspectFilterSelection(
+                this.filteredThreads,
+                checked,
+                this.withKeyThread,
+                this.withoutKeyThread
+            );
         },
 
         changeThread(event) {

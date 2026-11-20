@@ -2,16 +2,20 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="calendarKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <calendar-row
-                v-for="calendar in filteredCalendars"
-                :key="calendar.id"
-                :calendar="calendar"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredCalendars"
+                :selected="userBulkCalendars"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <calendar-row
+                        v-for="calendar in sortedItems"
+                        :key="calendar.id"
+                        :calendar="calendar"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <button @click.prevent="attach" :disabled="disabled">

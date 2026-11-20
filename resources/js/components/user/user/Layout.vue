@@ -2,17 +2,21 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="userKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <user-row
-                v-for="user in filteredUsers"
-                :key="user.id"
-                :user="user"
-                :value="isUserChecked(user)"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredUsers"
+                :selected="userUsers"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <user-row
+                        v-for="user in sortedItems"
+                        :key="user.id"
+                        :user="user"
+                        :value="isUserChecked(user)"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <a @click.prevent="addUser" v-text="$t('add')"></a>

@@ -2,17 +2,21 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="questionnaireKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <questionnaire-row
-                v-for="questionnaire in filteredQuestionnaires"
-                :key="questionnaire.id"
-                :questionnaire="questionnaire"
-                :value="isQuestionnaireChecked(questionnaire)"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredQuestionnaires"
+                :selected="userQuestionnaires"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <questionnaire-row
+                        v-for="questionnaire in sortedItems"
+                        :key="questionnaire.id"
+                        :questionnaire="questionnaire"
+                        :value="isQuestionnaireChecked(questionnaire)"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.questionnaire.add')">
             <a @click.prevent="addQuestionnaire" v-text="$t('add')"></a>

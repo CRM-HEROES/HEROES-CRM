@@ -18,19 +18,19 @@
                     <icon class="fa fa-caret-right" />
                 </item>
                 <item-list class="hc-flex-1" padding="5px">
-                    <item tag="label">
-                        <icon class="fa fa-check-square" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('all')"
-                        ></div>
-                        <checkbox v-model="all" />
-                    </item>
-                    <user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                    />
+                    <selection-list
+                        :items="filteredUsers"
+                        :is-selected="isBulkUserSelected"
+                        @select-all="selectAllUsers"
+                    >
+                        <template #default="{ sortedItems }">
+                            <user-row
+                                v-for="user in sortedItems"
+                                :key="user.id"
+                                :user="user"
+                            />
+                        </template>
+                    </selection-list>
                 </item-list>
                 <buttons>
                     <button
@@ -101,9 +101,11 @@ import { CLOSE_SLIDE } from "@/actions/slide";
 // Components
 import UserRow from "./UserRow.vue";
 import RoleRow from "./RoleRow.vue";
+import SelectionList from "../../filters/SelectionList.vue";
 
 export default {
     components: {
+        SelectionList,
         UserRow,
         RoleRow,
     },
@@ -118,6 +120,14 @@ export default {
     },
 
     methods: {
+        isBulkUserSelected(user) {
+            return this.prospectBulkUsers.some((id) => id == user.id);
+        },
+
+        selectAllUsers(checked) {
+            this.all = checked;
+        },
+
         /**
          *
          * @param {*} user

@@ -36,11 +36,19 @@
                             @change="changeUser"
                         />
                     </item>
-                    <user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                    />
+                    <selection-list
+                        :items="filteredUsers"
+                        :is-selected="isUserSelected"
+                        @select-all="selectAllUsers"
+                    >
+                        <template #default="{ sortedItems }">
+                            <user-row
+                                v-for="user in sortedItems"
+                                :key="user.id"
+                                :user="user"
+                            />
+                        </template>
+                    </selection-list>
                 </item-list>
                 <buttons v-if="can('all')">
                     <a @click.prevent="addUser" v-text="$t('add')"></a>
@@ -85,6 +93,7 @@ import store from "@/store";
 
 // Actions
 import { OPEN_MODAL } from "@/actions/modal";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 import {
     REMOVE_PROSPECT_PARAMS,
     ADD_PROSPECT_PARAMS,
@@ -94,9 +103,11 @@ import {
 
 import UserRow from "./UserRow.vue";
 import RoleRow from "./RoleRow.vue";
+import SelectionList from "../SelectionList.vue";
 
 export default {
     components: {
+        SelectionList,
         UserRow,
         RoleRow,
     },
@@ -117,6 +128,22 @@ export default {
          */
         fetchUsers() {
             // store.dispatch(FETCH_USERS);
+        },
+
+        isUserSelected(user) {
+            return (
+                this.prospectsParamExists(this.withKeyUser, user.id) ||
+                this.prospectsParamExists(this.withoutKeyUser, user.id)
+            );
+        },
+
+        selectAllUsers(checked) {
+            setProspectFilterSelection(
+                this.filteredUsers,
+                checked,
+                this.withKeyUser,
+                this.withoutKeyUser
+            );
         },
 
         changeUser(event) {
@@ -194,6 +221,7 @@ export default {
             "roles",
             "prospect",
             "prospectFullName",
+            "prospectsParamExists",
             "prospectsParamValue",
             "can",
         ]),

@@ -2,16 +2,20 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="documentKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <document-row
-                v-for="document in filteredDocuments"
-                :key="document.id"
-                :document="document"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredDocuments"
+                :selected="userBulkDocuments"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <document-row
+                        v-for="document in sortedItems"
+                        :key="document.id"
+                        :document="document"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <button @click.prevent="attach" :disabled="disabled">

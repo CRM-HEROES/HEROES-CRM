@@ -18,20 +18,20 @@
                     <icon class="fa fa-caret-right" />
                 </item>
                 <item-list class="hc-flex-1" padding="5px">
-                    <item tag="label">
-                        <icon class="fa fa-check-square" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('all')"
-                        ></div>
-                        <checkbox v-model="all" />
-                    </item>
-                    <user-row
-                        v-for="user in filteredUsers"
-                        :key="user.id"
-                        :user="user"
-                        :value="isUserChecked(user)"
-                    />
+                    <selection-list
+                        :items="filteredUsers"
+                        :is-selected="isUserChecked"
+                        @select-all="selectAllUsers"
+                    >
+                        <template #default="{ sortedItems }">
+                            <user-row
+                                v-for="user in sortedItems"
+                                :key="user.id"
+                                :user="user"
+                                :value="isUserChecked(user)"
+                            />
+                        </template>
+                    </selection-list>
                 </item-list>
                 <buttons v-if="can('all')">
                     <a @click.prevent="addUser" v-text="$t('add')"></a>
@@ -89,9 +89,11 @@ import { FETCH_PROSPECTS } from "@/actions/project/prospect";
 // Components
 import UserRow from "./UserRow.vue";
 import RoleRow from "./RoleRow.vue";
+import SelectionList from "../filters/SelectionList.vue";
 
 export default {
     components: {
+        SelectionList,
         UserRow,
         RoleRow,
     },
@@ -113,6 +115,10 @@ export default {
          */
         isUserChecked(user) {
             return this.prospectUsers.findIndex((l) => l.id == user.id) >= 0;
+        },
+
+        selectAllUsers(checked) {
+            this.all = checked;
         },
 
         /**

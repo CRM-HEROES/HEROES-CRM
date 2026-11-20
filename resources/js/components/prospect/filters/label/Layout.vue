@@ -121,22 +121,24 @@
                             />
                         </item>
 
-                        <item tag="label">
-                            <icon class="fa fa-tags" />
-                            <div
-                                class="hc-item-main-content"
-                                v-text="$t('all')"
-                            ></div>
-                            <checkbox v-model="all" />
-                        </item>
-
                         <!-- Labels list -->
 
-                        <label-row
-                            v-for="label in filteredLabels"
-                            :label="label"
-                            :show-label-setting="showLabelSetting"
-                        />
+                        <selection-list
+                            v-model="all"
+                            :items="filteredLabels"
+                            :is-selected="isLabelSelected"
+                            :render-when-empty="true"
+                            select-all-icon="fa fa-tags"
+                        >
+                            <template #default="{ sortedItems }">
+                                <label-row
+                                    v-for="label in sortedItems"
+                                    :key="label.id"
+                                    :label="label"
+                                    :show-label-setting="showLabelSetting"
+                                />
+                            </template>
+                        </selection-list>
                     </item-list>
                     <buttons v-if="can('all.project.category.label.add')">
                         <a
@@ -167,11 +169,13 @@ import { FETCH_LABELS } from "@/actions/project/label";
 import { OPEN_MODAL } from "@/actions/modal";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import CategoryRow from "./CategoryRow.vue";
 import LabelRow from "./LabelRow.vue";
 
 export default {
     components: {
+        SelectionList,
         CategoryRow,
         LabelRow,
     },
@@ -191,6 +195,13 @@ export default {
     },
 
     methods: {
+        isLabelSelected(label) {
+            return (
+                this.prospectsParamExists(this.withKeyCategory, label.id) ||
+                this.prospectsParamExists(this.withoutKeyCategory, label.id)
+            );
+        },
+
         /**
          * Set or clear a date range param then reload prospects
          */

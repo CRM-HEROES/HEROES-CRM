@@ -2,16 +2,20 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="orderActionKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <order-action-row
-                v-for="orderAction in filteredOrderActions"
-                :key="orderAction.id"
-                :orderAction="orderAction"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredOrderActions"
+                :selected="userBulkOrderActions"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <order-action-row
+                        v-for="orderAction in sortedItems"
+                        :key="orderAction.id"
+                        :orderAction="orderAction"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <button @click.prevent="attach" :disabled="disabled">

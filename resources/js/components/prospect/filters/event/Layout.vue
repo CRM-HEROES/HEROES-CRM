@@ -349,12 +349,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <calendar-row
-                                v-for="calendar in filteredCalendars"
-                                :key="calendar.id"
-                                :calendar="calendar"
-                                v-model="filterCalendars"
-                            />
+                            <selection-list
+                                :items="filteredCalendars"
+                                :is-selected="isCalendarSelected"
+                                @select-all="selectAllCalendars"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <calendar-row
+                                        v-for="calendar in sortedItems"
+                                        :key="calendar.id"
+                                        :calendar="calendar"
+                                        v-model="filterCalendars"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingCalendars" />
                         </item-list>
                     </div>
@@ -385,12 +393,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <user-row
-                                v-for="user in filteredUsers"
-                                :key="user.id"
-                                :user="user"
-                                v-model="filterUsers"
-                            />
+                            <selection-list
+                                :items="filteredUsers"
+                                :is-selected="isEventUserSelected"
+                                @select-all="selectAllEventUsers"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <user-row
+                                        v-for="user in sortedItems"
+                                        :key="user.id"
+                                        :user="user"
+                                        v-model="filterUsers"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingUsers" />
                         </item-list>
                     </div>
@@ -421,12 +437,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <user-row
-                                v-for="user in filteredUsers"
-                                :key="user.id"
-                                :user="user"
-                                v-model="filterCreators"
-                            />
+                            <selection-list
+                                :items="filteredUsers"
+                                :is-selected="isEventCreatorSelected"
+                                @select-all="selectAllEventCreators"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <user-row
+                                        v-for="user in sortedItems"
+                                        :key="user.id"
+                                        :user="user"
+                                        v-model="filterCreators"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingUsers" />
                         </item-list>
                     </div>
@@ -477,13 +501,16 @@ import {
     REMOVE_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { mergeVisibleSelection } from "@/utils/prospect-filter-selection";
 
 // Components
 import CalendarRow from "./CalendarRow.vue";
 import UserRow from "./UserRow.vue";
+import SelectionList from "../SelectionList.vue";
 
 export default {
     components: {
+        SelectionList,
         CalendarRow,
         UserRow,
     },
@@ -1071,6 +1098,42 @@ export default {
     },
 
     methods: {
+        isCalendarSelected(calendar) {
+            return this.filterCalendars.some((id) => id == calendar.id);
+        },
+
+        selectAllCalendars(checked) {
+            this.filterCalendars = mergeVisibleSelection(
+                this.filterCalendars,
+                this.filteredCalendars,
+                checked
+            );
+        },
+
+        isEventUserSelected(user) {
+            return this.filterUsers.some((id) => id == user.id);
+        },
+
+        selectAllEventUsers(checked) {
+            this.filterUsers = mergeVisibleSelection(
+                this.filterUsers,
+                this.filteredUsers,
+                checked
+            );
+        },
+
+        isEventCreatorSelected(user) {
+            return this.filterCreators.some((id) => id == user.id);
+        },
+
+        selectAllEventCreators(checked) {
+            this.filterCreators = mergeVisibleSelection(
+                this.filterCreators,
+                this.filteredUsers,
+                checked
+            );
+        },
+
         getPeriodRange(period) {
             const date = new Date();
             date.setHours(0, 0, 0, 0);
