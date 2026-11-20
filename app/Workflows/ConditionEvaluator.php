@@ -19,6 +19,10 @@ use Illuminate\Database\Eloquent\Builder;
  *   { "op": "and", "items": [
  *       { "filters": { "withUsers": [3], "createdDaysAgo": 2 } },   // all of them
  *       { "check": "work_hours", "days": [1,2,3,4,5], "from": "08:00", "to": "17:00" },
+ *       { "field": "rdv_fixe", "is": "oui" },                       // a custom field of the prospect
+ *       { "field": "mailing_optout", "is_not": "oui" },
+ *       { "field": "centre", "filled": true },                      // "filled": false: empty
+ *       { "field": "plus_50", "is": "oui" },                        // computed: 50 years old or more
  *       { "op": "or", "items": [ { "filters": {...} }, { "filters": {...} } ] }
  *   ] }
  *
@@ -32,6 +36,21 @@ class ConditionEvaluator
 {
     public const ALL = 'all';
     public const ANY = 'any';
+
+    /**
+     * What a "field" item can ask: is, is_not (a value), filled (true / false)
+     */
+    public const FIELD_TESTS = ['is', 'is_not', 'filled'];
+
+    /**
+     * Fields that are not stored but computed from the prospect
+     */
+    public const COMPUTED_FIELDS = ['plus_50'];
+
+    public static function validSlug(mixed $slug): bool
+    {
+        return is_string($slug) && preg_match('/^[a-z0-9_]{1,60}$/', $slug) === 1;
+    }
 
     /**
      * Nesting limit of the groups
@@ -103,6 +122,48 @@ class ConditionEvaluator
         ];
     }
 
+    /**
+     * A custom field of the prospect (its value is in the "meta" of the record)
+     */
+    protected function field(Builder $query, array $node): void
+    {
+        $slug = $node['field'];
+
+        if (!self::validSlug($slug)) {
+            throw new \InvalidArgumentException('Unknown field.');
+        }
+
+        if ($slug === 'plus_50') {
+            // 50 years old or more: born at least 50 years ago (nobody without a birth date)
+            $older = array_key_exists('is', $node) ? $node['is'] === 'oui' : ($node['is_not'] ?? null) === 'non';
+
+            $older
+                ? $query->whereNotNull('date_of_birth')->where('date_of_birth', '<=', now()->subYears(50)->toDateString())
+                : $query->where(fn ($q) => $q->whereNull('date_of_birth')->orWhere('date_of_birth', '>', now()->subYears(50)->toDateString()));
+
+            return;
+        }
+
+        $column = "meta->$slug";
+
+        if (array_key_exists('filled', $node)) {
+            $node['filled']
+                ? $query->whereNotNull($column)->where($column, '!=', '')
+                : $query->where(fn ($q) => $q->whereNull($column)->orWhere($column, ''));
+
+            return;
+        }
+
+        if (array_key_exists('is', $node)) {
+            $query->where($column, (string) $node['is']);
+
+            return;
+        }
+
+        // is_not: a field without value is not that value either
+        $query->where(fn ($q) => $q->whereNull($column)->orWhere($column, '!=', (string) ($node['is_not'] ?? '')));
+    }
+
     protected function apply(Builder $query, Filters $filter, int $projectId, array $node, string $boolean, int $depth = 1): void
     {
         $where = $boolean === 'or' ? 'orWhere' : 'where';
@@ -127,6 +188,12 @@ class ConditionEvaluator
             $result = TimeChecks::evaluate($node['check'], $node, $projectId, now());
 
             $query->{$where . 'Raw'}($result ? '1 = 1' : '1 = 0');
+
+            return;
+        }
+
+        if (isset($node['field'])) {
+            $query->{$where}(fn (Builder $group) => $this->field($group, $node));
 
             return;
         }

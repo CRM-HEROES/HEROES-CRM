@@ -42,6 +42,30 @@
                 <p class="hc-wfc-help" v-text="$t('workflow.condition.timezone_help')"></p>
             </div>
 
+            <!-- A custom field of the prospect -->
+            <div v-else-if="item.field" class="hc-wfc-row">
+                <select :value="item.field" :disabled="readOnly" @change="setItem(index, fieldItem($event.target.value, item))">
+                    <option v-if="!choices.some((c) => c.slug === item.field)" :value="item.field" v-text="item.field"></option>
+                    <option v-for="choice in choices" :key="choice.slug" :value="choice.slug" v-text="fieldName(choice)"></option>
+                </select>
+                <select :value="testOf(item)" :disabled="readOnly" @change="setItem(index, fieldItem(item.field, item, $event.target.value))">
+                    <option v-for="test in tests" :key="test" :value="test" v-text="$t('workflow.condition.field_test.' + test)"></option>
+                </select>
+                <select v-if="item.field === 'plus_50'" :value="valueOf(item)" :disabled="readOnly" @change="setItem(index, fieldItem(item.field, item, testOf(item), $event.target.value))">
+                    <option value="oui" v-text="$t('workflow.yes')"></option>
+                    <option value="non" v-text="$t('workflow.no')"></option>
+                </select>
+                <input
+                    v-else-if="['is', 'is_not'].includes(testOf(item))"
+                    type="text"
+                    maxlength="120"
+                    :value="valueOf(item)"
+                    :placeholder="$t('workflow.condition.field_value')"
+                    :disabled="readOnly"
+                    @input="setItem(index, fieldItem(item.field, item, testOf(item), $event.target.value))"
+                />
+            </div>
+
             <!-- Criterion on the prospect -->
             <div v-else class="hc-wfc-row">
                 <select :value="filterName(item)" :disabled="readOnly" @change="setItem(index, newFilter($event.target.value))">
@@ -71,6 +95,7 @@
 
         <div v-if="!readOnly" class="hc-wfc-add">
             <span v-if="filters.length" class="hc-wfc-addwrap"><button type="button" @click="add(newFilter(filters[0].name))" v-text="'+ ' + $t('workflow.condition.add_filter')"></button><help-tip k="workflow.tip.add_filter" /></span>
+            <span v-if="subject === 'prospect'" class="hc-wfc-addwrap"><button type="button" @click="add(fieldItem(choices[0].slug, null, 'is', ''))" v-text="'+ ' + $t('workflow.condition.add_field')"></button><help-tip k="workflow.tip.add_field" /></span>
             <span class="hc-wfc-addwrap"><button type="button" @click="add(newCheck('work_hours'))" v-text="'+ ' + $t('workflow.condition.add_check')"></button><help-tip k="workflow.tip.add_check" /></span>
             <span v-if="depth < catalog.conditions.max_depth" class="hc-wfc-addwrap"><button type="button" @click="add({ op: 'and', items: [] })" v-text="'+ ' + $t('workflow.condition.add_group')"></button><help-tip k="workflow.tip.add_group" /></span>
         </div>
@@ -116,7 +141,10 @@
 <script>
 import FieldInput from "./FieldInput.vue";
 import HelpTip from "./HelpTip.vue";
-import { filtersFor, newCheckItem, newFilterItem } from "@/utils/workflow-conditions";
+import { mapGetters } from "vuex";
+import store from "@/store";
+import { FETCH_FIELDS } from "@/actions/project/field";
+import { FIELD_TESTS, fieldChoices, fieldTest, fieldValue, filtersFor, newCheckItem, newFieldItem, newFilterItem } from "@/utils/workflow-conditions";
 
 export default {
     name: "ConditionGroup",
@@ -135,7 +163,24 @@ export default {
 
     emits: ["update:modelValue", "remove"],
 
+    created() {
+        // The custom fields of the project are not loaded for this page
+        if (this.subject === "prospect" && !this.fields.length) {
+            store.dispatch(FETCH_FIELDS).catch(() => {});
+        }
+    },
+
     computed: {
+        ...mapGetters(["fields"]),
+
+        choices() {
+            return fieldChoices(this.fields);
+        },
+
+        tests() {
+            return FIELD_TESTS;
+        },
+
         items() {
             return this.modelValue.items || [];
         },
@@ -164,6 +209,29 @@ export default {
 
         filterName(item) {
             return Object.keys(item.filters || {})[0];
+        },
+
+        testOf: fieldTest,
+        valueOf: fieldValue,
+
+        fieldName(choice) {
+            return choice.computed ? this.$t("workflow.condition.field_plus_50") : choice.name;
+        },
+
+        /**
+         * The item for a field, keeping the test and the value when only the field changes
+         */
+        fieldItem(slug, previous, test, value) {
+            const current = previous || {};
+            const nextTest = test || (previous ? fieldTest(current) : "is");
+            const nextValue = value !== undefined ? value : previous ? fieldValue(current) : "";
+
+            // The computed field is a yes / no question
+            if (slug === "plus_50") {
+                return newFieldItem(slug, ["is", "is_not"].includes(nextTest) ? nextTest : "is", ["oui", "non"].includes(nextValue) ? nextValue : "oui");
+            }
+
+            return newFieldItem(slug, nextTest, nextValue);
         },
 
         known(name) {

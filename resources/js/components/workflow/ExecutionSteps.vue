@@ -236,6 +236,11 @@ export default {
                 lines.push(`${this.$t("workflow.monitor.message")} #${result.message_id}`);
             }
 
+            // What the rules of the project kept from leaving
+            if (result.skipped) {
+                lines.push(this.$t("workflow.monitor.skipped_reason." + result.skipped));
+            }
+
             // Written by the step, sent right after: say whether it left
             if (step.delivery) {
                 lines.push(

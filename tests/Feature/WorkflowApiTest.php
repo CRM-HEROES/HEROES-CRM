@@ -666,6 +666,9 @@ class WorkflowApiTest extends TestCase
             if (str_contains($trigger['type'], '.filter_')) {
                 $config['items'] = [['filters' => ['processed' => true]]];
             }
+            if ($trigger['type'] === 'prospect.scheduled') {
+                $config += ['days' => [8], 'at' => '11:00'];
+            }
 
             $graph = ['nodes' => [['id' => 't', 'type' => 'trigger', 'config' => $config]], 'edges' => []];
 

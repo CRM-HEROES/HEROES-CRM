@@ -25,7 +25,10 @@
 
             <template v-for="field in triggerFields" :key="field.key">
                 <template v-if="field.type === 'condition'">
-                    <label class="hc-wfn-label"><span v-text="$t('workflow.trigger_filter')"></span><help-tip k="workflow.trigger_filter_help" /></label>
+                    <label class="hc-wfn-label">
+                        <span v-text="$t(config.trigger === 'prospect.scheduled' ? 'workflow.trigger_audience' : 'workflow.trigger_filter')"></span>
+                        <help-tip :k="config.trigger === 'prospect.scheduled' ? 'workflow.trigger_audience_help' : 'workflow.trigger_filter_help'" />
+                    </label>
                     <condition-group :model-value="tree" :subject="subject" :catalog="catalog" :read-only="readOnly" @update:model-value="setTree" />
                 </template>
                 <template v-else>
@@ -66,7 +69,7 @@
 
             <template v-if="actionDef">
                 <p v-if="actionDef.danger" class="hc-wfn-danger" v-text="$t('workflow.danger')"></p>
-                <template v-for="field in actionDef.fields" :key="config.action + ':' + field.key">
+                <template v-for="field in actionFields" :key="config.action + ':' + field.key">
                     <label class="hc-wfn-label">
                         {{ $t("workflow.field." + fieldName(field)) }}
                         <span v-if="field.required" class="hc-wfn-required">*</span>
@@ -95,7 +98,41 @@
                 <option value="duration" v-text="$t('workflow.wait.duration')"></option>
                 <option value="time" v-text="$t('workflow.wait.until_time')"></option>
                 <option value="date" v-text="$t('workflow.wait.until_date')"></option>
+                <option value="relative" v-text="$t('workflow.wait.relative')"></option>
             </select>
+
+            <!-- Counted from an appointment of the prospect -->
+            <template v-if="waitMode === 'relative'">
+                <div class="hc-wfn-duration">
+                    <label>
+                        <span v-text="$t('workflow.wait.offset_days')"></span>
+                        <field-input :model-value="config.offset_days" type="number" :read-only="readOnly" @update:model-value="setConfig({ offset_days: $event })" />
+                    </label>
+                    <label>
+                        <span v-text="$t('workflow.wait.direction_label')"></span>
+                        <select :value="config.direction || 'before'" :disabled="readOnly" @change="setConfig({ direction: $event.target.value })">
+                            <option value="before" v-text="$t('workflow.wait.direction.before')"></option>
+                            <option value="after" v-text="$t('workflow.wait.direction.after')"></option>
+                        </select>
+                    </label>
+                </div>
+                <label class="hc-wfn-label" v-text="$t('workflow.wait.relative_to_label')"></label>
+                <select :value="config.relative_to" :disabled="readOnly" @change="setConfig({ relative_to: $event.target.value })">
+                    <option v-for="anchor in ['next_event', 'last_event', 'created']" :key="anchor" :value="anchor" v-text="$t('workflow.wait.relative_to.' + anchor)"></option>
+                </select>
+                <label class="hc-wfn-label" v-text="$t('workflow.wait.at')"></label>
+                <field-input :model-value="config.at || ''" type="time" :read-only="readOnly" @update:model-value="setConfig({ at: $event || null })" />
+                <label class="hc-wfn-label" v-text="$t('workflow.wait.if_past_label')"></label>
+                <select :value="config.if_past || 'end'" :disabled="readOnly" @change="setConfig({ if_past: $event.target.value })">
+                    <option value="end" v-text="$t('workflow.wait.if_past.end')"></option>
+                    <option value="skip" v-text="$t('workflow.wait.if_past.skip')"></option>
+                </select>
+                <label class="hc-wff-check">
+                    <input type="checkbox" :checked="!!config.check_only" :disabled="readOnly" @change="setConfig({ check_only: $event.target.checked })" />
+                    <span v-text="$t('workflow.wait.check_only')"></span>
+                </label>
+                <p class="hc-wfn-help" v-text="$t('workflow.wait.relative_help')"></p>
+            </template>
 
             <div v-if="waitMode === 'duration'" class="hc-wfn-duration">
                 <label v-for="unit in ['days', 'hours', 'minutes']" :key="unit">
@@ -121,7 +158,7 @@
                 />
             </template>
 
-            <p v-if="waitMode !== 'duration'" class="hc-wfn-help" v-text="$t('workflow.condition.timezone_help')"></p>
+            <p v-if="waitMode !== 'duration' && waitMode !== 'relative'" class="hc-wfn-help" v-text="$t('workflow.condition.timezone_help')"></p>
         </template>
 
         <!-- Wait for an event -->
@@ -302,6 +339,16 @@ export default {
 
     computed: {
         /**
+         * The fields of the action. With an email template, the subject and the text come from it:
+         * they are not asked for
+         */
+        actionFields() {
+            const fields = (this.actionDef && this.actionDef.fields) || [];
+
+            return this.config.template ? fields.filter((field) => !["subject", "body"].includes(field.key)) : fields;
+        },
+
+        /**
          * The configuration being edited. A change is only seen in the "node" prop
          * after the parent has rendered again; "pending" holds the latest one in the meantime, so
          * that two changes in a row (an operator and its name, for instance) are
@@ -363,7 +410,13 @@ export default {
         },
 
         waitMode() {
-            return this.config.until_date !== undefined ? "date" : this.config.until_time !== undefined ? "time" : "duration";
+            return this.config.relative_to !== undefined
+                ? "relative"
+                : this.config.until_date !== undefined
+                  ? "date"
+                  : this.config.until_time !== undefined
+                    ? "time"
+                    : "duration";
         },
 
         outputList() {
@@ -460,6 +513,7 @@ export default {
                 duration: { minutes: 30 },
                 time: { until_time: "09:00", days: [1, 2, 3, 4, 5, 6, 7] },
                 date: { until_date: "" },
+                relative: { relative_to: "next_event", offset_days: 7, direction: "before", at: "09:00", if_past: "end" },
             }[mode];
 
             this.replaceConfig(config);

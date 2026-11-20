@@ -66,6 +66,14 @@ class WorkflowCatalog
             'prospect.filter_left' => [
                 ['key' => 'condition', 'type' => 'condition', 'required' => true],
             ],
+            'prospect.scheduled' => [
+                ['key' => 'condition', 'type' => 'condition'],
+                ['key' => 'months', 'type' => 'numbers'],
+                ['key' => 'days', 'type' => 'numbers'],
+                ['key' => 'weekdays', 'type' => 'weekdays', 'empty' => 'none'],
+                ['key' => 'at', 'type' => 'time', 'required' => true],
+                ['key' => 'window_minutes', 'type' => 'minutes'],
+            ],
             'event.starting_soon' => [
                 ['key' => 'minutes_before', 'type' => 'minutes'],
             ],
@@ -89,11 +97,15 @@ class WorkflowCatalog
                     ['key' => 'provider', 'type' => 'provider', 'capability' => ProviderRegistry::EMAIL, 'required' => true],
                     // Optional: without it the first public channel of the project is used
                     ['key' => 'thread', 'type' => 'thread'],
+                    // A template of the library of the project (a mailing plan): it replaces the subject and the text below
+                    ['key' => 'template', 'type' => 'template'],
                     ['key' => 'subject', 'type' => 'line'],
                     ['key' => 'body', 'type' => 'html', 'required' => true],
                     // People in copy of the email: users, and the members of groups
                     ['key' => 'cc_users', 'type' => 'users'],
                     ['key' => 'cc_groups', 'type' => 'groups'],
+                    // An email marketing already has its limit of the day: tomorrow, or never
+                    ['key' => 'if_busy', 'type' => 'if_busy'],
                     $onError,
                 ],
             ],
