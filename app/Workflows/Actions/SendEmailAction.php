@@ -2,7 +2,9 @@
 
 namespace App\Workflows\Actions;
 
+use App\Models\Prospect;
 use App\Models\WorkflowExecution;
+use App\Workflows\ProjectTimezone;
 use App\Workflows\Providers\ProviderRegistry;
 use App\Workflows\VariableResolver;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +32,12 @@ use Illuminate\Support\Facades\DB;
  * "cc_users" / "cc_groups": the users, and the members of the groups, who get
  * a copy. Their addresses are looked up when the email is sent, so a user who
  * joined the group since is included and one who left the project is not.
+ *
+ * Protections (optional, by step): "skip_minors" (nothing to a contact under 18), "quiet_days_before" /
+ * "quiet_days_after" (nothing in the days around an appointment of the contact), "daily_limit": "wait"
+ * (a second email of the day leaves tomorrow) or "skip" (it is dropped: a newsletter a day late is not
+ * worth sending). Whatever the options, nothing is ever sent to a contact who unsubscribed (see
+ * EmailGuards). A step held back by one of them is done, and says why (result.skipped).
  *
  * "design": the look of the email, chosen in the builder (see EmailDesign). Without
  * it the email keeps the CRM's usual look.
@@ -75,6 +83,19 @@ class SendEmailAction extends CommunicationAction
         }
 
         $errors = array_merge($errors, EmailDesign::problems($config['design'] ?? null, $label));
+
+        if (!in_array($config['daily_limit'] ?? null, [null, 'wait', 'skip'], true)) {
+            $errors[] = "L'action \"$label\" : « si le contact a déjà reçu un email aujourd'hui » est invalide.";
+        }
+
+        foreach (['quiet_days_before', 'quiet_days_after'] as $key) {
+            $days = $config[$key] ?? 0;
+
+            if ($days !== null && (!is_int($days) || $days < 0 || $days > 60)) {
+                $errors[] = "L'action \"$label\" : le nombre de jours de silence autour d'un rendez-vous doit être entre 0 et 60.";
+                break;
+            }
+        }
 
         foreach (['cc_users' => 'utilisateur', 'cc_groups' => 'groupe'] as $key => $noun) {
             $ids = $config[$key] ?? [];
@@ -133,6 +154,23 @@ class SendEmailAction extends CommunicationAction
         return $errors;
     }
 
+    /**
+     * Rate limit of the operator, then the daily limit of the step ("wait": tomorrow)
+     */
+    public function delay(WorkflowExecution $execution, array $config): ?\Carbon\CarbonInterface
+    {
+        $until = parent::delay($execution, $config);
+
+        if ($until || ($config['daily_limit'] ?? null) !== 'wait' || $execution->subject_type !== 'prospect') {
+            return $until;
+        }
+
+        $prospect = Prospect::withoutGlobalScopes()->find($execution->subject_id);
+        $timezone = ProjectTimezone::for($execution->project_id);
+
+        return $prospect && EmailGuards::sentToday($prospect, $timezone) >= 1 ? EmailGuards::tomorrow($timezone) : null;
+    }
+
     public function handle(Model $subject, array $config, WorkflowExecution $execution): array
     {
         $provider = $this->provider($execution, $config);
@@ -148,6 +186,11 @@ class SendEmailAction extends CommunicationAction
 
         if (!$thread || $thread->private) {
             throw new \RuntimeException("Aucun canal de discussion public pour envoyer l'email (à créer dans les paramètres des messages).");
+        }
+
+        // What must not be sent is not: the step is done, and says why
+        if ($reason = $this->heldBack($prospect, $config, $execution->project_id)) {
+            return ['provider' => $provider['ref'], 'skipped' => $reason];
         }
 
         $variables = new VariableResolver($prospect);
@@ -181,6 +224,31 @@ class SendEmailAction extends CommunicationAction
             'thread_id' => $thread->id,
             'cc' => count($copies),
         ];
+    }
+
+    /**
+     * The reason why this email must not leave (see EmailGuards), or null
+     */
+    protected function heldBack(Prospect $prospect, array $config, int $projectId): ?string
+    {
+        if (EmailGuards::optedOut($prospect)) {
+            return EmailGuards::OPTED_OUT;
+        }
+
+        if (!empty($config['skip_minors']) && EmailGuards::minor($prospect)) {
+            return EmailGuards::MINOR;
+        }
+
+        if (EmailGuards::quiet($prospect, (int) ($config['quiet_days_before'] ?? 0), (int) ($config['quiet_days_after'] ?? 0))) {
+            return EmailGuards::QUIET_WINDOW;
+        }
+
+        // "wait" was handled before the step ran (see delay()): only "skip" is left to decide here
+        if (($config['daily_limit'] ?? null) === 'skip' && EmailGuards::sentToday($prospect, ProjectTimezone::for($projectId)) >= 1) {
+            return EmailGuards::BUSY;
+        }
+
+        return null;
     }
 
     /**

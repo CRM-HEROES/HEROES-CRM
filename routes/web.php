@@ -67,6 +67,12 @@ Route::group([
 
 });
 
+// Link "stop these emails" of the automations (public, signed: see the controller)
+Route::get('mailing/unsubscribe/{prospect}', App\Http\Controllers\Mailing\UnsubscribeController::class)
+    ->whereNumber('prospect')
+    ->middleware('signed')
+    ->name('mailing.unsubscribe');
+
 Route::get('{any}', function () {
     return view('welcome');
 })->where('any', '.*');

@@ -75,5 +75,40 @@ test('every colour, font and style of the editor is a value the server accepts',
     }
 
     assert.deepEqual(e.FONTS, ['arial', 'verdana', 'tahoma', 'trebuchet', 'georgia', 'times']);
-    assert.deepEqual(e.STYLES, ['branded', 'simple']);
+    assert.deepEqual(e.STYLES, ['branded', 'simple', 'plain']);
+});
+
+test('the syntax of Brevo becomes the one of the CRM', () => {
+    assert.equal(e.convertBrevo('Bonjour {{ contact.PRENOM }},'), 'Bonjour {{prospect.firstname}},');
+    assert.equal(e.convertBrevo('{{ contact.EMAIL }} {{contact.DATE_RDV}} {{ contact.PLUS_50 }}'), '{{prospect.email}} {{field.date_rdv}} {{prospect.plus_50}}');
+    assert.equal(e.convertBrevo('{% if contact.PAYS == "BE" %}be{% else %}fr{% endif %}'), '{% if field.pays == "BE" %}be{% else %}fr{% endif %}');
+    assert.equal(e.convertBrevo('<a href="{{ unsubscribe }}">Se désinscrire</a>'), '<a href="{{prospect.unsubscribe_url}}">Se désinscrire</a>');
+    assert.equal(e.convertBrevo(null), '');
+    // What is not from Brevo is left as it is
+    assert.equal(e.convertBrevo('{{prospect.firstname}} {URL_RAPPEL}'), '{{prospect.firstname}} {URL_RAPPEL}');
+});
+
+test('the placeholders a file leaves are found, and filled with what the user gave', () => {
+    assert.deepEqual(e.placeholdersIn('<a href="{URL_RAPPEL}">x</a> {EMAIL_DPO} {URL_RAPPEL} {{prospect.firstname}}'), ['URL_RAPPEL', 'EMAIL_DPO']);
+    assert.deepEqual(e.placeholdersIn(''), []);
+
+    assert.equal(e.fillPlaceholders('{URL_RAPPEL}?e={{prospect.email}} {EMAIL_DPO}', { URL_RAPPEL: 'https://ex.fr/rappel', EMAIL_DPO: '  ' }), 'https://ex.fr/rappel?e={{prospect.email}} {EMAIL_DPO}');
+});
+
+test('the file of an email gives its subject, its body converted, and what it still asks for', () => {
+    const file = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Votre bilan du {{ contact.DATE_RDV }} est confirmé</title></head>'
+        + '<body style="margin:0"><p>Bonjour {{ contact.PRENOM }}</p><a href="{URL_RAPPEL}">Rappel</a></body></html>';
+
+    const parsed = e.parseEmailFile(file);
+
+    assert.equal(parsed.title, 'Votre bilan du {{field.date_rdv}} est confirmé');
+    assert.equal(parsed.body, '<p>Bonjour {{prospect.firstname}}</p><a href="{URL_RAPPEL}">Rappel</a>');   // the body of the page, no <html>
+    assert.deepEqual(parsed.placeholders, ['URL_RAPPEL']);
+
+    // A text that is not a whole page is its own body
+    assert.deepEqual(e.parseEmailFile('<p>Seul {{ contact.PRENOM }}</p>'), { title: '', body: '<p>Seul {{prospect.firstname}}</p>', placeholders: [] });
+});
+
+test('the design can be an email of its own, as the server has it', () => {
+    assert.deepEqual(e.STYLES, ['branded', 'simple', 'plain']);
 });

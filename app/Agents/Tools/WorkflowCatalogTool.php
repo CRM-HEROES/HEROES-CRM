@@ -74,6 +74,11 @@ class WorkflowCatalogTool implements AgentToolInterface
                     . 'Avec exit_on_leave, le prospect qui ne remplit plus ces conditions sort de l\'automatisation même pendant une attente : c\'est ainsi qu\'on exprime « la séquence s\'arrête quand un rendez-vous est fixé ».',
                 'schedule' => 'Déclencheur "prospect.scheduled" (envoi à date fixe, ex. une newsletter) : { "trigger": "prospect.scheduled", "months": [1], "days": [8], "weekdays": [], "at": "11:00", "window_minutes": 60, "op": "and", "items": [ audience ] }. '
                     . 'days = jours du mois (ou weekdays = 1 lundi .. 7 dimanche), months vide = tous les mois ; les prospects de l\'audience partent à partir de "at", étalés sur window_minutes ; un seul envoi par prospect et par jour.',
+                'email' => 'Action send_email : { "action": "send_email", "provider": "<ref>", "subject": "...", "body": "<html de l\'email>", "cc_users": [ids], "cc_groups": [ids], "design": {...} }. '
+                    . 'Le texte et l\'objet peuvent contenir {{prospect.firstname}}, {{field.<slug>}} (un champ personnalisé du prospect), {{prospect.unsubscribe_url}} (le lien personnel « ne plus recevoir ces emails », à mettre dans les emails marketing) et des blocs {% if field.x == "oui" %}...{% else %}...{% endif %}. '
+                    . 'design.style : "branded" (bandeau de couleur), "simple" (texte seul) ou "plain" (l\'email est déjà complet, avec sa propre mise en page : le CRM n\'ajoute rien autour). '
+                    . 'Protections facultatives de l\'étape : "daily_limit": "wait" (un 2e email du jour part demain) ou "skip" (abandonné), "quiet_days_before" / "quiet_days_after" (silence N jours avant/après un rendez-vous du contact), "skip_minors": true. '
+                    . 'Quelqu\'un qui s\'est désinscrit ne reçoit jamais rien.',
                 'example' => [
                     'nodes' => [
                         ['id' => 'trigger', 'type' => 'trigger', 'config' => ['trigger' => 'prospect.created']],

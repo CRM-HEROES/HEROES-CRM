@@ -27,6 +27,7 @@
             :read-only="readOnly"
             @update:model-value="$emit('update:modelValue', $event)"
             @update:design="$emit('update:design', $event)"
+            @update:subject="$emit('update:subject', $event)"
         />
 
         <!-- One line (the subject of an email) -->
@@ -96,6 +97,13 @@
             <p v-if="unconfiguredChosen" class="hc-wff-count" v-text="$t('workflow.provider_setup.waiting')"></p>
             <p v-if="!providersLoading && !providers.length" class="hc-wff-warn" v-text="$t('workflow.no_provider.' + field.capability)"></p>
         </template>
+
+        <!-- A second email of the day -->
+        <select v-else-if="type === 'daily_limit'" :value="modelValue || ''" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value || null)">
+            <option value="" v-text="$t('workflow.daily_limit.none')"></option>
+            <option value="wait" v-text="$t('workflow.daily_limit.wait')"></option>
+            <option value="skip" v-text="$t('workflow.daily_limit.skip')"></option>
+        </select>
 
         <!-- What happens when the step fails -->
         <select v-else-if="type === 'on_error'" :value="modelValue || 'fail'" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value)">
@@ -316,7 +324,7 @@ export default {
         readOnly: { type: Boolean, default: false },
     },
 
-    emits: ["update:modelValue", "update:design", "provider-label"],
+    emits: ["update:modelValue", "update:design", "update:subject", "provider-label"],
 
     data() {
         return {

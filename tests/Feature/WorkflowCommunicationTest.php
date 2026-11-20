@@ -610,7 +610,7 @@ class WorkflowCommunicationTest extends TestCase
             collect(array_keys(EmailDesign::defaults('Heroes')))->sort()->values()->all()
         );
         $this->assertSame(['arial', 'verdana', 'tahoma', 'trebuchet', 'georgia', 'times'], array_keys(EmailDesign::FONTS));
-        $this->assertSame(['branded', 'simple'], EmailDesign::STYLES);
+        $this->assertSame(['branded', 'simple', 'plain'], EmailDesign::STYLES);
         $this->assertSame('#163b52', EmailDesign::defaults()['header_color']);
         $this->assertSame('', EmailDesign::defaults('Heroes')['brand_label']);
     }
@@ -734,6 +734,135 @@ class WorkflowCommunicationTest extends TestCase
         $this->assertSame(['prospect.nom'], VariableResolver::unknown('{% if prospect.nom == "x" %}{{field.libre}}{% endif %}'));
     }
 
+
+    // Protections of the contact
+
+    protected function sendEmail(array $options = []): void
+    {
+        $this->activate($this->graph($this->email($options)));
+        $this->fire(1);
+    }
+
+    public function test_the_unsubscribe_link_is_personal_signed_and_stops_the_emails(): void
+    {
+        $url = $this->resolver()->render('{{prospect.unsubscribe_url}}');
+        $this->assertStringContainsString('/mailing/unsubscribe/1', $url);
+        $this->assertStringContainsString('signature=', $url);
+
+        $this->get(html_entity_decode($url))->assertOk()->assertSee('Vous ne recevrez plus');
+        $this->assertSame(now()->toDateString(), json_decode(DB::table('prospects')->where('id', 1)->value('meta'), true)['mailing_optout']);
+
+        // A link that the CRM did not make is refused, and nobody else is marked
+        $this->get('/mailing/unsubscribe/3')->assertForbidden();
+        $this->get(preg_replace('/signature=[^&]+/', 'signature=faux', $url))->assertForbidden();
+        $this->assertNull(DB::table('prospects')->where('id', 3)->value('meta'));
+
+        // And nothing is sent to him anymore, whatever the options of the step
+        $this->sendEmail();
+        $this->assertSame(0, Message::count());
+        $this->assertSame('optout', $this->nodeRow('a1')->result['skipped']);
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+    }
+
+    public function test_a_contact_who_did_not_unsubscribe_gets_the_email(): void
+    {
+        $this->setMeta(1, ['mailing_optout' => 'non']); // "non" is not a refusal
+
+        $this->sendEmail();
+
+        $this->assertSame(1, Message::count());
+    }
+
+    public function test_the_step_can_keep_quiet_for_the_minors(): void
+    {
+        DB::table('prospects')->where('id', 1)->update(['date_of_birth' => now()->subYears(17)->toDateString()]);
+
+        $this->sendEmail(['skip_minors' => true]);
+
+        $this->assertSame('minor', $this->nodeRow('a1')->result['skipped']);
+        $this->assertSame(0, Message::count());
+    }
+
+    public function test_a_minor_gets_the_email_when_the_step_does_not_ask_otherwise(): void
+    {
+        DB::table('prospects')->where('id', 1)->update(['date_of_birth' => now()->subYears(17)->toDateString()]);
+
+        $this->sendEmail();
+
+        $this->assertSame(1, Message::count());
+    }
+
+    public function test_the_step_can_keep_quiet_around_an_appointment(): void
+    {
+        DB::table('events')->insert(['prospect_id' => 1, 'started_at' => now()->addDays(2)]);
+
+        $this->sendEmail(['quiet_days_before' => 3]);
+
+        $this->assertSame('quiet_window', $this->nodeRow('a1')->result['skipped']);
+        $this->assertSame(0, Message::count());
+    }
+
+    public function test_an_appointment_far_enough_does_not_keep_the_email(): void
+    {
+        DB::table('events')->insert(['prospect_id' => 1, 'started_at' => now()->addDays(10)]);
+
+        $this->sendEmail(['quiet_days_before' => 3, 'quiet_days_after' => 1]);
+
+        $this->assertSame(1, Message::count());
+    }
+
+    public function test_a_second_email_of_the_day_waits_for_tomorrow_when_the_step_says_so(): void
+    {
+        DB::table('messages')->insert(['prospect_id' => 1, 'thread_id' => 1, 'from_user' => 1, 'subject' => 'Déjà un', 'created_at' => now(), 'updated_at' => now()]);
+
+        $this->sendEmail(['daily_limit' => 'wait']);
+
+        $this->assertSame(WorkflowExecution::WAITING, $this->execution()->status);   // not sent, not lost
+        $this->assertTrue($this->execution()->resume_at->isFuture());
+        $this->assertSame(1, Message::count());
+    }
+
+    public function test_a_second_email_of_the_day_is_dropped_when_the_step_says_so(): void
+    {
+        DB::table('messages')->insert(['prospect_id' => 1, 'thread_id' => 1, 'from_user' => 1, 'subject' => 'Déjà un', 'created_at' => now(), 'updated_at' => now()]);
+
+        $this->sendEmail(['daily_limit' => 'skip']);
+
+        $this->assertSame('busy', $this->nodeRow('a1')->result['skipped']);
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+        $this->assertSame(1, Message::count());
+    }
+
+    public function test_without_a_daily_limit_nothing_is_held_back(): void
+    {
+        DB::table('messages')->insert(['prospect_id' => 1, 'thread_id' => 1, 'from_user' => 1, 'subject' => 'Déjà un', 'created_at' => now(), 'updated_at' => now()]);
+
+        $this->sendEmail();
+
+        $this->assertSame(2, Message::count());
+    }
+
+    public function test_the_protections_of_the_step_are_checked_when_publishing(): void
+    {
+        $errors = fn (array $options) => $this->errors($this->graph($this->email($options)));
+
+        $this->assertSame([], $errors(['daily_limit' => 'wait', 'quiet_days_before' => 3, 'quiet_days_after' => 1, 'skip_minors' => true]));
+        $this->assertSame([], $errors(['daily_limit' => null, 'quiet_days_before' => null]));
+        $this->assertNotSame([], $errors(['daily_limit' => 'never']));
+        $this->assertNotSame([], $errors(['quiet_days_before' => -1]));
+        $this->assertNotSame([], $errors(['quiet_days_after' => 99]));
+    }
+
+    public function test_an_email_that_is_a_whole_page_is_sent_without_the_design_of_the_crm(): void
+    {
+        $html = EmailDesign::render(['style' => 'plain'], 'Objet', '<table><tr><td>Mon propre en-tête</td></tr></table>', 'Heroes');
+
+        $this->assertStringContainsString('<table><tr><td>Mon propre en-tête</td></tr></table>', $html);
+        $this->assertStringNotContainsString('border-radius:12px 12px 0 0', $html);   // no header of the CRM
+        $this->assertStringNotContainsString('Bien cordialement', $html);              // no signature of the CRM
+        $this->assertSame('plain', EmailDesign::normalize(['style' => 'plain'])['style']);
+        $this->assertSame([], EmailDesign::problems(['style' => 'plain'], 'x'));
+    }
 
     public function test_a_message_written_by_a_workflow_is_queued_at_once(): void
     {

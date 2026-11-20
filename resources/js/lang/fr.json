@@ -1183,6 +1183,11 @@
         "no": "Non",
         "choose": "Choisir...",
         "loading": "Chargement...",
+        "daily_limit": {
+            "none": "Aucune limite",
+            "wait": "Le décaler au lendemain",
+            "skip": "Ne pas l'envoyer"
+        },
         "trigger_audience": "Les prospects concernés",
         "trigger_audience_help": "Les prospects qui reçoivent l'envoi, par exemple « a l'étiquette Newsletter ». Sans condition : tous les prospects du projet.",
         "numbers_placeholder": { "months": "1, 6, 12", "days": "8, 22" },
@@ -1197,6 +1202,24 @@
           "tab_edit": "Rédiger",
           "tab_preview": "Aperçu",
           "tab_design": "Design",
+            "load_file": "Charger un email (fichier HTML)",
+            "load_help": "Un email déjà fait : son texte, son objet et ses variables sont repris.",
+            "load_empty": "Ce fichier ne contient pas d'email lisible.",
+            "loaded": "Email chargé : son objet et son texte sont repris, sans habillage du CRM autour.",
+            "ask_title": "Quelques informations à compléter",
+            "ask_help": "Cet email contient des adresses ou des textes à renseigner. Ils seront écrits dans l'email (et proposés pour les suivants).",
+            "ask_load": "Charger l'email",
+            "placeholder_name": {
+                "FOURCHETTE_PRIX": "Fourchette de prix",
+                "EMAIL_DPO": "Adresse email du délégué à la protection des données",
+                "URL_RAPPEL": "Adresse de la page de rappel rapide",
+                "URL_QUESTIONNAIRE": "Adresse du questionnaire d'éligibilité",
+                "URL_GUIDE": "Adresse du guide (PDF)",
+                "URL_PARTAGE": "Adresse de la page de partage",
+                "URL_ENQUETE": "Adresse de l'enquête de satisfaction",
+                "URL_PREFERENCES": "Adresse de la page des préférences"
+            },
+            "plain_note": "L'email est envoyé tel quel, avec sa propre mise en page : le CRM n'ajoute ni bandeau, ni signature, ni pied de page.",
           "design_standard": "Design standard du CRM",
           "design_standard_help": "L'email part avec la présentation habituelle du CRM. Personnalisez-la pour qu'elle ressemble à votre projet : couleurs, en-tête, signature, pied de page.",
           "design_customize": "Personnaliser le design",
@@ -1208,11 +1231,13 @@
           "design_reset": "Revenir au design standard du CRM",
           "style": {
                     "branded": "Avec bandeau",
-                    "simple": "Simple"
+                    "simple": "Simple",
+                    "plain": "Email complet"
           },
           "style_help": {
                     "branded": "Un bandeau de couleur avec le nom du projet, et le message dans une carte.",
-                    "simple": "Seulement le texte, comme un email écrit à la main."
+                    "simple": "Seulement le texte, comme un email écrit à la main.",
+                    "plain": "Un email déjà fait, avec sa propre mise en page : le CRM n'ajoute rien autour."
           },
           "palette": {
                     "blue": "Bleu",
@@ -1397,6 +1422,10 @@
           "body": "Rédigez l'email comme dans un traitement de texte : gras, couleurs, listes, liens, images. Cliquez sur une variable pour l'insérer, par exemple le prénom du prospect. L'aperçu montre l'email tel que le prospect le recevra.",
           "subject": "L'objet de l'email. Facultatif : sans objet, c'est « Vous avez un nouveau message ». Vous pouvez y mettre une variable, par exemple le prénom.",
           "cc_users": "Ces utilisateurs reçoivent une copie de chaque email envoyé. Le prospect voit qui est en copie.",
+          "daily_limit": "Un seul email par jour et par contact : « Le décaler au lendemain » le garde pour demain, « Ne pas l'envoyer » l'abandonne (pour une newsletter, un jour de retard n'a pas de sens). Par défaut, aucune limite.",
+          "quiet_days_before": "L'email ne part pas si le contact a un rendez-vous dans les N prochains jours (0 : pas de silence).",
+          "quiet_days_after": "L'email ne part pas si le contact a eu un rendez-vous dans les N derniers jours (0 : pas de silence).",
+          "skip_minors": "Rien n'est envoyé à un contact de moins de 18 ans (si sa date de naissance est connue). Quelqu'un qui s'est désinscrit ne reçoit jamais rien, sans rien à régler.",
           "cc_groups": "Tous les membres de ces groupes reçoivent une copie de chaque email envoyé. Les adresses sont relues à chaque envoi : un nouveau membre est inclus.",
           "message": "Le texte du SMS. Cliquez sur une variable (en dessous) pour l'insérer, par exemple le prénom du prospect.",
           "user": "Facultatif : l'utilisateur dont on attend la réponse. Il sera prévenu quand le prospect répond.",
@@ -1485,6 +1514,12 @@
             "operator": "Opérateur",
             "wait_past": "Arrêtée : le moment visé était déjà passé",
             "wait_none": "Arrêtée : aucun rendez-vous à partir duquel compter",
+            "skipped_reason": {
+                "optout": "Non envoyé : le contact s'est désinscrit",
+                "minor": "Non envoyé : le contact est mineur",
+                "quiet_window": "Non envoyé : trop proche d'un rendez-vous du contact",
+                "busy": "Non envoyé : le contact a déjà reçu un email aujourd'hui"
+            },
             "delivery": {
                 "sent": "Email envoyé",
                 "failed": "Email non envoyé : {error}",
@@ -1651,6 +1686,10 @@
             "subject": "Objet de l'email",
             "cc_users": "Utilisateurs en copie",
             "cc_groups": "Groupes en copie",
+            "daily_limit": "Si le contact a déjà reçu un email aujourd'hui",
+            "quiet_days_before": "Silence : jours avant un rendez-vous",
+            "quiet_days_after": "Silence : jours après un rendez-vous",
+            "skip_minors": "Ne pas écrire aux mineurs",
             "message": "Message du SMS",
             "user": "Utilisateur",
             "group": "Groupe",

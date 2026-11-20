@@ -16,8 +16,9 @@ class EmailDesign
     /**
      * branded: a coloured header and a card, like the CRM's own emails
      * simple: only the text, as a person would write it
+     * plain: nothing is added around the email: it is a whole email of its own (made elsewhere, with its own header and footer)
      */
-    public const STYLES = ['branded', 'simple'];
+    public const STYLES = ['branded', 'simple', 'plain'];
 
     public const FONTS = [
         'arial' => 'Arial, Helvetica, sans-serif',

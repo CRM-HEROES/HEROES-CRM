@@ -85,6 +85,7 @@
                         :read-only="readOnly"
                         @update:model-value="setPath(field.key, $event)"
                         @update:design="setConfig({ design: $event })"
+                        @update:subject="setConfig({ subject: $event })"
                         @provider-label="setConfig({ provider_label: $event })"
                     />
                 </template>
