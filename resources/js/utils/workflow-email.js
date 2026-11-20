@@ -122,6 +122,61 @@ export const PALETTES = [
 ];
 
 export const FONTS = ["arial", "verdana", "tahoma", "trebuchet", "georgia", "times"];
-export const STYLES = ["branded", "simple"];
+export const STYLES = ["branded", "simple", "plain"];
 export const COLOR_KEYS = ["header_color", "accent_color", "text_color", "background_color"];
 export const TEXT_KEYS = ["brand_name", "brand_label", "category", "closing", "signature_name", "sent_by", "rights"];
+
+/**
+ * "PRENOM" -> "prospect.firstname", "DATE_RDV" -> "field.date_rdv" (a custom field of the prospect)
+ */
+const KNOWN_ATTRIBUTES = { PRENOM: "prospect.firstname", EMAIL: "prospect.email", PLUS_50: "prospect.plus_50" };
+
+export function attributeVariable(name) {
+    return KNOWN_ATTRIBUTES[name] || "field." + String(name).toLowerCase();
+}
+
+/**
+ * The syntax of Brevo (the kit) into the CRM's:
+ *   {{ contact.PRENOM }}            -> {{prospect.firstname}}
+ *   {{ contact.CENTRE }}            -> {{field.centre}}
+ *   {% if contact.PAYS == "BE" %}   -> {% if field.pays == "BE" %}
+ *   {{ unsubscribe }}               -> {{prospect.unsubscribe_url}}
+ */
+export function convertBrevo(text) {
+    return String(text || "")
+        .replace(/\{\{\s*unsubscribe\s*\}\}/gi, "{{prospect.unsubscribe_url}}")
+        .replace(/\{\{\s*contact\.([A-Z0-9_]+)\s*\}\}/g, (match, name) => "{{" + attributeVariable(name) + "}}")
+        .replace(/\{%\s*if\s+contact\.([A-Z0-9_]+)/g, (match, name) => "{% if " + attributeVariable(name));
+}
+
+/**
+ * The placeholders the file leaves to fill in: {URL_RAPPEL}, {EMAIL_DPO}, {FOURCHETTE_PRIX}
+ */
+export function placeholdersIn(text) {
+    return [...new Set([...String(text || "").matchAll(/\{([A-Z][A-Z0-9_]+)\}/g)].map((m) => m[1]))];
+}
+
+/**
+ * The values given for the placeholders written into a text (empty values are not written)
+ */
+export function fillPlaceholders(text, values) {
+    return String(text || "").replace(/\{([A-Z][A-Z0-9_]+)\}/g, (match, key) => {
+        const value = values && typeof values[key] === "string" ? values[key].trim() : "";
+
+        return value !== "" ? value : match;
+    });
+}
+
+/**
+ * An email that is a whole HTML file: its title (the subject, in the files of the kit) and its body,
+ * with the syntax of Brevo converted. { title, body, placeholders }
+ */
+export function parseEmailFile(html) {
+    const text = String(html || "");
+    const title = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(text);
+    const body = /<body[^>]*>([\s\S]*)<\/body>/i.exec(text);
+    const content = convertBrevo(body ? body[1] : text).trim();
+    const subject = title ? convertBrevo(title[1].replace(/<[^>]*>/g, "")).trim() : "";
+
+    return { title: subject, body: content, placeholders: placeholdersIn(content + " " + subject) };
+}

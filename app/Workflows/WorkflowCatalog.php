@@ -102,6 +102,11 @@ class WorkflowCatalog
                     // People in copy of the email: users, and the members of groups
                     ['key' => 'cc_users', 'type' => 'users'],
                     ['key' => 'cc_groups', 'type' => 'groups'],
+                    // Protections of the contact (all optional)
+                    ['key' => 'daily_limit', 'type' => 'daily_limit'],
+                    ['key' => 'quiet_days_before', 'type' => 'number'],
+                    ['key' => 'quiet_days_after', 'type' => 'number'],
+                    ['key' => 'skip_minors', 'type' => 'boolean'],
                     $onError,
                 ],
             ],

@@ -46,6 +46,29 @@
             <button type="button" :title="$t('workflow.email.clear')" @mousedown.prevent="run('removeFormat')"><i class="fa fa-eraser"></i></button>
         </div>
 
+        <!-- An email made elsewhere: its file is loaded here, with the variables turned into the CRM's -->
+        <div v-if="mode === 'edit' && !readOnly" class="hc-wfe-load">
+            <label class="hc-wfe-load-button">
+                <input type="file" accept=".html,.htm,text/html" @change="readFile" />
+                <span v-text="$t('workflow.email.load_file')"></span>
+            </label>
+            <span class="hc-wfe-load-help" v-text="$t('workflow.email.load_help')"></span>
+        </div>
+
+        <!-- What the file asks for before it is loaded (the addresses of the pages...) -->
+        <div v-if="pending" class="hc-wfe-ask">
+            <strong v-text="$t('workflow.email.ask_title')"></strong>
+            <p v-text="$t('workflow.email.ask_help')"></p>
+            <label v-for="key in pending.placeholders" :key="key">
+                <span v-text="placeholderLabel(key)"></span>
+                <input v-model="values[key]" type="text" maxlength="500" />
+            </label>
+            <div class="hc-wfe-ask-buttons">
+                <button type="button" class="hc-wfe-ask-ok" @click="applyFile" v-text="$t('workflow.email.ask_load')"></button>
+                <button type="button" @click="pending = null" v-text="$t('workflow.cancel')"></button>
+            </div>
+        </div>
+
         <!-- Writing -->
         <div
             v-show="mode === 'edit'"
@@ -81,6 +104,7 @@
                         @click="change({ style })"
                     >
                         <span class="hc-wfd-thumb">
+                            <span v-if="style === 'plain'" class="hc-wfd-thumb-whole">&lt;/&gt;</span>
                             <span class="hc-wfd-thumb-band" :style="{ background: design.header_color }"></span>
                             <span class="hc-wfd-thumb-line"></span>
                             <span class="hc-wfd-thumb-line short"></span>
@@ -90,6 +114,9 @@
                     </button>
                 </div>
 
+                <p v-if="design.style === 'plain'" class="hc-wfd-note" v-text="$t('workflow.email.plain_note')"></p>
+
+                <template v-if="design.style !== 'plain'">
                 <div class="hc-wfd-group" v-text="$t('workflow.email.design_colors')"></div>
                 <div class="hc-wfd-palettes">
                     <button
@@ -149,6 +176,8 @@
                         <input type="text" :value="design[key]" maxlength="255" :disabled="readOnly" @input="change({ [key]: $event.target.value })" />
                     </label>
                 </div>
+
+                </template>
 
                 <button v-if="!readOnly" type="button" class="hc-wfd-reset" @click="$emit('update:design', null)" v-text="$t('workflow.email.design_reset')"></button>
             </template>
@@ -430,6 +459,110 @@
     display: none;
 }
 
+.hc-wfe-load {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.hc-wfe-load-button input {
+    display: none;
+}
+
+.hc-wfe-load-button span {
+    display: inline-block;
+    padding: 5px 12px;
+    color: #3a49c9;
+    background: #eceefd;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hc-wfe-load-help {
+    color: #7a7f90;
+    font-size: 11px;
+}
+
+.hc-wfe-ask {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: #fff7dd;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.hc-wfe-ask p {
+    margin: 0;
+    color: #6b4b00;
+    font-size: 12px;
+}
+
+.hc-wfe-ask label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 0;
+    font-size: 12px;
+}
+
+.hc-wfe-ask input {
+    padding: 7px 10px;
+    border: 1px solid #d5d9e4;
+    border-radius: 8px;
+    font-size: 13px;
+}
+
+.hc-wfe-ask-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.hc-wfe-ask-buttons button {
+    padding: 6px 14px;
+    background: #fff;
+    border: 1px solid #d5d9e4;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.hc-wfe-ask-buttons .hc-wfe-ask-ok {
+    color: #fff;
+    background: #4b5ce8;
+    border-color: #4b5ce8;
+}
+
+.hc-wfd-note {
+    margin: 0;
+    padding: 8px 10px;
+    color: #5d6272;
+    background: #fff;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.45;
+}
+
+.hc-wfd-thumb-whole {
+    flex: 1;
+    margin: 6px;
+    color: #8a8fa0;
+    border: 1px dashed #c3c7d4;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 40px;
+    text-align: center;
+}
+
+.hc-wfd-style.plain .hc-wfd-thumb-band,
+.hc-wfd-style.plain .hc-wfd-thumb-line {
+    display: none;
+}
+
 .hc-wfd-thumb-line {
     height: 5px;
     margin: 0 8px;
@@ -555,7 +688,7 @@
 <script>
 import { mapGetters } from "vuex";
 import WorkflowService from "@/apis/project/workflow";
-import { COLOR_KEYS, FONTS, PALETTES, STYLES, TEXT_KEYS, defaultDesign, escapeHtml, hasContent, safeUrl, withSamples } from "@/utils/workflow-email";
+import { COLOR_KEYS, FONTS, PALETTES, STYLES, TEXT_KEYS, defaultDesign, escapeHtml, fillPlaceholders, hasContent, parseEmailFile, safeUrl, withSamples } from "@/utils/workflow-email";
 
 const FONT_CSS = {
     arial: "Arial, Helvetica, sans-serif",
@@ -584,7 +717,7 @@ export default {
         readOnly: { type: Boolean, default: false },
     },
 
-    emits: ["update:modelValue", "update:design"],
+    emits: ["update:modelValue", "update:design", "update:subject"],
 
     data() {
         return {
@@ -592,6 +725,9 @@ export default {
             textColor: "#c0341d",
             highlightColor: "#fff3a3",
             range: null,
+            // The file read, waiting for the values it asks for
+            pending: null,
+            values: {},
             previewHtml: "",
             previewLoading: false,
             previewError: "",
@@ -670,6 +806,85 @@ body{margin:0;padding:12px;background:#eef0f6;font-family:Arial,Helvetica,sans-s
     },
 
     methods: {
+        placeholderLabel(key) {
+            return this.$te("workflow.email.placeholder_name." + key) ? this.$t("workflow.email.placeholder_name." + key) : key;
+        },
+
+        storageKey() {
+            return `hc-workflow-placeholders:${this.project ? this.project.slug : ""}`;
+        },
+
+        /**
+         * The file of an email (HTML): read here, the variables of Brevo turned into the CRM's
+         */
+        readFile(event) {
+            const file = event.target.files && event.target.files[0];
+            event.target.value = "";
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+
+            reader.onload = () => {
+                const parsed = parseEmailFile(String(reader.result));
+
+                if (!hasContent(parsed.body)) {
+                    flashError({ title: this.$t("workflow.title"), body: this.$t("workflow.email.load_empty") });
+                    return;
+                }
+
+                // What was typed for the previous emails is offered again
+                let remembered = {};
+
+                try {
+                    remembered = JSON.parse(window.localStorage.getItem(this.storageKey()) || "{}");
+                } catch (e) {
+                    // no storage: the values are asked again
+                }
+
+                this.values = Object.fromEntries(parsed.placeholders.map((key) => [key, remembered[key] || ""]));
+                this.pending = parsed;
+
+                // Nothing to ask: loaded at once
+                if (!parsed.placeholders.length) {
+                    this.applyFile();
+                }
+            };
+            reader.onerror = () => flashError({ title: this.$t("workflow.title"), body: this.$t("workflow.email.load_empty") });
+            reader.readAsText(file);
+        },
+
+        /**
+         * The email of the file becomes the one of the step: its text, its subject, and no design of the CRM around it
+         */
+        applyFile() {
+            const parsed = this.pending;
+
+            if (!parsed) {
+                return;
+            }
+
+            try {
+                const stored = JSON.parse(window.localStorage.getItem(this.storageKey()) || "{}");
+                window.localStorage.setItem(this.storageKey(), JSON.stringify({ ...stored, ...Object.fromEntries(Object.entries(this.values).filter(([, v]) => String(v).trim() !== "")) }));
+            } catch (e) {
+                // nothing remembered
+            }
+
+            this.$emit("update:modelValue", fillPlaceholders(parsed.body, this.values));
+
+            if (parsed.title) {
+                this.$emit("update:subject", fillPlaceholders(parsed.title, this.values));
+            }
+
+            this.$emit("update:design", { ...(this.design || defaultDesign(this.project ? this.project.name : "")), style: "plain" });
+            this.pending = null;
+
+            flash({ title: this.$t("workflow.title"), body: this.$t("workflow.email.loaded") });
+        },
+
         /**
          * The design chosen, changed by a few values
          */

@@ -236,6 +236,11 @@ export default {
                 lines.push(`${this.$t("workflow.monitor.message")} #${result.message_id}`);
             }
 
+            // What kept an email from leaving (see the protections of the step)
+            if (["optout", "minor", "quiet_window", "busy"].includes(result.skipped)) {
+                lines.push(this.$t("workflow.monitor.skipped_reason." + result.skipped));
+            }
+
             // A wait counted from an appointment that stopped the automation
             if (result.skipped === "The moment is already past.") {
                 lines.push(this.$t("workflow.monitor.wait_past"));
