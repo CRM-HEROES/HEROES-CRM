@@ -2,16 +2,20 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="orderStepKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <order-step-row
-                v-for="orderStep in filteredOrderSteps"
-                :key="orderStep.id"
-                :orderStep="orderStep"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredOrderSteps"
+                :selected="userBulkOrderSteps"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <order-step-row
+                        v-for="orderStep in sortedItems"
+                        :key="orderStep.id"
+                        :orderStep="orderStep"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <button @click.prevent="attach" :disabled="disabled">

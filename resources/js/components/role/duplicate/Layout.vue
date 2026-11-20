@@ -74,20 +74,23 @@
                 </item>
                 <search v-model="duplicatableKeyword" />
                 <item-list class="hc-flex-1" padding="5px">
-                    <item tag="label">
-                        <icon class="fa fa-copy" />
-                        <div
-                            class="hc-item-main-content"
-                            v-text="$t('all')"
-                        ></div>
-                        <checkbox v-model="allDuplicatables" />
-                    </item>
-                    <duplicatable-row
-                        v-for="duplicatable in filteredDuplicatables"
-                        :key="duplicatable.key"
-                        :duplicatable="duplicatable"
-                        v-model="duplicate.duplicatables"
-                    />
+                    <selection-list
+                        v-model="allDuplicatables"
+                        :items="filteredDuplicatables"
+                        :selected="duplicate.duplicatables"
+                        value-key="key"
+                        select-all-icon="fa fa-copy"
+                        :render-when-empty="true"
+                    >
+                        <template #default="{ sortedItems }">
+                            <duplicatable-row
+                                v-for="duplicatable in sortedItems"
+                                :key="duplicatable.key"
+                                :duplicatable="duplicatable"
+                                v-model="duplicate.duplicatables"
+                            />
+                        </template>
+                    </selection-list>
                     <loading :loading="duplicating" />
                 </item-list>
                 <buttons>

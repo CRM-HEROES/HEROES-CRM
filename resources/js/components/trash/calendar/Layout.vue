@@ -3,26 +3,36 @@
         <div class="hc-flex-column hc-flex-1" style="overflow: hidden">
             <search v-model="keyword" />
             <item-list class="hc-flex-1" padding="5px" style="overflow: auto">
-                <item tag="label">
-                    <icon class="fa fa-check-square" />
-                    <div class="hc-item-main-content" v-text="$t('all')"></div>
+                <selection-list
+                    v-model="all"
+                    :items="calendars"
+                    :selected="selectedCalendars"
+                    :render-when-empty="true"
+                >
+                    <template #default="{ sortedItems }">
+                        <calendar-row
+                            v-for="calendar in sortedItems"
+                            :key="calendar.id"
+                            :calendar="calendar"
+                            v-model="selectedCalendars"
+                        />
+                    </template>
+                </selection-list>
 
-                    <checkbox v-model="all" />
-                </item>
-
-                <calendar-row
-                    v-for="calendar in calendars"
-                    :key="calendar.id"
-                    :calendar="calendar"
-                    v-model="selectedCalendars"
-                />
-
-                <event-row
-                    v-for="event in events"
-                    :key="event.id"
-                    :event="event"
-                    v-model="selectedEvents"
-                />
+                <selection-list
+                    :items="events"
+                    :selected="selectedEvents"
+                    :show-select-all="false"
+                >
+                    <template #default="{ sortedItems }">
+                        <event-row
+                            v-for="event in sortedItems"
+                            :key="event.id"
+                            :event="event"
+                            v-model="selectedEvents"
+                        />
+                    </template>
+                </selection-list>
                 <loading :loading="removing" />
             </item-list>
             <buttons>

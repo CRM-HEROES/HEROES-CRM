@@ -2,18 +2,22 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="calendarKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" @change="change" :disabled="canAll" />
-            </item>
-            <calendar-row
-                v-for="calendar in filteredCalendars"
-                :key="calendar.id"
-                :calendar="calendar"
-                :value="isCalendarChecked(calendar)"
+            <selection-list
+                v-model="all"
+                :items="filteredCalendars"
+                :is-selected="isCalendarChecked"
                 :disabled="canAll"
-            />
+             :render-when-empty="true">
+                <template #default="{ sortedItems }">
+                    <calendar-row
+                        v-for="calendar in sortedItems"
+                        :key="calendar.id"
+                        :calendar="calendar"
+                        :value="isCalendarChecked(calendar)"
+                        :disabled="canAll"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.calendar.add')">
             <a @click.prevent="addCalendar" v-text="$t('add')"></a>

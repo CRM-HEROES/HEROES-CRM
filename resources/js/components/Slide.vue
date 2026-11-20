@@ -21,6 +21,15 @@
                     v-text="title"
                 ></router-link>
                 <span v-else class="hc-slide-title" v-text="title"></span>
+                <a
+                    v-if="url"
+                    class="hc-slide-open-new-tab fa fa-external-link"
+                    :href="$router.resolve(url).href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Ouvrir dans un nouvel onglet"
+                    title="Ouvrir dans un nouvel onglet"
+                ></a>
                 <div
                     class="hc-slide-close hc-flex-column hc-flex-center"
                     @click="close"
@@ -110,6 +119,16 @@
     text-align: center;
     text-decoration: none;
     color: #333333;
+}
+
+.hc-slide-open-new-tab {
+    color: #888;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.hc-slide-open-new-tab:hover {
+    color: #555555;
 }
 
 .hc-slide-icon + .hc-slide-title {

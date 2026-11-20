@@ -20,11 +20,19 @@
                     @change="changeFolder"
                 />
             </item>
-            <folder-row
-                v-for="folder in filteredFolders"
-                :key="folder.id"
-                :folder="folder"
-            />
+            <selection-list
+                :items="filteredFolders"
+                :is-selected="isFolderSelected"
+                @select-all="selectAllFolders"
+            >
+                <template #default="{ sortedItems }">
+                    <folder-row
+                        v-for="folder in sortedItems"
+                        :key="folder.id"
+                        :folder="folder"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons v-if="can('all.project.folder.add')">
             <a @click.prevent="addFolder" v-text="$t('add')"></a>
@@ -43,12 +51,15 @@ import {
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
 import { OPEN_MODAL } from "@/actions/modal";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import FolderRow from "./FolderRow.vue";
 
 export default {
     components: {
+        SelectionList,
         FolderRow,
     },
 
@@ -111,6 +122,22 @@ export default {
             );
 
             store.dispatch(FETCH_PROSPECTS);
+        },
+
+        isFolderSelected(folder) {
+            return (
+                this.prospectsParamExists(this.withKeyFolder, folder.id) ||
+                this.prospectsParamExists(this.withoutKeyFolder, folder.id)
+            );
+        },
+
+        selectAllFolders(checked) {
+            setProspectFilterSelection(
+                this.filteredFolders,
+                checked,
+                this.withKeyFolder,
+                this.withoutKeyFolder
+            );
         },
     },
 

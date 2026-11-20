@@ -185,12 +185,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <product-row
-                                v-for="product in filteredProducts"
-                                :key="product.id"
-                                :product="product"
-                                v-model="filterProducts"
-                            />
+                            <selection-list
+                                :items="filteredProducts"
+                                :is-selected="isProductSelected"
+                                @select-all="selectAllProducts"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <product-row
+                                        v-for="product in sortedItems"
+                                        :key="product.id"
+                                        :product="product"
+                                        v-model="filterProducts"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingProducts" />
                         </item-list>
                     </div>
@@ -218,12 +226,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <action-row
-                                v-for="action in filteredActions"
-                                :key="action.id"
-                                :action="action"
-                                v-model="filterActions"
-                            />
+                            <selection-list
+                                :items="filteredActions"
+                                :is-selected="isActionSelected"
+                                @select-all="selectAllActions"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <action-row
+                                        v-for="action in sortedItems"
+                                        :key="action.id"
+                                        :action="action"
+                                        v-model="filterActions"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingActions" />
                         </item-list>
                     </div>
@@ -251,12 +267,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <step-row
-                                v-for="step in filteredSteps"
-                                :key="step.id"
-                                :step="step"
-                                v-model="filterSteps"
-                            />
+                            <selection-list
+                                :items="filteredSteps"
+                                :is-selected="isStepSelected"
+                                @select-all="selectAllSteps"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <step-row
+                                        v-for="step in sortedItems"
+                                        :key="step.id"
+                                        :step="step"
+                                        v-model="filterSteps"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingSteps" />
                         </item-list>
                     </div>
@@ -284,12 +308,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <status-row
-                                v-for="status in filteredStatuses"
-                                :key="status.id"
-                                :status="status"
-                                v-model="filterStatuses"
-                            />
+                            <selection-list
+                                :items="filteredStatuses"
+                                :is-selected="isStatusSelected"
+                                @select-all="selectAllStatuses"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <status-row
+                                        v-for="status in sortedItems"
+                                        :key="status.id"
+                                        :status="status"
+                                        v-model="filterStatuses"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingStatus" />
                         </item-list>
                     </div>
@@ -317,12 +349,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <document-row
-                                v-for="document in filteredDocuments"
-                                :key="document.id"
-                                :document="document"
-                                v-model="filterDocuments"
-                            />
+                            <selection-list
+                                :items="filteredDocuments"
+                                :is-selected="isDocumentSelected"
+                                @select-all="selectAllDocuments"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <document-row
+                                        v-for="document in sortedItems"
+                                        :key="document.id"
+                                        :document="document"
+                                        v-model="filterDocuments"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingDocuments" />
                         </item-list>
                     </div>
@@ -353,12 +393,20 @@
                             padding="12px"
                             style="position: relative"
                         >
-                            <user-row
-                                v-for="user in filteredUsers"
-                                :key="user.id"
-                                :user="user"
-                                v-model="filterCreators"
-                            />
+                            <selection-list
+                                :items="filteredUsers"
+                                :is-selected="isOrderCreatorSelected"
+                                @select-all="selectAllOrderCreators"
+                            >
+                                <template #default="{ sortedItems }">
+                                    <user-row
+                                        v-for="user in sortedItems"
+                                        :key="user.id"
+                                        :user="user"
+                                        v-model="filterCreators"
+                                    />
+                                </template>
+                            </selection-list>
                             <loading :loading="fetchingUsers" />
                         </item-list>
                     </div>
@@ -406,6 +454,7 @@ import {
     REMOVE_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { mergeVisibleSelection } from "@/utils/prospect-filter-selection";
 
 // Components
 import ActionRow from "./ActionRow.vue";
@@ -414,9 +463,11 @@ import ProductRow from "./ProductRow.vue";
 import StatusRow from "./StatusRow.vue";
 import StepRow from "./StepRow.vue";
 import UserRow from "./UserRow.vue";
+import SelectionList from "../SelectionList.vue";
 
 export default {
     components: {
+        SelectionList,
         ActionRow,
         DocumentRow,
         ProductRow,
@@ -934,6 +985,80 @@ export default {
                         ? -1
                         : 1
                 );
+        },
+    },
+
+    methods: {
+        isProductSelected(product) {
+            return this.filterProducts.some((id) => id == product.id);
+        },
+
+        selectAllProducts(checked) {
+            this.filterProducts = mergeVisibleSelection(
+                this.filterProducts,
+                this.filteredProducts,
+                checked
+            );
+        },
+
+        isActionSelected(action) {
+            return this.filterActions.some((id) => id == action.id);
+        },
+
+        selectAllActions(checked) {
+            this.filterActions = mergeVisibleSelection(
+                this.filterActions,
+                this.filteredActions,
+                checked
+            );
+        },
+
+        isStepSelected(step) {
+            return this.filterSteps.some((id) => id == step.id);
+        },
+
+        selectAllSteps(checked) {
+            this.filterSteps = mergeVisibleSelection(
+                this.filterSteps,
+                this.filteredSteps,
+                checked
+            );
+        },
+
+        isStatusSelected(status) {
+            return this.filterStatuses.some((id) => id == status.id);
+        },
+
+        selectAllStatuses(checked) {
+            this.filterStatuses = mergeVisibleSelection(
+                this.filterStatuses,
+                this.filteredStatuses,
+                checked
+            );
+        },
+
+        isDocumentSelected(document) {
+            return this.filterDocuments.some((id) => id == document.id);
+        },
+
+        selectAllDocuments(checked) {
+            this.filterDocuments = mergeVisibleSelection(
+                this.filterDocuments,
+                this.filteredDocuments,
+                checked
+            );
+        },
+
+        isOrderCreatorSelected(user) {
+            return this.filterCreators.some((id) => id == user.id);
+        },
+
+        selectAllOrderCreators(checked) {
+            this.filterCreators = mergeVisibleSelection(
+                this.filterCreators,
+                this.filteredUsers,
+                checked
+            );
         },
     },
 };

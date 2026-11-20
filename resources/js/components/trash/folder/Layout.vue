@@ -3,26 +3,36 @@
         <div class="hc-flex-column hc-flex-1" style="overflow: hidden">
             <search v-model="keyword" />
             <item-list class="hc-flex-1" padding="5px" style="overflow: auto">
-                <item tag="label">
-                    <icon class="fa fa-check-square" />
-                    <div class="hc-item-main-content" v-text="$t('all')"></div>
+                <selection-list
+                    v-model="all"
+                    :items="folders"
+                    :selected="selectedFolders"
+                    :render-when-empty="true"
+                >
+                    <template #default="{ sortedItems }">
+                        <folder-row
+                            v-for="folder in sortedItems"
+                            :key="folder.id"
+                            :folder="folder"
+                            v-model="selectedFolders"
+                        />
+                    </template>
+                </selection-list>
 
-                    <checkbox v-model="all" />
-                </item>
-
-                <folder-row
-                    v-for="folder in folders"
-                    :key="folder.id"
-                    :folder="folder"
-                    v-model="selectedFolders"
-                />
-
-                <file-row
-                    v-for="file in files"
-                    :key="file.id"
-                    :file="file"
-                    v-model="selectedFiles"
-                />
+                <selection-list
+                    :items="files"
+                    :selected="selectedFiles"
+                    :show-select-all="false"
+                >
+                    <template #default="{ sortedItems }">
+                        <file-row
+                            v-for="file in sortedItems"
+                            :key="file.id"
+                            :file="file"
+                            v-model="selectedFiles"
+                        />
+                    </template>
+                </selection-list>
                 <loading :loading="removing" />
             </item-list>
             <buttons>

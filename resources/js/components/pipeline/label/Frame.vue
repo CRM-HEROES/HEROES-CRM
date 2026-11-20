@@ -75,39 +75,38 @@
                     "
                 >
                     <search v-model="labelKeyword" />
-                    <draggable
-                        tag="item-list"
-                        :list="
-                            labelKeyword
-                                ? filteredLabels
-                                : this.category
-                                ? this.category.labels
-                                : []
-                        "
-                        class="hc-flex-1"
-                        style="overflow-y: auto; overflow-x: hidden"
-                        item-key="id"
-                        :component-data="{ padding: '12px' }"
-                        :disabled="labelKeyword || !labelsDraggable"
-                        @end="updateLabelsOrder"
+                    <selection-list
+                        v-model="all"
+                        :items="filteredLabels"
+                        :selected="pipelineLabels"
+                        :show-select-all="!labelKeyword"
+                        :render-when-empty="true"
+                        :sort-enabled="!labelsDraggable"
                     >
-                        <template #header>
-                            <item v-if="!labelKeyword" tag="label">
-                                <icon class="fa fa-check-square" />
-                                <div
-                                    class="hc-item-main-content"
-                                    v-text="$t('all')"
-                                ></div>
-                                <checkbox v-model="all" />
-                            </item>
+                        <template #default="{ sortedItems }">
+                            <draggable
+                                tag="item-list"
+                                :list="
+                                    labelsDraggable && !labelKeyword
+                                        ? category.labels
+                                        : sortedItems
+                                "
+                                class="hc-flex-1"
+                                style="overflow-y: auto; overflow-x: hidden"
+                                item-key="id"
+                                :component-data="{ padding: '12px' }"
+                                :disabled="labelKeyword || !labelsDraggable"
+                                @end="updateLabelsOrder"
+                            >
+                                <template #item="{ element }">
+                                    <label-row
+                                        :label="element"
+                                        :value="isLabelChecked(element)"
+                                    />
+                                </template>
+                            </draggable>
                         </template>
-                        <template #item="{ element }">
-                            <label-row
-                                :label="element"
-                                :value="isLabelChecked(element)"
-                            />
-                        </template>
-                    </draggable>
+                    </selection-list>
                     <buttons v-if="can('all.project.category.label.add')">
                         <a
                             @click.prevent="addLabel"
@@ -154,7 +153,7 @@ export default {
             labelKeyword: "",
             fetchingLabels: false,
             categoriesDraggable: deviceType() == "desktop",
-            labelsDraggable: deviceType() == "desktop",
+            labelsDraggable: false,
         };
     },
 

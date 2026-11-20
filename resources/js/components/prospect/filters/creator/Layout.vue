@@ -20,11 +20,19 @@
                     @change="changeCreator"
                 />
             </item>
-            <creator-row
-                v-for="creator in filteredCreators"
-                :key="creator.id"
-                :creator="creator"
-            />
+            <selection-list
+                :items="filteredCreators"
+                :is-selected="isCreatorSelected"
+                @select-all="selectAllCreators"
+            >
+                <template #default="{ sortedItems }">
+                    <creator-row
+                        v-for="creator in sortedItems"
+                        :key="creator.id"
+                        :creator="creator"
+                    />
+                </template>
+            </selection-list>
         </item-list>
     </div>
 </template>
@@ -39,12 +47,15 @@ import {
     ADD_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import CreatorRow from "./CreatorRow.vue";
 
 export default {
     components: {
+        SelectionList,
         CreatorRow,
     },
 
@@ -56,6 +67,22 @@ export default {
     },
 
     methods: {
+        isCreatorSelected(creator) {
+            return (
+                this.prospectsParamExists(this.withKeyCreator, creator.id) ||
+                this.prospectsParamExists(this.withoutKeyCreator, creator.id)
+            );
+        },
+
+        selectAllCreators(checked) {
+            setProspectFilterSelection(
+                this.filteredCreators,
+                checked,
+                this.withKeyCreator,
+                this.withoutKeyCreator
+            );
+        },
+
         changeCreator(event) {
             // Remove without param
             store.commit(REMOVE_PROSPECT_PARAMS, {
@@ -104,6 +131,7 @@ export default {
             "users",
             "prospect",
             "prospectFullName",
+            "prospectsParamExists",
             "prospectsParamValue",
             "can",
         ]),

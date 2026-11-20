@@ -27,11 +27,19 @@
                     @change="changeInteraction"
                 />
             </item>
-            <source-row
-                v-for="source in sources"
-                :key="source.key"
-                :source="source"
-            />
+            <selection-list
+                :items="sources"
+                :is-selected="isSourceSelected"
+                @select-all="selectAllSources"
+            >
+                <template #default="{ sortedItems }">
+                    <source-row
+                        v-for="source in sortedItems"
+                        :key="source.key"
+                        :source="source"
+                    />
+                </template>
+            </selection-list>
         </item-list>
     </div>
 </template>
@@ -46,12 +54,15 @@ import {
     ADD_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { setProspectFilterSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import SourceRow from "./SourceRow.vue";
 
 export default {
     components: {
+        SelectionList,
         SourceRow,
     },
 
@@ -80,6 +91,23 @@ export default {
     },
 
     methods: {
+        isSourceSelected(source) {
+            return (
+                this.prospectsParamExists(this.withKeyInteraction, source.key) ||
+                this.prospectsParamExists(this.withoutKeyInteraction, source.key)
+            );
+        },
+
+        selectAllSources(checked) {
+            setProspectFilterSelection(
+                this.sources,
+                checked,
+                this.withKeyInteraction,
+                this.withoutKeyInteraction,
+                (source) => source.key
+            );
+        },
+
         changeInteraction(event) {
             // Remove without param
             store.commit(REMOVE_PROSPECT_PARAMS, {

@@ -2,16 +2,20 @@
     <div class="hc-flex-column" style="height: 100%">
         <search v-model="threadKeyword" />
         <item-list class="hc-flex-1" padding="5px">
-            <item tag="label">
-                <icon class="fa fa-check-square" />
-                <div class="hc-item-main-content" v-text="$t('all')"></div>
-                <checkbox v-model="all" />
-            </item>
-            <thread-row
-                v-for="thread in filteredThreads"
-                :key="thread.id"
-                :thread="thread"
-            />
+            <selection-list
+                v-model="all"
+                :items="filteredThreads"
+                :selected="userBulkThreads"
+                :render-when-empty="true"
+            >
+                <template #default="{ sortedItems }">
+                    <thread-row
+                        v-for="thread in sortedItems"
+                        :key="thread.id"
+                        :thread="thread"
+                    />
+                </template>
+            </selection-list>
         </item-list>
         <buttons>
             <button @click.prevent="attach" :disabled="disabled">

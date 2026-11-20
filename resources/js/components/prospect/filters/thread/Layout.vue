@@ -6,12 +6,20 @@
             padding="12px"
             style="position: relative"
         >
-            <user-row
-                v-for="user in filteredUsers"
-                :key="user.id"
-                :user="user"
-                v-model="filterUsers"
-            />
+            <selection-list
+                :items="filteredUsers"
+                :is-selected="isThreadFilterUserSelected"
+                @select-all="selectAllThreadFilterUsers"
+            >
+                <template #default="{ sortedItems }">
+                    <user-row
+                        v-for="user in sortedItems"
+                        :key="user.id"
+                        :user="user"
+                        v-model="filterUsers"
+                    />
+                </template>
+            </selection-list>
             <loading :loading="fetchingUsers" />
         </item-list>
     </div>
@@ -26,12 +34,15 @@ import {
     REMOVE_PROSPECT_PARAMS,
     FETCH_PROSPECTS,
 } from "@/actions/project/prospect";
+import { mergeVisibleSelection } from "@/utils/prospect-filter-selection";
 
 // Components
+import SelectionList from "../SelectionList.vue";
 import UserRow from "./UserRow.vue";
 
 export default {
     components: {
+        SelectionList,
         UserRow,
     },
 
@@ -52,6 +63,20 @@ export default {
             this.eventParams = prospectsParamValue
                 ? prospectsParamValue
                 : {};
+        },
+    },
+
+    methods: {
+        isThreadFilterUserSelected(user) {
+            return this.filterUsers.some((id) => id == user.id);
+        },
+
+        selectAllThreadFilterUsers(checked) {
+            this.filterUsers = mergeVisibleSelection(
+                this.filterUsers,
+                this.filteredUsers,
+                checked
+            );
         },
     },
 
