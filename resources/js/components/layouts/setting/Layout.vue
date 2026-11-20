@@ -490,6 +490,22 @@
             <checkbox v-model="remindEvent" />
         </item>
 
+        <!-- Screen ruler on prospects list -->
+        <item class="hc-setting-item" tag="label">
+            <icon class="fa fa-arrows-h" />
+            <div class="hc-item-main-content hc-flex-column">
+                <div
+                    class="hc-setting-item-name"
+                    v-text="'Règle sur la liste des prospects'"
+                ></div>
+                <div
+                    class="hc-setting-item-description"
+                    v-text="'Règle déplaçable à la souris'"
+                ></div>
+            </div>
+            <checkbox v-model="screenRuler.enabled" />
+        </item>
+
         <!-- Pappers -->
         <item class="hc-setting-item" @click="managePappers">
             <icon class="fa fa-users" />
@@ -569,6 +585,7 @@ import GoogleContactService from "@/apis/google/contact";
 import GoogleDriveService from "@/apis/project/google/drive";
 import GoogleAuthenticatorService from "@/apis/google/authenticator";
 import ClaudeService from "@/apis/user/claude";
+import { screenRuler } from "@/utils/screen-ruler";
 
 export default {
     data() {
@@ -588,6 +605,7 @@ export default {
             removingGoogleAuthenticator: false,
             claudeValid: false,
             claudeRequestId: 0,
+            screenRuler,
         };
     },
 

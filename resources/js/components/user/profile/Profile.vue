@@ -98,6 +98,17 @@
                 <loading :loading="locking" />
             </icon>
             <icon
+                tag="a"
+                :class="['fa fa-arrows-h', screenRuler.enabled ? 'icon-blue' : 'icon-grey']"
+                v-tooltip="
+                    screenRuler.enabled
+                        ? 'Masquer la règle sur la liste des prospects'
+                        : 'Afficher la règle sur la liste des prospects'
+                "
+                :icon-size="16"
+                @click.prevent="screenRuler.enabled = !screenRuler.enabled"
+            />
+            <icon
                 v-if="can('all')"
                 tag="a"
                 class="fa fa-sign-in icon-purple"
@@ -225,6 +236,7 @@ import store from "@/store";
 
 import { OPEN_SLIDE } from "@/actions/slide";
 import LockService from "@/apis/project/user/lock";
+import { screenRuler } from "@/utils/screen-ruler";
 import {
     GET_PROJECT_USER_SETTING,
     UPDATE_PROJECT_USER_SETTING,
@@ -251,6 +263,7 @@ export default {
         return {
             impersonating: false,
             locking: false,
+            screenRuler,
             sendingPasswordReset: false,
             movable: deviceType() == "desktop",
             openBlocs: deviceType() == "desktop",
