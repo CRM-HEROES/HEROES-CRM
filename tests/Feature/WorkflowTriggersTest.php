@@ -49,6 +49,8 @@ class WorkflowTriggersTest extends TestCase
             $table->unsignedBigInteger('project_id');
             $table->unsignedBigInteger('import_id')->nullable();
             $table->timestamp('processed_at')->nullable();
+            $table->date('date_of_birth')->nullable();
+            $table->json('meta')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
@@ -413,6 +415,99 @@ class WorkflowTriggersTest extends TestCase
         return app(ConditionEvaluator::class)->matches(1, 'prospect', $prospectId, $config);
     }
 
+    protected function meta(int $id, ?array $meta): void
+    {
+        DB::table('prospects')->where('id', $id)->update(['meta' => $meta === null ? null : json_encode($meta)]);
+    }
+
+    public function test_a_condition_can_test_a_custom_field_of_the_prospect(): void
+    {
+        $this->meta(1, ['rdv_fixe' => 'oui', 'centre' => 'Lyon', 'vide' => '']);
+
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is' => 'oui']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is' => 'non']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is_not' => 'oui']]]));
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is_not' => 'non']]]));
+        // A field that was never filled is not any value
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'joint', 'is_not' => 'oui']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'joint', 'is' => 'oui']]]));
+        // Filled / empty: absent and "" are both empty
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'centre', 'filled' => true]]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'vide', 'filled' => true]]]));
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'vide', 'filled' => false]]]));
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'absent', 'filled' => false]]]));
+
+        // A prospect without any custom field
+        $this->meta(1, null);
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is_not' => 'oui']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'rdv_fixe', 'is' => 'oui']]]));
+
+        // Combined with the other criteria, in one group
+        $this->meta(1, ['rdv_fixe' => 'oui']);
+        $this->setProcessed(1, true);
+        $this->assertTrue($this->satisfies(['op' => 'and', 'items' => [['field' => 'rdv_fixe', 'is' => 'oui'], ['filters' => ['processed' => true]]]]));
+        $this->assertFalse($this->satisfies(['op' => 'and', 'items' => [['field' => 'rdv_fixe', 'is_not' => 'oui'], ['filters' => ['processed' => true]]]]));
+    }
+
+    public function test_plus_50_is_computed_from_the_birth_date(): void
+    {
+        $birth = fn (?int $years) => DB::table('prospects')->where('id', 1)->update(['date_of_birth' => $years === null ? null : now()->subYears($years)->subDay()->toDateString()]);
+
+        $birth(57);
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'oui']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'non']]]));
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'plus_50', 'is_not' => 'oui']]]));
+
+        $birth(34);
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'oui']]]));
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'non']]]));
+
+        // Nobody is "plus 50" without a birth date
+        $birth(null);
+        $this->assertFalse($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'oui']]]));
+        $this->assertTrue($this->satisfies(['items' => [['field' => 'plus_50', 'is' => 'non']]]));
+    }
+
+    public function test_a_sequence_stops_for_the_prospect_who_stops_matching_its_filter(): void
+    {
+        // The exits of a mailing sequence: it starts when the filter is matched and stops when it no longer is
+        $graph = $this->graph('prospect.filter_entered', [
+            'op' => 'and',
+            'items' => [['field' => 'etape', 'is' => 'chaud'], ['field' => 'rdv_fixe', 'is_not' => 'oui']],
+            'exit_on_leave' => true,
+        ]);
+        $graph['nodes'][] = $this->node('w', 'wait', ['days' => 3]);
+        $graph['nodes'][] = $this->node('b', 'action', ['action' => 'mark-a']);
+        $graph['edges'] = [$this->edge('t', 'a'), $this->edge('a', 'w'), $this->edge('w', 'b')];
+        $this->activate($graph);
+
+        $this->meta(1, ['etape' => 'chaud']);
+        $this->changed([1]);
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+        $this->assertSame(1, $this->executions('waiting'));
+
+        // The appointment is fixed: the prospect leaves the sequence, what waits is stopped
+        $this->meta(1, ['etape' => 'chaud', 'rdv_fixe' => 'oui']);
+        $this->changed([1], 'updated', 2000);
+
+        $this->assertSame(0, $this->executions('waiting'));
+        $this->assertSame(1, $this->executions('cancelled'));
+    }
+
+    public function test_the_tests_of_a_field_are_checked_when_publishing(): void
+    {
+        $errors = fn (array $item) => $this->errors($this->graph('prospect.filter_entered', ['op' => 'and', 'items' => [$item]]));
+
+        $this->assertSame([], $errors(['field' => 'rdv_fixe', 'is_not' => 'oui']));
+        $this->assertSame([], $errors(['field' => 'centre', 'filled' => true]));
+        $this->assertSame([], $errors(['field' => 'plus_50', 'is' => 'oui']));
+        $this->assertNotSame([], $errors(['field' => 'Rdv Fixe', 'is' => 'oui']));      // not a slug
+        $this->assertNotSame([], $errors(['field' => 'rdv_fixe']));                       // no test
+        $this->assertNotSame([], $errors(['field' => 'rdv_fixe', 'is' => 'a', 'is_not' => 'b'])); // two tests
+        $this->assertNotSame([], $errors(['field' => 'plus_50', 'is' => 'peut-être']));
+        $this->assertNotSame([], $errors(['field' => 'rdv_fixe', 'is' => ['x']]));
+    }
+
     public function test_condition_groups_can_be_nested(): void
     {
         // Prospect 1: not processed, created long ago. Prospect 2: processed.
@@ -512,6 +607,140 @@ class WorkflowTriggersTest extends TestCase
     protected function appointment(int $id, ?string $startedAt, ?string $endedAt = null, int $calendar = 1): void
     {
         DB::table('events')->insert(['id' => $id, 'calendar_id' => $calendar, 'started_at' => $startedAt, 'ended_at' => $endedAt]);
+    }
+
+    // Scheduled trigger (the newsletter)
+
+    protected function scheduled(array $config = []): Workflow
+    {
+        // 11:00 in Paris on the 8th, spread over an hour
+        return $this->activate($this->graph('prospect.scheduled', $config + ['days' => [8], 'at' => '11:00', 'window_minutes' => 60]));
+    }
+
+    public function test_a_scheduled_trigger_starts_the_audience_spread_over_the_window(): void
+    {
+        DB::table('project_settings')->insert(['project_id' => 1, 'key' => 'timezone', 'value' => json_encode('Europe/Paris')]);
+        $scanner = app(TimeTriggerScanner::class);
+        $this->scheduled();
+
+        // 10:59 in Paris: not yet
+        Carbon::setTestNow('2026-11-08 09:59:00');
+        $this->assertSame(0, $scanner->scan());
+
+        // 11:00: the prospect whose number is 0 modulo the window (none here); 11:01: number 1; 11:02: number 2
+        Carbon::setTestNow('2026-11-08 10:00:00');
+        $this->assertSame(0, $scanner->scan());
+        Carbon::setTestNow('2026-11-08 10:01:00');
+        $this->assertSame(1, $scanner->scan());
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+        Carbon::setTestNow('2026-11-08 10:02:00');
+        $this->assertSame(1, $scanner->scan());
+        $this->assertSame(['a:1', 'a:2'], RecordingHandler::$calls);
+
+        // The next minutes do not start them again
+        Carbon::setTestNow('2026-11-08 10:03:00');
+        $this->assertSame(0, $scanner->scan());
+        $this->assertSame(2, $this->executions());
+    }
+
+    public function test_a_scheduled_trigger_catches_up_a_missed_minute_and_stops_after_the_window(): void
+    {
+        $scanner = app(TimeTriggerScanner::class);
+        $this->scheduled(['window_minutes' => 10]);
+
+        // The scheduler was down until 10:05: the prospects of the minutes before are started
+        Carbon::setTestNow('2026-11-08 11:05:00'); // project time = application time without a setting
+        $this->assertSame(2, $scanner->scan());
+
+        // Long after the window: nothing, whoever is left
+        DB::table('prospects')->insert(['id' => 13, 'project_id' => 1, 'created_at' => '2026-10-01 10:00:00']);
+        Carbon::setTestNow('2026-11-08 11:40:00');
+        $this->assertSame(0, $scanner->scan());
+    }
+
+    public function test_a_scheduled_trigger_only_runs_on_its_days_and_months(): void
+    {
+        $scanner = app(TimeTriggerScanner::class);
+        $this->scheduled(['months' => [1, 6], 'days' => [8, 22]]);
+
+        foreach (['2026-11-08 11:05:00', '2026-06-09 11:05:00', '2026-06-21 11:05:00'] as $date) {
+            Carbon::setTestNow($date); // November: not a month; the 9th and the 21st: not days
+            $this->assertSame(0, $scanner->scan(), $date);
+        }
+
+        Carbon::setTestNow('2027-06-22 11:05:00');
+        $this->assertSame(2, $scanner->scan());
+    }
+
+    public function test_a_scheduled_trigger_can_run_every_week(): void
+    {
+        $scanner = app(TimeTriggerScanner::class);
+        $this->activate($this->graph('prospect.scheduled', ['weekdays' => [2], 'at' => '09:00', 'window_minutes' => 5]));
+
+        Carbon::setTestNow('2026-11-09 09:05:00'); // a Monday
+        $this->assertSame(0, $scanner->scan());
+        Carbon::setTestNow('2026-11-10 09:05:00'); // a Tuesday
+        $this->assertSame(2, $scanner->scan());
+    }
+
+    public function test_a_scheduled_trigger_only_reaches_its_audience_and_once_a_day(): void
+    {
+        $scanner = app(TimeTriggerScanner::class);
+        $this->meta(1, ['newsletter' => 'oui']);
+        $this->meta(2, ['newsletter' => 'non']);
+        $this->scheduled(['condition' => null, 'op' => 'and', 'items' => [['field' => 'newsletter', 'is' => 'oui']]]);
+
+        Carbon::setTestNow('2026-11-08 11:05:00');
+        $this->assertSame(1, $scanner->scan());
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+
+        // The audience changes during the window: the prospect 2 joins it, he is started (and the first one is not again)
+        $this->meta(2, ['newsletter' => 'oui']);
+        Carbon::setTestNow('2026-11-08 11:06:00');
+        $this->assertSame(1, $scanner->scan());
+        $this->assertSame(['a:1', 'a:2'], RecordingHandler::$calls);
+        Carbon::setTestNow('2026-11-08 11:07:00');
+        $this->assertSame(0, $scanner->scan());
+
+        // The same project, another prospect of another project: never
+        DB::table('prospects')->insert(['id' => 2 + 60, 'project_id' => 2, 'created_at' => '2026-10-01 10:00:00']);
+        $this->meta(62, ['newsletter' => 'oui']);
+        Carbon::setTestNow('2026-11-08 11:08:00');
+        $this->assertSame(0, $scanner->scan());
+    }
+
+    public function test_a_paused_scheduled_workflow_starts_nothing_and_the_scan_is_free_without_one(): void
+    {
+        $scanner = app(TimeTriggerScanner::class);
+        Carbon::setTestNow('2026-11-08 11:05:00');
+
+        DB::enableQueryLog();
+        $this->assertSame(0, $scanner->scan()); // no workflow at all: no query
+        $this->assertSame([], array_filter(DB::getQueryLog(), fn ($q) => str_contains($q['query'], 'prospects')));
+        DB::disableQueryLog();
+
+        $workflow = $this->scheduled();
+        app(\App\Workflows\WorkflowService::class)->pause($workflow);
+
+        $this->assertSame(0, $scanner->scan());
+    }
+
+    public function test_a_schedule_is_checked_when_publishing(): void
+    {
+        $errors = fn (array $config) => $this->errors($this->graph('prospect.scheduled', $config));
+
+        $this->assertSame([], $errors(['days' => [8], 'at' => '11:00']));
+        $this->assertSame([], $errors(['weekdays' => [1, 3], 'at' => '08:30', 'window_minutes' => 120, 'months' => [3]]));
+        $this->assertNotSame([], $errors(['at' => '11:00']));                                   // no day
+        $this->assertNotSame([], $errors(['days' => [8]]));                                      // no hour
+        $this->assertNotSame([], $errors(['days' => [32], 'at' => '11:00']));
+        $this->assertNotSame([], $errors(['days' => [8], 'at' => '25:00']));
+        $this->assertNotSame([], $errors(['days' => [8], 'at' => '11:00', 'months' => [13]]));
+        $this->assertNotSame([], $errors(['days' => [8], 'at' => '11:00', 'window_minutes' => 0]));
+        $this->assertNotSame([], $errors(['days' => ['8'], 'at' => '11:00']));
+        // The audience is a condition like the others
+        $this->assertSame([], $errors(['days' => [8], 'at' => '11:00', 'op' => 'and', 'items' => [['field' => 'newsletter', 'is' => 'oui']]]));
+        $this->assertNotSame([], $errors(['days' => [8], 'at' => '11:00', 'op' => 'and', 'items' => [['field' => 'Bad Slug', 'is' => 'oui']]]));
     }
 
     public function test_an_appointment_starting_soon_starts_the_workflow_once(): void

@@ -66,6 +66,7 @@ return [
 
     'triggers' => [
         'prospect.created',
+        'prospect.scheduled',
         'prospect.updated',
         'prospect.filter_entered',
         'prospect.filter_left',

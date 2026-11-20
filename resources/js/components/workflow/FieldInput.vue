@@ -16,6 +16,22 @@
             @input="$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value))"
         />
 
+        <!-- A template of the library of the project (the mailing plan) -->
+        <div v-else-if="type === 'template'" class="hc-wff-template">
+            <input v-if="templates.length > 8" v-model="templateFilter" type="text" :placeholder="$t('workflow.template_field.filter')" />
+            <select :value="modelValue || ''" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value || null)">
+                <option value="" v-text="$t('workflow.template_field.none')"></option>
+                <option
+                    v-if="modelValue && !templates.some((t) => templateRef(t) === String(modelValue))"
+                    :value="modelValue"
+                    v-text="$t('workflow.template_field.missing')"
+                ></option>
+                <option v-for="template in shownTemplates" :key="template.id" :value="templateRef(template)" v-text="templateLabel(template)"></option>
+            </select>
+            <p v-if="chosenTemplate && chosenTemplate.disabled" class="hc-wff-warn" v-text="$t('workflow.template_field.disabled')"></p>
+            <p v-else-if="chosenTemplate && chosenTemplate.marketing" class="hc-wff-count" v-text="$t('workflow.template_field.marketing')"></p>
+        </div>
+
         <!-- The email: written as in a word processor -->
         <email-editor
             v-else-if="type === 'html'"
@@ -97,6 +113,12 @@
             <p v-if="!providersLoading && !providers.length" class="hc-wff-warn" v-text="$t('workflow.no_provider.' + field.capability)"></p>
         </template>
 
+        <!-- What happens to a marketing email when the day already has one -->
+        <select v-else-if="type === 'if_busy'" :value="modelValue || 'wait'" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value)">
+            <option value="wait" v-text="$t('workflow.if_busy.wait')"></option>
+            <option value="skip" v-text="$t('workflow.if_busy.skip')"></option>
+        </select>
+
         <!-- What happens when the step fails -->
         <select v-else-if="type === 'on_error'" :value="modelValue || 'fail'" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value)">
             <option value="fail" v-text="$t('workflow.on_error.fail')"></option>
@@ -106,9 +128,19 @@
         <input v-else-if="type === 'time'" type="time" :value="modelValue" :disabled="readOnly" @input="$emit('update:modelValue', $event.target.value)" />
         <input v-else-if="type === 'date'" type="date" :value="modelValue" :disabled="readOnly" @input="$emit('update:modelValue', $event.target.value || null)" />
 
+        <!-- A list of numbers: months, days of the month -->
+        <input
+            v-else-if="type === 'numbers'"
+            type="text"
+            :value="(modelValue || []).join(', ')"
+            :placeholder="$t('workflow.numbers_placeholder.' + field.key)"
+            :disabled="readOnly"
+            @change="$emit('update:modelValue', parseNumbers($event.target.value))"
+        />
+
         <div v-else-if="type === 'weekdays'" class="hc-wff-days">
             <label v-for="day in 7" :key="day" class="hc-wff-check">
-                <input type="checkbox" :checked="(modelValue || allDays).includes(day)" :disabled="readOnly" @change="toggleDay(day)" />
+                <input type="checkbox" :checked="(modelValue || defaultDays).includes(day)" :disabled="readOnly" @change="toggleDay(day)" />
                 <span v-text="$t('workflow.weekday.' + day)"></span>
             </label>
         </div>
@@ -284,6 +316,7 @@ import { FETCH_USERS } from "@/actions/project/user";
 import { FETCH_GROUPS } from "@/actions/project/group";
 import { ADD_THREAD, FETCH_THREADS } from "@/actions/project/thread";
 import { OPEN_MODAL } from "@/actions/modal";
+import { FETCH_MESSAGE_TEMPLATES } from "@/actions/project/message-template";
 import { FETCH_CATEGORIES } from "@/actions/project/category";
 
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
@@ -311,6 +344,7 @@ export default {
     data() {
         return {
             providers: [],
+            templateFilter: "",
             providersLoading: false,
             // The operator being configured in its window: chosen when it is done
             pendingProvider: null,
@@ -324,10 +358,24 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["project", "users", "groups", "threads", "categories", "can", "modals"]),
+        ...mapGetters(["project", "users", "groups", "threads", "categories", "can", "modals", "messageTemplates"]),
 
         isSingle() {
             return ["user", "group", "label", "thread"].includes(this.type);
+        },
+
+        templates() {
+            return this.messageTemplates || [];
+        },
+
+        shownTemplates() {
+            const keyword = this.templateFilter.trim().toLowerCase();
+
+            return keyword ? this.templates.filter((t) => `${t.code || ""} ${t.name || ""}`.toLowerCase().includes(keyword)) : this.templates;
+        },
+
+        chosenTemplate() {
+            return this.modelValue ? this.templates.find((t) => this.templateRef(t) === String(this.modelValue)) : null;
         },
 
         canAddThread() {
@@ -350,6 +398,13 @@ export default {
          */
         unconfiguredChosen() {
             return !!this.pendingProvider;
+        },
+
+        /**
+         * What the days are when nothing was chosen: every day (a wait), or none (a schedule that uses the days of the month)
+         */
+        defaultDays() {
+            return this.field && this.field.empty === "none" ? [] : ALL_DAYS;
         },
 
         isLabels() {
@@ -454,6 +509,7 @@ export default {
             if (["user", "users"].includes(this.type) && !this.users.length) needs.push(FETCH_USERS);
             if (["group", "groups"].includes(this.type) && !this.groups.length) needs.push(FETCH_GROUPS);
             if (this.type === "thread" && !this.threads.length) needs.push(FETCH_THREADS);
+            if (this.type === "template" && !this.templates.length) needs.push(FETCH_MESSAGE_TEMPLATES);
             if (["label", "labels"].includes(this.type) && !this.categories.length) needs.push(FETCH_CATEGORIES);
 
             if (!needs.length) {
@@ -506,8 +562,15 @@ export default {
             this.$emit("update:modelValue", [...ids]);
         },
 
+        /**
+         * "8, 22" -> [8, 22]: whole numbers, once each, in order
+         */
+        parseNumbers(text) {
+            return [...new Set(String(text).split(/[^0-9]+/).filter(Boolean).map(Number).filter((n) => n >= 1 && n <= 31))].sort((a, b) => a - b);
+        },
+
         toggleDay(day) {
-            const days = new Set(this.modelValue || ALL_DAYS);
+            const days = new Set(this.modelValue || this.defaultDays);
 
             days.has(day) ? days.delete(day) : days.add(day);
 
@@ -528,6 +591,15 @@ export default {
 
             this.$emit("update:modelValue", ref || null);
             this.$emit("provider-label", provider?.label || null);
+        },
+
+        // A template is found by its code (the same in every project that has the plan), else by its number
+        templateRef(template) {
+            return String(template.code || template.id);
+        },
+
+        templateLabel(template) {
+            return template.disabled ? `${template.name} (${this.$t("workflow.template_field.off")})` : template.name;
         },
 
         providerLabel(provider) {

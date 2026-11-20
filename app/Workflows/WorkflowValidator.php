@@ -300,6 +300,28 @@ class WorkflowValidator
             return ["L'attente \"$label\" doit durer au moins une minute (ou aller jusqu'à une heure ou une date)."];
         }
 
+        if ($mode === WaitNode::RELATIVE) {
+            if (!in_array($config['relative_to'], WaitNode::ANCHORS, true)) {
+                return ["L'attente \"$label\" : la date de référence est inconnue."];
+            }
+
+            $days = $config['offset_days'] ?? 0;
+
+            if (!is_int($days) || $days < 0 || $days > config('workflows.max_wait_days')) {
+                return ["L'attente \"$label\" : le nombre de jours est invalide (0 au minimum, " . config('workflows.max_wait_days') . ' au maximum).'];
+            }
+
+            if (!in_array($config['direction'] ?? 'before', ['before', 'after'], true) || !in_array($config['if_past'] ?? 'end', ['end', 'skip'], true)) {
+                return ["L'attente \"$label\" est mal configurée."];
+            }
+
+            if (!empty($config['at']) && !preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', (string) $config['at'])) {
+                return ["L'attente \"$label\" : l'heure est invalide (format HH:MM)."];
+            }
+
+            return [];
+        }
+
         if ($mode === WaitNode::DURATION && WaitNode::seconds($config) > config('workflows.max_wait_days') * 86400) {
             return ["L'attente \"$label\" ne peut pas dépasser " . config('workflows.max_wait_days') . ' jours.'];
         }
@@ -346,6 +368,10 @@ class WorkflowValidator
             return $this->validateCondition($config, $label, $subjectType);
         }
 
+        if ($type === 'prospect.scheduled') {
+            return $this->validateSchedule($config, $label, $subjectType);
+        }
+
         if ($type === 'event.starting_soon') {
             $minutes = $config['minutes_before'] ?? 0;
 
@@ -355,6 +381,38 @@ class WorkflowValidator
         }
 
         return [];
+    }
+
+    /**
+     * The schedule of a trigger "prospect.scheduled" (see TimeTriggerScanner::scanScheduled)
+     */
+    protected function validateSchedule(array $config, string $label, ?string $subjectType): array
+    {
+        $label .= ' "planifié"';
+        $numbers = fn ($values, int $min, int $max) => is_array($values) && !array_filter($values, fn ($v) => !is_int($v) || $v < $min || $v > $max);
+
+        foreach (['months' => [1, 12], 'days' => [1, 31], 'weekdays' => [1, 7]] as $key => [$min, $max]) {
+            if (isset($config[$key]) && !$numbers($config[$key], $min, $max)) {
+                return ["$label : les valeurs de « $key » sont invalides ($min à $max)."];
+            }
+        }
+
+        if (empty($config['days']) && empty($config['weekdays'])) {
+            return ["$label doit dire quels jours du mois (ou quels jours de la semaine) il se déclenche."];
+        }
+
+        if (!preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', (string) ($config['at'] ?? ''))) {
+            return ["$label doit avoir une heure de départ (format HH:MM)."];
+        }
+
+        $window = $config['window_minutes'] ?? 60;
+
+        if (!is_int($window) || $window < 1 || $window > 720) {
+            return ["$label : l'étalement des envois doit être entre 1 et 720 minutes."];
+        }
+
+        // Who it is for: a condition on the prospects (none: all of them)
+        return (new ConditionEvaluator())->tree($config) ? $this->validateCondition($config, $label, $subjectType) : [];
     }
 
     /**
@@ -390,6 +448,8 @@ class WorkflowValidator
                 $errors[] = "$label est mal configurée.";
             } elseif (isset($item['items'])) {
                 $errors = array_merge($errors, $this->validateGroup($item, $label, $subjectType, $depth + 1));
+            } elseif (isset($item['field'])) {
+                $errors = array_merge($errors, $this->validateField($item, $label, $subjectType));
             } elseif (isset($item['check'])) {
                 $errors = array_merge($errors, $this->validateCheck($item, $label));
             } elseif (!empty($item['filters'])) {
@@ -400,6 +460,36 @@ class WorkflowValidator
         }
 
         return $errors;
+    }
+
+    /**
+     * A test on a custom field of the prospect: { field, is | is_not | filled }
+     */
+    protected function validateField(array $item, string $label, ?string $subjectType): array
+    {
+        if ($subjectType && $subjectType !== WorkflowSubject::PROSPECT) {
+            return ["$label : les champs personnalisés ne sont disponibles que pour les prospects."];
+        }
+
+        if (!ConditionEvaluator::validSlug($item['field'])) {
+            return ["$label utilise un champ inconnu."];
+        }
+
+        $tests = array_values(array_intersect(ConditionEvaluator::FIELD_TESTS, array_keys($item)));
+
+        if (count($tests) !== 1) {
+            return ["$label : le test du champ \"{$item['field']}\" est incomplet."];
+        }
+
+        if ($tests[0] !== 'filled' && !is_scalar($item[$tests[0]])) {
+            return ["$label : la valeur du champ \"{$item['field']}\" n'est pas valide."];
+        }
+
+        if ($item['field'] === 'plus_50' && !in_array($item[$tests[0]] ?? null, ['oui', 'non'], true)) {
+            return ["$label : « plus de 50 ans » se teste avec \"oui\" ou \"non\"."];
+        }
+
+        return [];
     }
 
     protected function validateFilters($filters, string $label, ?string $subjectType): array

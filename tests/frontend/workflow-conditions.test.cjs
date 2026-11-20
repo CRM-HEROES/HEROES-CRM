@@ -68,3 +68,37 @@ test('the other triggers start with nothing else', () => {
     assert.deepEqual(c.triggerConfig(catalog, 'prospect.created'), { trigger: 'prospect.created' });
     assert.deepEqual(c.triggerConfig(catalog, 'event.starting_soon'), { trigger: 'event.starting_soon' });
 });
+
+test('a test on a field is read and written the way the server expects it', () => {
+    assert.deepEqual(c.newFieldItem('rdv_fixe', 'is', 'oui'), { field: 'rdv_fixe', is: 'oui' });
+    assert.deepEqual(c.newFieldItem('rdv_fixe', 'is_not', 'oui'), { field: 'rdv_fixe', is_not: 'oui' });
+    assert.deepEqual(c.newFieldItem('centre', 'filled'), { field: 'centre', filled: true });
+    assert.deepEqual(c.newFieldItem('centre', 'empty'), { field: 'centre', filled: false });
+
+    assert.equal(c.fieldTest({ field: 'a', is: 'x' }), 'is');
+    assert.equal(c.fieldTest({ field: 'a', is_not: 'x' }), 'is_not');
+    assert.equal(c.fieldTest({ field: 'a', filled: true }), 'filled');
+    assert.equal(c.fieldTest({ field: 'a', filled: false }), 'empty');
+    assert.equal(c.fieldValue({ field: 'a', is_not: 'x' }), 'x');
+    assert.equal(c.fieldValue({ field: 'a', filled: true }), '');
+
+    // Back and forth, nothing is lost
+    for (const test of c.FIELD_TESTS) {
+        assert.equal(c.fieldTest(c.newFieldItem('a', test, 'v')), test);
+    }
+});
+
+test('the fields offered are the custom ones of the prospects, and the computed one', () => {
+    const fields = [
+        { slug: 'rdv_fixe', name: 'RDV_FIXE', meta: true, for: 'prospect' },
+        { slug: 'first_name', name: 'Prénom', meta: false, for: 'prospect' },
+        { slug: 'montant', name: 'Montant', meta: true, for: 'order' },
+    ];
+
+    assert.deepEqual(c.fieldChoices(fields), [{ slug: 'rdv_fixe', name: 'RDV_FIXE' }, { slug: 'plus_50', name: 'plus_50', computed: true }]);
+    assert.deepEqual(c.fieldChoices(null), [{ slug: 'plus_50', name: 'plus_50', computed: true }]);
+});
+
+test('a scheduled trigger starts with values that are valid', () => {
+    assert.deepEqual(c.triggerConfig(catalog, 'prospect.scheduled'), { trigger: 'prospect.scheduled', days: [8], at: '11:00', window_minutes: 60 });
+});

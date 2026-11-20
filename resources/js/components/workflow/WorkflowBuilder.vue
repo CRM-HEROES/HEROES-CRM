@@ -1200,6 +1200,14 @@ export default {
         },
 
         describeWait(c) {
+            if (c.relative_to) {
+                return this.$t("workflow.wait.relative_summary", {
+                    days: c.offset_days || 0,
+                    direction: this.$t("workflow.wait.direction." + (c.direction || "before")),
+                    anchor: this.$t("workflow.wait.relative_to." + c.relative_to),
+                });
+            }
+
             if (c.until_date) {
                 return this.$t("workflow.wait.until_date_summary", { date: c.until_date });
             }

@@ -61,6 +61,12 @@ class WorkflowWaitingTest extends TestCase
             $table->timestamps();
             $table->softDeletes();
         });
+        $schema->create('events', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('prospect_id')->nullable();
+            $table->timestamp('started_at')->nullable();
+            $table->softDeletes();
+        });
         $schema->create('project_settings', function (Blueprint $table) {
             $table->unsignedBigInteger('project_id');
             $table->string('key');
@@ -233,6 +239,149 @@ class WorkflowWaitingTest extends TestCase
 
         $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
         $this->assertSame(['a:1'], RecordingHandler::$calls);
+    }
+
+    // Wait relative to an appointment
+
+    protected function relativeGraph(array $wait): array
+    {
+        return [
+            'nodes' => [$this->trigger(), $this->node('w', 'wait', $wait), $this->node('a', 'action', ['action' => 'mark-a'])],
+            'edges' => [$this->edge('t', 'w'), $this->edge('w', 'a')],
+        ];
+    }
+
+    protected function appointmentAt(string $startedAt, int $prospectId = 1): void
+    {
+        DB::table('events')->insert(['prospect_id' => $prospectId, 'started_at' => $startedAt]);
+    }
+
+    public function test_an_execution_waits_until_some_days_before_the_next_appointment(): void
+    {
+        Carbon::setTestNow('2026-11-02 08:00:00');
+        $this->appointmentAt('2026-11-20 13:30:00'); // 14:30 in Paris
+        $this->appointmentAt('2026-12-15 13:30:00'); // not the next one
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 7, 'direction' => 'before', 'at' => '09:00']));
+
+        $this->fire();
+
+        // 7 days before the 20th, at 09:00 in Paris (08:00 UTC)
+        $this->assertSame(WorkflowExecution::WAITING, $this->execution()->status);
+        $this->assertSame('2026-11-13 08:00:00', $this->execution()->resume_at->format('Y-m-d H:i:s'));
+        $this->assertSame([], RecordingHandler::$calls);
+
+        Carbon::setTestNow('2026-11-13 08:01:00');
+        app(WorkflowExecutionManager::class)->resumeDue(100);
+
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+    }
+
+    public function test_without_an_hour_the_wait_keeps_the_hour_of_the_appointment(): void
+    {
+        Carbon::setTestNow('2026-11-02 08:00:00');
+        $this->appointmentAt('2026-11-20 13:30:00');
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 1, 'direction' => 'before']));
+
+        $this->fire();
+
+        $this->assertSame('2026-11-19 13:30:00', $this->execution()->resume_at->format('Y-m-d H:i:s'));
+    }
+
+    public function test_when_the_moment_is_already_past_the_workflow_ends_without_sending(): void
+    {
+        Carbon::setTestNow('2026-11-18 08:00:00');
+        $this->appointmentAt('2026-11-20 13:30:00'); // in 2 days: "7 days before" has passed
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 7, 'direction' => 'before', 'at' => '09:00']));
+
+        $this->fire();
+
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+        $this->assertSame([], RecordingHandler::$calls);
+        $this->assertSame('The moment is already past.', $this->nodeRow('w')->result['skipped']);
+    }
+
+    public function test_the_wait_can_be_told_to_go_on_when_the_moment_is_past(): void
+    {
+        Carbon::setTestNow('2026-11-18 08:00:00');
+        $this->appointmentAt('2026-11-20 13:30:00');
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 7, 'direction' => 'before', 'if_past' => 'skip']));
+
+        $this->fire();
+
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+    }
+
+    public function test_without_any_appointment_nothing_is_sent(): void
+    {
+        Carbon::setTestNow('2026-11-02 08:00:00');
+        $this->appointmentAt('2026-10-20 13:30:00'); // behind us: not "next"
+        $this->appointmentAt('2026-12-20 13:30:00', 2); // another prospect
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 1, 'direction' => 'before']));
+
+        $this->fire();
+
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+        $this->assertSame([], RecordingHandler::$calls);
+        $this->assertSame('No date to count from.', $this->nodeRow('w')->result['skipped']);
+    }
+
+    public function test_a_check_only_wait_does_not_wait_but_stops_when_the_appointment_is_too_close(): void
+    {
+        Carbon::setTestNow('2026-11-02 08:00:00');
+        $this->appointmentAt('2026-11-10 13:30:00'); // in 8 days: "3 days before" is still to come
+        $this->activate($this->relativeGraph(['relative_to' => 'next_event', 'offset_days' => 3, 'direction' => 'before', 'check_only' => true]));
+
+        $this->fire();
+        $this->assertSame(['a:1'], RecordingHandler::$calls);
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution()->status);
+
+        // An appointment in 2 days: not worth it
+        RecordingHandler::$calls = [];
+        $this->appointmentAt('2026-11-04 13:30:00', 2);
+        app(WorkflowTriggerResolver::class)->fire('prospect.created', 1, 2, 'prospect.created:2');
+        $this->assertSame([], RecordingHandler::$calls);
+        $this->assertSame(WorkflowExecution::COMPLETED, $this->execution(2)->status);
+    }
+
+    public function test_the_wait_counts_after_the_last_appointment_or_from_the_creation_of_the_prospect(): void
+    {
+        Carbon::setTestNow('2026-11-21 08:00:00');
+        $this->appointmentAt('2026-11-20 13:30:00'); // yesterday
+        $this->activate($this->relativeGraph(['relative_to' => 'last_event', 'offset_days' => 30, 'direction' => 'after', 'at' => '09:00']));
+
+        $this->fire();
+
+        $this->assertSame('2026-12-20 08:00:00', $this->execution()->resume_at->format('Y-m-d H:i:s'));
+    }
+
+    public function test_the_wait_can_count_from_the_creation_of_the_prospect(): void
+    {
+        // The prospect 1 was created on 2026-10-01: 60 days after, at 09:00 in Paris
+        DB::table('prospects')->where('id', 1)->update(['created_at' => '2026-10-01 10:00:00']);
+        Carbon::setTestNow('2026-11-21 08:00:00');
+        $this->activate($this->relativeGraph(['relative_to' => 'created', 'offset_days' => 60, 'direction' => 'after', 'at' => '09:00']));
+
+        $this->fire();
+
+        $this->assertSame('2026-11-30 08:00:00', $this->execution()->resume_at->format('Y-m-d H:i:s'));
+    }
+
+    protected function nodeRow(string $node, int $executionId = 1): \App\Models\WorkflowNodeExecution
+    {
+        return \App\Models\WorkflowNodeExecution::where('execution_id', $executionId)->where('node_id', $node)->firstOrFail();
+    }
+
+    public function test_a_wait_relative_to_a_date_is_checked_when_publishing(): void
+    {
+        $errors = fn (array $wait) => app(WorkflowValidator::class)->validate($this->relativeGraph($wait), 1);
+
+        $this->assertSame([], $errors(['relative_to' => 'next_event', 'offset_days' => 7, 'direction' => 'before', 'at' => '09:00']));
+        $this->assertSame([], $errors(['relative_to' => 'created', 'offset_days' => 180, 'direction' => 'after']));
+        $this->assertNotSame([], $errors(['relative_to' => 'the-moon', 'offset_days' => 1]));
+        $this->assertNotSame([], $errors(['relative_to' => 'next_event', 'offset_days' => -1]));
+        $this->assertNotSame([], $errors(['relative_to' => 'next_event', 'offset_days' => 7, 'direction' => 'sideways']));
+        $this->assertNotSame([], $errors(['relative_to' => 'next_event', 'offset_days' => 7, 'at' => '25:00']));
+        $this->assertNotSame([], $errors(['relative_to' => 'next_event', 'offset_days' => 100000]));
     }
 
     // Wait for an event
