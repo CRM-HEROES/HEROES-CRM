@@ -26,6 +26,9 @@ class UserController extends Controller
      */
     public function update(Project $project, Import $import, User $user)
     {
+        // Importing prospects: the right of the import screen (the routes of the import checked nothing).
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_if($import->is_processing, 404);
 
@@ -52,6 +55,8 @@ class UserController extends Controller
      */
     public function destroy(Project $project, Import $import, User $user)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_if($import->is_processing, 404);
 

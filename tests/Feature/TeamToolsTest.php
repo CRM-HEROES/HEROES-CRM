@@ -228,6 +228,22 @@ class TeamToolsTest extends TestCase
         $this->assertSame('userRole', $this->roles()->ability());
     }
 
+    public function test_what_will_be_refused_is_refused_before_the_human_is_asked(): void
+    {
+        $ctx = $this->as('admin');
+
+        $this->assertSame(ToolResult::PERMISSION_DENIED, $this->roles()->precheck($ctx, ['action' => 'assign', 'user_ids' => [$this->u['creator']], 'role_ids' => [$this->role['telepro']]])->code);
+        $this->assertNull($this->roles()->precheck($ctx, ['action' => 'assign', 'user_ids' => [$this->u['carol']], 'role_ids' => [$this->role['telepro']]]));
+        $this->assertSame(ToolResult::PERMISSION_DENIED, $this->membership()->precheck($ctx, ['action' => 'detach', 'user_ids' => [$this->u['root']]])->code);
+        $this->assertNull($this->membership()->precheck($ctx, ['action' => 'detach', 'user_ids' => [$this->u['bob']]]));
+
+        $manager = $this->as('manager');
+        $this->assertSame(ToolResult::PERMISSION_DENIED, $this->membership()->precheck($manager, ['action' => 'detach', 'user_ids' => [$this->u['bob']]])->code);
+        $this->assertSame(ToolResult::PERMISSION_DENIED, $this->roles()->precheck($manager, ['action' => 'assign', 'user_ids' => [$this->u['carol']], 'role_ids' => [$this->role['superviseur']]])->code);
+        // A check changes nothing
+        $this->assertSame([], $this->sent);
+    }
+
     // B — membership
 
     public function test_only_an_administrator_changes_who_is_in_the_project(): void

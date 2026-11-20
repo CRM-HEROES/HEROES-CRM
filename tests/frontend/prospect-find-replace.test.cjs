@@ -16,12 +16,8 @@ const compiled = transformSync(script, {
     plugins: ['@babel/plugin-transform-modules-commonjs'],
 }).code;
 const store = { dispatch: async () => {} };
-<<<<<<< HEAD
 const prospectService = { findReplace: async () => ({ data: {} }) };
 const componentModule = { exports: {} };
-=======
-const loaded = { exports: {} };
->>>>>>> origin/main
 
 new Function('require', 'module', 'exports', compiled)(specifier => {
     if (specifier === 'vuex') {
@@ -39,15 +35,9 @@ new Function('require', 'module', 'exports', compiled)(specifier => {
         return { FETCH_PROSPECTS: 'fetchProspects' };
     }
     throw new Error(`Unexpected dependency: ${specifier}`);
-<<<<<<< HEAD
 }, componentModule, componentModule.exports);
 
 const component = componentModule.exports.default;
-=======
-}, loaded, loaded.exports);
-
-const component = loaded.exports.default;
->>>>>>> origin/main
 
 function instance({ search, replace = 'X', caseSensitive = true, sample }) {
     const vm = {

@@ -19,7 +19,7 @@ use App\Models\Thread;
  * Everything is checked before the first call, so a wrong request changes nothing. The routes of the CRM do not check
  * a right themselves: the tool declares the one of the import screen.
  */
-class ImportConfigureTool implements AgentToolInterface
+class ImportConfigureTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public const MAX_COLUMNS = 60;
     public const MAX_RELATIONS = 20;
@@ -107,7 +107,19 @@ class ImportConfigureTool implements AgentToolInterface
         return 'prospectImport';
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $prepared = $this->prepare($context, $input);
+
+        return $prepared instanceof ToolResult ? $prepared : null;
+    }
+
+    /**
+     * The import and the calls to make, or the refusal.
+     *
+     * @return ToolResult|array{0: Import, 1: array<int, array>}
+     */
+    protected function prepare(AgentExecutionContext $context, array $input): ToolResult|array
     {
         $import = $input['import_id'] > 0
             ? Import::query()->where('project_id', $context->project->id)->find((int) $input['import_id'])
@@ -130,6 +142,18 @@ class ImportConfigureTool implements AgentToolInterface
         if (!$plan) {
             return ToolResult::error('Rien à configurer : donne un mapping, des champs de doublons, des labels ou des groupes.', ToolResult::VALIDATION_FAILED);
         }
+
+        return [$import, $plan];
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $prepared = $this->prepare($context, $input);
+        if ($prepared instanceof ToolResult) {
+            return $prepared;
+        }
+
+        [$import, $plan] = $prepared;
 
         $applied = 0;
         $failed = [];

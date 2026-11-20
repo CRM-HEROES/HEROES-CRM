@@ -16,6 +16,9 @@ class DuplicateController extends Controller
      */
     public function find(Request $request, Project $project, Import $import)
     {
+        // Importing prospects: the right of the import screen (the routes of the import checked nothing).
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         
         $this->validate($request, [
@@ -33,6 +36,8 @@ class DuplicateController extends Controller
      */
     public function show(Request $request, Project $project, Import $import)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         
         return $project
@@ -48,6 +53,8 @@ class DuplicateController extends Controller
      */
     public function destroy(Request $request, Project $project, Import $import)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         
         $this->validate($request, [

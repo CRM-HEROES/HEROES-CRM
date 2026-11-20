@@ -140,8 +140,8 @@ return [
         ],
         'document_generation' => [
             'label' => 'Générer des documents PDF pour un prospect',
-            'tools' => ['document_templates', 'document_generate'],
-            'playbook' => "Liste d'abord les modèles avec document_templates (for = prospect) et choisis celui qui correspond à la demande ; s'il y a un doute, demande lequel. document_generate crée le PDF et le range dans le dossier du modèle sur la fiche du prospect : un modèle sans dossier (keeps_a_copy = false) est refusé, dis alors à l'utilisateur de choisir un dossier dans l'éditeur du modèle. Tu ne lis pas le contenu du PDF et tu ne peux ni créer ni modifier un modèle : c'est l'éditeur de l'interface. Les factures ne se génèrent pas ici.",
+            'tools' => ['project_config', 'document_templates', 'document_generate', 'document_template_install', 'project_entity_save'],
+            'playbook' => "Liste d'abord les modèles avec document_templates (for = prospect) et choisis celui qui correspond à la demande ; s'il y a un doute, demande lequel. document_generate crée le PDF et le range dans le dossier du modèle sur la fiche du prospect : un modèle sans dossier (keeps_a_copy = false) est refusé : propose alors de lui donner un dossier avec project_entity_save (entity = document, id, values.folder_id ; les dossiers se lisent avec project_config). Pour un nouveau modèle : le catalogue des modèles prêts à l'emploi se lit avec document_templates (catalog = true) et s'installe avec document_template_install ; un modèle vide se crée avec project_entity_save (entity = document, name, for, folder_id). Les pages et les champs d'un modèle se composent dans l'éditeur de l'interface : tu ne peux pas les écrire. Tu ne lis pas le contenu d'un PDF. Les factures ne se génèrent pas ici.",
         ],
         'campaign_control' => [
             'label' => 'Suivre et activer les campagnes',
@@ -162,6 +162,26 @@ return [
             'label' => 'Chercher des propriétaires avec Pappers',
             'tools' => ['pappers_search', 'crm_search'],
             'playbook' => "Pappers est un service PAYANT qui ajoute des propriétaires comme prospects du projet. Avant tout appel, dis à l'utilisateur ce que tu vas chercher (lieu, filtres), combien de résultats (commence par 10) et que chaque résultat coûte un appel. Un filtre de lieu est obligatoire (code postal, commune, département, région, parcelle, ou coordonnées et distance). L'utilisateur valide chaque appel, il y a un seul appel par tour et un budget par jour et par projet : pour la page suivante, il te relance. Tu ne reçois pas les données, seulement le nombre de prospects ajoutés ; retrouve-les ensuite avec crm_search. Les propriétaires déjà présents (même SIREN) sont ignorés ; zéro ajouté peut aussi vouloir dire une erreur du service, que le CRM ne renvoie pas. Les résultats peuvent contenir des personnes physiques : ne les utilise que pour la prospection demandée.",
+        ],
+        'project_configuration' => [
+            'label' => 'Configurer le projet (textes, filtres, groupes, pipelines, dossiers, champs)',
+            'tools' => ['project_config', 'message_templates', 'pipeline_overview', 'project_entity_save', 'project_entity_delete'],
+            'playbook' => "Pour configurer le projet : lis d'abord ce qui existe (project_config pour les catégories, filtres, groupes, champs, dossiers ; message_templates pour les textes ; pipeline_overview pour les pipelines) afin de ne pas créer de doublon, puis project_entity_save pour créer (sans id) ou modifier (avec id) : modèle de SMS, de message ou de description de rendez-vous, catégorie de filtres et ses filtres (label : parent_id = la catégorie, name, color et bgcolor « #RRGGBB »), groupe, pipeline, dossier de prospect, champ personnalisé, état, action ou étape de devis, calendrier (type de rendez-vous), modèle de document, questionnaire (son nom). Un pipeline reçoit ses étapes en y rangeant des filtres : cela se fait dans l'écran des pipelines. Pour supprimer : project_entity_delete, toujours validé par l'utilisateur : annonce ce qui disparaît, et vérifie avant qu'une catégorie ou un champ n'est pas utilisé. Tu ne touches ni aux rôles, ni aux canaux, ni aux produits, ni aux calendriers partagés. Reprends le ton des modèles existants pour un nouveau texte.",
+        ],
+        'questionnaires' => [
+            'label' => 'Questionnaires (lire, construire, lire les réponses)',
+            'tools' => ['questionnaire_overview', 'questionnaire_responses', 'questionnaire_build', 'project_entity_save', 'project_entity_delete', 'crm_search'],
+            'playbook' => "Lis d'abord les questionnaires existants avec questionnaire_overview (la liste, puis la structure d'un questionnaire). Pour en construire un : questionnaire_build en une seule demande, avec des sections et des questions (radio ou checkbox avec au moins deux choix, text, textarea, date, image, file) ; sans questionnaire_id il en crée un nouveau, avec questionnaire_id il ajoute des sections à un questionnaire existant. Annonce la structure à l'utilisateur avant de la proposer. Renommer ou supprimer un questionnaire : project_entity_save / project_entity_delete (entity = questionnaire). Les réponses d'un prospect se lisent avec questionnaire_responses : ce sont des données personnelles, ne les cite que pour la demande. Affecter un questionnaire à des rôles ou à des prospects se fait dans l'interface.",
+        ],
+        'vehicles_view' => [
+            'label' => 'Voir les véhicules du projet',
+            'tools' => ['vehicles'],
+            'playbook' => "vehicles donne la liste des véhicules (nom, utilisateur affecté, date de la dernière position). Les positions elles-mêmes (view = position) sont réservées à qui gère les véhicules, limitées aux cinq dernières et arrondies à environ 100 m : c'est le déplacement d'une personne, ne le cite que pour la demande et ne le recoupe pas avec d'autres données pour suivre quelqu'un. Tu ne crées ni ne modifies de véhicule : c'est l'interface.",
+        ],
+        'commissions_view' => [
+            'label' => 'Voir les commissions du projet',
+            'tools' => ['commissions'],
+            'playbook' => "commissions donne, par utilisateur, produit et action de devis, le type et la valeur de la commission. C'est de la rémunération de collègues : réservé à qui gère les commissions, lecture seule, à ne citer que pour la demande. Tu ne modifies aucun montant : une personne le fait dans le CRM.",
         ],
         'prospect_import' => [
             'label' => 'Suivre et lancer les imports de prospects',

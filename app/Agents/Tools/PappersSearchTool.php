@@ -18,7 +18,7 @@ use App\Models\Prospect;
  *
  * The route of the CRM runs the command and answers nothing, whatever happens: the number added is counted here.
  */
-class PappersSearchTool implements AgentToolInterface
+class PappersSearchTool implements AgentToolInterface, ChecksBeforeApproval
 {
     /** The filters the route of the CRM accepts (see Project\API\PappersController) */
     public const FILTERS = [
@@ -91,14 +91,19 @@ class PappersSearchTool implements AgentToolInterface
         return 'prospectImport';
     }
 
+    /**
+     * Before asking a human: the place, the size of the page, the token and what is left of the budget. The call that is
+     * proposed is not counted yet (it is, once it runs), hence the "already" in the budget.
+     */
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        return $this->check($context, $input, false) ?? $this->tokenProblem();
+    }
+
     public function handle(AgentExecutionContext $context, array $input): ToolResult
     {
-        if ($error = $this->check($context, $input)) {
+        if ($error = $this->check($context, $input) ?? $this->tokenProblem()) {
             return $error;
-        }
-
-        if (!filled(env('PAPPERS_TOKEN'))) {
-            return ToolResult::error("Pappers n'est pas configuré sur le serveur (jeton absent) : rien n'a été appelé.", ToolResult::UNAVAILABLE);
         }
 
         $filters = $this->filters($input);
@@ -144,7 +149,17 @@ class PappersSearchTool implements AgentToolInterface
     /**
      * What stops the call before anything is spent, or null.
      */
-    protected function check(AgentExecutionContext $context, array $input): ?ToolResult
+    protected function tokenProblem(): ?ToolResult
+    {
+        return filled(env('PAPPERS_TOKEN'))
+            ? null
+            : ToolResult::error("Pappers n'est pas configuré sur le serveur (jeton absent) : rien n'a été appelé.", ToolResult::UNAVAILABLE);
+    }
+
+    /**
+     * @param  bool  $running  the call is running: it is already recorded as executed and counts itself
+     */
+    protected function check(AgentExecutionContext $context, array $input, bool $running = true): ?ToolResult
     {
         $filters = $this->filters($input);
 
@@ -162,10 +177,10 @@ class PappersSearchTool implements AgentToolInterface
         }
 
         // The approval of this very call is already recorded when it runs: it counts itself
-        if ($context->runId && $this->callsInRun($context) > 1) {
+        if ($context->runId && $this->callsInRun($context) > ($running ? 1 : 0)) {
             return ToolResult::error("Un seul appel Pappers par tour : l'utilisateur relance l'agent pour la page suivante.", ToolResult::LIMIT_EXCEEDED);
         }
-        if ($this->callsToday($context) > $this->dailyCalls()) {
+        if ($this->callsToday($context) > $this->dailyCalls() - ($running ? 0 : 1)) {
             return ToolResult::error("Budget du jour atteint : {$this->dailyCalls()} appel(s) Pappers par jour et par projet.", ToolResult::LIMIT_EXCEEDED);
         }
 

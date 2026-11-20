@@ -13,7 +13,7 @@ use App\Models\User;
  * The routes of the CRM only let a super administrator or an administrator of the project do this: the tool asks the
  * same of the owner of the agent. At most 10 at once; never a super administrator, the creator of the project or the owner.
  */
-class ProjectUserMembershipTool implements AgentToolInterface
+class ProjectUserMembershipTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public const MAX = 10;
 
@@ -62,13 +62,30 @@ class ProjectUserMembershipTool implements AgentToolInterface
         return null;
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $plan = $this->plan($context, $input);
+
+        return $plan instanceof ToolResult ? $plan : null;
+    }
+
+    /**
+     * The calls to make, checked beforehand, or the refusal.
+     *
+     * @return array<int, array>|ToolResult
+     */
+    protected function plan(AgentExecutionContext $context, array $input): array|ToolResult
     {
         if (!$this->access->isAdministrator($context)) {
             return ToolResult::error("Seul un administrateur du projet (ou un super-administrateur) peut rattacher ou retirer des utilisateurs : ce n'est pas le cas du propriétaire de l'agent.", ToolResult::PERMISSION_DENIED);
         }
 
-        $plan = $input['action'] === 'attach' ? $this->attachPlan($context, $input) : $this->detachPlan($context, $input);
+        return $input['action'] === 'attach' ? $this->attachPlan($context, $input) : $this->detachPlan($context, $input);
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $plan = $this->plan($context, $input);
         if ($plan instanceof ToolResult) {
             return $plan;
         }

@@ -13,7 +13,7 @@ use App\Services\IncomingCommunications;
  *
  * Only communications the agent was told to treat should be marked: reading is not treating.
  */
-class IncomingMarkTreatedTool implements AgentToolInterface, ConfirmsLargeActions
+class IncomingMarkTreatedTool implements AgentToolInterface, ConfirmsLargeActions, ChecksBeforeApproval
 {
     public const MAX = 100;
 
@@ -68,15 +68,29 @@ class IncomingMarkTreatedTool implements AgentToolInterface, ConfirmsLargeAction
         return count($this->ids($input));
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
     {
-        $ids = $this->ids($input);
+        return $this->problem($this->ids($input));
+    }
 
+    protected function problem(array $ids): ?ToolResult
+    {
         if (!$ids) {
             return ToolResult::error('Aucun identifiant à traiter.', ToolResult::VALIDATION_FAILED);
         }
         if (count($ids) > self::MAX) {
             return ToolResult::error('Au plus ' . self::MAX . ' communications à la fois.', ToolResult::LIMIT_EXCEEDED);
+        }
+
+        return null;
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $ids = $this->ids($input);
+
+        if ($error = $this->problem($ids)) {
+            return $error;
         }
 
         $response = $this->api->call($context, 'POST', 'incoming-communications/read', [

@@ -13,7 +13,7 @@ use App\Models\Import;
  *
  * Creating prospects in bulk is not something to do lightly: the number of rows drives the confirmation of the user.
  */
-class ImportRunTool implements AgentToolInterface, ConfirmsLargeActions
+class ImportRunTool implements AgentToolInterface, ConfirmsLargeActions, ChecksBeforeApproval
 {
     public function __construct(protected InternalApi $api)
     {
@@ -62,12 +62,15 @@ class ImportRunTool implements AgentToolInterface, ConfirmsLargeActions
         return (int) ($this->find($context, (int) ($input['import_id'] ?? 0))?->rows_count ?? 0);
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
     {
-        $import = $this->find($context, (int) $input['import_id']);
+        return $this->problem($this->find($context, (int) $input['import_id']), $input['import_id']);
+    }
 
+    protected function problem(?Import $import, mixed $id): ?ToolResult
+    {
         if (!$import) {
-            return ToolResult::error("Import {$input['import_id']} introuvable dans ce projet, ou non accessible pour cet utilisateur.", ToolResult::NOT_FOUND);
+            return ToolResult::error("Import $id introuvable dans ce projet, ou non accessible pour cet utilisateur.", ToolResult::NOT_FOUND);
         }
         if (!in_array($import->source, ['file', 'google_sheets'], true)) {
             return ToolResult::error('Seuls les imports de fichier ou de Google Sheets se lancent ici.', ToolResult::INVALID_INPUT);
@@ -77,6 +80,17 @@ class ImportRunTool implements AgentToolInterface, ConfirmsLargeActions
         }
         if (!array_filter((array) $import->mapping)) {
             return ToolResult::error('Aucune colonne n\'est reliée à un champ : le mapping se fait dans l\'interface, onglet « Mapping ».', ToolResult::INVALID_INPUT);
+        }
+
+        return null;
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $import = $this->find($context, (int) $input['import_id']);
+
+        if ($error = $this->problem($import, $input['import_id'])) {
+            return $error;
         }
 
         $response = $this->api->call($context, 'PUT', "import/{$import->id}", ['is_processing' => true]);

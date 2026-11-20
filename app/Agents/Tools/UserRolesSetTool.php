@@ -16,7 +16,7 @@ use App\Models\User;
  * owner holds every permission it carries (unless he administers the project). The routes of the CRM check the right
  * "userRole" themselves.
  */
-class UserRolesSetTool implements AgentToolInterface
+class UserRolesSetTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public const MAX_USERS = 10;
     public const MAX_ROLES = 5;
@@ -64,6 +64,13 @@ class UserRolesSetTool implements AgentToolInterface
     public function ability(): ?string
     {
         return 'userRole';
+    }
+
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $plan = $this->plan($context, $input);
+
+        return $plan instanceof ToolResult ? $plan : null;
     }
 
     public function handle(AgentExecutionContext $context, array $input): ToolResult

@@ -20,7 +20,9 @@ use App\Agents\Tools\WorkflowCatalogTool;
 use App\Agents\Tools\WorkflowDraftTool;
 use App\Agents\Tools\CampaignSetActiveTool;
 use App\Agents\Tools\CampaignStatusTool;
+use App\Agents\Tools\CommissionsTool;
 use App\Agents\Tools\DocumentGenerateTool;
+use App\Agents\Tools\DocumentTemplateInstallTool;
 use App\Agents\Tools\DocumentTemplatesTool;
 use App\Agents\Tools\ImportConfigureTool;
 use App\Agents\Tools\ImportMappingTool;
@@ -31,11 +33,17 @@ use App\Agents\Tools\ImportStatusTool;
 use App\Agents\Tools\MessageTemplatesTool;
 use App\Agents\Tools\PipelineOverviewTool;
 use App\Agents\Tools\PappersSearchTool;
+use App\Agents\Tools\ProjectEntityDeleteTool;
+use App\Agents\Tools\ProjectEntitySaveTool;
 use App\Agents\Tools\ProjectUserMembershipTool;
+use App\Agents\Tools\QuestionnaireBuildTool;
+use App\Agents\Tools\QuestionnaireOverviewTool;
+use App\Agents\Tools\QuestionnaireResponsesTool;
 use App\Agents\Tools\TeamMembersTool;
 use App\Agents\Tools\TrashListTool;
 use App\Agents\Tools\UserRolesSetTool;
 use App\Agents\Tools\TrashRestoreTool;
+use App\Agents\Tools\VehiclesTool;
 use App\Agents\Tools\WorkflowCancelExecutionTool;
 use App\Agents\Tools\WorkflowExecutionsTool;
 use App\Agents\Writes\WriteCapabilities;
@@ -81,7 +89,7 @@ class AppServiceProvider extends ServiceProvider
                 $registry->register($app->make($tool));
             }
 
-            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, ReportCreateTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class, WorkflowExecutionsTool::class, TrashListTool::class, TrashRestoreTool::class, ImportStatusTool::class, ImportRunTool::class, CampaignStatusTool::class, CampaignSetActiveTool::class, DocumentTemplatesTool::class, DocumentGenerateTool::class, IncomingCommunicationsTool::class, IncomingMarkTreatedTool::class, MessageTemplatesTool::class, PipelineOverviewTool::class, WorkflowCancelExecutionTool::class, ImportMappingTool::class, ImportConfigureTool::class, TeamMembersTool::class, ProjectUserMembershipTool::class, UserRolesSetTool::class, PappersSearchTool::class] as $tool) {
+            foreach ([ProjectConfigTool::class, ProspectHistoryTool::class, ReportCreateTool::class, WorkflowCatalogTool::class, WorkflowDraftTool::class, WorkflowExecutionsTool::class, TrashListTool::class, TrashRestoreTool::class, ImportStatusTool::class, ImportRunTool::class, CampaignStatusTool::class, CampaignSetActiveTool::class, DocumentTemplatesTool::class, DocumentGenerateTool::class, IncomingCommunicationsTool::class, IncomingMarkTreatedTool::class, MessageTemplatesTool::class, PipelineOverviewTool::class, WorkflowCancelExecutionTool::class, ImportMappingTool::class, ImportConfigureTool::class, TeamMembersTool::class, ProjectUserMembershipTool::class, UserRolesSetTool::class, PappersSearchTool::class, ProjectEntitySaveTool::class, ProjectEntityDeleteTool::class, DocumentTemplateInstallTool::class, QuestionnaireOverviewTool::class, QuestionnaireResponsesTool::class, QuestionnaireBuildTool::class, VehiclesTool::class, CommissionsTool::class] as $tool) {
                 $registry->register($app->make($tool));
             }
 

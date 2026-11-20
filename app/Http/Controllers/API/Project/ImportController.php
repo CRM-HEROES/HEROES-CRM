@@ -30,6 +30,9 @@ class ImportController extends Controller
      */
     public function store(Request $request, Project $project)
     {
+        // Importing prospects: the right of the import screen (the routes of the import checked nothing).
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         $this->validate($request, [
             'name' => 'required',
             'source_url' => 'required_if:source,google_sheets',
@@ -76,6 +79,8 @@ class ImportController extends Controller
      */
     public function download(Project $project, Import $import)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_unless(in_array($import->source, ['file', 'google_sheets']), 400);
 
@@ -93,6 +98,8 @@ class ImportController extends Controller
      */
     public function update(Request $request, Project $project, Import $import)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
 
         $this->validate(request(), [
@@ -123,6 +130,8 @@ class ImportController extends Controller
      */
     public function syncScript(Project $project, Import $import, SheetSyncScript $script)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_unless($import->source === 'google_sheets', 400);
 
@@ -137,6 +146,8 @@ class ImportController extends Controller
      */
     public function destroy(Request $request, Project $project, Import $import)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
 
         if ($request->input('prospects', false)) {

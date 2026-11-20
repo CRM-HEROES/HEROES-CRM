@@ -27,6 +27,9 @@ class GroupController extends Controller
      */
     public function update(Project $project, Import $import, Group $group)
     {
+        // Importing prospects: the right of the import screen (the routes of the import checked nothing).
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_unless($project->id == $group->project_id, 404);
         abort_if($import->is_processing, 404);
@@ -43,6 +46,8 @@ class GroupController extends Controller
      */
     public function destroy(Project $project, Import $import, Group $group)
     {
+        abort_unless(auth()->user()->can('prospectImport', $project), 404);
+
         abort_unless($project->id == $import->project_id, 404);
         abort_unless($project->id == $group->project_id, 404);
         abort_if($import->is_processing, 404);

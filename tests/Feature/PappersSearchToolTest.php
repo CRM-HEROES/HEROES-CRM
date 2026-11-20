@@ -195,6 +195,41 @@ class PappersSearchToolTest extends TestCase
         $this->assertSame(ToolResult::LIMIT_EXCEEDED, $this->tool()->handle($this->context, ['filters' => ['departement' => '69']])->code);
     }
 
+    public function test_the_refusals_come_before_the_human_is_asked(): void
+    {
+        $tool = $this->tool();
+
+        $this->assertSame(ToolResult::VALIDATION_FAILED, $tool->precheck($this->context, ['filters' => ['code_naf_proprietaire' => '6820A']])->code);
+        $this->assertSame(ToolResult::LIMIT_EXCEEDED, $tool->precheck($this->context, ['filters' => ['departement' => '69'], 'par_page' => 30])->code);
+        $this->assertNull($tool->precheck($this->context, ['filters' => ['departement' => '69']]));
+
+        putenv('PAPPERS_TOKEN');
+        unset($_ENV['PAPPERS_TOKEN'], $_SERVER['PAPPERS_TOKEN']);
+        $this->assertSame(ToolResult::UNAVAILABLE, $tool->precheck($this->context, ['filters' => ['departement' => '69']])->code);
+        $this->assertSame([], $this->sent);
+    }
+
+    public function test_the_budget_is_checked_before_asking_without_counting_the_call_not_yet_made(): void
+    {
+        config(['agents.pappers_daily_calls' => 2]);
+        $tool = $this->tool();
+
+        $this->action(1, $this->pid);
+        $this->assertNull($tool->precheck($this->context, ['filters' => ['departement' => '69']]), 'Un appel reste sur deux');
+
+        $this->action(2, $this->pid);
+        $this->assertSame(ToolResult::LIMIT_EXCEEDED, $tool->precheck($this->context, ['filters' => ['departement' => '69']])->code);
+    }
+
+    public function test_one_call_per_turn_is_also_checked_before_asking(): void
+    {
+        $this->context->runId = 7;
+        $this->assertNull($this->tool()->precheck($this->context, ['filters' => ['departement' => '69']]));
+
+        $this->action(7, $this->pid);
+        $this->assertSame(ToolResult::LIMIT_EXCEEDED, $this->tool()->precheck($this->context, ['filters' => ['departement' => '69']])->code);
+    }
+
     public function test_it_is_always_decided_by_a_human_and_needs_the_import_right(): void
     {
         $this->assertSame(PappersSearchTool::COMMUNICATION, $this->tool()->risk());
