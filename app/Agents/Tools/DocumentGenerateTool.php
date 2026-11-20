@@ -13,7 +13,7 @@ use App\Models\Document;
  *
  * A template without a folder would render a PDF nobody can get back, so it is refused.
  */
-class DocumentGenerateTool implements AgentToolInterface
+class DocumentGenerateTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public function __construct(protected InternalApi $api, protected ReadGateway $reader)
     {
@@ -58,7 +58,19 @@ class DocumentGenerateTool implements AgentToolInterface
         return 'projectDocumentView';
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $checked = $this->check($context, $input);
+
+        return $checked instanceof ToolResult ? $checked : null;
+    }
+
+    /**
+     * The template and the id of the prospect, or the refusal.
+     *
+     * @return ToolResult|array{0: Document, 1: int}
+     */
+    protected function check(AgentExecutionContext $context, array $input): ToolResult|array
     {
         $document = $this->document($context, (int) $input['document_id']);
 
@@ -77,7 +89,18 @@ class DocumentGenerateTool implements AgentToolInterface
             return ToolResult::error("Prospect {$input['prospect_id']} introuvable dans ce projet, ou non accessible pour cet utilisateur.", ToolResult::NOT_FOUND);
         }
 
-        $prospectId = $visible['ids'][0];
+        return [$document, $visible['ids'][0]];
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $checked = $this->check($context, $input);
+
+        if ($checked instanceof ToolResult) {
+            return $checked;
+        }
+
+        [$document, $prospectId] = $checked;
         $response = $this->api->call($context, 'GET', "prospect/$prospectId/document/{$document->id}", [], true);
 
         if (!$response->ok()) {

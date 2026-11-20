@@ -13,7 +13,7 @@ use App\Models\WorkflowExecution;
  *
  * Stopping is the safe direction (a message that would have gone out does not), but it cannot be resumed.
  */
-class WorkflowCancelExecutionTool implements AgentToolInterface
+class WorkflowCancelExecutionTool implements AgentToolInterface, ChecksBeforeApproval
 {
     public function __construct(protected InternalApi $api)
     {
@@ -58,15 +58,29 @@ class WorkflowCancelExecutionTool implements AgentToolInterface
         return 'projectWorkflowExecute';
     }
 
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        return $this->problem($this->find($context, (int) $input['execution_id']), $input['execution_id']);
+    }
+
+    protected function problem(?WorkflowExecution $execution, mixed $id): ?ToolResult
+    {
+        if (!$execution) {
+            return ToolResult::error("Exécution $id introuvable dans ce projet.", ToolResult::NOT_FOUND);
+        }
+        if (!in_array($execution->status, [WorkflowExecution::PENDING, WorkflowExecution::WAITING], true)) {
+            return ToolResult::error("Cette exécution est « {$execution->status} » : seules celles en attente (pending ou waiting) s'annulent.", ToolResult::INVALID_INPUT);
+        }
+
+        return null;
+    }
+
     public function handle(AgentExecutionContext $context, array $input): ToolResult
     {
         $execution = $this->find($context, (int) $input['execution_id']);
 
-        if (!$execution) {
-            return ToolResult::error("Exécution {$input['execution_id']} introuvable dans ce projet.", ToolResult::NOT_FOUND);
-        }
-        if (!in_array($execution->status, [WorkflowExecution::PENDING, WorkflowExecution::WAITING], true)) {
-            return ToolResult::error("Cette exécution est « {$execution->status} » : seules celles en attente (pending ou waiting) s'annulent.", ToolResult::INVALID_INPUT);
+        if ($error = $this->problem($execution, $input['execution_id'])) {
+            return $error;
         }
 
         $response = $this->api->call($context, 'POST', "workflow-execution/{$execution->id}/cancel");

@@ -319,7 +319,16 @@ class WriteCapabilities
                     return ['POST', "prospect/{$prospect->id}/sms", ['source' => $source, 'message' => $input['message']]];
                 },
                 'describe' => fn ($context, $input) => ['action' => 'Envoyer un SMS', 'canal' => $input['provider'], 'message' => $input['message']],
-                'result' => fn ($json) => ['sms_id' => $json['id'] ?? null, 'note' => "Le SMS est créé ; l'opérateur l'envoie aussitôt (en cas d'échec, l'erreur est enregistrée sur le SMS)."],
+                // The CRM creates the SMS and the operator takes it over: a refusal known at once (an operator without
+                // settings, a line without number) is written on the SMS and is told here, not hidden behind "created"
+                'verify' => function ($context, $json) {
+                    $sms = isset($json['id']) ? \App\Models\Sms::query()->find($json['id']) : null;
+
+                    return $sms && filled($sms->error)
+                        ? ToolResult::error("Le SMS a été créé (n° {$sms->id}) mais l'opérateur ne l'a pas pris en charge : " . mb_substr(strip_tags((string) $sms->error), 0, 300) . " Ne le renvoie pas avant d'avoir corrigé la configuration de l'opérateur.", ToolResult::UNAVAILABLE)
+                        : null;
+                },
+                'result' => fn ($json) => ['sms_id' => $json['id'] ?? null, 'note' => "Le SMS est créé et remis à l'opérateur. Une erreur détectée tout de suite serait donnée ici ; une erreur plus tardive (opérateur injoignable, solde) s'enregistre sur le SMS : elle se lit dans l'historique du prospect."],
             ],
             [
                 'key' => 'email_send',

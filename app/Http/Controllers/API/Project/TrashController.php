@@ -308,6 +308,8 @@ class TrashController extends Controller
                         $query->where('project_id', $project->id);
                     })
                     ->whereIn('files.id', $items);
+            // The list of kinds says "order-status", the lists of the screen "order-statuses": both are the same thing
+            case 'order-status':
             case 'order-statuses':
                 return $project
                     ->orderStatuses()

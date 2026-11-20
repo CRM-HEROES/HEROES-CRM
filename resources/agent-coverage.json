@@ -92,30 +92,44 @@
         "document_templates"
       ],
       "write_tools": [
-        "document_generate"
+        "document_generate",
+        "document_template_install",
+        "project_entity_delete",
+        "project_entity_save"
       ],
       "priority": "haute",
-      "note": "Créer ou modifier un modèle (pages, champs, polices) reste à faire dans l'éditeur de l'interface."
+      "note": "Le modèle lui-même (nom, description, destination, dossier) se crée, se modifie et se supprime ; ses pages, champs et polices se composent dans l'éditeur de l'interface."
     },
     "project/document-template": {
       "label": "Modèles de documents prêts à l'emploi",
       "sheets": [
         "documents"
       ],
-      "read_tools": [],
-      "write_tools": [],
+      "read_tools": [
+        "document_templates"
+      ],
+      "write_tools": [
+        "document_template_install"
+      ],
       "priority": "moyenne",
-      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+      "note": "Le catalogue se lit avec document_templates (catalog = true) et un modèle s'installe avec document_template_install."
     },
     "project/questionnaire": {
       "label": "Questionnaires",
       "sheets": [
         "questionnaires"
       ],
-      "read_tools": [],
-      "write_tools": [],
+      "read_tools": [
+        "questionnaire_overview",
+        "questionnaire_responses"
+      ],
+      "write_tools": [
+        "questionnaire_build",
+        "project_entity_save",
+        "project_entity_delete"
+      ],
       "priority": "moyenne",
-      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+      "note": "Structure complète en une demande (sections, questions, choix) ; renommer et supprimer par project_entity_*. L'affectation à des rôles ou à des prospects se fait dans l'interface."
     },
     "project/campaign": {
       "label": "Campagnes",
@@ -139,7 +153,7 @@
       "read_tools": [],
       "write_tools": [],
       "priority": "haute",
-      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+      "excluded": "Fonction historique remplacée par les workflows : le menu des campagnes est masqué et une campagne se convertit en workflow (workflows:convert-campaign). L'agent construit des workflows (workflow_builder) ; il suit et active les campagnes existantes (campaign_status, campaign_set_active) mais ne compose pas leurs règles, opérateurs et actions."
     },
     "project/campaign-operator": {
       "label": "Opérateurs de campagne",
@@ -149,7 +163,7 @@
       "read_tools": [],
       "write_tools": [],
       "priority": "haute",
-      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+      "excluded": "Fonction historique remplacée par les workflows : le menu des campagnes est masqué et une campagne se convertit en workflow (workflows:convert-campaign). L'agent construit des workflows (workflow_builder) ; il suit et active les campagnes existantes (campaign_status, campaign_set_active) mais ne compose pas leurs règles, opérateurs et actions."
     },
     "project/campaign-rule": {
       "label": "Règles de campagne",
@@ -159,7 +173,7 @@
       "read_tools": [],
       "write_tools": [],
       "priority": "haute",
-      "note": "La composition visuelle des règles, opérateurs et actions reste à faire dans la page des campagnes."
+      "excluded": "Fonction historique remplacée par les workflows : le menu des campagnes est masqué et une campagne se convertit en workflow (workflows:convert-campaign). L'agent construit des workflows (workflow_builder) ; il suit et active les campagnes existantes (campaign_status, campaign_set_active) mais ne compose pas leurs règles, opérateurs et actions."
     },
     "project/category": {
       "label": "Catégories de filtres",
@@ -169,8 +183,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/label": {
       "label": "Filtres (labels)",
@@ -180,7 +198,11 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": []
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/field": {
       "label": "Champs de prospects",
@@ -190,8 +212,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/group": {
       "label": "Groupes",
@@ -201,8 +227,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/folder": {
       "label": "Dossiers",
@@ -212,8 +242,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/thread": {
       "label": "Canaux de discussion",
@@ -234,8 +268,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié). Les utilisateurs et rôles qui y ont accès se règlent dans l'interface."
     },
     "project/menu": {
       "label": "Menus de prospects",
@@ -262,18 +300,23 @@
       "sheets": [
         "menus-prospects"
       ],
-      "read_tools": [],
-      "write_tools": []
+      "read_tools": [
+        "crm_search"
+      ],
+      "write_tools": [],
+      "note": "Les menus de base sont des filtres (traité, non traité, en attente) : crm_search donne les mêmes comptes."
     },
     "project/vehicle": {
       "label": "Véhicules",
       "sheets": [
         "vehicules-duplication-suivi"
       ],
-      "read_tools": [],
+      "read_tools": [
+        "vehicles"
+      ],
       "write_tools": [],
       "priority": "moyenne",
-      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+      "note": "Lecture seule : la liste est ouverte, les positions (derniers points arrondis) demandent le droit de modifier les véhicules. Créer ou modifier un véhicule se fait dans l'interface (équipement de suivi des personnes)."
     },
     "project/line": {
       "label": "Lignes téléphoniques",
@@ -292,9 +335,12 @@
       "read_tools": [
         "pipeline_overview"
       ],
-      "write_tools": [],
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
       "priority": "moyenne",
-      "note": "Lecture seule : créer un pipeline ou ses étapes se fait dans le CRM."
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié). Les étapes d'un pipeline (filtres rangés dans le pipeline) se règlent dans l'écran des pipelines."
     },
     "project/product": {
       "label": "Produits",
@@ -305,7 +351,8 @@
         "project_config"
       ],
       "write_tools": [],
-      "priority": "moyenne"
+      "priority": "moyenne",
+      "note": "Lecture seule : les produits portent des prix et des taxes, l'agent ne les modifie pas."
     },
     "project/order": {
       "label": "Devis (tableau)",
@@ -330,8 +377,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/order-status": {
       "label": "États de devis",
@@ -341,8 +392,12 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/order-step": {
       "label": "Étapes de devis",
@@ -352,18 +407,24 @@
       "read_tools": [
         "project_config"
       ],
-      "write_tools": [],
-      "priority": "moyenne"
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
+      "priority": "moyenne",
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/commission": {
       "label": "Commissions",
       "sheets": [
         "devis-produits-commissions"
       ],
-      "read_tools": [],
+      "read_tools": [
+        "commissions"
+      ],
       "write_tools": [],
       "priority": "moyenne",
-      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+      "note": "Lecture seule, réservée à qui gère les commissions. Les montants (rémunération) se changent dans le CRM par une personne : décision de ne pas les confier à l'agent."
     },
     "project/event": {
       "label": "Rendez-vous",
@@ -388,9 +449,12 @@
       "read_tools": [
         "message_templates"
       ],
-      "write_tools": [],
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
       "priority": "moyenne",
-      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/events-daily-directions": {
       "label": "Itinéraires journaliers",
@@ -422,9 +486,12 @@
       "read_tools": [
         "message_templates"
       ],
-      "write_tools": [],
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
       "priority": "moyenne",
-      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/message-template": {
       "label": "Modèles de messages",
@@ -434,9 +501,12 @@
       "read_tools": [
         "message_templates"
       ],
-      "write_tools": [],
+      "write_tools": [
+        "project_entity_delete",
+        "project_entity_save"
+      ],
       "priority": "moyenne",
-      "note": "Lecture seule : créer ou modifier un modèle se fait dans le CRM."
+      "note": "Création, modification et suppression par project_entity_save / project_entity_delete (le droit de chaque type est vérifié)."
     },
     "project/export": {
       "label": "Exports de prospects",
@@ -528,16 +598,22 @@
       "sheets": [
         "workflows-catalogue"
       ],
-      "read_tools": [],
-      "write_tools": []
+      "read_tools": [
+        "workflow_catalog"
+      ],
+      "write_tools": [],
+      "note": "Les opérateurs configurés du projet sont donnés par workflow_catalog."
     },
     "project/workflow-stats": {
       "label": "Statistiques d'automatisation",
       "sheets": [
         "workflows-catalogue"
       ],
-      "read_tools": [],
-      "write_tools": []
+      "read_tools": [
+        "workflow_executions"
+      ],
+      "write_tools": [],
+      "note": "Les chiffres des automatisations sont donnés par workflow_executions (view=overview)."
     },
     "project/stat": {
       "label": "Statistiques",
@@ -688,7 +764,7 @@
       "read_tools": [],
       "write_tools": [],
       "priority": "moyenne",
-      "note": "Pas encore couvert par un outil : à faire dans l'interface, l'agent peut l'expliquer avec la fiche d'aide."
+      "excluded": "Scan d'une image de carte de visite : l'agent ne reçoit ni ne téléverse d'image de ce type, et la route crée des prospects à partir d'une lecture automatique. À faire par une personne depuis l'écran « Scanner »."
     },
     "project/logo": {
       "label": "Logo du projet",
@@ -755,7 +831,8 @@
         "tableau-de-bord"
       ],
       "read_tools": [],
-      "write_tools": []
+      "write_tools": [],
+      "excluded": "Compteurs de toute la plateforme (tous les projets) et liste des projets de l'utilisateur : l'agent travaille dans un projet donné et n'a pas besoin de ces chiffres globaux."
     },
     "event": {
       "label": "Agenda global",

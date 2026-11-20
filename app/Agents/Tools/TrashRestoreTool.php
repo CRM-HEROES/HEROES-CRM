@@ -12,7 +12,7 @@ use App\Agents\Writes\InternalApi;
  * The route of the CRM (PUT trash/bulk) does not check any right itself, so the tool does: restoring needs the right
  * that deleting needs. Only what is really in the trash of this project is sent to the route.
  */
-class TrashRestoreTool implements AgentToolInterface, ConfirmsLargeActions
+class TrashRestoreTool implements AgentToolInterface, ConfirmsLargeActions, ChecksBeforeApproval
 {
     public const MAX = 100;
 
@@ -66,7 +66,19 @@ class TrashRestoreTool implements AgentToolInterface, ConfirmsLargeActions
         return count($this->ids($input));
     }
 
-    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    public function precheck(AgentExecutionContext $context, array $input): ?ToolResult
+    {
+        $resolved = $this->resolve($context, $input);
+
+        return $resolved instanceof ToolResult ? $resolved : null;
+    }
+
+    /**
+     * What is really in the trash among the ids asked: [found, missing], or the refusal.
+     *
+     * @return ToolResult|array{0: int[], 1: int[]}
+     */
+    protected function resolve(AgentExecutionContext $context, array $input): ToolResult|array
     {
         $type = $input['type'];
         $ids = $this->ids($input);
@@ -82,11 +94,24 @@ class TrashRestoreTool implements AgentToolInterface, ConfirmsLargeActions
         }
 
         $found = $this->items->query($context, $type)->whereIn($this->column($type), $ids)->pluck($this->column($type))->map(fn ($id) => (int) $id)->all();
-        $missing = array_values(array_diff($ids, $found));
 
         if (!$found) {
             return ToolResult::error('Aucun de ces éléments n\'est dans la corbeille de ce projet (ou son prospect est lui-même supprimé).', ToolResult::NOT_FOUND);
         }
+
+        return [$found, array_values(array_diff($ids, $found))];
+    }
+
+    public function handle(AgentExecutionContext $context, array $input): ToolResult
+    {
+        $type = $input['type'];
+        $resolved = $this->resolve($context, $input);
+
+        if ($resolved instanceof ToolResult) {
+            return $resolved;
+        }
+
+        [$found, $missing] = $resolved;
 
         $response = $this->api->call($context, 'PUT', 'trash/bulk', ['action' => 'restore', TrashItems::TYPES[$type]['route'] => $found]);
 
