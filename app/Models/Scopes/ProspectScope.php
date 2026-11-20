@@ -13,12 +13,17 @@ class ProspectScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        $project = request()->route('project') ?? request()->input('project');
+        if (!$project instanceof \App\Models\Project) {
+            $project = null;
+        }
+
     	if (
             !auth()->user() || 
             auth()->user()->is_super_admin || 
             !getPermissionsTeamId() ||
             auth()->user()->is_project_admin ||
-            (request()->project && auth()->user()->can('prospectView', request()->project))
+            ($project && auth()->user()->can('prospectView', $project))
         ) {
             return;
     	}

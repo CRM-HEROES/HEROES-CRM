@@ -16,11 +16,13 @@ class Policy
         if ($user->is_super_admin) {
             return true;
         }
+
+        $project = request()->route('project') ?? request()->input('project');
         
         // The project creator
         // should have all permissions
         // inside the project
-        if (request()->project && request()->project->creator_id == $user->id) {
+        if ($project instanceof \App\Models\Project && $project->creator_id == $user->id) {
             return true;
         }
         

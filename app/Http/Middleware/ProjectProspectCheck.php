@@ -18,8 +18,8 @@ class ProjectProspectCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $project = $request->project;
-        $prospect = $request->prospect;
+        $project = $request->route('project');
+        $prospect = $request->route('prospect');
 
         if ($project && !is_object($project)) {
             $project = Project::where((new Project())->getRouteKeyName(), $project)->first();
@@ -31,7 +31,7 @@ class ProjectProspectCheck
             $request->route()->setParameter('prospect', $prospect);
         }
 
-        if ($request->project && $request->prospect) {
+        if ($project && $prospect) {
             // Check if prospect is
             // associated to the current project
             abort_unless(
@@ -55,7 +55,7 @@ class ProjectProspectCheck
             // ProspectScope of the prospects list, which
             // shows them all to a user having "prospectView"
             abort_unless(
-                /*auth()->user()->can("project.{$request->project->id}") || */
+                /*auth()->user()->can("project.{$project->id}") || */
                 !auth()->user() ||
                 auth()->user()->is_super_admin ||
                 auth()->user()->is_project_admin ||

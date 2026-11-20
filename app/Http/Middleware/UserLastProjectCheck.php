@@ -18,16 +18,17 @@ class UserLastProjectCheck
     public function handle(Request $request, Closure $next): Response
     {
         $user = auth()->user();
+        $project = $request->route('project');
 
         if ($user) {
-            if ($request->project && $request->project instanceof Project) {
-                if ($user->last_project_id != $request->project->id) {
+            if ($project instanceof Project) {
+                if ($user->last_project_id != $project->id) {
                     $user->update([
-                        'last_project_id' => $request->project->id
+                        'last_project_id' => $project->id
                     ]);
                     DB::table('user_project')->where([
                         'user_id' => $user->id,
-                        'project_id' => $request->project->id,
+                        'project_id' => $project->id,
                     ])->update([
                         'last_activity' => \Carbon\Carbon::now()
                     ]);

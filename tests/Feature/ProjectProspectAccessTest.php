@@ -169,6 +169,15 @@ class ProjectProspectAccessTest extends TestCase
             'project' => $project,
             'prospect' => $prospect,
         ]);
+        $route = new \Illuminate\Routing\Route(
+            ['GET'],
+            'api/project/{project}/prospect/{prospect}/sms',
+            fn () => null
+        );
+        $route->bind($request);
+        $route->setParameter('project', $project);
+        $route->setParameter('prospect', $prospect);
+        $request->setRouteResolver(fn () => $route);
         $this->app->instance('request', $request);
 
         return (new ProjectProspectCheck())->handle($request, fn () => new Response('ok'));

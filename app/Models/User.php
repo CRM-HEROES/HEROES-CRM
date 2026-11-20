@@ -127,7 +127,10 @@ class User extends Authenticatable // implements MustVerifyEmail
      */
     public function getIsProjectAdminAttribute()
     {
-        return request()->project && (request()->project->creator_id == $this->id || $this->can('', request()->project));
+        $project = request()->route('project') ?? request()->input('project');
+
+        return $project instanceof Project
+            && ($project->creator_id == $this->id || $this->can('', $project));
     }
 
 

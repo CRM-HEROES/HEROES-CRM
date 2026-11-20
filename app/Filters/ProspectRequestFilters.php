@@ -67,26 +67,27 @@ class ProspectRequestFilters extends ProspectFilters
      */
     public function __construct(Request $request)
     {
-        if ($request->project) {
+        $project = $request->route('project') ?? $request->input('project');
+        if ($project instanceof \App\Models\Project) {
             // Fields
-            foreach ($request->project->fields as $field) {
+            foreach ($project->fields as $field) {
                 $this->params[] = ($field->meta ? 'meta_' : 'field_') . $field->slug;
             }
             // With fields
-            foreach ($request->project->fields as $field) {
+            foreach ($project->fields as $field) {
                 $this->params[] = ($field->meta ? 'withMeta_' : 'withField_') . $field->slug;
             }
             // Without fields (values different from the search)
-            foreach ($request->project->fields as $field) {
+            foreach ($project->fields as $field) {
                 $this->params[] = ($field->meta ? 'withoutMeta_' : 'withoutField_') . $field->slug;
             }
             // Labels
-            foreach ($request->project->categories as $category) {
+            foreach ($project->categories as $category) {
                 $this->params[] = 'withCategory_' . $category->id;
                 $this->params[] = 'withoutCategory_' . $category->id;
             }
             // Threads
-            foreach ($request->project->threads as $thread) {
+            foreach ($project->threads as $thread) {
                 $this->params[] = 'thread_' . $thread->id;
             }
         }
@@ -112,7 +113,12 @@ class ProspectRequestFilters extends ProspectFilters
             return;
         }
 
-        $menu = $request->project->menus()->find($menu);
+        $project = $request->route('project') ?? $request->input('project');
+        if (!$project instanceof \App\Models\Project) {
+            return;
+        }
+
+        $menu = $project->menus()->find($menu);
         if (!$menu) {
             return;
         }

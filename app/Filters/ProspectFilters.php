@@ -23,7 +23,12 @@ class ProspectFilters extends Filters
      *
      */
     public function scopeUser(Builder $builder, $userId) {
-        $user = request()->project->users()->where('id', $userId)->first();
+        $project = request()->route('project') ?? request()->input('project');
+        if (!$project instanceof \App\Models\Project) {
+            return;
+        }
+
+        $user = $project->users()->where('id', $userId)->first();
 
         if (!$user) {
             return;
@@ -32,7 +37,7 @@ class ProspectFilters extends Filters
         // If user does not have
         // permission to view all prospects
         // in current project,
-        $builder->when($user->can('prospectView', request()->project), function($query) use($user) {
+        $builder->when($user->can('prospectView', $project), function($query) use($user) {
             $query->where(function($query) use($user) {
                 // Then show only:
                 // - prospects created by the user
@@ -915,11 +920,12 @@ class ProspectFilters extends Filters
      * Filter by search query
      */
     public function query(Builder $builder, $value) {
-        if (!request()->project) {
+        $project = request()->route('project') ?? request()->input('project');
+        if (!$project instanceof \App\Models\Project) {
             return;
         }
 
-        return $this->projectQuery($builder, $value, request()->project);
+        return $this->projectQuery($builder, $value, $project);
     }
 
     /**

@@ -15,9 +15,12 @@ class ProjectRoleCheck
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->project && $request->role) {
+        $project = $request->route('project');
+        $role = $request->route('role');
+
+        if ($project && $role) {
             abort_unless(
-                $request->project->roles()->find($request->role->id),
+                $project->roles()->find($role->id),
                 404, 
                 trans('project.error.unknown_role')
             );

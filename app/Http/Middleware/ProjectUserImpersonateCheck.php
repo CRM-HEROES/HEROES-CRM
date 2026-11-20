@@ -30,9 +30,10 @@ class ProjectUserImpersonateCheck
     	}
 
     	// if the impersonated project is the same as the current project
-    	if ($request->project && $request->project->slug == $project) {
-    		return $next($request);
-    	}
+        $routeProject = $request->route('project');
+        if ($routeProject && $routeProject->slug == $project) {
+            return $next($request);
+        }
 
         if (in_array($request->route()->getName(), [
             "api.auth", "api.event", "api.event.index", "api.user.impersonate.leave",

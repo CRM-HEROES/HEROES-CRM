@@ -13,6 +13,7 @@ use App\Services\ProspectHistory;
 use App\Utils\ProjectSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProspectController extends Controller
@@ -336,9 +337,21 @@ class ProspectController extends Controller
                     'project' => 'required',
                 ]);
 
-                abort_unless($project = Project::find($request->input('project')), 404);
+                $targetProject = Project::find($request->input('project'));
+                abort_unless($targetProject, 404);
 
-                $this->copyToProject($prospects->get(), $project, $request->input('mapping', []));
+                $selectedProspects = $prospects->get();
+                if ($selectedProspects->count() !== count($request->input('prospects'))) {
+                    Log::warning('Prospect bulk copy selection did not match the source project', [
+                        'source_project_id' => $project->id,
+                        'requested_prospect_ids' => $request->input('prospects'),
+                        'matched_prospect_ids' => $selectedProspects->pluck('id')->all(),
+                    ]);
+
+                    abort(422, 'Certains prospects sélectionnés sont introuvables dans le projet source.');
+                }
+
+                $this->copyToProject($selectedProspects, $targetProject, $request->input('mapping', []));
 
                 return ['message' => trans('common.success.updated_resource')];
             default:
@@ -517,14 +530,43 @@ class ProspectController extends Controller
         $date = new \Carbon\Carbon();
         $prospects_labels = [];
 
+        Log::info('Prospect bulk copy started', [
+            'source_project_id' => $prospects->first()?->project_id,
+            'target_project_id' => $project->id,
+            'prospect_ids' => $prospects->pluck('id')->all(),
+            'mapping' => $mapping,
+        ]);
+
         foreach ($prospects as $prospect) {
             // Replicate prospect
             // in the other project
             $p = $prospect->replicate();
             $p->project_id = $project->id;
+            $p->creator_id = auth()->id();
+            $p->deleted_at = null;
             $p->created_at = $date;
             $p->updated_at = $date;
-            $p->save();
+            try {
+                if (!$p->save()) {
+                    throw new \RuntimeException('Prospect copy save returned false.');
+                }
+            } catch (\Throwable $e) {
+                Log::error('Prospect bulk copy failed to save a prospect', [
+                    'source_project_id' => $prospect->project_id,
+                    'target_project_id' => $project->id,
+                    'source_prospect_id' => $prospect->id,
+                    'exception' => $e->getMessage(),
+                ]);
+
+                throw $e;
+            }
+
+            Log::info('Prospect copied to target project', [
+                'source_project_id' => $prospect->project_id,
+                'target_project_id' => $project->id,
+                'source_prospect_id' => $prospect->id,
+                'copied_prospect_id' => $p->id,
+            ]);
 
             // Copy prospect labels
             // from $categoryId to $mapId
@@ -532,6 +574,11 @@ class ProspectController extends Controller
                 // Check mapped category from the other project
                 $category = $categories->where('id', $mapId)->first();
                 if (!$category) {
+                    Log::warning('Prospect copy skipped an unmapped target category', [
+                        'target_project_id' => $project->id,
+                        'source_category_id' => $categoryId,
+                        'target_category_id' => $mapId,
+                    ]);
                     continue;
                 }
 
@@ -559,7 +606,15 @@ class ProspectController extends Controller
         }
 
         // Bulk attach prospects labels
-        DB::table("prospect_label")->insert($prospects_labels);
+        if ($prospects_labels) {
+            DB::table("prospect_label")->insert($prospects_labels);
+        }
+
+        Log::info('Prospect bulk copy completed', [
+            'target_project_id' => $project->id,
+            'copied_count' => $prospects->count(),
+            'copied_label_count' => count($prospects_labels),
+        ]);
     }
 
     /**

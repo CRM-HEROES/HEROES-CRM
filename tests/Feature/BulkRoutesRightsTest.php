@@ -6,6 +6,7 @@ use App\Http\Controllers\API\Project\Pipeline\LabelController as PipelineLabelCo
 use App\Http\Controllers\API\Project\Prospect\FileController as ProspectFileController;
 use App\Http\Controllers\API\Project\ProspectController;
 use App\Http\Controllers\API\Project\TrashController;
+use App\Http\Middleware\ProjectUserAccessCheck;
 use App\Models\Calendar;
 use App\Models\Category;
 use App\Models\Document;
@@ -23,9 +24,11 @@ use App\Models\Role;
 use App\Models\Thread;
 use App\Models\User;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Spatie\Permission\PermissionRegistrar;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -192,6 +195,83 @@ class BulkRoutesRightsTest extends TestCase
 
         DB::table('user_project')->insert(['user_id' => $this->u['creator'], 'project_id' => $this->otherPid]);
         $this->assertSame('through', $this->outcome('creator', $copy));
+    }
+
+    public function test_a_copied_prospect_is_visible_to_the_user_who_copied_it(): void
+    {
+        $this->give('bob', ['all.prospect.view']);
+        DB::table('user_project')->insert(['user_id' => $this->u['bob'], 'project_id' => $this->otherPid]);
+
+        Schema::create('prospects', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id');
+            $table->unsignedBigInteger('creator_id')->nullable();
+            $table->string('email')->nullable();
+            $table->timestamp('deleted_at')->nullable();
+            $table->timestamps();
+        });
+        Schema::create('prospect_user', function (Blueprint $table) {
+            $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('user_id');
+        });
+        Schema::create('groups', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('project_id');
+        });
+        Schema::create('user_group', function (Blueprint $table) {
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('group_id');
+        });
+        Schema::create('prospect_group', function (Blueprint $table) {
+            $table->unsignedBigInteger('prospect_id');
+            $table->unsignedBigInteger('group_id');
+        });
+        DB::table('prospects')->insert([
+            'id' => 1,
+            'project_id' => $this->pid,
+            'creator_id' => $this->u['creator'],
+            'email' => 'prospect@example.test',
+        ]);
+        $source = Project::withoutGlobalScopes()->findOrFail($this->pid);
+        $target = Project::withoutGlobalScopes()->findOrFail($this->otherPid);
+        auth()->setUser(User::findOrFail($this->u['bob']));
+        $bulkRequest = Request::create('/api/project/alpha/prospect/bulk', 'PUT', [
+            'prospects' => [999],
+            'action' => 'project',
+            'project' => $this->otherPid,
+        ]);
+        $route = new \Illuminate\Routing\Route('PUT', 'api/project/{project}/prospect/bulk', []);
+        $route->bind($bulkRequest);
+        $route->setParameter('project', $source);
+        $bulkRequest->setRouteResolver(fn () => $route);
+        $this->app->instance('request', $bulkRequest);
+        setPermissionsTeamId(null);
+
+        (new ProjectUserAccessCheck())->handle($bulkRequest, fn () => response()->noContent());
+        $this->assertSame($this->pid, getPermissionsTeamId());
+        $this->assertSame($this->otherPid, $bulkRequest->project);
+        $this->assertSame($source, $bulkRequest->route('project'));
+        $this->assertTrue(Prospect::whereKey(1)->exists());
+
+        try {
+            (new ProspectController())->bulk($bulkRequest, $source);
+            $this->fail('A prospect outside the source project must not be reported as copied.');
+        } catch (HttpException $e) {
+            $this->assertSame(422, $e->getStatusCode());
+        }
+
+        $bulkRequest->merge(['prospects' => [1]]);
+        Prospect::withoutEvents(function () use ($bulkRequest, $source) {
+            (new ProspectController())->bulk($bulkRequest, $source);
+        });
+
+        setPermissionsTeamId($this->otherPid);
+
+        $copy = $target->prospects()->where('email', 'prospect@example.test')->first();
+
+        $this->assertNotNull($copy);
+        $this->assertSame($this->u['bob'], $copy->creator_id);
+        $this->assertNull($copy->deleted_at);
     }
 
     public function test_the_trash_asks_the_right_to_delete_each_kind_of_item(): void
