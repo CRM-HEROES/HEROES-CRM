@@ -8,6 +8,7 @@
         <prospect-table-footer />
         <add-column-slide />
         <ocr-modal />
+        <screen-ruler />
     </div>
 </template>
 
@@ -34,6 +35,7 @@ import ProspectTableFooter from "./CardMenus.vue";
 import ProspectTable from "./Table.vue";
 import AddColumnSlide from "./slides/add-column/Slide.vue";
 import OcrModal from "@/components/ocr/Modal.vue";
+import ScreenRuler from "./Ruler.vue";
 
 export default {
     components: {
@@ -42,6 +44,7 @@ export default {
         ProspectTable,
         AddColumnSlide,
         OcrModal,
+        ScreenRuler,
     },
 };
 </script>
