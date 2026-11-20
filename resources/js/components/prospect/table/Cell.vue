@@ -32,7 +32,6 @@
             v-else-if="category == 'category'"
             :prospect="prospect"
             :items="categoryLabels(column.id)"
-            :category-id="column.id"
             @click="manageLabels"
         />
         <thread-cell

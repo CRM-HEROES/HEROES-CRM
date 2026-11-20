@@ -1,9 +1,6 @@
 import ProspectLabelService from "@/apis/project/prospect/label";
 import ProspectRevisionService from "@/apis/project/prospect/revision";
-import {
-    FETCH_PROSPECT_REVISIONS,
-    SET_PROSPECT_REVISION_LOADING,
-} from "@/actions/project/prospect/revision";
+import { FETCH_PROSPECT_REVISIONS } from "@/actions/project/prospect/revision";
 
 import {
     FETCH_PROSPECT_LABELS,
@@ -51,42 +48,34 @@ export const actions = {
     async [ADD_PROSPECT_LABEL](context, label) {
         const project = context.state.project.slug;
         const prospect = context.state.project.prospect.id;
-        context.commit(SET_PROSPECT_REVISION_LOADING, {
-            project,
-            prospect,
-            categoryId: label.category_id,
-            loading: true,
-        });
+        const previousLabels = [
+            ...(context.state.project.prospect.labels || []),
+        ];
+        const alreadyAttached = previousLabels.find(
+            (item) => item.id == label.id
+        );
+        const userId = context.rootState.auth?.user?.id;
+        const optimisticLabel = alreadyAttached || {
+            ...label,
+            pivot: {
+                ...(label.pivot || {}),
+                created_at: new Date().toISOString(),
+                creator_id: userId ?? label.pivot?.creator_id ?? null,
+            },
+        };
+
+        context.commit(ADD_PROSPECT_LABEL, optimisticLabel);
 
         try {
-            let response;
-            try {
-                response = await ProspectLabelService.update(
-                    project,
-                    prospect,
-                    label.id
-                );
-            } catch (error) {
-                flashLabelAssignmentError(error);
-                throw error;
-            }
-
-            const attached =
-                (response && response.data && response.data.label) || label;
-            await refreshLabelHistory(
-                context,
+            await ProspectLabelService.update(project, prospect, label.id);
+        } catch (error) {
+            context.commit(SET_PROSPECT_LABELS, {
                 project,
                 prospect,
-                ADD_PROSPECT_LABEL,
-                attached
-            );
-        } finally {
-            context.commit(SET_PROSPECT_REVISION_LOADING, {
-                project,
-                prospect,
-                categoryId: label.category_id,
-                loading: false,
+                labels: previousLabels,
             });
+            flashLabelAssignmentError(error);
+            throw error;
         }
     },
 
@@ -100,40 +89,21 @@ export const actions = {
     async [REMOVE_PROSPECT_LABEL](context, label) {
         const project = context.state.project.slug;
         const prospect = context.state.project.prospect.id;
-        context.commit(SET_PROSPECT_REVISION_LOADING, {
-            project,
-            prospect,
-            categoryId: label.category_id,
-            loading: true,
-        });
 
         try {
-            try {
-                await ProspectLabelService.destroy(
-                    project,
-                    prospect,
-                    label.id
-                );
-            } catch (error) {
-                flashLabelAssignmentError(error);
-                throw error;
-            }
-
-            await refreshLabelHistory(
-                context,
-                project,
-                prospect,
-                REMOVE_PROSPECT_LABEL,
-                label
-            );
-        } finally {
-            context.commit(SET_PROSPECT_REVISION_LOADING, {
-                project,
-                prospect,
-                categoryId: label.category_id,
-                loading: false,
-            });
+            await ProspectLabelService.destroy(project, prospect, label.id);
+        } catch (error) {
+            flashLabelAssignmentError(error);
+            throw error;
         }
+
+        await refreshLabelHistory(
+            context,
+            project,
+            prospect,
+            REMOVE_PROSPECT_LABEL,
+            label
+        );
     },
 
     /**
@@ -174,48 +144,23 @@ export const actions = {
 async function updateBulkLabels(context, prospects, labels, update) {
     const project = context.state.project.slug;
     const prospectIds = [...new Set(prospects)];
-    const categoryIds = getLabelCategoryIds(context, labels);
-
-    prospectIds.forEach((prospect) => {
-        categoryIds.forEach((categoryId) => {
-            context.commit(SET_PROSPECT_REVISION_LOADING, {
-                project,
-                prospect,
-                categoryId,
-                loading: true,
-            });
-        });
-    });
 
     try {
-        try {
-            await update(project);
-        } catch (error) {
-            flashLabelAssignmentError(error);
-            throw error;
-        }
-
-        await Promise.all(
-            prospectIds.map(async (prospect) => {
-                try {
-                    await ProspectRevisionService.get(project, prospect);
-                } catch {
-                    // Refreshing the history does not undo a successful label change.
-                }
-            })
-        );
-    } finally {
-        prospectIds.forEach((prospect) => {
-            categoryIds.forEach((categoryId) => {
-                context.commit(SET_PROSPECT_REVISION_LOADING, {
-                    project,
-                    prospect,
-                    categoryId,
-                    loading: false,
-                });
-            });
-        });
+        await update(project);
+    } catch (error) {
+        flashLabelAssignmentError(error);
+        throw error;
     }
+
+    await Promise.all(
+        prospectIds.map(async (prospect) => {
+            try {
+                await ProspectRevisionService.get(project, prospect);
+            } catch {
+                // Refreshing the history does not undo a successful label change.
+            }
+        })
+    );
 }
 
 function flashLabelAssignmentError(error) {
@@ -233,25 +178,6 @@ function flashLabelAssignmentError(error) {
             "Impossible d'affecter les étiquettes au prospect.",
         duration: 7000,
     });
-}
-
-function getLabelCategoryIds(context, labels) {
-    const labelIds = new Set(labels.map(String));
-    const matchedLabelIds = new Set();
-    const categoryIds = new Set();
-
-    (context.state.project.categories || []).forEach((category) => {
-        (category.labels || []).forEach((label) => {
-            if (labelIds.has(String(label.id))) {
-                matchedLabelIds.add(String(label.id));
-                categoryIds.add(category.id);
-            }
-        });
-    });
-
-    return matchedLabelIds.size === labelIds.size && categoryIds.size
-        ? [...categoryIds]
-        : ["*"];
 }
 
 async function refreshLabelHistory(context, project, prospect, mutation, label) {
@@ -278,8 +204,25 @@ export const mutations = {
      * @param {*} state
      * @returns
      */
-    [SET_PROSPECT_LABELS](state, labels) {
-        state.project.prospect.labels = labels;
+    [SET_PROSPECT_LABELS](state, payload) {
+        const isLegacyPayload = Array.isArray(payload);
+        const project = isLegacyPayload ? state.project.slug : payload.project;
+        const prospectId = isLegacyPayload
+            ? state.project.prospect.id
+            : payload.prospect;
+        const labels = isLegacyPayload ? payload : payload.labels;
+
+        if (state.project.slug !== project) return;
+        if (state.project.prospect.id == prospectId) {
+            state.project.prospect.labels = labels;
+        }
+
+        const index = state.project.prospects.findIndex(
+            (prospect) => prospect.id == prospectId
+        );
+        if (index >= 0) {
+            state.project.prospects[index].labels = labels;
+        }
     },
 
     /**
