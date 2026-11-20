@@ -8,20 +8,6 @@
     $branded = $d['style'] === 'branded';
     $title = $d['category'] !== '' ? $d['category'] : null;
 @endphp
-@if ($d['style'] === 'raw')
-{{-- A template that is a whole email of its own (a mailing plan): nothing is added around it --}}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $subject }}</title>
-</head>
-<body style="margin:0; padding:0;">
-{!! $body !!}
-</body>
-</html>
-@else
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -136,4 +122,3 @@
 </body>
 @endif
 </html>
-@endif

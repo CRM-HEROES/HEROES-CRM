@@ -16,21 +16,6 @@ class EmailHtml
 {
     protected const FORBIDDEN_TAGS = ['script', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'link', 'meta', 'base', 'style', 'applet', 'frame', 'frameset'];
 
-    /**
-     * The title and the body of an email that is a whole HTML document (a
-     * template made elsewhere): the part to send, and its title. A text that
-     * is not a document is its own body.
-     *
-     * @return array{title: ?string, body: string}
-     */
-    public static function parts(string $html): array
-    {
-        $title = preg_match('/<title[^>]*>(.*?)<\/title>/is', $html, $match) ? trim(html_entity_decode(strip_tags($match[1]))) : null;
-        $body = preg_match('/<body[^>]*>(.*)<\/body>/is', $html, $match) ? $match[1] : $html;
-
-        return ['title' => $title ?: null, 'body' => trim($body)];
-    }
-
     public static function clean(string $html): string
     {
         if (trim($html) === '') {

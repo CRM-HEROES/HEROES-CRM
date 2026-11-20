@@ -4,7 +4,6 @@ namespace App\Workflows;
 
 use App\Models\Prospect;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\URL;
 
 /**
  * Variables of the messages: "Bonjour {{prospect.firstname}}".
@@ -15,8 +14,7 @@ use Illuminate\Support\Facades\URL;
  * being sent. A known variable without value gives an empty text.
  *
  *   prospect  firstname lastname fullname email phone mobile company city postal_code country
- *             age plus_50 ("oui" from 50 years old, else "non") unsubscribe_url (the personal link
- *             that stops the mailings)
+ *             age plus_50 ("oui" from 50 years old, else "non")
  *   user      firstname lastname fullname email     the first user assigned to the prospect
  *   project   name
  *   field     {{field.date_rdv}}: a custom field of the prospect (what the project added to its
@@ -44,7 +42,7 @@ class VariableResolver
     protected const TAG = '/\{%\s*(if\s+([a-z_]+)\.([a-z0-9_]+)(?:\s*(==|!=)\s*"([^"]*)")?|else|endif)\s*%\}/i';
 
     public const VARIABLES = [
-        'prospect' => ['firstname', 'lastname', 'fullname', 'email', 'phone', 'mobile', 'company', 'city', 'postal_code', 'country', 'age', 'plus_50', 'unsubscribe_url'],
+        'prospect' => ['firstname', 'lastname', 'fullname', 'email', 'phone', 'mobile', 'company', 'city', 'postal_code', 'country', 'age', 'plus_50'],
         'user' => ['firstname', 'lastname', 'fullname', 'email'],
         'project' => ['name'],
     ];
@@ -254,10 +252,6 @@ class VariableResolver
                     $age = $this->age();
 
                     return $age !== null && $age >= 50 ? 'oui' : 'non';
-                }
-
-                if ($name === 'unsubscribe_url') {
-                    return URL::signedRoute('mailing.unsubscribe', ['prospect' => $this->prospect->id]);
                 }
 
                 $column = self::PROSPECT_COLUMNS[$name] ?? null;

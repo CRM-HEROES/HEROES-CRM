@@ -3,8 +3,6 @@
 namespace App\Workflows\Actions;
 
 use App\Models\WorkflowExecution;
-use App\Models\Prospect;
-use App\Workflows\Mailing\MailingRules;
 use App\Workflows\Providers\ProviderRegistry;
 use App\Workflows\VariableResolver;
 use Illuminate\Database\Eloquent\Model;
@@ -32,16 +30,6 @@ use Illuminate\Support\Facades\DB;
  * "cc_users" / "cc_groups": the users, and the members of the groups, who get
  * a copy. Their addresses are looked up when the email is sent, so a user who
  * joined the group since is included and one who left the project is not.
- *
- * "template": the id (or the code) of a template of the project's library (see the
- * mailing plans): its subject and its body are used, and it is sent as it is
- * (it is a whole email). The rules of the project apply (see MailingRules): a
- * template that is switched off is never sent, and a marketing one waits for
- * tomorrow when one email already left today.
- *
- * "if_busy": what to do of a marketing email when the day already has one (or a reply waits for
- * a person): "wait" (default) sends it tomorrow, "skip" drops it - a newsletter that is a day late
- * is not worth sending.
  *
  * "design": the look of the email, chosen in the builder (see EmailDesign). Without
  * it the email keeps the CRM's usual look.
@@ -78,11 +66,7 @@ class SendEmailAction extends CommunicationAction
     {
         $errors = [];
 
-        if (!empty($config['template'])) {
-            if ($projectId !== null && !$this->template($config, $projectId)) {
-                $errors[] = "Le modèle d'email de l'action \"$label\" n'existe plus dans ce projet.";
-            }
-        } elseif (trim(strip_tags((string) ($config['body'] ?? ''), '<img>')) === '') {
+        if (trim(strip_tags((string) ($config['body'] ?? ''), '<img>')) === '') {
             $errors[] = "L'action \"$label\" ({$this->actionName()}) n'a pas de contenu.";
         }
 
@@ -91,10 +75,6 @@ class SendEmailAction extends CommunicationAction
         }
 
         $errors = array_merge($errors, EmailDesign::problems($config['design'] ?? null, $label));
-
-        if (!in_array($config['if_busy'] ?? 'wait', ['wait', 'skip'], true)) {
-            $errors[] = "L'action \"$label\" : « si la journée a déjà un email » est invalide.";
-        }
 
         foreach (['cc_users' => 'utilisateur', 'cc_groups' => 'groupe'] as $key => $noun) {
             $ids = $config[$key] ?? [];
@@ -153,28 +133,6 @@ class SendEmailAction extends CommunicationAction
         return $errors;
     }
 
-    /**
-     * Rate limit of the operator, then the rules of the project for a marketing email
-     */
-    public function delay(WorkflowExecution $execution, array $config): ?\Carbon\CarbonInterface
-    {
-        $until = parent::delay($execution, $config);
-
-        if ($until || empty($config['template']) || $execution->subject_type !== 'prospect' || ($config['if_busy'] ?? 'wait') === 'skip') {
-            return $until;
-        }
-
-        $template = $this->template($config, $execution->project_id);
-
-        if (!$template || !$template->marketing || $template->disabled) {
-            return null;
-        }
-
-        $prospect = Prospect::withoutGlobalScopes()->find($execution->subject_id);
-
-        return $prospect ? app(MailingRules::class)->postponedUntil($prospect) : null;
-    }
-
     public function handle(Model $subject, array $config, WorkflowExecution $execution): array
     {
         $provider = $this->provider($execution, $config);
@@ -190,25 +148,6 @@ class SendEmailAction extends CommunicationAction
 
         if (!$thread || $thread->private) {
             throw new \RuntimeException("Aucun canal de discussion public pour envoyer l'email (à créer dans les paramètres des messages).");
-        }
-
-        $template = !empty($config['template']) ? $this->template($config, $execution->project_id) : null;
-
-        if (!empty($config['template']) && !$template) {
-            throw new \RuntimeException("Le modèle d'email n'existe plus dans ce projet.");
-        }
-
-        // What must not be sent is not: the step is done, and says why
-        if ($reason = $this->notToBeSent($prospect, $template, $config)) {
-            return ['provider' => $provider['ref'], 'skipped' => $reason];
-        }
-
-        if ($template) {
-            $parts = EmailHtml::parts((string) $template->body);
-            $config['body'] = $parts['body'];
-            $config['subject'] = $config['subject'] ?? null ?: ($template->subject ?: $parts['title']);
-            // A whole email of its own: sent as it is
-            $config['design'] = ['style' => EmailDesign::RAW];
         }
 
         $variables = new VariableResolver($prospect);
@@ -242,56 +181,6 @@ class SendEmailAction extends CommunicationAction
             'thread_id' => $thread->id,
             'cc' => count($copies),
         ];
-    }
-
-    /**
-     * A template of the project's library, by id or by code
-     */
-    protected function template(array $config, int $projectId): ?object
-    {
-        $ref = $config['template'] ?? null;
-
-        if (!$ref) {
-            return null;
-        }
-
-        return DB::table('message_templates')
-            ->where('project_id', $projectId)
-            ->whereNull('deleted_at')
-            ->where(is_numeric($ref) ? 'id' : 'code', $ref)
-            ->first(['id', 'code', 'name', 'subject', 'body', 'marketing', 'disabled']);
-    }
-
-    /**
-     * The reason why this email must not leave (see MailingRules), or null
-     */
-    protected function notToBeSent(Prospect $prospect, ?object $template, array $config = []): ?string
-    {
-        if ($template && $template->disabled) {
-            return MailingRules::DISABLED;
-        }
-
-        // The confirmation of a deletion is the one email that leaves after the request
-        if ($template && in_array($template->code, MailingRules::ALWAYS_SENT, true)) {
-            return null;
-        }
-
-        $rules = app(MailingRules::class);
-
-        if ($reason = $rules->never($prospect)) {
-            return $reason;
-        }
-
-        if ($template && $template->marketing && $rules->quiet($prospect)) {
-            return MailingRules::QUIET_WINDOW;
-        }
-
-        // Dropped, not postponed (the engine postpones the others before they reach this point)
-        if ($template && $template->marketing && ($config['if_busy'] ?? 'wait') === 'skip' && $rules->postponedUntil($prospect)) {
-            return MailingRules::BUSY;
-        }
-
-        return null;
     }
 
     /**
