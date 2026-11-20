@@ -13,7 +13,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _FieldInput_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./FieldInput.vue */ "./resources/js/components/workflow/FieldInput.vue");
 /* harmony import */ var _HelpTip_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./HelpTip.vue */ "./resources/js/components/workflow/HelpTip.vue");
-/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
+/* harmony import */ var _actions_project_field__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @/actions/project/field */ "./resources/js/actions/project/field.js");
+/* harmony import */ var _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/utils/workflow-conditions */ "./resources/js/utils/workflow-conditions.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -26,6 +29,9 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
+
+
 
 
 
@@ -60,14 +66,26 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     }
   },
   emits: ["update:modelValue", "remove"],
-  computed: {
+  created: function created() {
+    // The custom fields of the project are not loaded for this page
+    if (this.subject === "prospect" && !this.fields.length) {
+      _store__WEBPACK_IMPORTED_MODULE_2__["default"].dispatch(_actions_project_field__WEBPACK_IMPORTED_MODULE_3__.FETCH_FIELDS)["catch"](function () {});
+    }
+  },
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_5__.mapGetters)(["fields"])), {}, {
+    choices: function choices() {
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.fieldChoices)(this.fields);
+    },
+    tests: function tests() {
+      return _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.FIELD_TESTS;
+    },
     items: function items() {
       return this.modelValue.items || [];
     },
     filters: function filters() {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.filtersFor)(this.catalog, this.subject);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.filtersFor)(this.catalog, this.subject);
     }
-  },
+  }),
   methods: {
     update: function update(patch) {
       this.$emit("update:modelValue", _objectSpread(_objectSpread({}, this.modelValue), {}, {
@@ -96,6 +114,25 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
     filterName: function filterName(item) {
       return Object.keys(item.filters || {})[0];
     },
+    testOf: _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.fieldTest,
+    valueOf: _utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.fieldValue,
+    fieldName: function fieldName(choice) {
+      return choice.computed ? this.$t("workflow.condition.field_plus_50") : choice.name;
+    },
+    /**
+     * The item for a field, keeping the test and the value when only the field changes
+     */
+    fieldItem: function fieldItem(slug, previous, test, value) {
+      var current = previous || {};
+      var nextTest = test || (previous ? (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.fieldTest)(current) : "is");
+      var nextValue = value !== undefined ? value : previous ? (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.fieldValue)(current) : "";
+
+      // The computed field is a yes / no question
+      if (slug === "plus_50") {
+        return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.newFieldItem)(slug, ["is", "is_not"].includes(nextTest) ? nextTest : "is", ["oui", "non"].includes(nextValue) ? nextValue : "oui");
+      }
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.newFieldItem)(slug, nextTest, nextValue);
+    },
     known: function known(name) {
       return this.filters.some(function (filter) {
         return filter.name === name;
@@ -108,10 +145,10 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       }) || {}).type;
     },
     newFilter: function newFilter(name) {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.newFilterItem)(this.catalog, this.subject, name);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.newFilterItem)(this.catalog, this.subject, name);
     },
     newCheck: function newCheck(name) {
-      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_2__.newCheckItem)(name);
+      return (0,_utils_workflow_conditions__WEBPACK_IMPORTED_MODULE_4__.newCheckItem)(name);
     },
     checkFields: function checkFields(name) {
       return (this.catalog.conditions.checks.find(function (check) {
@@ -541,6 +578,11 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         lines.push("".concat(this.$t("workflow.monitor.message"), " #").concat(result.message_id));
       }
 
+      // What the rules of the project kept from leaving
+      if (result.skipped) {
+        lines.push(this.$t("workflow.monitor.skipped_reason." + result.skipped));
+      }
+
       // Written by the step, sent right after: say whether it left
       if (step.delivery) {
         lines.push(step.delivery.sent ? this.$t("workflow.monitor.delivery.sent") : step.delivery.error ? this.$t("workflow.monitor.delivery.failed", {
@@ -573,7 +615,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm-bundler.js");
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/store */ "./resources/js/store/index.js");
 /* harmony import */ var _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/apis/project/workflow */ "./resources/js/apis/project/workflow.js");
 /* harmony import */ var _EmailEditor_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./EmailEditor.vue */ "./resources/js/components/workflow/EmailEditor.vue");
@@ -582,7 +624,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_project_group__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @/actions/project/group */ "./resources/js/actions/project/group.js");
 /* harmony import */ var _actions_project_thread__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @/actions/project/thread */ "./resources/js/actions/project/thread.js");
 /* harmony import */ var _actions_modal__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @/actions/modal */ "./resources/js/actions/modal.js");
-/* harmony import */ var _actions_project_category__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/category */ "./resources/js/actions/project/category.js");
+/* harmony import */ var _actions_project_message_template__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @/actions/project/message-template */ "./resources/js/actions/project/message-template.js");
+/* harmony import */ var _actions_project_category__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @/actions/project/category */ "./resources/js/actions/project/category.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -602,6 +645,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -659,6 +703,7 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
   data: function data() {
     return {
       providers: [],
+      templateFilter: "",
       providersLoading: false,
       // The operator being configured in its window: chosen when it is done
       pendingProvider: null,
@@ -670,9 +715,24 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       allDays: ALL_DAYS
     };
   },
-  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_9__.mapGetters)(["project", "users", "groups", "threads", "categories", "can", "modals"])), {}, {
+  computed: _objectSpread(_objectSpread({}, (0,vuex__WEBPACK_IMPORTED_MODULE_10__.mapGetters)(["project", "users", "groups", "threads", "categories", "can", "modals", "messageTemplates"])), {}, {
     isSingle: function isSingle() {
       return ["user", "group", "label", "thread"].includes(this.type);
+    },
+    templates: function templates() {
+      return this.messageTemplates || [];
+    },
+    shownTemplates: function shownTemplates() {
+      var keyword = this.templateFilter.trim().toLowerCase();
+      return keyword ? this.templates.filter(function (t) {
+        return "".concat(t.code || "", " ").concat(t.name || "").toLowerCase().includes(keyword);
+      }) : this.templates;
+    },
+    chosenTemplate: function chosenTemplate() {
+      var _this = this;
+      return this.modelValue ? this.templates.find(function (t) {
+        return _this.templateRef(t) === String(_this.modelValue);
+      }) : null;
     },
     canAddThread: function canAddThread() {
       return this.can("all.project.thread.add");
@@ -693,6 +753,12 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
      */
     unconfiguredChosen: function unconfiguredChosen() {
       return !!this.pendingProvider;
+    },
+    /**
+     * What the days are when nothing was chosen: every day (a wait), or none (a schedule that uses the days of the month)
+     */
+    defaultDays: function defaultDays() {
+      return this.field && this.field.empty === "none" ? [] : ALL_DAYS;
     },
     isLabels: function isLabels() {
       return this.type === "label" || this.type === "labels";
@@ -783,18 +849,18 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
     }
   },
   created: function created() {
-    var _this = this;
+    var _this2 = this;
     return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee() {
       return _regeneratorRuntime().wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
-            if (_this.type === "provider") {
-              _this.loadProviders();
+            if (_this2.type === "provider") {
+              _this2.loadProviders();
             }
 
             // The lists of the project are not loaded for this page: load what is needed
             _context.next = 3;
-            return _this.refresh();
+            return _this2.refresh();
           case 3:
           case "end":
             return _context.stop();
@@ -804,17 +870,17 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
   },
   methods: {
     refresh: function refresh() {
-      var _this2 = this;
+      var _this3 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee2() {
         return _regeneratorRuntime().wrap(function _callee2$(_context2) {
           while (1) switch (_context2.prev = _context2.next) {
             case 0:
-              _this2.labelsLoaded = false;
+              _this3.labelsLoaded = false;
               _context2.next = 3;
-              return _this2.ensureLoaded();
+              return _this3.ensureLoaded();
             case 3:
-              if (_this2.isLabels) {
-                _this2.loadLabels();
+              if (_this3.isLabels) {
+                _this3.loadLabels();
               }
             case 4:
             case "end":
@@ -824,68 +890,69 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       }))();
     },
     ensureLoaded: function ensureLoaded() {
-      var _this3 = this;
+      var _this4 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee3() {
         var needs;
         return _regeneratorRuntime().wrap(function _callee3$(_context3) {
           while (1) switch (_context3.prev = _context3.next) {
             case 0:
               needs = [];
-              if (["user", "users"].includes(_this3.type) && !_this3.users.length) needs.push(_actions_project_user__WEBPACK_IMPORTED_MODULE_4__.FETCH_USERS);
-              if (["group", "groups"].includes(_this3.type) && !_this3.groups.length) needs.push(_actions_project_group__WEBPACK_IMPORTED_MODULE_5__.FETCH_GROUPS);
-              if (_this3.type === "thread" && !_this3.threads.length) needs.push(_actions_project_thread__WEBPACK_IMPORTED_MODULE_6__.FETCH_THREADS);
-              if (["label", "labels"].includes(_this3.type) && !_this3.categories.length) needs.push(_actions_project_category__WEBPACK_IMPORTED_MODULE_8__.FETCH_CATEGORIES);
+              if (["user", "users"].includes(_this4.type) && !_this4.users.length) needs.push(_actions_project_user__WEBPACK_IMPORTED_MODULE_4__.FETCH_USERS);
+              if (["group", "groups"].includes(_this4.type) && !_this4.groups.length) needs.push(_actions_project_group__WEBPACK_IMPORTED_MODULE_5__.FETCH_GROUPS);
+              if (_this4.type === "thread" && !_this4.threads.length) needs.push(_actions_project_thread__WEBPACK_IMPORTED_MODULE_6__.FETCH_THREADS);
+              if (_this4.type === "template" && !_this4.templates.length) needs.push(_actions_project_message_template__WEBPACK_IMPORTED_MODULE_8__.FETCH_MESSAGE_TEMPLATES);
+              if (["label", "labels"].includes(_this4.type) && !_this4.categories.length) needs.push(_actions_project_category__WEBPACK_IMPORTED_MODULE_9__.FETCH_CATEGORIES);
               if (needs.length) {
-                _context3.next = 7;
+                _context3.next = 8;
                 break;
               }
               return _context3.abrupt("return");
-            case 7:
-              _this3.loadingLists = true;
-              _context3.prev = 8;
-              _context3.next = 11;
+            case 8:
+              _this4.loadingLists = true;
+              _context3.prev = 9;
+              _context3.next = 12;
               return Promise.all(needs.map(function (action) {
                 return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(action);
               }));
-            case 11:
-              _context3.next = 16;
+            case 12:
+              _context3.next = 17;
               break;
-            case 13:
-              _context3.prev = 13;
-              _context3.t0 = _context3["catch"](8);
+            case 14:
+              _context3.prev = 14;
+              _context3.t0 = _context3["catch"](9);
               flashError({
-                title: _this3.$t("workflow.title"),
-                body: _this3.$t("workflow.error.load")
+                title: _this4.$t("workflow.title"),
+                body: _this4.$t("workflow.error.load")
               });
-            case 16:
-              _context3.prev = 16;
-              _this3.loadingLists = false;
-              return _context3.finish(16);
-            case 19:
+            case 17:
+              _context3.prev = 17;
+              _this4.loadingLists = false;
+              return _context3.finish(17);
+            case 20:
             case "end":
               return _context3.stop();
           }
-        }, _callee3, null, [[8, 13, 16, 19]]);
+        }, _callee3, null, [[9, 14, 17, 20]]);
       }))();
     },
     /**
      * A public channel made on the spot, and chosen
      */
     createThread: function createThread() {
-      var _this4 = this;
+      var _this5 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee4() {
         var name, thread;
         return _regeneratorRuntime().wrap(function _callee4$(_context4) {
           while (1) switch (_context4.prev = _context4.next) {
             case 0:
-              name = _this4.newThreadName.trim();
-              if (!(!name || _this4.creatingThread)) {
+              name = _this5.newThreadName.trim();
+              if (!(!name || _this5.creatingThread)) {
                 _context4.next = 3;
                 break;
               }
               return _context4.abrupt("return");
             case 3:
-              _this4.creatingThread = true;
+              _this5.creatingThread = true;
               _context4.prev = 4;
               _context4.next = 7;
               return _store__WEBPACK_IMPORTED_MODULE_0__["default"].dispatch(_actions_project_thread__WEBPACK_IMPORTED_MODULE_6__.ADD_THREAD, {
@@ -894,10 +961,10 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
               });
             case 7:
               thread = _context4.sent;
-              _this4.$emit("update:modelValue", thread.id);
+              _this5.$emit("update:modelValue", thread.id);
               flash({
-                title: _this4.$t("workflow.title"),
-                body: _this4.$t("workflow.thread_create.done", {
+                title: _this5.$t("workflow.title"),
+                body: _this5.$t("workflow.thread_create.done", {
                   name: name
                 })
               });
@@ -907,12 +974,12 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
               _context4.prev = 12;
               _context4.t0 = _context4["catch"](4);
               flashError({
-                title: _this4.$t("workflow.title"),
-                body: _this4.$t("workflow.thread_create.error")
+                title: _this5.$t("workflow.title"),
+                body: _this5.$t("workflow.thread_create.error")
               });
             case 15:
               _context4.prev = 15;
-              _this4.creatingThread = false;
+              _this5.creatingThread = false;
               return _context4.finish(15);
             case 18:
             case "end":
@@ -929,8 +996,18 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       ids.has(id) ? ids["delete"](id) : ids.add(id);
       this.$emit("update:modelValue", _toConsumableArray(ids));
     },
+    /**
+     * "8, 22" -> [8, 22]: whole numbers, once each, in order
+     */
+    parseNumbers: function parseNumbers(text) {
+      return _toConsumableArray(new Set(String(text).split(/[^0-9]+/).filter(Boolean).map(Number).filter(function (n) {
+        return n >= 1 && n <= 31;
+      }))).sort(function (a, b) {
+        return a - b;
+      });
+    },
     toggleDay: function toggleDay(day) {
-      var days = new Set(this.modelValue || ALL_DAYS);
+      var days = new Set(this.modelValue || this.defaultDays);
       days.has(day) ? days["delete"](day) : days.add(day);
       this.$emit("update:modelValue", _toConsumableArray(days).sort());
     },
@@ -949,6 +1026,13 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       }
       this.$emit("update:modelValue", ref || null);
       this.$emit("provider-label", (provider === null || provider === void 0 ? void 0 : provider.label) || null);
+    },
+    // A template is found by its code (the same in every project that has the plan), else by its number
+    templateRef: function templateRef(template) {
+      return String(template.code || template.id);
+    },
+    templateLabel: function templateLabel(template) {
+      return template.disabled ? "".concat(template.name, " (").concat(this.$t("workflow.template_field.off"), ")") : template.name;
     },
     providerLabel: function providerLabel(provider) {
       return provider.configured === false ? "".concat(provider.label, " (").concat(this.$t("workflow.provider_setup.to_configure"), ")") : provider.label;
@@ -977,32 +1061,32 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
      * Back from the window: the operator is chosen if it is configured now
      */
     afterSetup: function afterSetup() {
-      var _this5 = this;
+      var _this6 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee5() {
         var pending, provider;
         return _regeneratorRuntime().wrap(function _callee5$(_context5) {
           while (1) switch (_context5.prev = _context5.next) {
             case 0:
-              pending = _this5.pendingProvider;
-              _this5.pendingProvider = null;
+              pending = _this6.pendingProvider;
+              _this6.pendingProvider = null;
               _context5.next = 4;
-              return _this5.loadProviders();
+              return _this6.loadProviders();
             case 4:
-              provider = _this5.providers.find(function (p) {
+              provider = _this6.providers.find(function (p) {
                 return p.ref === pending.ref;
               });
               if (provider && provider.configured) {
-                _this5.chooseProvider(provider.ref);
+                _this6.chooseProvider(provider.ref);
                 flash({
-                  title: _this5.$t("workflow.title"),
-                  body: _this5.$t("workflow.provider_setup.done", {
+                  title: _this6.$t("workflow.title"),
+                  body: _this6.$t("workflow.provider_setup.done", {
                     name: provider.label
                   })
                 });
               } else {
                 flashWarning({
-                  title: _this5.$t("workflow.title"),
-                  body: _this5.$t("workflow.provider_setup.not_done", {
+                  title: _this6.$t("workflow.title"),
+                  body: _this6.$t("workflow.provider_setup.not_done", {
                     name: pending.label
                   })
                 });
@@ -1022,40 +1106,40 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
       this.$emit("update:modelValue", text.slice(0, start) + variable + text.slice(end));
     },
     loadProviders: function loadProviders() {
-      var _this6 = this;
+      var _this7 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee6() {
         var capability, _yield$WorkflowServic, data;
         return _regeneratorRuntime().wrap(function _callee6$(_context6) {
           while (1) switch (_context6.prev = _context6.next) {
             case 0:
-              _this6.providersLoading = true;
-              capability = _this6.field.capability;
+              _this7.providersLoading = true;
+              capability = _this7.field.capability;
               _context6.prev = 2;
               _context6.next = 5;
-              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this6.project.slug, capability, true);
+              return _apis_project_workflow__WEBPACK_IMPORTED_MODULE_1__["default"].providers(_this7.project.slug, capability, true);
             case 5:
               _yield$WorkflowServic = _context6.sent;
               data = _yield$WorkflowServic.data;
-              if (!(capability !== _this6.field.capability)) {
+              if (!(capability !== _this7.field.capability)) {
                 _context6.next = 9;
                 break;
               }
               return _context6.abrupt("return");
             case 9:
-              _this6.providers = data;
+              _this7.providers = data;
               _context6.next = 15;
               break;
             case 12:
               _context6.prev = 12;
               _context6.t0 = _context6["catch"](2);
               flashError({
-                title: _this6.$t("workflow.title"),
-                body: _this6.$t("workflow.error.load")
+                title: _this7.$t("workflow.title"),
+                body: _this7.$t("workflow.error.load")
               });
             case 15:
               _context6.prev = 15;
-              if (capability === _this6.field.capability) {
-                _this6.providersLoading = false;
+              if (capability === _this7.field.capability) {
+                _this7.providersLoading = false;
               }
               return _context6.finish(15);
             case 18:
@@ -1069,13 +1153,13 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
      * Labels belong to categories: the ones of the prospects, all of them
      */
     loadLabels: function loadLabels() {
-      var _this7 = this;
+      var _this8 = this;
       return _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime().mark(function _callee8() {
         var categories, lists;
         return _regeneratorRuntime().wrap(function _callee8$(_context8) {
           while (1) switch (_context8.prev = _context8.next) {
             case 0:
-              categories = _this7.categories.filter(function (c) {
+              categories = _this8.categories.filter(function (c) {
                 return c["for"] === "prospect";
               });
               _context8.next = 3;
@@ -1087,7 +1171,7 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
                       case 0:
                         _context7.prev = 0;
                         _context7.next = 3;
-                        return _apis_project_label__WEBPACK_IMPORTED_MODULE_3__["default"].get(_this7.project.slug, category.id);
+                        return _apis_project_label__WEBPACK_IMPORTED_MODULE_3__["default"].get(_this8.project.slug, category.id);
                       case 3:
                         _yield$LabelService$g = _context7.sent;
                         data = _yield$LabelService$g.data;
@@ -1113,8 +1197,8 @@ var ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
               }()));
             case 3:
               lists = _context8.sent;
-              _this7.labels = lists.flat();
-              _this7.labelsLoaded = true;
+              _this8.labels = lists.flat();
+              _this8.labelsLoaded = true;
             case 6:
             case "end":
               return _context8.stop();
@@ -1290,6 +1374,16 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
   },
   computed: {
     /**
+     * The fields of the action. With an email template, the subject and the text come from it:
+     * they are not asked for
+     */
+    actionFields: function actionFields() {
+      var fields = this.actionDef && this.actionDef.fields || [];
+      return this.config.template ? fields.filter(function (field) {
+        return !["subject", "body"].includes(field.key);
+      }) : fields;
+    },
+    /**
      * The configuration being edited. A change is only seen in the "node" prop
      * after the parent has rendered again; "pending" holds the latest one in the meantime, so
      * that two changes in a row (an operator and its name, for instance) are
@@ -1358,7 +1452,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       return value && _typeof(value) === "object" && Object.keys(value).length > 0;
     },
     waitMode: function waitMode() {
-      return this.config.until_date !== undefined ? "date" : this.config.until_time !== undefined ? "time" : "duration";
+      return this.config.relative_to !== undefined ? "relative" : this.config.until_date !== undefined ? "date" : this.config.until_time !== undefined ? "time" : "duration";
     },
     outputList: function outputList() {
       var _this3 = this;
@@ -1472,6 +1566,13 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
         },
         date: {
           until_date: ""
+        },
+        relative: {
+          relative_to: "next_event",
+          offset_days: 7,
+          direction: "before",
+          at: "09:00",
+          if_past: "end"
         }
       }[mode];
       this.replaceConfig(config);
@@ -2169,6 +2270,13 @@ function problemsOf(data) {
       return [c.days ? "".concat(c.days, " ").concat(this.$t("workflow.wait.days")) : null, c.hours ? "".concat(c.hours, " ").concat(this.$t("workflow.wait.hours")) : null, c.minutes ? "".concat(c.minutes, " ").concat(this.$t("workflow.wait.minutes")) : null].filter(Boolean).join(" ");
     },
     describeWait: function describeWait(c) {
+      if (c.relative_to) {
+        return this.$t("workflow.wait.relative_summary", {
+          days: c.offset_days || 0,
+          direction: this.$t("workflow.wait.direction." + (c.direction || "before")),
+          anchor: this.$t("workflow.wait.relative_to." + c.relative_to)
+        });
+      }
       if (c.until_date) {
         return this.$t("workflow.wait.until_date_summary", {
           date: c.until_date
@@ -2952,27 +3060,44 @@ var _hoisted_14 = ["value", "disabled", "onChange"];
 var _hoisted_15 = ["value", "textContent"];
 var _hoisted_16 = ["value", "textContent"];
 var _hoisted_17 = ["value", "disabled", "onChange"];
-var _hoisted_18 = ["textContent"];
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = ["title", "onClick"];
-var _hoisted_21 = {
+var _hoisted_18 = ["value", "textContent"];
+var _hoisted_19 = ["value", "disabled", "onChange"];
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = ["textContent"];
+var _hoisted_22 = ["value", "placeholder", "disabled", "onInput"];
+var _hoisted_23 = {
+  "class": "hc-wfc-row"
+};
+var _hoisted_24 = ["value", "disabled", "onChange"];
+var _hoisted_25 = ["value", "textContent"];
+var _hoisted_26 = ["value", "textContent"];
+var _hoisted_27 = ["value", "disabled", "onChange"];
+var _hoisted_28 = ["textContent"];
+var _hoisted_29 = ["textContent"];
+var _hoisted_30 = ["title", "onClick"];
+var _hoisted_31 = {
   key: 2,
   "class": "hc-wfc-add"
 };
-var _hoisted_22 = {
+var _hoisted_32 = {
   key: 0,
   "class": "hc-wfc-addwrap"
 };
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = {
-  "class": "hc-wfc-addwrap"
-};
-var _hoisted_25 = ["textContent"];
-var _hoisted_26 = {
+var _hoisted_33 = ["textContent"];
+var _hoisted_34 = {
   key: 1,
   "class": "hc-wfc-addwrap"
 };
-var _hoisted_27 = ["textContent"];
+var _hoisted_35 = ["textContent"];
+var _hoisted_36 = {
+  "class": "hc-wfc-addwrap"
+};
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = {
+  key: 2,
+  "class": "hc-wfc-addwrap"
+};
+var _hoisted_39 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_help_tip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("help-tip");
   var _component_condition_group = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("condition-group", true);
@@ -3059,9 +3184,64 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }), 128 /* KEYED_FRAGMENT */)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
       "class": "hc-wfc-help",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.timezone_help'))
-    }, null, 8 /* PROPS */, _hoisted_12)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    }, null, 8 /* PROPS */, _hoisted_12)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : item.field ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 2
-    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Criterion on the prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A custom field of the prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      value: item.field,
+      disabled: $props.readOnly,
+      onChange: function onChange($event) {
+        return $options.setItem(index, $options.fieldItem($event.target.value, item));
+      }
+    }, [!$options.choices.some(function (c) {
+      return c.slug === item.field;
+    }) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: 0,
+      value: item.field,
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item.field)
+    }, null, 8 /* PROPS */, _hoisted_15)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.choices, function (choice) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+        key: choice.slug,
+        value: choice.slug,
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.fieldName(choice))
+      }, null, 8 /* PROPS */, _hoisted_16);
+    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+      value: $options.testOf(item),
+      disabled: $props.readOnly,
+      onChange: function onChange($event) {
+        return $options.setItem(index, $options.fieldItem(item.field, item, $event.target.value));
+      }
+    }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.tests, function (test) {
+      return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+        key: test,
+        value: test,
+        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.field_test.' + test))
+      }, null, 8 /* PROPS */, _hoisted_18);
+    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_17), item.field === 'plus_50' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("select", {
+      key: 0,
+      value: $options.valueOf(item),
+      disabled: $props.readOnly,
+      onChange: function onChange($event) {
+        return $options.setItem(index, $options.fieldItem(item.field, item, $options.testOf(item), $event.target.value));
+      }
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+      value: "oui",
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.yes'))
+    }, null, 8 /* PROPS */, _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+      value: "non",
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.no'))
+    }, null, 8 /* PROPS */, _hoisted_21)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19)) : ['is', 'is_not'].includes($options.testOf(item)) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+      key: 1,
+      type: "text",
+      maxlength: "120",
+      value: $options.valueOf(item),
+      placeholder: _ctx.$t('workflow.condition.field_value'),
+      disabled: $props.readOnly,
+      onInput: function onInput($event) {
+        return $options.setItem(index, $options.fieldItem(item.field, item, $options.testOf(item), $event.target.value));
+      }
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_22)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      key: 3
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Criterion on the prospect "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
       value: $options.filterName(item),
       disabled: $props.readOnly,
       onChange: function onChange($event) {
@@ -3071,13 +3251,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: 0,
       value: $options.filterName(item),
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.filterName(item))
-    }, null, 8 /* PROPS */, _hoisted_15)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filters, function (filter) {
+    }, null, 8 /* PROPS */, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filters, function (filter) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
         key: filter.name,
         value: filter.name,
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.filter.' + filter.name))
-      }, null, 8 /* PROPS */, _hoisted_16);
-    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14), $options.known($options.filterName(item)) && $options.filterType(item) !== 'boolean' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_field_input, {
+      }, null, 8 /* PROPS */, _hoisted_26);
+    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_24), $options.known($options.filterName(item)) && $options.filterType(item) !== 'boolean' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_field_input, {
       key: 0,
       "model-value": item.filters[$options.filterName(item)],
       type: $options.filterType(item),
@@ -3099,44 +3279,52 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: "true",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.yes'))
-    }, null, 8 /* PROPS */, _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    }, null, 8 /* PROPS */, _hoisted_28), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: "false",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.no'))
-    }, null, 8 /* PROPS */, _hoisted_19)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_17)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), !$props.readOnly && !item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-      key: 3,
+    }, null, 8 /* PROPS */, _hoisted_29)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)), !$props.readOnly && !item.items ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+      key: 4,
       type: "button",
       "class": "hc-wfc-remove",
       title: _ctx.$t('workflow.condition.remove'),
       onClick: function onClick($event) {
         return $options.removeItem(index);
       }
-    }, "×", 8 /* PROPS */, _hoisted_20)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
-  }), 128 /* KEYED_FRAGMENT */)), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_21, [$options.filters.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    }, "×", 8 /* PROPS */, _hoisted_30)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }), 128 /* KEYED_FRAGMENT */)), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_31, [$options.filters.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[2] || (_cache[2] = function ($event) {
       return $options.add($options.newFilter($options.filters[0].name));
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_filter'))
-  }, null, 8 /* PROPS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.tip.add_filter"
-  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $props.subject === 'prospect' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     onClick: _cache[3] || (_cache[3] = function ($event) {
+      return $options.add($options.fieldItem($options.choices[0].slug, null, 'is', ''));
+    }),
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_field'))
+  }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+    k: "workflow.tip.add_field"
+  })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", _hoisted_36, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    type: "button",
+    onClick: _cache[4] || (_cache[4] = function ($event) {
       return $options.add($options.newCheck('work_hours'));
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_check'))
-  }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.tip.add_check"
-  })]), $props.depth < $props.catalog.conditions.max_depth ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_26, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  })]), $props.depth < $props.catalog.conditions.max_depth ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
-    onClick: _cache[4] || (_cache[4] = function ($event) {
+    onClick: _cache[5] || (_cache[5] = function ($event) {
       return $options.add({
         op: 'and',
         items: []
       });
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)('+ ' + _ctx.$t('workflow.condition.add_group'))
-  }, null, 8 /* PROPS */, _hoisted_27), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.tip.add_group"
   })])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 2 /* CLASS */);
 }
@@ -3891,51 +4079,65 @@ var _hoisted_2 = {
 var _hoisted_3 = ["checked", "disabled"];
 var _hoisted_4 = ["textContent"];
 var _hoisted_5 = ["value", "disabled"];
-var _hoisted_6 = ["value", "placeholder", "disabled"];
-var _hoisted_7 = ["value", "disabled"];
-var _hoisted_8 = {
+var _hoisted_6 = {
+  "class": "hc-wff-template"
+};
+var _hoisted_7 = ["placeholder"];
+var _hoisted_8 = ["value", "disabled"];
+var _hoisted_9 = ["textContent"];
+var _hoisted_10 = ["value", "textContent"];
+var _hoisted_11 = ["value", "textContent"];
+var _hoisted_12 = ["textContent"];
+var _hoisted_13 = ["textContent"];
+var _hoisted_14 = ["value", "placeholder", "disabled"];
+var _hoisted_15 = ["value", "disabled"];
+var _hoisted_16 = {
   key: 0,
   "class": "hc-wff-variables"
 };
-var _hoisted_9 = ["textContent"];
-var _hoisted_10 = ["onClick", "textContent"];
-var _hoisted_11 = ["value", "disabled"];
-var _hoisted_12 = ["textContent"];
-var _hoisted_13 = ["value", "textContent"];
-var _hoisted_14 = {
+var _hoisted_17 = ["textContent"];
+var _hoisted_18 = ["onClick", "textContent"];
+var _hoisted_19 = ["value", "disabled"];
+var _hoisted_20 = ["textContent"];
+var _hoisted_21 = ["value", "textContent"];
+var _hoisted_22 = {
   "class": "hc-wff-list"
 };
-var _hoisted_15 = ["checked", "disabled", "onChange"];
-var _hoisted_16 = ["textContent"];
-var _hoisted_17 = ["textContent"];
-var _hoisted_18 = ["value", "disabled"];
-var _hoisted_19 = ["textContent"];
-var _hoisted_20 = ["value", "textContent"];
-var _hoisted_21 = ["value", "textContent"];
-var _hoisted_22 = ["textContent"];
-var _hoisted_23 = ["textContent"];
-var _hoisted_24 = ["value", "disabled"];
+var _hoisted_23 = ["checked", "disabled", "onChange"];
+var _hoisted_24 = ["textContent"];
 var _hoisted_25 = ["textContent"];
-var _hoisted_26 = ["textContent"];
-var _hoisted_27 = ["value", "disabled"];
-var _hoisted_28 = ["value", "disabled"];
-var _hoisted_29 = {
-  key: 11,
-  "class": "hc-wff-days"
-};
-var _hoisted_30 = ["checked", "disabled", "onChange"];
+var _hoisted_26 = ["value", "disabled"];
+var _hoisted_27 = ["textContent"];
+var _hoisted_28 = ["value", "textContent"];
+var _hoisted_29 = ["value", "textContent"];
+var _hoisted_30 = ["textContent"];
 var _hoisted_31 = ["textContent"];
 var _hoisted_32 = ["value", "disabled"];
 var _hoisted_33 = ["textContent"];
-var _hoisted_34 = {
+var _hoisted_34 = ["textContent"];
+var _hoisted_35 = ["value", "disabled"];
+var _hoisted_36 = ["textContent"];
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = ["value", "disabled"];
+var _hoisted_39 = ["value", "disabled"];
+var _hoisted_40 = ["value", "placeholder", "disabled"];
+var _hoisted_41 = {
   key: 14,
+  "class": "hc-wff-days"
+};
+var _hoisted_42 = ["checked", "disabled", "onChange"];
+var _hoisted_43 = ["textContent"];
+var _hoisted_44 = ["value", "disabled"];
+var _hoisted_45 = ["textContent"];
+var _hoisted_46 = {
+  key: 17,
   "class": "hc-wff-create"
 };
-var _hoisted_35 = ["textContent"];
-var _hoisted_36 = ["placeholder"];
-var _hoisted_37 = ["disabled", "textContent"];
-var _hoisted_38 = ["textContent"];
-var _hoisted_39 = ["textContent"];
+var _hoisted_47 = ["textContent"];
+var _hoisted_48 = ["placeholder"];
+var _hoisted_49 = ["disabled", "textContent"];
+var _hoisted_50 = ["textContent"];
+var _hoisted_51 = ["textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_email_editor = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("email-editor");
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Yes / no "), $props.type === 'boolean' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
@@ -3957,8 +4159,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onInput: _cache[1] || (_cache[1] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value));
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'html' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_5)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'template' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 2
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A template of the library of the project (the mailing plan) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [$options.templates.length > 8 ? (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)(((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 0,
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+      return $data.templateFilter = $event;
+    }),
+    type: "text",
+    placeholder: _ctx.$t('workflow.template_field.filter')
+  }, null, 8 /* PROPS */, _hoisted_7)), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.templateFilter]]) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $props.modelValue || '',
+    disabled: $props.readOnly,
+    onChange: _cache[3] || (_cache[3] = function ($event) {
+      return _ctx.$emit('update:modelValue', $event.target.value || null);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.template_field.none'))
+  }, null, 8 /* PROPS */, _hoisted_9), $props.modelValue && !$options.templates.some(function (t) {
+    return $options.templateRef(t) === String($props.modelValue);
+  }) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+    key: 0,
+    value: $props.modelValue,
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.template_field.missing'))
+  }, null, 8 /* PROPS */, _hoisted_10)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.shownTemplates, function (template) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
+      key: template.id,
+      value: $options.templateRef(template),
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.templateLabel(template))
+    }, null, 8 /* PROPS */, _hoisted_11);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_8), $options.chosenTemplate && $options.chosenTemplate.disabled ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 1,
+    "class": "hc-wff-warn",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.template_field.disabled'))
+  }, null, 8 /* PROPS */, _hoisted_12)) : $options.chosenTemplate && $options.chosenTemplate.marketing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 2,
+    "class": "hc-wff-count",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.template_field.marketing'))
+  }, null, 8 /* PROPS */, _hoisted_13)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'html' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 3
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" The email: written as in a word processor "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_email_editor, {
     "model-value": $props.modelValue || '',
     variables: $props.variables,
@@ -3966,37 +4206,37 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     design: $props.design,
     "project-name": _ctx.project ? _ctx.project.name : '',
     "read-only": $props.readOnly,
-    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
       return _ctx.$emit('update:modelValue', $event);
     }),
-    "onUpdate:design": _cache[3] || (_cache[3] = function ($event) {
+    "onUpdate:design": _cache[5] || (_cache[5] = function ($event) {
       return _ctx.$emit('update:design', $event);
     })
   }, null, 8 /* PROPS */, ["model-value", "variables", "subject", "design", "project-name", "read-only"])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'line' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 3
+    key: 4
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" One line (the subject of an email) "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "text",
     maxlength: "255",
     value: $props.modelValue,
     placeholder: _ctx.$t('workflow.line_placeholder.' + $props.field.key),
     disabled: $props.readOnly,
-    onInput: _cache[4] || (_cache[4] = function ($event) {
+    onInput: _cache[6] || (_cache[6] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_6)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 4
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_14)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 5
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Texts "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
     ref: "text",
     rows: "5",
     maxlength: "5000",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[5] || (_cache[5] = function ($event) {
+    onInput: _cache[7] || (_cache[7] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_7), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15), !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.variables'))
-  }, null, 8 /* PROPS */, _hoisted_9), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.variableList, function (variable) {
+  }, null, 8 /* PROPS */, _hoisted_17), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.variableList, function (variable) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
       key: variable,
       type: "button",
@@ -4004,27 +4244,27 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         return $options.insertVariable(variable);
       },
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(variable)
-    }, null, 8 /* PROPS */, _hoisted_10);
+    }, null, 8 /* PROPS */, _hoisted_18);
   }), 128 /* KEYED_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $options.isSingle ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 5
+    key: 6
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" One or several items of the project "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onChange: _cache[6] || (_cache[6] = function ($event) {
+    onChange: _cache[8] || (_cache[8] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value));
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.emptyLabel)
-  }, null, 8 /* PROPS */, _hoisted_12), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
+  }, null, 8 /* PROPS */, _hoisted_20), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: option.id,
       value: option.id,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.label)
-    }, null, 8 /* PROPS */, _hoisted_13);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_11)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $options.isMultiple ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 6
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Several items: a click on a line ticks it, no key to hold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
+    }, null, 8 /* PROPS */, _hoisted_21);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_19)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $options.isMultiple ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 7
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Several items: a click on a line ticks it, no key to hold "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_22, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.options, function (option) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("label", {
       key: option.id,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wff-item", {
@@ -4037,134 +4277,158 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onChange: function onChange($event) {
         return $options.toggleId(option.id);
       }
-    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_15), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_23), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(option.label)
-    }, null, 8 /* PROPS */, _hoisted_16)], 2 /* CLASS */);
+    }, null, 8 /* PROPS */, _hoisted_24)], 2 /* CLASS */);
   }), 128 /* KEYED_FRAGMENT */)), !$options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 0,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.chosen_count', {
       count: ($props.modelValue || []).length
     }))
-  }, null, 8 /* PROPS */, _hoisted_17)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'provider' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 7
+  }, null, 8 /* PROPS */, _hoisted_25)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'provider' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 8
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" An operator of the project "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     ref: "provider",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onChange: _cache[7] || (_cache[7] = function ($event) {
+    onChange: _cache[9] || (_cache[9] = function ($event) {
       return $options.chooseProvider($event.target.value);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.choose'))
-  }, null, 8 /* PROPS */, _hoisted_19), $props.modelValue && !$data.providers.some(function (p) {
+  }, null, 8 /* PROPS */, _hoisted_27), $props.modelValue && !$data.providers.some(function (p) {
     return p.ref === $props.modelValue;
   }) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
     key: 0,
     value: $props.modelValue,
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.provider_missing'))
-  }, null, 8 /* PROPS */, _hoisted_20)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.providers, function (provider) {
+  }, null, 8 /* PROPS */, _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.providers, function (provider) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
       key: provider.ref,
       value: provider.ref,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.providerLabel(provider))
-    }, null, 8 /* PROPS */, _hoisted_21);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_18), $options.unconfiguredChosen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    }, null, 8 /* PROPS */, _hoisted_29);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_26), $options.unconfiguredChosen ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 0,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.provider_setup.waiting'))
-  }, null, 8 /* PROPS */, _hoisted_22)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.providersLoading && !$data.providers.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+  }, null, 8 /* PROPS */, _hoisted_30)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$data.providersLoading && !$data.providers.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 1,
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.no_provider.' + $props.field.capability))
-  }, null, 8 /* PROPS */, _hoisted_23)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.type === 'on_error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 8
+  }, null, 8 /* PROPS */, _hoisted_31)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.type === 'if_busy' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 9
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What happens to a marketing email when the day already has one "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $props.modelValue || 'wait',
+    disabled: $props.readOnly,
+    onChange: _cache[10] || (_cache[10] = function ($event) {
+      return _ctx.$emit('update:modelValue', $event.target.value);
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "wait",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.if_busy.wait'))
+  }, null, 8 /* PROPS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "skip",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.if_busy.skip'))
+  }, null, 8 /* PROPS */, _hoisted_34)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_32)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'on_error' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 10
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What happens when the step fails "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $props.modelValue || 'fail',
     disabled: $props.readOnly,
-    onChange: _cache[8] || (_cache[8] = function ($event) {
+    onChange: _cache[11] || (_cache[11] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "fail",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.on_error.fail'))
-  }, null, 8 /* PROPS */, _hoisted_25), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  }, null, 8 /* PROPS */, _hoisted_36), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "continue",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.on_error.continue'))
-  }, null, 8 /* PROPS */, _hoisted_26)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_24)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'time' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 9,
+  }, null, 8 /* PROPS */, _hoisted_37)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_35)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'time' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 11,
     type: "time",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[9] || (_cache[9] = function ($event) {
+    onInput: _cache[12] || (_cache[12] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_27)) : $props.type === 'date' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 10,
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_38)) : $props.type === 'date' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
+    key: 12,
     type: "date",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[10] || (_cache[10] = function ($event) {
+    onInput: _cache[13] || (_cache[13] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value || null);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_28)) : $props.type === 'weekdays' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_29, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(7, function (day) {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_39)) : $props.type === 'numbers' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 13
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A list of numbers: months, days of the month "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    value: ($props.modelValue || []).join(', '),
+    placeholder: _ctx.$t('workflow.numbers_placeholder.' + $props.field.key),
+    disabled: $props.readOnly,
+    onChange: _cache[14] || (_cache[14] = function ($event) {
+      return _ctx.$emit('update:modelValue', $options.parseNumbers($event.target.value));
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_40)], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */)) : $props.type === 'weekdays' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_41, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(7, function (day) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: day,
       "class": "hc-wff-check"
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
       type: "checkbox",
-      checked: ($props.modelValue || $data.allDays).includes(day),
+      checked: ($props.modelValue || $options.defaultDays).includes(day),
       disabled: $props.readOnly,
       onChange: function onChange($event) {
         return $options.toggleDay(day);
       }
-    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_30), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_42), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.weekday.' + day))
-    }, null, 8 /* PROPS */, _hoisted_31)]);
+    }, null, 8 /* PROPS */, _hoisted_43)]);
   }), 64 /* STABLE_FRAGMENT */))])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("input", {
-    key: 12,
+    key: 15,
     type: "text",
     value: $props.modelValue,
     disabled: $props.readOnly,
-    onInput: _cache[11] || (_cache[11] = function ($event) {
+    onInput: _cache[15] || (_cache[15] = function ($event) {
       return _ctx.$emit('update:modelValue', $event.target.value);
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_32)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Not part of the chain above: it would take the place of its last \"else\" "), $options.isLabels && !$data.labelsLoaded ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-    key: 13,
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_44)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Not part of the chain above: it would take the place of its last \"else\" "), $options.isLabels && !$data.labelsLoaded ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 16,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.loading'))
-  }, null, 8 /* PROPS */, _hoisted_33)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A channel is needed to send emails: offer to create it right here "), $options.emptyList && $props.type === 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_34, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+  }, null, 8 /* PROPS */, _hoisted_45)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" A channel is needed to send emails: offer to create it right here "), $options.emptyList && $props.type === 'thread' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_46, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.why'))
-  }, null, 8 /* PROPS */, _hoisted_35), $options.canAddThread && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_47), $options.canAddThread && !$props.readOnly ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 0
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-    "onUpdate:modelValue": _cache[12] || (_cache[12] = function ($event) {
+    "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
       return $data.newThreadName = $event;
     }),
     type: "text",
     maxlength: "50",
     placeholder: _ctx.$t('workflow.thread_create.placeholder'),
-    onKeydown: _cache[13] || (_cache[13] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+    onKeydown: _cache[17] || (_cache[17] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withKeys)((0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
       return $options.createThread && $options.createThread.apply($options, arguments);
     }, ["prevent"]), ["enter"]))
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_36), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.newThreadName]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_48), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $data.newThreadName]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     type: "button",
     disabled: !$data.newThreadName.trim() || $data.creatingThread,
-    onClick: _cache[14] || (_cache[14] = function () {
+    onClick: _cache[18] || (_cache[18] = function () {
       return $options.createThread && $options.createThread.apply($options, arguments);
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.button'))
-  }, null, 8 /* PROPS */, _hoisted_37)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+  }, null, 8 /* PROPS */, _hoisted_49)], 64 /* STABLE_FRAGMENT */)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
     key: 1,
     "class": "hc-wff-count",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.thread_create.ask_admin'))
-  }, null, 8 /* PROPS */, _hoisted_38))])) : $options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-    key: 15,
+  }, null, 8 /* PROPS */, _hoisted_50))])) : $options.emptyList ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 18,
     "class": "hc-wff-warn",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.empty_list.' + $props.type))
-  }, null, 8 /* PROPS */, _hoisted_39)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, null, 8 /* PROPS */, _hoisted_51)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -4285,40 +4549,63 @@ var _hoisted_33 = ["value", "disabled"];
 var _hoisted_34 = ["textContent"];
 var _hoisted_35 = ["textContent"];
 var _hoisted_36 = ["textContent"];
-var _hoisted_37 = {
-  key: 0,
+var _hoisted_37 = ["textContent"];
+var _hoisted_38 = {
   "class": "hc-wfn-duration"
 };
-var _hoisted_38 = ["textContent"];
 var _hoisted_39 = ["textContent"];
 var _hoisted_40 = ["textContent"];
-var _hoisted_41 = ["textContent"];
-var _hoisted_42 = ["value", "disabled"];
+var _hoisted_41 = ["value", "disabled"];
+var _hoisted_42 = ["textContent"];
 var _hoisted_43 = ["textContent"];
-var _hoisted_44 = {
-  "class": "hc-wfn-label"
-};
-var _hoisted_45 = ["textContent"];
-var _hoisted_46 = ["value", "disabled"];
-var _hoisted_47 = ["value", "textContent"];
-var _hoisted_48 = {
-  "class": "hc-wfn-label"
-};
-var _hoisted_49 = ["textContent"];
-var _hoisted_50 = {
-  "class": "hc-wfn-duration"
-};
+var _hoisted_44 = ["textContent"];
+var _hoisted_45 = ["value", "disabled"];
+var _hoisted_46 = ["value", "textContent"];
+var _hoisted_47 = ["textContent"];
+var _hoisted_48 = ["textContent"];
+var _hoisted_49 = ["value", "disabled"];
+var _hoisted_50 = ["textContent"];
 var _hoisted_51 = ["textContent"];
-var _hoisted_52 = ["textContent"];
-var _hoisted_53 = {
-  "class": "hc-wfn-label"
+var _hoisted_52 = {
+  "class": "hc-wff-check"
 };
+var _hoisted_53 = ["checked", "disabled"];
 var _hoisted_54 = ["textContent"];
 var _hoisted_55 = ["textContent"];
-var _hoisted_56 = ["value", "disabled", "onChange"];
+var _hoisted_56 = {
+  key: 1,
+  "class": "hc-wfn-duration"
+};
 var _hoisted_57 = ["textContent"];
-var _hoisted_58 = ["value", "disabled", "textContent"];
-var _hoisted_59 = ["title", "textContent"];
+var _hoisted_58 = ["textContent"];
+var _hoisted_59 = ["textContent"];
+var _hoisted_60 = ["textContent"];
+var _hoisted_61 = ["value", "disabled"];
+var _hoisted_62 = ["textContent"];
+var _hoisted_63 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_64 = ["textContent"];
+var _hoisted_65 = ["value", "disabled"];
+var _hoisted_66 = ["value", "textContent"];
+var _hoisted_67 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_68 = ["textContent"];
+var _hoisted_69 = {
+  "class": "hc-wfn-duration"
+};
+var _hoisted_70 = ["textContent"];
+var _hoisted_71 = ["textContent"];
+var _hoisted_72 = {
+  "class": "hc-wfn-label"
+};
+var _hoisted_73 = ["textContent"];
+var _hoisted_74 = ["textContent"];
+var _hoisted_75 = ["value", "disabled", "onChange"];
+var _hoisted_76 = ["textContent"];
+var _hoisted_77 = ["value", "disabled", "textContent"];
+var _hoisted_78 = ["title", "textContent"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_help_tip = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("help-tip");
   var _component_condition_group = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("condition-group");
@@ -4374,10 +4661,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [field.type === 'condition' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: 0
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.trigger_filter'))
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t($options.config.trigger === 'prospect.scheduled' ? 'workflow.trigger_audience' : 'workflow.trigger_filter'))
     }, null, 8 /* PROPS */, _hoisted_14), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
-      k: "workflow.trigger_filter_help"
-    })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
+      k: $options.config.trigger === 'prospect.scheduled' ? 'workflow.trigger_audience_help' : 'workflow.trigger_filter_help'
+    }, null, 8 /* PROPS */, ["k"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_condition_group, {
       "model-value": $options.tree,
       subject: $options.subject,
       catalog: $props.catalog,
@@ -4453,7 +4740,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 0,
     "class": "hc-wfn-danger",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.danger'))
-  }, null, 8 /* PROPS */, _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionDef.fields, function (field) {
+  }, null, 8 /* PROPS */, _hoisted_28)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.actionFields, function (field) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
       key: $options.config.action + ':' + field.key
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_29, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)((0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t("workflow.field." + $options.fieldName(field))) + " ", 1 /* TEXT */), field.required ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", _hoisted_30, "*")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
@@ -4501,12 +4788,104 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, _hoisted_35), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
     value: "date",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.until_date'))
-  }, null, 8 /* PROPS */, _hoisted_36)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_33), $options.waitMode === 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
+  }, null, 8 /* PROPS */, _hoisted_36), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "relative",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.relative'))
+  }, null, 8 /* PROPS */, _hoisted_37)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Counted from an appointment of the prospect "), $options.waitMode === 'relative' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+    key: 0
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.offset_days'))
+  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    "model-value": $options.config.offset_days,
+    type: "number",
+    "read-only": $props.readOnly,
+    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+      return $options.setConfig({
+        offset_days: $event
+      });
+    })
+  }, null, 8 /* PROPS */, ["model-value", "read-only"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.direction_label'))
+  }, null, 8 /* PROPS */, _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $options.config.direction || 'before',
+    disabled: $props.readOnly,
+    onChange: _cache[8] || (_cache[8] = function ($event) {
+      return $options.setConfig({
+        direction: $event.target.value
+      });
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "before",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.direction.before'))
+  }, null, 8 /* PROPS */, _hoisted_42), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "after",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.direction.after'))
+  }, null, 8 /* PROPS */, _hoisted_43)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_41)])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "hc-wfn-label",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.relative_to_label'))
+  }, null, 8 /* PROPS */, _hoisted_44), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $options.config.relative_to,
+    disabled: $props.readOnly,
+    onChange: _cache[9] || (_cache[9] = function ($event) {
+      return $options.setConfig({
+        relative_to: $event.target.value
+      });
+    })
+  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['next_event', 'last_event', 'created'], function (anchor) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+      key: anchor,
+      value: anchor,
+      textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.relative_to.' + anchor))
+    }, null, 8 /* PROPS */, _hoisted_46);
+  }), 64 /* STABLE_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_45), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "hc-wfn-label",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.at'))
+  }, null, 8 /* PROPS */, _hoisted_47), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    "model-value": $options.config.at || '',
+    type: "time",
+    "read-only": $props.readOnly,
+    "onUpdate:modelValue": _cache[10] || (_cache[10] = function ($event) {
+      return $options.setConfig({
+        at: $event || null
+      });
+    })
+  }, null, 8 /* PROPS */, ["model-value", "read-only"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+    "class": "hc-wfn-label",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.if_past_label'))
+  }, null, 8 /* PROPS */, _hoisted_48), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    value: $options.config.if_past || 'end',
+    disabled: $props.readOnly,
+    onChange: _cache[11] || (_cache[11] = function ($event) {
+      return $options.setConfig({
+        if_past: $event.target.value
+      });
+    })
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "end",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.if_past.end'))
+  }, null, 8 /* PROPS */, _hoisted_50), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+    value: "skip",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.if_past.skip'))
+  }, null, 8 /* PROPS */, _hoisted_51)], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_49), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_52, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "checkbox",
+    checked: !!$options.config.check_only,
+    disabled: $props.readOnly,
+    onChange: _cache[12] || (_cache[12] = function ($event) {
+      return $options.setConfig({
+        check_only: $event.target.checked
+      });
+    })
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_53), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.check_only'))
+  }, null, 8 /* PROPS */, _hoisted_54)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", {
+    "class": "hc-wfn-help",
+    textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.relative_help'))
+  }, null, 8 /* PROPS */, _hoisted_55)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode === 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_56, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: unit
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.' + unit))
-    }, null, 8 /* PROPS */, _hoisted_38), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, null, 8 /* PROPS */, _hoisted_57), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.config[unit],
       type: "number",
       "read-only": $props.readOnly,
@@ -4515,15 +4894,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }
     }, null, 8 /* PROPS */, ["model-value", "read-only", "onUpdate:modelValue"])]);
   }), 64 /* STABLE_FRAGMENT */))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode === 'time' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 1
+    key: 2
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.time'))
-  }, null, 8 /* PROPS */, _hoisted_39), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+  }, null, 8 /* PROPS */, _hoisted_58), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
     "model-value": $options.config.until_time,
     type: "time",
     "read-only": $props.readOnly,
-    "onUpdate:modelValue": _cache[7] || (_cache[7] = function ($event) {
+    "onUpdate:modelValue": _cache[13] || (_cache[13] = function ($event) {
       return $options.setConfig({
         until_time: $event
       });
@@ -4531,43 +4910,43 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   }, null, 8 /* PROPS */, ["model-value", "read-only"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.only_days'))
-  }, null, 8 /* PROPS */, _hoisted_40), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+  }, null, 8 /* PROPS */, _hoisted_59), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
     "model-value": $options.config.days,
     type: "weekdays",
     "read-only": $props.readOnly,
-    "onUpdate:modelValue": _cache[8] || (_cache[8] = function ($event) {
+    "onUpdate:modelValue": _cache[14] || (_cache[14] = function ($event) {
       return $options.setConfig({
         days: $event
       });
     })
   }, null, 8 /* PROPS */, ["model-value", "read-only"])], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode === 'date' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
-    key: 2
+    key: 3
   }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
     "class": "hc-wfn-label",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.date'))
-  }, null, 8 /* PROPS */, _hoisted_41), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+  }, null, 8 /* PROPS */, _hoisted_60), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     type: "datetime-local",
     value: ($options.config.until_date || '').replace(' ', 'T'),
     disabled: $props.readOnly,
-    onInput: _cache[9] || (_cache[9] = function ($event) {
+    onInput: _cache[15] || (_cache[15] = function ($event) {
       return $options.setConfig({
         until_date: $event.target.value.replace('T', ' ')
       });
     })
-  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_42)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode !== 'duration' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
-    key: 3,
+  }, null, 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_61)], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $options.waitMode !== 'duration' && $options.waitMode !== 'relative' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
+    key: 4,
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.condition.timezone_help'))
-  }, null, 8 /* PROPS */, _hoisted_43)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait_event' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_62)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)], 64 /* STABLE_FRAGMENT */)) : $props.node.type === 'wait_event' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 4
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait for an event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_44, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Wait for an event "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_63, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.field.event'))
-  }, null, 8 /* PROPS */, _hoisted_45), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_64), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.tip.wait_event"
   })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     value: $options.config.event,
     disabled: $props.readOnly,
-    onChange: _cache[10] || (_cache[10] = function ($event) {
+    onChange: _cache[16] || (_cache[16] = function ($event) {
       return $options.setConfig({
         event: $event.target.value
       });
@@ -4577,17 +4956,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: event,
       value: event,
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.event.' + event))
-    }, null, 8 /* PROPS */, _hoisted_47);
-  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_46), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_48, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+    }, null, 8 /* PROPS */, _hoisted_66);
+  }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_65), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_67, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.max'))
-  }, null, 8 /* PROPS */, _hoisted_49), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_68), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.wait.event_help"
-  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_50, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
+  })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_69, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(['days', 'hours', 'minutes'], function (unit) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
       key: unit
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.wait.' + unit))
-    }, null, 8 /* PROPS */, _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
+    }, null, 8 /* PROPS */, _hoisted_70), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_field_input, {
       "model-value": $options.config[unit],
       type: "number",
       "read-only": $props.readOnly,
@@ -4599,11 +4978,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     key: 5,
     "class": "hc-wfn-help",
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.node_help.end'))
-  }, null, 8 /* PROPS */, _hoisted_52)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What follows "), $options.outputList.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+  }, null, 8 /* PROPS */, _hoisted_71)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" What follows "), $options.outputList.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
     key: 6
-  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_53, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+  }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", _hoisted_72, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.next'))
-  }, null, 8 /* PROPS */, _hoisted_54), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
+  }, null, 8 /* PROPS */, _hoisted_73), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_help_tip, {
     k: "workflow.tip.next"
   })]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.outputList, function (output) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
@@ -4613,7 +4992,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       key: 0,
       "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["hc-wfn-branch", output.branch]),
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.' + output.branch))
-    }, null, 10 /* CLASS, PROPS */, _hoisted_55)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    }, null, 10 /* CLASS, PROPS */, _hoisted_74)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
       value: output.to || '',
       disabled: $props.readOnly,
       onChange: function onChange($event) {
@@ -4625,24 +5004,24 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
       value: "",
       textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.nothing'))
-    }, null, 8 /* PROPS */, _hoisted_57), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.candidates, function (candidate) {
+    }, null, 8 /* PROPS */, _hoisted_76), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.candidates, function (candidate) {
       return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", {
         key: candidate.id,
         value: candidate.id,
         disabled: $options.cycle(candidate.id),
         textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.label(candidate))
-      }, null, 8 /* PROPS */, _hoisted_58);
-    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_56)]);
+      }, null, 8 /* PROPS */, _hoisted_77);
+    }), 128 /* KEYED_FRAGMENT */))], 40 /* PROPS, HYDRATE_EVENTS */, _hoisted_75)]);
   }), 128 /* KEYED_FRAGMENT */))], 64 /* STABLE_FRAGMENT */)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), !$props.readOnly && $props.node.type !== 'trigger' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 7,
     type: "button",
     "class": "hc-wfn-delete",
     title: _ctx.$t('workflow.tip.remove_node'),
-    onClick: _cache[11] || (_cache[11] = function ($event) {
+    onClick: _cache[17] || (_cache[17] = function ($event) {
       return _ctx.$emit('remove');
     }),
     textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('workflow.remove_node'))
-  }, null, 8 /* PROPS */, _hoisted_59)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
+  }, null, 8 /* PROPS */, _hoisted_78)) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
 /***/ }),
@@ -5770,12 +6149,25 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   FIELD_TESTS: () => (/* binding */ FIELD_TESTS),
+/* harmony export */   fieldChoices: () => (/* binding */ fieldChoices),
+/* harmony export */   fieldTest: () => (/* binding */ fieldTest),
+/* harmony export */   fieldValue: () => (/* binding */ fieldValue),
 /* harmony export */   filtersFor: () => (/* binding */ filtersFor),
 /* harmony export */   newCheckItem: () => (/* binding */ newCheckItem),
+/* harmony export */   newFieldItem: () => (/* binding */ newFieldItem),
 /* harmony export */   newFilterItem: () => (/* binding */ newFilterItem),
 /* harmony export */   triggerConfig: () => (/* binding */ triggerConfig)
 /* harmony export */ });
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) arr2[i] = arr[i]; return arr2; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
@@ -5835,6 +6227,76 @@ function newCheckItem(name) {
   };
 }
 
+// What a test on a field of the prospect can say (see ConditionEvaluator::FIELD_TESTS)
+var FIELD_TESTS = ["is", "is_not", "filled", "empty"];
+
+/**
+ * The test of a "field" item: is, is_not, filled or empty
+ */
+function fieldTest(item) {
+  if ("is" in item) return "is";
+  if ("is_not" in item) return "is_not";
+  return item.filled === false ? "empty" : "filled";
+}
+
+/**
+ * A "field" item for a field, a test and a value: { field, is | is_not | filled }
+ */
+function newFieldItem(slug) {
+  var test = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "is";
+  var value = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "";
+  switch (test) {
+    case "is_not":
+      return {
+        field: slug,
+        is_not: value
+      };
+    case "filled":
+      return {
+        field: slug,
+        filled: true
+      };
+    case "empty":
+      return {
+        field: slug,
+        filled: false
+      };
+    default:
+      return {
+        field: slug,
+        is: value
+      };
+  }
+}
+
+/**
+ * The value a "field" item compares to ("" for filled / empty)
+ */
+function fieldValue(item) {
+  return "is" in item ? item.is : "is_not" in item ? item.is_not : "";
+}
+
+/**
+ * The fields offered for a test: the custom fields of the project, and the one that is computed
+ *
+ * @param {Array} fields the fields of the project ({ slug, name, meta })
+ * @returns {Array<{slug: string, name: string, computed?: boolean}>}
+ */
+function fieldChoices(fields) {
+  return [].concat(_toConsumableArray((fields || []).filter(function (f) {
+    return f.meta && f["for"] === "prospect";
+  }).map(function (f) {
+    return {
+      slug: f.slug,
+      name: f.name || f.slug
+    };
+  })), [{
+    slug: "plus_50",
+    name: "plus_50",
+    computed: true
+  }]);
+}
+
 /**
  * The configuration of a trigger just chosen.
  *
@@ -5847,6 +6309,15 @@ function triggerConfig(catalog, type) {
   var config = {
     trigger: type
   };
+
+  // A schedule starts with values that are valid: the 8th of every month at 11:00, over an hour
+  if (type === "prospect.scheduled") {
+    return _objectSpread(_objectSpread({}, config), {}, {
+      days: [8],
+      at: "11:00",
+      window_minutes: 60
+    });
+  }
   if (type.includes(".filter_")) {
     var first = filtersFor(catalog, subject)[0];
     if (first) {

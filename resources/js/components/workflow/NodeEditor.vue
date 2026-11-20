@@ -69,7 +69,7 @@
 
             <template v-if="actionDef">
                 <p v-if="actionDef.danger" class="hc-wfn-danger" v-text="$t('workflow.danger')"></p>
-                <template v-for="field in actionFields" :key="config.action + ':' + field.key">
+                <template v-for="field in actionDef.fields" :key="config.action + ':' + field.key">
                     <label class="hc-wfn-label">
                         {{ $t("workflow.field." + fieldName(field)) }}
                         <span v-if="field.required" class="hc-wfn-required">*</span>
@@ -338,16 +338,6 @@ export default {
     },
 
     computed: {
-        /**
-         * The fields of the action. With an email template, the subject and the text come from it:
-         * they are not asked for
-         */
-        actionFields() {
-            const fields = (this.actionDef && this.actionDef.fields) || [];
-
-            return this.config.template ? fields.filter((field) => !["subject", "body"].includes(field.key)) : fields;
-        },
-
         /**
          * The configuration being edited. A change is only seen in the "node" prop
          * after the parent has rendered again; "pending" holds the latest one in the meantime, so

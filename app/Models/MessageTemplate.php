@@ -21,16 +21,11 @@ class MessageTemplate extends Model
         'attachments',
         'email_layout',
         'order',
-        'code',
-        'marketing',
-        'disabled',
     ];
 
     protected $casts = [
         'attachments' => 'array',
         'email_layout' => 'array',
-        'marketing' => 'boolean',
-        'disabled' => 'boolean',
     ];
 
     public function attributesToArray()

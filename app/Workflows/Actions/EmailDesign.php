@@ -19,12 +19,6 @@ class EmailDesign
      */
     public const STYLES = ['branded', 'simple'];
 
-    /**
-     * Not chosen in the builder: a template that is a complete email of its
-     * own (see the mailing plans) is sent as it is
-     */
-    public const RAW = 'raw';
-
     public const FONTS = [
         'arial' => 'Arial, Helvetica, sans-serif',
         'verdana' => 'Verdana, Geneva, sans-serif',
@@ -91,7 +85,7 @@ class EmailDesign
 
         $errors = [];
 
-        if (isset($design['style']) && !in_array($design['style'], [...self::STYLES, self::RAW], true)) {
+        if (isset($design['style']) && !in_array($design['style'], self::STYLES, true)) {
             $errors[] = "Le style de l'email de l'action \"$label\" n'existe pas.";
         }
 
@@ -128,7 +122,7 @@ class EmailDesign
         $design = is_array($design) ? $design : [];
         $result = self::defaults($projectName);
 
-        if (in_array($design['style'] ?? null, [...self::STYLES, self::RAW], true)) {
+        if (in_array($design['style'] ?? null, self::STYLES, true)) {
             $result['style'] = $design['style'];
         }
 

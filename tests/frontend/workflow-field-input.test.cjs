@@ -64,7 +64,7 @@ test('the operators are loaded again when the action changes (SMS instead of ema
 
     // And the editor starts a new field for each action
     const editor = fs.readFileSync(path.resolve(__dirname, '../../resources/js/components/workflow/NodeEditor.vue'), 'utf8');
-    assert.ok(editor.includes(`v-for="field in actionFields" :key="config.action + ':' + field.key"`));
+    assert.ok(editor.includes(`v-for="field in actionDef.fields" :key="config.action + ':' + field.key"`));
 });
 
 test('an operator that is not configured opens its window instead of being chosen, and is chosen once configured', async () => {

@@ -16,22 +16,6 @@
             @input="$emit('update:modelValue', $event.target.value === '' ? null : Number($event.target.value))"
         />
 
-        <!-- A template of the library of the project (the mailing plan) -->
-        <div v-else-if="type === 'template'" class="hc-wff-template">
-            <input v-if="templates.length > 8" v-model="templateFilter" type="text" :placeholder="$t('workflow.template_field.filter')" />
-            <select :value="modelValue || ''" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value || null)">
-                <option value="" v-text="$t('workflow.template_field.none')"></option>
-                <option
-                    v-if="modelValue && !templates.some((t) => templateRef(t) === String(modelValue))"
-                    :value="modelValue"
-                    v-text="$t('workflow.template_field.missing')"
-                ></option>
-                <option v-for="template in shownTemplates" :key="template.id" :value="templateRef(template)" v-text="templateLabel(template)"></option>
-            </select>
-            <p v-if="chosenTemplate && chosenTemplate.disabled" class="hc-wff-warn" v-text="$t('workflow.template_field.disabled')"></p>
-            <p v-else-if="chosenTemplate && chosenTemplate.marketing" class="hc-wff-count" v-text="$t('workflow.template_field.marketing')"></p>
-        </div>
-
         <!-- The email: written as in a word processor -->
         <email-editor
             v-else-if="type === 'html'"
@@ -112,12 +96,6 @@
             <p v-if="unconfiguredChosen" class="hc-wff-count" v-text="$t('workflow.provider_setup.waiting')"></p>
             <p v-if="!providersLoading && !providers.length" class="hc-wff-warn" v-text="$t('workflow.no_provider.' + field.capability)"></p>
         </template>
-
-        <!-- What happens to a marketing email when the day already has one -->
-        <select v-else-if="type === 'if_busy'" :value="modelValue || 'wait'" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value)">
-            <option value="wait" v-text="$t('workflow.if_busy.wait')"></option>
-            <option value="skip" v-text="$t('workflow.if_busy.skip')"></option>
-        </select>
 
         <!-- What happens when the step fails -->
         <select v-else-if="type === 'on_error'" :value="modelValue || 'fail'" :disabled="readOnly" @change="$emit('update:modelValue', $event.target.value)">
@@ -316,7 +294,6 @@ import { FETCH_USERS } from "@/actions/project/user";
 import { FETCH_GROUPS } from "@/actions/project/group";
 import { ADD_THREAD, FETCH_THREADS } from "@/actions/project/thread";
 import { OPEN_MODAL } from "@/actions/modal";
-import { FETCH_MESSAGE_TEMPLATES } from "@/actions/project/message-template";
 import { FETCH_CATEGORIES } from "@/actions/project/category";
 
 const ALL_DAYS = [1, 2, 3, 4, 5, 6, 7];
@@ -344,7 +321,6 @@ export default {
     data() {
         return {
             providers: [],
-            templateFilter: "",
             providersLoading: false,
             // The operator being configured in its window: chosen when it is done
             pendingProvider: null,
@@ -358,24 +334,10 @@ export default {
     },
 
     computed: {
-        ...mapGetters(["project", "users", "groups", "threads", "categories", "can", "modals", "messageTemplates"]),
+        ...mapGetters(["project", "users", "groups", "threads", "categories", "can", "modals"]),
 
         isSingle() {
             return ["user", "group", "label", "thread"].includes(this.type);
-        },
-
-        templates() {
-            return this.messageTemplates || [];
-        },
-
-        shownTemplates() {
-            const keyword = this.templateFilter.trim().toLowerCase();
-
-            return keyword ? this.templates.filter((t) => `${t.code || ""} ${t.name || ""}`.toLowerCase().includes(keyword)) : this.templates;
-        },
-
-        chosenTemplate() {
-            return this.modelValue ? this.templates.find((t) => this.templateRef(t) === String(this.modelValue)) : null;
         },
 
         canAddThread() {
@@ -509,7 +471,6 @@ export default {
             if (["user", "users"].includes(this.type) && !this.users.length) needs.push(FETCH_USERS);
             if (["group", "groups"].includes(this.type) && !this.groups.length) needs.push(FETCH_GROUPS);
             if (this.type === "thread" && !this.threads.length) needs.push(FETCH_THREADS);
-            if (this.type === "template" && !this.templates.length) needs.push(FETCH_MESSAGE_TEMPLATES);
             if (["label", "labels"].includes(this.type) && !this.categories.length) needs.push(FETCH_CATEGORIES);
 
             if (!needs.length) {
@@ -591,15 +552,6 @@ export default {
 
             this.$emit("update:modelValue", ref || null);
             this.$emit("provider-label", provider?.label || null);
-        },
-
-        // A template is found by its code (the same in every project that has the plan), else by its number
-        templateRef(template) {
-            return String(template.code || template.id);
-        },
-
-        templateLabel(template) {
-            return template.disabled ? `${template.name} (${this.$t("workflow.template_field.off")})` : template.name;
         },
 
         providerLabel(provider) {

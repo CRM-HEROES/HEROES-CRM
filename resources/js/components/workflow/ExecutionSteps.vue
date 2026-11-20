@@ -236,9 +236,11 @@ export default {
                 lines.push(`${this.$t("workflow.monitor.message")} #${result.message_id}`);
             }
 
-            // What the rules of the project kept from leaving
-            if (result.skipped) {
-                lines.push(this.$t("workflow.monitor.skipped_reason." + result.skipped));
+            // A wait counted from an appointment that stopped the automation
+            if (result.skipped === "The moment is already past.") {
+                lines.push(this.$t("workflow.monitor.wait_past"));
+            } else if (result.skipped === "No date to count from.") {
+                lines.push(this.$t("workflow.monitor.wait_none"));
             }
 
             // Written by the step, sent right after: say whether it left

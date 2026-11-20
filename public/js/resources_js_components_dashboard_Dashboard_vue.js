@@ -5149,8 +5149,7 @@ var _hoisted_35 = {
   }
 };
 var _hoisted_36 = ["textContent"];
-var _hoisted_37 = ["textContent"];
-var _hoisted_38 = {
+var _hoisted_37 = {
   key: 1,
   "class": "hc-flex-column",
   style: {
@@ -5168,8 +5167,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_v_field = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("v-field");
   var _component_buttons = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("buttons");
   var _component_category_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("category-row");
-  var _component_checkbox = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("checkbox");
   var _component_label_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("label-row");
+  var _component_selection_list = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("selection-list");
   var _component_tab_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("tab-layout");
   var _component_user_row = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("user-row");
   var _component_modal = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("modal", true);
@@ -5509,49 +5508,46 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
                     "onUpdate:modelValue": _cache[15] || (_cache[15] = function ($event) {
                       return $data.labelKeyword = $event;
                     })
-                  }, null, 8 /* PROPS */, ["modelValue"]), !$data.labelKeyword ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_item, {
-                    key: 0,
-                    tag: "label"
+                  }, null, 8 /* PROPS */, ["modelValue"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_selection_list, {
+                    modelValue: $options.allLabels,
+                    "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
+                      return $options.allLabels = $event;
+                    }),
+                    items: $options.filteredLabels,
+                    selected: $data.newChart.labels,
+                    "show-select-all": !$data.labelKeyword,
+                    "render-when-empty": !$data.labelKeyword
                   }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_icon, {
-                        "class": "fa fa-check-square"
-                      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-                        "class": "hc-item-main-content",
-                        textContent: (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(_ctx.$t('all'))
-                      }, null, 8 /* PROPS */, _hoisted_37), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_checkbox, {
-                        modelValue: $options.allLabels,
-                        "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
-                          return $options.allLabels = $event;
-                        })
-                      }, null, 8 /* PROPS */, ["modelValue"])];
+                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function (_ref5) {
+                      var sortedItems = _ref5.sortedItems;
+                      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
+                        "class": "hc-flex-1",
+                        style: {
+                          "overflow-y": "auto",
+                          "overflow-x": "hidden"
+                        },
+                        padding: 5
+                      }, {
+                        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+                          return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(sortedItems, function (label) {
+                            return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_label_row, {
+                              key: label.id,
+                              label: label,
+                              modelValue: $data.newChart.labels,
+                              "onUpdate:modelValue": _cache[16] || (_cache[16] = function ($event) {
+                                return $data.newChart.labels = $event;
+                              })
+                            }, null, 8 /* PROPS */, ["label", "modelValue"]);
+                          }), 128 /* KEYED_FRAGMENT */))];
+                        }),
+                        _: 2 /* DYNAMIC */
+                      }, 1024 /* DYNAMIC_SLOTS */)];
                     }),
                     _: 1 /* STABLE */
-                  })) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_item_list, {
-                    "class": "hc-flex-1",
-                    style: {
-                      "overflow-y": "auto",
-                      "overflow-x": "hidden"
-                    },
-                    padding: 5
-                  }, {
-                    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-                      return [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($options.filteredLabels, function (label) {
-                        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_label_row, {
-                          key: label.id,
-                          label: label,
-                          modelValue: $data.newChart.labels,
-                          "onUpdate:modelValue": _cache[17] || (_cache[17] = function ($event) {
-                            return $data.newChart.labels = $event;
-                          })
-                        }, null, 8 /* PROPS */, ["label", "modelValue"]);
-                      }), 128 /* KEYED_FRAGMENT */))];
-                    }),
-                    _: 1 /* STABLE */
-                  })])];
+                  }, 8 /* PROPS */, ["modelValue", "items", "selected", "show-select-all", "render-when-empty"])])];
                 }),
                 _: 1 /* STABLE */
-              }, 8 /* PROPS */, ["tab"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.newChart.type == 'total-commissions-per-user-per-day' || $data.newChart.type == 'new-commissions-per-user-per-day' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_38, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
+              }, 8 /* PROPS */, ["tab"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.newChart.type == 'total-commissions-per-user-per-day' || $data.newChart.type == 'new-commissions-per-user-per-day' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_search, {
                 modelValue: $data.userKeyword,
                 "onUpdate:modelValue": _cache[18] || (_cache[18] = function ($event) {
                   return $data.userKeyword = $event;
