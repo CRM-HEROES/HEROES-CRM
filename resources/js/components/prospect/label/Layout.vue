@@ -190,6 +190,7 @@ import { FETCH_LABELS, REMOVE_LABEL } from "@/actions/project/label";
 import { OPEN_MODAL } from "@/actions/modal";
 import { OPEN_SUB_SLIDE } from "@/actions/slide";
 
+import SelectionList from "../filters/SelectionList.vue";
 import LabelService from "@/apis/project/label";
 import CategoryService from "@/apis/project/category";
 import CategoryRow from "./CategoryRow.vue";
@@ -197,6 +198,7 @@ import LabelRow from "./LabelRow.vue";
 
 export default {
     components: {
+        SelectionList,
         CategoryRow,
         LabelRow,
     },

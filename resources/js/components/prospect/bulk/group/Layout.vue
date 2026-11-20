@@ -59,10 +59,12 @@ import { CLOSE_SLIDE } from "@/actions/slide";
 
 // Components
 import GroupRow from "./GroupRow.vue";
+import SelectionList from "../../filters/SelectionList.vue";
 
 export default {
     components: {
         GroupRow,
+        SelectionList,
     },
 
     data() {

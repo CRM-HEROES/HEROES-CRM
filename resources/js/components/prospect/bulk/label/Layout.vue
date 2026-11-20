@@ -128,11 +128,13 @@ import { FETCH_LABELS } from "@/actions/project/label";
 import { OPEN_MODAL } from "@/actions/modal";
 import { CLOSE_SLIDE } from "@/actions/slide";
 
+import SelectionList from "../../filters/SelectionList.vue";
 import CategoryRow from "./CategoryRow.vue";
 import LabelRow from "./LabelRow.vue";
 
 export default {
     components: {
+        SelectionList,
         CategoryRow,
         LabelRow,
     },
