@@ -842,6 +842,15 @@ class WorkflowCommunicationTest extends TestCase
         $this->assertSame(2, Message::count());
     }
 
+    public function test_an_email_that_is_only_a_place_holder_cannot_be_published(): void
+    {
+        $errors = $this->errors($this->graph($this->email(['body' => '<p>[À CHARGER : AB3]</p>'])));
+
+        $this->assertCount(1, $errors);
+        $this->assertStringContainsString('pas encore été chargé', $errors[0]);
+        $this->assertSame([], $this->errors($this->graph($this->email(['body' => '<p>Un vrai email</p>']))));
+    }
+
     public function test_the_protections_of_the_step_are_checked_when_publishing(): void
     {
         $errors = fn (array $options) => $this->errors($this->graph($this->email($options)));

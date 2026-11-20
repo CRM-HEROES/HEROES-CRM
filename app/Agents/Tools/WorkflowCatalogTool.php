@@ -78,7 +78,8 @@ class WorkflowCatalogTool implements AgentToolInterface
                     . 'Le texte et l\'objet peuvent contenir {{prospect.firstname}}, {{field.<slug>}} (un champ personnalisé du prospect), {{prospect.unsubscribe_url}} (le lien personnel « ne plus recevoir ces emails », à mettre dans les emails marketing) et des blocs {% if field.x == "oui" %}...{% else %}...{% endif %}. '
                     . 'design.style : "branded" (bandeau de couleur), "simple" (texte seul) ou "plain" (l\'email est déjà complet, avec sa propre mise en page : le CRM n\'ajoute rien autour). '
                     . 'Protections facultatives de l\'étape : "daily_limit": "wait" (un 2e email du jour part demain) ou "skip" (abandonné), "quiet_days_before" / "quiet_days_after" (silence N jours avant/après un rendez-vous du contact), "skip_minors": true. '
-                    . 'Quelqu\'un qui s\'est désinscrit ne reçoit jamais rien.',
+                    . 'Quelqu\'un qui s\'est désinscrit ne reçoit jamais rien. '
+                    . 'Si tu ne disposes pas du texte exact d\'un email, mets dans body le repère « <p>[À CHARGER : CODE]</p> » : le brouillon est enregistré, mais la publication est refusée tant que ce repère y est (la personne charge le fichier de l\'email dans l\'éditeur).',
                 'example' => [
                     'nodes' => [
                         ['id' => 'trigger', 'type' => 'trigger', 'config' => ['trigger' => 'prospect.created']],

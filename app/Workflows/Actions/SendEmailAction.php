@@ -55,6 +55,11 @@ class SendEmailAction extends CommunicationAction
      */
     protected const MAX_COPIES = 50;
 
+    /**
+     * Written in the body of an email that is only a place holder: publishing is refused until it is replaced
+     */
+    public const TO_LOAD = '[À CHARGER';
+
     protected function capability(): string
     {
         return ProviderRegistry::EMAIL;
@@ -76,6 +81,11 @@ class SendEmailAction extends CommunicationAction
 
         if (trim(strip_tags((string) ($config['body'] ?? ''), '<img>')) === '') {
             $errors[] = "L'action \"$label\" ({$this->actionName()}) n'a pas de contenu.";
+        }
+
+        // A draft prepared by someone else (an agent) marks the emails still to be loaded: such an email must not go out
+        if (str_contains((string) ($config['body'] ?? ''), self::TO_LOAD)) {
+            $errors[] = "L'email de l'action \"$label\" n'a pas encore été chargé : il contient encore le repère « " . self::TO_LOAD . ' ».';
         }
 
         if (mb_strlen((string) ($config['subject'] ?? '')) > 255) {
